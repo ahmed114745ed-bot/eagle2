@@ -99,7 +99,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'skyPay',
         ], [
             'photo' => 'images/paysky.png',
-            'status' => 0,
+            'status' => 1,
              'type' => 'sky_pay',
          ]);
 
@@ -192,7 +192,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'opay',
         ], [
             'photo' => 'images/opay.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'opay',
         ]);
 
@@ -341,7 +341,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'mada',
         ], [
             'photo' => 'images/mada.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'mada',
         ]);
 
@@ -382,7 +382,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'liqpay',
         ], [
             'photo' => 'images/liqpay.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'liq_pay',
         ]);
 
@@ -423,7 +423,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paypal',
         ], [
             'photo' => 'images/paypal.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'paypal',
         ]);
 
@@ -465,7 +465,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paytm',
         ], [
             'photo' => 'images/paytm.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'paytm',
         ]);
 
@@ -511,7 +511,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paytabs',
         ], [
             'photo' => 'images/paytabs.webp',
-            'status' => 0,
+            'status' => 1,
             'type' => 'paytabs',
         ]);
 
@@ -558,7 +558,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'bkash',
         ], [
             'photo' => 'images/bkash.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'bkash',
         ]);
 
@@ -608,7 +608,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'razorpay',
         ], [
             'photo' => 'images/razorpay.webp',
-            'status' => 0,
+            'status' => 1,
             'type' => 'razor_pay',
         ]);
 
@@ -649,7 +649,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'senangpay',
         ], [
             'photo' => 'images/senangpay.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'senang_pay',
         ]);
 
@@ -696,7 +696,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paymob_accept',
         ], [
             'photo' => 'images/paymob.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'paymob_accept',
         ]);
 
@@ -752,7 +752,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'flutterwave',
         ], [
             'photo' => 'images/flutterwave.jpg',
-            'status' => 0,
+            'status' => 1,
             'type' => 'flutter_wave',
         ]);
 
@@ -799,7 +799,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paystack',
         ], [
             'photo' => 'images/paystack.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'pay_stack',
         ]);
 
@@ -850,7 +850,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'sslcommerz',
         ], [
             'photo' => 'images/sslcommerz.png',
-            'status' => 0,
+            'status' => 1,
             'type' => 'ssl_commerz',
         ]);
 
@@ -894,10 +894,15 @@ class PaymentGatewaysSeeder extends Seeder
         ]);
 
         $google_pay_fields = [
-            'new_2' => [
-                "name" => "google_pay_merchant_id",
+            'new_1' => [
+                "name" => "google_pay_payment_url",
                 "type" => "input",
-                "value" => "123"
+                "value" => "test"
+            ],
+            'new_2' => [
+                "name" => "google_pay_node_server_name",
+                "type" => "input",
+                "value" => "test"
             ],
         ];
 

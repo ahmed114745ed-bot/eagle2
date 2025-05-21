@@ -351,7 +351,52 @@ return [
     "sslcommerz_payment_address" => "Payment Address",
 
     //googlePay
-    "google_pay_merchant_id" => "Merchant Id",
+    "payment_url" => "Payment Url",
+    "node_server_name" => "Node Server Name",
+
+    //mada
+    "access_token" => "Access Token",
+    "payment_address" => "Payment Address",
+
+    //LiqPay
+    "private_key" => "Private Key",
+
+    //PayPal
+    "client_id" => "Client Id",
+    "client_secret" => "Client Secret",
+
+    //Paytm
+    "merchant_key" => "Merchant Key",
+    "merchant_website_link" => "Merchant Website Link",
+
+    //PayTabs
+    "profile_id" => "Profile Id",
+    "server_key" => "Server Key",
+
+    //bKash
+    "appkey" => "App Key",
+    "app_secret" => "App Secret",
+
+    //Razorpay
+    "api_secret" => "Api Secret",
+
+    //SenangPay
+    "callback_url" => "Callback Url",
+
+    //Paymob Accept
+    "iframe_id" => "Iframe Id",
+    "integration_id" => "Integration Id",
+    "hmac" => "Hmac",
+
+    //Flutter Wave
+    "hash" => "Hash",
+
+    //Paystack
+    "merchant_email" => "Merchant Email",
+
+    //SSLCommerz
+    "store_id" => "Store Id",
+    "store_password" => "Store Password",
 
     //huaweiPay
     "huawei_pay_merchant_id" => "Merchant Id",
@@ -377,9 +422,14 @@ return [
     'google_pay'    => 'Google Pay',
     'huawei_pay'    => 'Huawei Pay',
 
-    'creator' => 'admin'
+    "target_no" => 'Target Number',
+    "diamonds" => 'Diamond Target',
+    "usd" => 'dollar',
+    "agency_share" => 'Agents Salary',
+    "db_percentage" => 'BD Percentage',
+    "hours" => "Hours",
+    "days" => "Days",
 
 
-
-
+    'creator' => 'admin',
 ];

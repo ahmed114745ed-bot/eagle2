@@ -4,13 +4,13 @@ namespace App\Admin\Controllers;
 
 use App\Helpers\Common;
 use App\Models\Target;
+use Encore\Admin\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\MessageBag;
 use PDF;
 class TargetController extends MainController
@@ -18,17 +18,10 @@ class TargetController extends MainController
     use HasResourceActions;
     public $permission_name = 'target';
 
-
-    public function __construct()
-    {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-    }
-
     public function index(Content $content)
     {
+        checkAgencyFeature();
+
         return parent::index($content
             ->title(trans('targets'))
             ->body($this->grid()));
@@ -199,12 +192,12 @@ class TargetController extends MainController
             ";
             });
         $grid->tools(function (Grid\Tools $tools) {
-            $url = '/admin/download-target-pdf';
-            $create_new = __('export pdf');
-            $button = '<a href="' . $url . '" class="btn btn-sm btn-success" target="_blank">
-              <i class="fa fa-download"></i>&nbsp;&nbsp;' . $create_new . '</a>';
+            $button = '<button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#exportPdfModal">
+        <i class="fa fa-download"></i> ' . __('export pdf') . '
+    </button>';
             $tools->append($button);
         });
+
         // $grid->tools(function (Grid\Tools $tools) {
         //     $url = route('download.target.pdf');
         //     $button = <<<HTML
@@ -215,6 +208,34 @@ class TargetController extends MainController
 
         //     $tools->append($button);
         // });
+        Admin::html(
+            '<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <form id="exportPdfForm" method="GET" action="/admin/download-target-pdf" target="_blank">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exportPdfLabel">' . __('Choose Columns to Export') . '</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <label><input type="checkbox" name="columns[]" value="target_no" checked> ' . __('Target No') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="diamonds" checked> ' . __('Diamonds') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="usd" checked> ' . __('Host Percentage') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="agency_share" checked> ' . __('Agency Share') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="db_percentage" checked> ' . __('DB Percentage') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="hours" checked> ' . __('Hours') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="days" checked> ' . __('Days') . '</label><br>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="submit" class="btn btn-primary">' . __('Export PDF') . '</button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>'
+            );
 
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -530,15 +551,24 @@ class TargetController extends MainController
     }
 
 
-    public function downloadTargetPdf()
+    public function downloadTargetPdf(HttpRequest $request)
     {
         try {
-            $targets = Target::orderByDesc('diamonds')->get();
+            $selectedColumns = $request->input('columns', []);
+
+            $targets = Target::orderBy('diamonds')->get();
             //$pdf = Pdf::loadView('target_pdf', compact('targets'));
-            $pdf = PDF::loadView('target_pdf', compact('targets'));
+//            $pdf = PDF::loadView('target_pdf', compact('targets'));
+//            return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
+
+            $pdf = PDF::loadView('target_pdf', [
+                'targets' => $targets,
+                'selectedColumns' => $selectedColumns,
+            ]);
+
             return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
         } catch (\Exception $e) {
-
+            info($e->getMessage());
             return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
     }

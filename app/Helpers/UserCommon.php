@@ -82,43 +82,49 @@ class UserCommon
         return $data;
     }
 
-    public static function UserStatistic($userId, $type, bool $reals = false)
+    public static function UserStatistic($userId, $type, bool $reals = false, \DateTime $startDate = null, \DateTime $endDate = null)
     {
-        $user = User::withCount(["reals" => function ($reals) use ($type) {
+        $timezone = getTimezone();
+        if ($startDate == null || $endDate == null) {
+
+            $startDate = Carbon::now($timezone)->startOfMonth()->timezone('UTC');
+            $endDate = Carbon::now($timezone)->endOfMonth()->timezone('UTC');
+        }
+        $user = User::withCount(["reals" => function ($reals) use ($type, $startDate, $endDate) {
             if ($type == 0) {
-                $reals->whereDate("reals.created_at", date("Y-m-d"));
+                $reals->whereBetween("reals.created_at", getToday());
             } elseif ($type == 1) {
-                $reals->whereMonth("reals.created_at", date("m"))->whereYear("reals.created_at", date("Y"));
+                $reals->whereBetween('reals.created_at', [$startDate, $endDate]);
             }
-        }, 'real_comments' => function ($real_comments) use ($type) {
+        }, 'real_comments' => function ($real_comments) use ($type, $startDate, $endDate) {
             if ($type == 0) {
-                $real_comments->whereDate("real_user_comments.created_at", date("Y-m-d"));
+                $real_comments->whereBetween("real_user_comments.created_at", getToday());
             } elseif ($type == 1) {
-                $real_comments->whereMonth("real_user_comments.created_at", date("m"))->whereYear("real_user_comments.created_at", date("Y"));
+                $real_comments->whereBetween("real_user_comments.created_at", [$startDate, $endDate]);
             }
-        }, 'real_likes' => function ($real_likes) use ($type) {
+        }, 'real_likes' => function ($real_likes) use ($startDate, $endDate, $type) {
             if ($type == 0) {
-                $real_likes->whereDate("real_user_likes.created_at", date("Y-m-d"));
+                $real_likes->whereBetween("real_user_likes.created_at", getToday());
             } elseif ($type == 1) {
-                $real_likes->whereMonth("real_user_likes.created_at", date("m"))->whereYear("real_user_likes.created_at", date("Y"));
+                $real_likes->whereBetween("real_user_likes.created_at", [$startDate, $endDate]);
             }
-        }, 'moments' => function ($moments) use ($type) {
+        }, 'moments' => function ($moments) use ($startDate, $endDate, $type) {
             if ($type == 0) {
-                $moments->whereDate("moment.created_at", date("Y-m-d"));
+                $moments->whereBetween("moment.created_at", getToday());
             } elseif ($type == 1) {
-                $moments->whereMonth("moment.created_at", date("m"))->whereYear("moment.created_at", date("Y"));
+                $moments->whereBetween("moment.created_at", [$startDate, $endDate]);
             }
-        }, 'moment_comments' => function ($moment_comments) use ($type) {
+        }, 'moment_comments' => function ($moment_comments) use ($startDate, $endDate, $type) {
             if ($type == 0) {
-                $moment_comments->whereDate("moment_user_comments.created_at", date("Y-m-d"));
+                $moment_comments->whereBetween("moment_user_comments.created_at", getToday());
             } elseif ($type == 1) {
-                $moment_comments->whereMonth("moment_user_comments.created_at", date("m"))->whereYear("moment_user_comments.created_at", date("Y"));
+                $moment_comments->whereBetween("moment_user_comments.created_at", [$startDate, $endDate]);
             }
-        }, 'moment_likes' => function ($moment_likes) use ($type) {
+        }, 'moment_likes' => function ($moment_likes) use ($startDate, $endDate, $type) {
             if ($type == 0) {
-                $moment_likes->whereDate("moment_user_likes.created_at", date("Y-m-d"));
+                $moment_likes->whereBetween("moment_user_likes.created_at", getToday());
             } elseif ($type == 1) {
-                $moment_likes->whereMonth("moment_user_likes.created_at", date("m"))->whereYear("moment_user_likes.created_at", date("Y"));
+                $moment_likes->whereBetween("moment_user_likes.created_at", [$startDate, $endDate]);
             }
         }])->find($userId);
 

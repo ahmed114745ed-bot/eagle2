@@ -18,6 +18,7 @@
     "charge-reports": "Şarj raporları",
     "Achievement Id" : "Başarı Kimliği",
     "Badges" : "rozetler",
+    "this room has been banned.": "Bu oda yasaklandı.",
     "Owner uuid": "Sahip Kimlik Numarası",
     "Roles": "Roller",
     "Agency wallet": "Ajans cüzdanı",
@@ -2272,7 +2273,9 @@
   "create charge country": "Ülke Ücreti Oluştur",
   "shipping agency switch": "Nakliye Ajansı Anahtarı",
   "browse updates_group_chat": "Grup Sohbet Güncellemelerini Görüntüle",
-   "agency does not have this coin": "Ajansın bu kadar jetonu yok."
+   "agency does not have this coin": "Ajansın bu kadar jetonu yok.",
+   "Game profits": "Oyun kazançları",
+   "role name": "Rol adı"
 
 
 

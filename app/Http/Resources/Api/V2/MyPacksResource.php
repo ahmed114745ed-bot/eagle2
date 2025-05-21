@@ -72,6 +72,7 @@ class MyPacksResource extends JsonResource
             'svg'       =>  $this->img2 ?? '',
             'price' => @$this->price ?? '',
             'price_item' => @$this->ware->price ?? '',
+            'image_type' => $this->ware->image_type ?? "",
             'is_dress' => $is_dress ?? 0,
             'title' => $title,
             'color' => $color,

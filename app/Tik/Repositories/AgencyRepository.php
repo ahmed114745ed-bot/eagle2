@@ -25,15 +25,21 @@ class AgencyRepository extends AbstractRepository
         return  $data->first();
     }
 
-    public function find($id){
+    public function find($id)
+    {
         return $this->model->find($id);
+    }
+
+    public function filterAgency($id)
+    {
+        return $this->model->whereRaw('CAST(id AS CHAR) LIKE ?', [$id . '%'])->with('owner','AgencypaymentGateways')->get();
     }
     public function findById($id)
     {
-       
-        return $this->model->with(['additionalInfo', 'mempers','admins'])
-        ->withCount('mempers')
-        ->where('id', $id)->first();
+
+        return $this->model->with(['additionalInfo', 'mempers', 'admins'])
+            ->withCount('mempers')
+            ->where('id', $id)->first();
     }
     public function findByStatus($id)
     {
@@ -90,7 +96,8 @@ class AgencyRepository extends AbstractRepository
         })->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function getAllActiveAgency($id){
+    public function getAllActiveAgency($id)
+    {
         return $this->model->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->where(function ($query) {
@@ -103,7 +110,8 @@ class AgencyRepository extends AbstractRepository
         })->orderByDesc('id')->get();
     }
 
-    public function agencyById($id){
+    public function agencyById($id)
+    {
         return $this->model->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
                 'additionalInfo',
@@ -203,7 +211,7 @@ class AgencyRepository extends AbstractRepository
 
     public function report($id, $month = null, $year = null, $perPage, $page)
     {
-       return $this->model->when(isset($id), function ($query) use ($id) {
+        return $this->model->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->whereHas('agencySalaries', function ($q) use ($month, $year) {
             $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {
