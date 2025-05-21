@@ -15,10 +15,14 @@ use Modules\SalaryTransaction\Transformers\FilterAgencyMangerResource;
 
 class AgencyController extends Controller
 {
-    public function get_info()
+    public function get_info(?ShippingAgency $agency)
     {
         $user = Auth::user();
-        $agency = ShippingAgency::query()->with("countries", 'AgencypaymentGateways')->whereAppOwnerId($user->id)->first();
+
+        if (!$agency){
+            $agency = ShippingAgency::query()->with("countries", 'AgencypaymentGateways')->whereAppOwnerId($user->id)->first();
+        }
+
         if (!$agency) {
             return Common::apiResponse(1, __("api_responses.agency"), []);
         }

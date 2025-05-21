@@ -14,8 +14,10 @@ class AgencyResource extends JsonResource
      */
     public function toArray($request)
     {
+        $isOwner = $this->app_owner_id == auth()->id();
+
         $owner = new \stdClass();
-        if ($request->user () && ($this->app_owner_id == $request->user ()->id)){
+        if ($request->user () && ($isOwner)){
             $owner = new \stdClass();
         }else{
             $owner = new MiniUserResource($this->owner);
@@ -32,9 +34,11 @@ class AgencyResource extends JsonResource
             'payments'=>@$this->AgencypaymentGateways,
             'countries'=>@$this?->countries,
             'owner'=>$owner,
-            'dollar'=>$this->salary,
-            'coins'=>$this->coins,
-            'salaryTransfer'=>$this->transfer_salary,
+            $this->mergeWhen($isOwner, [
+                'dollar' => $this->salary,
+                'coins' => $this->coins,
+                'salaryTransfer' => $this->transfer_salary,
+            ]),
         ];
     }
 }

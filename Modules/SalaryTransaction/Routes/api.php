@@ -33,7 +33,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
         Route::get('charge-country', [AgentSalaryTransactionController::class, 'charge_country']);
 
         Route::prefix('agencies')->group(function () {
-            Route::get('/get-info', [AgencyController::class, 'get_info']);
+            Route::get('/get-info/{shipping_agency?}', [AgencyController::class, 'get_info']);
             Route::post('/update-info', [AgencyController::class, 'update_info']);
             Route::post('search-agent', [AgentSalaryTransactionController::class, 'searchAgent']);
             Route::post('shipping-agencies', [AgentSalaryTransactionController::class, 'shipping_agencies']);
