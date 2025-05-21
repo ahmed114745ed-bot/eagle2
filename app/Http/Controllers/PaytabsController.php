@@ -11,6 +11,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\Processor;
 use App\Models\PaymentRequest;
+use Illuminate\Support\Facades\Cache;
 
 class Paytabs
 {
@@ -20,20 +21,26 @@ class Paytabs
 
     public function __construct()
     {
-        $config = $this->payment_config('paytabs', 'payment_config');
-        if (!is_null($config) && $config->mode == 'live') {
-            $this->config_values = json_decode($config->live_values);
-        } elseif (!is_null($config) && $config->mode == 'test') {
-            $this->config_values = json_decode($config->test_values);
-        }
+        $this->config_values = [
+            'profile_id'        => Common::getSettingValue('paytabs_profile_id'),
+            'server_key'        => Common::getSettingValue('paytabs_server_key'),
+            'base_url'          => Common::getSettingValue('paytabs_base_url'),
+            'payment_address'   => Common::getSettingValue('paytabs_payment_address'),
+        ];
+        
+    }
+
+    public function getConfig($key)
+    {
+        return $this->config_values[$key] ?? null;
     }
 
     function send_api_request($request_url, $data, $request_method = null)
     {
-        $data['profile_id'] = '145717';
+        $data['profile_id'] = $this->getConfig('profile_id');
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://secure-egypt.paytabs.com' . '/' . $request_url,
+            CURLOPT_URL => $this->getConfig('base_url') . '/' . $request_url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -41,7 +48,7 @@ class Paytabs
             CURLOPT_CUSTOMREQUEST => isset($request_method) ? $request_method : 'POST',
             CURLOPT_POSTFIELDS => json_encode($data, true),
             CURLOPT_HTTPHEADER => array(
-                'authorization:' .'SGJ9RLKBJD-JLDTM9HM99-HD2BDLLLWH',
+                'authorization:' . $this->getConfig('server_key'),
                 'Content-Type:application/json'
             ),
         ));
@@ -119,20 +126,6 @@ class PaytabsController extends Controller
         $log = $this->coinLogRepository->create($dataCoinLog);
       
 
-        // $validator = Validator::make($request->all(), [
-        //     'payment_id' => 'required|uuid'
-        // ]);
-
-        // if ($validator->fails()) {
-        //     return response()->json($this->response_formatter(GATEWAYS_DEFAULT_400, null, $this->error_processor($validator)), 400);
-        // }
-
-        // $payment_data = $this->payment::where(['id' => $request['payment_id']])->where(['is_paid' => 0])->first();
-        // if (!isset($payment_data)) {
-        //     return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
-        // }
-        // $payer = json_decode($payment_data['payer_information']);
-
         $plugin = new Paytabs();
         $request_url = 'payment/request';
         $data = [
@@ -143,7 +136,7 @@ class PaytabsController extends Controller
             "cart_amount" => round($log->paid_usd, 2),
             "cart_description" => "products",
             "paypage_lang" => "en",
-            "callback" => route('paytabs.callback'), // بدون ID هنا
+            "callback" => route('paytabs.callback'),   
             "return" => route('paytabs.return', ['payment_id' => $log->id]),
             "customer_details" => [
                 "name" => $user->name,
@@ -175,7 +168,8 @@ class PaytabsController extends Controller
         if (!isset($page['redirect_url'])) {
             return Common::apiResponse(0, 'try leter', null, 404);
         }
-        return redirect($page['redirect_url']);
+        return Common::apiResponse(1, '', ['url' => $page['redirect_url']], 200);
+        
     }
 
     public function callback(Request $request)
@@ -184,13 +178,12 @@ class PaytabsController extends Controller
         $transRef = $request->input('tranRef') 
         ?? $request->query('tranRef') 
         ?? $request->post('tranRef');
-    \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
+        \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
         $plugin = new Paytabs();
         $response_data = $_POST;
         $transRef = filter_input(INPUT_POST, 'tranRef');
         
         \Log::info("تم callback بنجاح للطلب رقم: " . $transRef);
-        dd($transRef);
 
         if (!$transRef) {
             return Common::apiResponse(0, 'try leter', null, 200);
