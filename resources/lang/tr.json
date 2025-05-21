@@ -2299,9 +2299,10 @@
   "edit admin profile": "Yönetici profilini düzenle",
   "browse updates_family config": "Güncellemeler_aile yapılandırmasını gözat",
   "updates_family config": "Güncellemeler_aile yapılandırması",
-
-
-  
+   "setting agency system": "Ajans sistemi ayarları",
+  "setting agency manager": "Ajans yöneticisi ayarları",
+  "Setting host agencies": "Barındırıcı ajans ayarları",
+  "setting internal sales system": "Dahili satış sistemi ayarları",
   "Remaining": "Kalan",
    "app BD id": "Uygulama BD Kimliği",
   "salaries BD": "BD Maaşları",

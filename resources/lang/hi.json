@@ -1821,7 +1821,11 @@
   "delete admin profile": "प्रशासक प्रोफ़ाइल हटाएं",
   "edit admin profile": "प्रशासक प्रोफ़ाइल संपादित करें",
   "browse updates_family config": "अपडेट्स_फैमिली कॉन्फ़िगरेशन ब्राउज़ करें",
-  "updates_family config": "अपडेट्स_फैमिली कॉन्फ़िगरेशन"
+  "updates_family config": "अपडेट्स_फैमिली कॉन्फ़िगरेशन",
+  "setting agency system": "एजेंसी सिस्टम सेटिंग",
+  "setting agency manager": "एजेंसी मैनेजर सेटिंग",
+  "Setting host agencies": "होस्ट एजेंसियों की सेटिंग",
+  "setting internal sales system": "आंतरिक बिक्री प्रणाली सेटिंग"
 
 
 

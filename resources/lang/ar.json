@@ -2440,7 +2440,11 @@
   "delete admin profile": "حذف ملف المسؤول",
   "edit admin profile": "تعديل ملف المسؤول",
   "browse updates_family config": "استعراض إعدادات تحديث العائلة",
-  "updates_family config": "إعدادات تحديث العائلة"
+  "updates_family config": "إعدادات تحديث العائلة",
+  "setting agency system": "إعداد نظام الوكالة",
+  "setting agency manager": "إعداد مدير الوكالة",
+  "Setting host agencies": "إعداد وكالات الاستضافة",
+  "setting internal sales system": "إعداد نظام المبيعات الداخلية"
 
 
 
