@@ -488,7 +488,7 @@
             <button onclick="showSection('chargesSettings')">{{ __('Charges settings') }}</button>
         </div>
     </div>
-    <div class="all-page" style="    width: 100%;">
+    <div class="all-page" style="width: 100%;">
 
 
         <div class="settings-content">
