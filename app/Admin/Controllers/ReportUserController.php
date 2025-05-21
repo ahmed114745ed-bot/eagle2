@@ -10,8 +10,6 @@ use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use Illuminate\Support\Facades\Request;
-use Carbon\Carbon;
 
 class ReportUserController extends MainController
 {
@@ -86,13 +84,12 @@ class ReportUserController extends MainController
             $filter->disableIdFilter();
 
             $filter->where(function ($query) {
-                $year = Request::input('year', now()->year); // Default to current year
-                $query->whereYear('created_at', $year);
-            }, __('Year'), 'year')->integer()->default(now()->year);
+                //   $year = Request::input('year');
 
+            }, __('Year'), 'year')->integer()->default(now()->year);
             $filter->where(function ($query) {
-                $month = Request::input('month', now()->month); // Default to current month
-                $query->whereMonth('created_at', $month);
+                //  $month = Request::input('month');
+
             }, __('Month'), 'month')->integer()->default(now()->month);
 
             $filter->column(1 / 2, function ($filter) {
@@ -179,8 +176,9 @@ class ReportUserController extends MainController
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
             });
+           
         }
-        $grid->disableActions();
+         $grid->disableActions();
         return $grid;
     }
 

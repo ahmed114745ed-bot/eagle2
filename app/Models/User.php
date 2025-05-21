@@ -440,7 +440,7 @@ class User extends Authenticatable
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class);
+        return $this->belongsTo(Agency::class, 'agency_id');
     }
 
     public function agencies()

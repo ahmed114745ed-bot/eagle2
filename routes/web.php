@@ -141,6 +141,15 @@ Route::get('/clear_clear', function () {
 //    return "Seeded!";
 //});
 
+Route::get('/change_agencies_type', function () {
+
+    DB::table('agencies')
+        ->where('type', 0)
+        ->update(['type' => 1]);
+
+    return "Done!";
+});
+
 Route::get('/config_cache', function () {
     return Artisan::call('config:cache');
 });

@@ -21,8 +21,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->boolean('Host_agency')->default(false);
-            $table->boolean('Shipping_agency')->default(false);
+            // $table->boolean('Host_agency')->default(false);
+            // $table->boolean('Shipping_agency')->default(false);
             $table->dropColumn('type');
         });
     }
