@@ -142,7 +142,7 @@ class AgencyService
                     'minutes' => $minutes,
                 ],
 
-                'target' =>(string) $target,
+                'target' =>floor($target),
                 'rate_percentage' => $result,
                 'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
             ],
