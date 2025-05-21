@@ -90,7 +90,7 @@ class SettingsController extends Controller
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token', 'super_admin_coins');
+        $data = $request->except('_token');
 
 
 

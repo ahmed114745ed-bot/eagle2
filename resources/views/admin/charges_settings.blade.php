@@ -515,8 +515,7 @@
                     <div class="form-group soon">
                         <label>{{ __('Super Admin') }}</label>
                         <input type="text" name="super_admin_coins" id="super_admin_coins"
-                               value="00000" class="form-control" disabled>
-                               <!-- value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control"> -->
+                               value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control">
                         <small id="super_admin_coins_hint" class="form-text text-muted mt-1"
                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
                             {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
