@@ -2293,7 +2293,12 @@
 "show Real": "Videoyu Göster",
 " browse charger report": "Şarj cihazı raporunu gözat",
   "gift price": "hediye fiyatı",
-
+  "browse charge level": "Şarj seviyesini gözat",
+  "create admin profile": "Yönetici profili oluştur",
+  "delete admin profile": "Yönetici profilini sil",
+  "edit admin profile": "Yönetici profilini düzenle",
+  "browse updates_family config": "Güncellemeler_aile yapılandırmasını gözat",
+  "updates_family config": "Güncellemeler_aile yapılandırması",
 
 
   
