@@ -195,12 +195,14 @@ class AdminPermission extends Seeder
             ['name' => 'Events', 'sort' => 22, 'permissions' => ['event-period', 'target-event', 'pk-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'general-roles', 'event_report']],
             ['name' => 'Reels', 'sort' => 23, 'permissions' => ['Real', 'report-real']],
             ['name' => 'Moment', 'sort' => 24, 'permissions' => ['moment', 'report-moment']],
-            ['name' => 'Work Settings', 'sort' => 25, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history']],
-            ['name' => 'Sensitive Settings', 'sort' => 26, 'permissions' => ['updates', 'config']],
-            ['name' => 'System Settings', 'sort' => 27, 'permissions' => ['settings', 'language', 'daily-prize']],
+            ['name' => 'Employees and Permissions', 'sort' => 25, 'permissions' => [ 'auth-users', 'roles']],
+            ['name' => 'Work Settings', 'sort' => 26, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history']],
+            ['name' => 'Sensitive Settings', 'sort' => 27, 'permissions' => ['updates', 'config']],
+            ['name' => 'System Settings', 'sort' => 28, 'permissions' => ['settings', 'language', 'daily-prize']],
             ['name' => 'Level', 'sort' => 29, 'permissions' => ['level', 'level-interval']],
-            ['name' => 'user parent', 'sort' => 29, 'permissions' => ['user-parent']],
         ];
+
+        RoleCategory::where('slug', 'user parent')->delete();
 
         // Step 2: Save categories to rolecategories table
         foreach ($categories as $category) {
@@ -260,7 +262,7 @@ class AdminPermission extends Seeder
 
         DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
         $actions = ['create', 'edit', 'delete', 'show', 'charge'];
-        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate', 'level-user-history', 'agent-request-history', 'salary-history', 'request-agency-history', 'updates_group_chat', 'users-family', 'uuid-dedicate','all-statistic'];
+        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate', 'level-user-history', 'agent-request-history', 'salary-history', 'request-agency-history', 'updates_group_chat', 'users-family', 'uuid-dedicate', 'all-statistic'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -271,7 +273,7 @@ class AdminPermission extends Seeder
         })->delete();
 
         $actions = ['create', 'delete', 'show'];
-        $targets = ['update_setting_button', 'agency-settings', 'agency-setting', 'settings', 'charge-settings', 'room-settings', 'ovip-settings', 'box-settings', 'moment-settings', 'reel-settings', 'chat-setting', 'user-status', 'updates_family-config', 'agora-zego'];
+        $targets = ['update_setting_button', 'agency-settings', 'agency-setting', 'settings', 'charge-settings', 'room-settings', 'ovip-settings', 'box-settings', 'moment-settings', 'reel-settings', 'chat-setting', 'user-status', 'updates_family-config', 'agora-zego','updates'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -294,6 +296,17 @@ class AdminPermission extends Seeder
 
         $actions = ['create'];
         $targets = ['box-use'];
+
+        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
+            foreach ($actions as $action) {
+                foreach ($targets as $target) {
+                    $query->orWhere('slug', 'like', "{$action}-{$target}");
+                }
+            }
+        })->delete();
+
+        $actions = ['browse'];
+        $targets = ['user-parent'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
