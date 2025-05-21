@@ -899,7 +899,7 @@ class User extends Authenticatable
 
     public function getTotalSenderLevelAttribute()
     {
-        return $this->sender_level + $this->sub_sender_level;
+        return $this->sender_level;
     }
 
     public function getTotalSenderDiamondsAttribute()
@@ -919,13 +919,12 @@ class User extends Authenticatable
 
     public function setTotalSenderLevelAttribute(float $value)
     {
-        $level = $this->sender_level + $this->sub_sender_level;
+        $level = $this->sender_level;
         if ($level == $value) return;
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
 
-        $this->sub_sender_level = $value - $this->sender_level;
-        $diamonds               =
-            (@Vip::query()->where('type', 2)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
+        $this->sub_sender_level = 0;
+        $diamonds  = (@Vip::query()->where('type', 2)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         //        $this->sub_sender_num   = $diamonds - $this->total_diamond_send;
         //        $this->sub_sender_num   = ($diamonds - $this->total_diamond_send) + (( (( $diamonds - $this->total_diamond_send) * ( 2 * ($expPercentages[0] / 100)))) );
         /*if ($expPercentages[0] <= 1) {
@@ -1344,7 +1343,7 @@ class User extends Authenticatable
     {
         $userSallary = $this->bdSalaries()
             ->sum(DB::raw('sallary - cut_amount'));
-        return floor($userSallary );
+        return floor($userSallary);
     }
     public function incrementCutAmountInBdSallary(int $amount)
     {
@@ -1358,5 +1357,4 @@ class User extends Authenticatable
 
         return false;
     }
-
 }

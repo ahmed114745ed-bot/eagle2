@@ -119,11 +119,7 @@ class UpdateUserWhenSendGift
         $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages['exp_sender_percentage'];
         // dd($total,$totalDiamondSend,$totalDiamond ,$this->expPercentages['exp_sender_percentage']);
         $levelVip                 = $this->getLevel(2, $total);
-        if ($subSenderLevel < 0) {
-
-            return $levelVip != null ? (@$levelVip->level + $subSenderLevel) ?? 0 : 0;
-        }
-        return $levelVip != null ? (@$levelVip->level - $subSenderLevel) ?? 0 : 0;
+        return $levelVip != null ? (@$levelVip->level ) ?? 0 : 0;
     }
 
     public function getRoomLevel($total)
