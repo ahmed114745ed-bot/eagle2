@@ -134,12 +134,12 @@ Route::get('/clear_clear', function () {
     return "Cleared!";
 });
 
-Route::get('/seed', function () {
-
-    Artisan::call('db:seed');
-
-    return "Seeded!";
-});
+//Route::get('/seed', function () {
+//
+//    Artisan::call('db:seed');
+//
+//    return "Seeded!";
+//});
 
 Route::get('/config_cache', function () {
     return Artisan::call('config:cache');
