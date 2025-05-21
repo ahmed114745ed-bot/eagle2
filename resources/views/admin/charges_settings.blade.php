@@ -500,7 +500,7 @@
             @csrf
             <div class="form row">
                 <div class="col-md-6">
-                    <div class="form-group soon">
+                    <div class="form-group ">
                         <label>{{ __('Zones') }}</label>
                         <input type="text" name="zones_coins" id="zones_coins"
                                value="{{ $settings['zones_coins'] ?? '' }}" class="form-control">
@@ -512,7 +512,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group soon">
+                    <div class="form-group ">
                         <label>{{ __('Super Admin') }}</label>
                         <input type="text" name="super_admin_coins" id="super_admin_coins"
                                value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control">
