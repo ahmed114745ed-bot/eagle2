@@ -336,7 +336,52 @@ return [
     "sslcommerz_payment_address" => "भुगतान पता",
 
     //googlePay
-    "google_pay_merchant_id" => "व्यापारी आईडी",
+    "payment_url"       => "भुगतान लिंक",
+    "node_server_name"  => "नोड सर्वर नाम",
+
+    // Mada
+    "access_token"      => "एक्सेस टोकन",
+    "payment_address"   => "भुगतान पता",
+
+    // LiqPay
+    "private_key"       => "प्राइवेट की",
+
+    // PayPal
+    "client_id"         => "क्लाइंट आईडी",
+    "client_secret"     => "क्लाइंट सीक्रेट",
+
+    // Paytm
+    "merchant_key"             => "व्यापारी कुंजी",
+    "merchant_website_link"    => "व्यापारी वेबसाइट लिंक",
+
+    // PayTabs
+    "profile_id"        => "प्रोफ़ाइल आईडी",
+    "server_key"        => "सर्वर कुंजी",
+
+    // bKash
+    "appkey"            => "ऐप कुंजी",
+    "app_secret"        => "ऐप सीक्रेट",
+
+    // Razorpay
+    "api_secret"        => "एपीआई सीक्रेट",
+
+    // SenangPay
+    "callback_url"      => "कॉलबैक यूआरएल",
+
+    // Paymob Accept
+    "iframe_id"         => "आईफ्रेम आईडी",
+    "integration_id"    => "इंटीग्रेशन आईडी",
+    "hmac"              => "एचएमएसी",
+
+    // Flutter Wave
+    "hash"              => "हैश",
+
+    // Paystack
+    "merchant_email"    => "व्यापारी ईमेल",
+
+    // SSLCommerz
+    "store_id"          => "स्टोर आईडी",
+    "store_password"    => "स्टोर पासवर्ड",
 
     //huaweiPay
     'huawei_pay_merchant_id' => 'मर्चेंट आईडी',

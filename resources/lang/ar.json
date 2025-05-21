@@ -412,6 +412,8 @@
     "current phone not verified": "لم يتم التحقق من الهاتف الحالي",
     "account deleted successfully": "تم حذف الحساب بنجاح",
     "please set usd_value_in_coins in configs": "يرجى تعيين usd_value_in_coins في الإعدادات",
+    "please set usd_value_in_coins in configs. Contact the administration!": "يرجى ضبط قيمة usd_value_in_coins في الإعدادات. يرجى التواصل مع الإدارة!",
+    "this agency not found": "هذه الوكالة غير موجودة",
     "balance not enough": "الرصيد غير كافي",
     "missing owner_id": "معرف المستخدم مفقود",
     "Missing data": "بيانات مفقودة",
@@ -536,6 +538,12 @@
     "PK": "PK",
     "Party" : "حفلة",
     "Festival": "مهرجان",
+    "Experience settings:" : "اعدادات نقاط الخبرة Exp :",
+    "wealth": "الثروة",
+    "attraction" : "الجاذبية",
+    "gift_price" : "سعر الهديه",
+    "coins_number": "عدد العملات",
+    "live_experience": "تجربة حية",
     "from uid": "معرف مستخدم المرسل",
     "get_type": "النوع الاساسي",
     "color": "اللون",
@@ -1764,9 +1772,11 @@
     "Group Chat":"دردشة جماعية",
     "Settings":"الأعدادات",
     "Agency System":"نظام الوكالات",
-    "Agency Feature is Disabled, Contact the administration": "ميزة الوكالة معطلة، يرجى التواصل مع الإدارة",
-    "Agency Feature": "ميزة الوكالة",
-    "Enable Agency Feature": "تفعيل ميزة الوكالة",
+
+    "Agencies Count": "عدد الوكالات",
+    "BD Wallet": "محفظة Bd",
+    "My Wallet": "محفظتي",
+
     "Internal Sales System":"نظام البيع الداخلي",
     "App Feature": "ميزة التطبيق",
     "Countries Where Salary Payments Are Available":"الدول المتاح بها تسليم رواتب",
@@ -2257,7 +2267,15 @@
   "failed_reject_request": "فشل في رفض الطلب. يرجى المحاولة مرة أخرى.",
   "failed_make_admin": "فشل في ترقية المستخدم إلى مشرف. يرجى المحاولة مرة أخرى.",
   "This seat is out of the designated range" : "هذا المقعد خارج النطاق المحدد",
-
+  "cp_gift_price": "سعر هدية النقاط التنافسية",
+  "Enter Exp": "أدخل النقاط",
+  "rooms_gift_price": "سعر هدية الغرف",
+  "charge_gift_price": "سعر هدية الشحن",
+  "attraction_gift_price": "سعر هدية الجاذبية",
+  "Go to Settings": "انتقل إلى الإعدادات"
+,
+  "wealth_gift_price": "سعر هدية الثروة",
+  
   "browse agency settings": "عرض إعدادات الوكالة",
   "edit agency settings": "تعديل إعدادات الوكالة",
   "browse page": "عرض الصفحة",
@@ -2336,6 +2354,7 @@
   "user parent": " المستخدمون  ",
   "general": "عام",
    "Lucky box": "صندوق الحظ",
+   
 
   "Create Agencies": "إنشاء الوكالات",
   "browse report": "تصفح التقرير",
@@ -2388,7 +2407,34 @@
   "agency does not have this coin":"الوكالة لا تملك هذا العدد من القطع.",
   "Game profits": "أرباح الألعاب",
 "role name": "اسم الدور",
-" browse charger report": "تصفح تقرير الشاحن"
+" browse charger report": "تصفح تقرير الشاحن",
+  "gift price":"سعر الهدية",
+
+
+  "app BD id": "معرّف  BD",
+  "salaries BD": "محفظة  BD",
+  "my wallet": "محفظتي",
+  "My wallet": "محفظتي",
+  "request-agencies": "طلبات الوكالات",
+  "request agencies": "طلبات الوكالات",
+  "Request agencies": "طلبات الوكالات",
+
+  "current_balance": "الرصيد الحالي",
+  "remaining_percent": "النسبة المتبقية",
+  "cut": "الخصم",
+  "total": "الإجمالي",
+  "agency": "وكالة",
+  "List of Agencies": "قائمة الوكالات",
+  "confirm_charge": "تأكيد الشحن",
+  "enter_amount": "أدخل المبلغ",
+  "transfer_to_wallet": "تحويل إلى المحفظة",
+  "charge_wallet": "شحن المحفظة",
+  "current_balance": "الرصيد الحالي",
+  "select_target": "اختر المستهدف",
+  "bd_wallet_notice": "عند تحويلك مبلغ من الدولارات من محفظة الـ BD سيتم إضافة المبلغ إلى محفظتي، ثم يمكنك بيعه أو إرساله للآخرين من خلال صفحة محفظتي."
+ ,"confirm_transfer":"تحويل",
+  "total_sallary":" اجمالي دخل المرتبات",
+  "totalCut":" اجمالي المصروفات"
 
 
 

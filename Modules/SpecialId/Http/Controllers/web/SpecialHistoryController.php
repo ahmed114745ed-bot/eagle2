@@ -7,6 +7,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 use Modules\SpecialId\Entities\SpecialHistory;
 
 class SpecialHistoryController extends MainController

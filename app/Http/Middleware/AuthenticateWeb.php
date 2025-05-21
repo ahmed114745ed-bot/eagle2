@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Str;
 
 class AuthenticateWeb
 {
@@ -27,6 +28,13 @@ class AuthenticateWeb
             return redirect()->to($redirectTo . '?redirect_url=' . urlencode($test));
         }
 
+        $user = Admin::user();
+        $uri = $request->path(); 
+
+        if (Str::contains($uri, 'bd') && !$user->inRoles(['bd'])) {
+            abort(403, 'غير مصرح بالدخول');
+        }
+        
         return $next($request);
     }
 

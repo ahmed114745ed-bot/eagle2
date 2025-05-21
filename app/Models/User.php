@@ -209,9 +209,7 @@ class User extends Authenticatable
             ->where('uid', $this->id)
             ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
             ->havingRaw('SUM(hours) > 1')
-            ->get(); // Having condition
-
-
+            ->get();
 
         return $subQuery->count('entry_count');
     }
@@ -711,6 +709,9 @@ class User extends Authenticatable
         //        }
     }
 
+
+
+    
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level  + $this->sub_charger_level;
@@ -931,7 +932,7 @@ class User extends Authenticatable
             $this->sub_sender_num = ($diamonds - $expPercentages[0] * $this->total_diamond_send) / $expPercentages[0];
         } else {*/
 
-        $this->sub_sender_num = ceil(($diamonds / $expPercentages[0])) - $this->total_diamond_send;
+        $this->sub_sender_num = ceil(($diamonds / $expPercentages['exp_sender_percentage'])) - $this->total_diamond_send;
 
         //        }
     }
@@ -950,7 +951,7 @@ class User extends Authenticatable
         /*if ($expPercentages[0] <= 1) {
             $this->sub_receiver_num = ($diamonds - $this->total_diamond_received * $expPercentages[1]) / $expPercentages[1];
         } else {*/
-        $this->sub_receiver_num = (ceil(($diamonds / $expPercentages[1])) - $this->total_diamond_received);
+        $this->sub_receiver_num = (ceil(($diamonds / $expPercentages['exp_received_percentage'])) - $this->total_diamond_received);
 
         //        }
     }
@@ -1315,4 +1316,47 @@ class User extends Authenticatable
     {
         return $this->hasMany(WalletTransactionBackup::class);
     }
+
+    public function shippingAgency()
+    {
+        return $this->hasOne(ShippingAgency::class, 'app_owner_id');
+    }
+    public function hasShippingAgency()
+    {
+        return $this->shippingAgency()->exists();
+    }
+
+    public function hostAgency()
+    {
+        return $this->hasOne(Agency::class, 'app_owner_id');
+    }
+    public function hasHostAgency()
+    {
+        return $this->shippingAgency()->exists();
+    }
+
+    public function bdSalaries()
+    {
+        return $this->hasMany(BDSallary::class, 'bd_id');
+    }
+
+    public function getBdSalaryAttribute()
+    {
+        $userSallary = $this->bdSalaries()
+            ->sum(DB::raw('sallary - cut_amount'));
+        return floor($userSallary );
+    }
+    public function incrementCutAmountInBdSallary(int $amount)
+    {
+        $lastBdSalary = $this->bdSalaries()->latest()->first();
+    
+        if ($lastBdSalary) {
+            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);  
+            $lastBdSalary->update(['cut_amount' => $newAmount]);
+            return true;
+        }
+    
+        return false;
+    }
+    
 }

@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
+use App\Models\Agency;
+use App\Models\ShippingAgency;
+use App\Models\User;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository;
@@ -112,7 +115,7 @@ class ChargeRepoService
         }
     }
 
-    public function chargeToAgency(User $fromUser, Agency $toAgency, $coins, $isRoomTarget, $usd)
+    public function chargeToAgency(User $fromUser, ShippingAgency $toAgency, $coins, $isRoomTarget, $usd)
     {
         $chargeType = $isRoomTarget ? 'room_owner' : 'host';
 
@@ -221,7 +224,8 @@ class ChargeRepoService
             if ($receiver->is_frozen == 1) {
                 throw new \Exception(__('api_responses.frozen_agency'));
             }
-            $agency = $this->agencyRepository->findByStatus($sender->agency_id);
+
+            $agency = $this->agencyRepository->findAllByStatus($sender->agency_id);
             if (!isset($agency)) throw new \Exception('agency not founded');
             if ($agency->is_frozen == 1) {
                 throw new \Exception(__('api_responses.frozen_agency'));
@@ -259,8 +263,10 @@ class ChargeRepoService
             $usd,
             'user_transaction',
             'transfer_to_user',
-            ['receiver_id' => $receiver->id]
-        );
+            ['receiver_id' => $receiver->id],
+            'charge_to_user'
+
+         );
 
         $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
@@ -284,7 +290,7 @@ class ChargeRepoService
 
 
 
-    public function chargeAgencyNew(User $sender, Agency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function chargeAgencyNew(User $sender, ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
         $type = $receiver->owner?->user_type ?? '';
 
@@ -296,8 +302,9 @@ class ChargeRepoService
             $usd,
             'user_transaction',
             'transfer_to_agency',
-            ['agency_id' => $receiver->id]
-        );
+            ['agency_id' => $receiver->id],
+                             'charge_to_agency'
+         );
 
         $data = [
             'charger_id' => $sender->id,
@@ -316,7 +323,7 @@ class ChargeRepoService
 
 
 
-    public function chargeAgency(User $sender, Agency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function chargeAgency(User $sender,Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
         $type = $receiver->owner?->user_type ?? '';
 
@@ -361,7 +368,7 @@ class ChargeRepoService
         DB::beginTransaction();
 
         try {
-            $authAgency = $this->agencyRepository->find($auth->agency_id);
+            $authAgency = $this->agencyRepository->findFomAll($auth->agency_id);
 
             if (!$authAgency) throw new \Exception(__('api.notAgency'));
             if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
