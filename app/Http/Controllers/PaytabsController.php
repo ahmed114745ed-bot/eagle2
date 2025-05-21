@@ -1,0 +1,244 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Helpers\Common;
+use App\Models\User;
+use App\Tik\Repositories\CoinLogRepository;
+use App\Tik\Repositories\CoinRepository;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
+use App\Traits\Processor;
+use App\Models\PaymentRequest;
+
+class Paytabs
+{
+    use Processor;
+
+    private $config_values;
+
+    public function __construct()
+    {
+        $config = $this->payment_config('paytabs', 'payment_config');
+        if (!is_null($config) && $config->mode == 'live') {
+            $this->config_values = json_decode($config->live_values);
+        } elseif (!is_null($config) && $config->mode == 'test') {
+            $this->config_values = json_decode($config->test_values);
+        }
+    }
+
+    function send_api_request($request_url, $data, $request_method = null)
+    {
+        $data['profile_id'] = '145717';
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://secure-egypt.paytabs.com' . '/' . $request_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_CUSTOMREQUEST => isset($request_method) ? $request_method : 'POST',
+            CURLOPT_POSTFIELDS => json_encode($data, true),
+            CURLOPT_HTTPHEADER => array(
+                'authorization:' .'SGJ9RLKBJD-JLDTM9HM99-HD2BDLLLWH',
+                'Content-Type:application/json'
+            ),
+        ));
+
+        $response = json_decode(curl_exec($curl), true);
+        curl_close($curl);
+        return $response;
+    }
+
+    function is_valid_redirect($post_values)
+    {
+        $serverKey = $this->config_values->server_key;
+        $requestSignature = $post_values["signature"];
+        unset($post_values["signature"]);
+        $fields = array_filter($post_values);
+        ksort($fields);
+        $query = http_build_query($fields);
+        $signature = hash_hmac('sha256', $query, $serverKey);
+        if (hash_equals($signature, $requestSignature) === TRUE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+class PaytabsController extends Controller
+{
+    use Processor;
+
+    private PaymentRequest $payment;
+    private CoinLogRepository $coinLogRepository;
+    private CoinRepository $coinRepository;
+    private $user;
+
+    public function __construct(
+
+         PaymentRequest $payment,
+         User $user,
+         CoinLogRepository $coinLogRepository,
+         CoinRepository $coinRepository,
+         )
+    {
+        $this->payment = $payment;
+        $this->user = $user;
+        $this->coinLogRepository = $coinLogRepository;
+        $this->coinRepository = $coinRepository;
+    }
+
+    public function payment(Request $request)
+    {
+
+        $user = $request->user();
+        $validator = Validator::make($request->all(), [
+                'coin_id' => 'required',
+                'pay_method' => 'required',
+            ]);
+       if ($validator->fails()) {
+            return response()->json($validator->messages(), 400);
+        }
+        $coin = $this->coinRepository->findById($request->coin_id);
+        if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
+        $trx = rand(111111111111111111, 999999999999999999);
+            $dataCoinLog = [
+                'paid_usd' => $coin->usd,
+                'obtained_coins' => $coin->coin,
+                'user_id' => $user->id,
+                'method' => $request->pay_method,
+                'trx' => $trx,
+                'status' => 0,
+                'coin_id' => $request->coin_id,
+            ];
+           
+           
+        $log = $this->coinLogRepository->create($dataCoinLog);
+      
+
+        // $validator = Validator::make($request->all(), [
+        //     'payment_id' => 'required|uuid'
+        // ]);
+
+        // if ($validator->fails()) {
+        //     return response()->json($this->response_formatter(GATEWAYS_DEFAULT_400, null, $this->error_processor($validator)), 400);
+        // }
+
+        // $payment_data = $this->payment::where(['id' => $request['payment_id']])->where(['is_paid' => 0])->first();
+        // if (!isset($payment_data)) {
+        //     return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
+        // }
+        // $payer = json_decode($payment_data['payer_information']);
+
+        $plugin = new Paytabs();
+        $request_url = 'payment/request';
+        $data = [
+            "tran_type" => "sale",
+            "tran_class" => "ecom",
+            "cart_id" => 'invoice_' . $log->id,
+            "cart_currency" => 'EGP',
+            "cart_amount" => round($log->paid_usd, 2),
+            "cart_description" => "products",
+            "paypage_lang" => "en",
+            "callback" => route('paytabs.callback'), // بدون ID هنا
+            "return" => route('paytabs.return', ['payment_id' => $log->id]),
+            "customer_details" => [
+                "name" => $user->name,
+                "email" => $user->email,
+                "phone" => $user->phone ?? "000000",
+                "street1" => "N/A",
+                "city" => "N/A",
+                "state" => "N/A",
+                "country" => "N/A",
+                "zip" => "00000"
+            ],
+            "shipping_details" => [
+                "name" => "N/A",
+                "email" => "N/A",
+                "phone" => "N/A",
+                "street1" => "N/A",
+                "city" => "N/A",
+                "state" => "N/A",
+                "country" => "N/A",
+                "zip" => "0000"
+            ],
+            "user_defined" => [
+                "udf9" => "UDF9",
+                "udf3" => "UDF3"
+            ]
+        ];
+
+        $page = $plugin->send_api_request($request_url, $data);
+        if (!isset($page['redirect_url'])) {
+            return Common::apiResponse(0, 'try leter', null, 404);
+        }
+        return redirect($page['redirect_url']);
+    }
+
+    public function callback(Request $request)
+    {
+        \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($request->all()));
+        $transRef = $request->input('tranRef') 
+        ?? $request->query('tranRef') 
+        ?? $request->post('tranRef');
+    \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
+        $plugin = new Paytabs();
+        $response_data = $_POST;
+        $transRef = filter_input(INPUT_POST, 'tranRef');
+        
+        \Log::info("تم callback بنجاح للطلب رقم: " . $transRef);
+        dd($transRef);
+
+        if (!$transRef) {
+            return Common::apiResponse(0, 'try leter', null, 200);
+        }
+
+        $is_valid = $plugin->is_valid_redirect($response_data);
+        if (!$is_valid) {
+            return Common::apiResponse(0, 'try leter', null, 200);
+        }
+
+        $request_url = 'payment/query';
+        $data = [
+            "tran_ref" => $transRef
+        ];
+        $verify_result = $plugin->send_api_request($request_url, $data);
+        $is_success = $verify_result['payment_result']['response_status'] === 'A';
+        if ($is_success) {
+            $this->coinLogRepository->getCoinsById($request['payment_id'])->update([
+                'pid' => 1,
+            ]);
+            $payment_data = $this->coinLogRepository->getCoinsById([ $request['payment_id']]);
+            if (isset($payment_data) && $payment_data->pid == 1 ) {
+                $this->onPaymentSuccess($payment_data);
+            }
+            return $this->payment_response($payment_data,'success');
+        }
+        $payment_data =$this->coinLogRepository->getCoinsById([ $request['payment_id']]);
+        if (isset($payment_data) && $payment_data->pid == 0 ) {
+            $this->onPaymentFailure($payment_data);
+        }
+        return $this->payment_response($payment_data,'fail');
+    }
+
+
+
+    public function onPaymentSuccess($payment_data)
+    {
+        \Log::info("تم الدفع بنجاح للطلب رقم: " . $payment_data->id);
+    }
+
+        public function onPaymentFailure($payment_data)
+        {
+            \Log::warning("فشل الدفع للطلب رقم: " . $payment_data->id);
+        }
+
+    public function return(Request $request)
+    {
+        \Log::info("تم الدفع بنجاح للطلب رقم: " . $request->payment_id);
+        return response()->json(['message' => 'Callback received'], 200);
+    }
+}

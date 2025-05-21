@@ -3,6 +3,7 @@
 use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\PaytabsController;
 use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
@@ -550,6 +551,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::get('app_feature', [AppFeatureController::class, 'show']);
+
+
+            Route::group(['prefix' => 'paytabs', 'as' => 'paytabs.'], function () {
+                Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');
+                // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
+                Route::any('response', [PaytabsController::class, 'response'])->name('response');
+            });
+
+
         }
     );
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Common;
+use App\Http\Controllers\PaytabsController;
 use App\Models\DeleteAccount;
 use App\Models\Room;
 use Encore\Admin\Controllers\AdminController;
@@ -32,6 +33,9 @@ use App\Http\Controllers\NowPaymentsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
+Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
+
 Route::get('applications/{id}', [SettingsController::class, 'downloadApp']);
 
 Route::get('/now-payment', [NowPaymentsController::class, 'rechargeForm']);
