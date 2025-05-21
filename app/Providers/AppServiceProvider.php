@@ -139,6 +139,7 @@ class AppServiceProvider extends ServiceProvider
             if (!Cache::has('app_title')) {
                 Cache::put('app_title', $appName, now()->addHours(24));
             }
+            Cache::put('host_agency', $settings['host_agency'] ?? 1);
         } else {
             config(['app.name' => 'Default']);
             Cache::put('app_title', 'Default Title', now()->addHours(24));

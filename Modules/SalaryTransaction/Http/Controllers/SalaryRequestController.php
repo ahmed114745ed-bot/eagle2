@@ -22,16 +22,10 @@ class SalaryRequestController extends MainController
 
     public $permission_name = 'salary-request';
 
-    public function __construct()
-    {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-    }
-
     public function index(Content $content)
     {
+        checkAgencyFeature();
+
         return parent::index($content
             ->title(trans('salary-requests'))
             ->body($this->grid()));

@@ -21,16 +21,10 @@ class ReportUserController extends MainController
 
     public $permission_name = 'report-user';
 
-    public function __construct()
-    {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-    }
-
     public function index(Content $content)
     {
+        checkAgencyFeature();
+
         return parent::index($content
             ->title(trans('Hosts Reports'))
             ->body($this->grid()));
