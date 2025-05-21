@@ -213,7 +213,9 @@ return [
     'kickFamily' => 'Aileden at',
     'chickKick' => 'Aileden atmak istediğinizden emin misiniz?',
     'kickAgency' => 'Ajansdan at',
-    'chickKickAgency' => 'Bu kullanıcı için maaş değeri sıfırlanacak ve elde edilen elmaslar ile saatler silinecek. Onaylamak istiyor musunuz?',
+    'chickKickAgency' => 'Onay verilirse, ev sahibi ajansdan çıkarılacak ve bu ajanstaki kazanılan elmaslar, saatler ve günler silinecektir.
+    *Ancak daha önce kazandığı dolarlar silinmeyecek, cüzdanına eklenmiştir ve istediği zaman kullanabilir.
+    Ajansdan ayrıldıktan sonra başka bir ajansa katılabilir ve hedefe yeniden başlayabilir.',
     'free' => 'Ücretsiz',
     'raise' => 'Zam',
     'lower' => 'Düşür',
