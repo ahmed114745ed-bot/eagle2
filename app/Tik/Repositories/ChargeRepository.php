@@ -52,8 +52,9 @@ class ChargeRepository extends AbstractRepository
        
         return $this->model
             ->where('charger_id', Auth::user()->id)
-            ->with('receiver:id,uuid')
+            ->with(['receiver:id,uuid','receiver.profile:id,user_id,avatar'])
             ->select('id', 'user_id', 'amount', 'usd') ->get();
+
     }
     
     public function getChargeToAgencyHistory()
