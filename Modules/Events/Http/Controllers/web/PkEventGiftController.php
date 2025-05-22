@@ -118,7 +118,7 @@ class PkEventGiftController extends MainController
                 $path = @$ware->img2 ?? (@$ware->show_img ?? '');
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $vips->img;
+                $path = @$vips->img ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
@@ -252,7 +252,7 @@ class PkEventGiftController extends MainController
                 $path = @$ware->img2 ?? (@$ware->show_img ?? '');
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $$vips->img ?? '';
+                $path = @$vips->img ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
