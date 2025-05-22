@@ -676,6 +676,8 @@
     "Name en": "الاسم بالانجليزيه",
     "Description ar": "الوصف بالعربى",
     "Description en": "الوصف بالانجليزيه",
+    "Description tr": "الوصف بالتركيه",
+    "Description hi": "الوصف بالهندية",
     "statistics": "احصائيات",
     "delete": "حذف",
     "manger type": "انواع الادمن",
@@ -2020,6 +2022,7 @@
     "Is enable": "هل مفعل",
     "Stats": "الإحصائيات",
     "Search by name or UUID": "ابحث بالاسم أو UUID",
+    "Search": "ابحث",
     "Moment id": "رقم اللحظة",
     "room-vips": "نخبة الغرفة",
     "hosts": "المضيفون",
@@ -2275,7 +2278,7 @@
   "Go to Settings": "انتقل إلى الإعدادات"
 ,
   "wealth_gift_price": "سعر هدية الثروة",
-  
+
   "browse agency settings": "عرض إعدادات الوكالة",
   "edit agency settings": "تعديل إعدادات الوكالة",
   "browse page": "عرض الصفحة",
@@ -2354,7 +2357,7 @@
   "user parent": " المستخدمون  ",
   "general": "عام",
    "Lucky box": "صندوق الحظ",
-   
+
 
   "Create Agencies": "إنشاء الوكالات",
   "browse report": "تصفح التقرير",
@@ -2447,22 +2450,63 @@
 "Settings charging agencies": "إعدادات وكالات الشحن",
   "setting Agency Manager": "إعداد مدير الوكالة",
   "Host Agencies Settings": "إعدادات وكالات المضفين",
-"Agency Hosts Reports": "تقارير وكالات المضفين"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"Agency Hosts Reports": "تقارير وكالات المضفين",
+    "back": "رجوع",
+  "Charge History": "سجل الشحن",
+  "Total Agency Sallary": "إجمالي راتب الوكالة",
+  "Total Users Sallary": "إجمالي رواتب المستخدمين",
+  "Total Diamond": "إجمالي الألماس",
+  "totalBd":"اجمالي راتبBD",
+  "January": "يناير",
+  "February": "فبراير",
+  "March": "مارس",
+  "April": "أبريل",
+  "May": "مايو",
+  "June": "يونيو",
+  "July": "يوليو",
+  "August": "أغسطس",
+  "September": "سبتمبر",
+  "October": "أكتوبر",
+  "November": "نوفمبر",
+  "December": "ديسمبر",
+  "ID": "المعرف",
+  "username": "اسم المستخدم",
+  "Go Back": "العودة",
+  "total salary": "إجمالي الراتب",
+  "Agency Count": "عدد الوكالات",
+  "agencies": "الوكالات",
+  "transactions": "المعاملات",
+  "Loading...": "جارٍ التحميل...",
+  "Agencies": "الوكالات",
+  "Name": "الاسم",
+  "owner": "المالك",
+  "Status": "الحالة",
+  "No agencies found": "لم يتم العثور على وكالات",
+  "Charges": "المعاملات",
+  "Coin": "العملة",
+  "Created": "تاريخ الإنشاء",
+  "No charges found": "لم يتم العثور على معاملات",
+  "Target History": "سجل الأهداف",
+    "Agency ID": "معرف الوكالة",
+    "Salary": "الراتب",
+    "Cut Amount": "المبلغ المخصوم",
+    "Total Agency Salary": "إجمالي رواتب الوكالة",
+    "Total Users Salary": "إجمالي رواتب المستخدمين",
+    "Total Diamond": "إجمالي الدايموند",
+    "Month": "الشهر",
+    "Year": "السنة",
+    "Is Paid": "تم الدفع؟",
+    "Yes": "نعم",
+    "No": "لا",
+    "Created At": "تاريخ الإنشاء",
+    "No target history found": "لا يوجد سجل أهداف",
+    "Net Salary":"الرصيد الحالي",
+    "set_bd_as_default":"افتراضي bd",
+        "bd_already_default": "هذا الـ BD هو الافتراضي بالفعل",
+    "bd_set_default_success": "تم تعيين الـ BD كافتراضي بنجاح",
+    "BD Management":"ادارة BD",
+    "bd management":"ادارة BD",
+    "bD Management":"ادارة BD"
 
 
 

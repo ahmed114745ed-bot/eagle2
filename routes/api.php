@@ -119,6 +119,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users4', [UserController::class, 'userFamily'])->name('users4');
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
         Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
+        Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
     });
 
     // authorization
@@ -164,7 +165,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
 
             Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
-              Route::post('/testCharge', [GooglePaymentController::class, 'addChargeLevel']);
+            Route::post('/testCharge', [GooglePaymentController::class, 'addChargeLevel']);
 
             Route::get('/countries/users', [CountryController::class, 'countries']);
 
@@ -175,6 +176,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
             Route::prefix('config')->group(function () {
+                Route::get('settings', [VersionController::class, 'settings']);
                 Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
                 //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
             });
@@ -260,6 +262,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
                 Route::get('/online', [UserController::class, 'online']);
                 Route::get('/friends', [UserController::class, 'friends']);
+                Route::get('/data', [UserController::class, 'dataUser']);
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -497,9 +500,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
+                Route::post('charges-history', [ChargeController::class, 'chargeToHistory']);
+                 Route::get('history/{id}', [AgencyController::class, 'history']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
+               
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);

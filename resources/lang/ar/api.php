@@ -92,6 +92,7 @@ return [
     'background_accept' => "تم قبول طلب صوره الخلفية",
     'background_refuse' => "تم رفض طلب صوره الخلفية",
     'freez_charge' => 'تم تجميد محفظتك تواصل مع الاداره!',
+    'freez_charge_user' => 'تم تجميد محفظه هذا المستخدم',
     'phone' => 'هذا الحساب ليس لديه رقم هاتف',
     'myPhone' => 'اتصل بـ whatsapp أولاً لتتمكن من شراء VIP',
     'notShippingAgent' => 'آسف! أنت لست وكيل الشحن',

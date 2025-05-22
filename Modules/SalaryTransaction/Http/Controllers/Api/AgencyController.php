@@ -17,13 +17,15 @@ class AgencyController extends Controller
 {
     public function get_info(?ShippingAgency $agency)
     {
+
         $user = Auth::user();
 
-        if (!$agency){
-            $agency = ShippingAgency::query()->with("countries", 'AgencypaymentGateways')->whereAppOwnerId($user->id)->first();
-        }
 
-        if (!$agency) {
+        if (is_null($agency->id)){
+            $agency = ShippingAgency::query()->with("countries", 'AgencypaymentGateways')->whereAppOwnerId(@$user->id)->first();
+        }
+        
+        if (is_null($agency)) {
             return Common::apiResponse(1, __("api_responses.agency"), []);
         }
         $result = new AgencyResource($agency);

@@ -56,6 +56,7 @@ class RemoveBackgroundCron extends Command
             }
             $img->delete();
         }
+        $this->info('Background removal started...');
 
         //$this->info('update-room-user-now:cron Command Run Successfully !');
     }

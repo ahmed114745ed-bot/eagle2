@@ -8,12 +8,14 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\VipPrivilege;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Validation\ValidationException;
 use Modules\Public\Http\Services\UserCounterServices;
 use Encore\Admin\Widgets\Box;
 
@@ -39,7 +41,7 @@ class OvipGiftTapController extends MainController
         } elseif (request('level')) {
             $ovip = OVip::where('level', request('level'));
         }
-      
+
 
 
         return parent::index($content
@@ -198,7 +200,6 @@ class OvipGiftTapController extends MainController
     protected function form()
     {
         $form = new Form(new Ware());
-
         $form->hidden('level')->value(request('level'));
         $form->hidden('type')->value(request('type'));
         $form->hidden('is_active_for_vip')->value(1);
@@ -228,26 +229,51 @@ class OvipGiftTapController extends MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
         //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function ($file) {
+        $form->file('img2', trans('svg'))
+            ->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
-        $form->select('image_type1', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'alpha' => __('alpha'),
-                'mp4' => __('mp4'),
-                'vap' => __('vap'),
+//        $form->select('image_type1', __('image_type'))->options(
+//            [
+//                'svga' => __('svga'),
+//                'alpha' => __('alpha'),
+//                'mp4' => __('mp4'),
+//                'vap' => __('vap'),
+//
+//            ]
+//        )->attribute(['id' => 'image_type1'])->required();
+//
+//        $form->select('profile_frame_type', __('image_type'))->options(
+//            [
+//                'svga' => __('svga'),
+//                'png' => __('png'),
+//
+//            ]
+//        )->attribute(['id' => 'profile_frame'])->required();
 
-            ]
-        )->attribute(['id' => 'image_type1'])->required();
+        $form->saving(function (Form $form) {
+            if ($form->show_img instanceof UploadedFile) {
+                $form->image_type1 = $form->show_img->guessExtension();
+            }
 
-        $form->select('profile_frame_type', __('profile_frame_type'))->options(
-            [
-                'svga' => __('svga'),
-                'png' => __('png'),
+            if ($form->img2 instanceof UploadedFile) {
+                $ext = strtolower($form->img2->guessExtension());
+                $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
-            ]
-        )->attribute(['id' => 'profile_frame'])->required();
+                if ($ext === 'zz' && $originalExt === 'svga') {
+                    $ext = 'svga';
+                }
+
+                if (!in_array($ext, ['svga', 'mp4'])) {
+                    throw ValidationException::withMessages([
+                        'img2' => ['Only SVGA and MP4 files are allowed for img2.'], // field name => [errors array]
+                    ]);
+                } else {
+                    $form->profile_frame_type = $ext;
+                }
+            }
+        });
+
         $form->text('key', trans('key'));
 
         $script = <<<SCRIPT
@@ -294,6 +320,7 @@ class OvipGiftTapController extends MainController
                 ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
                     $query->where('id', "!=", $id);
                 })->exists();
+
             if ($exists) {
                 $error = new \Illuminate\Support\MessageBag([
                     'title' => 'Error',
@@ -302,7 +329,6 @@ class OvipGiftTapController extends MainController
 
                 return back()->with(compact('error'));
             }
-           
             $imageType1 = $form->input('image_type1');
             $profileFrameType = $form->input('profile_frame_type');
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
@@ -313,18 +339,15 @@ class OvipGiftTapController extends MainController
                 return redirect()->back();
             }
 
-         
+
             (new UserCounterServices)->eventUsers('ware');
         });
 
         $form->saved(function (Form $form) {
             $level = $form->model()->level;
-
             $type = $form->model()->type; // Get the saved model's ID
-            
             $ovip = Ovip::where('level', $level)->first();
             $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
-         
             return redirect()->to($url);
         });
 

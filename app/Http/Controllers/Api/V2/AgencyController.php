@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\V2;
 
 
+use Cache;
+use App\Models\User;
 use App\Models\Agency;
 use App\Helpers\Common;
-use App\Helpers\UserCommon;
 use App\Models\Setting;
-use App\Models\User;
-use Cache;
+use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Models\AgencyUserJob;
 use PHPUnit\Framework\Exception;
@@ -20,6 +20,7 @@ use App\Http\Resources\Api\V1\AdminsAgencyResource;
 use App\Http\Resources\Api\V1\AgencyDetailsResource;
 use App\Http\Resources\Api\V1\AgencyJoinReqResource;
 use App\Http\Resources\Api\V1\AllDataAgencyResource;
+use App\Http\Resources\Api\V1\HistoryAgencyResource;
 use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Http\Resources\Api\V1\MyDataForAgancyResource;
 use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
@@ -37,7 +38,7 @@ class AgencyController extends Controller
     public function joinRequest(Request $request)
     {
         $app_feature = Cache::get('host_agency');
-        if (!$app_feature){
+        if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
 
@@ -57,7 +58,7 @@ class AgencyController extends Controller
     public function view(Request $request)
     {
         $app_feature = Cache::get('host_agency');
-        if (!$app_feature){
+        if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
         $agencyId = request()->get('id', $request->user()->agency_id);
@@ -74,7 +75,7 @@ class AgencyController extends Controller
     public function agencyDetails($id)
     {
         $app_feature = Cache::get('host_agency');
-        if (!$app_feature){
+        if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
 
@@ -85,6 +86,25 @@ class AgencyController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         return Common::apiResponse(1, '', new AgencyDetailsResource($agency));
+    }
+
+    public function history($id, Request $request)
+    {
+        $user = $request->user();
+        $app_feature = Cache::get('host_agency');
+        if (!$app_feature) {
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
+        try {
+            $agency = $this->agencyService->find($id);
+
+            if ($user->id !=  $agency->app_owner_id) return Common::apiResponse(0, ' you are not owner of this agency', null, 400);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '', new HistoryAgencyResource($agency));
     }
 
     public function admin($id)
@@ -98,12 +118,12 @@ class AgencyController extends Controller
         return Common::apiResponse(1, '', AdminsAgencyResource::collection($agency->admins));
     }
 
-    public function agencyTargetDetails(Request $request)
+    public function agencyTargetDetails($agencyId, Request $request)
     {
         $id = User::whereId(auth()->id())->where('type_user', '!=', 0)->firstOrFail()->id;
         $user = $request->user();
         try {
-            $response = $this->agencyService->agencyTarget($id, $user, $request);
+            $response = $this->agencyService->agencyTarget($user->agency_id, $user, $request);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -205,7 +225,7 @@ class AgencyController extends Controller
     public function update(Request $request, $id)
     {
         $app_feature = Cache::get('host_agency');
-        if (!$app_feature){
+        if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
 
