@@ -37,11 +37,10 @@ class PkEventController extends MainController
             ->title(__('pk-events'))
             ->row(function (Row $row) {
 
-                // Sidebar on the left (3 columns)
-                $row->column(3, view('event_settings'));
+//                $row->column(3, view('event_settings'));
 
-                // Grids stacked on the right (9 columns)
-                $row->column(9, function (Column $column) {
+                $row->column(12, function (Column $column) {
+                    $column->row(view('event_taps'));
                     $column->row($this->grid2());
                     $column->row($this->grid());
                 });

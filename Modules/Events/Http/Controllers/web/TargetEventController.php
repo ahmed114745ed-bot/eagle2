@@ -5,6 +5,7 @@ namespace Modules\Events\Http\Controllers\web;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use App\Services\AppFeatureService;
@@ -27,14 +28,14 @@ class TargetEventController extends MainController
 
     public function index(Content $content)
     {
-        $sidebar = view('event_settings');
-        $grid = $this->grid();
-
         return $content
-            ->title(trans('Charging Events'))
-            ->row(function (Row $row) use ($sidebar, $grid) {
-                $row->column(3, $sidebar);
-                $row->column(9, $grid);
+            ->title(__('pk-events'))
+            ->row(function (Row $row) {
+
+                $row->column(12, function (Column $column) {
+                    $column->row(view('event_taps'));
+                    $column->row($this->grid());
+                });
             });
     }
 

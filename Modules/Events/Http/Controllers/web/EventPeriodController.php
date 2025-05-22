@@ -37,9 +37,10 @@ class EventPeriodController extends MainController
             ->title(__('event period'))
             ->row(function (Row $row) {
 
-                $row->column(3, view('event_settings'));
+//                $row->column(3, view('event_settings'));
 
-                $row->column(9, function (Column $column) {
+                $row->column(12, function (Column $column) {
+                    $column->row(view('event_taps'));
                     $column->row($this->grid2());
                     $column->row($this->grid());
                 });
