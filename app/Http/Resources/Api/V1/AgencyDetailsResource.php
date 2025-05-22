@@ -31,12 +31,12 @@ class AgencyDetailsResource extends JsonResource
         $user = $request->user();
 
         $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->take(3)->get();
+            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->take(3)->get();
         $heroGiftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, sender_id")
             ->with('sender')->groupBy('sender_id')->whereHas('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
-        $admin = $this->admins()->take(5)->get();
+        $admin = $this->admins()->take(3)->get();
 
-     
+
         $adminUser = $user?->agencyUserJob;
 
         return [
