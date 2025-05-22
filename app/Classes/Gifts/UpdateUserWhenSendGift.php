@@ -134,10 +134,7 @@ class UpdateUserWhenSendGift
         $total = intval($totalDiamondReceived + $totalDiamond) * $this->expPercentages['exp_received_percentage'];
 
         $levelVip                 = $this->getLevel(1, $total);
-        if ($subReceiverLevel < 0) {
-            return $levelVip != null ? (@$levelVip->level + $subReceiverLevel) ?? 0 : 0;
-        }
 
-        return $levelVip != null ? (@$levelVip->level - $subReceiverLevel) ?? 0 : 0;
+        return $levelVip != null ? (@$levelVip->level) ?? 0 : 0;
     }
 }

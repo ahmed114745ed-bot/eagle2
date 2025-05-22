@@ -914,7 +914,7 @@ class User extends Authenticatable
 
     public function getTotalReceivedLevelAttribute()
     {
-        return $this->received_level + $this->sub_receiver_level;
+        return $this->received_level;
     }
 
     public function setTotalSenderLevelAttribute(float $value)
@@ -939,14 +939,13 @@ class User extends Authenticatable
 
     public function setTotalReceivedLevelAttribute(float $value)
     {
-        $level = $this->received_level + $this->sub_receiver_level;
+        $level = $this->received_level;
         if ($level == $value) return;
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
 
-        $this->sub_receiver_level = $value - $this->received_level;
-
-        $diamonds               =
-            (@Vip::query()->where('type', 1)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
+        $this->sub_receiver_level = 0;
+        $this->received_level = $value;
+        $diamonds = (@Vip::query()->where('type', 1)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         //        $this->sub_receiver_num = $diamonds - $this->total_diamond_received;
         /*if ($expPercentages[0] <= 1) {
             $this->sub_receiver_num = ($diamonds - $this->total_diamond_received * $expPercentages[1]) / $expPercentages[1];
