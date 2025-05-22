@@ -15,6 +15,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Validation\ValidationException;
 use Modules\Public\Http\Services\UserCounterServices;
 use Encore\Admin\Widgets\Box;
 
@@ -264,7 +265,9 @@ class OvipGiftTapController extends MainController
                 }
 
                 if (!in_array($ext, ['svga', 'mp4'])) {
-                    $form->error('Only SVGA and MP4 files are allowed for img2.');
+                    throw ValidationException::withMessages([
+                        'img2' => ['Only SVGA and MP4 files are allowed for img2.'], // field name => [errors array]
+                    ]);
                 } else {
                     $form->profile_frame_type = $ext;
                 }
