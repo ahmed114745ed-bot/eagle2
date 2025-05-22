@@ -7,6 +7,7 @@ use App\Models\Agency;
 use App\Models\Agent;
 use App\Models\User;
 use Encore\Admin\Auth\Permission;
+use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -95,6 +96,9 @@ class AdminUserController extends EncorUsersController
         })->ajax('/api/search/users3', 'id', 'name')->rules('required');
 
 
+        $form->saving(function (Form $form) {
+            
+        });
         return $form;
     }
 }

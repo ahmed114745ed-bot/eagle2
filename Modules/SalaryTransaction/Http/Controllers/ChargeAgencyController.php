@@ -5,6 +5,7 @@ namespace Modules\SalaryTransaction\Http\Controllers;
 use App\Admin\Controllers\MainController;
 use App\Models\Agency;
 use App\Models\ChargeAgency;
+use App\Models\ShippingAgency;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -95,7 +96,8 @@ class ChargeAgencyController extends MainController
         $form->display(__('admin.ID'));
         $form->select('agency_id', __('agency'))->options (function (){
             $ops = [0=>'root'];
-            $ps = Agency::query ()->WhereDoesntHave('chargeAgency')->where("Shipping_agency",1)->get ();
+            // $ps = Agency::query ()->WhereDoesntHave('chargeAgency')->where("Shipping_agency",1)->get ();
+            $ps = ShippingAgency::query ()->get ();
             foreach ($ps as $p){
                 $ops[$p->id] = $p->name;
             }

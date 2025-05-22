@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\HostAgencyScope;
 use App\Traits\PaymentGetWayTrait;
 use Carbon\Carbon;
 use DB;
@@ -197,6 +198,8 @@ class Agency extends Model
     protected static function boot()
     {
         parent::boot();
+        
+        static::addGlobalScope(new HostAgencyScope);
 
         static::saving(function ($model) {
 

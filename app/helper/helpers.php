@@ -483,7 +483,7 @@ if (!function_exists('handleShowImageWithTypes')) {
                 ";
         }
 
-        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important;' alt='' />";
+        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: 50%; object-fit: cover;' alt='' />";
     }
 }
 if (!function_exists('userType')) {

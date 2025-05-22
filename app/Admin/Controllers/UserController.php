@@ -22,6 +22,7 @@ use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
@@ -226,13 +227,39 @@ class UserController extends MainController
             });
         }
 
-        $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid == $this->original_uuid
-                ? __("uuid") . ' : ' . $this->uuid
-                : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
-        });
-        $grid->column('name', __('Name'));
+//        $grid->column('uuid', __('uuid'))->display(function () {
+//            return $this->uuid == $this->original_uuid
+//                ? __("uuid") . ' : ' . $this->uuid
+//                : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
+//        });
+        $grid->column('name', __('Name'))
+            ->display(function ($name) {
+                $uid = @$this->uuid;
+                $path = @$this->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
+                $senderLevel = @$this->total_sender_level;
+                $receivedLevel = @$this->total_received_level;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+                return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+               <span style='color: #aaa; font-size: smaller;'>UID: $uid</span><br>
+                <span style='color: #aaa; font-size: smaller;'>Received Level: $senderLevel</span><br>
+                <span style='color: #aaa; font-size: smaller;'>Sender Level: $receivedLevel</span>
+                </div>
+            </div>
+        ";
+            });
         //        $grid->column('return', __('status user'))->display(function () {
         //            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
         //            return (new \App\Admin\Actions\UserAction(
@@ -260,91 +287,127 @@ class UserController extends MainController
 
         $grid->column('total_charge_level', __('admin.charge_level'));
 
-        $grid->column('profile.avatar', __('image'))->display(function ($path) {
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+//        $grid->column('profile.avatar', __('image'))->display(function ($path) {
+//            $defaultImage = asset("images/businessman-icon.jpg");
+//            $url = getImagePath($path) ?? $defaultImage;
+//            if (!isImageExists($url)) {
+//                $url = $defaultImage;
+//            }
+//            return handleShowImageWithTypes($this->id, $url, 50, 50);
+//        });
 
-        $grid->column('phone', __('Phone'));
+//        $grid->column('phone', __('Phone'));
 
-        $grid->column('agency_id', __('agency id'))->modal(__('agency'), function () {
-            $agency =  $this->agency;
-            $path = @$agency?->img;
-            $defaultImage = asset("images/icon-agency.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+        $grid->column('agency', __('Agency'))
+            ->display(function () {
+                if (!$this->agency) {
+                    return "<span style='color: #aaa;'>No agency</span>";
+                }
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $results = [
-                __('name') => @$agency->owner->name ?? '',
-                __('img') => "<img src='" . $url . "' style='width:100px;height:100px' class='img img-thumbnail'$ />",
+                $name = $this->agency->name ?? '';
 
-            ];
+                $cacheKey = "agency_image_{$this->agency_id}";
+                $image = Cache::remember($cacheKey, 3600, function (){
+                    $path = $this->agency->img;
+                    $defaultImage = asset("images/icon-agency.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
 
-            return new Table([__('Field Name'), __('Value')], $results);
-        });
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
 
-        $grid->column('target', __('target'))->expand(function ($model) {
+                    return handleShowImageWithTypes($this->agency_id, $url, 40, 40);
+                });
 
-            $targets = $model->targets()->where('agency_id', $this->agency_id)->orderBy('created_at', 'desc')->get()->map(function ($target) {
-                $data = json_decode($target->extras, true);
+                $profileUrl = route('admin.agency.profile', ['id' => $this->agency_id]);
 
-                $moment_upload = $data['moment']['upload'] ?? '';
-                $moment_likes = $data['moment']['likes'] ?? '';
-                $moment_comments = $data['moment']['comments'] ?? '';
-
-                // For "reel"
-                $reel_upload = $data['reel']['upload'] ?? '';
-                $reel_likes = $data['reel']['likes'] ?? '';
-                $reel_comments = $data['reel']['comments'] ?? '';
-
-                // Combine moment fields
-                $moment_info = "Upload: {$moment_upload} | Likes: {$moment_likes} | Comments: {$moment_comments}";
-
-                // Combine reel fields
-                $reel_info = "Upload: {$reel_upload} | Likes: {$reel_likes} | Comments: {$reel_comments}";
-                $target =
-                    [
-                        'id' => $target->id,
-                        'add_month' => $target->add_month . '/' . $target->add_year,
-                        'target_usd' => $target->target_usd,
-                        'target_agency_share' => $target->target_agency_share,
-                        'user_diamonds' => $target->user_diamonds,
-                        'user_hours' => $target->user_hours,
-                        'user_days' => $target->user_days,
-                        'moment' => $moment_info,
-                        'real' => $reel_info,
-                        'user_obtain' => $target->user_obtain,
-                        'updated_at' => $target->updated_at,
-                    ];
-
-
-                return $target;
+                return "
+                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            {$image}
+                            <div style='display: flex; flex-direction: column;'>
+                                    <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='font-size: smaller;'>ID: {$this->agency_id}</span>
+                            </div>
+                        </div>
+                    </a>
+                ";
             });
 
-            return new \App\Admin\Widgets\Table(
-                [
-                    'ID',
-                    __('month') . '/' . __('year'),
-                    __('usd') . ' ' . __('deserved') . '(%)',
-                    __('agency share') . '(%)',
-                    __('user diamonds'),
-                    __('user hours'),
-                    __('user days'),
-                    __('moment'),
-                    __('real'),
-                    __('user obtain'),
-                    __('at time'),
-                ],
-                $targets->toArray()
-            );
-        });
+//        $grid->column('agency_id', __('agency id'))->modal(__('agency'), function () {
+//            $agency =  $this->agency;
+//            $path = @$agency?->img;
+//            $defaultImage = asset("images/icon-agency.jpg");
+//            $url = getImagePath($path) ?? $defaultImage;
+//
+//            // Check if the image exists
+//            if (!isImageExists($url)) {
+//                $url = $defaultImage;
+//            }
+//            $results = [
+//                __('name') => @$agency->owner->name ?? '',
+//                __('img') => "<img src='" . $url . "' style='width:100px;height:100px' class='img img-thumbnail'$ />",
+//
+//            ];
+//
+//            return new Table([__('Field Name'), __('Value')], $results);
+//        });
+
+//        $grid->column('target', __('target'))->expand(function ($model) {
+//
+//            $targets = $model->targets()->where('agency_id', $this->agency_id)->orderBy('created_at', 'desc')->get()->map(function ($target) {
+//                $data = json_decode($target->extras, true);
+//
+//                $moment_upload = $data['moment']['upload'] ?? '';
+//                $moment_likes = $data['moment']['likes'] ?? '';
+//                $moment_comments = $data['moment']['comments'] ?? '';
+//
+//                // For "reel"
+//                $reel_upload = $data['reel']['upload'] ?? '';
+//                $reel_likes = $data['reel']['likes'] ?? '';
+//                $reel_comments = $data['reel']['comments'] ?? '';
+//
+//                // Combine moment fields
+//                $moment_info = "Upload: {$moment_upload} | Likes: {$moment_likes} | Comments: {$moment_comments}";
+//
+//                // Combine reel fields
+//                $reel_info = "Upload: {$reel_upload} | Likes: {$reel_likes} | Comments: {$reel_comments}";
+//                $target =
+//                    [
+//                        'id' => $target->id,
+//                        'add_month' => $target->add_month . '/' . $target->add_year,
+//                        'target_usd' => $target->target_usd,
+//                        'target_agency_share' => $target->target_agency_share,
+//                        'user_diamonds' => $target->user_diamonds,
+//                        'user_hours' => $target->user_hours,
+//                        'user_days' => $target->user_days,
+//                        'moment' => $moment_info,
+//                        'real' => $reel_info,
+//                        'user_obtain' => $target->user_obtain,
+//                        'updated_at' => $target->updated_at,
+//                    ];
+//
+//
+//                return $target;
+//            });
+//
+//            return new \App\Admin\Widgets\Table(
+//                [
+//                    'ID',
+//                    __('month') . '/' . __('year'),
+//                    __('usd') . ' ' . __('deserved') . '(%)',
+//                    __('agency share') . '(%)',
+//                    __('user diamonds'),
+//                    __('user hours'),
+//                    __('user days'),
+//                    __('moment'),
+//                    __('real'),
+//                    __('user obtain'),
+//                    __('at time'),
+//                ],
+//                $targets->toArray()
+//            );
+//        });
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             return $this->sameDeviceUsers()->count();
@@ -383,22 +446,22 @@ class UserController extends MainController
             return new Table([__('Name'), __('phone')], $rows->toArray());
         });
 
-        $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
-            $achivement = new UserAchievementService();
-            $data_achivement = $achivement->getUserAchievement($model);
-
-            $filtered = $data_achivement->map(function ($user) {
-                $img = $user["valid_image"] ?? $user["custom_image"];
-                $img = getDriverUrl() . '/' . $img;
-                $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
-                return [
-                    'id' => $user['id'],
-                    'target' => $user['target'],
-                    'image' => $img,
-                ];
-            });
-            return (new Table([__('Id'), __('target'), __('image')], $filtered->toArray()));
-        });
+//        $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
+//            $achivement = new UserAchievementService();
+//            $data_achivement = $achivement->getUserAchievement($model);
+//
+//            $filtered = $data_achivement->map(function ($user) {
+//                $img = $user["valid_image"] ?? $user["custom_image"];
+//                $img = getDriverUrl() . '/' . $img;
+//                $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
+//                return [
+//                    'id' => $user['id'],
+//                    'target' => $user['target'],
+//                    'image' => $img,
+//                ];
+//            });
+//            return (new Table([__('Id'), __('target'), __('image')], $filtered->toArray()));
+//        });
 
         // $grid->column('custom_button3', __('تبديل الحساب'))->modal('حسابات اخري علي نفس الجهاز', function ($model) {
         //     $device_token = $this->device_token;
@@ -428,44 +491,44 @@ class UserController extends MainController
         //     return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
         // });
 
-        $grid->column('custom_button3', __('تبديل الحساب'))->modal(__('Other accounts on the same device'), function () {
-            $deviceToken = $this->device_token;
-
-            // First: get all related user IDs, excluding current user in SQL
-            $relatedUserIds = UserAccount::query()
-                ->where('device_token', $deviceToken)
-                ->where(function ($query) {
-                    $query->where('parent_user_id', '!=', $this->id)
-                        ->orWhere('child_user_id', '!=', $this->id);
-                })
-                ->get()
-                ->flatMap(function ($ua) {
-                    return [$ua->parent_user_id, $ua->child_user_id];
-                })
-                ->filter(fn($id) => $id != $this->id)
-                ->unique()
-                ->values();
-
-            // Now fetch users in one query
-            $users = \App\Models\User::query()
-                ->whereIn('id', $relatedUserIds)
-                ->select(['name', 'uuid', 'phone'])
-                ->get();
-
-            // Format users for the table
-            $rows = $users->map(function ($user) {
-                return [
-                    'name' => $user->name,
-                    'uuid' => $user->uuid,
-                    'phone' => $user->phone,
-                ];
-            });
-
-            return new \Encore\Admin\Widgets\Table(
-                [__('Name'), __('uuid'), __('phone')],
-                $rows->toArray()
-            );
-        });
+//        $grid->column('custom_button3', __('تبديل الحساب'))->modal(__('Other accounts on the same device'), function () {
+//            $deviceToken = $this->device_token;
+//
+//            // First: get all related user IDs, excluding current user in SQL
+//            $relatedUserIds = UserAccount::query()
+//                ->where('device_token', $deviceToken)
+//                ->where(function ($query) {
+//                    $query->where('parent_user_id', '!=', $this->id)
+//                        ->orWhere('child_user_id', '!=', $this->id);
+//                })
+//                ->get()
+//                ->flatMap(function ($ua) {
+//                    return [$ua->parent_user_id, $ua->child_user_id];
+//                })
+//                ->filter(fn($id) => $id != $this->id)
+//                ->unique()
+//                ->values();
+//
+//            // Now fetch users in one query
+//            $users = \App\Models\User::query()
+//                ->whereIn('id', $relatedUserIds)
+//                ->select(['name', 'uuid', 'phone'])
+//                ->get();
+//
+//            // Format users for the table
+//            $rows = $users->map(function ($user) {
+//                return [
+//                    'name' => $user->name,
+//                    'uuid' => $user->uuid,
+//                    'phone' => $user->phone,
+//                ];
+//            });
+//
+//            return new \Encore\Admin\Widgets\Table(
+//                [__('Name'), __('uuid'), __('phone')],
+//                $rows->toArray()
+//            );
+//        });
 
         $grid->actions(function ($actions) {
             $actions->disableDelete();

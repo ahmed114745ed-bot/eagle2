@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;
+use App\Services\ZiniPaymentService;
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
@@ -97,7 +98,11 @@ class CoinService
             } else if ($request->pay_method == 'opay') {
                 $opay = new OPayController();
                 return $opay->make($data, $user);
-            } else {
+            } else if ($request->pay_method == 'zinipay') {
+                $ziniPayService = new ZiniPaymentService();
+                return $ziniPayService->makePayment($log->id, $coin->usd, $user);
+            }
+            else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
             }
         } catch (\Exception $exception) {

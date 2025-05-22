@@ -3,6 +3,7 @@
 namespace App\Observers\Api\V1;
 
 use App\Models\Agency;
+use App\Models\BDSallary;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Classes\Enums\NotificationType;
@@ -21,6 +22,7 @@ class UserSallaryObserver
     {
 
         $this->updateOrCreateAgencySallary($userSalary);
+        $this->updateOrCreateBDSallary($userSalary);
     }
 
 
@@ -43,6 +45,8 @@ class UserSallaryObserver
     public function saved(UserSallary $userSalary)
     {
         $this->updateOrCreateAgencySallary($userSalary, false);
+        $this->updateOrCreateBDSallary($userSalary);
+
     }
 
     public function creating(UserSallary $userSalary)
@@ -50,6 +54,8 @@ class UserSallaryObserver
 
         if(!$userSalary->extras) $userSalary->extras = '';
         $this->updateOrCreateAgencySallary($userSalary, true);
+        $this->updateOrCreateBDSallary($userSalary);
+
     }
 
 
@@ -105,4 +111,45 @@ class UserSallaryObserver
 
         }
     }
+
+    public function updateOrCreateBDSallary(UserSallary $userSalary, bool $isCreate = false): void
+    {
+        $agency = Agency::find($userSalary->user_agency_id);
+    
+        if ($userSalary->user_agency_id != 0 && $agency && $agency->bd_id && $agency->status == 1) {
+            $bdId    = $agency->bd_id;
+            $month   = now()->month;
+            $year    = now()->year;
+            $agencyId = $agency->id;
+    
+            $totalBdSallary = UserSallary::where('user_agency_id', $agencyId)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->sum('dB');
+    
+            $bdSalary = BDSallary::query()->where([
+                'bd_id'     => $bdId,
+                'agency_id' => $agencyId,
+                'month'     => $month,
+                'year'      => $year,
+            ])->lock()->first();
+    
+            if ($bdSalary) {
+                $bdSalary->update([
+                    'sallary' => $totalBdSallary
+                ]);
+            } else {
+                BDSallary::query()->create([
+                    'bd_id'      => $bdId,
+                    'agency_id'  => $agencyId,
+                    'month'      => $month,
+                    'year'       => $year,
+                    'cut_amount' => 0,
+                    'sallary'    => $totalBdSallary,
+                    'is_paid'    => false,
+                ]);
+            }
+        }
+    }
+
 }

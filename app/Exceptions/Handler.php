@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Helpers\Common;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -40,6 +41,9 @@ class Handler extends ExceptionHandler
             }elseif ($e instanceof \Illuminate\Auth\AuthenticationException) {
 
                 return Common::apiResponse (false,'Unauthenticated',[],401);
+            } elseif ($e instanceof ModelNotFoundException) {
+
+                return Common::apiResponse (false,'Wrong passed data',[],401);
             }
 
             \Log::error($e->getMessage() );

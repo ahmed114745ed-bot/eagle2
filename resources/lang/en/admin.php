@@ -401,6 +401,10 @@ return [
     //huaweiPay
     "huawei_pay_merchant_id" => "Merchant Id",
 
+    //ziniPay
+    "zinipay" => "ZiniPay",
+    "url" => "Url",
+
     'fawry'         => 'Fawry',
     'skyPay'        => 'Sky Pay',
     'strip'         => 'Stripe',
@@ -421,6 +425,7 @@ return [
     'sslcommerz'    => 'SSLCommerz',
     'google_pay'    => 'Google Pay',
     'huawei_pay'    => 'Huawei Pay',
+    "webhook_url" => "Webhook Url",
 
     "target_no" => 'Target Number',
     "diamonds" => 'Diamond Target',

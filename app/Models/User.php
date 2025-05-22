@@ -211,9 +211,7 @@ class User extends Authenticatable
             ->where('uid', $this->id)
             ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
             ->havingRaw('SUM(hours) > 1')
-            ->get(); // Having condition
-
-
+            ->get();
 
         return $subQuery->count('entry_count');
     }
@@ -444,7 +442,7 @@ class User extends Authenticatable
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class);
+        return $this->belongsTo(Agency::class, 'agency_id');
     }
 
     public function agencies()
@@ -713,6 +711,9 @@ class User extends Authenticatable
         //        }
     }
 
+
+
+
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level  + $this->sub_charger_level;
@@ -900,7 +901,7 @@ class User extends Authenticatable
 
     public function getTotalSenderLevelAttribute()
     {
-        return $this->sender_level + $this->sub_sender_level;
+        return $this->sender_level;
     }
 
     public function getTotalSenderDiamondsAttribute()
@@ -915,44 +916,43 @@ class User extends Authenticatable
 
     public function getTotalReceivedLevelAttribute()
     {
-        return $this->received_level + $this->sub_receiver_level;
+        return $this->received_level;
     }
 
     public function setTotalSenderLevelAttribute(float $value)
     {
-        $level = $this->sender_level + $this->sub_sender_level;
+        $level = $this->sender_level;
         if ($level == $value) return;
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
 
-        $this->sub_sender_level = $value - $this->sender_level;
-        $diamonds               =
-            (@Vip::query()->where('type', 2)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
+        $this->sub_sender_level = 0;
+        $this->sender_level = $value;
+        $diamonds  = (@Vip::query()->where('type', 2)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         //        $this->sub_sender_num   = $diamonds - $this->total_diamond_send;
         //        $this->sub_sender_num   = ($diamonds - $this->total_diamond_send) + (( (( $diamonds - $this->total_diamond_send) * ( 2 * ($expPercentages[0] / 100)))) );
         /*if ($expPercentages[0] <= 1) {
             $this->sub_sender_num = ($diamonds - $expPercentages[0] * $this->total_diamond_send) / $expPercentages[0];
         } else {*/
 
-        $this->sub_sender_num = ceil(($diamonds / $expPercentages[0])) - $this->total_diamond_send;
+        $this->sub_sender_num = ceil(($diamonds / $expPercentages['exp_sender_percentage'])) - $this->total_diamond_send;
 
         //        }
     }
 
     public function setTotalReceivedLevelAttribute(float $value)
     {
-        $level = $this->received_level + $this->sub_receiver_level;
+        $level = $this->received_level;
         if ($level == $value) return;
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
 
-        $this->sub_receiver_level = $value - $this->received_level;
-
-        $diamonds               =
-            (@Vip::query()->where('type', 1)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
+        $this->sub_receiver_level = 0;
+        $this->received_level = $value;
+        $diamonds = (@Vip::query()->where('type', 1)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         //        $this->sub_receiver_num = $diamonds - $this->total_diamond_received;
         /*if ($expPercentages[0] <= 1) {
             $this->sub_receiver_num = ($diamonds - $this->total_diamond_received * $expPercentages[1]) / $expPercentages[1];
         } else {*/
-        $this->sub_receiver_num = (ceil(($diamonds / $expPercentages[1])) - $this->total_diamond_received);
+        $this->sub_receiver_num = (ceil(($diamonds / $expPercentages['exp_received_percentage'])) - $this->total_diamond_received);
 
         //        }
     }
@@ -1119,7 +1119,7 @@ class User extends Authenticatable
     public function getLoadedPacks()
     {
         if ($this->loadedPacks === null) {
-            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6])->where('is_used', 1)->with('ware')->get();
+            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
         }
         return $this->loadedPacks;
     }
@@ -1316,5 +1316,47 @@ class User extends Authenticatable
     public function walletTransactionBackups()
     {
         return $this->hasMany(WalletTransactionBackup::class);
+    }
+
+    public function shippingAgency()
+    {
+        return $this->hasOne(ShippingAgency::class, 'app_owner_id');
+    }
+    public function hasShippingAgency()
+    {
+        return $this->shippingAgency()->exists();
+    }
+
+    public function hostAgency()
+    {
+        return $this->hasOne(Agency::class, 'app_owner_id');
+    }
+    public function hasHostAgency()
+    {
+        return $this->shippingAgency()->exists();
+    }
+
+    public function bdSalaries()
+    {
+        return $this->hasMany(BDSallary::class, 'bd_id');
+    }
+
+    public function getBdSalaryAttribute()
+    {
+        $userSallary = $this->bdSalaries()
+            ->sum(DB::raw('sallary - cut_amount'));
+        return floor($userSallary);
+    }
+    public function incrementCutAmountInBdSallary(int $amount)
+    {
+        $lastBdSalary = $this->bdSalaries()->latest()->first();
+
+        if ($lastBdSalary) {
+            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
+            $lastBdSalary->update(['cut_amount' => $newAmount]);
+            return true;
+        }
+
+        return false;
     }
 }

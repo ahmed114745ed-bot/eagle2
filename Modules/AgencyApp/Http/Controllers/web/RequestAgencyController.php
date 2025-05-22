@@ -251,8 +251,8 @@ class RequestAgencyController extends MainController
         $show->field('target_token_usd', __('Target token usd'));
         $show->field('app_owner_id', __('App owner id'));
         $show->field('salary', __('Salary'));
-        $show->field('Shipping_agency', __('Shipping agency'));
-        $show->field('Host_agency', __('Host agency'));
+        // $show->field('Shipping_agency', __('Shipping agency'));
+        // $show->field('Host_agency', __('Host agency'));
         $show->field('agency_manger_id', __('Agency manger id'));
         $show->field('agency_dash_manger_id', __('Agency dash manger id'));
         $show->field('deleted_at', __('Deleted at'));
@@ -284,8 +284,8 @@ class RequestAgencyController extends MainController
         $form->decimal('target_token_usd', __('Target token usd'));
         $form->number('app_owner_id', __('App owner id'));
         $form->decimal('salary', __('Salary'))->default(0.00);
-        $form->number('Shipping_agency', __('Shipping agency'));
-        $form->number('Host_agency', __('Host agency'));
+        // $form->number('Shipping_agency', __('Shipping agency'));
+        // $form->number('Host_agency', __('Host agency'));
         $form->number('agency_manger_id', __('Agency manger id'));
         $form->number('agency_dash_manger_id', __('Agency dash manger id'));
         $form->decimal('monthly_target', __('Monthly target'))->default(1000000);

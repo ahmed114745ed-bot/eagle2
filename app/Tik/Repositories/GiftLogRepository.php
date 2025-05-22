@@ -80,6 +80,7 @@ class GiftLogRepository extends AbstractRepository
             ->get();
     }
 
+
     public function getByDailyNew($userId, $agencyId, $start_at, $end_at)
     {
 
