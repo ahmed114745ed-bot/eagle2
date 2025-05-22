@@ -199,6 +199,8 @@ class SettingsController extends Controller
                     Cache::put($key, $value);
                 }
             }
+            info($key);
+            info($value);
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
@@ -213,6 +215,7 @@ class SettingsController extends Controller
 
         }
 
+        info($request);
 
         if ($request->has('user_coins')) {
             Config::query()->where('name', '=', 'one_usd_value_in_coins')->update(['value' => $request->user_coins]);
