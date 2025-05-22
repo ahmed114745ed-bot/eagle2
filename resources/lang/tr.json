@@ -642,6 +642,8 @@
     "Name en": "İsim (İngilizce)",
     "Description ar": "Açıklama (Arapça)",
     "Description en": "Açıklama (İngilizce)",
+    "Description tr": "Açıklama",
+    "Description hi": "Açıklama",
     "statistics": "İstatistikler",
     "delete": "Sil",
     "manger type": "Yönetici türleri",
@@ -1115,7 +1117,7 @@
   "create pk event": "PK Etkinliği Oluştur",
   "create pk event rewards": "PK Etkinliği Ödülleri Oluştur",
   "Create Privilege": "Ayrıcalık Oluştur",
- 
+
   "Create Recharge Request": "Yükleme Talebi Oluştur",
   "create report": "Rapor Oluştur",
   "create report moment": "Rapor Anı Oluştur",
@@ -2230,7 +2232,7 @@
   "user parent": "Kullanıcı velisi",
   "general": "Genel",
    "Lucky box": "Şans kutusu",
-   
+
 
   "Create Agencies": "Ajanslar Oluştur",
   "browse report": "Raporlara Gözat",

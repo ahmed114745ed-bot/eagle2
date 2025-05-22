@@ -676,6 +676,8 @@
     "Name en": "الاسم بالانجليزيه",
     "Description ar": "الوصف بالعربى",
     "Description en": "الوصف بالانجليزيه",
+    "Description tr": "الوصف بالتركيه",
+    "Description hi": "الوصف بالهندية",
     "statistics": "احصائيات",
     "delete": "حذف",
     "manger type": "انواع الادمن",
@@ -2276,7 +2278,7 @@
   "Go to Settings": "انتقل إلى الإعدادات"
 ,
   "wealth_gift_price": "سعر هدية الثروة",
-  
+
   "browse agency settings": "عرض إعدادات الوكالة",
   "edit agency settings": "تعديل إعدادات الوكالة",
   "browse page": "عرض الصفحة",
@@ -2355,7 +2357,7 @@
   "user parent": " المستخدمون  ",
   "general": "عام",
    "Lucky box": "صندوق الحظ",
-   
+
 
   "Create Agencies": "إنشاء الوكالات",
   "browse report": "تصفح التقرير",
@@ -2505,7 +2507,7 @@
     "BD Management":"ادارة BD",
     "bd management":"ادارة BD",
     "bD Management":"ادارة BD"
-    
+
 
 
 
