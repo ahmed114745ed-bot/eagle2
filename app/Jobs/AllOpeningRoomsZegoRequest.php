@@ -65,6 +65,8 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
 
         $rooms = $rooms->pluck('id');
 
+        \Log::info($rooms);
+
         $chunk = $rooms->chunk(15);
         foreach ($chunk as $roomIds) {
             $promises = Common::sendToZegoWithArrayOfRooms('SendCustomCommand', $roomIds->toArray(), $this->senderId, $this->json, exceptRoomId: $this->isExceptRoom ? $this->roomID : null);
