@@ -8,6 +8,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\VipPrivilege;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -227,7 +228,9 @@ class OvipGiftTapController extends MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
         //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function ($file) {
+        $form->file('img2', trans('svg'))
+            ->rules('required|mimes:mp4')
+            ->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
 //        $form->select('image_type1', __('image_type'))->options(
@@ -249,12 +252,23 @@ class OvipGiftTapController extends MainController
 //        )->attribute(['id' => 'profile_frame'])->required();
 
         $form->saving(function (Form $form) {
-            if ($form->show_img instanceof \Illuminate\Http\UploadedFile) {
+            if ($form->show_img instanceof UploadedFile) {
                 $form->image_type1 = $form->show_img->guessExtension();
             }
 
-            if ($form->img2 instanceof \Illuminate\Http\UploadedFile) {
-                $form->profile_frame_type = $form->img2->guessExtension();
+            if ($form->img2 instanceof UploadedFile) {
+                $ext = strtolower($form->img2->guessExtension());
+                $originalExt = strtolower($form->img2->getClientOriginalExtension());
+
+                if ($ext === 'zz' && $originalExt === 'svga') {
+                    $ext = 'svga';
+                }
+
+                if (!in_array($ext, ['svga', 'mp4'])) {
+                    $form->error('Only SVGA and MP4 files are allowed for img2.');
+                } else {
+                    $form->profile_frame_type = $ext;
+                }
             }
         });
 
