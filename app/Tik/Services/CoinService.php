@@ -85,6 +85,7 @@ class CoinService
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($request->pay_method == 'fawry') {
+                info('fawry');
                 $oldFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
