@@ -39,7 +39,7 @@ class OvipGiftTapController extends MainController
         } elseif (request('level')) {
             $ovip = OVip::where('level', request('level'));
         }
-      
+
 
 
         return parent::index($content
@@ -230,23 +230,34 @@ class OvipGiftTapController extends MainController
         $form->file('img2', trans('svg'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
-        $form->select('image_type1', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'alpha' => __('alpha'),
-                'mp4' => __('mp4'),
-                'vap' => __('vap'),
+//        $form->select('image_type1', __('image_type'))->options(
+//            [
+//                'svga' => __('svga'),
+//                'alpha' => __('alpha'),
+//                'mp4' => __('mp4'),
+//                'vap' => __('vap'),
+//
+//            ]
+//        )->attribute(['id' => 'image_type1'])->required();
+//
+//        $form->select('profile_frame_type', __('image_type'))->options(
+//            [
+//                'svga' => __('svga'),
+//                'png' => __('png'),
+//
+//            ]
+//        )->attribute(['id' => 'profile_frame'])->required();
 
-            ]
-        )->attribute(['id' => 'image_type1'])->required();
+        $form->saving(function (Form $form) {
+            if ($form->show_img instanceof \Illuminate\Http\UploadedFile) {
+                $form->image_type1 = $form->show_img->guessExtension();
+            }
 
-        $form->select('profile_frame_type', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'png' => __('png'),
+            if ($form->img2 instanceof \Illuminate\Http\UploadedFile) {
+                $form->profile_frame_type = $form->img2->guessExtension();
+            }
+        });
 
-            ]
-        )->attribute(['id' => 'profile_frame'])->required();
         $form->text('key', trans('key'));
 
         $script = <<<SCRIPT
