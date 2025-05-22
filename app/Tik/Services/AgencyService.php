@@ -117,7 +117,7 @@ class AgencyService
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        $target = $this->userSalaryRepository->newUserSalary($userId, $month, $year);
+        $target = $this->userSalaryRepository->newUserSalary($user->id, $month, $year);
         $minValue = $this->targetRepository->getByUsd($target);
         $result = (@$minValue->agency_share / 100) * @$target;
         $usersTargetDetails = $this->userRepository->agencyUsers($userId, $month, $year, 10, $request->page);
@@ -930,7 +930,7 @@ class AgencyService
             $userType = 2;
         } elseif ($request->type == 2 ) {
             $userType = 3;
-        } 
+        }
 
         $data = [
             'agency_id' =>  $agency->id,
@@ -963,7 +963,7 @@ class AgencyService
             $userType = 2;
         } elseif ($request->type == 2 ) {
             $userType = 3;
-        } 
+        }
 
         $data = [
             'agency_id' =>  $agency->id,
