@@ -1223,10 +1223,13 @@ class Common
             'name' => $user->name,
         ]);
         $role = Role::where('slug', 'agency-owner')->first();
-        if (!$role) Role::create([
-            'slug' => 'agency-owner',
-            'name' => 'agency owner',
-        ]);
+        if (!$role) {
+            Role::create([
+                'slug' => 'agency-owner',
+                'name' => 'agency owner',
+            ]);
+        }
+        $role = Role::where('slug', 'agency-owner')->first();
         if ($admin && $role) {
             DB::table('admin_role_users')->insert([
                 'user_id' => $admin->id,
