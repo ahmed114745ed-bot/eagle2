@@ -53,7 +53,7 @@ class AgencyDetailsResource extends JsonResource
                     "image" => ''
                 ]
             ],
-            'user_agency_status' =>  $this->app_owner_id == Auth::id() ? 2 : ($adminUser ? 1 : 3),
+            'user_agency_status' =>  $this->app_owner_id == $user->id ? 2 : ($adminUser ? 1 : 3),
             'admins' => AdminsAgencyResource::collection($admin),
             //'members' => MyDataForAgancyNewResource::collection($this->mempers),
             'star' => ReceiverGiftLogResource::collection($giftLog),
