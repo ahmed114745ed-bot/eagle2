@@ -65,6 +65,11 @@
     .sidebar-menu>li>a {
         padding-left: 0; !important;
     }
+
+    /*important*/
+    input, select{
+        width: auto !important;
+    }
 </style>
 </head>
 
