@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
 
 class BdController extends AdminController
 {
@@ -169,11 +171,34 @@ class BdController extends AdminController
                     $form->app_id = $originalAppId;  
                 }
             }
-        
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = Hash::make($form->password);
             }
         });
+
+        $form->saved(function (Form $form) {
+            $userId = $form->model()->id;
+        
+            $role = DB::table('admin_roles')->where('slug', 'bd')->first();
+        
+            if ($role && $userId) {
+                $exists = DB::table('admin_role_users')
+                    ->where('user_id', $userId)
+                    ->where('role_id', $role->id)
+                    ->exists();
+        
+                if (!$exists) {
+                    DB::table('admin_role_users')->insert([
+                        'user_id' => $userId,
+                        'role_id' => $role->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        });
+        
+        
         return $form;
     }
 
