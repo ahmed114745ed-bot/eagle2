@@ -480,4 +480,18 @@ class ChargeRepoService
         ];
         $this->create($data);
     }
+
+
+
+    public function getChargeToUserHistory()
+    {
+
+        return $this->chargeRepository->getChargeToUserHistory();
+    }
+
+    public function getChargeAgencyHistory()
+    {
+        return $this->chargeRepository->getChargeToAgencyHistory();
+        
+    }
 }

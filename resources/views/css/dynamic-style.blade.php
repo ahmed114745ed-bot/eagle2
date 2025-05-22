@@ -22,6 +22,17 @@
         --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
     }
 
+    .rtl label {
+        margin: 0 0 0 10px !important;
+    }
+
+    .ltr label {
+        margin: 0 70px 0 0 !important;
+    }
+
+    .rtl .pull-right{
+        float: left !important;
+    }
 
     .btn-success {
         background: var(--success-button) !important;
