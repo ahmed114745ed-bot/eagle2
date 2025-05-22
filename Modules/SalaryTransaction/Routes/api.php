@@ -44,4 +44,3 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
 
     }
 );
-Route::get('/get-info/{agency?}', [AgencyController::class, 'get_info'])->where('agency', '[0-9]+');
