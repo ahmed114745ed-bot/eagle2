@@ -277,6 +277,11 @@ class MyDataResource extends JsonResource
     public function getUserPack($type)
     {
         $pack = $this->packs->where('type', $type)->first();
-        return $pack ?  new GeneralUserPackResource($pack) : new \stdClass();
+        return $pack ?  new GeneralUserPackResource($pack) : [
+            'id'   =>  0,
+            'image_type' => 'png',
+            'key' => '',
+            'image' => 'wappel.png',
+        ];
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\BDControllers\RequestAgencyController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BDControllers\WalletController;
@@ -529,13 +530,13 @@ Route::group(
             $router->get('/charges', 'ChargeController@index')->name('charges');
             $router->resource('/agencies', 'AgencyController');
             $router->resource('/salaries', 'BdSalariesController');
-            $router->resource('/request-agencies', 'RequestAgencyController');
             $router->resource('charges', 'ChargeController');
             // $router->resource('/wallet', 'WalletController');
             Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
             Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
 
         });
+        $router->resource('/request-agencies', RequestAgencyController::class);
 
         
         
