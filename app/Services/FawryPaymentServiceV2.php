@@ -6,6 +6,7 @@ use App\Models\PaymentMethodHistory;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Mockery\Exception;
 
 class FawryPaymentServiceV2
 {
@@ -31,9 +32,13 @@ class FawryPaymentServiceV2
     {
         $data = $this->getBodyForFawry($trx,$amount);
 
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post($this->fawryUrl, $data);
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post($this->fawryUrl, $data);
+        }catch (Exception $exception){
+            info($exception->getMessage());
+        }
 
         return $response->body();
     }
