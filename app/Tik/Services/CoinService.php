@@ -39,7 +39,6 @@ class CoinService
         $coin = $this->coinRepository->findById($request->coin_id);
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $trx = rand(111111111111111111, 999999999999999999);
-        info('im here');
         // DB::beginTransaction();
         try {
             $dataCoinLog = [
@@ -86,7 +85,6 @@ class CoinService
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($request->pay_method == 'fawry') {
-                info('fawry');
                 $oldFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
