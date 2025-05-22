@@ -102,6 +102,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
+        
     });
 
     Route::post('/chatVideo', [StorageUploadController::class, 'chatVideo']);
@@ -174,6 +175,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
             Route::prefix('config')->group(function () {
+                 Route::get('settings', [VersionController::class, 'settings']);
                 Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
                 //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
             });
@@ -497,6 +499,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
+                Route::post('charges-history', [ChargeController::class, 'chargeToHistory']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);

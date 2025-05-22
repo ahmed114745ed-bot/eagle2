@@ -15,7 +15,7 @@ class VersionController extends Controller
     public function versionAndCache(Request $request)
     {
         $version = $request->version;
-        $currentVersion  = settings()->get( $request->OS == 'Huawei' ?'huawei_current_version' : ($request->OS == 'IOS' ? 'ios_current_version' : 'android_current_version'));
+        $currentVersion  = settings()->get($request->OS == 'Huawei' ? 'huawei_current_version' : ($request->OS == 'IOS' ? 'ios_current_version' : 'android_current_version'));
 
         /*if ($version > $currentVersion){
             return Common::apiResponse(false, __('api_responses.disabled_version'));
@@ -23,13 +23,13 @@ class VersionController extends Controller
         $authorizationHeader = $request->header('Authorization');
         $token               = $this->getTokenFromHeader($authorizationHeader);
         [$isAuth, $user] = $this->isAuth($token);
-        if ($user ){
+        if ($user) {
             try {
-                if ($request->OS != 'IOS' && $user->android_version != $version){
+                if ($request->OS != 'IOS' && $user->android_version != $version) {
                     DB::table('users')->where('id', $user->id)->update(['android_version' => intval($version)]);
-                }else if ($request->OS == 'IOS' && $user->ios_version != $version){
+                } else if ($request->OS == 'IOS' && $user->ios_version != $version) {
                     DB::table('users')->where('id', $user->id)->update(['ios_version' => intval($version)]);
-                }else if ($request->OS == 'Huawei' && $user->huawei_version != $version){
+                } else if ($request->OS == 'Huawei' && $user->huawei_version != $version) {
                     DB::table('users')->where('id', $user->id)->update(['huawei_version' => intval($version)]);
                 }
             } catch (\Exception $e) {
@@ -47,8 +47,8 @@ class VersionController extends Controller
 
         $data = [
             'is_auth'         => $isAuth && !$isBan,
-            'is_last_version' => $currentVersion <= (integer)$version && (integer)$version <= 40,
-            'is_force'        => $this->isForce($version, $request->OS ),
+            'is_last_version' => $currentVersion <= (int)$version && (int)$version <= 40,
+            'is_force'        => $this->isForce($version, $request->OS),
             'is_show_shipping_agencies' => true,
             'badges-agency' =>  settings()->get('badges-agency'),
             'cache_update' => [
@@ -62,7 +62,8 @@ class VersionController extends Controller
                 'background' => settings()->get('ground_updated_at') ?? false,
                 'host_agency' => (bool)\Cache::get('host_agency'),
                 //intro - frames - extradata - emoji
-            ], 'enable_chat'  => settings()->get('chat_status') == "on"
+            ],
+            'enable_chat'  => settings()->get('chat_status') == "on"
         ];
 
         //update current version for user
@@ -77,7 +78,8 @@ class VersionController extends Controller
         //split from id|token to $token
         $tokens = explode('|', $token);
 
-        if (count($tokens) == 2) $token = $tokens[1]; elseif (count($tokens) == 1) $token = $tokens[0];
+        if (count($tokens) == 2) $token = $tokens[1];
+        elseif (count($tokens) == 1) $token = $tokens[0];
         else $token = null;
         return $token;
     }
@@ -121,7 +123,6 @@ class VersionController extends Controller
         $isGiftUpdated     = true;
         if ($settingGiftUpdate == null && $time != null) {
             $isGiftUpdated = false;
-
         } elseif ($time) {
             $isGiftUpdated = $settingGiftUpdate > $time;
         }
@@ -153,5 +154,13 @@ class VersionController extends Controller
         $user->save();
         return true;
     }
-}
 
+    public function settings()
+    {
+        $config = getPusherConfig();
+        $data = [
+            'pusher' => $config,
+        ];
+        return Common::apiResponse(true, '', $data);
+    }
+}
