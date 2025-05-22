@@ -1223,6 +1223,10 @@ class Common
             'name' => $user->name,
         ]);
         $role = Role::where('slug', 'agency-owner')->first();
+        if (!$role) Role::create([
+            'slug' => 'agency-owner',
+            'name' => 'agency owner',
+        ]);
         if ($admin && $role) {
             DB::table('admin_role_users')->insert([
                 'user_id' => $admin->id,
@@ -1371,19 +1375,18 @@ class Common
     {
         $messageData = is_string($messageData) ? json_decode($messageData, true) ?? [] : $messageData;
         $fullKey = 'messages.' . $messageKey;
-    
+
         if (str_contains($messageKey, 'user')) {
             $userId = $messageData['receiver_id'] ?? $messageData['user_id'] ?? null;
             if ($userId) {
                 $user = \App\Models\User::find($userId);
                 if ($user) {
                     $messageData['name'] = $user->name;
-                    $messageData['target'] = $user->name; 
-                
+                    $messageData['target'] = $user->name;
                 }
             }
         }
-    
+
         if (str_contains($messageKey, 'agency')) {
             $agencyId = $messageData['agency_id'] ?? null;
             if ($agencyId) {
@@ -1394,11 +1397,10 @@ class Common
                 }
             }
         }
-    
+
         $messageData['name'] = $messageData['name'] ?? $messageData['target'] ?? __('unknown');
         $messageData['target'] = $messageData['target'] ?? $messageData['name'] ?? __('unknown');
-    
+
         return __($fullKey, $messageData);
     }
-    
 }
