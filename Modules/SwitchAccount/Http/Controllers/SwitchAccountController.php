@@ -91,34 +91,21 @@ class SwitchAccountController extends Controller
 
     public function getAllAccounts($userId, $otherUserId, $deviceToken)
     {
-        
 
         if (empty($deviceToken)) return [];
 
-        $users = UserAccount::where(function ($q) use ($userId, $otherUserId) {
-                $q->where('parent_user_id', $userId)
-                  ->orWhere('child_user_id', $userId)
-                  ->orWhere('parent_user_id', $otherUserId)
-                  ->orWhere('child_user_id', $otherUserId);
-            })
-            ->where('device_token', $deviceToken)
-            ->get();
-    
-        $relatedUserIds = collect();
-    
-        foreach ($users as $account) {
-            if ($account->parent_user_id != $userId) {
-                $relatedUserIds->push($account->parent_user_id);
+            $accounts = UserAccount::where('device_token', $deviceToken)->get();
+
+            $userIds = collect();
+
+            foreach ($accounts as $account) {
+                $userIds->push($account->parent_user_id);
+                $userIds->push($account->child_user_id);
             }
-    
-            if ($account->child_user_id != $userId) {
-                $relatedUserIds->push($account->child_user_id);
-            }
-        }
-    
-        $relatedUserIds = $relatedUserIds->unique()->values();
-    
-        return User::whereIn('id', $relatedUserIds)->get();
+
+            $userIds = $userIds->unique()->values();
+
+            return User::whereIn('id', $userIds)->get();
         // if (empty($deviceToken))  return  [];
 
         // $users = UserAccount::
