@@ -4,6 +4,7 @@ namespace App\Tik\Repositories;
 
 
 use App\Models\Charge;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -44,4 +45,25 @@ class ChargeRepository extends AbstractRepository
             }
         ])->where('charger_type', $type);
     }
+
+
+    public function getChargeToUserHistory()
+    {
+       
+        return $this->model
+            ->where('charger_id', Auth::user()->id)
+            ->with('receiver:id,uuid')
+            ->select('id', 'user_id', 'amount', 'usd') ->get();
+    }
+    
+    public function getChargeToAgencyHistory()
+    {
+        return $this->model
+            ->where('charger_id', Auth::user()->id)
+            ->with('agency:id,name,img')
+            ->select('id', 'agency_id', 'amount', 'usd')->get();
+    }
+    
+
 }
+
