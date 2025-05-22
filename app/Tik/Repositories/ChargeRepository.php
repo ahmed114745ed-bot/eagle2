@@ -49,20 +49,33 @@ class ChargeRepository extends AbstractRepository
 
     public function getChargeToUserHistory()
     {
-       
+        $perPage = request('per_page', 10);
+        $page = request('page', 1);
+    
         return $this->model
             ->where('charger_id', Auth::user()->id)
-            ->with(['receiver:id,uuid','receiver.profile:id,user_id,avatar'])
-            ->select('id', 'user_id', 'amount', 'usd') ->get();
-
+            ->whereNotNull('user_id')
+            ->with([
+                'receiver:id,uuid',
+                'receiver.profile:id,user_id,avatar'
+            ])
+            ->select('id', 'user_id', 'amount', 'usd', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
     
     public function getChargeToAgencyHistory()
     {
+        $perPage = request('per_page', 10);
+        $page = request('page', 1);
+    
         return $this->model
             ->where('charger_id', Auth::user()->id)
+            ->whereNotNull('agency_id')
             ->with('agency:id,name,img')
-            ->select('id', 'agency_id', 'amount', 'usd')->get();
+            ->select('id', 'agency_id', 'amount', 'usd', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
     
 
