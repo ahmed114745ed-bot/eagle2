@@ -33,9 +33,14 @@ class DataUserResource extends JsonResource
 
         $achievement_images = [];
         if ($this->medals) {
-            foreach ($this->medals()->take(3) as $medal) {
+            foreach ($this->medals as $medal) {
                 if ($medal->achievementLevel) {
                     $achievement_images[] = $medal->achievementLevel->valid_image;
+
+                    // Stop after collecting 3 images
+                    if (count($achievement_images) === 3) {
+                        break;
+                    }
                 }
             }
         }
