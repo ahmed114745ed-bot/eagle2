@@ -1497,18 +1497,18 @@ use App\Models\Vip;
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label for="fawry_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                        <div class="copy-container">--}}
-{{--                                                            <input type="text" id="fawry_webhook_url" name="fawry_webhook_url"--}}
-{{--                                                                   placeholder="fawry_webhook_url"--}}
-{{--                                                                   value="{{ $settings['fawry_webhook_url'] ?? '' }}"--}}
-{{--                                                                   class="form-control" readonly>--}}
-{{--                                                            <button type="button" class="copy-button" data-copy-target="fawry_webhook_url" title="Copy">📋</button>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="fawry_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                        <div class="copy-container">
+                                                            <input type="text" id="fawry_webhook_url" name="fawry_webhook_url"
+                                                                   placeholder="fawry_webhook_url"
+                                                                   value="{{ $settings['fawry_webhook_url'] ?? '' }}"
+                                                                   class="form-control" readonly>
+                                                            <button type="button" class="copy-button" data-copy-target="fawry_webhook_url" title="Copy">📋</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             @endif
                                             @if ($coin->type == 'strip')
                                                 <div class="col-md-6">
