@@ -2501,7 +2501,10 @@
     "Net Salary":"الرصيد الحالي",
     "set_bd_as_default":"افتراضي bd",
         "bd_already_default": "هذا الـ BD هو الافتراضي بالفعل",
-    "bd_set_default_success": "تم تعيين الـ BD كافتراضي بنجاح"
+    "bd_set_default_success": "تم تعيين الـ BD كافتراضي بنجاح",
+    "BD Management":"ادارة BD",
+    "bd management":"ادارة BD",
+    "bD Management":"ادارة BD"
     
 
 
