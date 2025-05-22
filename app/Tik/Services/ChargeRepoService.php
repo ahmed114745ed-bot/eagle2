@@ -9,6 +9,7 @@ use App\Models\Agency;
 use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Services\WalletService;
+use App\Tik\Repositories\ShippingAgencyRepository;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AgencyRepository;
@@ -30,6 +31,7 @@ class ChargeRepoService
         private readonly UserRepository         $userRepository,
         private readonly UserSalaryRepository   $userSalaryRepository,
         private readonly AgencyRepository       $agencyRepository,
+        private readonly ShippingAgencyRepository       $shippingAgencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly CoinLogRepository $coinLogRepository
     ) {}
@@ -346,7 +348,7 @@ class ChargeRepoService
     {
         try {
 
-            $agencies = $this->agencyRepository->filterAgency($request->id);
+            $agencies = $this->shippingAgencyRepository->filterAgency($request->id);
             $users = $this->userRepository->filterUser($request->id);
             $data = [
                 'agency' => GeneralAgencyResource::collection($agencies),
