@@ -39,6 +39,7 @@ class CoinService
         $coin = $this->coinRepository->findById($request->coin_id);
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $trx = rand(111111111111111111, 999999999999999999);
+        info('im here');
         // DB::beginTransaction();
         try {
             $dataCoinLog = [
