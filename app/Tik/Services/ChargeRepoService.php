@@ -186,7 +186,7 @@ class ChargeRepoService
 
             $receiver = $this->userRepository->searchUserById($receiverUuid);
             if (!$receiver) throw new \Exception('this user not found');
-            if ($receiver->transfer_salary == 1) throw new \Exception('api.freez_charge');
+            if ($receiver->transfer_salary == 1) throw new \Exception('api.freez_charge_user');
 
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
