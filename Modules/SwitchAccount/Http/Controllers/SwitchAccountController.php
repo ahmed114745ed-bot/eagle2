@@ -97,7 +97,9 @@ class SwitchAccountController extends Controller
     
         $userIds = $accounts->flatMap(function ($account) {
             return [$account->parent_user_id, $account->child_user_id];
-        })->unique()->values();
+        })->unique()->filter(function ($id,$userId) {
+            return $id !== $userId; 
+        })->values();
     
         return User::whereIn('id', $userIds)->get();
         // if (empty($deviceToken))  return  [];
