@@ -306,7 +306,7 @@ class AdminPermission extends Seeder
         })->delete();
 
         $actions = ['browse'];
-        $targets = ['user-parent','weekly_cp'],'level-cp';
+        $targets = ['user-parent','weekly_cp','level-cp'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
