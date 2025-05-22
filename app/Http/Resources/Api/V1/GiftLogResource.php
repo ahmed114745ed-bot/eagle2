@@ -16,8 +16,8 @@ class GiftLogResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'num'=>numToString($this->t),
-            'gift'=>new GiftResource($this->gift),
+            'num'=>numToString(@$this->t),
+            'gift'=>new GiftResource(@$this->gift),
         ];
     }
 }

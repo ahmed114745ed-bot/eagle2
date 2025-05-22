@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use DB;
 use Auth;
 use Exception;
+use App\Models\Gift;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
@@ -15,11 +16,11 @@ use App\Enums\UserType;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Services\UserService;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
 use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
@@ -38,6 +39,7 @@ use App\Http\Resources\UserVisitRoomResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\AllUsersResource;
+use App\Http\Resources\Api\V1\DataUserResource;
 use App\Http\Resources\Api\V1\ShowUserResource;
 use App\Http\Resources\Api\V1\UserTypeResource;
 use App\Http\Resources\Api\V1\LevelUserResource;
@@ -50,7 +52,6 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
-use App\Models\Gift;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -118,7 +119,7 @@ class UserController extends Controller
     }
     public function image_intro($id)
     {
-        if(!$id) return Common::apiResponse(false, 'messing user id parameter', 400);
+        if (!$id) return Common::apiResponse(false, 'messing user id parameter', 400);
         $user = User::find($id);
         if (! $user) return Common::apiResponse(false, 'user not found', 400);
         $dr = '';
@@ -192,7 +193,7 @@ class UserController extends Controller
             $invite_code = true;
         } else {
             $invite_code = false;
-            if ( $user->userSetting && $user->userSetting->show_invite_code == 1) {
+            if ($user->userSetting && $user->userSetting->show_invite_code == 1) {
                 $invite_code = true;
             }
         }
@@ -259,7 +260,7 @@ class UserController extends Controller
 
         return response()->json($users);
     }
-    
+
     public function userAgencyShipping(Request $request)
     {
         $key = $request->q;
@@ -1101,5 +1102,13 @@ class UserController extends Controller
         $user         = $request->user();
         $data = $this->userService->userChargeLevel($user);
         return Common::apiResponse(true, 'success', $data);
+    }
+
+    public function dataUser(Request $request)
+    {
+        $id = $request->id;
+        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
+        $data = $this->userService->dataUser($id);
+        return Common::apiResponse(true, 'done', new DataUserResource($data));
     }
 }
