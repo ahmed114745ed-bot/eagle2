@@ -34,7 +34,7 @@ class TargetEventController extends MainController
             ->title(trans('Charging Events'))
             ->row(function (Row $row) use ($sidebar, $grid) {
                 $row->column(3, $sidebar);
-                $row->column(9, $this->grid());
+                $row->column(9, $grid);
             });
     }
 

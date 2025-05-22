@@ -628,6 +628,8 @@
     "Name en": "नाम (अंग्रेज़ी)",
     "Description ar": "विवरण (अरबी)",
     "Description en": "विवरण (अंग्रेज़ी)",
+    "Description tr": "विवरण",
+    "Description hi": "विवरण",
     "statistics": "आंकड़े",
     "delete": "हटाएं",
     "manger type": "प्रबंधक प्रकार",
@@ -1385,7 +1387,7 @@
   "user parent": "उपयोगकर्ता अभिभावक",
   "general": "सामान्य",
   "Lucky box": "लकी बॉक्स",
-  
+
 
   "Create Agencies": "एजेंसियां बनाएँ",
   "browse report": "रिपोर्ट देखें",

@@ -75,19 +75,7 @@
         <div class="col-md-12">
             <div class="row ">
                 <div class="col-md-12">
-
-
-                    <div class="box-body no-padding" style="margin: 10px">
-                        @php
-                            $role = \Modules\Events\Entities\GeneralRole::where("type","weekly_star")->first();
-                        @endphp
-                        @if($role != null)
-                            <a href="{{url('admin/general-rols/'.@$role->id.'/edit')}}">
-                                {{ auth()->user()->lan == "en" ? @$role->desc_en : @$role->desc_ar }}
-                            </a>
-                        @endif
-                        
-                    </div>
+                    @include('admin.grid.users.language-tabs', ['type' => 'weekly_star'])
                 </div>
 
             </div>
