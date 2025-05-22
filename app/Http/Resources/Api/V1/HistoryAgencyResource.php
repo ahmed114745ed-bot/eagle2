@@ -28,9 +28,18 @@ class HistoryAgencyResource extends JsonResource
     {
 
 
+
         $year = request('year') ?? Carbon::now()->year;
         $month = request('month') ?? Carbon::now()->month;
+        $target = UserSallary::where('user_agency_id', $this->agency_id)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('agency_sallary');
 
+        // Calculate the agency share threshold based on the target
+
+        $minValue = Target::where('usd', '<', $target)
+            ->orderBy('usd', 'desc')
+            ->first();
+
+        $result = (@$minValue->agency_share / 100) * @$target;
 
         $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
             ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->take(3)->get();
@@ -43,7 +52,7 @@ class HistoryAgencyResource extends JsonResource
             'star' => ReceiverGiftLogResource::collection($giftLog),
             'heroes' => SenderGiftLogResource::collection($heroGiftLog),
             'salary' => $salary,
-            'target' => $target,
+            'target' => $result,
 
         ];
     }
