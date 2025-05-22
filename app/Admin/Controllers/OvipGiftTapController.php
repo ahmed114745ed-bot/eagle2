@@ -229,7 +229,7 @@ class OvipGiftTapController extends MainController
         })->default('1.png');
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))
-            ->rules('required|mimes:mp4')
+            ->rules('mimes:mp4')
             ->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
