@@ -1888,98 +1888,45 @@
   "delete achievement_level": "उपलब्धि स्तर हटाएं",
   "edit achievement_level": "उपलब्धि स्तर संपादित करें",
   "browse achievement_level": "उपलब्धि स्तर ब्राउज़ करें",
-  "edit version": "संस्करण संपादित करें"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "edit version": "संस्करण संपादित करें",
+  "salaries BD": "BD वेतन",
+  "my wallet": "मेरा वॉलेट",
+  "request-agencies": "एजेंसी अनुरोध",
+  "request agencies": "एजेंसी अनुरोध",
+  "Request agencies": "एजेंसी अनुरोध",
+  "bd": "BD",
+  "Bd": "BD",
+  "BD": "BD",
+  "current_balance": "वर्तमान शेष",
+  "remaining_percent": "शेष प्रतिशत",
+  "cut": "कटौती",
+  "total": "कुल",
+  "agency": "एजेंसी",
+  "List of Agencies": "एजेंसियों की सूची",
+  "confirm_charge": "चार्ज की पुष्टि करें",
+  "enter_amount": "राशि दर्ज करें",
+  "transfer_to_wallet": "वॉलेट में स्थानांतरित करें",
+  "charge_wallet": "वॉलेट चार्ज करें",
+  "current_balance": "वर्तमान शेष",
+  "select_target": "लक्ष्य चुनें",
+  "bd_wallet_notice": "BD वॉलेट से डॉलर राशि स्थानांतरित करने पर, वह राशि आपके वॉलेट में जोड़ दी जाएगी। फिर आप इसे बेच सकते हैं या दूसरों को भेज सकते हैं।"
+,  "back": "वापस",
+  "Charge History": "चार्ज इतिहास",
+  "Total Agency Sallary": "कुल एजेंसी वेतन",
+  "Total Users Sallary": "कुल उपयोगकर्ता वेतन",
+  "Total Diamond": "कुल हीरा",
+  "January": "जनवरी",
+  "February": "फ़रवरी",
+  "March": "मार्च",
+  "April": "अप्रैल",
+  "May": "मई",
+  "June": "जून",
+  "July": "जुलाई",
+  "August": "अगस्त",
+  "September": "सितंबर",
+  "October": "अक्टूबर",
+  "November": "नवंबर",
+  "December": "दिसंबर"
 
 
 
