@@ -23,8 +23,8 @@ class DataUserResource extends JsonResource
 
             $f = [
                 'owner_id' => $family->user_id,
-                'family_name' => $family->name,
-                'max_num' => $family->num,
+                'family_name' => $family->name ?? '',
+                'max_num' => $family->num ?? 0,
                 'img' => $family->image,
                 'num_of_members' => $family->members_count,
                 'level' => $family->level,
