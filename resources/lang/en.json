@@ -776,6 +776,23 @@
   "bd_wallet_notice": "When you transfer an amount in dollars from the BD wallet, it will be added to your wallet. Then you can sell or send it to others through the My Wallet page."
 ,"confirm_transfer":"Confirm Transfer",
 "total_sallary":" Total Sallary",
-"totalCut":"Total Amount"
+"totalCut":"Total Amount",
+  "back": "Back",
+  "Charge History": "Charge History",
+  "Total Agency Sallary": "Total Agency Salary",
+  "Total Users Sallary": "Total Users Salary",
+  "Total Diamond": "Total Diamond",
+  "January": "January",
+  "February": "February",
+  "March": "March",
+  "April": "April",
+  "May": "May",
+  "June": "June",
+  "July": "July",
+  "August": "August",
+  "September": "September",
+  "October": "October",
+  "November": "November",
+  "December": "December"
 
 }

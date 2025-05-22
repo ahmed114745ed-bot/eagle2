@@ -2020,6 +2020,7 @@
     "Is enable": "هل مفعل",
     "Stats": "الإحصائيات",
     "Search by name or UUID": "ابحث بالاسم أو UUID",
+    "Search": "ابحث",
     "Moment id": "رقم اللحظة",
     "room-vips": "نخبة الغرفة",
     "hosts": "المضيفون",
@@ -2447,22 +2448,25 @@
 "Settings charging agencies": "إعدادات وكالات الشحن",
   "setting Agency Manager": "إعداد مدير الوكالة",
   "Host Agencies Settings": "إعدادات وكالات المضفين",
-"Agency Hosts Reports": "تقارير وكالات المضفين"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"Agency Hosts Reports": "تقارير وكالات المضفين",
+    "back": "رجوع",
+  "Charge History": "سجل الشحن",
+  "Total Agency Sallary": "إجمالي راتب الوكالة",
+  "Total Users Sallary": "إجمالي رواتب المستخدمين",
+  "Total Diamond": "إجمالي الألماس",
+  "totalBd":"اجمالي راتبBD",
+  "January": "يناير",
+  "February": "فبراير",
+  "March": "مارس",
+  "April": "أبريل",
+  "May": "مايو",
+  "June": "يونيو",
+  "July": "يوليو",
+  "August": "أغسطس",
+  "September": "سبتمبر",
+  "October": "أكتوبر",
+  "November": "نوفمبر",
+  "December": "ديسمبر"
 
 
 
