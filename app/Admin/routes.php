@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BDControllers\WalletController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -355,6 +356,7 @@ Route::group(
             Route::delete('/{id}', [CoinController::class, 'destroy'])->name('coins.destroy');
         });
 
+        $router->resource('usersBd', BdController::class);
 
 
         $router->resource('ovip', 'OVipController');
@@ -527,7 +529,7 @@ Route::group(
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
 
-    
+
         Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@index')->name('home');
             $router->get('/charges', 'ChargeController@index')->name('charges');
