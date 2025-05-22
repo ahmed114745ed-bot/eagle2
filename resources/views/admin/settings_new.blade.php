@@ -1504,7 +1504,7 @@ use App\Models\Vip;
                                                             <input type="text" id="fawry_webhook_url" name="fawry_webhook_url"
                                                                    placeholder="fawry_webhook_url"
                                                                    value="{{ $settings['fawry_webhook_url'] ?? '' }}"
-                                                                   class="form-control" readonly>
+                                                                   class="form-control">
                                                             <button type="button" class="copy-button" data-copy-target="fawry_webhook_url" title="Copy">📋</button>
                                                         </div>
                                                     </div>
