@@ -69,6 +69,23 @@
         .slider.round:before {
             border-radius: 50%;
         }
+
+        /*important*/
+        input, select{
+            width: auto !important;
+        }
+
+        .rtl label {
+            margin: 0 0 0 10px !important;
+        }
+
+        .ltr label {
+            margin: 0 10px 0 0 !important;
+        }
+
+        .rtl .pull-right{
+            float: left !important;
+        }
     </style>
 
     <div class="row ">
