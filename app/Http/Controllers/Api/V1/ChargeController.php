@@ -9,6 +9,8 @@ use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
 use App\Http\Resources\Api\V1\ChargeResource;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
 use App\Http\Resources\Api\V1\TrxResource;
+use App\Http\Resources\DollarChargeAgencyResource;
+use App\Http\Resources\DollarChargeLogResource;
 use App\Models\User;
 use App\Tik\Services\ChargeRepoService;
 use Exception;
@@ -435,14 +437,14 @@ class ChargeController extends Controller
     public function chargeToUserHistory($request){
         $userId = auth()->user()->id;
         $charge = $this->chargeService->getChargeToUserHistory();
-        return Common::apiResponse(1, '', $charge, 200);
+        return Common::apiResponse(1, '', DollarChargeLogResource::collection($charge), 200);
     }
     
 
     public function chargeToAgencyHistory($request){
         
         $charge = $this->chargeService->getChargeAgencyHistory();
-        return Common::apiResponse(1, '', $charge, 200);
+        return Common::apiResponse(1, '', DollarChargeAgencyResource::collection($charge), 200);
   
     }
 
