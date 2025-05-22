@@ -5,6 +5,7 @@ namespace Modules\Events\Http\Controllers\web;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use App\Services\AppFeatureService;
 use App\Admin\Controllers\MainController;
@@ -26,9 +27,15 @@ class TargetEventController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
+        $sidebar = view('event_settings');
+        $grid = $this->grid();
+
+        return $content
             ->title(trans('Charging Events'))
-            ->body($this->grid()));
+            ->row(function (Row $row) use ($sidebar, $grid) {
+                $row->column(3, $sidebar);
+                $row->column(9, $this->grid());
+            });
     }
 
     /**

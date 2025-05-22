@@ -98,12 +98,12 @@ class AgencyController extends Controller
         return Common::apiResponse(1, '', AdminsAgencyResource::collection($agency->admins));
     }
 
-    public function agencyTargetDetails(Request $request)
+    public function agencyTargetDetails($agencyId, Request $request)
     {
         $id = User::whereId(auth()->id())->where('type_user', '!=', 0)->firstOrFail()->id;
         $user = $request->user();
         try {
-            $response = $this->agencyService->agencyTarget($id, $user, $request);
+            $response = $this->agencyService->agencyTarget($user->agency_id, $user, $request);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
