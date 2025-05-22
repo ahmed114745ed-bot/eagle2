@@ -510,7 +510,7 @@ class LuckyGiftService
             'room_id'      => $room->id,
             'percentage'   => $cashback_percentage,
             'is_room_pass' => ($room->room_pass != null && $room->room_pass != ''),
-            'gNum'         => $gift->price
+            'gift_price'   => $gift->price
 
         ];
         $this->sendToZegoLuckyGift($zigoData);
