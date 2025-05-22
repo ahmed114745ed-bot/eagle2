@@ -7,6 +7,7 @@ use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Show;
 use App\Helpers\UserCommon;
 use App\Services\AppFeatureService;
@@ -35,10 +36,15 @@ class PkEventController extends MainController
         return $content
             ->title(__('pk-events'))
             ->row(function (Row $row) {
-                $row->column(12, $this->grid2());
-            })
-            ->row(function (Row $row) {
-                $row->column(12, $this->grid());
+
+                // Sidebar on the left (3 columns)
+                $row->column(3, view('event_settings'));
+
+                // Grids stacked on the right (9 columns)
+                $row->column(9, function (Column $column) {
+                    $column->row($this->grid2());
+                    $column->row($this->grid());
+                });
             });
     }
 

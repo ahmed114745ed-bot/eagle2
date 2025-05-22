@@ -7,6 +7,7 @@ use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Show;
 use App\Selectables\Gifts;
 use Encore\Admin\Layout\Row;
@@ -35,11 +36,15 @@ class EventPeriodController extends MainController
         return parent::index($content
             ->title(__('event period'))
             ->row(function (Row $row) {
-                $row->column(12, $this->grid2());
+
+                $row->column(3, view('event_settings'));
+
+                $row->column(9, function (Column $column) {
+                    $column->row($this->grid2());
+                    $column->row($this->grid());
+                });
             })
-            ->row(function (Row $row) {
-                $row->column(12, $this->grid());
-            }));
+        );
     }
 
     public function edit($id, Content $content)
@@ -55,7 +60,7 @@ class EventPeriodController extends MainController
             ->title(trans('event period'))
             ->body($this->form()));
     }
-    
+
     protected function grid2()
     {
         $form = new Box();
