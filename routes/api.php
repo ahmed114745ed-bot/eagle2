@@ -163,7 +163,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
 
             Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
-              Route::post('/testCharge', [GooglePaymentController::class, 'addChargeLevel']);
+            Route::post('/testCharge', [GooglePaymentController::class, 'addChargeLevel']);
 
             Route::get('/countries/users', [CountryController::class, 'countries']);
 
@@ -259,6 +259,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
                 Route::get('/online', [UserController::class, 'online']);
                 Route::get('/friends', [UserController::class, 'friends']);
+                Route::get('/data', [UserController::class, 'dataUser']);
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
