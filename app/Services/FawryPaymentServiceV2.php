@@ -36,37 +36,46 @@ class FawryPaymentServiceV2
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
             ])->post($this->fawryUrl, $data);
-        }catch (Exception $exception){
+
+        }catch (\Exception $exception){
             info($exception->getMessage());
         }
 
+        info($response->body());
         return $response->body();
     }
 
     public function getBodyForFawry($trx,$amount): array
     {
-        $merchantCode = config("services.fawry.fawry_merchant_code");
-        $merchantRefNum = $trx;
-        $secure_key = config("services.fawry.fawry_secret");
-        $price = number_format($amount, 2, '.', '');
-        $qty = 1;
-        $syn = $merchantCode.$merchantRefNum."".self::redirect_if_payment_success ($trx).$trx.$qty.$price.$secure_key;
-        $signature = hash('sha256', $syn);
-        $data = [
-            "merchantCode"=> $merchantCode,
-            "merchantRefNum"=> $merchantRefNum,
-            "language" => "en-gb",
-            "chargeItems"=> [
-                [
-                    "itemId"=> $trx,
-                    "price"=> $price,
-                    "quantity"=> $qty,
-                ]
-            ],
-            "returnUrl"=> self::redirect_if_payment_success ($trx),
-            "signature"=> $signature
+        info('yes');
+        try {
+            $merchantCode = config("services.fawry.fawry_merchant_code");
+            $merchantRefNum = $trx;
+            $secure_key = config("services.fawry.fawry_secret");
+            $price = number_format($amount, 2, '.', '');
+            $qty = 1;
+            $syn = $merchantCode.$merchantRefNum."".self::redirect_if_payment_success ($trx).$trx.$qty.$price.$secure_key;
+            $signature = hash('sha256', $syn);
+            $data = [
+                "merchantCode"=> $merchantCode,
+                "merchantRefNum"=> $merchantRefNum,
+                "language" => "en-gb",
+                "chargeItems"=> [
+                    [
+                        "itemId"=> $trx,
+                        "price"=> $price,
+                        "quantity"=> $qty,
+                    ]
+                ],
+                "returnUrl"=> self::redirect_if_payment_success ($trx),
+                "signature"=> $signature
 
-        ];
+            ];
+        }catch (\Exception $e){
+            info($e->getMessage());
+        }
+
+        info('123');
         return $data;
     }
 
