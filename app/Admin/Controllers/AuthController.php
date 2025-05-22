@@ -122,7 +122,7 @@ class AuthController extends BaseAuthController
         $form->display('username', trans('admin.username'));
         $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));
-       if(!(Auth::user()->username == 'demo'))
+       if(!(Auth::user()->id != 1))
        {
         $form->password('password', trans('admin.password'))->rules('confirmed|required');
         $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
