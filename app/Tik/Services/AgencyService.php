@@ -122,6 +122,7 @@ class AgencyService
         $result = (@$minValue->agency_share / 100) * @$target;
         $usersTargetDetails = $this->userRepository->agencyUsers($userId, $month, $year, 10, $request->page);
 
+        dd($usersTargetDetails);
         $hours =   LiveTime::query()
             ->selectRaw('sum(hours) as hours, max(created_at) as date')
             ->where('uid', $user->id)
@@ -930,7 +931,7 @@ class AgencyService
             $userType = 2;
         } elseif ($request->type == 2 ) {
             $userType = 3;
-        } 
+        }
 
         $data = [
             'agency_id' =>  $agency->id,
@@ -963,7 +964,7 @@ class AgencyService
             $userType = 2;
         } elseif ($request->type == 2 ) {
             $userType = 3;
-        } 
+        }
 
         $data = [
             'agency_id' =>  $agency->id,
