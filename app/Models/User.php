@@ -1371,6 +1371,6 @@ class User extends Authenticatable
 
         $userTypes = array_unique($userTypes);
 
-        return empty($userTypes) ? [0] : $userTypes;
+        return empty($userTypes) ? [] : $userTypes;
     }
 }
