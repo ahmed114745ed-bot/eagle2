@@ -117,9 +117,9 @@ class AgentSalaryTransactionController extends Controller
             return Common::apiResponse(0, __('api_responses.this_user_not_found'));
         }
 
-        
+
         $user_id = $user_Resve->id;
-        $agency = $user->agency;
+        $agency = $user->shippingAgency;
         if (!$agency) {
             return Common::apiResponse(0, __('api_responses.agency'));
         }
