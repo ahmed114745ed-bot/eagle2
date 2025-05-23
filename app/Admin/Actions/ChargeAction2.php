@@ -2,7 +2,6 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\Agency;
 use App\Models\Charge;
 use App\Models\Setting;
 use App\Models\ShippingAgency;
@@ -43,7 +42,7 @@ class ChargeAction2 extends Action
         return ShippingAgency::where("id", $agencyId)->first();
     }
 
-    private function handleAgencyCharge(Request $request, Agency $agency)
+    private function handleAgencyCharge(Request $request, ShippingAgency $agency)
     {
         $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
 
@@ -82,7 +81,7 @@ class ChargeAction2 extends Action
 
 
 
-    private function createChargeRecord(Request $request, Agency $agency, $amount, $coins = 0, $usdAmount)
+    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount)
     {
 
         $charge = new Charge();
