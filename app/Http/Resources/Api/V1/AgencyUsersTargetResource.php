@@ -31,16 +31,16 @@ class AgencyUsersTargetResource extends JsonResource
         $months = collect(range($month - 3, $month - 1))
         ->filter(fn($m) => $m > 0)
         ->values();
-    
+
         $userTargets = UserTarget::where('user_id', $this->id)
             ->where('agency_id', $this->agency_id)
             ->where('add_year', $year)
             ->whereIn('add_month', $months)
             ->select('add_month', 'user_diamonds')
             ->pluck('user_diamonds', 'add_month');
-        
+
         $result = [];
-        
+
         foreach ($months as $m) {
             $result[] = [
                 'month_number' => $m,
@@ -60,17 +60,15 @@ class AgencyUsersTargetResource extends JsonResource
                 $query->where(DB::raw('concat(year,"-", month)'), '==', $year . '-' . $month);
             })->sum(DB::raw('sallary - cut_amount'));
 
-       
-        return [
-            'id' => $this->id ?? 0,
 
+        return [
             'id' => $this->id ?? 0,
             'name' => $this->name ?? '',
             'uuid' => $this->uuid ?? '',
             'image' => $this->profile->avatar ?? '',
             'is_host' => $this->is_host,
             'salary'  => $salary ?? 0,
-           
+
             'target' => [
                 'id' => @$target->target_id ?? 0,
                 'user_diamonds' => @$target->user_diamonds ?? 0,
@@ -83,7 +81,7 @@ class AgencyUsersTargetResource extends JsonResource
             'top_users' => $giftLog->map(function ($log) {
 
                                              return $log->sender?->profile?->avatar ?? '';
-                                             
+
                                  })->filter()->values()->toArray(),
         ];
     }

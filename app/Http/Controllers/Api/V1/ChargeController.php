@@ -9,6 +9,8 @@ use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
 use App\Http\Resources\Api\V1\ChargeResource;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
 use App\Http\Resources\Api\V1\TrxResource;
+use App\Http\Resources\DollarChargeAgencyResource;
+use App\Http\Resources\DollarChargeLogResource;
 use App\Models\User;
 use App\Tik\Services\ChargeRepoService;
 use Exception;
@@ -407,4 +409,44 @@ class ChargeController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
-    }}
+    }
+
+
+
+    public function chargeToHistory(Request $request)
+    {
+ 
+
+        $types = [
+            'user' => [$this, 'chargeToUserHistory'],
+            'agency' => [$this, 'chargeToAgencyHistory']
+        ];
+
+        $type = $request->input('type');
+        $instance = $types[$type] ?? $types['user'];
+
+        if (!$instance) {
+            return Common::apiResponse(0, 'Type Not Found', 400);
+        }
+        $data = call_user_func($instance, $request);
+        return $data;
+
+    }
+    
+
+    public function chargeToUserHistory($request){
+        $userId = auth()->user()->id;
+        $charge = $this->chargeService->getChargeToUserHistory();
+        return Common::apiResponse(1, '', DollarChargeLogResource::collection($charge), 200);
+    }
+    
+
+    public function chargeToAgencyHistory($request){
+        
+        $charge = $this->chargeService->getChargeAgencyHistory();
+        return Common::apiResponse(1, '', DollarChargeAgencyResource::collection($charge), 200);
+  
+    }
+
+
+}

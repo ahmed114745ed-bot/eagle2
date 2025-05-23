@@ -4,7 +4,6 @@
 <style>
     .wallet-card {
         padding: 20px;
-        /* background-color: #007bff; */
         font-size: 20px;
         text-align: center;
         width: 100%;
@@ -85,7 +84,18 @@
     .transferModal{
         width: 600px;
         height: 332px;
-        background-color;:var(--box-background-color)
+        background-color;:var(--box-background-color);
+        display: none;
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        background: white;
+        border-radius: 36px;
+        z-index: 9999;
+        width: 520px;
+        overflow: hidden;
+        height: 394px;
 
     }
     .transferForm{
@@ -119,7 +129,6 @@
             color: black !important;
         }
     .card-visa {
-        /* background: var(--secondary-color, #0d6efd); اللون الثانوي الافتراضي */
         background:  #0d6efd; /* اللون الثانوي الافتراضي */
         padding: 20px;
         color: #fff; /* نص أبيض */
@@ -153,8 +162,86 @@
         cursor: pointer;
     }
 
+
+
+    /* === General Modal Styling === */
+
+/* === Button Styling === */
+.actions button {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    color: #fff;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    color: #fff;
+}
+
+/* === Search Result List Styling === */
+#searchResults {
+    position: absolute;
+    border: 1px solid #ddd;
+    border-top: none;
+    max-height: 240px;
+    overflow-y: auto;
+    width: 67%;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 10px 10px;
+    z-index: 10000;
+    background-color;:var(--box-background-color);
+
+
+}
+
+#searchResults .list-group-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid ;
+    transition: background 0.2s;
+}
+#searchResults .list-group-item2 {
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none !important;
+    transition: background 0.2s;
+    color: black !important;
+
+    background-color;:var(--box-background-color) !important;
+
+}
+#searchResults .list-group-item:last-child {
+    border-bottom: none;
+}
+
+#searchResults .list-group-item:hover {
+    /* background-color: #f1f1f1; */
+}
+
+#target_id_search {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    font-size: 14px;
+}
+
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- <div class="card bg-primary" style="
    background: var(--secondary-color);
@@ -185,41 +272,49 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
 
 {{-- Charge Modal --}}
-<div id="chargeModal" class="transferModal" style="display: none; position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%);
-    background: white; padding: ; border-radius: 10px; z-index: 9999; width: 520px;">
+
+<div id="chargeModal" class="transferModal" style="
+
+    ">
       <div class="modal-header" style="background-color: var(--primary-color); color: var(--text-secondary-color);">
                     <h5 class="modal-title" id="modalDescriptionTitle"></h5>
                     <button type="button" class="close" data-dismiss="modal" style="color: var(--text-secondary-color);">&times;</button>
                 </div>
-    <form id="chargeForm" class="transferForm" method="POST" action="{{ route('admin.bd.wallet.charge') }}">
-        @csrf
+                <form id="chargeForm" class="transferForm" method="POST" action="{{ route('admin.bd.wallet.charge') }}">
+    @csrf
+
+    <div class="form-group">
+        <label for="target_type">{{ __('select_target') }}</label>
+        <select id="target_type" name="target_type" class="form-control" required onchange="toggleTargetFields()">
+            <option value="">{{ __('select') }}</option>
+            <option value="user">{{ __('user') }}</option>
+            <option value="agency">{{ __('agency') }}</option>
+        </select>
+    </div>
+
+    <div id="target_fields" style="display: none;">
+        <div class="form-group position-relative">
+            <label for="target_id_search">{{ __('receiver') }}</label>
+            <input type="text" id="target_id_search" class="form-control" placeholder="{{ __('Search') }}" oninput="searchTarget()" autocomplete="off">
+            <input type="hidden" name="target_id" id="target_id" required>
+
+            <div id="searchResults" class="list-group" style="
+             background-color;:var(--box-background-color);
+            position: absolute; z-index: 9999; width: 67%; display: none;"></div>
+        </div>
 
         <div class="form-group">
-            <label for="target_type">{{ __('select_target') }}</label>
-            <select id="target_type" name="target_type" class="form-control" required onchange="toggleTargetFields()">
-                <option value="">{{ __('select') }}</option>
-                <option value="user">{{ __('user') }}</option>
-                <option value="agency">{{ __('agency') }}</option>
-            </select>
+            <label for="amount">{{ __('enter_amount') }}</label>
+            <input type="number" name="amount" id="amount" class="form-control" required step="0.01" min="0.01">
         </div>
 
-        <div id="target_fields" style="display: none;">
-            <div class="form-group">
-                <label for="target_id">{{ __('id') }}</label>
-                <input type="number" name="target_id" id="target_id" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label for="amount">{{ __('enter_amount') }}</label>
-                <input type="number" name="amount" id="amount" class="form-control" required step="0.01" min="0.01">
-            </div>
-
-            <div class="text-right mt-3 actions">
-                <button type="submit" class="btn btn-success">{{ __('confirm_charge') }}</button>
-                <button type="button" class="btn btn-secondary" onclick="closeChargeModal()">{{ __('Cancel') }}</button>
-            </div>
+        <div class="text-right mt-3 actions">
+            <button type="submit" class="btn btn-success">{{ __('confirm_charge') }}</button>
+            <button type="button" class="btn btn-secondary" onclick="closeChargeModal()">{{ __('Cancel') }}</button>
         </div>
-    </form>
+    </div>
+</form>
+
 </div>
 
 {{-- Overlay --}}
@@ -243,4 +338,74 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         const fields = document.getElementById('target_fields');
         fields.style.display = type ? 'block' : 'none';
     }
+
+    let searchTimeout;
+
+    function toggleTargetFields() {
+        const type = document.getElementById('target_type').value;
+        const fields = document.getElementById('target_fields');
+        const inputSearch = document.getElementById('target_id_search');
+        const hiddenInput = document.getElementById('target_id');
+
+        fields.style.display = type ? 'block' : 'none';
+
+        // Reset input values
+        inputSearch.value = '';
+        hiddenInput.value = '';
+        document.getElementById('searchResults').style.display = 'none';
+    }
+
+    function searchTarget() {
+        clearTimeout(searchTimeout);
+
+        const query = document.getElementById('target_id_search').value;
+        const targetType = document.getElementById('target_type').value;
+        const resultsDiv = document.getElementById('searchResults');
+
+        if (!query || !targetType) {
+            resultsDiv.style.display = 'none';
+            return;
+        }
+
+        let url = targetType === 'user' ? '/api/search/users3' : '/api/search/agencies';
+
+        searchTimeout = setTimeout(() => {
+            fetch(`${url}?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(response => {
+                    const data = response.data;
+
+                    console.log(data);
+
+                    resultsDiv.innerHTML = '';
+                    if (!data.length) {
+                        resultsDiv.style.display = 'none';
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        
+                        const div = document.createElement('div');
+                        div.className = 'list-group-item list-group-item-action list-group-item2';
+                        div.textContent = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
+                        div.onclick = () => selectTarget(item);
+                        resultsDiv.appendChild(div);
+                    });
+
+                    resultsDiv.style.display = 'block';
+                });
+        }, 300);
+    }
+
+    function selectTarget(item) {
+        document.getElementById('target_id_search').value = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;
+        document.getElementById('target_id').value = item.id;
+        document.getElementById('searchResults').style.display = 'none';
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#searchResults') && e.target.id !== 'target_id_search') {
+            document.getElementById('searchResults').style.display = 'none';
+        }
+    });
 </script>

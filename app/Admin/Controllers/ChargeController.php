@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
@@ -179,7 +180,7 @@ class ChargeController extends MainController
     // }
     protected function grid()
     {
-        $grid = new Grid(new Agency());
+        $grid = new Grid(new ShippingAgency());
 
         $grid->filter(function (Grid\Filter $filter){
 
@@ -199,7 +200,7 @@ class ChargeController extends MainController
             }, __('Owner uuid'));
         });
 
-        $grid->model()->where("shipping_agency", 1)->orderByDesc('id');
+        $grid->model()->orderByDesc('id');
 
         $grid->id(__('ID'));
 

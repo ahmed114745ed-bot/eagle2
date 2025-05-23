@@ -70,8 +70,10 @@ class GeneralRoleController extends MainController
         $grid->type(__('type'));
         $grid->url(__('url'));
         $grid->sub_type(__('subType'));
-        $grid->desc_en(__('Description En'));
-        $grid->desc_ar(__('Description An'));
+        $grid->desc_en(__('Description en'));
+        $grid->desc_ar(__('Description ar'));
+        $grid->desc_tr(__('Description tr'));
+        $grid->desc_hi(__('Description hi'));
 
         return $grid;
     }
@@ -105,8 +107,10 @@ class GeneralRoleController extends MainController
             ->updateRules(['required', "unique:general_roles,type,{{id}}"]);
         $form->url('url', trans('url'))->required();
         $form->text('sub_type', 'sub_type');
-        $form->textarea('desc_en', 'Description En');
-        $form->textarea('desc_ar', 'Description Ar');
+        $form->textarea('desc_en', 'Description en');
+        $form->textarea('desc_ar', 'Description ar');
+        $form->textarea('desc_tr', 'Description tr');
+        $form->textarea('desc_hi', 'Description hi');
 
         return $form;
     }

@@ -93,9 +93,10 @@ class UserSalaryRepository extends AbstractRepository
         return $this->model->where('user_agency_id', $agencyId)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('agency_sallary');
     }
 
-    public function  newUserSalary($agencyId, $month, $year)
+    public function  newUserSalary($userId, $month, $year)
     {
-        return $this->model->where('user_id', $agencyId)->sum(DB::raw('sallary - cut_amount'));
+        return $this->model->where('user_id', $userId)
+            ->whereRaw("CONCAT(year, LPAD(month, 2, '0')) != CONCAT('$year', LPAD('$month', 2, '0'))")
+            ->sum('sallary');
     }
 }
-   

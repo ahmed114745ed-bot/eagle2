@@ -83,10 +83,9 @@ class WareTabController extends MainController
     protected function grid()
     {
         $type = request()->get('type', 1);
-
         $grid = new Grid(new Ware());
-        $types = [6, 4, 5];
-        $grid->model()->whereIn('type', $types)->whereNot('get_type', 1);
+      //  $types = [6, 4, 5];
+        $grid->model()->where('type',  $type)->whereNot('get_type', 1);
 
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -177,10 +176,7 @@ class WareTabController extends MainController
         // Define your type mapping
         $typeMap = MORE_Used_WARE;
 
-        $types = Ware::whereIn('type', array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
-            return [$type => $typeMap[$type] ?? "Type $type"];
-        });
-
+        $types =  collect($typeMap);
         $currentType = request()->get('type', $types->keys()->first());
 
         $box = new Box(content: view('admin.grid.Form.wareTables', [
