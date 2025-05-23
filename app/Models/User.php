@@ -772,7 +772,6 @@ class User extends Authenticatable
     }
 
 
-
     public function setOldUsdAttribute()
     {
         $currentYear                 = date('Y');
@@ -1358,5 +1357,22 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public function getUserTypesAttribute() : array
+    {
+        $userTypes = match (true) {
+            in_array($this->type_user, [2, 4]) => [1, 2],
+            $this->type_user == 1 => [1],
+            default => []
+        };
+
+        if ($this->hasShippingAgency()) {
+            $userTypes[] = 3;
+        }
+
+        $userTypes = array_unique($userTypes);
+
+        return empty($userTypes) ? [0] : $userTypes;
     }
 }
