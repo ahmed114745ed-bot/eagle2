@@ -97,6 +97,7 @@ return [
     'background_accept' => "تم قبول طلب صوره الخلفية",
     'background_refuse' => "تم رفض طلب صوره الخلفية",
     'freez_charge' => 'Your wallet has been frozen. Contact the administration!',
+    'freez_charge_user' => 'User wallet has been frozen!',
     'phone' => 'this account doesn\'t have phone number',
     'myPhone' => 'connect to whatsapp first to can buy vip',
     'notShippingAgent' => 'Sorry! You are not the shipping agent',

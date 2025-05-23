@@ -91,31 +91,42 @@ class SwitchAccountController extends Controller
 
     public function getAllAccounts($userId, $otherUserId, $deviceToken)
     {
+        if (empty($deviceToken)) return [];
 
-        if (empty($deviceToken))  return  [];
+        $accounts = UserAccount::where('device_token', $deviceToken)->get();
+    
+        $userIds = $accounts->flatMap(function ($account) {
+            return [$account->parent_user_id, $account->child_user_id];
+        })->unique()->filter(function ($id,$userId) {
+            return $id !== $userId; 
+        })->values();
+    
+        return User::whereIn('id', $userIds)->get();
+        // if (empty($deviceToken))  return  [];
 
-        $users = UserAccount::
-            //            where(function ($q) use ($userId,$otherUserId){
-            //                $q->where("parent_user_id", $userId)
-            //                    ->orWhere("child_user_id", $userId)
-            //                    ->orWhere("child_user_id", $otherUserId)
-            //                    ->orWhere("parent_user_id", $otherUserId);
-            //            })
-            where('device_token', $deviceToken)->where('parent_user_id',$userId)
-            ->get();
+        // $users = UserAccount::
+        //     where(function ($q) use ($userId,$otherUserId){
+        //         $q->where("parent_user_id", $userId)
+        //             ->orWhere("child_user_id", $userId)
+        //             ->orWhere("child_user_id", $otherUserId)
+        //             ->orWhere("parent_user_id", $otherUserId);
+        //     })
+        //     ->where('device_token', $deviceToken)
+        //     ->where('parent_user_id',$userId)
+        //     ->get();
 
-        // $parentUserIds = $users->pluck('parent_user_id');
-        $childUserIds = $users->pluck('child_user_id');
+        // // $parentUserIds = $users->pluck('parent_user_id');
+        // $childUserIds = $users->pluck('child_user_id');
 
-        // $allIds = $parentUserIds->merge($childUserIds)->unique()->values()->all();
+        // // $allIds = $parentUserIds->merge($childUserIds)->unique()->values()->all();
 
-        // $filteredIds = array_filter($allIds, function ($id) use ($userId) {
-        //     return $id != $userId;
-        // });
-        // $filteredIds = array_values($filteredIds);
-        $accounts = User::query()->whereIn('id', $childUserIds)->get();
+        // // $filteredIds = array_filter($allIds, function ($id) use ($userId) {
+        // //     return $id != $userId;
+        // // });
+        // // $filteredIds = array_values($filteredIds);
+        // $accounts = User::query()->whereIn('id', $childUserIds)->get();
 
-        return $accounts ?? [];
+        // return $accounts ?? [];
     }
 
     public function getOtherUser($request)

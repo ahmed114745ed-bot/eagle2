@@ -121,7 +121,19 @@ class UserSallaryObserver
             $month   = now()->month;
             $year    = now()->year;
             $agencyId = $agency->id;
-    
+
+            $totals = UserSallary::where('user_agency_id', $agency->id)
+            ->where('month', now()->month)
+            ->where('year', now()->year)
+            ->selectRaw('
+                SUM(agency_sallary) as total_agency_sallary,
+                SUM(sallary) as total_users_sallary,
+                SUM(diamond) as total_diamond
+            ')
+            ->first();
+        
+
+
             $totalBdSallary = UserSallary::where('user_agency_id', $agencyId)
                 ->where('month', $month)
                 ->where('year', $year)
@@ -136,7 +148,10 @@ class UserSallaryObserver
     
             if ($bdSalary) {
                 $bdSalary->update([
-                    'sallary' => $totalBdSallary
+                    'sallary' => $totalBdSallary,
+                    'total_agency_sallary' => $totals->total_agency_sallary ?? 0,
+                    'total_users_sallary' =>  $totals->total_users_sallary ?? 0,
+                    'total_diamond' =>  $totals->total_diamond ?? 0,
                 ]);
             } else {
                 BDSallary::query()->create([
@@ -147,6 +162,9 @@ class UserSallaryObserver
                     'cut_amount' => 0,
                     'sallary'    => $totalBdSallary,
                     'is_paid'    => false,
+                    'total_agency_sallary' => $totals->total_agency_sallary ?? 0,
+                    'total_users_sallary' =>  $totals->total_users_sallary ?? 0,
+                    'total_diamond' =>  $totals->total_diamond ?? 0,
                 ]);
             }
         }

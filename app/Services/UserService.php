@@ -106,6 +106,11 @@ class UserService
         $perPage = 10;
         return $this->userRepository->searchUserAgency($key, $page, $perPage);
     }
+    public function searchInAgency($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchInAgency($key, $page, $perPage);
+    }
 
     public function searchUsersInAgencyShipping($key, $page)
     {
@@ -469,7 +474,7 @@ class UserService
         // if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
 
         $app_feature = Cache::get('host_agency');
-        if ($app_feature){
+        if ($app_feature) {
             $targetService = new FixedTargetService($user);
             $targetService->calculateTarget();
         }
@@ -1091,5 +1096,10 @@ class UserService
             'gift_level' => Common::level_center($user->id),
             'charge_level' => $chargeLevel,
         ];
+    }
+
+    public function dataUser($userId)
+    {
+        return  $this->userRepository->findOrFail($userId, ['family','medals']);
     }
 }
