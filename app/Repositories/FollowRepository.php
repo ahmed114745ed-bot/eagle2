@@ -68,20 +68,20 @@ class FollowRepository
                 'manager'
             ];
         }
-        return $user->following()->with($with)->fitterByUuid($keyword)->paginate(10); // Set pagination limit
+        return $user->following()->with($with)->fitterByUuid($keyword)->paginate(12); // Set pagination limit
 
     }
 
     // Get paginated list of users that are following the current user
     public function getFollowers(User $user, array $with = [], $keyword)
     {
-        return $user->followerss()->with($with)->fitterByUuid($keyword)->paginate(10);
+        return $user->followerss()->with($with)->fitterByUuid($keyword)->paginate(12);
     }
 
     // Get paginated list of mutual followers (friends)
     public function getFriends(User $user, array $with = [], $keyword)
     {
-        return $user->friends()->with($with)->fitterByUuid($keyword)->paginate(10);
+        return $user->friends()->with($with)->fitterByUuid($keyword)->paginate(12);
     }
 
     public function getByFollower($userId)
