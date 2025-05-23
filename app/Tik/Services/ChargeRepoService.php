@@ -140,7 +140,7 @@ class ChargeRepoService
     public function sendMoney(User $sender, $receiverUuid, $count)
     {
 
-        $agency = $this->agencyRepository->findAgencyByOwnerId($sender->id, 1);
+        $agency = $this->shippingAgencyRepository->findAgencyByOwnerId($sender->id, 1);
         if (!$agency || $agency->status == 0) throw new \Exception(__('api_responses.canNotCharge'));
 
         if ($agency->is_frozen == 1) {
@@ -492,6 +492,6 @@ class ChargeRepoService
     public function getChargeAgencyHistory()
     {
         return $this->chargeRepository->getChargeToAgencyHistory();
-        
+
     }
 }
