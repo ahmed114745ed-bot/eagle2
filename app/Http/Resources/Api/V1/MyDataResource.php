@@ -136,23 +136,6 @@ class MyDataResource extends JsonResource
         /**@var User $this
          * @var Room $ownerRoom*/
 
-        $userTypes = [];
-
-        if ($this->type_user == 2) {
-            $userTypes = array_merge($userTypes, [1, 2]);
-        }
-        if ($this->hasShippingAgency()) {
-            $userTypes[] = 3;
-        }
-        $userTypes = array_unique($userTypes);
-
-         if ($this->type_user == 2) {
-             $userTypes = array_merge($userTypes, [1, 2]);
-         }
-         if ($this->hasShippingAgency()) {
-             $userTypes[] = 3;
-         }
-         $userTypes = array_unique($userTypes);
 
         $data = [
             'id' => @$this->id,
@@ -232,7 +215,7 @@ class MyDataResource extends JsonResource
             'new_gift'          => (bool)$this->new_gift,
             'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
             'wallet' => $this->wallet?->value ?? 0,
-            'user_types' => $userTypes ?? [],
+            'user_types' => $this->user_types,
             'wabble' => $this->getUserPack(12),
             "shipping-agency" => $this->shippingAgency ? [
                 "id" => $this->shippingAgency->id,
@@ -284,4 +267,6 @@ class MyDataResource extends JsonResource
             'image' => 'wappel.png',
         ];
     }
+
+
 }
