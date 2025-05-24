@@ -286,6 +286,11 @@ class Agency extends Model
         return $this->hasMany(UserSallary::class, 'sallary');
     }
 
+    public function userSalaries()
+    {
+        return $this->hasMany(UserSallary::class, 'user_agency_id');
+    }
+
     public function agencySalaries()
     {
         return $this->hasMany(AgencySallary::class, 'agency_id')->orderByDesc('id');

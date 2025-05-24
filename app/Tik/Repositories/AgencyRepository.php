@@ -44,7 +44,7 @@ class AgencyRepository extends AbstractRepository
     public function findById($id)
     {
 
-        return $this->model->withoutGlobalScope(HostAgencyScope::class)->with(['additionalInfo', 'mempers', 'admins','AgencyUsersTargets'])
+        return $this->model->withoutGlobalScope(HostAgencyScope::class)->with(['additionalInfo', 'mempers', 'admins','userSalaries'])
             ->withCount('mempers')
             ->where('id', $id)->first();
     }
