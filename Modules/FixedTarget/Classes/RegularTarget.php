@@ -23,13 +23,14 @@ class RegularTarget implements TargetInterface
         $extras = $extra;
         // $per = 0.50;
         $per =common::getDiamondsPercentage();
+        \Log::info($per);
         if ($target->hours <= $hours) {
-            $per += (settings()->get('hours') ?? 0)/100;
+            $per += (((int) settings()->get('hours')) ?? 0)/100;
         }
 
 
         if ($target->days <= $days) {
-            $per +=  (settings()->get('days')?? 0) /100;
+            $per +=  (((int) settings()->get('days'))?? 0) /100;
         }
 
 
