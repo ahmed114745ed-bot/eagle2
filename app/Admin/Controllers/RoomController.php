@@ -2,25 +2,26 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\RoomPinAction;
-use App\Helpers\Common;
 use App\Models\Room;
-use App\Http\Controllers\Controller;
-use App\Models\EnteredRoom;
-use App\Models\RoomCategory;
 use App\Models\User;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\EnteredRoom;
+use App\Models\RoomCategory;
+use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use Encore\Admin\Widgets\Table;
 use Illuminate\Support\Carbon;
+
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Widgets\Table;
+use Encore\Admin\Layout\Content;
+use App\Admin\Actions\RoomPinAction;
+use App\Http\Controllers\Controller;
+use App\Admin\Actions\CloseRoomAction;
 use Illuminate\Support\Facades\Request;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class RoomController extends MainController
 {
@@ -446,7 +447,9 @@ class RoomController extends MainController
 
             // إضافة الفعل مع تمرير الـ pin
             $action->add(new RoomPinAction($action->row->id, $pin));
+             $action->add(new CloseRoomAction());
         });
+         
         $grid->disableCreateButton();
         $grid->disableExport();
         $this->extendGrid($grid);
