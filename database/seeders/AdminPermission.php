@@ -155,11 +155,6 @@ class AdminPermission extends Seeder
             'level-user-history',
             'request-problem',
             'user-target-eg'
-
-
-
-
-
         ];
 
         $methods = [

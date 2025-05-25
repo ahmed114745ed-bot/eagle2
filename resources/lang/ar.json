@@ -2506,75 +2506,119 @@
     "bd_set_default_success": "تم تعيين الـ BD كافتراضي بنجاح",
     "BD Management":"ادارة BD",
     "bd management":"ادارة BD",
-    "bD Management":"ادارة BD"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    "bD Management":"ادارة BD",
+
+    "All Statistic": "كل الإحصائيات",
+    "Wares Dedicate": "المتاجر المخصصة",
+    "Bans": "الحظر",
+    "User Levels": "مستويات المستخدمين",
+    "Vips Dedicate": "VIP المخصص",
+    "Special Id Request": "طلبات الآيدي المميز",
+    "Ban Rooms": "حظر الغرف",
+    "Achievement_dedicate": "الإنجازات المخصصة",
+    "Core Wallets": "المحافظ الأساسية",
+    "Charger Report": "تقرير الشحن",
+    "Ticket": "التذاكر",
+    "Trashed Account User": "الحسابات المحذوفة",
+    "Free Users": "المستخدمين المجانيين",
+    "Carousel": "العرض المتحرك",
+    "Banners": "البانرات",
+    "Offers": "العروض",
+    "Wares": "المتاجر",
+    "Special History": "سجل المميزات",
+    "Special Ware": "المتجر المميز",
+    "Image Color": "لون الصورة",
+    "Vip Privilege": "امتيازات VIP",
+    "Ovip": "OVIP",
+    "Ovip Settings": "إعدادات OVIP",
+    "Family Level": "مستوى العائلة",
+    "Request Problem": "مشاكل الطلبات",
+    "Agent Request Transaction": "معاملات طلبات الوكلاء",
+    "Charge Country": "شحن البلد",
+    "Salary Request": "طلبات الرواتب",
+    "User Target": "أهداف المستخدم",
+    "Report": "التقارير",
+    "Users Hunters": "صيادو المستخدمين",
+    "Salary History": "سجل الرواتب",
+    "User Target Eg": "مثال أهداف المستخدم",
+    "Request Agencies": "طلبات الوكالات",
+    "Appear Charger Agency": "ظهور وكالة الشحن",
+    "Payment Gat Way": "بوابات الدفع",
+    "Charge Agency": "وكالة الشحن",
+    "Agency Manger Setting": "إعدادات مدير الوكالة",
+    "Emoji": "الرموز التعبيرية",
+    "Gift": "الهدايا",
+    "Categories": "التصنيفات",
+    "Room Vip": "غرفة VIP",
+    "Room Background": "خلفية الغرفة",
+    "User_achievement_level": "مستوى إنجاز المستخدم",
+    "Updates_group_chat": "تحديثات دردشة المجموعة",
+    "Boxes": "الصناديق",
+    "Box Use": "استخدام الصندوق",
+    "Box Settings": "إعدادات الصندوق",
+    "Weekly Star": "نجم الأسبوع",
+    "General Roles": "الأدوار العامة",
+    "Pk Event": "حدث PK",
+    "Pk Event Rewards": "جوائز حدث PK",
+    "Target Event": "حدث الهدف",
+    "Weekly_star_rewards": "جوائز نجم الأسبوع",
+    "Event_report": "تقرير الحدث",
+    "Event Period": "فترة الحدث",
+    "Real": "حقيقي",
+    "Report Real": "تقرير حقيقي",
+    "Report Moment": "تقرير اللحظة",
+    "Auth Users": "المستخدمين المصادق عليهم",
+    "Sailer": "البائع",
+    "Exchange": "التبادل",
+    "Delete Account Details": "حذف تفاصيل الحساب",
+    "Questions": "الأسئلة",
+    "Page": "الصفحة",
+    "Payment Coin": "عملة الدفع",
+    "Config": "الإعدادات",
+    "Daily Prize": "الجائزة اليومية",
+    "Level Interval": "فترة المستوى",
+    "Gold Coins": "العملات الذهبية",
+    "BD": "BD",
+    "Version": "الإصدار",
+    "Manger Agency Manager": "مدير وكالة المدير",
+    "Manger Type": "نوع المدير",
+    "Wares Vips": "متاجر VIP",
+    "Achievement_level": "مستوى الإنجاز",
+    "Special Frame": "الإطار المميز",
+    "Event": "الحدث",
+    "Withdraw Type": "نوع السحب",
+    "Get Salary Requests": "طلبات الحصول على الراتب",
+    "Agencies Tareget Manger": "مدير أهداف الوكالات",
+    "Background Image Request": "طلب صورة الخلفية",
+    "Admin Users": "مستخدمي الإدارة",
+    "Report User": "تقرير المستخدم",
+    "Auth User": "المستخدم المصادق",
+    "User Parent": "والد المستخدم",
+    "Users Devices": "أجهزة المستخدمين",
+    "Room Target": "هدف الغرفة",
+    "Agent Target": "هدف الوكيل",
+    "Agent Request": "طلب الوكيل",
+    "Agent User": "مستخدم الوكيل",
+    "Permissions": "الصلاحيات",
+    "Admin Profile": "الملف الشخصي للإدارة",
+    "Weekly_cp": "نقاط الأسبوع",
+    "Agent Request History": "سجل طلبات الوكيل",
+    "User Agent Target": "هدف وكيل المستخدم",
+    "Charges Agency": "وكالة الشحن",
+    "Agent Home": "الصفحة الرئيسية للوكيل",
+    "Agora Zego": "Agora Zego",
+    "Uuid Dedicate": "UUID المخصص",
+    "Agency Setting": "إعدادات الوكالة",
+    "Users Family": "عائلة المستخدمين",
+    "Updates_family Config": "تحديثات إعدادات العائلة",
+    "Ovip Gift": "هدية OVIP",
+    "Charge Level": "مستوى الشحن",
+    "Charge Settings": "إعدادات الشحن",
+    "Chat Setting": "إعدادات الدردشة",
+    "Action Trashed": "الإجراءات المحذوفة",
+    "User Status": "حالة المستخدم",
+    "Request Agency History": "سجل طلبات الوكالة",
+    "Update_setting_button": "تحديث زر الإعدادات",
+    "Gift Target Event": "حدث هدف الهدية",
+    "Level User History": "سجل مستوى المستخدم"
 }

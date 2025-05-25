@@ -1,26 +1,79 @@
 @php
     use App\Models\RoleCategory;
 
+    // Group permissions by category first
     $grouped = $permissions->groupBy('category');
     $categories = RoleCategory::orderBy('sort')->select('slug')->get();
     $selected = $selectedPermissions ?? [];
 
+    // Pre-process all permissions by category and group
+    $allGroupedPermissions = [];
+    foreach($grouped as $categorySlug => $categoryPermissions) {
+        $allGroupedPermissions[$categorySlug] = $categoryPermissions->groupBy(function($permission) {
+            $parts = explode('-', $permission->slug);
+            array_shift($parts);
+            return implode('-', $parts);
+        });
+    }
+
     $firstCategory = $categories->first()->slug ?? null;
-    $firstPermissions = $grouped[$firstCategory] ?? collect();
-    $chunked = $firstPermissions->chunk(ceil(max(1, $firstPermissions->count() / 3)));
 @endphp
 
 <style>
-    /* Highlight for active tab */
     .nav-link.active {
         background-color: var(--primary-color);
-        color: white ;
-       
+        color: white;
     }
-    
+    .permissions-section {
+        display: none;
+    }
+    .permissions-section.active {
+        display: block;
+    }
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        padding: 20px;
+    }
+    .permission-group {
+        background-color: var(--box-background-color);
+        border-radius: 8px;
+        padding: 15px;
+    }
+    .permission-group-title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    .form-check {
+        margin-bottom: 8px;
+        padding-right: 25px;
+    }
+    .form-check-input {
+        margin-left: 8px;
+    }
+    .form-check-label {
+        font-size: 14px;
+        color: #444;
+    }
+
+    /* RTL Specific Styles */
+    [dir="rtl"] .form-check {
+        padding-right: 30px;
+        padding-left: 0;
+    }
+    [dir="rtl"] .form-check-input {
+        float: right;
+        margin-right: -25px;
+        margin-left: 0;
+    }
 </style>
 
-<!-- Rest of your HTML remains the same -->
 <input type="hidden" name="permissions_all" id="permissions_all">
 <ul class="nav nav-tabs mb-3" role="tablist" id="permission-tabs">
     @foreach($categories as $category)
@@ -34,33 +87,38 @@
     @endforeach
 </ul>
 
-<!-- Permission Display Container -->
-<div id="permissions-container" data-loaded-category="{{ $firstCategory }}">
-    <div class="row">
-        @foreach($chunked as $chunk)
-            <div class="col-md-4">
-                @foreach($chunk as $perm)
-                    <div class="form-check mb-2">
-                        <input class="form-check-input permission-checkbox"
-                               type="checkbox"
-                               value="{{ $perm->id }}"
-                               id="perm-{{ $perm->id }}"
-                               {{ in_array($perm->id, $selected) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="perm-{{ $perm->id }}">
-                            {{ __($perm->name) }}
-                        </label>
+<div id="permissions-container">
+    @foreach($allGroupedPermissions as $categorySlug => $groupedPermissions)
+        <div class="permissions-section {{ $categorySlug === $firstCategory ? 'active' : '' }}"
+             data-category="{{ $categorySlug }}">
+            <div class="permissions-grid">
+                @foreach($groupedPermissions as $group => $perms)
+                    <div class="permission-group">
+                        <h6 class="permission-group-title">
+                            {{ __(ucwords(str_replace('-', ' ', $group))) }}
+                        </h6>
+                        @foreach($perms as $perm)
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value="{{ $perm->id }}"
+                                       id="perm-{{ $perm->id }}"
+                                    {{ in_array($perm->id, $selected) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="perm-{{ $perm->id }}">
+                                    {{ __($perm->name) }}
+                                </label>
+                            </div>
+                        @endforeach
                     </div>
                 @endforeach
             </div>
-        @endforeach
-    </div>
+        </div>
+    @endforeach
 </div>
-
 
 <script>
     $(function () {
         let selectedPermissions = new Set(@json($selected ?? []));
-        let loadedCategories = new Set([$('#permissions-container').data('loaded-category')]);
 
         function updateHiddenInput() {
             $('#permissions_all').val([...selectedPermissions].join(','));
@@ -85,41 +143,14 @@
         $('#permission-tabs .nav-link').on('click', function (e) {
             e.preventDefault();
 
+            // Update active tab
             $('#permission-tabs .nav-link').removeClass('active tab-highlight');
             $(this).addClass('active tab-highlight');
 
+            // Show corresponding permissions section
             const category = $(this).data('category');
-
-            $.get(`/admin/permissions/category/${encodeURIComponent(category)}`, function (response) {
-                const perms = response.permissions;
-                let html = '<div class="row">';
-                const chunkSize = Math.ceil(perms.length / 3);
-                for (let i = 0; i < 3; i++) {
-                    html += '<div class="col-md-4">';
-                    perms.slice(i * chunkSize, (i + 1) * chunkSize).forEach(perm => {
-                        const checked = selectedPermissions.has(perm.id) ? 'checked' : '';
-                        html += `
-                            <div class="form-check mb-2">
-                                <input class="form-check-input permission-checkbox"
-                                    type="checkbox"
-                                    value="${perm.id}"
-                                    id="perm-${perm.id}"
-                                    ${checked}>
-                                <label class="form-check-label" for="perm-${perm.id}">
-                                    ${ perm.name }
-                                </label>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                }
-                html += '</div>';
-                $('#permissions-container').html(html);
-                bindPermissionCheckboxes();
-                updateHiddenInput();
-            });
+            $('.permissions-section').removeClass('active');
+            $(`.permissions-section[data-category="${category}"]`).addClass('active');
         });
-
     });
 </script>
-
