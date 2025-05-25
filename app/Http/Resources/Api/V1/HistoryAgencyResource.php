@@ -38,7 +38,9 @@ class HistoryAgencyResource extends JsonResource
         $heroGiftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, sender_id")
             ->with('sender')->groupBy('sender_id')->whereHas('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->take(3)->get();
         $salary = AgencySallary::where('agency_id', $this->id)->where('year', $year)->where('month', $month)->sum('sallary');
-        $target = UserSallary::join('targets', 'targets.id', '=', 'user_sallaries.target_id')->where('user_sallaries.user_agency_id', $this->id)->where('user_sallaries.year', $year)->where('user_sallaries.month', $month)->whereHas('target')->sum('targets.diamonds');
+        $target = $this->userSalaries()->where('year', $year)->where('month', $month)->sum('target_diamonds');
+
+        // UserSallary::join('targets', 'targets.id', '=', 'user_sallaries.target_id')->where('user_sallaries.user_agency_id', $this->id)->where('user_sallaries.year', $year)->where('user_sallaries.month', $month)->whereHas('target')->sum('targets.diamonds');
 
         return [
             'star' => ReceiverGiftLogResource::collection($giftLog),
