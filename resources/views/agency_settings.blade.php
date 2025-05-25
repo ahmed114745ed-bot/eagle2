@@ -462,6 +462,8 @@
             </div>
 
         </div>
+
+        
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
