@@ -248,7 +248,8 @@ class RoomController extends Controller
                 Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
             }
             $this->handleLeaveCp($user, $roomId);
-            $this->updateMicrophone($roomId, $user->id);
+            $room=Room::find($roomId);
+            $this->updateMicrophone($room->uid, $user->id);
             return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
         } catch (Exception $exception) {
 
@@ -1815,6 +1816,10 @@ class RoomController extends Controller
 
     private function updateMicrophone($room_uid, $user_id)
     {
+        Log::info('shami test quit_room', [
+            'data' => $room_uid,
+            'user_id' => $user_id
+        ]);
         $user = User::query()->find($user_id);
         if (!$user) return;
         $result  = Common::go_microphone_hand($room_uid, $user_id);
