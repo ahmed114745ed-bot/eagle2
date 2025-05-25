@@ -45,6 +45,9 @@ class UserCharismaService
         if (!$user || !$room) {
             return Common::apiResponse(0, 'User Or Room does not exist', null, 404);
         }
+        \Log::info('shami test now updateMicrophone', [
+            'room_uid' => $room,
+        ]);
         // Delete the ExtraDataInRoom record for the specified user
         $deleted = ExtraDataInRoom::where('user_id', $userId)->where('room_id', $roomId)->delete();
 
