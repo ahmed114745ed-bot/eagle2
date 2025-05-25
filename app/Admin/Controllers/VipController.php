@@ -11,7 +11,7 @@ use Encore\Admin\Layout\Content;
 use App\Models\Admin as AdminModel;
 use App\Services\AppFeatureService;
 use Encore\Admin\Auth\Permission;
-use Encore\Admin\Facades\Admin;
+use Encore\Admin\Facades\Admin as EncoreAdmin;
 
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
@@ -43,7 +43,7 @@ class VipController extends MainController
 
     public function senderIndex(Content $content)
     {
-        if (!Admin::user()->can('*')) {
+        if (!EncoreAdmin::user()->can('*')) {
             Permission::check('browse-' . $this->permission_name);
         }
         return parent::index($content
