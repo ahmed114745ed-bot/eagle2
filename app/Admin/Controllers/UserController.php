@@ -244,6 +244,9 @@ class UserController extends MainController
                 $sender_img = @$this->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
                 $senderImg = getImagePath($sender_img) ?? $defaultImage;
 
+                $charger_img = @$this->getTotalChargeLevel($this->total_charge_level)?->img ?? '';
+                $chargerImg = getImagePath($charger_img) ?? '';
+
                 // Check if the image exists
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
@@ -257,9 +260,8 @@ class UserController extends MainController
                                 <strong>$name</strong><br>
                                 <span style='font-size: smaller;'>UID: $uid</span><br>
                                 <img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>
-                                <span style='font-size: smaller;'>Receiver Level</span><br>
                                 <img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>
-                                <span style='font-size: smaller;'>Sender Level</span>
+                                <img src='$chargerImg' style='width: 20px; height: 20px; border-radius: 50%;'>
                             </div>
                         </div>
                         ";
