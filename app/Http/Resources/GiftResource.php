@@ -17,7 +17,7 @@ class GiftResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => app()->getLocale() == 'ar' ? $this->name : $this->e_name,
+            'name' =>  $this->name,
             'type' => $this->type = 1 ? 'normal' : 'hot',
             'price' => $this->price ?: 0,
             'img' => $this->img ?: '',

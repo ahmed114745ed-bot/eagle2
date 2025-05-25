@@ -18,28 +18,30 @@ class RegularTarget implements TargetInterface
 
     public function calculateUsdFromTarget(Model $target, float $hours, int $days , array $extra): float
     {
+        \Log::info($target->toJson());
         $targetReel =  explode(',', $target->reel);
         $targetMoment = explode(',', $target->moment);
         $extras = $extra;
         // $per = 0.50;
         $per =common::getDiamondsPercentage();
+        \Log::info($target->hours <= $hours);
         if ($target->hours <= $hours) {
-            $per += (settings()->get('hours') ?? 0)/100;
+            $per += (((int) settings()->get('hours')) ?? 0)/100;
         }
 
 
         if ($target->days <= $days) {
-            $per +=  (settings()->get('days')?? 0) /100;
+            $per +=  (((int) settings()->get('days'))?? 0) /100;
         }
 
 
-        if((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1]??0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments'] )
+        if(((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1]??0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0)) )
         {
 
             $per += (settings()->get('moments')??0) /100;
         }
 
-        if((@$targetReel[0] ?? 0) <= $extras['reel']['upload'] && (@$targetReel[1] ?? 0) <= $extras['reel']['likes'] && (@$targetReel[2] ?? 0 )<= $extras['reel']['comments'] )
+        if(((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0)) && ((@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0)) && ((@$targetReel[2] ?? 0 )<= ($extras['reel']['comments'] ?? 0)) )
         {
             $per += (settings()->get('reels') ?? 0) /100;
         }
