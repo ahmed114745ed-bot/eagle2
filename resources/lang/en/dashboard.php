@@ -221,6 +221,8 @@ return [
     'giveSalary' => 'Give salary',
     'delete' => 'Delete',
     'chickDelete' => 'Are you sure you want to delete this item?',
+    'closeRoom' => "are you sure you want to close this room",
+    'roomClose' => " Close Room",
     'removeBlackList' => 'Remove user from blacklist',
     'userNotFound' => 'User not found',
     'taken' => 'Special ID is taken',
