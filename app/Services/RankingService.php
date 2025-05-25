@@ -229,7 +229,7 @@ class RankingService
     {
 
         $data->each(function ($item) {
-            $hasColor = Common::hasInPack($item->user_id, 18, true);
+            $hasColor = Common::hasInPack($item->user_id, 18, true) ?? '';
             $item->color_name = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '';
         });
 
