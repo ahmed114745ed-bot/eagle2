@@ -18,6 +18,7 @@ class RegularTarget implements TargetInterface
 
     public function calculateUsdFromTarget(Model $target, float $hours, int $days , array $extra): float
     {
+        \Log::info($target->toJson());
         $targetReel =  explode(',', $target->reel);
         $targetMoment = explode(',', $target->moment);
         $extras = $extra;
