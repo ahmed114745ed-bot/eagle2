@@ -64,7 +64,7 @@ class UserRepository extends Repository
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
-     
+
     }
 
     public function searchInAgency($key, $page, $perPage)
@@ -77,13 +77,13 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
-    
+
 
     public function searchUserAgencyShipping($key, $page, $perPage)
     {
         return User::selectRaw('concat(name, " - ", uuid) as name, id')
             ->whereDoesntHave('shippingAgency', function ($query) {
-                $query->where('type', 2);
+                $query->where('type', 2)->where('deleted_at' , null);
             })
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')

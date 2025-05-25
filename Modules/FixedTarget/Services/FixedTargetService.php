@@ -203,6 +203,7 @@ class FixedTargetService
             'days' => $days . ' / ' . ($target->days ?? 0),
             'diamond' => $month_received . ' / ' . @$target->diamonds ?? 0,
             'target_id' =>  @$target->id,
+            'target_diamonds'     => @$target->diamonds ?? 0,
             'extras'               => $extra !==  null ? json_encode($extra) : 0,
             'app_profit' => $app_profit_usd * $percentageAchieved,
             'dB' =>  $db_usd * $percentageAchieved,
