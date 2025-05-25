@@ -225,6 +225,9 @@ class RoomController extends Controller
 
     public function quit_room(Request $request)
     {
+        Log::info('shami test quit_room', [
+            'data' => $request->all()
+        ]);
 
         if (!$request->owner_id) {
 
