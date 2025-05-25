@@ -33,13 +33,13 @@ class RegularTarget implements TargetInterface
         }
 
 
-        if((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1]??0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments'] )
+        if(((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1]??0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0)) )
         {
 
             $per += (settings()->get('moments')??0) /100;
         }
 
-        if((@$targetReel[0] ?? 0) <= $extras['reel']['upload'] && (@$targetReel[1] ?? 0) <= $extras['reel']['likes'] && (@$targetReel[2] ?? 0 )<= $extras['reel']['comments'] )
+        if(((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0)) && ((@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0)) && ((@$targetReel[2] ?? 0 )<= ($extras['reel']['comments'] ?? 0)) )
         {
             $per += (settings()->get('reels') ?? 0) /100;
         }
