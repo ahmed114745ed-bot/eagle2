@@ -22,7 +22,7 @@ class AgencyRepository extends AbstractRepository
 
     public function findAgencyByOwnerId($ownerId, $status = null)
     {
-        $data = $this->model->withoutGlobalScope(HostAgencyScope::class)->where('app_owner_id', $ownerId);
+        $data = $this->model->where('app_owner_id', $ownerId);
         if ($status) $data->where('status', $status);
         return  $data->first();
     }
@@ -44,7 +44,7 @@ class AgencyRepository extends AbstractRepository
     public function findById($id)
     {
 
-        return $this->model->withoutGlobalScope(HostAgencyScope::class)->with(['additionalInfo', 'mempers', 'admins','userSalaries'])
+        return $this->model->with(['additionalInfo', 'mempers', 'admins','userSalaries'])
             ->withCount('mempers')
             ->where('id', $id)->first();
     }
