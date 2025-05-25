@@ -148,11 +148,7 @@ class EnteranceRoomServices
         $roomId = $request->room_id;
         $userId = $request->user_account;
 
-        Log::info('shami test now vi', [
-            'roomId' => $roomId,
-            'userId' => $userId,
-            'event' => $event,
-        ]);
+
         
 
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
@@ -350,22 +346,14 @@ class EnteranceRoomServices
 
     private function updateRoomVisitorsBasedOnEvent($event, $room, $userId)
     {
-        Log::info('shami test now updateRoomVisitorsBasedOnEvent', [
-            'room' => $room,
-            'userId' => $userId,
-            'event' => $event,
-        ]);
+       
         $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
 
         if ($event == 'room_login' && !in_array($userId, $visitors)) {
 
             $visitors[] = $userId;
         } elseif ($event == 'room_logout') {
-            Log::info('shami test now room_logout', [
-                'room' => $room,
-                'userId' => $userId,
-                'event' => $event,
-            ]);
+         
             UserHandling::calcTime($userId);
             $this->updateMicrophone($room->uid, $userId);
             $visitors = array_diff($visitors, [$userId]);
@@ -401,9 +389,7 @@ class EnteranceRoomServices
 
         if (!$room) return;
         if ($result) {
-            Log::info('shami test now updateMicrophone', [
-                'room_uid' => $room_uid,
-            ]);
+          
             (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
         }
     }
