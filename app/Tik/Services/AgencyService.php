@@ -196,7 +196,7 @@ class AgencyService
         if ($admin) {
             $agency = $this->agencyRepository->findById($admin->agency_id);
         } else {
-            $agency = $this->agencyRepository->findAgencyByOwnerId($owner->id);
+            $agency = $this->agencyRepository->findByOwner($owner->id);
         }
         if (!$agency) throw new Exception('u_not_owner_agncy');
         if ($agency->type == 2) throw new \Exception(__('api_responses.shippingAgency'));
