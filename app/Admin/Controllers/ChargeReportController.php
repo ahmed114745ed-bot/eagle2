@@ -575,6 +575,7 @@ class ChargeReportController extends MainController
     protected function customGrid($agency_id)
     {
         $grid = new Grid(new Charge());
+        $grid->model()->where('agency_id', $agency_id);
 
         // Add tabs to the header
         $grid->header(function () {
