@@ -19,6 +19,12 @@ class AgencyRepository extends AbstractRepository
         parent::__construct(new Agency());
     }
 
+    public function findByOwner($ownerId, $status = null)
+    {
+        $data =  $this->model->where('app_owner_id', $ownerId);
+        if ($status) $data->where('status', $status);
+        return  $data->first();
+    }
 
     public function findAgencyByOwnerId($ownerId, $status = null)
     {
