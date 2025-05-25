@@ -227,6 +227,12 @@ class RankingService
 
     protected function prepareResponse($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
+
+        $data->each(function ($item) {
+            $hasColor = Common::hasInPack($item->user_id, 18, true);
+            $item->color_name = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '';
+        });
+
         $achievement_images = [];
         if ($user->medals) {
             foreach ($user->medals as $medal) {
@@ -264,7 +270,9 @@ class RankingService
         $kong['type_user'] = 0;
         $kong['manger_type'] = null;
         $kong['achievement_images'] = [];
+        $kong['color_name'] = '';
 
+        
 
         $data[0] = isset($data[0]) ? $data[0] : $kong;
         $data[1] = isset($data[1]) ? $data[1] : $kong;
@@ -309,7 +317,7 @@ class RankingService
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
         $arr['user']['age'] = @$user->profile?->age ?? '';
-        $arr['user']['color_name'] = $color_name;
+        $arr['user']['color_name'] = $color_name ?? '';
         $arr['user']['achievement_images'] = $achievement_images;
 
 
