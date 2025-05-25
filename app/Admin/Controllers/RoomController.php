@@ -151,7 +151,7 @@ class RoomController extends MainController
         $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
             ->whereHas('owner')->orderByDesc('pin');
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
-        if ($topRooms){
+        if ($topRooms) {
             $grid->model()->orderByDesc('room_visitors_count');
         }
 
@@ -241,10 +241,10 @@ class RoomController extends MainController
 
             default:
                 $grid->model()->orderByDesc('hour_hot');
-//                $grid->model()->orderByDesc('rooms.pin')
-//                    ->orderByDesc('rooms.top_room')
-//                    ->orderByDesc('session')
-//                    ->orderByDesc('count_room_socket');
+                //                $grid->model()->orderByDesc('rooms.pin')
+                //                    ->orderByDesc('rooms.top_room')
+                //                    ->orderByDesc('session')
+                //                    ->orderByDesc('count_room_socket');
                 break;
         }
         // Filters UI
@@ -444,12 +444,12 @@ class RoomController extends MainController
         $grid->actions(function ($action) {
             $action->disableView();
             $pin = $action->row->pin;
-
+            $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
             $action->add(new RoomPinAction($action->row->id, $pin));
-             $action->add(new CloseRoomAction());
+            $action->add(new CloseRoomAction($model->id));
         });
-         
+
         $grid->disableCreateButton();
         $grid->disableExport();
         $this->extendGrid($grid);

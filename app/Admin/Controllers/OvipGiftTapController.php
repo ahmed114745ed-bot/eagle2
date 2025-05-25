@@ -298,13 +298,13 @@ class OvipGiftTapController extends MainController
              SCRIPT;
         Admin::script($script);
 
-        if (Session::has('show_alert')) {
-            $form->html('<script>
-             $(document).ready(function () {
-                 alert("الرجاء اختيار نوع  الصوره");
-             });
-         </script>');
-        }
+        // if (Session::has('show_alert')) {
+        //     $form->html('<script>
+        //      $(document).ready(function () {
+        //          alert("الرجاء اختيار نوع  الصوره");
+        //      });
+        //  </script>');
+        // }
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
