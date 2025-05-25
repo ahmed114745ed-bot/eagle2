@@ -104,7 +104,7 @@ class RoomRepository extends AbstractRepository
                     // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
 //                });
             })
-            ->where('uid','!=', Auth::id())
+            // ->where('uid','!=', Auth::id())
             ->where('room_status', 1);
         // Filter by country if provided
         if (!is_null($req->country_id)) {
