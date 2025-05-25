@@ -50,7 +50,7 @@ class RegularTarget implements TargetInterface
 //        }
           $usd = Common::getTargetUsd($target->diamonds,$target->usd);
 
-          \Log::info('This per for user id:'. auth()->id . ' ' . $per);
+          \Log::info('This per for user id:'. \Auth::id() . ' ' . $per);
           return $usd * $per;
     }
 
