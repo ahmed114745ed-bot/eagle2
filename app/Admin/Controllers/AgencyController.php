@@ -813,6 +813,9 @@ class AgencyController extends MainController
         });
 
         $form->saved(function (Form $form) {
+            $user=User:: find($form->model()->app_owner_id);
+            $user->monthly_diamond_received=0;
+            $user->save();
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $form->model()->app_owner_id,
                 'agency_id' => $form->model()->id,

@@ -4,6 +4,7 @@ namespace Modules\FixedTarget\Services;
 
 use App\Helpers\Common;
 use App\Models\BDSallary;
+use App\Models\UsersJoinedAgency;
 use App\Services\WalletService;
 use Carbon\Carbon;
 use App\Models\User;
@@ -33,6 +34,7 @@ class FixedTargetService
     private TargetType $userTargetType;
 
     private \DateTime $startDate;
+    private \DateTime $joinDate;
 
     private \DateTime $endDate;
 
@@ -45,6 +47,14 @@ class FixedTargetService
             $this->month = $dt->format('m');
             $this->year = $dt->format('Y');
         }
+
+        $joinDate = UsersJoinedAgency::where('user_id', $user->id)
+        ->where('agency_id', $user->agency_id)
+        ->latest()
+        ->value('join_date'); 
+
+        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');  
+        
 
         $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->startOfMonth()->timezone('UTC');
         $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->endOfMonth()->timezone('UTC');
@@ -252,6 +262,7 @@ class FixedTargetService
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
 
+
             if ($target) {
                 $hours = 0;
                 $days  = 0;
@@ -263,8 +274,10 @@ class FixedTargetService
 
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
+             
+                $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
 
-                $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $this->startDate, endDate: $this->endDate);
+                $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
 
 
                 $t                = $this->targetInstance->calculateUsdFromTarget($target, $hours ?? 0, $days, $extra);
