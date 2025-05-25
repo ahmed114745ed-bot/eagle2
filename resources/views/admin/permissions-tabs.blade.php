@@ -102,7 +102,7 @@
                         </h6>
                         @foreach($perms as $perm)
                             <div class="form-check">
-                                <input class="form-check-input"
+                                <input class="form-check-input permission-checkbox"
                                        type="checkbox"
                                        value="{{ $perm->id }}"
                                        id="perm-{{ $perm->id }}"
