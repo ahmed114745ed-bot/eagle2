@@ -20,6 +20,9 @@
 @endphp
 
 <style>
+    .nav-tabs{
+        background: var(--box-background-color);
+    }
     .nav-link.active {
         background-color: var(--primary-color);
         color: white;
@@ -95,7 +98,7 @@
                 @foreach($groupedPermissions as $group => $perms)
                     <div class="permission-group">
                         <h6 class="permission-group-title">
-                            {{ __(ucwords(str_replace('-', ' ', $group))) }}
+                            {{ __(ucwords(str_replace(['-', '_'], ' ', $group))) }}
                         </h6>
                         @foreach($perms as $perm)
                             <div class="form-check">
