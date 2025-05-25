@@ -23,7 +23,7 @@ class RegularTarget implements TargetInterface
         $extras = $extra;
         // $per = 0.50;
         $per =common::getDiamondsPercentage();
-        \Log::info($per);
+        \Log::info($target->hours <= $hours);
         if ($target->hours <= $hours) {
             $per += (((int) settings()->get('hours')) ?? 0)/100;
         }
