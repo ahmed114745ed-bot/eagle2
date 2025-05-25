@@ -154,7 +154,7 @@ class AdminPermission extends Seeder
             'config',
             'level-user-history',
             'request-problem',
-            'user-target-eg'
+            'user-target-eg',
         ];
 
         $methods = [
@@ -170,8 +170,8 @@ class AdminPermission extends Seeder
             ['name' => 'Dashboard', 'sort' => 1, 'permissions' => ['all-statistic']],
             ['name' => 'Fast orders', 'sort' => 2, 'permissions' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate']],
             ['name' => 'Wallet', 'sort' => 3, 'permissions' => ['core-wallets']],
-            ['name' => 'charge system', 'sort' => 4, 'permissions' => ['charge', 'charger-report']],
-            ['name' => 'users', 'sort' => 5, 'permissions' => ['free-users', 'ticket', 'trashed-account-user']],
+            ['name' => 'charge system', 'sort' => 4, 'permissions' => ['charge', 'charger-report', 'charge-settings']],
+            ['name' => 'users', 'sort' => 5, 'permissions' => ['users', 'ticket', 'trashed-account-user']],
             ['name' => 'Advertisements', 'sort' => 7, 'permissions' => ['carousel', 'banners', 'official-messages', 'offers']],
             ['name' => 'Store', 'sort' => 8, 'permissions' => ['wares']],
             ['name' => 'Distinguished identifier', 'sort' => 9, 'permissions' => ['special-Ware', 'special-history', 'image-color']],
@@ -179,7 +179,7 @@ class AdminPermission extends Seeder
             ['name' => 'families', 'sort' => 11, 'permissions' => ['family', 'family-level']],
             ['name' => 'Agency System', 'sort' => 12, 'permissions' => ['agency-settings']],
             ['name' => 'Internal Sales System', 'sort' => 13, 'permissions' => ['charge-country', 'salary-request', 'agent-request-transaction', 'request-problem']],
-            ['name' => 'Host Agencies', 'sort' => 14, 'permissions' => ['users-hunters', 'user-target', 'salary-history', 'Report_user', 'agencies', 'user-target-eg', 'report']],
+            ['name' => 'Host Agencies', 'sort' => 14, 'permissions' => ['users-hunters', 'user-target', 'sailer', 'report-user', 'agencies', 'agent-target', 'report']],
             ['name' => 'Agency Settings', 'sort' => 15, 'permissions' => ['agency-join-requests', 'request-agencies', 'target']],
             ['name' => 'Charging Agencies', 'sort' => 16, 'permissions' => ['agency-manger-setting', 'appear-charger-agency', 'charge-agency', 'payment-gat-way']],
             ['name' => 'Agency Manager', 'sort' => 17, 'permissions' => ['managers']],
@@ -191,7 +191,7 @@ class AdminPermission extends Seeder
             ['name' => 'Reels', 'sort' => 23, 'permissions' => ['Real', 'report-real']],
             ['name' => 'Moment', 'sort' => 24, 'permissions' => ['moment', 'report-moment']],
             ['name' => 'Employees and Permissions', 'sort' => 25, 'permissions' => [ 'auth-users', 'roles']],
-            ['name' => 'Work Settings', 'sort' => 26, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history']],
+            ['name' => 'Work Settings', 'sort' => 26, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin','gold-coins', 'exchange', 'sailer']],
             ['name' => 'Sensitive Settings', 'sort' => 27, 'permissions' => ['updates', 'config']],
             ['name' => 'System Settings', 'sort' => 28, 'permissions' => ['settings', 'language', 'daily-prize']],
             ['name' => 'Level', 'sort' => 29, 'permissions' => ['level', 'level-interval']],
