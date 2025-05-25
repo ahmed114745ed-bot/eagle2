@@ -2620,5 +2620,8 @@
     "Request Agency History": "سجل طلبات الوكالة",
     "Update_setting_button": "تحديث زر الإعدادات",
     "Gift Target Event": "حدث هدف الهدية",
-    "Level User History": "سجل مستوى المستخدم"
+    "Level User History": "سجل مستوى المستخدم",
+     "badge": "شارة",
+  "intro": "مقدمة",
+  "frame": "إطار"
 }

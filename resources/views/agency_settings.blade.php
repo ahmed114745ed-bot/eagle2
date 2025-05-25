@@ -426,12 +426,13 @@
                                                 @endphp
 
                                                 <div>
+                                                    <label> {{ __($suffix) }} </label>
                                                     <input type="file"
                                                            id="{{ $inputName }}"
                                                            name="{{ $inputName }}"
                                                            onchange="previewImage(this, 'preview_{{ $inputName }}')"
                                                            style="display: block; width: 100%; max-width: 200px;">
-
+                                                       
                                                     <div class="badge-preview" style="margin-top: 5px;">
                                                         @if ($row)
                                                             <img id="preview_{{ $inputName }}"
