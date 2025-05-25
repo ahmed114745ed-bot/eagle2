@@ -22,12 +22,17 @@ class AgencySettingsController extends MainController
     public function index(Content $content)
     {
         checkAgencyFeature();
+        // $hours =  settings()->get('hours');
+        // $days =  settings()->get('days');
+        // $moments =  settings()->get('moments');
+        // $reels = settings()->get('reels');
+        // $diamonds = settings()->get('diamonds');
 
         $hours =  Common::getSettingValue('hours') ?? 0;
         $days =  Common::getSettingValue('days') ?? 0;
         $moments =  Common::getSettingValue('moments') ?? 0;
         $reels = Common::getSettingValue('reels') ?? 0;
-        $diamonds = Common::getSettingValue('diamonds') ?? 0;
+        $diamonds = Common::getSettingValue('diamonds');
         $languages = Language::all();
         $configAll = Config::all();
         return parent::index($content
