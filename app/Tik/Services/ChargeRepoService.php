@@ -188,7 +188,7 @@ class ChargeRepoService
             if (!$receiver) throw new \Exception('this user not found');
             if ($receiver->transfer_salary == 1) throw new \Exception('api.freez_charge_user');
 
-            $agency = $this->shippingAgencyRepository->findAgencyByOwnerId($sender->id, status: true);
+            $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
                 throw new \Exception('api_responses.agency_stopped'); //Your agency stopped call the administrator
 
