@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Tik\Repositories\ShippingAgencyRepository;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Role;
@@ -57,6 +58,7 @@ class AgencyService
 {
     public function __construct(
         private readonly AgencyRepository $agencyRepository,
+        private readonly ShippingAgencyRepository $shippingAgencyRepository,
         private readonly AgencyJoinRequestRepository $agencyJoinRequestRepository,
         private readonly AgencyUserJobRepository $agencyUserJobRepository,
         private readonly UserRepository $userRepository,
@@ -71,7 +73,6 @@ class AgencyService
         private readonly FollowRepository $followRepository,
         private readonly LeaveAgencyRequestRepository $leaveAgencyRequestRepository,
         private readonly AdminRepository $adminRepository,
-        private readonly ChargeAgencyRepository $chargeAgencyRepository,
         private readonly UsersJoinedAgencyRepository $usersJoinedAgencyRepository,
 
 
@@ -1032,6 +1033,6 @@ class AgencyService
 
     public function allAgencyCharged($id)
     {
-        return $this->agencyRepository->getChargeAgency($id);
+        return $this->shippingAgencyRepository->getChargeAgency($id);
     }
 }

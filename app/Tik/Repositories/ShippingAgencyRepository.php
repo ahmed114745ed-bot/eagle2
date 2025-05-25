@@ -12,7 +12,7 @@ class ShippingAgencyRepository extends AbstractRepository
 {
 
     /**
-     * @param Model $model
+     * @param ShippingAgency $model
      */
     public function __construct()
     {
@@ -185,7 +185,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getAgencyByFilter($keyword)
     {
-        return  $this->model 
+        return  $this->model
             ->with('owner')
             ->where(function ($q) use ($keyword) {
                 $q->where('id', 'like', '%' . $keyword . '%')
@@ -270,7 +270,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getChargeAgency($id)
     {
-        return  $this->model  ->whereHas('chargeAgency')->when(isset($id), function ($query) use ($id) {
+        return  $this->model->whereHas('chargeAgency')->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->get();
     }
