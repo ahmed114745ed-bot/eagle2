@@ -2630,5 +2630,6 @@
     "Level User History": "سجل مستوى المستخدم",
      "badge": "شارة",
   "intro": "مقدمة",
-  "frame": "إطار"
+  "frame": "إطار",
+"total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!"
 }

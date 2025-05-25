@@ -277,6 +277,10 @@
     .upload-button:hover {
         background: #ffab40;
     }
+    .swal-wide {
+        width: 900px !important;
+        font-size: 25px;
+    }
 
     /* Responsive adjustments */
     @media (max-width: 2000px) {
@@ -595,7 +599,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'تحذير',
-                            text: 'يجب أن يكون مجموع النسب 100 بالضبط!',
+                            text: "{{ __('total_percentage_must_be_100') }}",
                             confirmButtonText: 'حسنًا'
                         });
                         return;

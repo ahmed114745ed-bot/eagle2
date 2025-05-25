@@ -2078,5 +2078,6 @@
     "Level User History": "स्तर उपयोगकर्ता इतिहास",
     "badge": "बैज",
   "intro": "परिचय",
-  "frame": "फ्रेम"
+  "frame": "फ्रेम",
+"total_percentage_must_be_100": "कुल प्रतिशत 100 होना चाहिए!"
 }
