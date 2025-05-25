@@ -103,12 +103,12 @@ class UserLevelController extends MainController
                 $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
                 $vip=Vip::find($value);
                 $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
-    
+
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                             <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
                             <span>$value</span>
-                           
-                            <img src='$arrowIcon' style='width: 16px; height: 16px;'>
+
+                            <img src='$arrowIcon' style='width: 32px; height: 8px;'>
                         </div>";
             });
 
