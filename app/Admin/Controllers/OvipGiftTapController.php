@@ -204,26 +204,27 @@ class OvipGiftTapController extends MainController
         $form->hidden('type')->value(request('type'));
         $form->hidden('is_active_for_vip')->value(1);
         $form->hidden('get_type')->value(1);
+        $form->hidden('enable')->value(1);
 
         $form->display('ID');
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        if (!$form->isEditing()) {
-            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
-        if ($form->isEditing()) {
-            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
+        // if (!$form->isEditing()) {
+        //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+        //         $form->currency('price', __('price'));
+        //        // $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        //     }
+        // }
+        // if ($form->isEditing()) {
+        //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+        //        // $form->currency('price', __('price'));
+        //      //   $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        //     }
+        // }
 
-        $form->number('exp', __('exp'));
+        //  $form->number('exp', __('exp'));
 
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
@@ -231,25 +232,25 @@ class OvipGiftTapController extends MainController
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        });
-//        $form->select('image_type1', __('image_type'))->options(
-//            [
-//                'svga' => __('svga'),
-//                'alpha' => __('alpha'),
-//                'mp4' => __('mp4'),
-//                'vap' => __('vap'),
-//
-//            ]
-//        )->attribute(['id' => 'image_type1'])->required();
-//
-//        $form->select('profile_frame_type', __('image_type'))->options(
-//            [
-//                'svga' => __('svga'),
-//                'png' => __('png'),
-//
-//            ]
-//        )->attribute(['id' => 'profile_frame'])->required();
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            });
+        //        $form->select('image_type1', __('image_type'))->options(
+        //            [
+        //                'svga' => __('svga'),
+        //                'alpha' => __('alpha'),
+        //                'mp4' => __('mp4'),
+        //                'vap' => __('vap'),
+        //
+        //            ]
+        //        )->attribute(['id' => 'image_type1'])->required();
+        //
+        //        $form->select('profile_frame_type', __('image_type'))->options(
+        //            [
+        //                'svga' => __('svga'),
+        //                'png' => __('png'),
+        //
+        //            ]
+        //        )->attribute(['id' => 'profile_frame'])->required();
 
         $form->saving(function (Form $form) {
             if ($form->show_img instanceof UploadedFile) {
@@ -306,11 +307,11 @@ class OvipGiftTapController extends MainController
          </script>');
         }
         //        $form->file('img3', trans('video'));
-        $form->color('color', trans('color'));
-        $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+        if (request('type') == 18) $form->color('color', trans('color'));
+        // $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
 
         //        $form->number('sort', 'sort');
-        $form->number('num', __('num'));
+        // $form->number('num', __('num'));
 
         $form->saving(function (Form $form) {
 
