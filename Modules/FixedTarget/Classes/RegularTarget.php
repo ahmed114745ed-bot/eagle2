@@ -16,75 +16,70 @@ class RegularTarget implements TargetInterface
         return Target::query()->where('diamonds', '<=', $diamond)->orderBy('diamonds', 'desc')->first();
     }
 
-    public function calculateUsdFromTarget(Model $target, float $hours, int $days , array $extra): float
+    public function calculateUsdFromTarget(Model $target, float $hours, int $days, array $extra): float
     {
         \Log::info($target->toJson());
         $targetReel =  explode(',', $target->reel);
         $targetMoment = explode(',', $target->moment);
         $extras = $extra;
         // $per = 0.50;
-        $per =common::getDiamondsPercentage();
+        $per = common::getDiamondsPercentage();
         \Log::info($target->hours <= $hours);
         if ($target->hours <= $hours) {
-            $per += (((int) settings()->get('hours')) ?? 0)/100;
+            $per += (((int) Common::getSettingsValue('hours')) ?? 0) / 100;
         }
 
 
         if ($target->days <= $days) {
-            $per +=  (((int) settings()->get('days'))?? 0) /100;
+            $per +=  (((int) Common::getSettingsValue('days')) ?? 0) / 100;
         }
 
 
-        if(((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1]??0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0)) )
-        {
+        if (((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1] ?? 0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0))) {
 
-            $per += (settings()->get('moments')??0) /100;
+            $per += (((int)Common::getSettingsValue('moments')) ?? 0) / 100;
         }
 
-        if(((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0)) && ((@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0)) && ((@$targetReel[2] ?? 0 )<= ($extras['reel']['comments'] ?? 0)) )
-        {
-            $per += (settings()->get('reels') ?? 0) /100;
+        if (((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0)) && ((@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0)) && ((@$targetReel[2] ?? 0) <= ($extras['reel']['comments'] ?? 0))) {
+            $per += (((int)Common::getSettingsValue('reels')) ?? 0) / 100;
         }
-//        if (Common::getConf('all_target_or_nothing') == 'true') {
-//            if ($per < 1) {
-//                $per = 0;
-//            }
-//        }
-          $usd = Common::getTargetUsd($target->diamonds,$target->usd);
-
-          \Log::info('This per for user id:'. \Auth::id() . ' ' . $per . PHP_EOL . ' Hours:'. $hours . ' Days:' . $days . PHP_EOL . ' USD:'. $usd);
-          return $usd * $per;
+        //        if (Common::getConf('all_target_or_nothing') == 'true') {
+        //            if ($per < 1) {
+        //                $per = 0;
+        //            }
+        //        }
+        $usd = Common::getTargetUsd($target->diamonds, $target->usd);
+        \Log::info('This per for user id:' . \Auth::id() . ' ' . $per . PHP_EOL . ' Hours:' . $hours . ' Days:' . $days . PHP_EOL . ' USD:' . $usd);
+        return $usd * $per;
     }
 
-    public function calculatePercentageAchieved(Model $target, float $hours, int $days , array $extra): float
+    public function calculatePercentageAchieved(Model $target, float $hours, int $days, array $extra): float
     {
         $targetReel =  explode(',', $target->reel);
         $targetMoment = explode(',', $target->moment);
         $extras = $extra;
         // $per = 0.50;
-        $per =common::getDiamondsPercentage();
+        $per = common::getDiamondsPercentage();
         if ($target->hours <= $hours) {
-            $per += (settings()->get('hours') ?? 0)/100;
+            $per += (settings()->get('hours') ?? 0) / 100;
         }
 
 
         if ($target->days <= $days) {
-            $per +=  (settings()->get('days')?? 0) /100;
+            $per +=  (settings()->get('days') ?? 0) / 100;
         }
 
 
-        if((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1]??0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments'] )
-        {
+        if ((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1] ?? 0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments']) {
 
-            $per += (settings()->get('moments')??0) /100;
+            $per += (settings()->get('moments') ?? 0) / 100;
         }
 
-        if((@$targetReel[0] ?? 0) <= $extras['reel']['upload'] && (@$targetReel[1] ?? 0) <= $extras['reel']['likes'] && (@$targetReel[2] ?? 0 )<= $extras['reel']['comments'] )
-        {
-            $per += (settings()->get('reels') ?? 0) /100;
+        if ((@$targetReel[0] ?? 0) <= $extras['reel']['upload'] && (@$targetReel[1] ?? 0) <= $extras['reel']['likes'] && (@$targetReel[2] ?? 0) <= $extras['reel']['comments']) {
+            $per += (settings()->get('reels') ?? 0) / 100;
         }
 
 
-          return $per;
+        return $per;
     }
 }
