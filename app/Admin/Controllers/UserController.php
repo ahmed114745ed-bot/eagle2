@@ -235,8 +235,14 @@ class UserController extends MainController
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
-                $senderLevel = @$this->total_sender_level;
-                $receivedLevel = @$this->total_received_level;
+//                $senderLevel = @$this->total_sender_level;
+//                $receivedLevel = @$this->total_received_level;
+
+                $receiver_img = @$this->getImageReceiverOrSender('receiver_id', 1)?->img ?? '';
+                $receiverImg = getImagePath($receiver_img) ?? $defaultImage;
+
+                $sender_img = @$this->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
+                $senderImg = getImagePath($sender_img) ?? $defaultImage;
 
                 // Check if the image exists
                 if (!isImageExists($url)) {
@@ -245,16 +251,18 @@ class UserController extends MainController
                 $image = handleShowImageWithTypes($this->id, $url, 50, 50);
 
                 return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                    <strong>$name</strong><br>
-               <span style='color: #aaa; font-size: smaller;'>UID: $uid</span><br>
-                <span style='color: #aaa; font-size: smaller;'>Received Level: $senderLevel</span><br>
-                <span style='color: #aaa; font-size: smaller;'>Sender Level: $receivedLevel</span>
-                </div>
-            </div>
-        ";
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            $image
+                            <div>
+                                <strong>$name</strong><br>
+                                <span style='font-size: smaller;'>UID: $uid</span><br>
+                                <img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>
+                                <span style='font-size: smaller;'>Receiver Level</span><br>
+                                <img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>
+                                <span style='font-size: smaller;'>Sender Level</span>
+                            </div>
+                        </div>
+                        ";
             });
         //        $grid->column('return', __('status user'))->display(function () {
         //            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
@@ -269,17 +277,17 @@ class UserController extends MainController
         //        });
 
 
-        $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
-
-            $results = [
-                __('reel count') => $this->reals()->count() ?? 0,
-                __('moment_count') => $this->moments()->count() ?? 0,
-                __('total_days') => $this->total_days ?? 0,
-                __('total_hours') => $this->liveTime->sum("hours") ?? 0,
-            ];
-
-            return new Table([__('Field Name'), __('Value')], $results);
-        });
+//        $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
+//
+//            $results = [
+//                __('reel count') => $this->reals()->count() ?? 0,
+//                __('moment_count') => $this->moments()->count() ?? 0,
+//                __('total_days') => $this->total_days ?? 0,
+//                __('total_hours') => $this->liveTime->sum("hours") ?? 0,
+//            ];
+//
+//            return new Table([__('Field Name'), __('Value')], $results);
+//        });
 
         $grid->column('total_charge_level', __('admin.charge_level'));
 
@@ -297,7 +305,7 @@ class UserController extends MainController
         $grid->column('agency', __('Agency'))
             ->display(function () {
                 if (!$this->agency) {
-                    return "<span style='color: #aaa;'>No agency</span>";
+                    return "<span>No agency</span>";
                 }
 
                 $name = $this->agency->name ?? '';
