@@ -212,6 +212,10 @@ class RoleControllerNew extends MainController
 
             $form->model()->permissions()->sync($permissions);
             //  $form->model()->permissions()->sync(request('permissions', []));
+            admin_toastr(__('Updated successfully'), 'success');
+
+            // Redirect to same edit page
+            return redirect(admin_url('roles/' . $form->model()->id . '/edit'));
         });
 
         return $form;

@@ -30,7 +30,8 @@ class DatabaseSeeder extends Seeder
 //        $this->call(UserSeeder::class);
         $this->call([
 //            CoreWalletsSeeder::class,
-            PaymentGatewaysSeeder::class,
+//            PaymentGatewaysSeeder::class,
+        AdminPermission::class,
         ]);
     }
 }

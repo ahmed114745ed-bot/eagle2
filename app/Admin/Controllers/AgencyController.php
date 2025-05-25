@@ -438,7 +438,8 @@ class AgencyController extends MainController
               <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
         </div>";
         });
-        $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
+        $grid->column('alary', __('Agency wallet'))->display(function ($coin) {
+            $coin = $this->salary;
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
@@ -813,6 +814,9 @@ class AgencyController extends MainController
         });
 
         $form->saved(function (Form $form) {
+            $user=User:: find($form->model()->app_owner_id);
+            $user->monthly_diamond_received=0;
+            $user->save();
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $form->model()->app_owner_id,
                 'agency_id' => $form->model()->id,

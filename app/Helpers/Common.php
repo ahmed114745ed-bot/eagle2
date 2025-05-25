@@ -1343,9 +1343,17 @@ class Common
         return $value;
     }
 
+    public  static function getSettingsValue($key)
+    {
+        $value = Cache::rememberForever($key, function () use ($key) {
+            return Setting::where('key', $key)->value('value');
+        });
+        return $value;
+    }
+
     public  static function getDiamondsPercentage()
     {
-        $num = settings()->get('diamonds');
+        $num = (int)self::getSettingsValue('diamonds');
         $per = $num / 100;
         return $per;
     }

@@ -180,7 +180,7 @@ Route::group(
         $router->post('agency-user-job/{agency_id}', 'AgencyUserJobController@store');
         $router->get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         $router->get('agency-statistic', 'AgencyStatisticController@index');
-        $router->get('agency-settings', 'AgencySettingController@index');
+    //    $router->get('agency-settings', 'AgencySettingController@index');
 
         $router->resource('test-test', 'TestTestController');
         $router->get('profile', [AdminAuthController::class, 'index']);
@@ -272,7 +272,7 @@ Route::group(
         $router->resource('vip_prev', 'VipAuthController');
         $router->resource('agencies', 'AgencyController');
         $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
-         $router->get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'profile'])->name('shipping.agency.profile');
+        $router->get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
         $router->post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         $router->post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
         $router->post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
