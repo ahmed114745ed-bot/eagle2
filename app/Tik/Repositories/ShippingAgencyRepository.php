@@ -209,7 +209,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getAgencyByOwnerId($ownerId)
     {
-        return Agency::where('app_owner_id', $ownerId)->first();
+        return $this->model->where('app_owner_id', $ownerId)->first();
     }
 
     public function getJoinRequests($agencyId)
