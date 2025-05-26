@@ -7,14 +7,15 @@ use App\Models\Vip;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Layout\Content;
 use App\Models\Admin as AdminModel;
-use App\Services\AppFeatureService;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin as EncoreAdmin;
 
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
+
+use App\Services\AppFeatureService;
 use App\Admin\Controllers\MainController;
 
 class VipController extends MainController

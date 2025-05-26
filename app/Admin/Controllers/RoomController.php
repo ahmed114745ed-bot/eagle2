@@ -2,39 +2,47 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\RoomPinAction;
-use App\Helpers\Common;
 use App\Models\Room;
-use App\Http\Controllers\Controller;
-use App\Models\EnteredRoom;
-use App\Models\RoomCategory;
 use App\Models\User;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Widgets\Table;
-use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
+use App\Helpers\Common;
+use App\Models\EnteredRoom;
+use App\Models\RoomCategory;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
+
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Widgets\Table;
+use Encore\Admin\Layout\Content;
+use App\Admin\Actions\RoomPinAction;
+use App\Http\Controllers\Controller;
+use App\Admin\Actions\CloseRoomAction;
 use Illuminate\Support\Facades\Request;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class RoomController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'rooms';
+
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(trans('Rooms'))
-            ->row(function (Row $row) {
+        $content = $content->title(trans('Rooms'));
+
+        if (Admin::user()->can('browse-room-actions') || Admin::user()->can('*')) {
+            $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
-            })
-            ->body($this->grid()));
+            });
+        }
+
+        $content = $content->body($this->grid());
+
+        return parent::index($content);
     }
 
     /**
@@ -151,7 +159,7 @@ class RoomController extends MainController
         $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
             ->whereHas('owner')->orderByDesc('pin');
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
-        if ($topRooms){
+        if ($topRooms) {
             $grid->model()->orderByDesc('room_visitors_count');
         }
 
@@ -241,10 +249,10 @@ class RoomController extends MainController
 
             default:
                 $grid->model()->orderByDesc('hour_hot');
-//                $grid->model()->orderByDesc('rooms.pin')
-//                    ->orderByDesc('rooms.top_room')
-//                    ->orderByDesc('session')
-//                    ->orderByDesc('count_room_socket');
+                //                $grid->model()->orderByDesc('rooms.pin')
+                //                    ->orderByDesc('rooms.top_room')
+                //                    ->orderByDesc('session')
+                //                    ->orderByDesc('count_room_socket');
                 break;
         }
         // Filters UI
@@ -444,10 +452,18 @@ class RoomController extends MainController
         $grid->actions(function ($action) {
             $action->disableView();
             $pin = $action->row->pin;
-
+            $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
-            $action->add(new RoomPinAction($action->row->id, $pin));
+            if (Admin::user()->can('browse-' . 'room-pin-switch') || Admin::user()->can('*')) {
+
+                $action->add(new RoomPinAction($action->row->id, $pin));
+            }
+            if (Admin::user()->can('browse-' . 'close-room-switch') || Admin::user()->can('*')) {
+
+                $action->add(new CloseRoomAction($model->id));
+            }
         });
+
         $grid->disableCreateButton();
         $grid->disableExport();
         $this->extendGrid($grid);

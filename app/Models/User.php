@@ -711,9 +711,6 @@ class User extends Authenticatable
         //        }
     }
 
-
-
-
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level  + $this->sub_charger_level;
@@ -722,6 +719,12 @@ class User extends Authenticatable
         $this->sub_charger_level = $value - @$this->charge_level ?? 0;
         $diamonds  = (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         $this->sub_charger_coins = $diamonds - $this->total_charge_coins;
+    }
+
+    public function getTotalChargeLevel(float $value)
+    {
+        $diamonds  = (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first()) ?? 0;
+        return $diamonds;
     }
 
     public function getTotalChargeLevelAttribute()

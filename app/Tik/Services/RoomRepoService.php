@@ -158,8 +158,9 @@ class RoomRepoService
     public function quiteRoom($ownerId, User $user)
     {
         $room  = $this->findRoomUser($ownerId);
-        if(!$room)  throw new \Exception(__("Room not found for this owner."));
+        if (!$room)  throw new \Exception(__("Room not found for this owner."));
         $isToZegoCharisma = false;
+        $userDataWithCharisma = [];
         //reset user charisma
         if (isset($room->charizma_status)) {
             $userCharismaService = new UserCharismaService();
@@ -167,6 +168,15 @@ class RoomRepoService
             $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom($room, [$user->id]);
             $isToZegoCharisma = true;
         }
+
+        if (isset($room->microphone)) {
+
+            $microphones = explode(',', $room->microphone);
+            if (in_array($user->id, $microphones)) {
+                UserHandling::calcTime($user->id);
+            }
+        }
+
         $res                = Common::quit_hand($ownerId, $user->id);
         $visitorIdsList   = explode(',', $res);
 
@@ -182,13 +192,6 @@ class RoomRepoService
             $room->count_room_socket = 0;
         }*/
 
-        if (isset($room->microphone)) {
-
-            $microphones = explode(',', $room->microphone);
-            if (in_array($user->id, $microphones)) {
-                UserHandling::calcTime($user->id);
-            }
-        }
 
 
 
@@ -339,7 +342,7 @@ class RoomRepoService
         $jsons[] = $json;
 
 
-            $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
+        $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {

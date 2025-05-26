@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RequestAgencyController extends MainController
 {
+     public $permission_name = 'request-agencies';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");

@@ -3,40 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Models\Setting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Validator;
-use Modules\Tasks\Selectable\Days;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission;
+use Cache;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class AddTargetToJsonController extends Controller
 {
     public $permission_name = 'agency-settings';
+
+
     public function targetPercentage(Request $request)
     {
-        if (!Admin::user()->can('*')){
-            Permission::check('edit-'.$this->permission_name);
-        }
         $hours =  $request->hours;
         $days =  $request->days;
         $reels =  $request->reels;
         $moments =  $request->moments;
         $diamonds = $request->diamonds;
-        $total = $hours + $days + $reels + $moments + $diamonds;
-        if ($total > 100) {
 
-            return   Redirect::back()->withErrors(['msg' => 'يجب ان يكون المجموع ليس اكبر من 100']);
+        $total = $hours + $days + $reels + $moments + $diamonds;
+
+        if ($total > 100) {
+            return Redirect::back()->withErrors(['msg' => 'يجب ان يكون المجموع ليس اكبر من 100']);
         }
-        settings()->set("hours", $hours);
-        settings()->set("days", $days);
-        settings()->set("reels", $reels);
-        settings()->set("moments", $moments);
-        settings()->set("diamonds", $diamonds);
+
+        foreach ($request->all() as $key => $value) {
+            if (!is_null($value)) {
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+                Cache::put($key, $value);
+            }
+        }
 
         return Redirect::back();
     }
-
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [

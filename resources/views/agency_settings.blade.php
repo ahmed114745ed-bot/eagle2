@@ -277,6 +277,10 @@
     .upload-button:hover {
         background: #ffab40;
     }
+    .swal-wide {
+        width: 900px !important;
+        font-size: 25px;
+    }
 
     /* Responsive adjustments */
     @media (max-width: 2000px) {
@@ -285,6 +289,8 @@
         }
     }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
@@ -304,7 +310,7 @@
 
                 <h3> {{ __('Percentage target') }}</h3>
 
-                <form action="{{ route('admin.target-percentage') }}" method="POST" enctype="multipart/form-data">
+                <form id="target-percentage-form" action="{{ route('admin.target-percentage') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @php
                         $errorMessage = $errors ? $errors->first('msg') : null;
@@ -426,12 +432,13 @@
                                                 @endphp
 
                                                 <div>
+                                                    <label> {{ __($suffix) }} </label>
                                                     <input type="file"
                                                            id="{{ $inputName }}"
                                                            name="{{ $inputName }}"
                                                            onchange="previewImage(this, 'preview_{{ $inputName }}')"
                                                            style="display: block; width: 100%; max-width: 200px;">
-
+                                                       
                                                     <div class="badge-preview" style="margin-top: 5px;">
                                                         @if ($row)
                                                             <img id="preview_{{ $inputName }}"
@@ -461,6 +468,8 @@
             </div>
 
         </div>
+
+        
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
@@ -574,6 +583,30 @@
             function closeFullScreen() {
                 document.getElementById("imageModal").style.display = "none";
             }
+
+            document.getElementById('target-percentage-form').addEventListener('submit', function(e) {
+                    e.preventDefault(); // إيقاف الإرسال مؤقتًا
+
+                    const hours = parseFloat(document.querySelector('input[name="hours"]').value) || 0;
+                    const days = parseFloat(document.querySelector('input[name="days"]').value) || 0;
+                    const moments = parseFloat(document.querySelector('input[name="moments"]').value) || 0;
+                    const reels = parseFloat(document.querySelector('input[name="reels"]').value) || 0;
+                    const diamonds = parseFloat(document.querySelector('input[name="diamonds"]').value) || 0;
+
+                    const total = hours + days + moments + reels + diamonds;
+
+                    if (total !== 100) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'تحذير',
+                            text: "{{ __('total_percentage_must_be_100') }}",
+                            confirmButtonText: 'حسنًا'
+                        });
+                        return;
+                    }
+
+                    e.target.submit();
+                });
         </script>
     </div>
 </body>

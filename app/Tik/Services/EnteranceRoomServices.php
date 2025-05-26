@@ -155,6 +155,7 @@ class EnteranceRoomServices
         $userId = $request->user_account;
 
 
+        
 
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
@@ -351,12 +352,14 @@ class EnteranceRoomServices
 
     private function updateRoomVisitorsBasedOnEvent($event, $room, $userId)
     {
+       
         $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
 
         if ($event == 'room_login' && !in_array($userId, $visitors)) {
 
             $visitors[] = $userId;
         } elseif ($event == 'room_logout') {
+         
             UserHandling::calcTime($userId);
             $this->updateMicrophone($room->uid, $userId);
             $visitors = array_diff($visitors, [$userId]);
@@ -392,6 +395,7 @@ class EnteranceRoomServices
 
         if (!$room) return;
         if ($result) {
+          
             (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
         }
     }

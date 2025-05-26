@@ -190,7 +190,7 @@ class ChargeRepoService
 
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
-                throw new \Exception('agency not founded');
+                throw new \Exception('api_responses.agency_stopped'); //Your agency stopped call the administrator
 
             if ($agency->is_frozen == 1) throw new \Exception(__('api_responses.frozen_agency'));
 
@@ -226,7 +226,7 @@ class ChargeRepoService
                 throw new \Exception(__('api_responses.frozen_agency'));
             }
 
-            $agency = $this->agencyRepository->findAllByStatus($sender->agency_id);
+            $agency = $this->shippingAgencyRepository->findAllByStatus($sender->agency_id);
             if (!isset($agency)) throw new \Exception('agency not founded');
             if ($agency->is_frozen == 1) {
                 throw new \Exception(__('api_responses.frozen_agency'));
