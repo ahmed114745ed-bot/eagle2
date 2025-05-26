@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\BDControllers\RequestAgencyController;
+use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BDControllers\WalletController;
@@ -360,7 +361,8 @@ Route::group(
         });
 
         $router->resource('usersBd', BdController::class);
-
+        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
         $router->resource('ovip', 'OVipController');
         $router->get('ovip-settings', [OVipController::class, 'vip_settings']);

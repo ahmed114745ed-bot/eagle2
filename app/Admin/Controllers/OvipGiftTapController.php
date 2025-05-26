@@ -109,7 +109,7 @@ class OvipGiftTapController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            return handleShowImageWithTypes($this->id, $url, 101, 50);
         });
         $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
@@ -118,7 +118,7 @@ class OvipGiftTapController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            return handleShowImageWithTypes($this->id, $url, 101, 50);
         });
 
 

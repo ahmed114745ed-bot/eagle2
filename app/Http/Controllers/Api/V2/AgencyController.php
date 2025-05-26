@@ -98,8 +98,7 @@ class AgencyController extends Controller
 
         try {
             $agency = $this->agencyService->find($id);
-
-            if ($user->id !=  $agency->app_owner_id) return Common::apiResponse(0, ' you are not owner of this agency', null, 400);
+            request()->is_onwer_agency = ($user->id !=  $agency->app_owner_id);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

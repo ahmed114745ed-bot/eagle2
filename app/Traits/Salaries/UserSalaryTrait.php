@@ -3,6 +3,7 @@
 namespace App\Traits\Salaries;
 
 use App\Helpers\Common;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Modules\FixedTarget\Services\FixedTargetService;
 

@@ -106,6 +106,20 @@ class UserService
         $perPage = 10;
         return $this->userRepository->searchUserAgency($key, $page, $perPage);
     }
+
+    public function user_bd($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->user_bd($key, $page, $perPage);
+    }
+
+    public function user_bd2($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->user_bd2($key, $page, $perPage);
+    }
+
+    
     public function searchInAgency($key, $page)
     {
         $perPage = 10;
