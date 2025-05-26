@@ -57,7 +57,7 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/redis-get-data.log'))
             ->runInBackground();
-        
+
 
         $schedule->command('weekly-star-winner')
             ->dailyAt('00:00')
@@ -87,6 +87,12 @@ class Kernel extends ConsoleKernel
             ->monthlyOn(1, '00:00')
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/app-update-game-wallet.log'))
+            ->runInBackground();
+
+        $schedule->command('users:update-salaries')
+            ->everyTenMinutes()
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/update-user-salaries.log'))
             ->runInBackground();
     }
 
