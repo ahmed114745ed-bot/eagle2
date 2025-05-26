@@ -23,7 +23,7 @@ class ReceiverGiftLogResource extends JsonResource
             'name' => @$this->receiver->name ?: '', // both
             'image' => $this->receiver->profile->avatar ?: '',
             'exp'   => $this->exp ?? '',
-            'level'=> Common::level_center_min (@$this->id), // refactor
+            'level'=> Common::level_center_min (@$this->receiver->id), // refactor
 
         ];
 
