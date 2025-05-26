@@ -189,10 +189,7 @@ class AgencyRepository extends AbstractRepository
         return  $this->model
             ->with('owner')
             ->where(function ($q) use ($keyword) {
-                $q->where('id', 'like', '%' . $keyword . '%')
-                    ->orWhereHas('owner', function ($query) use ($keyword) {
-                        $query->where('uuid', 'like', '%' . $keyword . '%');
-                    });
+                $q->where('id', 'like', '%' . $keyword . '%');
             })->take(10)->get();
     }
 
