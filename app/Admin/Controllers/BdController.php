@@ -177,7 +177,7 @@ class BdController extends MainController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users3', 'id', 'name')->rules('required')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
+            })->ajax('/api/search/users-bd', 'id', 'name')->rules('required')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
         } else {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -185,22 +185,24 @@ class BdController extends MainController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users3', 'id', 'name')->rules('required');
+            })->ajax('/api/search/users-bd', 'id', 'name')->rules('required');
         }
 
         $form->hidden('type', __('Type'))->value('bd');
 
         $form->saving(function (Form $form) {
             $originalAppId = $form->model()->getOriginal('app_id');
+            $userExists = \App\Models\User::find($originalAppId);
 
             if ($originalAppId && $originalAppId != $form->app_id) {
-                $userExists = \App\Models\User::find($originalAppId);
 
                 if ($userExists) {
                     admin_error('تحذير', 'app_user_change_denied');
                     $form->app_id = $originalAppId;
                 }
             }
+            $userExists->is_bd=1;
+            $userExists->save();
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = Hash::make($form->password);
             }

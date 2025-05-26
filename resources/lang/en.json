@@ -826,9 +826,10 @@
   "Created At": "Created At",
   "No target history found": "No target history found",
   "set_bd_as_default":"default bd",
-   "bd_already_default": "This BD is already default",
-    "bd_set_default_success": "BD set as default successfully",
-  "total_percentage_must_be_100": "Total percentage must be 100 exactly!"
+  "bd_already_default": "This BD is already default",
+  "bd_set_default_success": "BD set as default successfully",
+  "total_percentage_must_be_100": "Total percentage must be 100 exactly!",
+  "app bd id":" Bd ID"
 
   
 
