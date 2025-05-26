@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers\BDControllers;
+namespace App\Bd\Controllers;
 
 use App\Admin\Customization\Dashboard\CustomDashboard;
 use App\Http\Controllers\Controller;

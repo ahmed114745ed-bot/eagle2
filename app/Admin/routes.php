@@ -116,6 +116,24 @@ Route::group(
         Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin');
     }
 );
+    Route::group(
+        [
+            'prefix' => config('admin.route.prefix'),
+            'namespace' => '',
+            'middleware' => [
+                'web',
+
+                'multiLanguage',
+            ],
+            'as' => config('admin.route.prefix') . '.',
+        ],
+        function (Router $router) {
+            
+            require base_path('app/Bd/routes.php');
+
+            
+        }
+    );
 
 Route::group(
     [
@@ -361,8 +379,15 @@ Route::group(
         });
 
         $router->resource('usersBd', BdController::class);
+<<<<<<< HEAD
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+=======
+
+        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+        // Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+>>>>>>> 16913da47 (.)
 
         $router->resource('ovip', 'OVipController');
         $router->get('ovip-settings', [OVipController::class, 'vip_settings']);
@@ -526,6 +551,7 @@ Route::group(
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
 
+<<<<<<< HEAD
 
         Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@index')->name('home');
@@ -542,6 +568,8 @@ Route::group(
 
         
         
+=======
+>>>>>>> 16913da47 (.)
     
     }
 
