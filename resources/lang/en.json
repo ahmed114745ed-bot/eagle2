@@ -29,8 +29,10 @@
   "create users hunters":"create user host",
   "delete users hunters":"delete users host",
   "edit users hunters" : "edit users host",
-
-
+"browse user_achievement_level": "browse Achievement Reports",
+"create user_achievement_level": "create Achievement Reports",
+"delete user_achievement_level": "delete Achievement Reports",
+"edit user_achievement_level": "edit Achievement Reports",
     "male": "Male",
     "agency profile" : "agency profile",
     "registered successfully": "Registered Successfully",
