@@ -268,7 +268,7 @@ class AdminPermission extends Seeder
         })->delete();
 
         $actions = ['create', 'delete', 'show'];
-        $targets = ['update_setting_button', 'agency-settings', 'agency-setting', 'settings', 'charge-settings', 'room-settings', 'ovip-settings', 'box-settings', 'moment-settings', 'reel-settings', 'chat-setting', 'user-status', 'updates_family-config', 'agora-zego','updates','weekly_cp'];
+        $targets = ['update_setting_button', 'agency-settings', 'agency-setting', 'settings', 'charge-settings', 'room-settings', 'ovip-settings', 'box-settings', 'moment-settings', 'reel-settings', 'chat-setting', 'user-status', 'updates_family-config', 'agora-zego','updates','weekly_cp','agent-target','sailer'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {

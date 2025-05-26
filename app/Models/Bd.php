@@ -31,6 +31,24 @@ class Bd extends Model
         });
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+
+        static::creating(function ($model) {
+            if ($model->default) {
+                static::query()->update(['default' => 0]);
+            }
+        });
+
+        static::updating(function ($model) {
+            if ($model->default) {
+                static::where('id', '!=', $model->id)->update(['default' => 0]);
+            }
+        });
+    }
+
     protected $attributes = [
         'type' => 'bd',
     ];

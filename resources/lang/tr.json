@@ -1031,8 +1031,8 @@
     "Browse Target": "Hedefleri Gözden Geçir",
     "browse target event": "Hedef Etkinliklerini Gözden Geçir",
     "browse target percentage": "Hedef Yüzdesini Gözden Geçir",
-    "Browse Ticket": "Biletleri Gözden Geçir",
     "create room vip": "Oda VIP seviyesi oluştur",
+    "Browse Ticket": "Şikayetleri görüntüle",
     "browse trashed account user": "Silinmiş Hesap Kullanıcılarını Gözden Geçir",
     "browse updates": "Güncellemeleri Gözden Geçir",
     "browse user levels": "Kullanıcı Seviyelerini Gözden Geçir",
@@ -2500,5 +2500,10 @@
     "badge": "rozet",
   "intro": "giriş",
   "frame": "çerçeve",
-    "total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!"
+    "total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!",
+    "default_current": "Geçerli Varsayılan BD",
+    "no_default_set": "Henüz varsayılan BD ayarlanmadı",
+    "select_default_bd": "Varsayılan olacak BD'yi seçin",
+    "set_as_default": "Varsayılan BD olarak ayarla",
+    "back": "Geri"
 }
