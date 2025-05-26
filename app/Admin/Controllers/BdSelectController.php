@@ -76,8 +76,8 @@ class BdSelectController extends MainController
 
     admin_success('تم التحديث', 'تم تعيين BD الافتراضي بنجاح');
 
-    // return redirect()->back();
-    return redirect()->route('admin.usersBd.index');
+    return redirect()->back();
+    // return redirect()->route('admin.usersBd.index');
 
 }
 
