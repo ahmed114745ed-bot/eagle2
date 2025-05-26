@@ -118,7 +118,7 @@ class OvipGiftTapController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            return handleShowImageWithTypes($this->id, $url, 101, 50);
         });
 
 
