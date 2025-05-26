@@ -2079,5 +2079,10 @@
   "intro": "परिचय",
   "frame": "फ्रेम",
 "total_percentage_must_be_100": "कुल प्रतिशत 100 होना चाहिए!",
-"browse room vip": "कमरों के वीआईपी स्तर देखें"
+"browse room vip": "कमरों के वीआईपी स्तर देखें",
+"default_current": "वर्तमान डिफ़ॉल्ट BD",
+"no_default_set": "अभी तक कोई डिफ़ॉल्ट BD सेट नहीं किया गया है",
+"select_default_bd": "डिफ़ॉल्ट BD चुनें",
+"set_as_default": "डिफ़ॉल्ट BD के रूप में सेट करें",
+"back": "वापस"
 }
