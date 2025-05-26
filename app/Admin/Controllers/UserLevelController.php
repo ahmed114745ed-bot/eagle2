@@ -108,7 +108,7 @@ class UserLevelController extends MainController
                             <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
                             <span>$value</span>
 
-                            <img src='$arrowIcon' style='width: 64px; height: 16px;'>
+                            <img src='$arrowIcon' style='width: 16px; height: 16px;'>
                         </div>";
             });
 
