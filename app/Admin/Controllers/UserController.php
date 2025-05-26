@@ -310,7 +310,6 @@ class UserController extends MainController
 
             return "<div style='display: flex; align-items: center; gap: 5px;'>
               <img src='$img' alt='User Avatar' style='width: 64px; height: 16px;'>
-              <span>$level</span>
               <img src='$arrowIcon' style='width: 16px; height: 16px;'>
             </div>";
         });
