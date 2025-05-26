@@ -2640,5 +2640,6 @@
 "no_default_set": "لم يتم تعيين BD افتراضي بعد",
 "select_default_bd": "اختر BD ليكون الافتراضي",
 "set_as_default": "تعيين كـ BD افتراضي",
-"back": "رجوع"
+"back": "رجوع",
+"edit updates_family config": "تعديل إعدادات عائلة التحديثات"
 }

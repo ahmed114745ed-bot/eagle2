@@ -27,14 +27,20 @@ class RoomController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'rooms';
+
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(trans('Rooms'))
-            ->row(function (Row $row) {
+        $content = $content->title(trans('Rooms'));
+
+        if (Admin::user()->can('browse-room-actions') || Admin::user()->can('*')) {
+            $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
-            })
-            ->body($this->grid()));
+            });
+        }
+
+        $content = $content->body($this->grid());
+
+        return parent::index($content);
     }
 
     /**
@@ -446,8 +452,14 @@ class RoomController extends MainController
             $pin = $action->row->pin;
             $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
-            $action->add(new RoomPinAction($action->row->id, $pin));
-            $action->add(new CloseRoomAction($model->id));
+            if (Admin::user()->can('browse-' . 'room-pin-switch') || Admin::user()->can('*')) {
+
+                $action->add(new RoomPinAction($action->row->id, $pin));
+            }
+            if (Admin::user()->can('browse-' . 'close-room-switch') || Admin::user()->can('*')) {
+
+                $action->add(new CloseRoomAction($model->id));
+            }
         });
 
         $grid->disableCreateButton();
