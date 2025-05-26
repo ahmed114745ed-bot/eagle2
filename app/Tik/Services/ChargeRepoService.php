@@ -376,10 +376,7 @@ class ChargeRepoService
             if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
             if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
             if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
-
-            $authAgencyShipping = Common::searchAgency($authAgency->id);
-            if (!$authAgencyShipping) throw new \Exception(__('api.agencyNotShipping'));
-
+            
             switch ($request->type) {
                 case 'agency':
                     $this->handleAgencyCharge($authAgency, $request);
