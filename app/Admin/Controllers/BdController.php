@@ -71,7 +71,7 @@ class BdController extends MainController
     {
         return parent::show($id, $content
             ->title(trans('BD'))
-            ->body($this->detail($id)));
+            ->body($this->profile($id)));
     }
 
     /**
@@ -226,7 +226,7 @@ class BdController extends MainController
         $form->password('password', __('Password'))->rules('required');
         // $form->text('name', __('Name'));
         $form->image('avatar', __('img'));
-        $form->switch('default', __('default bd'))
+        $form->switch('default', __('set_as_default'))
         ->help(__('make_bd_default'));
 
 
