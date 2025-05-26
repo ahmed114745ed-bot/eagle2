@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Helpers\Common;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SenderGiftLogResource extends JsonResource
@@ -22,7 +23,9 @@ class SenderGiftLogResource extends JsonResource
             'name' => @$this->sender->name ?: '', // both
             'image' => $this->sender->profile->avatar ?? '',
             'exp'   => $this->exp ?? '',
-        ];
+            'level'=> Common::level_center_min (@$this->id),
+
+            ];
 
         return $data;
     }
