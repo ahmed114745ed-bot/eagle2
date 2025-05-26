@@ -85,6 +85,7 @@ trait UserSalaryTrait
 
                     if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
                         try {
+                           
                             $targetService = new FixedTargetService($user, month: $month, year: $year);
                             $targetService->calculateTarget();
 
