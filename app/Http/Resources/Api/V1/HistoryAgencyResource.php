@@ -47,9 +47,9 @@ class HistoryAgencyResource extends JsonResource
         return [
             'star' => ReceiverGiftLogResource::collection($giftLog),
             'heroes' => SenderGiftLogResource::collection($heroGiftLog),
-            $this->when($request->is_onwer_agency,
+            $this->mergeWhen($request->is_onwer_agency,
                 [
-                    'salary' => $salary,
+                    'salary' => @$salary,
                     'target' =>  $target,
                 ])
 
