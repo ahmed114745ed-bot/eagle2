@@ -1641,12 +1641,11 @@
   "Browse Gift": "उपहार ब्राउज़ करें",
   "Create Categories": "श्रेणियाँ बनाएँ",
   "Edit Categories": "श्रेणियाँ संपादित करें",
-  "browse room vip": "वीआईपी कमरे ब्राउज़ करें",
-  "create room vip": "वीआईपी कमरा बनाएँ",
-  "delete room vip": "वीआईपी कमरा हटाएँ",
+  "create room vip": "कमरे के वीआईपी स्तर बनाएं",
   "edit room vip": "वीआईपी कमरा संपादित करें",
   "show room vip": "वीआईपी कमरा दिखाएँ",
   "browse achievement": "उपलब्धियाँ ब्राउज़ करें",
+  "delete room vip": "कमरे का वीआईपी स्तर हटाएं",
   "browse user_achievement_level": "उपयोगकर्ता उपलब्धि स्तर ब्राउज़ करें",
   "create user_achievement_level": "उपयोगकर्ता उपलब्धि स्तर बनाएँ",
   "delete achievement": "उपलब्धि हटाएँ",
@@ -2079,5 +2078,6 @@
     "badge": "बैज",
   "intro": "परिचय",
   "frame": "फ्रेम",
-"total_percentage_must_be_100": "कुल प्रतिशत 100 होना चाहिए!"
+"total_percentage_must_be_100": "कुल प्रतिशत 100 होना चाहिए!",
+"browse room vip": "कमरों के वीआईपी स्तर देखें"
 }
