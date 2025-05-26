@@ -47,8 +47,8 @@
     border: 2px;
     border-radius: 30px;
     width: 50%;
-    margin: auto;
-">
+    margin: 10px auto 88px;
+    ">
     @csrf
     <div class="form-group">
         <label for="bd_id">{{ __('select_default_bd') }}:</label>
