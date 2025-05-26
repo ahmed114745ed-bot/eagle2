@@ -278,7 +278,7 @@ class ChargeController extends MainController
                 </div>
             ";
         });
-        if (Admin::user()->can('add-coins-Switch') || Admin::user()->can('*') || Admin::user()->can('charge-report-Switch')) {
+        if (\Encore\Admin\Facades\Admin::user()->can('add-coins-Switch') || \Encore\Admin\Facades\Admin::user()->can('*') || \Encore\Admin\Facades\Admin::user()->can('charge-report-Switch')) {
             $grid->column('actions', __('Actions'))
                 ->display(function () {
 
