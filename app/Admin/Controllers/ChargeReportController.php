@@ -695,9 +695,17 @@ class ChargeReportController extends MainController
         }
 
         $grid->column('amount', __('Amount'));
-        $grid->column('amount_type', __('Amount'))->display(function () {
-            return $this->amount < 0 ? __('decrement') : __('increment');
-        });
+        $grid->column('amount', __('Amount'));
+        if ($scope === 'not_dash' ) {
+           // dd(123);
+            $grid->column('amount_type', __('status'))->display(function () {
+                return $this->user_id == $agency_id  ?  __('increment') : __('decrement');
+            });
+        } else {
+            $grid->column('amount_type', __('status'))->display(function () {
+                return $this->amount < 0 ? __('decrement') : __('increment');
+            });
+        }
         $grid->column('created_at', __('Created at'));
 
         // Disable unnecessary buttons
