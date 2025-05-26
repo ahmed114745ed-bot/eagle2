@@ -128,10 +128,10 @@ Route::group(
             'as' => config('admin.route.prefix') . '.',
         ],
         function (Router $router) {
-            
+
             require base_path('app/Bd/routes.php');
 
-            
+
         }
     );
 
@@ -354,7 +354,6 @@ Route::group(
         $router->get('/dev', 'HomeController@devindex')->name('dev-home');
         $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
         $router->resource('manger-types', 'MangerTypeController');
-        $router->resource('chat-letters', ChatLetterController::class);
         $router->resource('userscharg', chargUsersSleemController::class);
         $router->resource('image-colors', ImageColorController::class);
         $router->resource('agency_join_requests', 'AgencyJoinRequestController');
@@ -379,15 +378,15 @@ Route::group(
         });
 
         $router->resource('usersBd', BdController::class);
-<<<<<<< HEAD
+
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
-=======
+
 
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
         // Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
->>>>>>> 16913da47 (.)
+
 
         $router->resource('ovip', 'OVipController');
         $router->get('ovip-settings', [OVipController::class, 'vip_settings']);
@@ -551,7 +550,7 @@ Route::group(
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
 
-<<<<<<< HEAD
+
 
         Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@index')->name('home');
@@ -560,17 +559,15 @@ Route::group(
             $router->resource('/salaries', 'BdSalariesController');
             $router->resource('charges', 'ChargeController');
             // $router->resource('/wallet', 'WalletController');
-            Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
-            Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+            Route::post('admin/wallet/charge', [\App\Bd\Controllers\WalletController::class, 'charge'])->name('wallet.charge');
+            Route::post('admin/salary/transfer', [\App\Bd\Controllers\WalletController::class, 'transfer'])->name('salary.transfer');
 
         });
-        $router->resource('/request-agencies', RequestAgencyController::class);
+        $router->resource('/request-agencies', \App\Bd\Controllers\RequestAgencyController::class);
 
-        
-        
-=======
->>>>>>> 16913da47 (.)
-    
+
+
+
     }
 
 
