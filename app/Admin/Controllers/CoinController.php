@@ -46,6 +46,7 @@ class CoinController extends MainController
         $grid->model()->where("payment_gateway_id", $paymentGatwayId);
         $grid->id(__('ID'));
         $grid->column('usd', __('usd'))->display(function ($usd) {
+            $usd = $usd ?? 0;
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -54,7 +55,7 @@ class CoinController extends MainController
                     </div>";
         });
         $grid->column('coin', __('coin'))->display(function ($usd) {
-
+            $usd = $usd ?? 0;
             $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
 
             return "<div style='display: flex; align-items: center; gap: 5px;'>
@@ -146,7 +147,7 @@ class CoinController extends MainController
     {
         //$unique_id = $data['apple_id'];
         $teamId = config('apple.apple_team_id'); // Use the correct environment variable name
-        $keyId = config('apple.apple_key_id');//"GNDGZ4LFR4"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+        $keyId = config('apple.apple_key_id'); //"GNDGZ4LFR4"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
         $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
@@ -189,7 +190,7 @@ class CoinController extends MainController
 
     protected function setPrice(Request $request): void
     {
-        $keyId = config('apple.apple_key_id');//"GNDGZ4LFR4"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+        $keyId = config('apple.apple_key_id'); //"GNDGZ4LFR4"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
         $keyContent = file_get_contents(config('apple.apple_service_file'));
