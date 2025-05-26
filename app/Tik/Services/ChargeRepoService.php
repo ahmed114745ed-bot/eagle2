@@ -369,7 +369,7 @@ class ChargeRepoService
         DB::beginTransaction();
 
         try {
-            $authAgency = $this->shippingAgencyRepository->findFomAll($auth->agency_id);
+            $authAgency = $this->shippingAgencyRepository->findOrFail($auth->agency_id);
 
             if (!$authAgency) throw new \Exception(__('api.notAgency'));
             if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
