@@ -2,14 +2,15 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\Agency;
 use App\Models\Charge;
 use App\Models\Setting;
+use App\Models\ShippingAgency;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Validation\ValidationException;
 
 class ChargeAction2 extends Action
@@ -39,10 +40,10 @@ class ChargeAction2 extends Action
 
     private function getAgency($agencyId)
     {
-        return Agency::where("id", $agencyId)->first();
+        return ShippingAgency::where("id", $agencyId)->first();
     }
 
-    private function handleAgencyCharge(Request $request, Agency $agency)
+    private function handleAgencyCharge(Request $request, ShippingAgency $agency)
     {
         $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
 
@@ -81,7 +82,7 @@ class ChargeAction2 extends Action
 
 
 
-    private function createChargeRecord(Request $request, Agency $agency, $amount, $coins = 0, $usdAmount)
+    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount)
     {
 
         $charge = new Charge();
@@ -113,20 +114,28 @@ class ChargeAction2 extends Action
         $shippingReports = __('Charge reports');
         $url = url('admin/charge-reports/' . $this->agencyId);
 
-        return <<<HTML
-                <a href="javascript:void(0);" onclick="pu({$this->agencyId})" class="charge_action btn btn-sm text-white" style="background-color: #28a745; border-color: #28a745; color: white;">
-                    {$title}
-                </a>
+        $html = '';
 
-                <a href="{$url}" class="shipping_report btn btn-sm text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">
-                    {$shippingReports}
-                </a>
+        if (Admin::user()->can('add-coins-Switch') || Admin::user()->can('*')) {
+            $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->agencyId . ')" class="charge_action btn btn-sm text-white" style="background-color: #28a745; border-color: #28a745; color: white;">'
+                . htmlspecialchars($title) .
+                '</a>';
+        }
 
-                <script>
-                function pu(val) {
-                    $("#vid").val(val);
-                }
-                </script>
-                HTML;
+        if (Admin::user()->can('charge-report-Switch') || Admin::user()->can('*')) {
+            $html .= '<a href="' . htmlspecialchars($url) . '" class="shipping_report btn btn-sm text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">'
+                . htmlspecialchars($shippingReports) .
+                '</a>';
+        }
+
+        $html .= <<<HTML
+<script>
+function pu(val) {
+    $("#vid").val(val);
+}
+</script>
+HTML;
+
+        return $html;
     }
 }

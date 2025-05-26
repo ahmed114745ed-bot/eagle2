@@ -709,9 +709,6 @@ class User extends Authenticatable
         //        }
     }
 
-
-
-
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level  + $this->sub_charger_level;
@@ -720,6 +717,12 @@ class User extends Authenticatable
         $this->sub_charger_level = $value - @$this->charge_level ?? 0;
         $diamonds  = (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         $this->sub_charger_coins = $diamonds - $this->total_charge_coins;
+    }
+
+    public function getTotalChargeLevel(float $value)
+    {
+        $diamonds  = (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first()) ?? 0;
+        return $diamonds;
     }
 
     public function getTotalChargeLevelAttribute()
@@ -768,7 +771,6 @@ class User extends Authenticatable
             UserSallary::query()->where('user_id', $this->id)->whereRaw("CONCAT(year, LPAD(month, 2, '0')) != CONCAT('$currentYear', LPAD('$currentMonth', 2, '0'))")->where('is_paid', 0)->sum(DB::raw('sallary - cut_amount'));
         return $old;
     }
-
 
 
     public function setOldUsdAttribute()
@@ -1356,5 +1358,22 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public function getUserTypesAttribute() : array
+    {
+        $userTypes = match (true) {
+            in_array($this->type_user, [2, 4]) => [1, 2],
+            $this->type_user == 1 => [1],
+            default => []
+        };
+
+        if ($this->hasShippingAgency()) {
+            $userTypes[] = 3;
+        }
+
+        $userTypes = array_unique($userTypes);
+
+        return empty($userTypes) ? [0] : $userTypes;
     }
 }

@@ -75,27 +75,7 @@
         <div class="col-md-12">
             <div class="row ">
                 <div class="col-md-12">
-
-                    <div class="box-body no-padding" style="margin: 10px">
-                        @php
-                            $role = \Modules\Events\Entities\GeneralRole::where("type","pk_event")->first();
-                        @endphp
-                        @if($role != null)
-                            <a href="{{url('admin/general-rols/'.@$role->id.'/edit')}}">
-                                {{ auth()->user()->lan == "en" ? @$role->desc_en : @$role->desc_ar }}
-                            </a>
-                        @endif
-
-
-                        </div>
-                        <div class="box-body no-padding" style="margin: 10px">
-                           <a href="{{url('admin/general-rols/'.@$role->id.'/edit')}}">{{$role->url ?? ''}}</a>
-                        </div>
-
-                    </div>
-                    <div class="box-body no-padding" style="margin: 10px">
-                        <a href="{{url('admin/general-rols/'.@$role->id.'/edit')}}">{{@$role->url}}</a>
-                    </div>
+                    @include('admin.grid.users.language-tabs',  ['type' => 'pk_event'])
                 </div>
 
             </div>
@@ -157,5 +137,4 @@
             });
         });
     </script>
-
 </div>

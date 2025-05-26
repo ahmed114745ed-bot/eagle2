@@ -3,6 +3,9 @@
 namespace App\Traits\Salaries;
 
 use App\Helpers\Common;
+use App\Models\User;
+use Illuminate\Support\Facades\Cache;
+use Modules\FixedTarget\Services\FixedTargetService;
 
 trait UserSalaryTrait
 {
@@ -63,5 +66,35 @@ trait UserSalaryTrait
             $this->callProcedure($month, $year, $allTargetOrNothing);
 
         }
+    }
+
+
+    /**
+     * @return void
+     */
+    public function calculateUserSalary(int $month = null, int $year = null): void
+    {
+
+        User::query()
+            ->where('agency_id', '!=', 0)
+            ->where('salary_is_updated', 1)
+            ->where('type_user', '!=', 0)
+            ->chunk(500, function ($users) use($month, $year){
+                foreach ($users as $user) {
+                    $cacheKey = 'cache-data-mystore-' . $user->id;
+
+                    if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
+                        try {
+                            $targetService = new FixedTargetService($user, month: $month, year: $year);
+                            $targetService->calculateTarget();
+
+                            $this->info("User ID {$user->id} processed.");
+                        } catch (\Throwable $e) {
+                            \Log::error("Failed to calculate target for user ID {$user->id}: " . $e->getMessage());
+                            $this->error("Failed user ID {$user->id}");
+                        }
+                    }
+                }
+            });
     }
 }

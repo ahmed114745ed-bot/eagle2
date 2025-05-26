@@ -225,6 +225,9 @@ class RoomController extends Controller
 
     public function quit_room(Request $request)
     {
+        Log::info('shami test quit_room', [
+            'data' => $request->all()
+        ]);
 
         if (!$request->owner_id) {
 
@@ -245,7 +248,8 @@ class RoomController extends Controller
                 Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
             }
             $this->handleLeaveCp($user, $roomId);
-
+            $room=Room::find($roomId);
+            $this->updateMicrophone($room->uid, $user->id);
             return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
         } catch (Exception $exception) {
 
@@ -1807,5 +1811,25 @@ class RoomController extends Controller
 
         ];
         return Common::apiResponse(true, '', $data, 200);
+    }
+
+
+    private function updateMicrophone($room_uid, $user_id)
+    {
+        Log::info('shami test quit_room', [
+            'data' => $room_uid,
+            'user_id' => $user_id
+        ]);
+        $user = User::query()->find($user_id);
+        if (!$user) return;
+        $result  = Common::go_microphone_hand($room_uid, $user_id);
+
+        $room = Room::query()->where('uid', $room_uid)->first();
+
+        if (!$room) return;
+        if ($result) {
+          
+            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
+        }
     }
 }

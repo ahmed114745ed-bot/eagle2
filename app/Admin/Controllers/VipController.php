@@ -6,11 +6,12 @@ use App\Models\Vip;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Services\AppFeatureService;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin;
-
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
+
+use App\Services\AppFeatureService;
+use App\Admin\Controllers\MainController;
 
 class VipController extends MainController
 {

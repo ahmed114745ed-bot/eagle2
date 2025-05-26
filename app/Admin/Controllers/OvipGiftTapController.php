@@ -8,12 +8,14 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\VipPrivilege;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Validation\ValidationException;
 use Modules\Public\Http\Services\UserCounterServices;
 use Encore\Admin\Widgets\Box;
 
@@ -39,7 +41,7 @@ class OvipGiftTapController extends MainController
         } elseif (request('level')) {
             $ovip = OVip::where('level', request('level'));
         }
-      
+
 
 
         return parent::index($content
@@ -107,7 +109,7 @@ class OvipGiftTapController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            return handleShowImageWithTypes($this->id, $url, 101, 50);
         });
         $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
@@ -116,7 +118,7 @@ class OvipGiftTapController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            return handleShowImageWithTypes($this->id, $url, 101, 50);
         });
 
 
@@ -202,51 +204,77 @@ class OvipGiftTapController extends MainController
         $form->hidden('type')->value(request('type'));
         $form->hidden('is_active_for_vip')->value(1);
         $form->hidden('get_type')->value(1);
+        $form->hidden('enable')->value(1);
 
         $form->display('ID');
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        if (!$form->isEditing()) {
-            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
-        if ($form->isEditing()) {
-            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
+        // if (!$form->isEditing()) {
+        //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+        //         $form->currency('price', __('price'));
+        //        // $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        //     }
+        // }
+        // if ($form->isEditing()) {
+        //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+        //        // $form->currency('price', __('price'));
+        //      //   $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        //     }
+        // }
 
-        $form->number('exp', __('exp'));
+        //  $form->number('exp', __('exp'));
 
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
         //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        $form->file('img2', trans('svg'))
+            ->name(function ($file) {
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            });
+        //        $form->select('image_type1', __('image_type'))->options(
+        //            [
+        //                'svga' => __('svga'),
+        //                'alpha' => __('alpha'),
+        //                'mp4' => __('mp4'),
+        //                'vap' => __('vap'),
+        //
+        //            ]
+        //        )->attribute(['id' => 'image_type1'])->required();
+        //
+        //        $form->select('profile_frame_type', __('image_type'))->options(
+        //            [
+        //                'svga' => __('svga'),
+        //                'png' => __('png'),
+        //
+        //            ]
+        //        )->attribute(['id' => 'profile_frame'])->required();
+
+        $form->saving(function (Form $form) {
+            if ($form->show_img instanceof UploadedFile) {
+                $form->image_type1 = $form->show_img->guessExtension();
+            }
+
+            if ($form->img2 instanceof UploadedFile) {
+                $ext = strtolower($form->img2->guessExtension());
+                $originalExt = strtolower($form->img2->getClientOriginalExtension());
+
+                if ($ext === 'zz' && $originalExt === 'svga') {
+                    $ext = 'svga';
+                }
+
+                if (!in_array($ext, ['svga', 'mp4'])) {
+                    throw ValidationException::withMessages([
+                        'img2' => ['Only SVGA and MP4 files are allowed for img2.'], // field name => [errors array]
+                    ]);
+                } else {
+                    $form->profile_frame_type = $ext;
+                }
+            }
         });
-        $form->select('image_type1', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'alpha' => __('alpha'),
-                'mp4' => __('mp4'),
-                'vap' => __('vap'),
 
-            ]
-        )->attribute(['id' => 'image_type1'])->required();
-
-        $form->select('profile_frame_type', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'png' => __('png'),
-
-            ]
-        )->attribute(['id' => 'profile_frame'])->required();
         $form->text('key', trans('key'));
 
         $script = <<<SCRIPT
@@ -271,19 +299,19 @@ class OvipGiftTapController extends MainController
              SCRIPT;
         Admin::script($script);
 
-        if (Session::has('show_alert')) {
-            $form->html('<script>
-             $(document).ready(function () {
-                 alert("الرجاء اختيار نوع  الصوره");
-             });
-         </script>');
-        }
+        // if (Session::has('show_alert')) {
+        //     $form->html('<script>
+        //      $(document).ready(function () {
+        //          alert("الرجاء اختيار نوع  الصوره");
+        //      });
+        //  </script>');
+        // }
         //        $form->file('img3', trans('video'));
-        $form->color('color', trans('color'));
-        $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+        if (request('type') == 18) $form->color('color', trans('color'));
+        // $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
 
         //        $form->number('sort', 'sort');
-        $form->number('num', __('num'));
+        // $form->number('num', __('num'));
 
         $form->saving(function (Form $form) {
 

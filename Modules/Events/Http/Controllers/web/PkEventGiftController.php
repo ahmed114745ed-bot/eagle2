@@ -101,9 +101,9 @@ class PkEventGiftController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('Gifts'))->display(function () {
             if ($this->type == "ware") {
-                return @$this->ware->name;
+                return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
-                return @$this->vip->name;
+                return @$this->vip->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
@@ -115,10 +115,10 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img;
+                $path = @$ware->img2 ?? (@$ware->show_img ?? '');
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $vips->img;
+                $path = @$vips->img ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
@@ -169,9 +169,9 @@ class PkEventGiftController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('Gifts'))->display(function () {
             if ($this->type == "ware") {
-                return @$this->ware->name;
+                return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
-                return @$this->vip->name;
+                return @$this->vip->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
@@ -182,10 +182,10 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img;
+                $path = @$ware->img2 ?? (@$ware->show_img ?? '');
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $vips->img;
+                $path = @$vips->img ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
@@ -235,9 +235,9 @@ class PkEventGiftController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('Gifts'))->display(function () {
             if ($this->type == "ware") {
-                return @$this->ware->name;
+                return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
-                return @$this->vip->name;
+                return @$this->vip->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
@@ -249,10 +249,10 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img;
+                $path = @$ware->img2 ?? (@$ware->show_img ?? '');
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $vips->img;
+                $path = @$vips->img ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {

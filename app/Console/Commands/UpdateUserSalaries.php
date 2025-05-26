@@ -3,13 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Services\TargetService;
+use App\Traits\Salaries\UserSalaryTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Modules\FixedTarget\Services\FixedTargetService;
 
 class UpdateUserSalaries extends Command
 {
+    use UserSalaryTrait;
     /**
      * The name and signature of the console command.
      *
@@ -41,17 +42,11 @@ class UpdateUserSalaries extends Command
      */
     public function handle()
     {
-        User::query()
-            ->where('agency_id', '!=', 0)
-            ->chunk(500, function ($users){
-                foreach ($users as $user) {
-                    $data = Cache::get('cach-data-mystore-'.$user->id);
-                    $cacheKey = 'cache-data-mystore-' . $user->id;
-                    if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
-                        $targetService = new FixedTargetService($user);
-                        $targetService->calculateTarget();
-                    }
-                }
-            });
+        $this->calculateUserSalary();
+
+
+        return Command::SUCCESS;
     }
+
+
 }

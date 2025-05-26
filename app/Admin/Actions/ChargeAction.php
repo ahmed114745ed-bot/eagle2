@@ -2,6 +2,7 @@
 
 namespace App\Admin\Actions;
 
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
@@ -72,7 +73,7 @@ class ChargeAction extends Action
 
     private function getAgency($agencyId)
     {
-        return Agency::where("id", $agencyId)->first();
+        return ShippingAgency::where("id", $agencyId)->first();
     }
 
     private function isInvalidAmount($amount)

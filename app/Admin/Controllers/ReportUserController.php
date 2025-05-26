@@ -96,7 +96,12 @@ class ReportUserController extends MainController
                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter_with_owner_id());
             });
         });
+        if (!request('agency_id')) {
+            // Prevent any records from showing
+            $grid->model()->whereRaw('1 = 0');
+        }
         if (request('agency_id')) {
+
             $grid->column('id', __('Id'));
             $grid->column('name', __('user'))->display(function ($name) {
                 $name = @$this->name ?? '';
@@ -176,9 +181,8 @@ class ReportUserController extends MainController
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
             });
-           
         }
-         $grid->disableActions();
+        $grid->disableActions();
         return $grid;
     }
 

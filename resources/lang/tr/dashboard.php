@@ -222,6 +222,8 @@ return [
     'giveSalary' => 'Maaş ver',
     'delete' => 'Sil',
     'chickDelete' => 'Bu öğeyi silmek istediğinizden emin misiniz?',
+    'closeRoom' => 'Bu odayı kapatmak istediğinizden emin misiniz?',
+    'roomClose' => 'Odayı Kapat',
     'removeBlackList' => 'Kullanıcıyı kara listeden çıkar',
     'userNotFound' => 'Kullanıcı bulunamadı',
     'taken' => 'Özel ID alınmış',

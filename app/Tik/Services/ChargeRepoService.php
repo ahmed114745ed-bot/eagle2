@@ -2,14 +2,14 @@
 
 namespace App\Tik\Services;
 
-use App\Models\User;
-use App\Models\Agency;
+
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\Agency;
 use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Services\WalletService;
+use App\Tik\Repositories\ShippingAgencyRepository;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AgencyRepository;
@@ -31,6 +31,7 @@ class ChargeRepoService
         private readonly UserRepository         $userRepository,
         private readonly UserSalaryRepository   $userSalaryRepository,
         private readonly AgencyRepository       $agencyRepository,
+        private readonly ShippingAgencyRepository       $shippingAgencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly CoinLogRepository $coinLogRepository
     ) {}
@@ -139,7 +140,7 @@ class ChargeRepoService
     public function sendMoney(User $sender, $receiverUuid, $count)
     {
 
-        $agency = $this->agencyRepository->findAgencyByOwnerId($sender->id, 1);
+        $agency = $this->shippingAgencyRepository->findAgencyByOwnerId($sender->id, 1);
         if (!$agency || $agency->status == 0) throw new \Exception(__('api_responses.canNotCharge'));
 
         if ($agency->is_frozen == 1) {
@@ -185,11 +186,11 @@ class ChargeRepoService
 
             $receiver = $this->userRepository->searchUserById($receiverUuid);
             if (!$receiver) throw new \Exception('this user not found');
-            if ($receiver->transfer_salary == 1) throw new \Exception('api.freez_charge');
+            if ($receiver->transfer_salary == 1) throw new \Exception('api.freez_charge_user');
 
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
-                throw new \Exception('agency not founded');
+                throw new \Exception('api_responses.agency_stopped'); //Your agency stopped call the administrator
 
             if ($agency->is_frozen == 1) throw new \Exception(__('api_responses.frozen_agency'));
 
@@ -225,7 +226,7 @@ class ChargeRepoService
                 throw new \Exception(__('api_responses.frozen_agency'));
             }
 
-            $agency = $this->agencyRepository->findAllByStatus($sender->agency_id);
+            $agency = $this->shippingAgencyRepository->findAllByStatus($sender->agency_id);
             if (!isset($agency)) throw new \Exception('agency not founded');
             if ($agency->is_frozen == 1) {
                 throw new \Exception(__('api_responses.frozen_agency'));
@@ -347,7 +348,7 @@ class ChargeRepoService
     {
         try {
 
-            $agencies = $this->agencyRepository->filterAgency($request->id);
+            $agencies = $this->shippingAgencyRepository->filterAgency($request->id);
             $users = $this->userRepository->filterUser($request->id);
             $data = [
                 'agency' => GeneralAgencyResource::collection($agencies),
@@ -368,7 +369,7 @@ class ChargeRepoService
         DB::beginTransaction();
 
         try {
-            $authAgency = $this->agencyRepository->findFomAll($auth->agency_id);
+            $authAgency = $this->shippingAgencyRepository->findFomAll($auth->agency_id);
 
             if (!$authAgency) throw new \Exception(__('api.notAgency'));
             if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
@@ -478,5 +479,19 @@ class ChargeRepoService
             'is_used_transferred' => $transferred,
         ];
         $this->create($data);
+    }
+
+
+
+    public function getChargeToUserHistory()
+    {
+
+        return $this->chargeRepository->getChargeToUserHistory();
+    }
+
+    public function getChargeAgencyHistory()
+    {
+        return $this->chargeRepository->getChargeToAgencyHistory();
+
     }
 }

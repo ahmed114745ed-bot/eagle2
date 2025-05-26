@@ -51,7 +51,7 @@ class AllDataAgencyResource extends JsonResource
             $type = 'hosts ';
         } elseif ($this->type == 2) {
             $type = 'shipping';
-        } 
+        }
 
         $year = request('year') ?? Carbon::now()->year;
         $month = request('month') ?? Carbon::now()->month;
@@ -96,8 +96,9 @@ class AllDataAgencyResource extends JsonResource
                 ]
             ],
             'mempers_count' => $this->mempers_count,
-            // 'mempers'=>$this->mempers ?? (object)[], 
-            'members' => MyDataForAgancyNewResource::collection(@$this->mempers),
+            // 'mempers'=>$this->mempers ?? (object)[],
+//            'members' => MyDataForAgancyNewResource::collection(@$this->mempers),
+//            'members' => MyDataForAgancyNewResource::collection(@$this->mempers),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'admins' => AdminsAgencyResource::collection($this->admins),
             'star' => ReceiverGiftLogResource::collection($giftLog),

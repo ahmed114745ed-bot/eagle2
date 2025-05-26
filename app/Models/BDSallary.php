@@ -18,6 +18,9 @@ class BDSallary extends Model
         'month',
         'year',
         'is_paid',
+        'total_agency_sallary',
+        'total_users_sallary',
+        'total_diamond'
     ];
 
     public function agency()

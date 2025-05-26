@@ -2,8 +2,7 @@
 
 namespace App\Helpers;
 
-use App\Models\Setting;
-use App\Models\ShippingAgency;
+use App\Models\Pk;
 use App\Models\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -19,13 +18,17 @@ use GuzzleHttp\Client;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
+use App\Models\Setting;
 use App\Models\UserVip;
 use App\Models\Background;
+use App\Models\RoomVisitor;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
 use Kreait\Firebase\Factory;
+use App\Facades\UserHandling;
+use App\Models\ShippingAgency;
 use Illuminate\Support\Carbon;
 use App\Models\OfficialMessage;
 use Encore\Admin\Facades\Admin;
@@ -34,10 +37,10 @@ use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\Winner;
 use App\Models\NotificationTemplate;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Modules\Events\Entities\PkEvent;
-
 use Illuminate\Support\Facades\Cache;
 use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
@@ -56,8 +59,10 @@ use App\Traits\HelperTraits\FilterTrait;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
+use Modules\Charizma\Entities\ExtraDataInRoom;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
+use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
 {
@@ -1223,6 +1228,13 @@ class Common
             'name' => $user->name,
         ]);
         $role = Role::where('slug', 'agency-owner')->first();
+        if (!$role) {
+            Role::create([
+                'slug' => 'agency-owner',
+                'name' => 'agency owner',
+            ]);
+        }
+        $role = Role::where('slug', 'agency-owner')->first();
         if ($admin && $role) {
             DB::table('admin_role_users')->insert([
                 'user_id' => $admin->id,
@@ -1331,9 +1343,17 @@ class Common
         return $value;
     }
 
+    public  static function getSettingsValue($key)
+    {
+        $value = Cache::rememberForever($key, function () use ($key) {
+            return Setting::where('key', $key)->value('value');
+        });
+        return $value;
+    }
+
     public  static function getDiamondsPercentage()
     {
-        $num = settings()->get('diamonds');
+        $num = (int)self::getSettingsValue('diamonds');
         $per = $num / 100;
         return $per;
     }
@@ -1371,19 +1391,18 @@ class Common
     {
         $messageData = is_string($messageData) ? json_decode($messageData, true) ?? [] : $messageData;
         $fullKey = 'messages.' . $messageKey;
-    
+
         if (str_contains($messageKey, 'user')) {
             $userId = $messageData['receiver_id'] ?? $messageData['user_id'] ?? null;
             if ($userId) {
                 $user = \App\Models\User::find($userId);
                 if ($user) {
                     $messageData['name'] = $user->name;
-                    $messageData['target'] = $user->name; 
-                
+                    $messageData['target'] = $user->name;
                 }
             }
         }
-    
+
         if (str_contains($messageKey, 'agency')) {
             $agencyId = $messageData['agency_id'] ?? null;
             if ($agencyId) {
@@ -1394,11 +1413,58 @@ class Common
                 }
             }
         }
-    
+
         $messageData['name'] = $messageData['name'] ?? $messageData['target'] ?? __('unknown');
         $messageData['target'] = $messageData['target'] ?? $messageData['name'] ?? __('unknown');
-    
+
         return __($fullKey, $messageData);
     }
-    
+
+
+    public static function kickOfAllUsersRoom(\App\Models\Room $room)
+    {
+        $usersIdInRooms = RoomVisitor::query()->where(['room_id' => $room->id])->pluck('user_id')->toArray();
+        User::whereIn('id', $usersIdInRooms)->update(['now_room_uid' => 0]);
+        RoomVisitor::query()->where(['room_id' => $room->id])->delete();
+
+        //reset carisma
+        if ($room->charizma_status) self::handleCharismaStatusOnLogout($room, $usersIdInRooms, $room->uid);
+
+        //leave mic
+
+        foreach ($usersIdInRooms as $userId) {
+            if (isset($room->microphone)) {
+
+                $microphones = explode(',', $room->microphone);
+                if (in_array($userId, $microphones)) {
+                    UserHandling::calcTime($userId);
+                }
+            }
+            self::quit_hand($room->uid, $userId);
+        }
+
+        $room->update(['is_live' => false]);
+        if ($room->room_admin == null) {
+            $room->update(['is_afk' => 0]);
+        }
+        Pk::where('room_id', $room->id)->where('status', 1)->update(['status' => 0]);
+    }
+
+    private function handleCharismaStatusOnLogout($room, $users, $ownerId)
+    {
+        $userCharismaService = new UserCharismaService();
+        $userCharismaService->removeRoomCharisma($room->id);
+        $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom($room, $users);
+        $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, $users);
+
+        $ms = [
+            'messageContent' => [
+                "message" => "updateCharisma",
+                'data' => $userDataWithCharisma
+            ]
+        ];
+        $json = json_encode($ms);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
+    }
 }

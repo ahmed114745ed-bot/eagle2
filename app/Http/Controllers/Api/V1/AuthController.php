@@ -108,7 +108,11 @@ class AuthController extends Controller
         if (!$this->canLogin($user)) {
             return Common::apiResponse(false, 'you are blocked', [], 408);
         }
-        event(new DeviceTokenSent($user->id, $user->device_token));
+        try {
+            event(new DeviceTokenSent($user->id, $user->device_token));
+        } catch (\Exception $e) {
+
+        }
 
         $user->auth_token = $token;
         return Common::apiResponse(
@@ -141,7 +145,12 @@ class AuthController extends Controller
             return Common::apiResponse(false, 'you are blocked', [], 408);
         }
         $user->auth_token = $token;
-        event(new DeviceTokenSent($user->id, $user->device_token));
+        try {
+            event(new DeviceTokenSent($user->id, $user->device_token));
+        } catch (\Exception $e) {
+
+        }
+
 
         return Common::apiResponse(
             true,

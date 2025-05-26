@@ -6,6 +6,7 @@ use App\Models\PaymentMethodHistory;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Mockery\Exception;
 
 class FawryPaymentServiceV2
 {

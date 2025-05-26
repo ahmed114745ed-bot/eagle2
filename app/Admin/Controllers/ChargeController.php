@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
@@ -39,10 +40,10 @@ class ChargeController extends MainController
         return $content
             ->title(trans('charges'))
             ->body($this->grid());
-            // ->row(function ($row) {
-            //     $row->column(10, $this->grid());
-            //     $row->column(2, view('admin.grid.users.actions'));
-            // });
+        // ->row(function ($row) {
+        //     $row->column(10, $this->grid());
+        //     $row->column(2, view('admin.grid.users.actions'));
+        // });
     }
 
 
@@ -179,9 +180,9 @@ class ChargeController extends MainController
     // }
     protected function grid()
     {
-        $grid = new Grid(new Agency());
+        $grid = new Grid(new ShippingAgency());
 
-        $grid->filter(function (Grid\Filter $filter){
+        $grid->filter(function (Grid\Filter $filter) {
 
             $filter->expand();
 
@@ -199,7 +200,7 @@ class ChargeController extends MainController
             }, __('Owner uuid'));
         });
 
-        $grid->model()->where("shipping_agency", 1)->orderByDesc('id');
+        $grid->model()->orderByDesc('id');
 
         $grid->id(__('ID'));
 
@@ -261,10 +262,10 @@ class ChargeController extends MainController
                 return $setting?->value;
             });
 
-            if ($shippingCoins){
+            if ($shippingCoins) {
                 $dollars = $this->coins / $shippingCoins;
                 $numberFormatDollars = number_format($dollars);
-            }else{
+            } else {
                 $numberFormatDollars = __('please set agency coins in configs');
             }
 
@@ -277,11 +278,15 @@ class ChargeController extends MainController
                 </div>
             ";
         });
-        $grid->column('actions', __('Actions'))
-            ->display(function () {
+        if (\Encore\Admin\Facades\Admin::user()->can('add-coins-Switch') || \Encore\Admin\Facades\Admin::user()->can('*') || \Encore\Admin\Facades\Admin::user()->can('charge-report-Switch')) {
+            $grid->column('actions', __('Actions'))
+                ->display(function () {
 
-                 return (new ChargeAction2())->setAgencyId($this->id)->render(); })
-            ->style('white-space: nowrap; width: 100px;');
+                    return (new ChargeAction2())->setAgencyId($this->id)->render();
+                })
+                ->style('white-space: nowrap; width: 100px;');
+        }
+
         $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableActions();

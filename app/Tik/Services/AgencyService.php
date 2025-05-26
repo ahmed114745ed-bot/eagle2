@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Tik\Repositories\ShippingAgencyRepository;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Role;
@@ -57,6 +58,7 @@ class AgencyService
 {
     public function __construct(
         private readonly AgencyRepository $agencyRepository,
+        private readonly ShippingAgencyRepository $shippingAgencyRepository,
         private readonly AgencyJoinRequestRepository $agencyJoinRequestRepository,
         private readonly AgencyUserJobRepository $agencyUserJobRepository,
         private readonly UserRepository $userRepository,
@@ -71,7 +73,6 @@ class AgencyService
         private readonly FollowRepository $followRepository,
         private readonly LeaveAgencyRequestRepository $leaveAgencyRequestRepository,
         private readonly AdminRepository $adminRepository,
-        private readonly ChargeAgencyRepository $chargeAgencyRepository,
         private readonly UsersJoinedAgencyRepository $usersJoinedAgencyRepository,
 
 
@@ -117,7 +118,7 @@ class AgencyService
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        $target = $this->userSalaryRepository->newUserSalary($userId, $month, $year);
+        $target = $this->userSalaryRepository->newUserSalary($user->id, $month, $year);
         $minValue = $this->targetRepository->getByUsd($target);
         $result = (@$minValue->agency_share / 100) * @$target;
         $usersTargetDetails = $this->userRepository->agencyUsers($userId, $month, $year, 10, $request->page);
@@ -196,7 +197,7 @@ class AgencyService
         if ($admin) {
             $agency = $this->agencyRepository->findById($admin->agency_id);
         } else {
-            $agency = $this->agencyRepository->findAgencyByOwnerId($owner->id);
+            $agency = $this->agencyRepository->findByOwner($owner->id);
         }
         if (!$agency) throw new Exception('u_not_owner_agncy');
         if ($agency->type == 2) throw new \Exception(__('api_responses.shippingAgency'));
@@ -930,7 +931,7 @@ class AgencyService
             $userType = 2;
         } elseif ($request->type == 2 ) {
             $userType = 3;
-        } 
+        }
 
         $data = [
             'agency_id' =>  $agency->id,
@@ -963,7 +964,7 @@ class AgencyService
             $userType = 2;
         } elseif ($request->type == 2 ) {
             $userType = 3;
-        } 
+        }
 
         $data = [
             'agency_id' =>  $agency->id,
@@ -1032,6 +1033,6 @@ class AgencyService
 
     public function allAgencyCharged($id)
     {
-        return $this->agencyRepository->getChargeAgency($id);
+        return $this->shippingAgencyRepository->getChargeAgency($id);
     }
 }

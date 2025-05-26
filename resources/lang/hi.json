@@ -628,6 +628,8 @@
     "Name en": "नाम (अंग्रेज़ी)",
     "Description ar": "विवरण (अरबी)",
     "Description en": "विवरण (अंग्रेज़ी)",
+    "Description tr": "विवरण",
+    "Description hi": "विवरण",
     "statistics": "आंकड़े",
     "delete": "हटाएं",
     "manger type": "प्रबंधक प्रकार",
@@ -1385,7 +1387,7 @@
   "user parent": "उपयोगकर्ता अभिभावक",
   "general": "सामान्य",
   "Lucky box": "लकी बॉक्स",
-  
+
 
   "Create Agencies": "एजेंसियां बनाएँ",
   "browse report": "रिपोर्ट देखें",
@@ -1473,7 +1475,6 @@
   "Edit Charge": "चार्ज संपादित करें",
   "Browse Charge": "चार्ज ब्राउज़ करें",
   "delete Charge": "चार्ज हटाएं",
-  "Browse Ticket": "टिकट ब्राउज़ करें",
   "Create Ticket": "टिकट बनाएं",
   "delete Ticket": "टिकट हटाएं",
   "Edit Ticket": "टिकट संपादित करें",
@@ -1483,6 +1484,7 @@
   "create trashed account user": "हटाया गया उपयोगकर्ता खाता बनाएं",
   "delete trashed account user": "हटाया गया उपयोगकर्ता खाता हटाएं",
   "edit trashed account user": "हटाया गया उपयोगकर्ता संपादित करें",
+  "create achievement": "Başarı oluştur",
   "Create Carousel": "कैरोसेल बनाएं",
   "delete Carousel": "कैरोसेल हटाएं",
   "Edit Carousel": "कैरोसेल संपादित करें",
@@ -1639,12 +1641,12 @@
   "Browse Gift": "उपहार ब्राउज़ करें",
   "Create Categories": "श्रेणियाँ बनाएँ",
   "Edit Categories": "श्रेणियाँ संपादित करें",
-  "browse room vip": "वीआईपी कमरे ब्राउज़ करें",
-  "create room vip": "वीआईपी कमरा बनाएँ",
-  "delete room vip": "वीआईपी कमरा हटाएँ",
+  "create room vip": "कमरे के वीआईपी स्तर बनाएं",
   "edit room vip": "वीआईपी कमरा संपादित करें",
+  "Browse Ticket": "शिकायतें ब्राउज़ करें",
   "show room vip": "वीआईपी कमरा दिखाएँ",
   "browse achievement": "उपलब्धियाँ ब्राउज़ करें",
+  "delete room vip": "कमरे का वीआईपी स्तर हटाएं",
   "browse user_achievement_level": "उपयोगकर्ता उपलब्धि स्तर ब्राउज़ करें",
   "create user_achievement_level": "उपयोगकर्ता उपलब्धि स्तर बनाएँ",
   "delete achievement": "उपलब्धि हटाएँ",
@@ -1888,150 +1890,223 @@
   "delete achievement_level": "उपलब्धि स्तर हटाएं",
   "edit achievement_level": "उपलब्धि स्तर संपादित करें",
   "browse achievement_level": "उपलब्धि स्तर ब्राउज़ करें",
-  "edit version": "संस्करण संपादित करें"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "edit version": "संस्करण संपादित करें",
+  "salaries BD": "BD वेतन",
+  "my wallet": "मेरा वॉलेट",
+  "request-agencies": "एजेंसी अनुरोध",
+  "request agencies": "एजेंसी अनुरोध",
+  "Request agencies": "एजेंसी अनुरोध",
+  "bd": "BD",
+  "Bd": "BD",
+  "BD": "BD",
+  "current_balance": "वर्तमान शेष",
+  "remaining_percent": "शेष प्रतिशत",
+  "cut": "कटौती",
+  "total": "कुल",
+  "agency": "एजेंसी",
+  "List of Agencies": "एजेंसियों की सूची",
+  "confirm_charge": "चार्ज की पुष्टि करें",
+  "enter_amount": "राशि दर्ज करें",
+  "transfer_to_wallet": "वॉलेट में स्थानांतरित करें",
+  "charge_wallet": "वॉलेट चार्ज करें",
+  "current_balance": "वर्तमान शेष",
+  "select_target": "लक्ष्य चुनें",
+  "bd_wallet_notice": "BD वॉलेट से डॉलर राशि स्थानांतरित करने पर, वह राशि आपके वॉलेट में जोड़ दी जाएगी। फिर आप इसे बेच सकते हैं या दूसरों को भेज सकते हैं।"
+,  "back": "वापस",
+  "Charge History": "चार्ज इतिहास",
+  "Total Agency Sallary": "कुल एजेंसी वेतन",
+  "Total Users Sallary": "कुल उपयोगकर्ता वेतन",
+  "Total Diamond": "कुल हीरा",
+  "January": "जनवरी",
+  "February": "फ़रवरी",
+  "March": "मार्च",
+  "April": "अप्रैल",
+  "May": "मई",
+  "June": "जून",
+  "July": "जुलाई",
+  "August": "अगस्त",
+  "September": "सितंबर",
+  "October": "अक्टूबर",
+  "November": "नवंबर",
+  "December": "दिसंबर",
+  "ID": "पहचान",
+  "username": "यूज़रनेम",
+  "Go Back": "वापस जाएं",
+  "total salary": "कुल वेतन",
+  "Agency Count": "एजेंसी की संख्या",
+  "agencies": "एजेंसियाँ",
+  "transactions": "लेन-देन",
+  "Loading...": "लोड हो रहा है...",
+  "Agencies": "एजेंसियाँ",
+  "Name": "नाम",
+  "owner": "मालिक",
+  "Status": "स्थिति",
+  "No agencies found": "कोई एजेंसी नहीं मिली",
+  "Charges": "लेन-देन",
+  "Coin": "मुद्रा",
+  "Created": "निर्माण तिथि",
+  "No charges found": "कोई लेन-देन नहीं मिला",
+  "Target History": "लक्ष्य इतिहास",
+    "Agency ID": "एजेंसी आईडी",
+    "Salary": "वेतन",
+    "Cut Amount": "कटौती राशि",
+    "Total Agency Salary": "कुल एजेंसी वेतन",
+    "Total Users Salary": "कुल उपयोगकर्ता वेतन",
+    "Total Diamond": "कुल डायमंड",
+    "Month": "महीना",
+    "Year": "साल",
+    "Is Paid": "क्या भुगतान किया गया?",
+    "Yes": "हाँ",
+    "No": "नहीं",
+    "Created At": "निर्माण तिथि",
+    "No target history found": "कोई लक्ष्य इतिहास नहीं मिला",
+     "bd_already_default": "यह BD पहले से ही डिफ़ॉल्ट है",
+    "bd_set_default_success": "BD सफलतापूर्वक डिफ़ॉल्ट के रूप में सेट किया गया",
+
+    "All Statistic": "सभी आंकड़े",
+    "Wares Dedicate": "समर्पित सामान",
+    "Bans": "प्रतिबंध",
+    "User Levels": "उपयोगकर्ता स्तर",
+    "Vips Dedicate": "वीआईपी समर्पित",
+    "Special Id Request": "विशेष आईडी अनुरोध",
+    "Ban Rooms": "कमरे प्रतिबंधित करें",
+    "Achievement_dedicate": "उपलब्धि समर्पित",
+    "Core Wallets": "मुख्य वॉलेट",
+    "Charger Report": "चार्जर रिपोर्ट",
+    "Ticket": "टिकट",
+    "Trashed Account User": "हटाए गए खाते के उपयोगकर्ता",
+    "Free Users": "मुफ्त उपयोगकर्ता",
+    "Carousel": "कैरोसेल",
+    "Banners": "बैनर",
+    "Offers": "ऑफर",
+    "Wares": "सामान",
+    "Special History": "विशेष इतिहास",
+    "Special Ware": "विशेष सामान",
+    "Image Color": "छवि रंग",
+    "Vip Privilege": "वीआईपी विशेषाधिकार",
+    "Ovip": "ओवीआईपी",
+    "Ovip Settings": "ओवीआईपी सेटिंग्स",
+    "Family Level": "परिवार स्तर",
+    "Request Problem": "समस्या का अनुरोध",
+    "Agent Request Transaction": "एजेंट अनुरोध लेनदेन",
+    "Charge Country": "देश चार्ज",
+    "Salary Request": "वेतन अनुरोध",
+    "User Target": "उपयोगकर्ता लक्ष्य",
+    "Report": "रिपोर्ट",
+    "Users Hunters": "उपयोगकर्ता शिकारी",
+    "Salary History": "वेतन इतिहास",
+    "User Target Eg": "उपयोगकर्ता लक्ष्य उदाहरण",
+    "Request Agencies": "एजेंसी अनुरोध",
+    "Appear Charger Agency": "चार्जर एजेंसी दिखाएं",
+    "Payment Gat Way": "भुगतान गेटवे",
+    "Charge Agency": "चार्ज एजेंसी",
+    "Agency Manger Setting": "एजेंसी प्रबंधक सेटिंग",
+    "Emoji": "इमोजी",
+    "Gift": "उपहार",
+    "Categories": "श्रेणियां",
+    "Room Vip": "कमरा वीआईपी",
+    "Room Background": "कमरा पृष्ठभूमि",
+    "User_achievement_level": "उपयोगकर्ता उपलब्धि स्तर",
+    "Updates_group_chat": "समूह चैट अपडेट",
+    "Boxes": "बॉक्स",
+    "Box Use": "बॉक्स उपयोग",
+    "Box Settings": "बॉक्स सेटिंग्स",
+    "Weekly Star": "साप्ताहिक स्टार",
+    "General Roles": "सामान्य भूमिकाएं",
+    "Pk Event": "पीके इवेंट",
+    "Pk Event Rewards": "पीके इवेंट पुरस्कार",
+    "Target Event": "लक्ष्य इवेंट",
+    "Weekly_star_rewards": "साप्ताहिक स्टार पुरस्कार",
+    "Event_report": "इवेंट रिपोर्ट",
+    "Event Period": "इवेंट अवधि",
+    "Real": "वास्तविक",
+    "Report Real": "वास्तविक रिपोर्ट",
+    "Report Moment": "क्षण की रिपोर्ट",
+    "Auth Users": "प्रमाणित उपयोगकर्ता",
+    "Sailer": "विक्रेता",
+    "Exchange": "विनिमय",
+    "Delete Account Details": "खाता विवरण हटाएं",
+    "Questions": "प्रश्न",
+    "Page": "पृष्ठ",
+    "Payment Coin": "भुगतान सिक्का",
+    "Config": "कॉन्फ़िग",
+    "Daily Prize": "दैनिक पुरस्कार",
+    "Level Interval": "स्तर अंतराल",
+    "Gold Coins": "सोने के सिक्के",
+    "BD": "बीडी",
+    "Version": "संस्करण",
+    "Manger Agency Manager": "प्रबंधक एजेंसी प्रबंधक",
+    "Manger Type": "प्रबंधक प्रकार",
+    "Wares Vips": "सामान वीआईपी",
+    "Achievement_level": "उपलब्धि स्तर",
+    "Special Frame": "विशेष फ्रेम",
+    "Event": "इवेंट",
+    "Withdraw Type": "निकासी प्रकार",
+    "Get Salary Requests": "वेतन अनुरोध प्राप्त करें",
+    "Agencies Tareget Manger": "एजेंसी लक्ष्य प्रबंधक",
+    "Background Image Request": "पृष्ठभूमि छवि अनुरोध",
+    "Admin Users": "व्यवस्थापक उपयोगकर्ता",
+    "Report User": "उपयोगकर्ता रिपोर्ट",
+    "Auth User": "प्रमाणित उपयोगकर्ता",
+    "User Parent": "उपयोगकर्ता अभिभावक",
+    "Users Devices": "उपयोगकर्ता उपकरण",
+    "Room Target": "कमरा लक्ष्य",
+    "Agent Target": "एजेंट लक्ष्य",
+    "Agent Request": "एजेंट अनुरोध",
+    "Agent User": "एजेंट उपयोगकर्ता",
+    "Permissions": "अनुमतियां",
+    "Admin Profile": "व्यवस्थापक प्रोफ़ाइल",
+    "Weekly_cp": "साप्ताहिक सीपी",
+    "Agent Request History": "एजेंट अनुरोध इतिहास",
+    "User Agent Target": "उपयोगकर्ता एजेंट लक्ष्य",
+    "Charges Agency": "शुल्क एजेंसी",
+    "Agent Home": "एजेंट होम",
+    "Agora Zego": "अगोरा ज़ेगो",
+    "Uuid Dedicate": "यूयूआईडी समर्पित",
+    "Agency Setting": "एजेंसी सेटिंग",
+    "Users Family": "उपयोगकर्ता परिवार",
+    "Updates_family Config": "परिवार कॉन्फ़िग अपडेट",
+    "Ovip Gift": "ओवीआईपी उपहार",
+    "Charge Level": "चार्ज स्तर",
+    "Charge Settings": "चार्ज सेटिंग्स",
+    "Chat Setting": "चैट सेटिंग",
+    "Action Trashed": "कार्रवाई हटाई गई",
+    "User Status": "उपयोगकर्ता स्थिति",
+    "Request Agency History": "एजेंसी इतिहास का अनुरोध",
+    "Update_setting_button": "सेटिंग बटन अपडेट करें",
+    "Gift Target Event": "उपहार लक्ष्य इवेंट",
+    "Level User History": "स्तर उपयोगकर्ता इतिहास",
+    "badge": "बैज",
+  "intro": "परिचय",
+  "frame": "फ्रेम",
+"total_percentage_must_be_100": "कुल प्रतिशत 100 होना चाहिए!",
+"browse room vip": "कमरों के वीआईपी स्तर देखें",
+"default_current": "वर्तमान डिफ़ॉल्ट BD",
+"no_default_set": "अभी तक कोई डिफ़ॉल्ट BD सेट नहीं किया गया है",
+"select_default_bd": "डिफ़ॉल्ट BD चुनें",
+"set_as_default": "डिफ़ॉल्ट BD के रूप में सेट करें",
+"back": "वापस",
+"edit updates_family config": "अपडेट्स_परिवार कॉन्फ़िगरेशन संपादित करें",
+"Charge Switch": "चार्ज स्विच",
+  "browse charge switch": "चार्ज स्विच देखें",
+  "Invite Switch": "आमंत्रण स्विच",
+  "browse invite switch": "आमंत्रण स्विच देखें",
+  "User Actions": "उपयोगकर्ता क्रियाएं",
+  "browse user actions": "उपयोगकर्ता क्रियाएं देखें",
+  "Can Play Switch": "प्ले स्विच सक्षम करें",
+  "browse can Play Switch": "प्ले स्विच ब्राउज़ करें",
+  "Kick Agency Switch": "एजेंसी हटाने का स्विच",
+  "browse kick agency Switch": "एजेंसी हटाने का स्विच देखें",
+  "Kick Family Switch": "परिवार हटाने का स्विच",
+  "browse kick family Switch": "परिवार हटाने का स्विच देखें",
+  "Chang Agency Switch": "एजेंसी बदलने का स्विच",
+  "Delete Agency Switch": "एजेंसी हटाने का स्विच",
+  "browse delete agency Switch": "एजेंसी हटाने का स्विच ब्राउज़ करें",
+  "Change Users Agency Switch": "उपयोगकर्ता एजेंसी बदलने का स्विच",
+  "browse change users agency Switch": "उपयोगकर्ता एजेंसी स्विच ब्राउज़ करें",
+  "Delete Shipping Agency Switch": "शिपिंग एजेंसी हटाने का स्विच",
+  "browse delete shipping agency Switch": "शिपिंग एजेंसी हटाने का स्विच ब्राउज़ करें",
+  "browse chang agency Switch": "एजेंसी बदलने का स्विच ब्राउज़ करें"
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

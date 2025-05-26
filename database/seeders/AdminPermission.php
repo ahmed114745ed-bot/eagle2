@@ -154,12 +154,22 @@ class AdminPermission extends Seeder
             'config',
             'level-user-history',
             'request-problem',
-            'user-target-eg'
-
-
-
-
-
+            'user-target-eg',
+            'user-actions',
+            'charge-switch',
+            'invite-switch',
+            'can-Play-Switch',
+            'kick-agency-Switch',
+            'kick-family-Switch',
+            'chang-agency-Switch',
+            'room-actions',
+            'close-room-switch',
+            'room-pin-switch',
+            'add-coins-Switch',
+            'charge-report-Switch',
+            'delete-agency-Switch',
+            'change-users-agency-Switch',
+            'delete-shipping-agency-Switch'
         ];
 
         $methods = [
@@ -175,8 +185,8 @@ class AdminPermission extends Seeder
             ['name' => 'Dashboard', 'sort' => 1, 'permissions' => ['all-statistic']],
             ['name' => 'Fast orders', 'sort' => 2, 'permissions' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate']],
             ['name' => 'Wallet', 'sort' => 3, 'permissions' => ['core-wallets']],
-            ['name' => 'charge system', 'sort' => 4, 'permissions' => ['charge', 'charger-report']],
-            ['name' => 'users', 'sort' => 5, 'permissions' => ['free-users', 'ticket', 'trashed-account-user']],
+            ['name' => 'charge system', 'sort' => 4, 'permissions' => ['charge', 'charge-report-Switch', 'add-coins-Switch', 'charger-report', 'charge-settings']],
+            ['name' => 'users', 'sort' => 5, 'permissions' => ['users', 'chang-agency-Switch', 'kick-agency-Switch', 'kick-family-Switch', 'can-Play-Switch', 'ticket', 'invite-switch', 'trashed-account-user', 'user-actions', 'charge-switch']],
             ['name' => 'Advertisements', 'sort' => 7, 'permissions' => ['carousel', 'banners', 'official-messages', 'offers']],
             ['name' => 'Store', 'sort' => 8, 'permissions' => ['wares']],
             ['name' => 'Distinguished identifier', 'sort' => 9, 'permissions' => ['special-Ware', 'special-history', 'image-color']],
@@ -184,19 +194,19 @@ class AdminPermission extends Seeder
             ['name' => 'families', 'sort' => 11, 'permissions' => ['family', 'family-level']],
             ['name' => 'Agency System', 'sort' => 12, 'permissions' => ['agency-settings']],
             ['name' => 'Internal Sales System', 'sort' => 13, 'permissions' => ['charge-country', 'salary-request', 'agent-request-transaction', 'request-problem']],
-            ['name' => 'Host Agencies', 'sort' => 14, 'permissions' => ['users-hunters', 'user-target', 'salary-history', 'Report_user', 'agencies', 'user-target-eg', 'report']],
-            ['name' => 'Agency Settings', 'sort' => 15, 'permissions' => ['agency-join-requests', 'request-agencies', 'target']],
-            ['name' => 'Charging Agencies', 'sort' => 16, 'permissions' => ['agency-manger-setting', 'appear-charger-agency', 'charge-agency', 'payment-gat-way']],
+            ['name' => 'Host Agencies', 'sort' => 14, 'permissions' => ['users-hunters', 'user-target', 'sailer', 'report-user', 'delete-agency-Switch', 'change-users-agency-Switch', 'agencies', 'agent-target', 'report']],
+            ['name' => 'Agency Settings', 'sort' => 15, 'permissions' => ['agency-join-requests',  'request-agencies', 'target']],
+            ['name' => 'Charging Agencies', 'sort' => 16, 'permissions' => ['agency-manger-setting', 'appear-charger-agency', 'delete-shipping-agency-Switch','charge-agency', 'payment-gat-way']],
             ['name' => 'Agency Manager', 'sort' => 17, 'permissions' => ['managers']],
-            ['name' => 'Room', 'sort' => 18, 'permissions' => ['rooms', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings']],
+            ['name' => 'Room', 'sort' => 18, 'permissions' => ['rooms', 'room-pin-switch', 'close-room-switch', 'room-actions', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings']],
             ['name' => 'Achievements', 'sort' => 19, 'permissions' => ['achievement', 'user_achievement_level']],
             ['name' => 'Group chat', 'sort' => 20, 'permissions' => ['group-chat', 'updates_group_chat']],
             ['name' => 'Lucky box', 'sort' => 21, 'permissions' => ['boxes', 'box-use', 'box-settings']],
             ['name' => 'Events', 'sort' => 22, 'permissions' => ['event-period', 'target-event', 'pk-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'general-roles', 'event_report']],
             ['name' => 'Reels', 'sort' => 23, 'permissions' => ['Real', 'report-real']],
             ['name' => 'Moment', 'sort' => 24, 'permissions' => ['moment', 'report-moment']],
-            ['name' => 'Employees and Permissions', 'sort' => 25, 'permissions' => [ 'auth-users', 'roles']],
-            ['name' => 'Work Settings', 'sort' => 26, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history']],
+            ['name' => 'Employees and Permissions', 'sort' => 25, 'permissions' => ['auth-users', 'roles']],
+            ['name' => 'Work Settings', 'sort' => 26, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'gold-coins', 'exchange', 'sailer']],
             ['name' => 'Sensitive Settings', 'sort' => 27, 'permissions' => ['updates', 'config']],
             ['name' => 'System Settings', 'sort' => 28, 'permissions' => ['settings', 'language', 'daily-prize']],
             ['name' => 'Level', 'sort' => 29, 'permissions' => ['level', 'level-interval']],
@@ -261,8 +271,8 @@ class AdminPermission extends Seeder
         }
 
         DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
-        $actions = ['create', 'edit', 'delete', 'show', ];
-        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report', 'wares-dedicate','charge', 'level-cp','vips-dedicate', 'achievement_dedicate', 'level-user-history', 'agent-request-history', 'salary-history', 'request-agency-history', 'updates_group_chat', 'users-family', 'uuid-dedicate', 'all-statistic'];
+        $actions = ['create', 'edit', 'delete', 'show',];
+        $targets = ['report-user', 'report', 'event_report', 'delete-shipping-agency-Switch', 'charge-report-Switch', 'change-users-agency-Switch', 'delete-agency-Switch', 'add-coins-Switch', 'room-pin-switch', 'close-room-switch', 'room-actions', 'chang-agency-Switch', 'kick-family-Switch', 'kick-agency-Switch', 'can-Play-Switch', 'report-real', 'charger-report', 'invite-switch', 'charge-switch', 'wares-dedicate', 'charge', 'level-cp', 'vips-dedicate', 'achievement_dedicate', 'level-user-history', 'agent-request-history', 'salary-history', 'request-agency-history', 'updates_group_chat', 'users-family', 'uuid-dedicate', 'all-statistic', 'user-actions'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -273,7 +283,7 @@ class AdminPermission extends Seeder
         })->delete();
 
         $actions = ['create', 'delete', 'show'];
-        $targets = ['update_setting_button', 'agency-settings', 'agency-setting', 'settings', 'charge-settings', 'room-settings', 'ovip-settings', 'box-settings', 'moment-settings', 'reel-settings', 'chat-setting', 'user-status', 'updates_family-config', 'agora-zego','updates','weekly_cp'];
+        $targets = ['update_setting_button', 'agency-settings', 'agency-setting', 'settings', 'charge-settings', 'room-settings', 'ovip-settings', 'box-settings', 'moment-settings', 'reel-settings', 'chat-setting', 'user-status', 'updates_family-config', 'agora-zego', 'updates', 'weekly_cp', 'agent-target', 'sailer'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -306,7 +316,7 @@ class AdminPermission extends Seeder
         })->delete();
 
         $actions = ['browse'];
-        $targets = ['user-parent','weekly_cp','level-cp'];
+        $targets = ['user-parent', 'weekly_cp', 'level-cp'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {

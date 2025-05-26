@@ -92,6 +92,9 @@ class AuthController extends BaseAuthController
         admin_toastr(trans('admin.login_successful'));
 
         $request->session()->regenerate();
+        if (Auth::user()->roles->contains('slug', 'bd')) {
+            return redirect()->route('admin.bd.home');
+        }
 
         return redirect()->intended($request->url??$this->redirectPath());
     }
