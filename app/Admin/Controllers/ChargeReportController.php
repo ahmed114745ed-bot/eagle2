@@ -698,7 +698,7 @@ class ChargeReportController extends MainController
         $grid->column('amount', __('Amount'));
         if ($scope === 'not_dash' ) {
            // dd(123);
-            $grid->column('amount_type', __('status'))->display(function () {
+            $grid->column('amount_type', __('status'))->display(function () use($agency_id){
                 return $this->user_id == $agency_id  ?  __('increment') : __('decrement');
             });
         } else {
