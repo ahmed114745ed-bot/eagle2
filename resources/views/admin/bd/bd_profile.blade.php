@@ -844,7 +844,7 @@
                 <div class="section-header">
                     <h2 class="section-title">
                         <i class="fas fa-star"></i>
-                        {{ __('total salary') }}
+                        {{ __('total proft') }}
                     </h2>
                 </div>
                     <div class="avatar-grid">

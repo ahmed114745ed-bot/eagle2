@@ -74,15 +74,15 @@ class ReportMomentController extends MainController
 
 
 
-     protected function grid()
-     {
-         $grid = new Grid(new ReportMoment());
-         $grid->model()->whereHas('moment')->orderByDesc('id');
-         $grid->model()->with(['moment' => fn($query) => $query->withExists(['likes','comments'])]);
+    protected function grid()
+    {
+        $grid = new Grid(new ReportMoment());
+        $grid->model()->whereHas('moment')->orderByDesc('id');
+        $grid->model()->with(['moment' => fn($query) => $query->withExists(['likes', 'comments'])]);
 
-         $grid->column('id', __('Id'));
+        $grid->column('id', __('Id'));
 
-         $grid->column('Reporter_id', __('Reporter'))->display(function () {
+        $grid->column('Reporter_id', __('Reporter'))->display(function () {
             if (!$this->reporter) return '-';
 
             $url = admin_url('users/' . $this->reporter->id);
@@ -91,9 +91,9 @@ class ReportMomentController extends MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $avatarPath = @$this->reporter->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-                if (!isImageExists($avatar)) {
-                    $avatar = $defaultImage;
-                }
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
+            }
             return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='$url'\">
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -112,9 +112,9 @@ class ReportMomentController extends MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $avatarPath = @$this->reportedUser->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-                if (!isImageExists($avatar)) {
-                    $avatar = $defaultImage;
-                }
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
+            }
             return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='$url'\">
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -129,15 +129,15 @@ class ReportMomentController extends MainController
 
 
 
-            $grid->column('moment_id', __('View Moment'))->modal(__('moment'), function ($model) {
-                return self::getRoomsShow($model->moment);
-            });
+        $grid->column('moment_id', __('View Moment'))->modal(__('moment'), function ($model) {
+            return self::getRoomsShow($model->moment);
+        });
 
-            $grid->column('description', __('Description'))->display(function ($description) {
-                $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-                return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-            });
-            Admin::script("
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+        });
+        Admin::script("
                 $(document).ready(function () {
                     $('.view-description').click(function (e) {
                         e.preventDefault();
@@ -159,24 +159,25 @@ class ReportMomentController extends MainController
                 }); ");
 
 
-             $grid->column('type', __('Type'));
-
-             $grid->column(__('redirect_button'))->display(function () {
+        $grid->column('type', __('Type'));
+        if (!Admin::user()->can('*') || !Admin::user()->can('delete-' . $this->permission_name)) {
+            $grid->column(__('redirect_button'))->display(function () {
                 $delete_moment = 'حذف اللحظة';
-                if(app()->getLocale() == 'en'){
+                if (app()->getLocale() == 'en') {
                     $delete_moment = "Delete moment";
                 }
                 $redirectRoute = 'delete-moment';
-                return '<a href="'.route($redirectRoute, ['moment_id' => $this->moment_id, 'id' => $this->id]).'" class="btn btn-xs btn-primary">'. $delete_moment . ' </a>';
+                return '<a href="' . route($redirectRoute, ['moment_id' => $this->moment_id, 'id' => $this->id]) . '" class="btn btn-xs btn-primary">' . $delete_moment . ' </a>';
             });
-         return $grid;
-     }
+        }
+        return $grid;
+    }
 
-     public static function getRoomsShow(Moment $moment)
-     {
-         $show = new Show($moment);
+    public static function getRoomsShow(Moment $moment)
+    {
+        $show = new Show($moment);
 
-         $show->field('img', __('Image'))->unescape()->as(function ($img) {
+        $show->field('img', __('Image'))->unescape()->as(function ($img) {
             if (!$img) {
                 return "<span style='color: #e74c3c;'>No Image Available</span>";
             }
@@ -184,39 +185,39 @@ class ReportMomentController extends MainController
             return "<img src='$url' style='max-width: 500px; max-height: 500px; border-radius: 10px;' class='img-thumbnail'/>";
         });
 
-         $show->panel()->tools(function ($tools) {
-             $tools->disableEdit();
-             $tools->disableList();
-             $tools->disableDelete();
-         });
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableList();
+            $tools->disableDelete();
+        });
 
-         return $show;
-     }
+        return $show;
+    }
 
 
-     public static function getDescriptionShow(Real $reel)
-     {
-         $show = new Show($reel);
+    public static function getDescriptionShow(Real $reel)
+    {
+        $show = new Show($reel);
 
-         $show->field('description', __('Description'))->unescape()->as(function ($description) {
-             $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-         });
+        $show->field('description', __('Description'))->unescape()->as(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+        });
 
-         $show->panel()->tools(function ($tools) {
-             $tools->disableEdit();
-             $tools->disableList();
-             $tools->disableDelete();
-         });
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableList();
+            $tools->disableDelete();
+        });
 
-         Admin::script("
+        Admin::script("
              if (window.innerWidth >= 1024) {
                  $('.table-responsive').removeClass('table-responsive');
              }
          ");
 
-         return $show;
-     }
+        return $show;
+    }
 
 
     // protected function grid()

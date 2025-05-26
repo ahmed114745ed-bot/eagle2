@@ -98,7 +98,7 @@ class AgencyController extends Controller
 
         try {
             $agency = $this->agencyService->find($id);
-            $request->is_onwer_agency = $user->id !=  $agency->app_owner_id;
+            request()->is_onwer_agency = ($user->id !=  $agency->app_owner_id);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

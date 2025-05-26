@@ -157,6 +157,8 @@ return [
                 'driver' => 'eloquent',
                 'model'  => \App\Models\Admin::class,
 //                'model'  => Encore\Admin\Auth\Database\Administrator::class,
+                App\Admin\Controllers\AdminControllerServiceProvider::class,
+
             ],
             'preview-admin' => [
                 'driver' => 'eloquent',

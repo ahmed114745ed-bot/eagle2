@@ -302,7 +302,22 @@ class UserController extends MainController
         //            return new Table([__('Field Name'), __('Value')], $results);
         //        });
 
-        $grid->column('total_charge_level', __('admin.charge_level'));
+        $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
+
+        $grid->column('total_charge_level', __('admin.charge_level'))->display(function () use ($arrowIcon) {
+            $level = $this->charge_level + $this->sub_charger_level;
+
+            $diamonds = $this->getTotalChargeLevel($level);
+
+            $defaultImage = asset("images/level0.png");
+            $img = $diamonds && $diamonds->img ? getImagePath($diamonds->img) : $defaultImage;
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+              <img src='$img' alt='User Avatar' style='width: 64px; height: 16px;'>
+              <img src='$arrowIcon' style='width: 16px; height: 16px;'>
+            </div>";
+        });
+
 
         //        $grid->column('profile.avatar', __('image'))->display(function ($path) {
         //            $defaultImage = asset("images/businessman-icon.jpg");

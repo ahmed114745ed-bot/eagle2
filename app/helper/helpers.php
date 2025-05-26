@@ -629,9 +629,37 @@ if (!function_exists('getTimezone')) {
 
 
 if (!function_exists('getToday')) {
-    function getToday() : array
+    function getToday(): array
     {
         $timezone = getTimezone();
         return [Carbon::now($timezone)->startOfDay()->timezone('UTC'), Carbon::now($timezone)->endOfDay()->timezone('UTC')];
     }
+
+}
+
+
+
+    if (!function_exists('bd_url')) {
+        /**
+         * Get BD admin url.
+         *
+         * @param string $path
+         * @param mixed  $parameters
+         * @param bool   $secure
+         *
+         * @return string
+         */
+        function bd_url($path = '', $parameters = [], $secure = null)
+        {
+            if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
+                return $path;
+            }
+
+            // حدد base path الخاص بوحدة BD
+            $base = trim(config('bd.route.prefix', 'bd'), '/');
+
+            $secure = $secure ?? (config('bd.https') || config('bd.secure'));
+
+            return secure_url($base . '/' . trim($path, '/'), $parameters, $secure);
+        }
 }

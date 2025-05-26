@@ -38,10 +38,10 @@ class FixedTargetService
 
     private \DateTime $endDate;
 
-    public function __construct(private User $user, private int $month = 0, private int $year = 0)
+    public function __construct(private User $user, private? int $month = null, private? int $year = null)
     {
             $timezone = getTimezone();
-        if ($this->month == 0 || $this->year == 0) {
+        if (is_null($this->month) || is_null($this->year)){
             $tz = new \DateTimeZone($timezone);
             $dt = new \DateTime('now', $tz);
             $this->month = $dt->format('m');

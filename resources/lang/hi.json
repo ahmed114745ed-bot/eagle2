@@ -2086,6 +2086,26 @@
 "set_as_default": "डिफ़ॉल्ट BD के रूप में सेट करें",
 "back": "वापस",
 "edit updates_family config": "अपडेट्स_परिवार कॉन्फ़िगरेशन संपादित करें",
+"Charge Switch": "चार्ज स्विच",
+  "browse charge switch": "चार्ज स्विच देखें",
+  "Invite Switch": "आमंत्रण स्विच",
+  "browse invite switch": "आमंत्रण स्विच देखें",
+  "User Actions": "उपयोगकर्ता क्रियाएं",
+  "browse user actions": "उपयोगकर्ता क्रियाएं देखें",
+  "Can Play Switch": "प्ले स्विच सक्षम करें",
+  "browse can Play Switch": "प्ले स्विच ब्राउज़ करें",
+  "Kick Agency Switch": "एजेंसी हटाने का स्विच",
+  "browse kick agency Switch": "एजेंसी हटाने का स्विच देखें",
+  "Kick Family Switch": "परिवार हटाने का स्विच",
+  "browse kick family Switch": "परिवार हटाने का स्विच देखें",
+  "Chang Agency Switch": "एजेंसी बदलने का स्विच",
+  "Delete Agency Switch": "एजेंसी हटाने का स्विच",
+  "browse delete agency Switch": "एजेंसी हटाने का स्विच ब्राउज़ करें",
+  "Change Users Agency Switch": "उपयोगकर्ता एजेंसी बदलने का स्विच",
+  "browse change users agency Switch": "उपयोगकर्ता एजेंसी स्विच ब्राउज़ करें",
+  "Delete Shipping Agency Switch": "शिपिंग एजेंसी हटाने का स्विच",
+  "browse delete shipping agency Switch": "शिपिंग एजेंसी हटाने का स्विच ब्राउज़ करें",
+  "browse chang agency Switch": "एजेंसी बदलने का स्विच ब्राउज़ करें"
 
 
 }
