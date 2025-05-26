@@ -252,6 +252,26 @@ class OvipGiftTapController extends MainController
         //            ]
         //        )->attribute(['id' => 'profile_frame'])->required();
 
+        if ($form->isEditing()){
+            $form->select('image_type1', __('image_type'))->options(
+                [
+                    'svga' => __('svga'),
+                    'alpha' => __('alpha'),
+                    'mp4' => __('mp4'),
+                    'vap' => __('vap'),
+
+                ]
+            )->attribute(['id' => 'image_type1'])->required();
+
+            $form->select('profile_frame_type', __('image_type'))->options(
+                [
+                    'svga' => __('svga'),
+                    'png' => __('png'),
+
+                ]
+            )->attribute(['id' => 'profile_frame'])->required();
+        }
+
         $form->saving(function (Form $form) {
             if ($form->show_img instanceof UploadedFile) {
                 $form->image_type1 = $form->show_img->guessExtension();
