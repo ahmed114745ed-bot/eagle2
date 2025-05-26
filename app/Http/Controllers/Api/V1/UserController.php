@@ -252,6 +252,24 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+
+    public function user_bd(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->user_bd($key, $page);
+
+        return response()->json($users);
+    }
+    public function user_bd2(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->user_bd2($key, $page);
+
+        return response()->json($users);
+    }
+    
     public function agencies(Request $request)
     {
         $key = $request->q;

@@ -66,7 +66,49 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
 
     }
+    public function user_bd($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+        ->where('is_bd',0)
+        ->where(function ($query) {
+                $query->where('agency_id', 0)
+                    ->orWhereNull('agency_id');
+            })
+            // ->where('type_user', 0)
+            ->whereDoesntHave('hostAgency', function ($query) {
+                $query->where('type', 1);
+            })
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
 
+    }
+
+    public function user_bd2($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+        ->where('is_bd',1)
+        ->where(function ($query) {
+                $query->where('agency_id', 0)
+                    ->orWhereNull('agency_id');
+            })
+            // ->where('type_user', 0)
+            ->whereDoesntHave('hostAgency', function ($query) {
+                $query->where('type', 1);
+            })
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+
+    }
+    
+    
     public function searchInAgency($key, $page, $perPage)
     {
         return Agency::selectRaw('concat(name, " - ", id) as name, id')

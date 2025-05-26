@@ -2500,5 +2500,10 @@
     "badge": "rozet",
   "intro": "giriş",
   "frame": "çerçeve",
-    "total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!"
+    "total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!",
+    "default_current": "Geçerli Varsayılan BD",
+    "no_default_set": "Henüz varsayılan BD ayarlanmadı",
+    "select_default_bd": "Varsayılan olacak BD'yi seçin",
+    "set_as_default": "Varsayılan BD olarak ayarla",
+    "back": "Geri"
 }

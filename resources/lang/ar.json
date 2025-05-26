@@ -2632,5 +2632,12 @@
      "badge": "شارة",
   "intro": "مقدمة",
   "frame": "إطار",
-"total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!"
+"total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!",
+"app bd id":"معرف  Bd في التطبيق",
+"make_bd_default":"عند تفعيل هذا الاختيار سوف يصبح هذا bd هو الافتراضي  بدلا من الافتراضي الحالي",
+"default_current": "BD الافتراضي الحالي",
+"no_default_set": "لم يتم تعيين BD افتراضي بعد",
+"select_default_bd": "اختر BD ليكون الافتراضي",
+"set_as_default": "تعيين كـ BD افتراضي",
+"back": "رجوع"
 }

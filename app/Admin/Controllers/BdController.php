@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use App\Admin\Actions\MakeBdDefultAction;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
+use App\Admin\Widgets\InfoBox;
+
 
 
 
@@ -31,9 +35,29 @@ class BdController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(trans('BD'))
-            ->body($this->grid()));
+        // return parent::index($content
+        //     ->title(trans('BD'))
+        //     ->body($this->grid()));
+        return $content
+        ->title(__($this->title))
+        ->row(function (Row $row) {
+            $row->column(12, $this->grid2());
+        })
+        ->row(function ($row) {
+            $row->column(12, $this->grid());
+        });
+    }
+
+
+ 
+
+    protected function grid2()
+    {
+     
+        return (new Box(
+            title: __('admin.description'),
+            content: view('admin.grid.bd.description'),
+        ));
     }
 
     /**
@@ -139,6 +163,12 @@ class BdController extends MainController
             $actions->add(new \App\Admin\Actions\DeleteBdAction());
             $actions->add(new MakeBdDefultAction($model->id));
         });
+
+
+        $grid->tools(function (Grid\Tools $tools) {
+         
+            $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
+        });
         return $grid;
     }
 
@@ -168,6 +198,8 @@ class BdController extends MainController
         $form->password('password', __('Password'))->rules('required');
         $form->text('name', __('Name'));
         $form->image('avatar', __('img'));
+        $form->switch('default', __('default bd'))
+        ->help(__('make_bd_default'));
 
 
         if ($form->isEditing()) {
@@ -177,7 +209,7 @@ class BdController extends MainController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users3', 'id', 'name')->rules('required')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
+            })->ajax('/api/search/users-bd', 'id', 'name')->rules('required')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
         } else {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -185,22 +217,23 @@ class BdController extends MainController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users3', 'id', 'name')->rules('required');
+            })->ajax('/api/search/users-bd', 'id', 'name')->rules('required');
         }
 
         $form->hidden('type', __('Type'))->value('bd');
 
         $form->saving(function (Form $form) {
             $originalAppId = $form->model()->getOriginal('app_id');
+            $userExists = \App\Models\User::find($originalAppId);
 
             if ($originalAppId && $originalAppId != $form->app_id) {
-                $userExists = \App\Models\User::find($originalAppId);
 
                 if ($userExists) {
                     admin_error('تحذير', 'app_user_change_denied');
                     $form->app_id = $originalAppId;
                 }
             }
+            
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = Hash::make($form->password);
             }
@@ -208,6 +241,11 @@ class BdController extends MainController
 
         $form->saved(function (Form $form) {
             $userId = $form->model()->id;
+            $userAppId = $form->model()->app_id;
+
+            $userApp = User::find($userAppId);
+            $userApp->is_bd=1;
+            $userApp->save();
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();
 

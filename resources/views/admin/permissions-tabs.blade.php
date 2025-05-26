@@ -105,9 +105,9 @@
                                 <input class="form-check-input permission-checkbox"
                                        type="checkbox"
                                        value="{{ $perm->id }}"
+                                       data-slug="{{ $perm->slug }}"
                                        id="perm-{{ $perm->id }}"
-                                    {{ in_array($perm->id, $selected) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="perm-{{ $perm->id }}">
+                                    {{ in_array($perm->id, $selected) ? 'checked' : '' }}>                                <label class="form-check-label" for="perm-{{ $perm->id }}">
                                     {{ __($perm->name) }}
                                 </label>
                             </div>
@@ -127,30 +127,65 @@
             $('#permissions_all').val([...selectedPermissions].join(','));
         }
 
+        function getBrowsePermissionId(currentCheckbox) {
+            const groupContainer = currentCheckbox.closest('.permission-group');
+            const browseCheckbox = groupContainer.find('.permission-checkbox').filter(function() {
+                const permSlug = $(this).data('slug');
+                return permSlug && permSlug.includes('browse-');
+            });
+
+            return browseCheckbox.length ? parseInt(browseCheckbox.val()) : null;
+        }
+
         function bindPermissionCheckboxes() {
             $('.permission-checkbox').on('change', function () {
                 const id = parseInt($(this).val());
+                const permSlug = $(this).data('slug');
+
                 if ($(this).is(':checked')) {
                     selectedPermissions.add(id);
+
+                    if (permSlug && (
+                        permSlug.includes('create-') ||
+                        permSlug.includes('edit-') ||
+                        permSlug.includes('delete-')
+                    )) {
+                        const browsePermissionId = getBrowsePermissionId($(this));
+                        if (browsePermissionId) {
+                            selectedPermissions.add(browsePermissionId);
+                            $(`#perm-${browsePermissionId}`).prop('checked', true);
+                        }
+                    }
                 } else {
                     selectedPermissions.delete(id);
+
+                    if (permSlug && permSlug.includes('browse-')) {
+                        const groupContainer = $(this).closest('.permission-group');
+                        groupContainer.find('.permission-checkbox').each(function() {
+                            const relatedSlug = $(this).data('slug');
+                            if (relatedSlug && (
+                                relatedSlug.includes('create-') ||
+                                relatedSlug.includes('edit-') ||
+                                relatedSlug.includes('delete-')
+                            )) {
+                                const relatedId = parseInt($(this).val());
+                                selectedPermissions.delete(relatedId);
+                                $(this).prop('checked', false);
+                            }
+                        });
+                    }
                 }
                 updateHiddenInput();
             });
         }
 
-        // Initial bind and update
         bindPermissionCheckboxes();
         updateHiddenInput();
 
         $('#permission-tabs .nav-link').on('click', function (e) {
             e.preventDefault();
-
-            // Update active tab
             $('#permission-tabs .nav-link').removeClass('active tab-highlight');
             $(this).addClass('active tab-highlight');
-
-            // Show corresponding permissions section
             const category = $(this).data('category');
             $('.permissions-section').removeClass('active');
             $(`.permissions-section[data-category="${category}"]`).addClass('active');
