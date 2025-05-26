@@ -256,12 +256,8 @@
 }
 
 .ltr .btn-back {
-    position: absolute;
-    top: 5px;
-    right: 20px;
     background: #ecf0f1;
     border: none;
-    padding: 8px 15px;
     border-radius: 6px;
     color: #7f8c8d;
     cursor: pointer;
@@ -272,12 +268,8 @@
 }
 
 .rtl .btn-back {
-    position: absolute;
-    top: 5px;
-    left: 20px;
     background: #ecf0f1;
     border: none;
-    padding: 8px 15px;
     border-radius: 6px;
     color: #7f8c8d;
     cursor: pointer;
@@ -285,6 +277,10 @@
     display: flex;
     align-items: center;
     gap: 5px;
+}
+
+.fa-arrow-left{
+    margin-top: 5px;
 }
 
 .btn-back:hover {
@@ -329,11 +325,19 @@
 
 .performers-card {
     background: var(--secondary-color);
+    filter: brightness(0.85);
     border-radius: 10px;
     padding: 20px;
+    margin-top: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    /* filter: brightness(0.5); */
+}
 
+.ltr .performers-card{
+    margin-left: 20px;
+}
+
+.rtl .performers-card{
+    margin-right: 20px;
 }
 
 .section-header {
@@ -374,11 +378,11 @@
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 15px; */
     align-content: center;
-    width: 14%;
+    width: 12%;
     margin: auto;
     border: 2px solid;
-    height: 63px;
-    padding: 8px;
+    height: 60px;
+    padding: 10px;
     border-radius: 31px;
 }
 
@@ -473,7 +477,7 @@
     border: none;
     border-bottom: 3px solid transparent;
     font-weight: 600;
-   
+
     cursor: pointer;
     transition: all 0.3s;
     white-space: nowrap;
@@ -497,7 +501,9 @@
 }
 
 .card {
-    background: white;
+    background: var(--secondary-color);
+    filter: brightness(0.85);
+    padding-bottom: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     margin-bottom: 30px;
@@ -544,7 +550,7 @@
     /* text-align: left; */
     padding: 12px 15px;
     background: var(--secondary-color);
-   
+
     font-weight: 600;
     text-transform: uppercase;
     font-size: 12px;
@@ -703,19 +709,25 @@
     }
     .card-target-filter-phone{
         width: 49%;
-        margin-bottom: 27px;
         position: relative;
     }
     .card-target-filter-phone .form-group {
         margin-bottom: 16px;
-        right: 20px;
         position: relative;
-        top: 10px;
+        top: 58px;
     }
-    .card-target-filter-phone button {
+
+    .rtl .card-target-filter-phone .form-group{
+        right: 20px;
+    }
+
+    .ltr .card-target-filter-phone .form-group{
+        left: 20px;
+    }
+
+.card-target-filter-phone button {
         position: relative;
-        left: -49px;
-        bottom: -29px;
+        bottom: -58px;
     }
 
     .target-card-stat{
@@ -724,7 +736,15 @@
     .filter-form{
         border-radius: 13px;
         height: 165px;
+        margin-top: 20px;
+    }
 
+    .ltr .filter-form{
+        margin-right: 20px;
+    }
+
+    .rtl .filter-form{
+        margin-left: 20px;
     }
 
     .card-target-filter-phone{
@@ -739,7 +759,7 @@
         width: 108%;
 
     }
-    
+
     .avatar-grid {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     }
@@ -751,7 +771,7 @@
             margin-bottom: 35px;
         }
 
-    
+
     .stat-icon {
             width: 50px;
             height: 50px;
@@ -766,7 +786,7 @@
 
     }
 
-    
+
     .target-card-stat {
          width: 92%;
 
@@ -779,10 +799,9 @@
         width: 49%;
         left: 0px;
         position: relative;
-        margin-bottom: 31px;
 
     }
-    .card-target-filter-phone  .col-md-7{  
+    .card-target-filter-phone  .col-md-7{
        float: none;
     }
 
@@ -809,10 +828,18 @@
         }
 
         .card-target-filter-phone button {
-            left: -224px;
-
+            left: -224px
         }
 }
+.table-responsive {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.agency-tabs {
+    margin: 20px 20px 20px 20px;
+}
+
     </style>
 
 
@@ -854,10 +881,12 @@
                 </div>
             </div>
             <button class="btn-back" onclick="window.history.back()">
-                <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
+                {{__("Go Back")}} <i class="fas fa-arrow-left"></i>
             </button>
         </div>
-    
+
+        <div class="card">
+            <div class="card-body">
         <!-- Notice Section -->
         @if(@$agency->notice)
         <div class="notice-section">
@@ -870,71 +899,59 @@
             </div>
         </div>
         @endif
-    
-        <!-- Stars & Admins Section -->
-        <div class="top-performers-section">
-            <!-- Stars Section -->
-            <div class="performers-card">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-star"></i>
-                        {{ __('Agency Coins') }}
-                    </h2>
-                </div>
-                
-                    <div class="avatar-grid">
-                      
-                            
-                                    {{ @$agency->coins }}
-                               
+
+                <div style="display: flex; gap: 20px;">
+                    <!-- Stars Section -->
+                    <div class="performers-card" style="flex: 1;">
+                        <div class="section-header">
+                            <h2 class="section-title">
+                                <i class="fas fa-star"></i>
+                                {{ __('Agency Coins') }}
+                            </h2>
+                        </div>
+                        <div class="avatar-grid">
+                            {{ @$agency->coins }}
+                        </div>
                     </div>
-              
-            </div>
-    
 
-        </div>
-
-        <div class="card-target-filter-phone ">
-
-        <form method="GET" action="{{ url('admin/shipping-agencies/profile/' . $agency->id ) }}" class="filter-form">
-                    <div class="row">
-                        <input type="hidden" name="tab" value="charge">
-                        <div class="col-sm-12 col-md-7 ">
-                            <div class="form-group">
-                                <!-- <label for="month">{{ __('Month') }}</label> -->
-                                    <select name="filter_by" id="filter_by" class="form-control">
-                                        <option value="">{{ __('Select type') }}</option>
-                                        <option value="user" {{ request('filter_by') == 'user' ? 'selected' : '' }}>{{ __('User') }}</option>
-                                        <option value="agency" {{ request('filter_by') == 'agency' ? 'selected' : '' }}>{{ __('Agency') }}</option>
-                                    </select>
-
+                    <!-- Filter Section -->
+                    <div class="card-target-filter-phone">
+                        <form method="GET" action="{{ url('admin/shipping-agencies/profile/' . $agency->id ) }}" class="filter-form">
+                            <div class="row">
+                                <input type="hidden" name="tab" value="charge">
+                                <div class="col-sm-12 col-md-8">
+                                    <div class="form-group mb-0">
+                                        <select name="filter_by" id="filter_by" class="form-control">
+                                            <option value="">{{ __('Select type') }}</option>
+                                            <option value="user" {{ request('filter_by') == 'user' ? 'selected' : '' }}>{{ __('User') }}</option>
+                                            <option value="agency" {{ request('filter_by') == 'agency' ? 'selected' : '' }}>{{ __('Agency') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-filter"></i> {{ __('Apply') }}
+                                        </button>
+                                        @if(request()->has('month') || request()->has('year'))
+                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        
-                        
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-filter"></i> {{ __('Apply') }}
-                            </button>
-                            @if(request()->has('month') || request()->has('year'))
-                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
-                                <i class="fas fa-times"></i>
-                            </a>
-                            @endif
-                        </div>
+                        </form>
                     </div>
-                </form>
-            </div>
+                </div>
             </div>
         @php
-                    $activeTab = request('tab', 'charges'); 
+            $activeTab = request('tab', 'charges');
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
             <a href="?tab=charge" class="tab-btn" data-target="charges-tab">{{ __('Charges') }}</a>
             <a href="?tab=resived" class="tab-btn" data-target="resived-tab">{{ __('receiver') }}</a>
-         
         </div>
         <div id="tab-loading" style="
             display: none;
@@ -953,12 +970,6 @@
         ">
             {{ __('Loading...') }}
         </div>
-
-           
-    
-              
-    
-
             <!-- Charges Section -->
             @if($charges && $charges->count())
             <div class="table-responsive">
@@ -975,7 +986,7 @@
             @foreach($charges as $index => $charge)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    
+
                     <td>
                         @if($charge->resiver instanceof \App\Models\User)
                             <div style="display: flex; align-items: center; gap: 10px;">
@@ -1007,11 +1018,13 @@
 
     {{ $charges->withQueryString()->links() }}
 </div>
+        </div>
+    </div>
 
 @else
 <!-- <p class="text-center text-muted">{{ __('No charges found.') }}</p> -->
 @endif
-       
+
     @if($resiveds && $resiveds->count())
     <div class="table-responsive">
         <table class="table table-bordered">
@@ -1027,8 +1040,8 @@
                 @foreach($resiveds as $index => $res)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td> 
-                            
+                        <td>
+
                         @if($res->sender instanceof \App\Models\User)
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <img src="{{ $res->sender->profile->avatar ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
@@ -1048,7 +1061,7 @@
                         @else
                             -
                         @endif
-                    
+
                     </td>
                         <td>{{ $res->amount ?? '-' }}</td>
                         <td>{{ $res->created_at }}</td>
@@ -1063,10 +1076,8 @@
 @endif
 
 
-
-        
     </div>
- 
+
 <!-- jQuery أولاً -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
