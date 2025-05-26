@@ -45,10 +45,10 @@ class AgencyController extends MainController
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
 
-//    public function __construct()
-//    {
-//        (new AppFeatureService)->validateStatusEnable("agencies");
-//    }
+    //    public function __construct()
+    //    {
+    //        (new AppFeatureService)->validateStatusEnable("agencies");
+    //    }
 
     public function index(Content $content)
     {
@@ -454,8 +454,14 @@ class AgencyController extends MainController
             $model = $actions->row;
             // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
-            $actions->add(new DeleteAgencyAction());
-            $actions->add(new ChangeUsersAgencyAction($model->id));
+            if (Admin::user()->can('browse-' . 'delete-agency-Switch') || Admin::user()->can('*')) {
+
+                $actions->add(new DeleteAgencyAction());
+            }
+            if (Admin::user()->can('browse-' . 'change-users-agency-Switch') || Admin::user()->can('*')) {
+
+                $actions->add(new ChangeUsersAgencyAction($model->id));
+            }
         });
         $grid->disableExport();
 
@@ -627,7 +633,7 @@ class AgencyController extends MainController
                     }
                     return $ops2;
                 })->ajax('/api/search/users3', 'id', 'name')->rules('required');
-                
+
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
@@ -829,8 +835,8 @@ class AgencyController extends MainController
         });
 
         $form->saved(function (Form $form) {
-            $user=User:: find($form->model()->app_owner_id);
-            $user->monthly_diamond_received=0;
+            $user = User::find($form->model()->app_owner_id);
+            $user->monthly_diamond_received = 0;
             $user->save();
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $form->model()->app_owner_id,

@@ -2506,5 +2506,27 @@
     "no_default_set": "Henüz varsayılan BD ayarlanmadı",
     "select_default_bd": "Varsayılan olacak BD'yi seçin",
     "set_as_default": "Varsayılan BD olarak ayarla",
-    "back": "Geri"
+    "back": "Geri",
+    "edit updates_family config": "updates_family yapılandırmasını düzenle",
+   "Charge Switch": "Şarj Düğmesi",
+  "browse charge switch": "Şarj Düğmesini Görüntüle",
+  "Invite Switch": "Davet Düğmesi",
+  "browse invite switch": "Davet Düğmesini Görüntüle",
+  "User Actions": "Kullanıcı İşlemleri",
+  "browse user actions": "Kullanıcı İşlemlerini Görüntüle",
+  "Can Play Switch": "Oynayabilir Düğmesi",
+  "browse can Play Switch": "Oynayabilir Düğmesini Görüntüle",
+  "Kick Agency Switch": "Ajansı Atma Düğmesi",
+  "browse kick agency Switch": "Ajansı Atma Düğmesini Görüntüle",
+  "Kick Family Switch": "Aileyi Atma Düğmesi",
+  "browse kick family Switch": "Aileyi Atma Düğmesini Görüntüle",
+  "Chang Agency Switch": "Ajansı Değiştir Düğmesi",
+  "Delete Agency Switch": "Ajansı Silme Düğmesi",
+  "browse delete agency Switch": "Ajansı Silme Düğmesini Görüntüle",
+  "Change Users Agency Switch": "Kullanıcı Ajansını Değiştir Düğmesi",
+  "browse change users agency Switch": "Kullanıcı Ajansını Değiştir Düğmesini Görüntüle",
+  "Delete Shipping Agency Switch": "Kargo Ajansını Silme Düğmesi",
+  "browse delete shipping agency Switch": "Kargo Ajansını Silme Düğmesini Görüntüle",
+  "browse chang agency Switch": "Ajans Değiştirme Düğmesini Görüntüle"
+
 }

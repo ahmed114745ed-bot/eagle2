@@ -299,7 +299,10 @@ class AppearChargerAgencyController extends MainController
 
         $grid->actions(function ($actions) {
             $actions->disableView();
-            $actions->add(new DeleteShippingAgencyAction());
+            if (Admin::user()->can('browse-' . 'delete-shipping-agency-Switch') || Admin::user()->can('*')) {
+
+                $actions->add(new DeleteShippingAgencyAction());
+            }
             $actions->disableDelete();
         });
 
@@ -500,14 +503,13 @@ class AppearChargerAgencyController extends MainController
 
         $resived = $charges =  null;
 
-        $filterBy = $request->filter_by ?? null; 
-        $filterId = $request->filter_id  ?? null; 
-        $charges =$resiveds =null;
+        $filterBy = $request->filter_by ?? null;
+        $filterId = $request->filter_id  ?? null;
+        $charges = $resiveds = null;
         switch ($tab) {
-            case 'charge': 
-                $charges = Charge::
-                  where('user_charger_type', 'agency')
-                ->where('charger_id', $agencyId);
+            case 'charge':
+                $charges = Charge::where('user_charger_type', 'agency')
+                    ->where('charger_id', $agencyId);
                 $relations = [];
                 $charges->when($filter_by === 'user', function ($query) use (&$relations) {
                     $query->whereNotNull('user_id')
@@ -523,18 +525,18 @@ class AppearChargerAgencyController extends MainController
                     $charges->with($relations);
                 }
                 $charges = $charges->latest()
-                ->paginate(10, ['*'], 'charges_page');
+                    ->paginate(10, ['*'], 'charges_page');
                 break;
-        
-            case 'resived': 
-                $resiveds = Charge::with([ 'sender'])
+
+            case 'resived':
+                $resiveds = Charge::with(['sender'])
                     ->where('agency_id', $agencyId)
                     ->latest()
                     ->paginate(10, ['*'], 'resived_page');
                 break;
         }
-        
-// dd($charges);
+
+        // dd($charges);
         $data = compact(
             'agency',
             'resiveds',
@@ -545,7 +547,4 @@ class AppearChargerAgencyController extends MainController
         return $content->title(__('agency profile'))
             ->view('shippingAgencyProfile', $data);
     }
-
 }
-
-
