@@ -904,6 +904,11 @@ class User extends Authenticatable
         return $this->sender_level;
     }
 
+    public function agencyAdmins()
+    {
+        return $this->hasOne(AgencyUserJob::class, 'user_id')->where('type', 'requestManger');
+    }
+
     public function getTotalSenderDiamondsAttribute()
     {
         return $this->total_diamond_send + $this->sub_sender_num;
