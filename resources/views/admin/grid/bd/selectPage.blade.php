@@ -30,12 +30,21 @@
 }
 </style>
 <div style="" class="bck-bt">
-    <a href="{{ url()->previous() }}" class="btn btn-secondary mt-3">{{ __('back') }}</a>
+    <a href="{{ route('admin.usersBd.index') }}" class="btn btn-secondary mt-3">{{ __('back') }}</a>
 </div>
-<div style="width: 50%; margin: 20px auto; padding: 10px; border: 1px solid #ccc; border-radius: 10px;">
-    <p><strong>{{ __('default_current') }}:</strong>
+<div style="width: 50%; margin: 20px auto; padding: 10px;  border-radius: 10px;">
+ 
+<p>
+&#9432;  
+        <strong>
+       
+            {{ __('default_current') }}:
+            <span title="{{ __('default_current_info') }}" style="cursor: help; color: #007bff;">
+              
+            </span>
+        </strong>
         @if($defaultBd)
-            {{ $defaultBd->name }} - {{ $defaultBd->username }}
+            {{ $defaultBd->username }}
         @else
             {{ __('no_default_set') }}
         @endif
