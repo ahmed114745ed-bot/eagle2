@@ -71,7 +71,7 @@ class BdController extends MainController
     {
         return parent::show($id, $content
             ->title(trans('BD'))
-            ->body($this->detail($id)));
+            ->body($this->profile($id)));
     }
 
     /**
