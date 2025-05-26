@@ -2660,5 +2660,7 @@
   "Change Users Agency Switch": "زر تغيير وكالة المستخدمين",
   "browse change users agency Switch": "استعراض زر تغيير وكالة المستخدمين",
   "Delete Shipping Agency Switch": "زر حذف وكالة الشحن",
-  "browse delete shipping agency Switch": "استعراض زر حذف وكالة الشحن"
+  "browse delete shipping agency Switch": "استعراض زر حذف وكالة الشحن",
+  "browse chang agency Switch": "استعراض زر تغيير الوكالة"
+
 }
