@@ -271,8 +271,11 @@ class BdController extends MainController
             $userAppId = $form->model()->app_id;
 
             $userApp = User::find($userAppId);
-            $userApp->is_bd=1;
-            $userApp->save();
+            if(isset($userApp)){
+                $userApp->is_bd=1;
+                $userApp->save();
+            }
+          
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();
 
