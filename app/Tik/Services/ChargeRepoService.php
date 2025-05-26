@@ -408,7 +408,7 @@ class ChargeRepoService
             throw new \Exception(__('api.notYourself'));
         }
 
-        $chargeAgency = $this->agencyRepository->find($request->id);
+        $chargeAgency = $this->shippingAgencyRepository->findOrFail($request->id);
         if (!$chargeAgency) throw new \Exception(__('api.notAgencyFound'));
         if (!$chargeAgency->status) throw new \Exception(__('api.notActive'));
         if ($chargeAgency->is_frozen) throw new \Exception(__('api_responses.frozen'));
