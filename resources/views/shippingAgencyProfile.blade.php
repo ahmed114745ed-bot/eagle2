@@ -484,12 +484,8 @@
 }
 
 .tab-btn.active {
-    color:var(--primary-color);
+    color:var(--primary-color) ;
     border-bottom-color: var(--primary-color);
-}
-
-.tab-btn:hover:not(.active) {
-    color: #34495e;
 }
 
 .tab-content {
@@ -850,7 +846,7 @@
         <!-- Header Section -->
         <div class="agency-header">
             <div class="agency-avatar">
-                <img src="{{ $agency->display_image }}" alt="Agency Logo" class="logo-img">
+                <img src="{{ getImagePath($agency->display_image) }}" alt="Agency Logo" class="logo-img">
             </div>
             <div class="agency-info">
                 <h1 class="agency-name">{{ @$agency?->name ?? ''}}</h1>
@@ -950,8 +946,8 @@
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
-            <a href="?tab=charge" class="tab-btn" data-target="charges-tab">{{ __('Charges') }}</a>
-            <a href="?tab=resived" class="tab-btn" data-target="resived-tab">{{ __('receiver') }}</a>
+            <a href="?tab=charges" class="tab-btn {{ (!request('tab') || request('tab') != 'charges') ? 'active' : '' }}" data-target="charges-tab">{{ __('Charges') }}</a>
+            <a href="?tab=resived" class="tab-btn {{ request('tab') == 'resived' ? 'active' : '' }}" data-target="resived-tab">{{ __('receiver') }}</a>
         </div>
         <div id="tab-loading" style="
             display: none;
@@ -990,7 +986,7 @@
                     <td>
                         @if($charge->resiver instanceof \App\Models\User)
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ $charge->resiver->profile->avatar ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                <img src="{{ getImagePath($charge->resiver->profile->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
                                 <div>
                                     <strong>{{ $charge->resiver->name }}</strong><br>
                                     <small>ID: {{ $charge->resiver->id }}</small>
@@ -998,7 +994,7 @@
                             </div>
                         @elseif($charge->agency instanceof \App\Models\Agency)
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ $charge->agency->logo_url ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
+                                <img src="{{ getImagePath($charge->agency->logo_url) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
                                 <div>
                                     <strong>{{ $charge->agency->name }}</strong><br>
                                     <small>ID: {{ $charge->agency->id }}</small>
@@ -1044,7 +1040,7 @@
 
                         @if($res->sender instanceof \App\Models\User)
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ $res->sender->profile->avatar ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                <img src="{{ getImagePath($res->sender->profile->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
                                 <div>
                                     <strong>{{ $res->sender->name }}</strong><br>
                                     <small>ID: {{ $res->sender->id }}</small>
@@ -1052,7 +1048,7 @@
                             </div>
                         @elseif($res->sender instanceof \App\Models\Agency)
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ $res->sender->logo_url ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
+                                <img src="{{ getImagePath($res->sender->logo_url) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
                                 <div>
                                     <strong>{{ $res->sender->name }}</strong><br>
                                     <small>ID: {{ $res->sender->id }}</small>
@@ -1099,6 +1095,8 @@
         const target = tab.getAttribute('data-target');
         const content = document.getElementById(target);
 
+        console.log(target)
+        console.log(selectedTab)
         if (target === selectedTab) {
             tab.classList.add('active');
             content.style.display = 'block';
