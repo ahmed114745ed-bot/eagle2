@@ -629,17 +629,16 @@ if (!function_exists('getTimezone')) {
 
 
 if (!function_exists('getToday')) {
-    function getToday() : array
+    function getToday(): array
     {
         $timezone = getTimezone();
         return [Carbon::now($timezone)->startOfDay()->timezone('UTC'), Carbon::now($timezone)->endOfDay()->timezone('UTC')];
     }
-<<<<<<< HEAD
-=======
+
+}
 
 
 
-    
     if (!function_exists('bd_url')) {
         /**
          * Get BD admin url.
@@ -655,16 +654,12 @@ if (!function_exists('getToday')) {
             if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
                 return $path;
             }
-    
+
             // حدد base path الخاص بوحدة BD
             $base = trim(config('bd.route.prefix', 'bd'), '/');
-    
+
             $secure = $secure ?? (config('bd.https') || config('bd.secure'));
-    
+
             return url($base . '/' . trim($path, '/'), $parameters, $secure);
         }
-    }
-    
-
->>>>>>> 16913da47 (.)
 }
