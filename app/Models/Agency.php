@@ -202,7 +202,7 @@ class Agency extends Model
         static::addGlobalScope(new HostAgencyScope);
 
         static::saving(function ($model) {
-
+            $model->type =1;     
 
             if (request()->has('phone_code')) {
                 $model->phone_code = request('phone_code');

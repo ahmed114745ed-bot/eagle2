@@ -28,6 +28,11 @@ class Bd extends Model
             } else {
                 throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
             }
+            $userApp = \App\Models\User::find($bd->app_id);
+                if ($userApp) {
+                    $userApp->is_bd = 0;
+                    $userApp->save();
+                }
         });
     }
 
