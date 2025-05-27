@@ -39,6 +39,7 @@ Route::group(
             Route::get('login', [\App\Bd\Controllers\AuthController::class, 'showLoginForm'])->name('login');
         }
         Route::post('login', [\App\Bd\Controllers\AuthController::class, 'postLogin']);
+        Route::get('logout', [\App\Bd\Controllers\AuthController::class, 'logout']);
       
     }
 
