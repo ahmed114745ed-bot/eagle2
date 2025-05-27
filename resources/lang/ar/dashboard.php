@@ -2,6 +2,7 @@
 
 return [
     'login.title'           => 'دخول لوحة التحكم',
+    'login.titleBD'           => ' BD دخول لوحة التحكم',
     'login.remember'        => 'حفظ بيانات الدخول',
     'login.rights'          => '  ٢٠٢٣. جميع الحقوق محفوظة © ',
     'login.language.switch' => 'Switch to',
