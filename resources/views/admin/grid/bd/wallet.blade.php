@@ -280,7 +280,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                     <h5 class="modal-title" id="modalDescriptionTitle"></h5>
                     <button type="button" class="close" data-dismiss="modal" style="color: var(--text-secondary-color);">&times;</button>
                 </div>
-                <form id="chargeForm" class="transferForm" method="POST" action="{{ route('admin.bd.wallet.charge') }}">
+                <form id="chargeForm" class="transferForm" method="POST" action="{{ route('bd.wallet.charge') }}">
     @csrf
 
     <div class="form-group">

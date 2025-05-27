@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers\BDControllers;
+namespace App\Bd\Controllers;
 
 use App\Models\Charge;
 use Encore\Admin\Controllers\AdminController;

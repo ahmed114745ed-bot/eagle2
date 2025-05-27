@@ -108,6 +108,7 @@ class BdController extends MainController
         // $grid->column('username', __('username'));
         // $grid->column('name', __('Name'));
         $grid->column('username', __('Bd'))->display(function ($name) {
+            
            
 
             $id = $this->id ?? '-';
@@ -135,6 +136,28 @@ class BdController extends MainController
                 </div>
             ";
         });
+        $grid->column('default', __('status'))->display(function () {
+            if ($this->default == 1) {
+                return <<<HTML
+                    <span style="display: flex; align-items: center;">
+                        <strong style="color: green; margin-right: 5px;">✔</strong>
+                        <span style="
+                            font-size: smaller;
+                            background: red;
+                            display: inline-block;
+                            border-radius: 50%;
+                            width: 10px;
+                            height: 10px;
+                            margin-left: 5px;
+                        " title=""></span>
+                    </span>
+                HTML;
+            } else {
+                return '<span style="color: #999;"></span>';
+            }
+        });
+        
+
 
         $grid->column('appUser.name', __('المستخدم المرتبط'))->display(function ($name) {
             $user = $this->appUser;
@@ -169,7 +192,8 @@ class BdController extends MainController
             return $this->agencies_count;
         });
 
-        $grid->column('total_salary', __('total salary'))->display(function () {
+
+        $grid->column('total_salary', __('total proft'))->display(function () {
             return number_format($this->total_salary, 2);
         });
 

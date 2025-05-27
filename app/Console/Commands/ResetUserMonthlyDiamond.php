@@ -44,12 +44,13 @@ class ResetUserMonthlyDiamond extends Command
     public function handle()
     {
         $timezone = getTimezone();
-        $dt = new \DateTime('now', $timezone);
-
-        if ($dt->day == 1){
+        $dt = new \DateTime('now', new \DateTimeZone($timezone));
+        if ($dt->format('j') == 1){
             $carbon = $dt->subDay();
+           
             $this->calculateUserSalary(month: $carbon->month, year: $carbon->year);
         }else{
+         
             $this->calculateUserSalary();
         }
 

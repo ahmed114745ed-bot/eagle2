@@ -1,23 +1,19 @@
 <?php
 
-namespace App\Admin\Controllers\BDControllers;
+namespace App\Bd\Controllers;
 
 use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\Admin;
 use App\Models\Charge;
-use App\Http\Controllers\Controller;
 use App\Models\BDSallary;
 use App\Models\User;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Layout\Row;
 

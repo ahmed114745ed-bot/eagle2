@@ -87,7 +87,7 @@ class AgencyRepository extends AbstractRepository
 
     public function members($agency)
     {
-        return $agency->mempers()->where('id', '!=', $agency->app_owner_id)->orderBy('monthly_diamond_received', 'desc')->paginate(20);
+        return $agency->mempers()->where('id', '!=', $agency->app_owner_id)->orderBy('monthly_diamond_received', 'desc')->whereDoesntHave('agencyAdmins')->paginate(20);
     }
 
     public function userMembers($agency, $type = null, $userIds = null)
@@ -189,10 +189,7 @@ class AgencyRepository extends AbstractRepository
         return  $this->model
             ->with('owner')
             ->where(function ($q) use ($keyword) {
-                $q->where('id', 'like', '%' . $keyword . '%')
-                    ->orWhereHas('owner', function ($query) use ($keyword) {
-                        $query->where('uuid', 'like', '%' . $keyword . '%');
-                    });
+                $q->where('id', 'like', '%' . $keyword . '%');
             })->take(10)->get();
     }
 

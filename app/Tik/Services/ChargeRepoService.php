@@ -366,19 +366,18 @@ class ChargeRepoService
 
     public function chargeAgencyToAnother(User $auth, $request)
     {
+
+        if (!$request->id || $request->amount ) return Common::apiResponse(false, 'missing_params');
         DB::beginTransaction();
 
         try {
-            $authAgency = $this->shippingAgencyRepository->findFomAll($auth->agency_id);
+            $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
 
             if (!$authAgency) throw new \Exception(__('api.notAgency'));
             if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
             if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
             if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
             if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
-
-            $authAgencyShipping = Common::searchAgency($authAgency->id);
-            if (!$authAgencyShipping) throw new \Exception(__('api.agencyNotShipping'));
 
             switch ($request->type) {
                 case 'agency':
@@ -408,7 +407,7 @@ class ChargeRepoService
             throw new \Exception(__('api.notYourself'));
         }
 
-        $chargeAgency = $this->agencyRepository->find($request->id);
+        $chargeAgency = $this->shippingAgencyRepository->findOrFail($request->id);
         if (!$chargeAgency) throw new \Exception(__('api.notAgencyFound'));
         if (!$chargeAgency->status) throw new \Exception(__('api.notActive'));
         if ($chargeAgency->is_frozen) throw new \Exception(__('api_responses.frozen'));

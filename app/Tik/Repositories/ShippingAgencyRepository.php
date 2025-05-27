@@ -28,14 +28,6 @@ class ShippingAgencyRepository extends AbstractRepository
 
     }
 
-    public function find($id){
-        // return $this->model->find($id);
-        $shipping = ShippingAgency::find( $id);
-        if ($shipping) {
-            return $shipping;
-        }
-        return Agency::find( $id);
-    }
 
     public function filterAgency($id)
     {
@@ -217,7 +209,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getAgencyByOwnerId($ownerId)
     {
-        return Agency::where('app_owner_id', $ownerId)->first();
+        return $this->model->where('app_owner_id', $ownerId)->first();
     }
 
     public function getJoinRequests($agencyId)
