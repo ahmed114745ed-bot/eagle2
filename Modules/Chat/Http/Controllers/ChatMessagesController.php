@@ -123,10 +123,10 @@ class ChatMessagesController extends Controller
 
         //add status for message
 
-        info(config('chat'.'broadcasting.connections.pusher.key'));
-        info(config('chat'.'broadcasting.connections.pusher.secret'));
-        info(config('chat'.'broadcasting.connections.pusher.app_id'));
-        info(config('chat'.'broadcasting.connections.pusher.options.cluster'));
+        info('chat '.config('broadcasting.connections.pusher.key'));
+        info('chat '.config('broadcasting.connections.pusher.secret'));
+        info('chat '.config('broadcasting.connections.pusher.app_id'));
+        info('chat '.config('broadcasting.connections.pusher.options.cluster'));
 
         // return $user2;
         event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
