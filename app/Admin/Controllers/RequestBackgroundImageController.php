@@ -158,7 +158,7 @@ class RequestBackgroundImageController extends MainController
 
         $grid->img(__('image'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
-            $path = getImagePath($img);
+            $path = getImagePath($img) ?? $defaultImage;
             if (!isImageExists($path)) {
                 $path = $defaultImage;
             }
