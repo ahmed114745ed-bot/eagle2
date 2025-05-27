@@ -22,11 +22,6 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        info('config Before '.config('broadcasting.connections.pusher.key'));
-        info('config Before '.config('broadcasting.connections.pusher.secret'));
-        info('config Before '.config('broadcasting.connections.pusher.app_id'));
-        info('config Before '.config('broadcasting.connections.pusher.options.cluster'));
-
         Config::set('exp_percentages', $this->getReceivedAndSanderPercentage());
 
          $config = getPusherConfig();
@@ -47,11 +42,6 @@ class ConfigServiceProvider extends ServiceProvider
             Config::set('admin.route.middleware',$get);
              Config::set('admin.auth.controller', \App\Admin\Controllers\Preview\AuthController::class);
          }
-
-        info('config After '.config('broadcasting.connections.pusher.key'));
-        info('config After '.config('broadcasting.connections.pusher.secret'));
-        info('config After '.config('broadcasting.connections.pusher.app_id'));
-        info('config After '.config('broadcasting.connections.pusher.options.cluster'));
     }
 
     public function getReceivedAndSanderPercentage(): array
