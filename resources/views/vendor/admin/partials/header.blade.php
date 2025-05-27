@@ -58,9 +58,9 @@
                             <a href="{{ bd_url('/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
 
                             @endif
-                            @if (Admin::user()->type != 'bd')
-                                <a href="{{ admin_url('auth/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
-                           @endif
+                                    @if (Admin::user()->type != 'bd')
+                                        <a href="{{ admin_url('auth/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
+                                @endif
                             </div>
                         </li>
                     </ul>
