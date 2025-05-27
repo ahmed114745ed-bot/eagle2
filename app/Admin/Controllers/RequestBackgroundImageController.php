@@ -99,7 +99,7 @@ class RequestBackgroundImageController extends MainController
         // $grid->owner_room_id(__('owner room id'))->display(function () {
         //     $name = @$this->owner->name ?? '';
         //     $uuid = @$this->owner->uuid ?? '';
-        //     $path = @$this->owner?->ownerRoom->room_cover;
+        //     $path = @$this->owner?->ownerRoom?->room_cover;
         //     $defaultImage = asset("images/room.jpg");
         //     $url = getImagePath($path) ?? $defaultImage;
 
@@ -138,7 +138,7 @@ class RequestBackgroundImageController extends MainController
         //             $url = $defaultImage;
         //         }
 
-        //         $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+        //         $image = handleShowImageWithTypes($this->owner->id, $url, 40, 40);
         //         $showUrl = url("admin/users/{$this->owner->id}");
         //         $escapedName = json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
         //         $escapedName = substr($escapedName, 1, -1);
@@ -156,44 +156,44 @@ class RequestBackgroundImageController extends MainController
         //              EOT;
         //     });
 
-        // $grid->img(__('image'))->display(function ($img) {
-        //     $defaultImage = asset("images/background_room.jpg");
-        //     $path = getImagePath($img) ?? $defaultImage;
-        //     if (!isImageExists($path)) {
-        //         $path = $defaultImage;
-        //     }
-        //     $parsedUrl = parse_url($path);
-        //     $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+        $grid->img(__('image'))->display(function ($img) {
+            $defaultImage = asset("images/background_room.jpg");
+            $path = getImagePath($img) ?? $defaultImage;
+            if (!isImageExists($path)) {
+                $path = $defaultImage;
+            }
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
 
-        //     return "
-        //             <img src='$correctUrl' style='width: 50px; height: 50px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+            return "
+                    <img src='$correctUrl' style='width: 50px; height: 50px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
 
-        //             <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
-        //                 <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
-        //                 <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
-        //             </div>
+                    <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
+                        <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
+                        <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
+                    </div>
 
-        //             <script>
-        //                 function openModal(src) {
-        //                     let modal = document.getElementById('imageModal');
-        //                     let modalImage = document.getElementById('modalImage');
-        //                     modal.style.display = 'block';
-        //                     modalImage.src = src;
-        //                 }
+                    <script>
+                        function openModal(src) {
+                            let modal = document.getElementById('imageModal');
+                            let modalImage = document.getElementById('modalImage');
+                            modal.style.display = 'block';
+                            modalImage.src = src;
+                        }
 
-        //                 function closeModal() {
-        //                     document.getElementById('imageModal').style.display = 'none';
-        //                 }
+                        function closeModal() {
+                            document.getElementById('imageModal').style.display = 'none';
+                        }
 
-        //                 // Close modal when clicking outside the image
-        //                 document.getElementById('imageModal').addEventListener('click', function(event) {
-        //                     if (event.target === this) {
-        //                         closeModal();
-        //                     }
-        //                 });
-        //             </script>
-        //         ";
-        // });
+                        // Close modal when clicking outside the image
+                        document.getElementById('imageModal').addEventListener('click', function(event) {
+                            if (event.target === this) {
+                                closeModal();
+                            }
+                        });
+                    </script>
+                ";
+        });
 
         $grid->column('status', __('status'))->display(function ($status) {
             $statuses = [
