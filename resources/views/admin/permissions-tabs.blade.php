@@ -37,7 +37,6 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 15px;
-        padding: 20px;
     }
     .permission-group {
         background-color: var(--box-background-color);
@@ -62,24 +61,31 @@
     }
     .form-check {
         margin-bottom: 8px;
-        padding-right: 25px;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
     }
     .form-check-input {
-        margin-left: 8px;
+        margin: 0;
+        flex-shrink: 0;
+        margin-top: 2px;
     }
     .form-check-label {
         font-size: 14px;
         color: #444;
+        line-height: 1.4;
+        word-wrap: break-word;
+        flex: 1;
     }
 
     /* RTL Specific Styles */
     [dir="rtl"] .form-check {
-        padding-right: 30px;
-        padding-left: 0;
+        padding-right: 0;
+        padding-left: 25px;
+        flex-direction: row-reverse;
     }
     [dir="rtl"] .form-check-input {
-        float: right;
-        margin-right: -25px;
+        margin-right: 0;
         margin-left: 0;
     }
     [dir="rtl"] .permission-group-title {
@@ -182,12 +188,11 @@
             const totalCheckboxes = groupCheckboxes.length;
             const checkedCheckboxes = groupCheckboxes.filter(':checked').length;
 
-            if (checkedCheckboxes === 0) {
-                groupSelectAll.prop('checked', false).prop('indeterminate', false);
-            } else if (checkedCheckboxes === totalCheckboxes) {
+            // Only checked when ALL permissions are selected, otherwise unchecked
+            if (checkedCheckboxes === totalCheckboxes) {
                 groupSelectAll.prop('checked', true).prop('indeterminate', false);
             } else {
-                groupSelectAll.prop('checked', false).prop('indeterminate', true);
+                groupSelectAll.prop('checked', false).prop('indeterminate', false);
             }
         }
 
@@ -198,12 +203,11 @@
             const totalCheckboxes = categoryCheckboxes.length;
             const checkedCheckboxes = categoryCheckboxes.filter(':checked').length;
 
-            if (checkedCheckboxes === 0) {
-                categorySelectAll.prop('checked', false).prop('indeterminate', false);
-            } else if (checkedCheckboxes === totalCheckboxes) {
+            // Only checked when ALL permissions are selected, otherwise unchecked
+            if (checkedCheckboxes === totalCheckboxes) {
                 categorySelectAll.prop('checked', true).prop('indeterminate', false);
             } else {
-                categorySelectAll.prop('checked', false).prop('indeterminate', true);
+                categorySelectAll.prop('checked', false).prop('indeterminate', false);
             }
         }
 
