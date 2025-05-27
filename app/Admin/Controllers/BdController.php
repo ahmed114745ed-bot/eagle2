@@ -110,7 +110,6 @@ class BdController extends MainController
         $grid->column('username', __('Bd'))->display(function ($name) {
             
            
-
             $id = $this->id ?? '-';
             $name = $this->username ?? 'غير معروف';
             $path = $this->avatar;
