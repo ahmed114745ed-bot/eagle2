@@ -138,7 +138,7 @@ class RequestBackgroundImageController extends MainController
                     $url = $defaultImage;
                 }
 
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $image = handleShowImageWithTypes($this->owner->id, $url, 40, 40);
                 $showUrl = url("admin/users/{$this->owner->id}");
                 $escapedName = json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
                 $escapedName = substr($escapedName, 1, -1);
