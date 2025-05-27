@@ -1055,7 +1055,7 @@
                         @csrf
                         <div class="modal-body p-0">
                             <div class="rounded-top-lg py-3 ps-4 pe-6 bg-light">
-                                <h4 class="mb-1" id="modalExampleDemoLabel"> {{ __('validation.add_currency') }}</h4>
+                                <h4 class="mb-1" id="modalExampleDemoLabel"> {{ __('dashboard.free') }}</h4>
                             </div>
                             <div class="p-4">
 
