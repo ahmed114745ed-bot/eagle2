@@ -241,6 +241,9 @@ Route::group(
             ]
         ]);
 
+        $router->post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);
+         $router->post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
+
          $router->get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         $router->resource('free-users', 'FreeUserController');

@@ -39,6 +39,7 @@ use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
+use Illuminate\Support\Facades\Redirect;
 
 
 class UserController extends MainController
@@ -534,10 +535,10 @@ class UserController extends MainController
             if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'kick-agency-Switch') || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
             }
-            if ($model->family_id >= 1&& (Admin::user()->can('browse-' . 'kick-family-Switch') || Admin::user()->can('*'))) {
+            if ($model->family_id >= 1 && (Admin::user()->can('browse-' . 'kick-family-Switch') || Admin::user()->can('*'))) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1&& (Admin::user()->can('browse-' . 'chang-agency-Switch') || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'chang-agency-Switch') || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
             if ($model->phone = '+201000100010') {
@@ -676,7 +677,7 @@ class UserController extends MainController
         ]);
 
         $grid->column('target_id', __('img'))->display(function () {
-            return $this->ware ? "<img width='30' src='" . getDriverUrl() . '/' . (@$this->ware?->show_img  ?? ''). "'>" : '';
+            return $this->ware ? "<img width='30' src='" . getDriverUrl() . '/' . (@$this->ware?->show_img  ?? '') . "'>" : '';
         });
 
         $grid->column('expire', __('expire'))->display(function ($row) {
@@ -1018,5 +1019,46 @@ class UserController extends MainController
         } else {
             settings()->set("stop_invite_code", "0");
         }
+    }
+
+
+    public function deletePack($id)
+    {
+        $pack = Pack::find($id);
+
+        if (!$pack) {
+            return response()->json([
+                'status' => 404,
+                'message' => __('not_found'),
+            ], 404);
+        }
+
+        $pack->delete();
+
+         return Redirect::back();
+    }
+
+    public function free(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:packs,id',
+            'type' => 'required|in:0,1',
+            'days' => 'required|integer|min:1',
+            'use_num' => 'required|integer|min:1',
+        ]);
+
+        $pack = Pack::find($request->id);
+        $ex = ($request->days ?: 0);
+        $num = $request->use_num ?: 0;
+
+        if ($request->type == 0) {
+            $pack->expire += $ex * 86400;
+            $pack->use_num += $num;
+        } else {
+            $pack->expire -= $ex * 86400;
+            $pack->use_num -= $num;
+        }
+        $pack->save();
+        return Redirect::back();
     }
 }
