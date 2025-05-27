@@ -37,6 +37,8 @@ class Bd extends Model
 
 
         static::creating(function ($model) {
+            $model->type = 'bd';
+
             if ($model->default) {
                 static::query()->update(['default' => 0]);
             }

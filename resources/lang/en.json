@@ -849,12 +849,15 @@
   "total_percentage_must_be_100": "Total percentage must be 100 exactly!",
   "app bd id":" Bd ID",
   "make_bd_default":"When you enable this option, this BD will become the default instead of the current default."
-,
-"default_current": "Current Default BD",
+    ,
+   "default_current": "This BD will become the default owner for any agency when its BD is deleted",
     "no_default_set": "No default BD has been set yet",
     "select_default_bd": "Select BD to be default",
     "set_as_default": "Set as Default BD",
-    "back": "Back"
+    "back": "Back",
+    "total proft":"total proft",
+    "default_status":"Default BD"
+
   
 
 }

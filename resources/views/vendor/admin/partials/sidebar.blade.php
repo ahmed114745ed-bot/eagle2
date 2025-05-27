@@ -30,12 +30,25 @@
               </span>
                 <ul class="dropdown-menu" role="menu" style="min-width: 210px;max-height: 300px;overflow: auto;">
 
-              
-                @foreach(Admin::menuLinks() as $link)
-                    <li>
-                        <a href="{{ admin_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
-                    </li>
-                    @endforeach
+                    @if (Admin::user()->type == 'bd')
+
+                        @foreach(Admin::menuLinks() as $link)
+                            <li>
+                                <a href="{{ bd_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                            </li>
+                        @endforeach
+
+                    @endif
+
+
+                    @if (Admin::user()->type != 'bd')
+
+                        @foreach(Admin::menuLinks() as $link)
+                            <li>
+                                <a href="{{ admin_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                            </li>
+                        @endforeach
+                    @endif
                 </ul>
             </div>
         </form>
@@ -49,7 +62,7 @@
             $menu = Admin::menu();
 
             $filteredMenu = collect($menu)->filter(function ($item) {
-                if ((Str::startsWith($item['uri'] ?? '', 'bd') || ($item['uri'] ?? '') === '*') && !Admin::user()->inRoles(['bd'])) {
+                if ((Str::startsWith($item['uri'] ?? '', 'bd') || ($item['uri'] ?? '') === '*') && !Admin::user()->type == 'bd') {
                     return false; 
                 }
                 return true; 

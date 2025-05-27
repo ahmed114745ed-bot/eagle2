@@ -2636,7 +2636,7 @@
 "total_percentage_must_be_100": "يجب أن يكون مجموع النسب 100 بالضبط!",
 "app bd id":"معرف  Bd في التطبيق",
 "make_bd_default":"عند تفعيل هذا الاختيار سوف يصبح هذا bd هو الافتراضي  بدلا من الافتراضي الحالي",
-"default_current": "BD الافتراضي الحالي",
+"default_current": "سوف يصبح BD الافتراضي المالك الافتراضي لاي وكالة عند حذف BD الخاص بها",
 "no_default_set": "لم يتم تعيين BD افتراضي بعد",
 "select_default_bd": "اختر BD ليكون الافتراضي",
 "set_as_default": "تعيين كـ BD افتراضي",
@@ -2661,6 +2661,8 @@
   "browse change users agency Switch": "استعراض زر تغيير وكالة المستخدمين",
   "Delete Shipping Agency Switch": "زر حذف وكالة الشحن",
   "browse delete shipping agency Switch": "استعراض زر حذف وكالة الشحن",
-  "browse chang agency Switch": "استعراض زر تغيير الوكالة"
+  "browse chang agency Switch": "استعراض زر تغيير الوكالة",
+  "total proft":"الربح الكلي ",
+  "default_status":"BD افتراضي"
 
 }
