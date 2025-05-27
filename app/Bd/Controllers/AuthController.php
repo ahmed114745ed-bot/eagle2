@@ -62,7 +62,7 @@ class AuthController extends BaseAuthController
 
         $request->session()->regenerate();
         if ($this->guard()->user()->type === 'bd') {
-            return redirect()->route('admin.bd.home');
+            return redirect()->route('bd.home');
         }
 
         return redirect()->intended($request->url??$this->redirectPath());

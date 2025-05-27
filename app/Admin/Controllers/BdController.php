@@ -136,11 +136,10 @@ class BdController extends MainController
                 </div>
             ";
         });
-        $grid->column('default', __('status'))->display(function () {
+        $grid->column('default', __('default_status'))->display(function () {
             if ($this->default == 1) {
                 return <<<HTML
                     <span style="display: flex; align-items: center;">
-                        <strong style="color: green; margin-right: 5px;">✔</strong>
                         <span style="
                             font-size: smaller;
                             background: red;
@@ -213,7 +212,7 @@ class BdController extends MainController
             $actions->disableDelete();
             $model = $actions->row;
             $actions->add(new \App\Admin\Actions\DeleteBdAction());
-            $actions->add(new MakeBdDefultAction($model->id));
+            // $actions->add(new MakeBdDefultAction($model->id));
         });
 
 
