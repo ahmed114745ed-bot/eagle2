@@ -54,7 +54,10 @@ class UserRepository extends Repository
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');
             })
-            // ->where('type_user', 0)
+              ->where(function ($query) {
+                $query->where('is_bd', 0)
+                    ->orWhereNull('is_bd');
+            })
             ->whereDoesntHave('hostAgency', function ($query) {
                 $query->where('type', 1);
             })
