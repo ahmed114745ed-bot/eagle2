@@ -264,37 +264,78 @@ class GiftController extends MainController
             ->attribute(['id' => 'max_percentage']);
 
         // Add custom JS
+        // Replace your existing script section with this:
         $script = <<<SCRIPT
-             $(document).ready(function() {
-                 function toggleWinProbability() {
-                     var type = $('#type').val();
-                     if(type == '6') {
-                         $('#win_probability').closest('.form-group').show();
-                         $('#min_percentage').closest('.form-group').show();
-                         $('#mid_percentage').closest('.form-group').show();
-                         $('#max_percentage').closest('.form-group').show();
-                     } else if(type == '9'){
-                       $('#vip_level').closest('.form-group').show();
-                        $('#win_probability').closest('.form-group').hide();
-                         $('#min_percentage').closest('.form-group').hide();
-                         $('#mid_percentage').closest('.form-group').hide();
-                         $('#max_percentage').closest('.form-group').hide();
-                      }
-                         else {
-                         $('#win_probability').closest('.form-group').hide();
-                         $('#min_percentage').closest('.form-group').hide();
-                         $('#mid_percentage').closest('.form-group').hide();
-                         $('#max_percentage').closest('.form-group').hide();
-                         $('#vip_level').closest('.form-group').hide();
-                     }
-                 }
-                 toggleWinProbability();
+console.log('Script loaded');
+(function() {
+    function initializeFormToggle() {
+        if (typeof jQuery === 'undefined') {
+            setTimeout(initializeFormToggle, 100);
+            return;
+        }
 
-                 $('#type').change(function() {
-                     toggleWinProbability();
-                 });
-             });
-             SCRIPT;
+        jQuery(function($) {
+            var maxAttempts = 50;
+            var attempts = 0;
+
+            function waitForFormElements() {
+                attempts++;
+
+                if ($('#type').length === 0 && attempts < maxAttempts) {
+                    setTimeout(waitForFormElements, 100);
+                    return;
+                }
+
+                if ($('#type').length === 0) {
+                    console.error('Form elements not found after', maxAttempts, 'attempts');
+                    return;
+                }
+
+                setupFormToggle();
+            }
+
+            function setupFormToggle() {
+                function toggleWinProbability() {
+                    var type = $('#type').val();
+
+                    var fieldsToToggle = {
+                        'win_probability': type == '6',
+                        'min_percentage': type == '6',
+                        'mid_percentage': type == '6',
+                        'max_percentage': type == '6',
+                        'vip_level': type == '9'
+                    };
+
+                    $.each(fieldsToToggle, function(fieldId, shouldShow) {
+                        var element = $('#' + fieldId);
+                        if (element.length > 0) {
+                            element.closest('.form-group')[shouldShow ? 'show' : 'hide']();
+                        }
+                    });
+                }
+
+                // Initial toggle
+                toggleWinProbability();
+
+                // Bind change event
+                $('#type').on('change.giftForm', function() {
+                    toggleWinProbability();
+                });
+            }
+
+            waitForFormElements();
+        });
+    }
+
+    // Initialize when DOM is ready or immediately if already ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeFormToggle);
+    } else {
+        initializeFormToggle();
+    }
+})();
+SCRIPT;
+
         Admin::script($script);
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
         if (!$form->isEditing()) {
