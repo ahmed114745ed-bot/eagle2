@@ -19,18 +19,20 @@ class AuthenticateWeb
     public function handle($request, Closure $next)
     {
         \config(['auth.defaults.guard' => 'admin']);
+        $uri = $request->path(); 
 
         $redirectTo = admin_base_path(config('admin.auth.redirect_to', 'auth/login'));
         $test = $request->getRequestUri();  // Or any other value you want to pass
-
+        if (Str::contains($uri, 'bd')) {
+            $redirectTo = '/bd/login';
+        }
         // If the user is not authenticated, redirect to login and pass the $test variable as a query parameter
         if (Admin::guard()->guest() && !$this->shouldPassThrough($request)) {
             return redirect()->to($redirectTo . '?redirect_url=' . urlencode($test));
         }
 
         $user = Admin::user();
-        $uri = $request->path(); 
-
+        
         if (Str::contains($uri, 'bd') && !$user->inRoles(['bd'])) {
             abort(403, 'غير مصرح بالدخول');
         }
