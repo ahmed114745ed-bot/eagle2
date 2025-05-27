@@ -1035,10 +1035,7 @@ class UserController extends MainController
 
         $pack->delete();
 
-        return response()->json([
-            'status' => 200,
-            'message' => __('successful'),
-        ]);
+         return Redirect::back();
     }
 
     public function free(Request $request)

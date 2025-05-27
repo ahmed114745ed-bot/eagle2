@@ -1088,8 +1088,8 @@
                         </div>
                         <div class="modal-footer mt-3">
                             <button class="btn btn-secondary" type="button"
-                                data-bs-dismiss="modal">{{ __('validation.cancel') }} </button>
-                            <button class="btn btn-primary add_country" type="submit">{{ __('validation.save') }}
+                                data-bs-dismiss="modal">{{ __('cancel') }} </button>
+                            <button class="btn btn-primary add_country" type="submit">{{ __('save') }}
                             </button>
                         </div>
                     </form>
