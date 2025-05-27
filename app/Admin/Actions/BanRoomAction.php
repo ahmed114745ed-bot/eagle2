@@ -33,10 +33,12 @@ class BanRoomAction extends Action
     public function handle(Request $request)
     {
 
-        if (!AdminAuth::user()->can('*')){
-            Permission::check('create-'.$this->permission_name);
+        if (!AdminAuth::user()->can('*')) {
+            Permission::check('create-' . $this->permission_name);
         }
-        $room = Room::find($request->room_id);
+        $user = User::query()->searchByUuid($request->uuid)->first();
+        if (!$user) return $this->response()->error('user not found')->refresh();
+        $room = Room::where('uid', $user->id)->first();
         if (!$room) {
             return $this->response()->error(__('room not found'))->refresh();
         }
@@ -93,7 +95,7 @@ class BanRoomAction extends Action
 
     public function form()
     {
-        $this->text('room_id', __('Room Id'));
+        $this->text('uuid', __('uuid'));
         $this->integer('duration', __('duration(hours)'))->rules('required|max:6');
     }
 
