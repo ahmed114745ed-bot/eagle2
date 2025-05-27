@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\MessageBag;
 
 class PreventDelete
 {
@@ -18,7 +19,15 @@ class PreventDelete
     {
         if ($request->input('_action') === 'Encore_Admin_Grid_Actions_Delete' || $request->input('_method') == "PUT") {
             if($request->input('_method') == "PUT"){
-                throw new Exception("لا يمكنك الحذف لان دي نسخه تجريبيه!");
+                // throw new Exception("لا يمكنك الحذف لان دي نسخه تجريبيه!");
+                $message ="لا يمكنك الحذف لان دي نسخه تجريبيه!";
+                $error = new MessageBag([
+                    'title'   => __(''),
+                    'message' => $message,
+                ]);
+        
+                session()->flash('error', $error);
+                throw new Exception($message);
             }
             return response()->json([
                 'status'  => false,
