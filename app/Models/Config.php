@@ -58,10 +58,19 @@ class Config extends Model
                 unset($model->valueInteger);
             }
             $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
+            info('model before '.config('broadcasting.connections.pusher.key'));
+            info('model before '.config('broadcasting.connections.pusher.secret'));
+            info('model before '.config('broadcasting.connections.pusher.app_id'));
+            info('model before '.config('broadcasting.connections.pusher.options.cluster'));
             if (in_array($model->name, $keys)) {
                 Cache::forget('pusher_config');
-                Artisan::call('config:cache');
+                $configClear = Artisan::call('config:cache');
+                info('config clear'.$configClear);
             }
+            info('model after '.config('broadcasting.connections.pusher.key'));
+            info('model after '.config('broadcasting.connections.pusher.secret'));
+            info('model after '.config('broadcasting.connections.pusher.app_id'));
+            info('model after '.config('broadcasting.connections.pusher.options.cluster'));
         });
     }
 }

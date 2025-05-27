@@ -129,12 +129,15 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
-        info(config('update Before'.'broadcasting.connections.pusher.key'));
-        info(config('update Before'.'broadcasting.connections.pusher.secret'));
-        info(config('update Before'.'broadcasting.connections.pusher.app_id'));
-        info(config('update Before'.'broadcasting.connections.pusher.options.cluster'));
+        info('update Before '.config('broadcasting.connections.pusher.key'));
+        info('update Before '.config('broadcasting.connections.pusher.secret'));
+        info('update Before '.config('broadcasting.connections.pusher.app_id'));
+        info('update Before '.config('broadcasting.connections.pusher.options.cluster'));
 
         Cache::forget('pusher_config');
+
+        $configClear = Artisan::call('config:cache');
+        info('config clear'.$configClear);
 
         $keys = array_keys($request->all());
 
@@ -152,10 +155,10 @@ class ConfigController extends Controller
             $config->save();
         }
 
-        info(config('update After'.'broadcasting.connections.pusher.key'));
-        info(config('update After'.'broadcasting.connections.pusher.secret'));
-        info(config('update After'.'broadcasting.connections.pusher.app_id'));
-        info(config('update After'.'broadcasting.connections.pusher.options.cluster'));
+        info('update After '.config('broadcasting.connections.pusher.key'));
+        info('update After '.config('broadcasting.connections.pusher.secret'));
+        info('update After '.config('broadcasting.connections.pusher.app_id'));
+        info('update After '.config('broadcasting.connections.pusher.options.cluster'));
 
         return Redirect::back();
     }
