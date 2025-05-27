@@ -50,8 +50,9 @@ class AgencyUsersTargetResource extends JsonResource
         $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
             ->selectRaw("sum(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')->orderByRaw("exp desc")->limit(3)
-            ->get()->reject(function ($q) {
-                return $q->exp == 0;
+            ->get()
+            ->filter(function ($q) {
+                return $q->exp > 0;
             });
 
 
@@ -78,11 +79,9 @@ class AgencyUsersTargetResource extends JsonResource
                 'old_targets'  => $result,
             ],
             // 'top_users' => SenderGiftLogResource::collection($giftLog),
-            'top_users' => $giftLog->map(function ($log) {
-
-                                             return $log->sender?->profile?->avatar ?? '';
-
-                                 })->filter()->values()->toArray(),
+           'top_users' => $giftLog->map(function ($log) {
+                return $log->sender?->profile?->avatar ?? '';
+            })->filter()->values()->toArray(),
         ];
     }
 }
