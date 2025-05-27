@@ -42,6 +42,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use App\Models\Language;
+use Illuminate\Support\Facades\URL;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -52,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        // }
+
         if ($this->app->isLocal()) {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
