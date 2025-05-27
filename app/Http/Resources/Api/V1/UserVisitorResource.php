@@ -75,10 +75,10 @@ class UserVisitorResource extends JsonResource
             ],
             'vip'        => [
                 'level' => @$this->UserVip->level,
-                'img' => @$this->UserVip->OVip->img,
+                'img' => Common::ovip_center_rank_img($this->id),
             ],
 
-             'vips' => Common::ovip_center($this),
+
             'level'      => [
                 'receiver_img' => $imageReceiver ? @$imageReceiver->img : '',
                 'sender_img'   => $imageSender ? @$imageSender->img : '',
