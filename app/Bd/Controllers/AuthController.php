@@ -68,9 +68,10 @@ class AuthController extends BaseAuthController
         return redirect()->intended($request->url??$this->redirectPath());
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::guard('bd')->logout();
+        
+        $this->getLogout( $request);
         return redirect()->route('bd.login');
     }
 }
