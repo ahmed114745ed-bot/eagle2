@@ -129,7 +129,15 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
+        info('update Before '.config('broadcasting.connections.pusher.key'));
+        info('update Before '.config('broadcasting.connections.pusher.secret'));
+        info('update Before '.config('broadcasting.connections.pusher.app_id'));
+        info('update Before '.config('broadcasting.connections.pusher.options.cluster'));
+
         Cache::forget('pusher_config');
+
+        $configClear = Artisan::call('config:clear');
+        info('config clear'.$configClear);
 
         $keys = array_keys($request->all());
 
@@ -146,6 +154,11 @@ class ConfigController extends Controller
 
             $config->save();
         }
+
+        info('update After '.config('broadcasting.connections.pusher.key'));
+        info('update After '.config('broadcasting.connections.pusher.secret'));
+        info('update After '.config('broadcasting.connections.pusher.app_id'));
+        info('update After '.config('broadcasting.connections.pusher.options.cluster'));
 
         return Redirect::back();
     }
