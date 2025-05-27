@@ -54,6 +54,10 @@ return [
             'driver'   => 'session',
             'provider' => 'preview-admin',
         ],
+        'bd' => [
+            'driver' => 'session',
+            'provider' => 'bd_users',
+        ],
     ],
 
     /*
@@ -100,6 +104,10 @@ return [
 //                'model'  => Encore\Admin\Auth\Database\Administrator::class,
         ],
 
+        'bd_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Bd::class,
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

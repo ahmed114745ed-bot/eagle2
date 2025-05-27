@@ -70,7 +70,7 @@ class AgentSalaryTransactionController extends Controller
     public function chargeCoForUserHistory(Request $request)
     {
         $usrAuth = $request->user();
-        $agency = $usrAuth->ownAgency;
+        $agency = $usrAuth->shippingAgency;
         $search = $request->search;
         $type = $request->type;
         if (!$agency) {

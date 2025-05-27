@@ -45,7 +45,7 @@ class UpgradeReceiverLevelServices
         $oldReceiverLevel = $user->received_level;
         $subReceivedLevel = $user->sub_receiver_level;
 
-        $receiverLevel = (new UpdateUserWhenSendGift())->getReceiverLevel($user->total_diamond_received, 0, $subReceivedLevel);
+        $receiverLevel = (new UpdateUserWhenSendGift())->getReceiverLevel($user->total_received_diamonds, 0, $subReceivedLevel);
         if ($receiverLevel > $oldReceiverLevel) {
             $user->received_level = $receiverLevel;
             $hadNotRewards = $this->hadNotRewards($user->id, $user->total_received_level);

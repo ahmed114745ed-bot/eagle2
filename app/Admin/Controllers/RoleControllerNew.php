@@ -204,14 +204,63 @@ class RoleControllerNew extends MainController
         });
 
         $form->saved(function (Form $form) {
-
             $form->slug = Str::slug(request('name'));
-            $all = request('permissions_all'); // comma-separated string
 
-            $permissions = array_filter(explode(',', $all));
+            $all = request('permissions_all');
+            $selectedPermissionIds = array_filter(explode(',', $all));
 
-            $form->model()->permissions()->sync($permissions);
-            //  $form->model()->permissions()->sync(request('permissions', []));
+            $permissionModel = config('admin.database.permissions_model');
+            $allPermissions = $permissionModel::all();
+
+            $slugToId = $allPermissions->pluck('id', 'slug')->toArray();
+            $idToSlug = $allPermissions->pluck('slug', 'id')->toArray();
+
+            $resourceActions = [];
+            foreach ($selectedPermissionIds as $pid) {
+                $slug = $idToSlug[$pid] ?? '';
+                if (preg_match('/^(browse|create|edit|delete)\-(.+)$/', $slug, $m)) {
+                    $action = $m[1];
+                    $resource = $m[2];
+                    $resourceActions[$resource][$action] = true;
+                }
+            }
+
+            $finalPermissionIds = [];
+
+            foreach ($resourceActions as $resource => $actions) {
+                $hasBrowse = !empty($actions['browse']);
+                $hasCrud   = !empty($actions['create']) || !empty($actions['edit']) || !empty($actions['delete']);
+
+                if ($hasBrowse) {
+                    if (isset($slugToId["browse-$resource"])) $finalPermissionIds[] = $slugToId["browse-$resource"];
+                    foreach (['create', 'edit', 'delete'] as $act) {
+                        if (!empty($actions[$act]) && isset($slugToId["$act-$resource"])) {
+                            $finalPermissionIds[] = $slugToId["$act-$resource"];
+                        }
+                    }
+                } elseif ($hasCrud) {
+                    if (isset($slugToId["browse-$resource"])) $finalPermissionIds[] = $slugToId["browse-$resource"];
+                    foreach (['create', 'edit', 'delete'] as $act) {
+                        if (!empty($actions[$act]) && isset($slugToId["$act-$resource"])) {
+                            $finalPermissionIds[] = $slugToId["$act-$resource"];
+                        }
+                    }
+                }
+            }
+
+            foreach ($selectedPermissionIds as $pid) {
+                $slug = $idToSlug[$pid] ?? '';
+                if (!preg_match('/^(browse|create|edit|delete)\-(.+)$/', $slug)) {
+                    $finalPermissionIds[] = $pid;
+                }
+            }
+
+            $finalPermissionIds = array_unique($finalPermissionIds);
+
+            $form->model()->permissions()->sync($finalPermissionIds);
+
+            admin_toastr(__('Updated successfully'), 'success');
+            return redirect(admin_url('roles/' . $form->model()->id . '/edit'));
         });
 
         return $form;

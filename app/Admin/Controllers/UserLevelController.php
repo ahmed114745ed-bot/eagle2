@@ -100,14 +100,13 @@ class UserLevelController extends MainController
         $grid->column('total_sender_level', __('Sender Level'))
             ->display(function ($value) use ($arrowIcon) {
 
-                $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
+                $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
                 $vip=Vip::find($value);
                 $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
-    
+
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
-                            <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
+                        <img src='$avatar' alt='User Avatar' style='width: 64px; height: 16px;'>
                             <span>$value</span>
-                           
                             <img src='$arrowIcon' style='width: 16px; height: 16px;'>
                         </div>";
             });
@@ -115,12 +114,12 @@ class UserLevelController extends MainController
         $grid->column('total_received_level', __('Received Level'))
             ->display(function ($value) use ($arrowIcon) {
 
-                $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
+                $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
                 $vip=Vip::find($value);
                 $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
+                        <img src='$avatar' alt='User Avatar' style='width: 64px; height: 16px;'>
                             <span>$value</span>
                             <img src='$arrowIcon' style='width: 16px; height: 16px;'>
                         </div>";

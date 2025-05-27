@@ -111,18 +111,20 @@ class RequestBackgroundImageController extends MainController
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = url("admin/rooms/{$this->owner?->ownerRoom?->id}");
 
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
-                    </div>
+            $escapedName = json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
+            $escapedName = substr($escapedName, 1, -1);
 
-                </div>
-            ";
+            return <<<EOT
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            $image
+                            <div>
+                                  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                                    <span style='text-decoration: underline; cursor: pointer;'>$escapedName</span>
+                                  </a>
+                                <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
+                            </div>
+                        </div>
+                     EOT;
         });
 
         $grid->column('owner.name', __('owner'))
@@ -132,24 +134,26 @@ class RequestBackgroundImageController extends MainController
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
-                // Check if the image exists
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
 
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $image = handleShowImageWithTypes($this->owner->id, $url, 40, 40);
                 $showUrl = url("admin/users/{$this->owner->id}");
-                return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        $image
-                        <div>
-                           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                            </a>
-                            <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                $escapedName = json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
+                $escapedName = substr($escapedName, 1, -1);
+
+                return <<<EOT
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            $image
+                            <div>
+                                  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                                    <span style='text-decoration: underline; cursor: pointer;'>$escapedName</span>
+                                  </a>
+                                <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                            </div>
                         </div>
-                    </div>
-                ";
+                     EOT;
             });
 
         $grid->img(__('image'))->display(function ($img) {

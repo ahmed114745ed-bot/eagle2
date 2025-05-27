@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers\BDControllers;
+namespace App\Bd\Controllers;
 
 use App\Models\Agency;
 use Encore\Admin\Form;
@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RequestAgencyController extends MainController
 {
+     public $permission_name = 'request-agencies';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");

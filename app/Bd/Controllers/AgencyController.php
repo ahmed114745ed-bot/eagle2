@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers\BDControllers;
+namespace App\Bd\Controllers;
 
 use App\Admin\Controllers\MainController;
 use Carbon\Carbon;
@@ -425,12 +425,18 @@ class AgencyController extends MainController
             ";
         });
 
-        $grid->actions(function ($actions) {
+         $grid->actions(function ($actions) {
             $model = $actions->row;
             // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
-            $actions->add(new DeleteAgencyAction());
-            $actions->add(new ChangeUsersAgencyAction($model->id));
+            if (Admin::user()->can('browse-' . 'delete-agency-Switch') || Admin::user()->can('*')) {
+
+                $actions->add(new DeleteAgencyAction());
+            }
+            if (Admin::user()->can('browse-' . 'change-users-agency-Switch') || Admin::user()->can('*')) {
+
+                $actions->add(new ChangeUsersAgencyAction($model->id));
+            }
         });
         $grid->disableExport();
 

@@ -3,8 +3,6 @@
 namespace Modules\SalaryTransaction\Http\Controllers;
 
 use App\Admin\Controllers\MainController;
-use App\Models\Agency;
-use App\Models\ChargeAgency;
 use App\Models\ShippingAgency;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;

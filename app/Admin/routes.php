@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\BDControllers\RequestAgencyController;
+use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BDControllers\WalletController;
@@ -115,6 +116,24 @@ Route::group(
         Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin');
     }
 );
+    Route::group(
+        [
+            'prefix' => config('admin.route.prefix'),
+            'namespace' => '',
+            'middleware' => [
+                'web',
+
+                'multiLanguage',
+            ],
+            'as' => config('admin.route.prefix') . '.',
+        ],
+        function (Router $router) {
+
+            require base_path('app/Bd/routes.php');
+
+
+        }
+    );
 
 Route::group(
     [
@@ -180,7 +199,7 @@ Route::group(
         $router->post('agency-user-job/{agency_id}', 'AgencyUserJobController@store');
         $router->get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         $router->get('agency-statistic', 'AgencyStatisticController@index');
-        $router->get('agency-settings', 'AgencySettingController@index');
+    //    $router->get('agency-settings', 'AgencySettingController@index');
 
         $router->resource('test-test', 'TestTestController');
         $router->get('profile', [AdminAuthController::class, 'index']);
@@ -272,7 +291,7 @@ Route::group(
         $router->resource('vip_prev', 'VipAuthController');
         $router->resource('agencies', 'AgencyController');
         $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
-         $router->get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'profile'])->name('shipping.agency.profile');
+        $router->get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
         $router->post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         $router->post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
         $router->post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
@@ -335,7 +354,6 @@ Route::group(
         $router->get('/dev', 'HomeController@devindex')->name('dev-home');
         $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
         $router->resource('manger-types', 'MangerTypeController');
-        $router->resource('chat-letters', ChatLetterController::class);
         $router->resource('userscharg', chargUsersSleemController::class);
         $router->resource('image-colors', ImageColorController::class);
         $router->resource('agency_join_requests', 'AgencyJoinRequestController');
@@ -360,6 +378,14 @@ Route::group(
         });
 
         $router->resource('usersBd', BdController::class);
+
+        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+
+
+        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
+        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
+        // Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
         $router->resource('ovip', 'OVipController');
@@ -525,22 +551,23 @@ Route::group(
         });
 
 
-        Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
-            $router->get('/', 'HomeController@index')->name('home');
-            $router->get('/charges', 'ChargeController@index')->name('charges');
-            $router->resource('/agencies', 'AgencyController');
-            $router->resource('/salaries', 'BdSalariesController');
-            $router->resource('charges', 'ChargeController');
-            // $router->resource('/wallet', 'WalletController');
-            Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
-            Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
 
-        });
-        $router->resource('/request-agencies', RequestAgencyController::class);
+        // Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
+        //     $router->get('/', 'HomeController@index')->name('home');
+        //     $router->get('/charges', 'ChargeController@index')->name('charges');
+        //     $router->resource('/agencies', 'AgencyController');
+        //     $router->resource('/salaries', 'BdSalariesController');
+        //     $router->resource('charges', 'ChargeController');
+        //     // $router->resource('/wallet', 'WalletController');
+        //     Route::post('admin/wallet/charge', [\App\Bd\Controllers\WalletController::class, 'charge'])->name('wallet.charge');
+        //     Route::post('admin/salary/transfer', [\App\Bd\Controllers\WalletController::class, 'transfer'])->name('salary.transfer');
 
-        
-        
-    
+        // });
+        // $router->resource('/request-agencies', \App\Bd\Controllers\RequestAgencyController::class);
+
+
+
+
     }
 
 

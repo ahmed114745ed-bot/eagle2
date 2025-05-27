@@ -19,10 +19,16 @@ class AgencyRepository extends AbstractRepository
         parent::__construct(new Agency());
     }
 
+    public function findByOwner($ownerId, $status = null)
+    {
+        $data =  $this->model->where('app_owner_id', $ownerId);
+        if ($status) $data->where('status', $status);
+        return  $data->first();
+    }
 
     public function findAgencyByOwnerId($ownerId, $status = null)
     {
-        $data = $this->model->withoutGlobalScope(HostAgencyScope::class)->where('app_owner_id', $ownerId);
+        $data = $this->model->where('app_owner_id', $ownerId);
         if ($status) $data->where('status', $status);
         return  $data->first();
     }
@@ -44,13 +50,13 @@ class AgencyRepository extends AbstractRepository
     public function findById($id)
     {
 
-        return $this->model->withoutGlobalScope(HostAgencyScope::class)->with(['additionalInfo', 'mempers', 'admins'])
+        return $this->model->with(['additionalInfo', 'mempers', 'admins','userSalaries'])
             ->withCount('mempers')
             ->where('id', $id)->first();
     }
     public function findByStatus($id)
     {
-        return $this->model->withoutGlobalScope(HostAgencyScope::class)->with('additionalInfo')->where('id', $id)->where('status', 1)->first();
+        return $this->model->with('additionalInfo')->where('id', $id)->where('status', 1)->first();
     }
 
     public function findFomAll($id)
@@ -81,7 +87,7 @@ class AgencyRepository extends AbstractRepository
 
     public function members($agency)
     {
-        return $agency->mempers()->where('id', '!=', $agency->app_owner_id)->orderBy('monthly_diamond_received', 'desc')->paginate(20);
+        return $agency->mempers()->where('id', '!=', $agency->app_owner_id)->orderBy('monthly_diamond_received', 'desc')->whereDoesntHave('agencyAdmins')->paginate(20);
     }
 
     public function userMembers($agency, $type = null, $userIds = null)
@@ -92,7 +98,7 @@ class AgencyRepository extends AbstractRepository
 
     public function getWithSelectMonthAndYear($agencyId)
     {
-        return $this->model->withoutGlobalScope(HostAgencyScope::class)->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, created_at')->where('id', $agencyId)->first();
+        return $this->model->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, created_at')->where('id', $agencyId)->first();
     }
 
     public function updateAgency($agency)
@@ -110,7 +116,7 @@ class AgencyRepository extends AbstractRepository
 
     public function getByAdditionalInfo()
     {
-        return $this->model->withoutGlobalScope(HostAgencyScope::class)->where('status', 0)->whereHas('additionalInfo', function ($query) {
+        return $this->model->where('status', 0)->whereHas('additionalInfo', function ($query) {
             $query->where('status', 0);
         })->with('additionalInfo')->get();
     }
@@ -145,7 +151,7 @@ class AgencyRepository extends AbstractRepository
 
     public function agencyById($id)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class)->where(function ($query) {
+        return  $this->model->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
                 'additionalInfo',
                 function ($query) {
@@ -180,24 +186,21 @@ class AgencyRepository extends AbstractRepository
 
     public function getAgencyByFilter($keyword)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class)
+        return  $this->model
             ->with('owner')
             ->where(function ($q) use ($keyword) {
-                $q->where('id', 'like', '%' . $keyword . '%')
-                    ->orWhereHas('owner', function ($query) use ($keyword) {
-                        $query->where('uuid', 'like', '%' . $keyword . '%');
-                    });
+                $q->where('id', 'like', '%' . $keyword . '%');
             })->take(10)->get();
     }
 
     public function countAgencyUserAdmin($userId)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class)->where('agency_manger_id', $userId)->count();
+        return  $this->model->where('agency_manger_id', $userId)->count();
     }
 
     public function getByAgencyMangerId($agencyMangerId)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class)->where('agency_manger_id', $agencyMangerId)->with('owner')->get();
+        return  $this->model->where('agency_manger_id', $agencyMangerId)->with('owner')->get();
     }
 
     public function getAdminByUserId($userId)
@@ -244,7 +247,7 @@ class AgencyRepository extends AbstractRepository
 
     public function report($id, $month = null, $year = null, $perPage, $page)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class)->when(isset($id), function ($query) use ($id) {
+        return  $this->model->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->whereHas('agencySalaries', function ($q) use ($month, $year) {
             $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {

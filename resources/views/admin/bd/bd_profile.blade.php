@@ -844,7 +844,7 @@
                 <div class="section-header">
                     <h2 class="section-title">
                         <i class="fas fa-star"></i>
-                        {{ __('total salary') }}
+                        {{ __('total proft') }}
                     </h2>
                 </div>
                     <div class="avatar-grid">
@@ -955,8 +955,17 @@
     </div>
 @endif
 
+@if($activeTab === 'transactions')
+
+<div class="tab-content active" id="members-tab">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ __('transactions') }}</h3>
+                <span class="badge count-badge">{{ optional($transactions)->total() ?? 0 }}</span>
+            </div>
 <!-- Charges Tab -->
 @if($transactions && $transactions->count())
+
     <div class="table-responsive">
         <table class="data-table" id="charge">
             <thead>
@@ -1078,6 +1087,9 @@
         <i class="fas fa-info-circle"></i>
         <p>{{ __('No transactions found') }}</p>
     </div> -->
+@endif
+</div>
+</div>
 @endif
 
 

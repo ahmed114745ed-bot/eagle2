@@ -45,10 +45,10 @@ class AgencyController extends MainController
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
 
-//    public function __construct()
-//    {
-//        (new AppFeatureService)->validateStatusEnable("agencies");
-//    }
+    //    public function __construct()
+    //    {
+    //        (new AppFeatureService)->validateStatusEnable("agencies");
+    //    }
 
     public function index(Content $content)
     {
@@ -438,7 +438,8 @@ class AgencyController extends MainController
               <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
         </div>";
         });
-        $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
+        $grid->column('alary', __('Agency wallet'))->display(function ($coin) {
+            $coin = $this->salary;
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
@@ -453,8 +454,14 @@ class AgencyController extends MainController
             $model = $actions->row;
             // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
-            $actions->add(new DeleteAgencyAction());
-            $actions->add(new ChangeUsersAgencyAction($model->id));
+            if (Admin::user()->can('browse-' . 'delete-agency-Switch') || Admin::user()->can('*')) {
+
+                $actions->add(new DeleteAgencyAction());
+            }
+            if (Admin::user()->can('browse-' . 'change-users-agency-Switch') || Admin::user()->can('*')) {
+
+                $actions->add(new ChangeUsersAgencyAction($model->id));
+            }
         });
         $grid->disableExport();
 
@@ -612,6 +619,13 @@ class AgencyController extends MainController
         $form->display('ID');
         if (!$form->isEditing()) {
             $form->row(function ($row) {
+                $row->width(12)->select('bd_id', __('app bd id'))->options(function ($value) {
+                    $ops2 = [];
+                    foreach (User::Where('id', $value)->get() as $user) {
+                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                    }
+                    return $ops2;
+                })->ajax('/api/search/users-bd2', 'id', 'name')->rules('required');
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
                     $ops2 = [];
                     foreach (User::Where('id', $value)->get() as $user) {
@@ -634,6 +648,14 @@ class AgencyController extends MainController
         } else {
 
             $form->row(function ($row) {
+                $row->width(12)->select('bd_id', __('app bd id'))->options(function ($value) {
+                    $ops2 = [];
+                    foreach (User::Where('id', $value)->get() as $user) {
+                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                    }
+                    return $ops2;
+                })->ajax('/api/search/users-bd2', 'id', 'name')->rules('required');
+
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
                     $ops2 = [];
                     foreach (User::Where('id', $value)->get() as $user) {
@@ -813,6 +835,9 @@ class AgencyController extends MainController
         });
 
         $form->saved(function (Form $form) {
+            $user = User::find($form->model()->app_owner_id);
+            $user->monthly_diamond_received = 0;
+            $user->save();
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $form->model()->app_owner_id,
                 'agency_id' => $form->model()->id,

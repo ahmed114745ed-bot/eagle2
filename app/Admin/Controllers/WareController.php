@@ -71,7 +71,7 @@ class WareController extends MainController
      * @return Grid
      */
 
-     protected function grid()
+    protected function grid()
     {
         $grid = new Grid(new Ware);
         // $grid->model()->whereNot('get_type', 1);
@@ -116,9 +116,96 @@ class WareController extends MainController
         $grid->column('name', __('name'))->editable();
         if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
             $grid->column('price', __('price'))->editable();
-            $grid->setResource('wares/toggle-enable');
-            $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
-         
+            // $grid->setResource('wares/toggle-enable');
+            //  $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
+            $grid->column('enable', __('enable'))->display(function ($value) {
+                $checked = $value ? 'checked' : '';
+                $id = $this->id;
+
+                return <<<HTML
+                    <label class="switch">
+                        <input type="checkbox" class="toggle-enable" data-id="{$id}" {$checked}>
+                        <span class="slider round"></span>
+                    </label>
+                HTML;
+            });
+
+                Admin::style("
+                    .switch {
+                        position: relative;
+                        display: inline-block;
+                        width: 50px;
+                        height: 24px;
+                    }
+
+                    .switch input {
+                        opacity: 0;
+                        width: 0;
+                        height: 0;
+                    }
+
+                    .slider {
+                        position: absolute;
+                        cursor: pointer;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: #ccc;
+                        transition: .4s;
+                        border-radius: 24px;
+                    }
+
+                    .slider:before {
+                        position: absolute;
+                        content: '';
+                        height: 18px;
+                        width: 18px;
+                        left: 3px;
+                        bottom: 3px;
+                        background-color: white;
+                        transition: .4s;
+                        border-radius: 50%;
+                    }
+
+                    input:checked + .slider {
+                        background-color: #4CAF50;
+                    }
+
+                    input:checked + .slider:before {
+                        transform: translateX(26px);
+                    }
+                ");
+
+                Admin::script("
+                    $(document).off('change', '.toggle-enable').on('change', '.toggle-enable', function () {
+                        var id = $(this).data('id');
+                        var enable = $(this).is(':checked') ? 1 : 0;
+
+                        $.ajax({
+                            url: '/admin/wares/toggle-enable/' + id,
+                            method: 'PUT',
+                            data: {
+                                enable: enable,
+                                _token: LA.token
+                            },
+                            success: function (res) {
+                                if (res.status) {
+                                    toastr.success(res.message);
+                                } else {
+                                    toastr.error(res.message || 'حدث خطأ.');
+                                }
+                            },
+                            error: function (xhr) {
+                                let msg = xhr.responseJSON?.message || 'خطأ في الاتصال بالسيرفر.';
+                                toastr.error(msg);
+                            }
+                        });
+                    });
+                ");
+
+
+
         } else {
             $grid->column('price', __('price'));
         }
@@ -351,33 +438,33 @@ class WareController extends MainController
 
 
     public function toggleEnable($id, Request $request)
-{
-    try {
-        $ware = Ware::findOrFail($id);
+    {
+        try {
+            $ware = Ware::findOrFail($id);
 
-        if (!$request->has('enable')) {
+            if (!$request->has('enable')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Missing enable value.',
+                ], 422);
+            }
+
+
+            $enable = $request->input('enable') == '1' ? true : false;
+
+            $ware->enable = $enable;
+
+            $ware->save();
+            // dd($ware);
+            return response()->json([
+                'status' => true,
+                'message' => 'تم تحديث الحالة بنجاح.',
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Missing enable value.',
-            ], 422);
+                'message' => 'حدث خطأ أثناء الحفظ: ' . $e->getMessage(),
+            ], 500);
         }
-
-       
-        $enable = $request->input('enable') == '1' ? true : false;
-       
-        $ware->enable = $enable;  
-        
-        $ware->save();
-        dd($ware);
-        return response()->json([
-            'status' => true,
-            'message' => 'تم تحديث الحالة بنجاح.',
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'حدث خطأ أثناء الحفظ: ' . $e->getMessage(),
-        ], 500);
     }
-}
 }

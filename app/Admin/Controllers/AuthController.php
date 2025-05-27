@@ -93,7 +93,7 @@ class AuthController extends BaseAuthController
 
         $request->session()->regenerate();
         if (Auth::user()->roles->contains('slug', 'bd')) {
-            return redirect()->route('admin.bd.home');
+            return redirect()->route('bd.home');
         }
 
         return redirect()->intended($request->url??$this->redirectPath());

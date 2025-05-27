@@ -12,7 +12,7 @@ class ShippingAgencyRepository extends AbstractRepository
 {
 
     /**
-     * @param Model $model
+     * @param ShippingAgency $model
      */
     public function __construct()
     {
@@ -22,20 +22,12 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function findAgencyByOwnerId($ownerId, $status = null)
     {
-        $data = $this->model ->withoutGlobalScope(HostAgencyScope::class) ->where('app_owner_id', $ownerId);
+        $data = $this->model->where('app_owner_id', $ownerId);
         if ($status) $data->where('status', $status);
         return  $data->first();
 
     }
 
-    public function find($id){
-        // return $this->model->find($id);
-        $shipping = ShippingAgency::find( $id);
-        if ($shipping) {
-            return $shipping;
-        }
-        return Agency::find( $id);
-    }
 
     public function filterAgency($id)
     {
@@ -44,7 +36,7 @@ class ShippingAgencyRepository extends AbstractRepository
     public function findById($id)
     {
 
-        return $this->model ->withoutGlobalScope(HostAgencyScope::class) ->with(['additionalInfo', 'mempers','admins'])
+        return $this->model  ->with(['additionalInfo', 'mempers','admins'])
         ->withCount('mempers')
         ->where('id', $id)->first();
 
@@ -52,7 +44,7 @@ class ShippingAgencyRepository extends AbstractRepository
     }
     public function findByStatus($id)
     {
-        return $this->model ->withoutGlobalScope(HostAgencyScope::class) ->with('additionalInfo')->where('id', $id)->where('status', 1)->first();
+        return $this->model  ->with('additionalInfo')->where('id', $id)->where('status', 1)->first();
 
     }
 
@@ -95,7 +87,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getWithSelectMonthAndYear($agencyId)
     {
-        return $this->model ->withoutGlobalScope(HostAgencyScope::class) ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, created_at')->where('id', $agencyId)->first();
+        return $this->model  ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, created_at')->where('id', $agencyId)->first();
     }
 
     public function updateAgency($agency)
@@ -113,7 +105,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getByAdditionalInfo()
     {
-        return $this->model ->withoutGlobalScope(HostAgencyScope::class) ->where('status', 0)->whereHas('additionalInfo', function ($query) {
+        return $this->model  ->where('status', 0)->whereHas('additionalInfo', function ($query) {
             $query->where('status', 0);
         })->with('additionalInfo')->get();
 
@@ -122,7 +114,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getActiveAgency($id, $perPage, $page)
     {
-        return $this->model ->withoutGlobalScope(HostAgencyScope::class) ->where(function ($query) {
+        return $this->model  ->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
                 'additionalInfo',
                 function ($query) {
@@ -137,7 +129,7 @@ class ShippingAgencyRepository extends AbstractRepository
     }
 
     public function getAllActiveAgency($id){
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->when(isset($id), function ($query) use ($id) {
+        return  $this->model ->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
@@ -150,7 +142,7 @@ class ShippingAgencyRepository extends AbstractRepository
     }
 
     public function agencyById($id){
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->where(function ($query) {
+        return  $this->model->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
                 'additionalInfo',
                 function ($query) {
@@ -163,11 +155,11 @@ class ShippingAgencyRepository extends AbstractRepository
     public function getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status = null, $action = null)
     {
         if ($action == null) {
-            $agencies =    $this->model->withoutGlobalScope(HostAgencyScope::class) ->where('status', 0)->whereHas('additionalInfo', function ($query) {
+            $agencies =    $this->model ->where('status', 0)->whereHas('additionalInfo', function ($query) {
                 $query->where('status', 0);
             });
         } else {
-            $agencies =    $this->model->withoutGlobalScope(HostAgencyScope::class) ->where('status', '!=', 0)->whereHas('additionalInfo', function ($query) {
+            $agencies =    $this->model  ->where('status', '!=', 0)->whereHas('additionalInfo', function ($query) {
                 $query->where('status', '!=', 0);
             });
         }
@@ -185,7 +177,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getAgencyByFilter($keyword)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class)
+        return  $this->model
             ->with('owner')
             ->where(function ($q) use ($keyword) {
                 $q->where('id', 'like', '%' . $keyword . '%')
@@ -197,12 +189,12 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function countAgencyUserAdmin($userId)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->where('agency_manger_id', $userId)->count();
+        return  $this->model->where('agency_manger_id', $userId)->count();
     }
 
     public function getByAgencyMangerId($agencyMangerId)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->where('agency_manger_id', $agencyMangerId)->with('owner')->get();
+        return  $this->model ->where('agency_manger_id', $agencyMangerId)->with('owner')->get();
     }
 
     public function getAdminByUserId($userId)
@@ -217,7 +209,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getAgencyByOwnerId($ownerId)
     {
-        return Agency::where('app_owner_id', $ownerId)->first();
+        return $this->model->where('app_owner_id', $ownerId)->first();
     }
 
     public function getJoinRequests($agencyId)
@@ -227,12 +219,12 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getByIds($ids)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->whereIn('id', $ids)->get();
+        return  $this->model ->whereIn('id', $ids)->get();
     }
 
     public function agencies($id, $search, $perPage, $page)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->where('id', '!=', $id)->where(function ($query) {
+        return  $this->model  ->where('id', '!=', $id)->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
                 'additionalInfo',
                 function ($query) {
@@ -249,7 +241,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function report($id, $month = null, $year = null, $perPage, $page)
     {
-       return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->when(isset($id), function ($query) use ($id) {
+       return  $this->model  ->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->whereHas('agencySalaries', function ($q) use ($month, $year) {
             $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {
@@ -270,7 +262,7 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function getChargeAgency($id)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->whereHas('chargeAgency')->when(isset($id), function ($query) use ($id) {
+        return  $this->model->whereHas('chargeAgency')->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->get();
     }

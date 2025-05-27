@@ -15,6 +15,24 @@
     "App": "Application",
     "Email": "Email",
     "action": "Action",
+    "Browse Ticket": "View Complaints",
+    "Create Ticket": "Create Complaint",
+    "delete Ticket": "delete Complaint ",
+    "Edit Ticket": "Edit Complaint",
+    "browse image color": "browse color id",
+  "create image color": "create color id",
+    "delete image color": "delete color id",
+  "edit image color": "edit color id",
+  "show image color": "show color id",
+  "browse sailer": "Browse Users' Wallet",
+  "browse users hunters" :"browse users host",
+  "create users hunters":"create user host",
+  "delete users hunters":"delete users host",
+  "edit users hunters" : "edit users host",
+"browse user_achievement_level": "browse Achievement Reports",
+"create user_achievement_level": "create Achievement Reports",
+"delete user_achievement_level": "delete Achievement Reports",
+"edit user_achievement_level": "edit Achievement Reports",
     "male": "Male",
     "agency profile" : "agency profile",
     "registered successfully": "Registered Successfully",
@@ -826,9 +844,17 @@
   "Created At": "Created At",
   "No target history found": "No target history found",
   "set_bd_as_default":"default bd",
-   "bd_already_default": "This BD is already default",
-    "bd_set_default_success": "BD set as default successfully"
-
+  "bd_already_default": "This BD is already default",
+  "bd_set_default_success": "BD set as default successfully",
+  "total_percentage_must_be_100": "Total percentage must be 100 exactly!",
+  "app bd id":" Bd ID",
+  "make_bd_default":"When you enable this option, this BD will become the default instead of the current default."
+,
+"default_current": "Current Default BD",
+    "no_default_set": "No default BD has been set yet",
+    "select_default_bd": "Select BD to be default",
+    "set_as_default": "Set as Default BD",
+    "back": "Back"
   
 
 }
