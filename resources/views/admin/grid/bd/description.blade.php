@@ -1,1 +1,1 @@
-<h1>{{ __("bdDescription") }}</h1>
+<h6>{{ __("bdDescription") }}</h6>
