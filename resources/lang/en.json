@@ -918,9 +918,7 @@
     "Config": "Configurations",
     "Daily Prize": "Login Reward",
     "Level Interval": "Level Gifts",
-    "bdDescription": "To ensure smooth operations, it's essential to create a virtual BD that you manage. All agencies that aren't affiliated with a specific BD are automatically assigned to this virtual BD.
-When a BD is deleted, the agencies associated with it are transferred to the virtual BD, ensuring uninterrupted management. If there isn't a virtual BD, the user will need to enter the BD ID when requesting to open an agency, but they won't be able to operate it without a specific BD.
-Therefore, it's always advisable to create and manage a virtual BD to ensure continuity of operations",
+    "bdDescription": "To ensure smooth operations, it's essential to create a virtual BD that you manage. All agencies that aren't affiliated with a specific BD are automatically assigned to this virtual BD.\nWhen a BD is deleted, the agencies associated with it are transferred to the virtual BD, ensuring uninterrupted management. If there isn't a virtual BD, the user will need to enter the BD ID when requesting to open an agency, but they won't be able to operate it without a specific BD.\nTherefore, it's always advisable to create and manage a virtual BD to ensure continuity of operations.",
     "default_status":"Default BD"
 
 
