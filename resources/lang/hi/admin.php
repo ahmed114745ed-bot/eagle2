@@ -203,7 +203,7 @@ return [
     "country_code" => 'देश कोड',
     "Tencent" => 'Tencent',
     "lucky_flex" => "लकी फ्लेक्स",
-    "guess_the_word" => "शब्द का अनुमान लगाएं",
+    "chess" => "शतरंज",
 
     // Fawry
     "fawry_secret" => "गुप्त कुंजी",

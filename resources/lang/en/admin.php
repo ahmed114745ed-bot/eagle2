@@ -218,7 +218,7 @@ return [
     "country_code" => 'Country Code',
     "Tencent" => 'Tencent',
     "lucky_flex" => "Lucky Flex",
-    "guess_the_word" => "Guess The Word",
+    "chess" => "Chess",
 
     // Fawry
     "fawry_secret" => "Secret",
