@@ -64,7 +64,8 @@ class Config extends Model
             info('model before '.config('broadcasting.connections.pusher.options.cluster'));
             if (in_array($model->name, $keys)) {
                 Cache::forget('pusher_config');
-                Artisan::call('config:cache');
+                $configClear = Artisan::call('config:cache');
+                info('config clear'.$configClear);
             }
             info('model after '.config('broadcasting.connections.pusher.key'));
             info('model after '.config('broadcasting.connections.pusher.secret'));

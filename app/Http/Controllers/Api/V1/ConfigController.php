@@ -136,6 +136,9 @@ class ConfigController extends Controller
 
         Cache::forget('pusher_config');
 
+        $configClear = Artisan::call('config:cache');
+        info('config clear'.$configClear);
+
         $keys = array_keys($request->all());
 
         foreach ($keys as $key) {
