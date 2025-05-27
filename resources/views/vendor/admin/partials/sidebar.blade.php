@@ -4,21 +4,21 @@
     <section class="sidebar">
 
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel">
-            <div class="pull-left image">
-                <img src="{{ Admin::user()->image }}" class="img-circle" alt="User Image">
-            </div>
-            <div class="pull-left info">
-                <p>{{ Admin::user()->name }}</p>
-                <!-- Status -->
-                <a href="#"><i class="fa fa-circle text-success"></i> {{ trans('admin.online') }}</a>
-            </div>
-            <div class="pull-role">
-            {{ Auth::user()->roles[0]->name ?? '' }}
-            <!-- Status -->
-            </div>
-        </div>
-   
+{{--        <div class="user-panel">--}}
+{{--            <div class="pull-left image">--}}
+{{--                <img src="{{ Admin::user()->image }}" class="img-circle" alt="User Image">--}}
+{{--            </div>--}}
+{{--            <div class="pull-left info">--}}
+{{--                <p>{{ Admin::user()->name }}</p>--}}
+{{--                <!-- Status -->--}}
+{{--                <a href="#"><i class="fa fa-circle text-success"></i> {{ trans('admin.online') }}</a>--}}
+{{--            </div>--}}
+{{--            <div class="pull-role">--}}
+{{--            {{ Auth::user()->roles[0]->name ?? '' }}--}}
+{{--            <!-- Status -->--}}
+{{--            </div>--}}
+{{--        </div>--}}
+
         @if(config('admin.enable_menu_search'))
         <!-- search form (Optional) -->
         <form class="sidebar-form" style="overflow: initial;" onsubmit="return false;">
@@ -63,10 +63,10 @@
 
             $filteredMenu = collect($menu)->filter(function ($item) {
                 if ((Str::startsWith($item['uri'] ?? '', 'bd') || ($item['uri'] ?? '') === '*') && !Admin::user()->type == 'bd') {
-                    return false; 
+                    return false;
                 }
-                return true; 
-            })->values()->all();   
+                return true;
+            })->values()->all();
             @endphp
 
             <ul class="sidebar-menu">
