@@ -52,6 +52,13 @@
         margin-bottom: 15px;
         padding-bottom: 10px;
         border-bottom: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .group-select-all {
+        margin: 0;
     }
     .form-check {
         margin-bottom: 8px;
@@ -75,6 +82,9 @@
         margin-right: -25px;
         margin-left: 0;
     }
+    [dir="rtl"] .permission-group-title {
+        flex-direction: row-reverse;
+    }
 </style>
 
 <input type="hidden" name="permissions_all" id="permissions_all">
@@ -90,6 +100,24 @@
     @endforeach
 </ul>
 
+<div class="category-select-all-container mb-3" style="padding: 0 20px;">
+    @foreach($categories as $category)
+        <div class="category-select-wrapper {{ $category->slug === $firstCategory ? 'active' : '' }}"
+             data-category="{{ $category->slug }}"
+             style="display: {{ $category->slug === $firstCategory ? 'block' : 'none' }};">
+            <div class="form-check">
+                <input class="form-check-input category-select-all"
+                       type="checkbox"
+                       data-category="{{ $category->slug }}"
+                       id="category-{{ $category->slug }}">
+                <label class="form-check-label fw-bold" for="category-{{ $category->slug }}">
+                    {{ __('Select All') }} {{ __($category->slug) }}
+                </label>
+            </div>
+        </div>
+    @endforeach
+</div>
+
 <div id="permissions-container">
     @foreach($allGroupedPermissions as $categorySlug => $groupedPermissions)
         <div class="permissions-section {{ $categorySlug === $firstCategory ? 'active' : '' }}"
@@ -98,7 +126,14 @@
                 @foreach($groupedPermissions as $group => $perms)
                     <div class="permission-group">
                         <h6 class="permission-group-title">
-                            {{ __(ucwords(str_replace(['-', '_'], ' ', $group))) }}
+                            <input class="form-check-input group-select-all"
+                                   type="checkbox"
+                                   data-group="{{ $group }}"
+                                   data-category="{{ $categorySlug }}"
+                                   id="group-{{ $categorySlug }}-{{ $group }}">
+                            <label for="group-{{ $categorySlug }}-{{ $group }}">
+                                {{ __(ucwords(str_replace(['-', '_'], ' ', $group))) }}
+                            </label>
                         </h6>
                         @foreach($perms as $perm)
                             <div class="form-check">
@@ -106,8 +141,11 @@
                                        type="checkbox"
                                        value="{{ $perm->id }}"
                                        data-slug="{{ $perm->slug }}"
+                                       data-group="{{ $group }}"
+                                       data-category="{{ $categorySlug }}"
                                        id="perm-{{ $perm->id }}"
-                                    {{ in_array($perm->id, $selected) ? 'checked' : '' }}>                                <label class="form-check-label" for="perm-{{ $perm->id }}">
+                                    {{ in_array($perm->id, $selected) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="perm-{{ $perm->id }}">
                                     {{ __($perm->name) }}
                                 </label>
                             </div>
@@ -137,10 +175,44 @@
             return browseCheckbox.length ? parseInt(browseCheckbox.val()) : null;
         }
 
+        function updateGroupCheckboxState(group, category) {
+            const groupCheckboxes = $(`.permission-checkbox[data-group="${group}"][data-category="${category}"]`);
+            const groupSelectAll = $(`.group-select-all[data-group="${group}"][data-category="${category}"]`);
+
+            const totalCheckboxes = groupCheckboxes.length;
+            const checkedCheckboxes = groupCheckboxes.filter(':checked').length;
+
+            if (checkedCheckboxes === 0) {
+                groupSelectAll.prop('checked', false).prop('indeterminate', false);
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                groupSelectAll.prop('checked', true).prop('indeterminate', false);
+            } else {
+                groupSelectAll.prop('checked', false).prop('indeterminate', true);
+            }
+        }
+
+        function updateCategoryCheckboxState(category) {
+            const categoryCheckboxes = $(`.permission-checkbox[data-category="${category}"]`);
+            const categorySelectAll = $(`.category-select-all[data-category="${category}"]`);
+
+            const totalCheckboxes = categoryCheckboxes.length;
+            const checkedCheckboxes = categoryCheckboxes.filter(':checked').length;
+
+            if (checkedCheckboxes === 0) {
+                categorySelectAll.prop('checked', false).prop('indeterminate', false);
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                categorySelectAll.prop('checked', true).prop('indeterminate', false);
+            } else {
+                categorySelectAll.prop('checked', false).prop('indeterminate', true);
+            }
+        }
+
         function bindPermissionCheckboxes() {
             $('.permission-checkbox').on('change', function () {
                 const id = parseInt($(this).val());
                 const permSlug = $(this).data('slug');
+                const group = $(this).data('group');
+                const category = $(this).data('category');
 
                 if ($(this).is(':checked')) {
                     selectedPermissions.add(id);
@@ -175,11 +247,91 @@
                         });
                     }
                 }
+
+                updateGroupCheckboxState(group, category);
+                updateCategoryCheckboxState(category);
                 updateHiddenInput();
             });
         }
 
+        function bindGroupSelectAll() {
+            $('.group-select-all').on('change', function() {
+                const group = $(this).data('group');
+                const category = $(this).data('category');
+                const isChecked = $(this).is(':checked');
+
+                const groupCheckboxes = $(`.permission-checkbox[data-group="${group}"][data-category="${category}"]`);
+
+                groupCheckboxes.each(function() {
+                    const id = parseInt($(this).val());
+                    const currentlyChecked = $(this).is(':checked');
+
+                    if (isChecked && !currentlyChecked) {
+                        selectedPermissions.add(id);
+                        $(this).prop('checked', true);
+                    } else if (!isChecked && currentlyChecked) {
+                        selectedPermissions.delete(id);
+                        $(this).prop('checked', false);
+                    }
+                });
+
+                updateCategoryCheckboxState(category);
+                updateHiddenInput();
+            });
+        }
+
+        function bindCategorySelectAll() {
+            $('.category-select-all').on('change', function() {
+                const category = $(this).data('category');
+                const isChecked = $(this).is(':checked');
+
+                const categoryCheckboxes = $(`.permission-checkbox[data-category="${category}"]`);
+                const categoryGroupCheckboxes = $(`.group-select-all[data-category="${category}"]`);
+
+                categoryCheckboxes.each(function() {
+                    const id = parseInt($(this).val());
+                    const currentlyChecked = $(this).is(':checked');
+
+                    if (isChecked && !currentlyChecked) {
+                        selectedPermissions.add(id);
+                        $(this).prop('checked', true);
+                    } else if (!isChecked && currentlyChecked) {
+                        selectedPermissions.delete(id);
+                        $(this).prop('checked', false);
+                    }
+                });
+
+                // Update all group checkboxes in this category
+                categoryGroupCheckboxes.each(function() {
+                    $(this).prop('checked', isChecked).prop('indeterminate', false);
+                });
+
+                updateHiddenInput();
+            });
+        }
+
+        function initializeGroupCheckboxes() {
+            // Initialize all group checkboxes based on current state
+            $('.group-select-all').each(function() {
+                const group = $(this).data('group');
+                const category = $(this).data('category');
+                updateGroupCheckboxState(group, category);
+            });
+        }
+
+        function initializeCategoryCheckboxes() {
+            // Initialize all category checkboxes based on current state
+            $('.category-select-all').each(function() {
+                const category = $(this).data('category');
+                updateCategoryCheckboxState(category);
+            });
+        }
+
         bindPermissionCheckboxes();
+        bindGroupSelectAll();
+        bindCategorySelectAll();
+        initializeGroupCheckboxes();
+        initializeCategoryCheckboxes();
         updateHiddenInput();
 
         $('#permission-tabs .nav-link').on('click', function (e) {
@@ -189,6 +341,10 @@
             const category = $(this).data('category');
             $('.permissions-section').removeClass('active');
             $(`.permissions-section[data-category="${category}"]`).addClass('active');
+
+            // Show/hide the appropriate category select-all checkbox
+            $('.category-select-wrapper').hide().removeClass('active');
+            $(`.category-select-wrapper[data-category="${category}"]`).show().addClass('active');
         });
     });
 </script>

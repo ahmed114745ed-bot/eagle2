@@ -35,7 +35,7 @@
     @endphp
         <div><img src="{{ empty($logo)? asset('images/app-logo.png') : getImagePath($logo_url)}}" style="width: 150px;"></div>
         <div class="box-title">
-            <a href="{{ admin_url('/') }}" style="color: var(--green-color);">{{__('dashboard.login.title')}}</a>
+            <a href="{{ admin_url('/') }}" style="color: var(--green-color);">{{__('dashboard.login.titleBD')}}</a>
         </div>
 
     </div>

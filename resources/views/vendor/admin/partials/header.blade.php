@@ -45,10 +45,22 @@
                         </li>
                         <li class="user-footer">
                             <div class="pull-left">
+                            @if (Admin::user()->type == 'bd')
+                                <a href="{{ bd_url('setting') }}" class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
+                            @endif
+                            @if (Admin::user()->type != 'bd')
                                 <a href="{{ admin_url('auth/setting') }}" class="btn btn-default btn-flat">{{ trans('admin.setting') }}</a>
+
+                            @endif
                             </div>
                             <div class="pull-right">
-                                <a href="{{ admin_url('auth/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
+                            @if (Admin::user()->type == 'bd')
+                            <a href="{{ bd_url('/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
+
+                            @endif
+                                    @if (Admin::user()->type != 'bd')
+                                        <a href="{{ admin_url('auth/logout') }}" class="btn btn-default btn-flat">{{ trans('admin.logout') }}</a>
+                                @endif
                             </div>
                         </li>
                     </ul>

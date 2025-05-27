@@ -332,7 +332,7 @@ class WalletController extends MainController
         // if (!$wallet || ($wallet->value - $wallet->cut_amount) < $amount) {
         //     throw new \Exception(__('balance not enough'));
         // }
-        $totalSalary = $sender->bdSalary;
+        $totalSalary = $sender?->bdSalary ?? 0;
         if ($totalSalary < $amount) {
             throw new \Exception(__('balance not enough'));
            }

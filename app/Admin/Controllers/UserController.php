@@ -681,7 +681,7 @@ class UserController extends MainController
         ]);
 
         $grid->column('target_id', __('img'))->display(function () {
-            return $this->ware ? "<img width='30' src='" . getDriverUrl() . '/' . $this->ware->show_img . "'>" : '';
+            return $this->ware ? "<img width='30' src='" . getDriverUrl() . '/' . (@$this->ware?->show_img  ?? ''). "'>" : '';
         });
 
         $grid->column('expire', __('expire'))->display(function ($row) {

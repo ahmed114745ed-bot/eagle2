@@ -147,6 +147,10 @@ class ConfigController extends Controller
             $config->save();
         }
 
+        Cache::forget('pusher_config');
+
+        Artisan::call('config:cache');
+
         return Redirect::back();
     }
 }

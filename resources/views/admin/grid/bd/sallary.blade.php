@@ -56,7 +56,7 @@ padding: 20px; font-size: 20px; text-align: center; width: 469px; margin: 42px a
                     <button type="button" class="close" data-dismiss="modal" style="color: var(--text-secondary-color);">&times;</button>
                 </div>
    
-   <form id="transferForm" class="transferForm" method="POST" action="{{ route('admin.bd.salary.transfer') }}">
+   <form id="transferForm" class="transferForm" method="POST" action="{{ route('bd.salary.transfer') }}">
         @csrf
         <input type="hidden" name="bd_id" value="{{ Auth::id() }}">
 
