@@ -80,6 +80,7 @@ class UserRelationsResource extends JsonResource
             ,
             'vip'            => [
                 'level' => @$this->UserVip->level,
+                 'img' => Common::ovip_center_rank_img($this->id),
             ],
             'level'          => [
                 'receiver_img' => $imageReceiver ? @$imageReceiver->img : '',
