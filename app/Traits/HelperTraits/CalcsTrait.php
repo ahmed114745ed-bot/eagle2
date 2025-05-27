@@ -766,22 +766,22 @@ trait CalcsTrait
             if (isset($user_id->userId)) {
                 $user_id = $user_id->userId;
             } else {
-                return new \stdClass();
+                return '';
             }
         }
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
-            if (!$user) return new \stdClass();
+            if (!$user) return '';
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return 0;
+        if (!isset($user->UserVip)) return '';
         $uvip = $user?->UserVip;
-        if (!$uvip) return new \stdClass();
+        if (!$uvip) return '';
 
         $vip = OVip::query()->find($uvip->vip_id);
 
-        if (!$vip) return new \stdClass();
+        if (!$vip) return '';
         $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
 
         // return $vip->level;
