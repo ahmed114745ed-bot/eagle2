@@ -139,11 +139,12 @@ class UserController extends MainController
         $stop_invite_code = settings()->get('stop_invite_code');
         $stop_charge = settings()->get('stop_charge');
         $make_rooms_top = settings()->get('make_rooms_top');
+         $make_gift_top = settings()->get('close_open_gifts');
 
 
         return (new Box(
             title: __('admin.Actions'),
-            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary',])),
+            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary','make_gift_top'])),
         ));
     }
 
