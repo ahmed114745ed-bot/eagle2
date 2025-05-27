@@ -42,7 +42,6 @@ class ConfigServiceProvider extends ServiceProvider
             Config::set('admin.route.middleware',$get);
              Config::set('admin.auth.controller', \App\Admin\Controllers\Preview\AuthController::class);
          }
-
     }
 
     public function getReceivedAndSanderPercentage(): array

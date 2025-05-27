@@ -98,68 +98,79 @@ class RequestBackgroundImageController extends MainController
         });
         $grid->id(__('ID'));
         $grid->owner_room_id(__('owner room id'))->display(function () {
-            $name = @$this->owner->name ?? '';
-            $uuid = @$this->owner->uuid ?? '';
-            $path = @$this->owner?->ownerRoom->room_cover;
-            $defaultImage = asset("images/room.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $owner = $this->owner ?? null;
+            $ownerRoom = $owner->ownerRoom ?? null;
 
-            // Check if the image exists
+            $name = $owner->name ?? '';
+            $uuid = $owner->uuid ?? '';
+            $path = $ownerRoom->room_cover ?? null;
+            $defaultImage = asset("images/room.jpg");
+            $url = $path ? getImagePath($path) : $defaultImage;
+
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/rooms/{$this->owner?->ownerRoom?->id}");
+            $showUrl = $ownerRoom ? url("admin/rooms/{$ownerRoom->id}") : '#';
 
             $escapedName = json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
-            $escapedName = substr($escapedName, 1, -1);
+            $escapedName = substr($escapedName, 1, -1); // remove surrounding quotes
 
             return <<<EOT
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div>
-                                  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                                    <span style='text-decoration: underline; cursor: pointer;'>$escapedName</span>
-                                  </a>
-                                <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
-                            </div>
-                        </div>
-                     EOT;
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            $image
+            <div>
+                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                    <span style='text-decoration: underline; cursor: pointer;'>$escapedName</span>
+                </a>
+                <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
+            </div>
+        </div>
+    EOT;
         });
+
+
+
 
         $grid->column('owner.name', __('owner'))
             ->display(function ($name) {
-                $uid = @$this->owner->uuid;
-                $path = @$this->owner?->profile?->avatar;
+                $owner = $this->owner ?? null;
+                $uid = $owner->uuid ?? '';
+                $ownerId = $owner->id ?? null;
+                $path = $owner->profile->avatar ?? null;
+
                 $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+                $url = $path ? getImagePath($path) : $defaultImage;
 
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
 
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = url("admin/users/{$this->owner->id}");
-                $escapedName = json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
-                $escapedName = substr($escapedName, 1, -1);
+                $image = $ownerId ? handleShowImageWithTypes($ownerId, $url, 40, 40) : "<img src='{$url}' width='40' height='40' style='border-radius: 50%; object-fit: cover;'>";
+
+                $escapedName = $name ? json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS) : '';
+                $escapedName = substr($escapedName, 1, -1); // remove quotes
+
+                $showUrl = $ownerId ? url("admin/users/{$ownerId}") : '#';
 
                 return <<<EOT
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div>
-                                  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                                    <span style='text-decoration: underline; cursor: pointer;'>$escapedName</span>
-                                  </a>
-                                <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                            </div>
-                        </div>
-                     EOT;
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        <span style='text-decoration: underline; cursor: pointer;'>$escapedName</span>
+                    </a>
+                    <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                </div>
+            </div>
+        EOT;
             });
+
 
         $grid->img(__('image'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
-            $path = getImagePath($img);
+            $path = getImagePath($img) ?? $defaultImage;
             if (!isImageExists($path)) {
                 $path = $defaultImage;
             }

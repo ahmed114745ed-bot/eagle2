@@ -4,21 +4,21 @@
     <section class="sidebar">
 
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel">
-            <div class="pull-left image">
-                <img src="{{ Admin::user()->image }}" class="img-circle" alt="User Image">
-            </div>
-            <div class="pull-left info">
-                <p>{{ Admin::user()->name }}</p>
-                <!-- Status -->
-                <a href="#"><i class="fa fa-circle text-success"></i> {{ trans('admin.online') }}</a>
-            </div>
-            <div class="pull-role">
-            {{ Auth::user()->roles[0]->name ?? '' }}
-            <!-- Status -->
-            </div>
-        </div>
-   
+{{--        <div class="user-panel">--}}
+{{--            <div class="pull-left image">--}}
+{{--                <img src="{{ Admin::user()->image }}" class="img-circle" alt="User Image">--}}
+{{--            </div>--}}
+{{--            <div class="pull-left info">--}}
+{{--                <p>{{ Admin::user()->name }}</p>--}}
+{{--                <!-- Status -->--}}
+{{--                <a href="#"><i class="fa fa-circle text-success"></i> {{ trans('admin.online') }}</a>--}}
+{{--            </div>--}}
+{{--            <div class="pull-role">--}}
+{{--            {{ Auth::user()->roles[0]->name ?? '' }}--}}
+{{--            <!-- Status -->--}}
+{{--            </div>--}}
+{{--        </div>--}}
+
         @if(config('admin.enable_menu_search'))
         <!-- search form (Optional) -->
         <form class="sidebar-form" style="overflow: initial;" onsubmit="return false;">
@@ -30,12 +30,25 @@
               </span>
                 <ul class="dropdown-menu" role="menu" style="min-width: 210px;max-height: 300px;overflow: auto;">
 
-              
-                @foreach(Admin::menuLinks() as $link)
-                    <li>
-                        <a href="{{ admin_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
-                    </li>
-                    @endforeach
+                    @if (Admin::user()->type == 'bd')
+
+                        @foreach(Admin::menuLinks() as $link)
+                            <li>
+                                <a href="{{ bd_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                            </li>
+                        @endforeach
+
+                    @endif
+
+
+                    @if (Admin::user()->type != 'bd')
+
+                        @foreach(Admin::menuLinks() as $link)
+                            <li>
+                                <a href="{{ admin_url($link['uri']) }}"><i class="fa {{ $link['icon'] }}"></i>{{ admin_trans($link['title']) }}</a>
+                            </li>
+                        @endforeach
+                    @endif
                 </ul>
             </div>
         </form>
@@ -49,11 +62,11 @@
             $menu = Admin::menu();
 
             $filteredMenu = collect($menu)->filter(function ($item) {
-                if ((Str::startsWith($item['uri'] ?? '', 'bd') || ($item['uri'] ?? '') === '*') && !Admin::user()->inRoles(['bd'])) {
-                    return false; 
+                if ((Str::startsWith($item['uri'] ?? '', 'bd') || ($item['uri'] ?? '') === '*') && !Admin::user()->type == 'bd') {
+                    return false;
                 }
-                return true; 
-            })->values()->all();   
+                return true;
+            })->values()->all();
             @endphp
 
             <ul class="sidebar-menu">

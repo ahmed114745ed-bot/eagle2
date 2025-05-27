@@ -116,24 +116,24 @@ Route::group(
         Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin');
     }
 );
-    Route::group(
-        [
-            'prefix' => config('admin.route.prefix'),
-            'namespace' => '',
-            'middleware' => [
-                'web',
+    // Route::group(
+    //     [
+    //         'prefix' => config('admin.route.prefix'),
+    //         'namespace' => '',
+    //         'middleware' => [
+    //             'web',
 
-                'multiLanguage',
-            ],
-            'as' => config('admin.route.prefix') . '.',
-        ],
-        function (Router $router) {
+    //             'multiLanguage',
+    //         ],
+    //         'as' => config('admin.route.prefix') . '.',
+    //     ],
+    //     function (Router $router) {
 
-            require base_path('app/Bd/routes.php');
+    //         require base_path('app/Bd/routes.php');
 
 
-        }
-    );
+    //     }
+    // );
 
 Route::group(
     [
@@ -552,18 +552,17 @@ Route::group(
 
 
 
-        Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
-            $router->get('/', 'HomeController@index')->name('home');
-            $router->get('/charges', 'ChargeController@index')->name('charges');
-            $router->resource('/agencies', 'AgencyController');
-            $router->resource('/salaries', 'BdSalariesController');
-            $router->resource('charges', 'ChargeController');
-            // $router->resource('/wallet', 'WalletController');
-            Route::post('admin/wallet/charge', [\App\Bd\Controllers\WalletController::class, 'charge'])->name('wallet.charge');
-            Route::post('admin/salary/transfer', [\App\Bd\Controllers\WalletController::class, 'transfer'])->name('salary.transfer');
-
-        });
-        $router->resource('/request-agencies', \App\Bd\Controllers\RequestAgencyController::class);
+        // Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
+        //     $router->get('/', 'HomeController@index')->name('home');
+        //     $router->get('/charges', 'ChargeController@index')->name('charges');
+        //     $router->resource('/agencies', 'AgencyController');
+        //     $router->resource('/salaries', 'BdSalariesController');
+        //     $router->resource('charges', 'ChargeController');
+        //     // $router->resource('/wallet', 'WalletController');
+        //     Route::post('admin/wallet/charge', [\App\Bd\Controllers\WalletController::class, 'charge'])->name('wallet.charge');
+        //     Route::post('admin/salary/transfer', [\App\Bd\Controllers\WalletController::class, 'transfer'])->name('salary.transfer');
+        // });
+        // $router->resource('/request-agencies', \App\Bd\Controllers\RequestAgencyController::class);
 
 
 

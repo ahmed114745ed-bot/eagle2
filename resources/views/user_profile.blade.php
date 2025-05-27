@@ -936,13 +936,16 @@
                                        
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($packs as $index => $pack)
-                                                
+                                                @php
+                                                    $path = @$pack->ware?->show_img ?? '';
+                                                   
+                                                @endphp
                                                 <tr>
                                                     <td>{{ $packs->firstItem() + $index }}</td>
                                                     <td>{{ $pack->getTypeGet() }}</td>
                                                     <td>{{ $pack->getType() }}</td>
                                                     <td>
-                                                        <img src="{{ getImagePath($pack->ware->show_img) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                        <img src="{{ getImagePath(@$path) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                                        
                                                     </td>
                                                     <td>{{\Carbon\Carbon::createFromTimestamp($pack->expire)->format('Y-m-d H:i:s') }}</td>
