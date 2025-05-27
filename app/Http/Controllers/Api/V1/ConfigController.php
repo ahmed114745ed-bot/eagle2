@@ -136,9 +136,6 @@ class ConfigController extends Controller
 
         Cache::forget('pusher_config');
 
-        $configClear = Artisan::call('config:clear');
-        info('config clear'.$configClear);
-
         $keys = array_keys($request->all());
 
         foreach ($keys as $key) {
@@ -154,6 +151,11 @@ class ConfigController extends Controller
 
             $config->save();
         }
+
+        Cache::forget('pusher_config');
+
+        $configClear = Artisan::call('config:cache');
+        info('config clear'.$configClear);
 
         info('update After '.config('broadcasting.connections.pusher.key'));
         info('update After '.config('broadcasting.connections.pusher.secret'));
