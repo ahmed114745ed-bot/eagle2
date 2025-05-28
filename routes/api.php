@@ -443,6 +443,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // start vips
             Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
                 Route::get('/list', [VipController::class, 'vipList']);
+                Route::get('/user/list', [VipController::class, 'vipUserList']);
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
                 Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);

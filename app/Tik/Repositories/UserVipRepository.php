@@ -26,6 +26,11 @@ class UserVipRepository extends AbstractRepository
         return $this->model->where('user_id', $userId)->orderBy('expire', 'DESC')->first();
     }
 
+    public function getAllByUserId($userId)
+    {
+        return $this->model->where('user_id', $userId)->with('OVip')->where('expire', '>', Carbon::now()->timestamp)->orderBy('expire', 'DESC')->get();
+    }
+
     public function deleteExpireUserVip()
     {
         $this->model->query()->where('expire', '!=', 0)->where('expire', '<', Carbon::now()->timestamp)->delete();
@@ -54,6 +59,7 @@ class UserVipRepository extends AbstractRepository
     public function updateIsUsed($userVip, $isUsed)
     {
         $userVip->is_used = $isUsed;
+        $userVip->using  = 1;
         $this->updateUserVip($userVip);
     }
     public function updateNumUsed($userVip)

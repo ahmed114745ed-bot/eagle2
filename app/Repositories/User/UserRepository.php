@@ -5,6 +5,7 @@ namespace App\Repositories\User;
 use App\Models\Agency;
 use App\Models\Follow;
 use App\Models\ProfileGallary;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository as Repository;
@@ -114,7 +115,7 @@ class UserRepository extends Repository
     
     public function searchInAgency($key, $page, $perPage)
     {
-        return Agency::selectRaw('concat(name, " - ", id) as name, id')
+        return ShippingAgency::selectRaw('concat(name, " - ", id) as name, id')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
