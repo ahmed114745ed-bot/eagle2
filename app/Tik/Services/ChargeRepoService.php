@@ -383,7 +383,7 @@ class ChargeRepoService
                     break;
 
                 case 'user':
-                    $authAgency = $this->userRepository->searchUserById($auth->id);
+                    $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
                     $this->handleUserCharge($authAgency, $auth, $request);
                     break;
 
@@ -434,11 +434,12 @@ class ChargeRepoService
 
         $this->agencyCharge(
             chargerId: $authAgency->id,
-            userId: $chargeAgency->id,
+            userId: null,
             amount: $amount,
             type: 'agency',
             usd: null,
-            chargeType: 'agency'
+            chargeType: 'agency',
+            agencyId: $chargeAgency->id,
         );
     }
 
@@ -453,7 +454,8 @@ class ChargeRepoService
             amount: $amount,
             type: 'app',
             usd: null,
-            chargeType: 'agency'
+            chargeType: 'agency',
+            agencyId: null,
         );
 
         if ($receiver instanceof User) {
@@ -464,8 +466,8 @@ class ChargeRepoService
     }
 
 
-    public function agencyCharge($chargerId, $userId, $amount, $type, $usd = null, $chargeType, $transferred = false)
-    {
+    public function agencyCharge($chargerId, $userId, $amount, $type, $usd = null, $chargeType, $transferred = false ,$agencyId=null)
+    {  
         $data = [
             'charger_id' => $chargerId,
             'charger_type' => $chargeType,
@@ -475,6 +477,7 @@ class ChargeRepoService
             'amount_type' => 2,
             "usd" => $usd != null ? $usd : $amount,
             'is_used_transferred' => $transferred,
+            'agency_id' => $agencyId,
         ];
         $this->create($data);
     }

@@ -78,7 +78,9 @@ class AgentSalaryTransactionController extends Controller
             return Common::apiResponse(0, __("api_responses.agency"));
         }
 
-        $data = Charge::with('receiver', 'sender')->where('is_used_transferred', false)->where("agency_id", $agency->id);
+        $data = Charge::with('receiver', 'sender')->where('is_used_transferred', false)
+                        ->where("charger_type", 'agency')
+                        ->where("charger_id", $agency->id);
 
         $data = $data->when($type == 'sent', function ($q) use ($search, $usrAuth) {
             $q->where("charger_id", $usrAuth->id)->where('agency_id', $usrAuth->agency_id)->where('charger_type', '!=', 'dash')
