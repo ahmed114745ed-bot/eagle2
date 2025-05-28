@@ -28,10 +28,10 @@ class AgencyUsersTargetResource extends JsonResource
         // $target = $this->targets->first();
         $target = UserTarget::where('user_id', $this->id)
         ->where('agency_id', $this->agency_id)
-        ->where('add_year', $year)
-        ->where('add_month', $month)
-        ->first();
-        
+        // ->where('add_year', $year)
+        // ->where('add_month', $month)
+        ->latest();
+
         // $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
         //     ->select('id', 'user_diamonds')->get();
         $months = collect(range($month - 3, $month - 1))
@@ -75,7 +75,6 @@ class AgencyUsersTargetResource extends JsonResource
             'image' => $this->profile->avatar ?? '',
             // 'is_host' => $this->is_host,
             'salary'  => $salary ?? 0,
-
             // 'target' => [
                 // 'id' => @$target->target_id ?? 0,
             'user_diamonds' => @$target->user_diamonds ?? 0,
