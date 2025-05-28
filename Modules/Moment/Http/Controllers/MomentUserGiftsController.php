@@ -14,6 +14,7 @@ use App\Facades\CustomNotification;
 use Modules\Moment\Entities\Moment;
 use App\Classes\Gifts\SendGiftService;
 use App\Exceptions\NotInfMoneyException;
+use Modules\Moment\Entities\MomentUserGift;
 use Illuminate\Contracts\Support\Renderable;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Http\Resources\Api\V1\GeneralUserResource;
@@ -199,9 +200,11 @@ class MomentUserGiftsController extends Controller
         return Common::apiResponse(1, 'successful', $data, 200);
     }
 
-    public function userGift()
+    public function userGift($id)
     {
-        $users = User::whereHas('momentUserGift')->get();
+        $momentsGift = MomentUserGift::where('moment_id', $id)->with('user')->get();
+        $users = $momentsGift->pluck('user')->filter(); // filter to remove null users if any
+
         return Common::apiResponse(1, 'successful', GeneralUserResource::collection($users), 200);
     }
 }

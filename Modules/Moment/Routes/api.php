@@ -20,7 +20,7 @@ use Modules\Moment\Http\Controllers\ReportController;
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'appFeatureEnable:moment'])->group(
     function () {
         Route::apiResource('/moment', 'MomentController');
-         Route::get('moments/users/gifts',  [MomentUserGiftsController::class, 'userGift']);
+         Route::get('moments/users/{id}/gifts',  [MomentUserGiftsController::class, 'userGift']);
         Route::apiResource('moment/{moment_id}/comment', 'MomentUserCommentController');
         Route::apiResource('moment/{moment_id}/like', 'MomentUserLikesController');
         Route::apiResource('moment/{moment_id}/gift/', 'MomentUserGiftsController');
