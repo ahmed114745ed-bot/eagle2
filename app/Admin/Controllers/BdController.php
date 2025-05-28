@@ -252,8 +252,8 @@ class BdController extends MainController
         $form->password('password', __('Password'))->rules('required');
         // $form->text('name', __('Name'));
         $form->image('avatar', __('img'));
-        $form->switch('default', __('set_as_default'))
-            ->help(__('make_bd_default'));
+        // $form->switch('default', __('set_as_default'))
+        //     ->help(__('make_bd_default'));
 
 
         if ($form->isEditing()) {
