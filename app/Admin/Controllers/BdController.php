@@ -249,8 +249,7 @@ class BdController extends MainController
         $form->password('password', __('Password'))->rules('required');
         // $form->text('name', __('Name'));
         $form->image('avatar', __('img'));
-        $form->switch('default', __('set_as_default'))
-        ->help(__('make_bd_default'));
+   
 
 
         if ($form->isEditing()) {
@@ -269,6 +268,9 @@ class BdController extends MainController
                 }
                 return $ops2;
             })->ajax('/api/search/users-bd', 'id', 'name');
+
+            $form->switch('default', __('set_as_default'))
+            ->help(__('make_bd_default'));
         }
 
         $form->hidden('type', __('Type'))->value('bd');
