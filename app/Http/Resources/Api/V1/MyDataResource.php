@@ -263,7 +263,7 @@ class MyDataResource extends JsonResource
 
     public function getUserPack($type)
     {
-        $pack = $this->packs->where('type', $type)->latest()->first();
+        $pack = $this->packs->where('type', $type)->sortByDesc('id')->first();
         return $pack ?  new GeneralUserPackResource($pack) : [
             'id'   =>  0,
             'image_type' => 'png',
@@ -274,7 +274,7 @@ class MyDataResource extends JsonResource
 
     public function getUserPackId($type)
     {
-        $pack = $this->packs->where('type', $type)->latest()->first();
+        $pack = $this->packs->where('type', $type)->sortByDesc('id')->first();
         return $pack ? @$pack?->ware->id : 0;
     }
 }
