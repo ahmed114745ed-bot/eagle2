@@ -153,4 +153,9 @@ class MallService
     {
         return $this->wareRepository->giftOVip($level, $type);
     }
+
+    public function ware($type)
+    {
+        return $this->wareRepository->all(0, $type);
+    }
 }
