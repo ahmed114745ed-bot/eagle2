@@ -226,117 +226,48 @@ class GiftController extends MainController
         $form = new Form(new Gift);
         $form->display(__('ID'));
         $form->text('name', __('name'));
+
         $form->select('type', __('type'))->options(
             translate(TYPE_GIFT)
-        )->attribute(['id' => 'type'])->required();
+        )
+            ->when(6, function() use ($form) {
+                $form->number('luckyGift.win_probability', __('win probability'))
+                    ->min(10)->max(100)
+                    ->placeholder(__('Enter win probability'))
+                    ->attribute(['id' => 'win_probability']);
 
-        $form->number('luckyGift.win_probability', __('win probability'))
-            ->min(10)
-            ->max(100)
-            ->placeholder(__('Enter win probability')) ->attribute(['id' => 'win_probability']);
+                $form->number('luckyGift.min_percentag', __('min percentage'))
+                    ->min(0)->max(100)
+                    ->placeholder(__('Enter min_percentage'))
+                    ->attribute(['id' => 'min_percentage']);
 
-        $form->number('luckyGift.min_percentag', __('min percentage'))
-            ->min(0)
-            ->max(100)
-            ->placeholder(__('Enter min_percentage'))
-            ->default(function ($form) {
-                $value = @$form->model()->luckyGift->min_percentage;
-                return @explode(',', $value)[0] ?? 0;
+                $form->number('luckyGift.mid_percentag', __('mid percentage'))
+                    ->min(0)->max(100)
+                    ->placeholder(__('Enter mid_percentage'))
+                    ->attribute(['id' => 'mid_percentage']);
+
+                $form->number('luckyGift.max_percentag', __('max percentage'))
+                    ->min(0)->max(100)
+                    ->placeholder(__('Enter max_percentage'))
+                    ->attribute(['id' => 'max_percentage']);
             })
-            ->attribute(['id' => 'min_percentage']);
-        $form->number('luckyGift.mid_percentag', __('mid percentage'))
-            ->min(0)
-            ->max(100)
-            ->placeholder(__('Enter mid_percentage'))
-            ->default(function ($form) {
-                $value = @$form->model()->luckyGift->min_percentage;
-                return @explode(',', $value)[1] ?? 0;
-            })
-            ->attribute(['id' => 'mid_percentage']);
-        $form->number('luckyGift.max_percentag', __('max percentage'))
-            ->min(0)
-            ->max(100)
-            ->placeholder(__('Enter max_percentage'))
-            ->default(function ($form) {
-                $value = @$form->model()->luckyGift->min_percentage;
-                return @explode(',', $value)[2] ?? 0;
-            })
-            ->attribute(['id' => 'max_percentage']);
+            ->when(9, function() use ($form) {
+                $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
+            });
 
-        // Add custom JS
-        // Replace your existing script section with this:
-        $script = <<<SCRIPT
-console.log('Script loaded');
-(function() {
-    function initializeFormToggle() {
-        if (typeof jQuery === 'undefined') {
-            setTimeout(initializeFormToggle, 100);
-            return;
-        }
+        $form->currency('price', __('price'))->symbol('💎');
+        $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
-        jQuery(function($) {
-            var maxAttempts = 50;
-            var attempts = 0;
-
-            function waitForFormElements() {
-                attempts++;
-
-                if ($('#type').length === 0 && attempts < maxAttempts) {
-                    setTimeout(waitForFormElements, 100);
-                    return;
-                }
-
-                if ($('#type').length === 0) {
-                    console.error('Form elements not found after', maxAttempts, 'attempts');
-                    return;
-                }
-
-                setupFormToggle();
-            }
-
-            function setupFormToggle() {
-                function toggleWinProbability() {
-                    var type = $('#type').val();
-
-                    var fieldsToToggle = {
-                        'win_probability': type == '6',
-                        'min_percentage': type == '6',
-                        'mid_percentage': type == '6',
-                        'max_percentage': type == '6',
-                        'vip_level': type == '9'
-                    };
-
-                    $.each(fieldsToToggle, function(fieldId, shouldShow) {
-                        var element = $('#' + fieldId);
-                        if (element.length > 0) {
-                            element.closest('.form-group')[shouldShow ? 'show' : 'hide']();
-                        }
-                    });
-                }
-
-                // Initial toggle
-                toggleWinProbability();
-
-                // Bind change event
-                $('#type').on('change.giftForm', function() {
-                    toggleWinProbability();
-                });
-            }
-
-            waitForFormElements();
-        });
-    }
-
-    // Initialize when DOM is ready or immediately if already ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeFormToggle);
-    } else {
-        initializeFormToggle();
-    }
-})();
-SCRIPT;
-
-        Admin::script($script);
+        $form->file('img', __('img'));
+        $form->file('show_img', __('show_img'))->name(function ($file) {
+            return 'svga_' . \Str::random(6) . '.' . $file->getClientOriginalExtension();
+        })->required();
+        $form->select('image_type', __('image_type'))->options([
+            'svga' => __('svga'),
+            'alpha' => __('alpha'),
+            'mp4' => __('mp4'),
+            'vap' => __('vap'),
+        ])->required();
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_gift_price') || Admin::user()->can('*')) {
