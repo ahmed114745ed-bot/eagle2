@@ -25,7 +25,7 @@ class AgencyUsersTargetResource extends JsonResource
         $month = request('month') ?? Carbon::now()->month;
 
 
-        $target = $this->targets->latest();
+        $target = $this->targets()->latest()->first();
      
 
         // $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
