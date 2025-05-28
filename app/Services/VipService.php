@@ -381,7 +381,7 @@ class VipService
     {
         $userVip = $this->userVipRepository->getAllByUserId($userId);
         $vipPrivileges = $this->vipPrivilegeRepository->all();
-        $oVips =  $userVip->ovip;
+        $oVips =  $userVip->pluck('OVip');
         $wares = $this->wareRepository->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
         $oVips = $oVips->map(function ($oVip) use ($wares) {
             $filteredWares = $wares->where('level', $oVip->level);
