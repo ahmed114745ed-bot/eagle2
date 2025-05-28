@@ -24,7 +24,7 @@ class OvipGiftTapController extends MainController
 {
 
     use HasResourceActions;
-    public $permission_name = 'ovip-gift';
+    public $permission_name = 'vip-gift';
 
     public function index(Content $content)
     {

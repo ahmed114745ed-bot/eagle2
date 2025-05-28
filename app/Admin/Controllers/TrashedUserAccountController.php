@@ -11,6 +11,7 @@ use App\Admin\Actions\RestoreUserAccount;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\SoftDeleteUserAccount;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 
 class TrashedUserAccountController extends  MainController
 {
@@ -19,7 +20,7 @@ class TrashedUserAccountController extends  MainController
      *
      * @var string
      */
-    public $permission_name = 'trashed-account-user';
+    public $permission_name = 'deleted-accounts';
     use HasResourceActions;
 
 
@@ -77,8 +78,12 @@ class TrashedUserAccountController extends  MainController
         $grid->column('deleted_at', __('Deleted at'))->diffForHumans();
         $grid->actions(function ($actions) {
             $model = $actions->row;
-            $actions->add(new RestoreUserAccount($model->id));
-            $actions->add(new SoftDeleteUserAccount($model->id));
+            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'restore-user-account-Switch') || Admin::user()->can('*'))) {
+                $actions->add(new RestoreUserAccount($model->id));
+            }
+            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'delete-user-account-Switch') || Admin::user()->can('*'))) {
+                $actions->add(new SoftDeleteUserAccount($model->id));
+            }
             $actions->disableEdit();
             $actions->disableView();
             $actions->disableDelete();

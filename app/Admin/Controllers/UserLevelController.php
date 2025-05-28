@@ -21,7 +21,7 @@ class UserLevelController extends MainController
      */
     protected $title = 'User Levels';
 
-    public $permission_name = 'user-levels';
+    public $permission_name = 'edit-level';
 
 
     public function index(Content $content)

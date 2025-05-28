@@ -37,7 +37,7 @@ class UserController extends MainController
      * @var string
      */
     protected $title;
-    public $permission_name = 'users-hunters';
+    public $permission_name = 'hosts';
 
 
 
@@ -576,17 +576,24 @@ class UserController extends MainController
         $grid->actions(function ($actions) {
             $model = $actions->row;
 
-            $actions->add(new ChargeSwitchAction());
-            $actions->add(new InviteSwitchAction());
-            $actions->add(new CanPlaySwitchAction());
+             if (Admin::user()->can('browse-' . 'host-charge-switch') || Admin::user()->can('*')) {
+                $actions->add(new ChargeSwitchAction());
+            }
+            if (Admin::user()->can('browse-' . 'host-invite-switch') || Admin::user()->can('*')) {
 
-            if ($model->agency_id >= 1) {
+                $actions->add(new InviteSwitchAction());
+            }
+            if (Admin::user()->can('browse-' . 'host-can-Play-Switch') || Admin::user()->can('*')) {
+
+                $actions->add(new CanPlaySwitchAction());
+            }
+            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'host-kick-agency-Switch') || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
             }
-            if ($model->family_id >= 1) {
+            if ($model->family_id >= 1 && (Admin::user()->can('browse-' . 'host-kick-family-Switch') || Admin::user()->can('*'))) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'host-chang-agency-Switch') || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
 

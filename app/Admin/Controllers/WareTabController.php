@@ -21,7 +21,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 class WareTabController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'wares';
+    public $permission_name = 'store';
     public function index(Content $content)
     {
         session(['last_ware_type' => request()->get('type', 1)]);
