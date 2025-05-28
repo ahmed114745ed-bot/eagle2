@@ -46,9 +46,9 @@ class WeeklyEventGiftNController extends MainController
                 ['text' => trans('admin.eventGift')]
             )
             ->row($buttonHTML)
-            ->row($this->grid1() // First grid
+            ->row($this->grid1()) // First grid
             ->row($this->grid2()) // Second grid
-            ->row($this->grid3())); // Third grid
+            ->row($this->grid3()); // Third grid
 
 
     }
@@ -136,7 +136,7 @@ class WeeklyEventGiftNController extends MainController
                 <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
-                <h3 style="margin-right: 10px;">{ $gifts}</h3>
+                <h3 style="margin-right: 10px;">$gifts</h3>
 
             HTML;
             $tools->append($customButtonHTML);
