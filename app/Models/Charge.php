@@ -5,7 +5,6 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 class Charge extends Model
 {
     use HasFactory;
@@ -78,7 +77,10 @@ class Charge extends Model
     {
         return $this->belongsTo(Agency::class, 'agency_id');
     }
-
+    public function shippingAgency()
+    {
+        return $this->belongsTo(ShippingAgency ::class, 'agency_id');
+    }
     protected static function booted()
     {
         static::saved(function ($model) {
