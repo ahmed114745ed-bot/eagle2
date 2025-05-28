@@ -29,7 +29,7 @@ use App\Admin\Extensions\AgencyExporter;
 
 class ChargeReportController extends MainController
 {
-    public $permission_name = 'charger-report';
+    public $permission_name = 'charger-reports';
 
     public function index(Content $content)
     {

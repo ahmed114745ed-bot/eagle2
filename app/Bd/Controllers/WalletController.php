@@ -9,6 +9,7 @@ use App\Models\Agency;
 use App\Models\Charge;
 use App\Http\Controllers\Controller;
 use App\Models\BDSallary;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Models\UserWallet;
 use App\Models\WalletTransaction;
@@ -416,7 +417,8 @@ class WalletController extends MainController
 
         }
 
-        $to = Common::searchAgency($toId);
+        $to = ShippingAgency::find($toId);
+    
         if (!$to || $to->is_frozen == 1) {
             throw new \Exception(__('api_responses.freez_charge'));
 
@@ -444,7 +446,7 @@ class WalletController extends MainController
        
     }
     
-    private function performAgencyCharge(User $fromUser, Agency $toAgency, $coins, $usd)
+    private function performAgencyCharge(User $fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
         
     

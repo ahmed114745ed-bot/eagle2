@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Storage;
 class TicketController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'ticket';
+    public $permission_name = 'complaints';
 
     public function index(Content $content)
     {

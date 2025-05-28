@@ -17,7 +17,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class FamilyController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'family';
+    public $permission_name = 'families';
     public $hiddenColumns = [];
 
     public function __construct()

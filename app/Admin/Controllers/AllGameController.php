@@ -17,14 +17,14 @@ use App\Admin\Controllers\MainController;
 
 class AllGameController extends MainController
 {
-    protected $title = 'AllGame';
+    protected $title = 'games';
     public $permission_name = 'games';
 
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("game");
     }
-public function show($id, Content $content)
+    public function show($id, Content $content)
     {
         return parent::show($id, $content
             ->title(trans('Games'))

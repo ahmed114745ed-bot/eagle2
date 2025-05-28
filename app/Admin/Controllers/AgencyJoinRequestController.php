@@ -26,7 +26,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class AgencyJoinRequestController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'agency-join-requests';
+    public $permission_name = 'agencies-join-requests';
 
     public function update($id)
     {

@@ -17,7 +17,7 @@ class OfferController extends MainController
      * @var string
      */
 
-    public $permission_name = 'offers';
+    public $permission_name = 'advertising-space';
 
     public function index(Content $content)
     {

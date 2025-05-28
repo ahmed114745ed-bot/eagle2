@@ -17,7 +17,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class UserTargetController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'agent-target';
+    public $permission_name = 'achieved-Target';
 
     public function index(Content $content)
     {

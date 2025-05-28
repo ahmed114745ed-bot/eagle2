@@ -1382,7 +1382,7 @@ class Common
     public static function searchAgency($id)
     {
         $agency = ShippingAgency::find($id);
-        return $agency ?: false;
+        return $agency ?? 0 ;
     }
 
 
