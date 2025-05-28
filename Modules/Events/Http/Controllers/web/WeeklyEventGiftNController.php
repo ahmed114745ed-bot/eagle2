@@ -69,7 +69,7 @@ class WeeklyEventGiftNController extends MainController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
             ->body($this->form()->edit($id)));
@@ -93,9 +93,9 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->type == "ware") {
-                return @$this->ware->name;
+                return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
-                return @$this->vip->name;
+                return @$this->vip->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
@@ -106,10 +106,10 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img;
+                $path = $ware->img2 ?? ($ware->show_img ?? "");
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $vips->img;
+                $path = $vips->img ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
@@ -160,9 +160,9 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->type == "ware") {
-                return @$this->ware->name;
+                return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
-                return @$this->vip->name;
+                return @$this->vip->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
@@ -173,10 +173,10 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img;
+                $path = $ware->img2 ?? ($ware->show_img ?? '');
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $vips->img;
+                $path = $vips->img ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
@@ -225,9 +225,9 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->type == "ware") {
-                return @$this->ware->name;
+                return @$this->ware->name ?? '';
             } elseif ($this->type == "vip") {
-                return @$this->vip->name;
+                return @$this->vip->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
@@ -238,10 +238,10 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img;
+                $path = $ware->img2 ?? ($ware->show_img ?? "");
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $vips->img;
+                $path = $vips->img ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
@@ -333,14 +333,14 @@ class WeeklyEventGiftNController extends MainController
     {
         $show = new Show(Reward::findOrFail($id));
 
-//        $show->id('ID');
-//        $show->name('name');
-//        $show->img('img');
-//        $show->exp('exp');
-//        $show->type('type');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow ($show);
+        //        $show->id('ID');
+        //        $show->name('name');
+        //        $show->img('img');
+        //        $show->exp('exp');
+        //        $show->type('type');
+        //        $show->created_at(trans('admin.created_at'));
+        //        $show->updated_at(trans('admin.updated_at'));
+        $this->extendShow($show);
         return $show;
     }
 }
