@@ -799,7 +799,7 @@ trait CalcsTrait
 
     }
 
-    public static function wareUserVip($user_id, $type, $item)
+    public static function wareUserVip($user_id, $type, $item, $isLatest = false)
     {
 
 
@@ -818,7 +818,7 @@ trait CalcsTrait
         $vip = OVip::query()->find($uvip->vip_id);
 
         if (!$vip) return  '';
-        $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
+        $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->when($isLatest, fn($q) => $q->latest())->first();
         $value = optional($ware)->{$item};
         return ($value === 'NULL' || $value === null) ? '' : $value;
     }
