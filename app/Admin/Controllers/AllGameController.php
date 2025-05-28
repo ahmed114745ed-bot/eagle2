@@ -90,6 +90,34 @@ class AllGameController extends MainController
         return $form;
     }
 
+     public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('Games'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('Games'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('Games'))
+            ->body($this->form()));
+    }
+
     protected function grid()
     {
         $grid = new Grid(new AllGame());

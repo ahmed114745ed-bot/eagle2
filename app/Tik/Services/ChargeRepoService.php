@@ -367,24 +367,25 @@ class ChargeRepoService
     public function chargeAgencyToAnother(User $auth, $request)
     {
 
-        if (!$request->id || $request->amount ) return Common::apiResponse(false, 'missing_params');
+        \Log::info(json_encode($request->all()));
+
         DB::beginTransaction();
 
         try {
-            $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
-
-            if (!$authAgency) throw new \Exception(__('api.notAgency'));
-            if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
-            if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
-            if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
-            if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
 
             switch ($request->type) {
                 case 'agency':
+                     $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
+                    if (!$authAgency) throw new \Exception(__('api.notAgency'));
+                    if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
+                    if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
+                    if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
+                    if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
                     $this->handleAgencyCharge($authAgency, $request);
                     break;
 
                 case 'user':
+                    $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
                     $this->handleUserCharge($authAgency, $auth, $request);
                     break;
 
@@ -403,9 +404,9 @@ class ChargeRepoService
 
     private function handleAgencyCharge($authAgency, $request)
     {
-        if ($authAgency->id == $request->id) {
-            throw new \Exception(__('api.notYourself'));
-        }
+        // if ($authAgency->id == $request->id) {
+        //     throw new \Exception(__('api.notYourself'));
+        // }
 
         $chargeAgency = $this->shippingAgencyRepository->findOrFail($request->id);
         if (!$chargeAgency) throw new \Exception(__('api.notAgencyFound'));
@@ -435,11 +436,12 @@ class ChargeRepoService
 
         $this->agencyCharge(
             chargerId: $authAgency->id,
-            userId: $chargeAgency->id,
+            userId: null,
             amount: $amount,
             type: 'agency',
             usd: null,
-            chargeType: 'agency'
+            chargeType: 'agency',
+            agencyId: $chargeAgency->id,
         );
     }
 
@@ -454,7 +456,8 @@ class ChargeRepoService
             amount: $amount,
             type: 'app',
             usd: null,
-            chargeType: 'agency'
+            chargeType: 'agency',
+            agencyId: null,
         );
 
         if ($receiver instanceof User) {
@@ -465,8 +468,8 @@ class ChargeRepoService
     }
 
 
-    public function agencyCharge($chargerId, $userId, $amount, $type, $usd = null, $chargeType, $transferred = false)
-    {
+    public function agencyCharge($chargerId, $userId, $amount, $type, $usd = null, $chargeType, $transferred = false ,$agencyId=null)
+    {  
         $data = [
             'charger_id' => $chargerId,
             'charger_type' => $chargeType,
@@ -476,6 +479,7 @@ class ChargeRepoService
             'amount_type' => 2,
             "usd" => $usd != null ? $usd : $amount,
             'is_used_transferred' => $transferred,
+            'agency_id' => $agencyId,
         ];
         $this->create($data);
     }

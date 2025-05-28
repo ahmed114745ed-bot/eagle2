@@ -39,6 +39,15 @@ class VipController extends Controller
 
         return Common::apiResponse(1, '', OVipResource::collection($data['o_vips']), 200);
     }
+    public function vipUserList(Request $request)
+    {
+        $userId = $request->user()->id;
+        $data = $this->vipService->vipUserList($userId);
+
+        \request()->vipPrivileges = $data['all_privileges'];
+
+        return Common::apiResponse(1, '', OVipResource::collection($data['o_vips']), 200);
+    }
 
     public function buyVip(Request $request)
     {

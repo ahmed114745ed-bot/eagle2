@@ -101,7 +101,7 @@ class UserLevelController extends MainController
             ->display(function ($value) use ($arrowIcon) {
 
                 $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
-                $vip=Vip::find($value);
+                $vip=Vip::where('level', $value)->where('type', 2)->first();
                 $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
@@ -115,7 +115,7 @@ class UserLevelController extends MainController
             ->display(function ($value) use ($arrowIcon) {
 
                 $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
-                $vip=Vip::find($value);
+                $vip=Vip::where('level', $value)->where('type', 1)->first();
                 $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>

@@ -165,9 +165,9 @@ class UserResource extends JsonResource
             "manger_type"          => new MangerTypeResource(@$this->manager),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
             'level' => Common::level_center($this->id),
-            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame' => common::wareUserVip($this->id, 28, 'img2', isLatest: true),
+            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id', isLatest: true),
             'image_color'          => @$this->color_image,
-            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
             "multi_images" => $this->images?->select("img"),
             'user_types' => $this->user_types,
             "shipping-agency" => $this->shippingAgency ? [
