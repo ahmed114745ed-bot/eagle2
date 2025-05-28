@@ -39,16 +39,16 @@ class WeeklyEventGiftNController extends MainController
             <i class="fa fa-arrow-left"></i> {$translation}
         </a>
         HTML;
-        return parent::index($content
+        return $content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
             ->breadcrumb(
                 ['text' => trans('admin.eventGift')]
             )
             ->row($buttonHTML)
-            ->row($this->grid1())); // First grid
-            // ->row($this->grid2()) // Second grid
-            // ->row($this->grid3())); // Third grid
+            ->row($this->grid1() // First grid
+            ->row($this->grid2()) // Second grid
+            ->row($this->grid3())); // Third grid
 
 
     }
