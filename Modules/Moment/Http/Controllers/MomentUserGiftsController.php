@@ -8,17 +8,16 @@ use App\Models\User;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use Illuminate\Http\Request;
-use GuzzleHttp\Promise\Utils;
 use Illuminate\Routing\Controller;
 use App\Facades\CustomNotification;
 use Modules\Moment\Entities\Moment;
-use App\Classes\Gifts\SendGiftService;
+
 use App\Exceptions\NotInfMoneyException;
 use Modules\Moment\Entities\MomentUserGift;
 use Illuminate\Contracts\Support\Renderable;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Http\Resources\Api\V1\GeneralUserResource;
-use Modules\Moment\Transformers\MomentGiftsResource;
+use Modules\Moment\Transformers\MomentGiftUserResource;
+
 
 class MomentUserGiftsController extends Controller
 {
@@ -202,9 +201,12 @@ class MomentUserGiftsController extends Controller
 
     public function userGift($id)
     {
-        $momentsGift = MomentUserGift::where('moment_id', $id)->with('user')->get();
-        $users = $momentsGift->pluck('user')->filter(); // filter to remove null users if any
+       $momentsGift = MomentUserGift::selectRaw('user_id, moment_id, SUM(num) as num')
+        ->where('moment_id', $id)
+        ->groupBy('user_id', 'moment_id')
+        ->with('user')
+        ->get();
 
-        return Common::apiResponse(1, 'successful', GeneralUserResource::collection($users), 200);
+        return Common::apiResponse(1, 'successful', MomentGiftUserResource::collection($momentsGift), 200);
     }
 }
