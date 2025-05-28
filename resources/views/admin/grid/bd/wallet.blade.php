@@ -265,7 +265,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
             {{ __('Charge') }}
         </button>
-        <strong>{{ $translated }}: </strong> {{ number_format($finalSalary) }} 💰
+        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
     </div>
 </div>
 
