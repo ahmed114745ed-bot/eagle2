@@ -108,7 +108,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('/image-intro/{id}', [UserController::class, 'image_intro']);
     Route::get('colors', [ColorController::class, 'index']);
     Route::get('all-servers', [RegisterController::class, 'all_servers']);
-    
+
     // v2
     Route::prefix('search')->name('search.')->group(function () {
         Route::get('users', [UserController::class, 'search'])->name('users');
@@ -467,6 +467,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('buy', [MallController::class, 'buyWare']);
                 Route::post('send', [MallController::class, 'sendWare']);
                 Route::get('best-sale', [MallController::class, 'bestWareSale']);
+
+                Route::get('wabble', [MallController::class, 'wabbleWare']);
             });
             //start games
             Route::prefix('all-games1')->group(function () {
@@ -501,11 +503,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
                 Route::post('charges-history', [ChargeController::class, 'chargeToHistory']);
-                 Route::get('history/{id}', [AgencyController::class, 'history']);
+                Route::get('history/{id}', [AgencyController::class, 'history']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
-               
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
@@ -561,6 +562,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         }
     );
 
+Route::get('/languages', [LanguageController::class, 'index']);
 
     Route::get('/privacy-policy', function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
@@ -568,19 +570,3 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     });
 });
 
-
-Route::get('/languages', [LanguageController::class, 'index']);
-
-Route::get('test/my-store-all', function (Request $request) {
-    $users = User::whereBetween('id', [1040, 1051])->get();
-
-    $result = [];
-
-    foreach ($users as $user) {
-        $userService = app()->make(\App\Services\UserService::class);
-        $updatedUser = $userService->myStore($user, $request);
-        $result = 'ok';
-    }
-
-    return Common::apiResponse(true, 'تم تنفيذ العملية على جميع المستخدمين', $result, 200);
-});
