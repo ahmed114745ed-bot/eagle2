@@ -89,7 +89,7 @@ class AgentSalaryTransactionController extends Controller
                 });
         })
             ->when($type == 'received', function ($q) use ($search, $usrAuth) {
-                $q->where("user_id", $usrAuth->id)->where('agency_id', $usrAuth->agency_id)
+                $q->where('agency_id', $usrAuth->agency_id)
                     ->whereHas('sender', function ($q2) use ($search) {
                         $q2->fitterByUuid($search);
                     });
