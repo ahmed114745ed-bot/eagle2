@@ -46,9 +46,9 @@ class WeeklyEventGiftNController extends MainController
                 ['text' => trans('admin.eventGift')]
             )
             ->row($buttonHTML)
-            ->row($this->grid1()) // First grid
-            ->row($this->grid2()) // Second grid
-            ->row($this->grid3())); // Third grid
+            ->row($this->grid1())); // First grid
+            // ->row($this->grid2()) // Second grid
+            // ->row($this->grid3())); // Third grid
 
 
     }
