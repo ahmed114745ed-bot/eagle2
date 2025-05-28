@@ -367,10 +367,12 @@ class ChargeRepoService
     public function chargeAgencyToAnother(User $auth, $request)
     {
 
+        \Log::info(json_encode($request->all()));
+
         DB::beginTransaction();
 
         try {
-           
+
             switch ($request->type) {
                 case 'agency':
                      $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
