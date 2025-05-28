@@ -75,30 +75,9 @@
             @if(url()->isValidUrl($item['uri']))
                 <a href="{{ $item['uri'] }}" target="_blank">
                     @else
-                    @if (Admin::user()->type == 'bd')
-                        @php
-                        $uri = ltrim($item['uri'], '/');
-                        $staticBdUrls = [
-                            'home' => '/bd',
-                            'login' => '/bd/login',
-                            'logout' => '/bd/logout',
-                            'setting' => '/bd/setting',
-                            'update-setting' => '/bd/update-setting',
-                            'charges' => '/bd/charges',
-                            'agencies' => '/bd/agencies',
-                            'salaries' => '/bd/salaries',
-                            'request-agencies' => '/bd/request-agencies',
-                            'wallet-charge' => '/bd/admin/wallet/charge',
-                            'salary-transfer' => '/bd/admin/salary/transfer',
-                        ];
+               
 
-                        $link = $staticBdUrls[$uri] ?? '/bd/' . $uri;
-                    @endphp
-
-                    <a href="{{ $link }}">
-                    @endif
-
-
+                    
                     @if (Admin::user()->type != 'bd')
                         <a href="{{ admin_url($item['uri']) }}">
                     @endif

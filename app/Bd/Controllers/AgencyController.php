@@ -279,16 +279,16 @@ class AgencyController extends MainController
             $newUser = User::find($data['app_owner_id']);
             if ($newUser) {
                 $newUser->agency_id = $agency->id;
-                if ($agency->Host_agency == 1 && $agency->Shipping_agency == 1) {
-                    $newUser->type_user = 4;
-                } elseif ($agency->Host_agency == 1 && $agency->Shipping_agency == 0) {
-                    $newUser->type_user = 2;
-                } elseif (
-                    $agency->Host_agency == 0 && $agency->Shipping_agency == 1
-                ) {
-                    $newUser->type_user = 3;
-                }
-
+                // if ($agency->Host_agency == 1 && $agency->Shipping_agency == 1) {
+                //     $newUser->type_user = 4;
+                // } elseif ($agency->Host_agency == 1 && $agency->Shipping_agency == 0) {
+                //     $newUser->type_user = 2;
+                // } elseif (
+                //     $agency->Host_agency == 0 && $agency->Shipping_agency == 1
+                // ) {
+                //     $newUser->type_user = 3;
+                // }
+                $newUser->type_user = 2;
                 $newUser->is_host = 1;
                 $newUser->save();
             }
@@ -607,10 +607,10 @@ class AgencyController extends MainController
                 $row->width(12)->switch('status', __('status'));
                 $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                $row->width(12)->hidden('Host_agency')->default(1);
+                // $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->hidden('Shipping_agency')->default(0);
+                    // $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         } else {
@@ -632,11 +632,11 @@ class AgencyController extends MainController
                 $row->width(12)->switch('status', __('status'));
                 $row->width(12)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                $row->width(12)->hidden('Host_agency')->default(1);
+                // $row->width(12)->hidden('Host_agency')->default(1);
 
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
+                    // $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
                 }
             });
         }
@@ -708,9 +708,9 @@ class AgencyController extends MainController
             $form->input('bd_id', Auth::user()->app_id);
             $form->model()->bd_id =Auth::user()->app_id;
             $appOwnerId = $form->input('app_owner_id');
-            $Host_agency = $form->input('Host_agency');
+            // $Host_agency = $form->input('Host_agency');
 
-            $Shipping_agency = $form->input('Shipping_agency') ;
+            // $Shipping_agency = $form->input('Shipping_agency') ;
             $host = 0;
 
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
@@ -733,48 +733,48 @@ class AgencyController extends MainController
                     'is_host' => 0,
                 ]);
 
-                if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 2,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 4,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 3,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                }
+                // if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 2,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 4,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 3,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // }
             }
 
 
 
-            if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
+            // if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
 
-                session()->flash('show_alert', 'Your alert message');
-                return redirect()->back();
-            }
-
-
+            //     session()->flash('show_alert', 'Your alert message');
+            //     return redirect()->back();
+            // }
 
 
-            if ($Host_agency == 'on' || $Host_agency == 1) {
-                $host += 2;
-            }
 
-            if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
-                $host += 3;
-            }
+
+            // if ($Host_agency == 'on' || $Host_agency == 1) {
+            //     $host += 2;
+            // }
+
+            // if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
+            //     $host += 3;
+            // }
             if ($host > 3) {
                 $host = 4;
             }

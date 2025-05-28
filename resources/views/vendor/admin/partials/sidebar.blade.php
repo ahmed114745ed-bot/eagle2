@@ -72,6 +72,27 @@
             <ul class="sidebar-menu">
                 <li class="header">{{ trans('admin.menu') }}</li>
 
+                @if (Admin::user()->type == 'bd')
+  
+                @php
+                    $bdLinks = [
+                        ['uri' => '/bd', 'icon' => 'fa-home', 'title' => __('home')],
+                        ['uri' => '/bd/charges', 'icon' => 'fa-money-bill', 'title' => __('charges')],
+                        ['uri' => '/bd/agencies', 'icon' => 'fa-building', 'title' => __('agencies')],
+                        ['uri' => '/bd/salaries', 'icon' => 'fa-wallet', 'title' => __('salaries')],
+                        ['uri' => '/bd/request-agencies', 'icon' => 'fa-file-alt', 'title' => __('request-agencies')],
+                    ];
+                @endphp
+
+                @foreach($bdLinks as $link)
+                    <li>
+                        <a href="{{ $link['uri'] }}">
+                            <i class="fa {{ $link['icon'] }}"></i>
+                            <span>{{ $link['title'] }}</span>
+                        </a>
+                    </li>
+                @endforeach
+                @endif
                 @each('admin::partials.menu', $filteredMenu, 'item')
             </ul>
 
