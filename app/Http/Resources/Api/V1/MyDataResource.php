@@ -218,6 +218,7 @@ class MyDataResource extends JsonResource
             'wallet' => $this->wallet?->value ?? 0,
             'user_types' => $this->user_types,
             'wabble' => $this->getUserPack(12),
+            'wabble_id' => $this->getUserPackId(12),
             "shipping-agency" => $this->shippingAgency ? [
                 "id" => $this->shippingAgency->id,
                 "name" => $this->shippingAgency->name ?? '',
@@ -249,6 +250,8 @@ class MyDataResource extends JsonResource
             ->get();
     }
 
+
+
     public function getUserDress($type, $dress, $item = 'img1')
     {
         $pack = $this->packs
@@ -269,5 +272,9 @@ class MyDataResource extends JsonResource
         ];
     }
 
-
+    public function getUserPackId($type)
+    {
+        $pack = $this->packs->where('type', $type)->first();
+        return $pack ? @$pack?->ware->id : 0;
+    }
 }
