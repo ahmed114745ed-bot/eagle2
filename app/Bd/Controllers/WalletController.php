@@ -311,11 +311,14 @@ class WalletController extends MainController
                 admin_toastr('نوع الوجهة غير موجود', 'error');
                 return back();
             }
-                $data = call_user_func($types[$type], $request->all());
-                admin_toastr('تم الشحن بنجاح', 'success');
-                return back();
+        
+       
+          
+            $data = call_user_func($types[$type], $request->all());
+            admin_toastr('تم الشحن بنجاح', 'success');
+            return back();
         } catch (\Exception $e) {
-            return Common::apiResponse(false, $e->getMessage());
+            throw new \Exception($e->getMessage());
         } catch (\Throwable $e) {
             admin_toastr('حدث خطأ أثناء الشحن: ' . $e->getMessage(), 'error');
             return back();
