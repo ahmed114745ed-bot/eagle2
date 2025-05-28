@@ -149,7 +149,7 @@ return [
     'agency_shipping' => 'You cannot send a request to the shipping agency',
     'expireAccount' => 'your account expired',
     'reserved' => 'The phone is reserved',
-    'notSend' => 'ypu can not send to yourself',
+    'notSend' => 'you can not send to yourself',
     'notFound' => 'user not found',
     'ownerNotFound' => 'owner not found',
     'shippingAgency' => ' you can\'t join this shipping agency',

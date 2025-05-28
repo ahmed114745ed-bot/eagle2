@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AllStatisticController extends MainController
 {
-    public $permission_name = 'all-statistic';
+    public $permission_name = 'dashboard';
 
     public function index(Content $content)
     {

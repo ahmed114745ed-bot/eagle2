@@ -57,6 +57,11 @@ class VipService
         return $data;
     }
 
+
+
+
+
+
     public function buyVip($request)
     {
         $vip = $this->ovipRepository->findById($request->vip_id);
@@ -139,7 +144,7 @@ class VipService
         $user_vip = $this->userVipRepository->findById($request->vip_id);
         if (!$user_vip || $user_vip->user_id != $from->id)  throw new \Exception(__("api_responses.vip_not_found"));
 
-        if ($user_vip->is_used == 1  || $user_vip->num_used >= 1) throw new \Exception('ال vip مستخدم من قبل لا يمكن اهدائه');
+        if ($user_vip->is_used == 1  || $user_vip->num_used >= 1 || $user_vip->using == 1) throw new \Exception('ال vip مستخدم من قبل لا يمكن اهدائه');
         $user = $this->userRepository->searchUser($request->user_id);
         if (!$user) throw new \Exception('api_responses.notFound');
         if ($user->id == $from->id)  throw new \Exception(__("api_responses.notSend"));
@@ -147,7 +152,8 @@ class VipService
             'sender_id' => $from->id,
             'user_id' => $user->id,
         ];
-        $this->userVipRepository->update($data, $user_vip->id);
+        $user_vip->update($data);
+
         return $user_vip;
     }
 
@@ -219,9 +225,9 @@ class VipService
         $expire == 0 ? $ex = 0 : $ex = now()->addDays($expire * $qty)->timestamp;
         try {
             if ($request->type == 1) {
-                [$user_id, $from, $type, $sender_id, $user] = $this->userTypeOne($request, $total);
+                [$user_id, $from, $type, $sender_id, $user] = $this->authUserSend($request, $total);
             } else {
-                [$user_id, $from, $type, $sender_id, $user] = $this->userTypeZero($request, $total);
+                [$user_id, $from, $type, $sender_id, $user] = $this->authUser($request, $total);
             }
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
@@ -277,7 +283,75 @@ class VipService
         }
     }
 
-    public function userTypeOne($request, $total)
+    public function buyVips($request)
+    {
+        $vip = $this->ovipRepository->findById($request->vip_id);
+        if (!$vip) return Common::apiResponse(0, __('api_responses.not_found'), null, 404);
+        $qty = $request->qty ?: 1;
+        $total = $vip->price * $qty;
+        $expire = $vip->expire;
+        $expire == 0 ? $ex = 0 : $ex = now()->addDays($expire * $qty)->timestamp;
+        try {
+            if ($request->type == 1) {
+                [$user_id, $from, $type, $sender_id, $user] = $this->authUserSend($request, $total);
+            } else {
+                [$user_id, $from, $type, $sender_id, $user] = $this->authUser($request, $total);
+            }
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+
+        DB::beginTransaction();
+        try {
+            $from->decrement('di', $total);
+
+            $this->packRepository->deleteExpirePack();
+
+            // $userVip = $this->userVipRepository->findByUserLevel($user_id, $vip->level, $vip->id);
+            // if ($userVip) {
+
+            //     if ($userVip->expire == 0) {
+            //         $ex = 0;
+            //     } else {
+            //         $ex =  $userVip->expire + ($expire * $qty * 86400);
+            //     }
+
+            //     $data = [
+            //         'expire'   => $ex,
+            //         'qty'      => $userVip->qty + $qty,
+            //         'total'    => $userVip->total + $total,
+            //         'is_used'  => 0,
+
+            //     ];
+            //     $this->userVipRepository->update($data, $userVip->id);
+            // } else {
+            $data = [
+                'type' => $type,
+                'sender_id' => $sender_id,
+                'user_id' => $user_id,
+                'vip_id' => $vip->id,
+                'level' => $vip->level,
+                'expire' => $ex,
+                'qty' => $qty,
+                'price' => $vip->price,
+                'total' => $total,
+                'is_used' => 0,
+            ];
+
+            $data = $this->userVipRepository->create($data);
+            // }
+            Common::handelVip($vip, $user);
+            DB::commit();
+            $ex = Carbon::parse($ex)->diffInDays(now());
+            CustomNotification::vips($user, $ex, $vip->img);
+            return Common::apiResponse(1, 'done', null, 201);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function authUserSend($request, $total)
     {
         $type = 1;
         if (!$request->to_user) throw new Exception(__('api_responses.missing_params'));
@@ -292,14 +366,32 @@ class VipService
         return [$user_id, $from, $type, $sender_id, $user];
     }
 
-    public function userTypeZero($request, $total)
+    public function authUser($request, $total)
     {
         $type = 0;
         $user = $request->user();
         $user_id = $user->id;
         $sender_id = 0;
-        if ($user->di < $total) throw new Exception( __('api_responses.low_balance'));
+        if ($user->di < $total) throw new Exception(__('api_responses.low_balance'));
         $from = $user;
         return [$user_id, $from, $type, $sender_id, $user];
+    }
+
+    public function vipUserList($userId)
+    {
+        $userVip = $this->userVipRepository->getAllByUserId($userId);
+        $vipPrivileges = $this->vipPrivilegeRepository->all();
+        $oVips =  $userVip->pluck('OVip');
+        $wares = $this->wareRepository->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
+        $oVips = $oVips->map(function ($oVip) use ($wares) {
+            $filteredWares = $wares->where('level', $oVip->level);
+            $oVip->setRelation('wares', $filteredWares);
+            return $oVip;
+        });
+        $data = [
+            'all_privileges' => $vipPrivileges,
+            'o_vips' => $oVips,
+        ];
+        return $data;
     }
 }
