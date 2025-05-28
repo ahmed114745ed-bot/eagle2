@@ -367,7 +367,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             return;
         }
 
-        let url = targetType === 'user' ? '/api/search/users3' : '/api/search/agencies';
+        let url = targetType === 'user' ? '/api/search/users2' : '/api/search/agencies';
 
         searchTimeout = setTimeout(() => {
             fetch(`${url}?q=${encodeURIComponent(query)}`)
