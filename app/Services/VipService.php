@@ -376,4 +376,22 @@ class VipService
         $from = $user;
         return [$user_id, $from, $type, $sender_id, $user];
     }
+
+    public function vipUserList($userId)
+    {
+        $userVip = $this->userVipRepository->getAllByUserId($userId);
+        $vipPrivileges = $this->vipPrivilegeRepository->all();
+        $oVips =  $userVip->ovip;
+        $wares = $this->wareRepository->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
+        $oVips = $oVips->map(function ($oVip) use ($wares) {
+            $filteredWares = $wares->where('level', $oVip->level);
+            $oVip->setRelation('wares', $filteredWares);
+            return $oVip;
+        });
+        $data = [
+            'all_privileges' => $vipPrivileges,
+            'o_vips' => $oVips,
+        ];
+        return $data;
+    }
 }
