@@ -14,10 +14,12 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Http\Controllers\ChargeAgencyController;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
+use App\Traits\DefaultBdAssignmentTrait;
+
 
 class Agency extends Model
 {
-    use SoftDeletes, AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait;
+    use SoftDeletes, AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait ,DefaultBdAssignmentTrait;
     protected $guarded = [];
 
     protected $hidden = [
