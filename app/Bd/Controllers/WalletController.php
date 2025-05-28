@@ -293,7 +293,7 @@ class WalletController extends MainController
     public function charge(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:0.01',
+            'amount' => 'required|integer|min:1',
             'target_id' => 'nullable',    
             'target_type' => 'required|string',
         ]);
