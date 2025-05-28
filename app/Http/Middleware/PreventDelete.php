@@ -7,7 +7,6 @@ use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\MessageBag;
-
 class PreventDelete
 {
     /**

@@ -1037,7 +1037,7 @@ use App\Models\Vip;
                                 @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.lucky_flex') }}</h4>
+                                        <h4 class="m-0">{{ __('lucky phonix') }}</h4>
                                         <div class="d-flex align-items-center">
                                             <input type="radio" id="luckyFlexRadio"
                                                 class="custom-radio libraryRealTime" name="games_library"
@@ -1068,7 +1068,7 @@ use App\Models\Vip;
                                 @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.guess_the_word') }}</h4>
+                                        <h4 class="m-0">{{ __('Zynga') }}</h4>
                                         <div class="ribbon-banner-card">
                                             <span>{{ __('soon') }}</span>
                                         </div>

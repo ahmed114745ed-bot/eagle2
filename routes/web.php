@@ -349,17 +349,5 @@ Route::get('/test-fcm/{userid}', function($userId) {
 use App\Http\Resources\MyStoreResource;
 
 
-Route::get('test/my-store-all', function (Request $request) {
-    $users = User::whereBetween('id', [1040, 1051])->get();
 
-    $result = [];
-
-    foreach ($users as $user) {
-        $userService = app()->make(\App\Services\UserService::class);
-        $updatedUser = $userService->myStore($user, $request);
-        $result = 'ok';
-    }
-
-    return Common::apiResponse(true, 'تم تنفيذ العملية على جميع المستخدمين', $result, 200);
-});
 
