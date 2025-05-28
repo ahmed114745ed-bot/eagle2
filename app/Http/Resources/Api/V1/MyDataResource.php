@@ -208,8 +208,8 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' => common::wareUserVip($this->id, 28, 'img2', isLatest: true),
-            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id', isLatest: true),
+            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
@@ -263,7 +263,7 @@ class MyDataResource extends JsonResource
 
     public function getUserPack($type)
     {
-        $pack = $this->packs->where('type', $type)->sortByDesc('id')->first();
+        $pack = $this->packs->where('type', $type)->first();
         return $pack ?  new GeneralUserPackResource($pack) : [
             'id'   =>  0,
             'image_type' => 'png',
@@ -274,7 +274,7 @@ class MyDataResource extends JsonResource
 
     public function getUserPackId($type)
     {
-        $pack = $this->packs->where('type', $type)->sortByDesc('id')->first();
+        $pack = $this->packs->where('type', $type)->first();
         return $pack ? @$pack?->ware->id : 0;
     }
 }
