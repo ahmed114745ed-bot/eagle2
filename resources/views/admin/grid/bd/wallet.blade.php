@@ -288,7 +288,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <select id="target_type" name="target_type" class="form-control" required onchange="toggleTargetFields()">
             <option value="">{{ __('select') }}</option>
             <option value="user">{{ __('user') }}</option>
-            <option value="agency">{{ __('agency') }}</option>
+            <option value="agency">{{ __('Shipping agency') }}</option>
         </select>
     </div>
 
