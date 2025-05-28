@@ -318,7 +318,7 @@ class WalletController extends MainController
             admin_toastr('تم الشحن بنجاح', 'success');
             return back();
         } catch (\Exception $e) {
-            admin_toastr($e->getMessage());
+            admin_toastr($e->getMessage(), 'error');
             return back();
         } catch (\Throwable $e) {
             admin_toastr('حدث خطأ أثناء الشحن: ' . $e->getMessage(), 'error');
