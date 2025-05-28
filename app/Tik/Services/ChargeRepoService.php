@@ -367,7 +367,6 @@ class ChargeRepoService
     public function chargeAgencyToAnother(User $auth, $request)
     {
 
-        if (!$request->id || !$request->amount ) return Common::apiResponse(false, 'missing_params');
         DB::beginTransaction();
 
         try {
@@ -379,7 +378,7 @@ class ChargeRepoService
                     if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
                     if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
                     if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
-                    if ($authAgency->coins > $request->amount) throw new \Exception(__('api.notHaveAmount'));
+                    if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
                     $this->handleAgencyCharge($authAgency, $request);
                     break;
 
@@ -431,7 +430,7 @@ class ChargeRepoService
     {
 
         $authAgency->decrement('coins', $amount);
-        $chargeAgency->increment('di', $amount);
+        $chargeAgency->increment('coins', $amount);
 
         $this->agencyCharge(
             chargerId: $authAgency->id,
