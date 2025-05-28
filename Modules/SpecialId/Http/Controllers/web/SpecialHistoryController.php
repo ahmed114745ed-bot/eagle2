@@ -17,7 +17,7 @@ class SpecialHistoryController extends MainController
      *
      * @var string
      */
-    public $permission_name = 'special-history';
+    public $permission_name = 'details-of-unique-identifiers';
 
     public function index(Content $content)
     {

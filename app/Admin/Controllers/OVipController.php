@@ -25,7 +25,7 @@ use Illuminate\Support\Str;
 class OVipController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'ovip';
+    public $permission_name = 'VIPs';
     public $permission_setting = 'ovip-settings';
 
 
@@ -128,13 +128,16 @@ class OVipController extends MainController
             ";
         });
         $grid->column('expire', __('expire'));
-        $grid->column(__('file'))->display(function () {
-            // توليد الروابط
-            $url1 = url('admin/ovip-gift/' . $this->id);
 
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";
-            return $button1;
-        });
+        if (Admin::user()->can('browse-' . 'vip-gift') || Admin::user()->can('*')) {
+            $grid->column(__('file'))->display(function () {
+                // توليد الروابط
+                $url1 = url('admin/ovip-gift/' . $this->id);
+
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";
+                return $button1;
+            });
+        }
         $this->extendGrid($grid);
         $grid->disableExport();
         Admin::script("

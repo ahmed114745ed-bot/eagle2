@@ -26,7 +26,7 @@ use Modules\SalaryTransaction\Entities\ChargeCountry;
 class ChargeCountryController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'charge-country';
+    public $permission_name = 'countries-where-salary-payments-are-available';
 
     public function index(Content $content)
     {

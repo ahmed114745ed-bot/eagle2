@@ -20,7 +20,7 @@ class SalaryRequestController extends MainController
      * @var string
      */
 
-    public $permission_name = 'salary-request';
+    public $permission_name = 'salary-requests';
 
     public function index(Content $content)
     {

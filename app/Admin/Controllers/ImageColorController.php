@@ -18,7 +18,7 @@ use Encore\Admin\Grid\Displayers\Image;
 class ImageColorController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'image-color';
+    public $permission_name = 'id-color';
 
     /**
      * Index interface.

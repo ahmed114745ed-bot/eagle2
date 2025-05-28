@@ -17,7 +17,7 @@ class UserTargetController extends MainController
 {
     use HasResourceActions;
 
-    public $permission_name = 'user-target-eg';
+    public $permission_name = 'hosts-target';
 
     public function index(Content $content)
     {

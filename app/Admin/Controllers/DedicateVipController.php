@@ -13,7 +13,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class DedicateVipController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'vips-dedicate';
+    public $permission_name = 'gift-VIP';
 
     public function index(Content $content)
     {
@@ -115,18 +115,19 @@ class DedicateVipController extends MainController
         });
         $grid->column('level', __('level'));
         $grid->column('expire', __('expire'));
+        if (Admin::user()->can('browse-' . 'gift-VIP-Switch') || Admin::user()->can('*')) {
+            $grid->column('return', __('dedicate'))->display(function () {
 
-        $grid->column ('return',__ ('dedicate'))->display (function (){
-
-          return (new \App\Admin\Actions\VipDedicateAction($this->id))->render ();
-        });
+                return (new \App\Admin\Actions\VipDedicateAction($this->id))->render();
+            });
+        }
         $grid->disableCreateButton();
         $grid->disableActions();
-          $grid->actions(function ($actions) {
+        $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
-           // $actions->add(new DedicateAction());
+            // $actions->add(new DedicateAction());
         });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens

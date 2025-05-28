@@ -21,7 +21,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class BanRoomsController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'ban-rooms';
+    public $permission_name = 'close-room';
 
     /**
      * Index interface.
@@ -190,6 +190,11 @@ class BanRoomsController extends MainController
         $grid->disableRowSelector();
         // $grid->disableActions();
         $grid->disableCreateButton();
+         $grid->actions(function ($actions) {
+            $actions->disableEdit();
+            $actions->disableView();
+            // $actions->add(new DedicateAction());
+        });
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
