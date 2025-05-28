@@ -819,7 +819,8 @@ trait CalcsTrait
 
         if (!$vip) return  '';
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
-        return optional($ware)->{$item} ?? '';
+        $value = optional($ware)->{$item};
+        return ($value === 'NULL' || $value === null) ? '' : $value;
     }
 
     public static function wareUserVipColor($user_id, $type)

@@ -1278,7 +1278,7 @@ function confirmAction(message, onConfirm) {
         cancelButtonText: 'Cancel',
         reverseButtons: true
     }).then((result) => {
-        if (result.isConfirmed) {
+        if (result.value) {
             $.ajax({
                 url: '/admin/delete-pack/' + itemId,
                 type: 'POST',
