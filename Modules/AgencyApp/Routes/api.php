@@ -44,3 +44,4 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','appFeatureE
     Route::post('/action-invite-agency', [AgencyHostInviteController::class, 'actionInvitation']);
     Route::post('/host-agency-edit', [ApiAgencyAppController::class, 'host_agency_edit']);
 });
+

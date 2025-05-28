@@ -98,7 +98,7 @@ class AllStatisticController extends MainController
                 })->row(function (\Encore\Admin\Layout\Row $row) use ($total_sallary) {
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('total salaries') );
 
-                    $row->column(6, new InfoBox(__('total salaries'), 'dollar', 'black', '', $this->formatNumber(@$total_sallary ?? 0)));
+                    $row->column(6, new InfoBox(__('total salaries'), 'dollar', 'blue', '', $this->formatNumber(@$total_sallary ?? 0)));
                 })->row(function (\Encore\Admin\Layout\Row $row) use ($app_earned_charge) {
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('app earned') );
 

@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Http\Resources\Api\V1\ChargeAgentResource;
 use App\Models\PaymentGateway;
+use App\Models\ShippingAgency;
 use App\Tik\Repositories\UserRepository;
 use Modules\SalaryTransaction\Helpers\TransactionCustomNotification;
 use App\Http\Controllers\Controller;
@@ -187,7 +188,7 @@ class AgentSalaryTransactionController extends Controller
         $countryId = $request->country_id;
         $paymentId = $request->payment_id;
 
-        $agencies = Agency::with("Countries", "AgencypaymentGateways")->has("chargeAgency")->withCount(['salaryRequests' => function ($query) {
+        $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")->withCount(['salaryRequests' => function ($query) {
             $query->where('status', 3);
         }])->whereHas('owner')
             ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))

@@ -341,10 +341,3 @@ Route::get('/test-fcm/{userid}', function($userId) {
     ]);
 });
 
-
-
-
-
-
-
-

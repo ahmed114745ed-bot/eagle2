@@ -24,9 +24,9 @@ class GiftController extends MainController
     {
         return parent::index($content
             ->title(__($this->title))
-            ->row(function (Row $row) {
-                $row->column(12, $this->grid2());
-            })
+            // ->row(function (Row $row) {
+            //     $row->column(12, $this->grid2());
+            // })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             }));
@@ -195,76 +195,48 @@ class GiftController extends MainController
         $form = new Form(new Gift);
         $form->display(__('ID'));
         $form->text('name', __('name'));
+
         $form->select('type', __('type'))->options(
             translate(TYPE_GIFT)
-        )->attribute(['id' => 'type'])->required();
+        )
+            ->when(6, function() use ($form) {
+                $form->number('luckyGift.win_probability', __('win probability'))
+                    ->min(10)->max(100)
+                    ->placeholder(__('Enter win probability'))
+                    ->attribute(['id' => 'win_probability']);
 
-        $form->number('luckyGift.win_probability', __('win probability'))
-            ->min(10)
-            ->max(100)
-            ->placeholder(__('Enter win probability')) ->attribute(['id' => 'win_probability']);
+                $form->number('luckyGift.min_percentag', __('min percentage'))
+                    ->min(0)->max(100)
+                    ->placeholder(__('Enter min_percentage'))
+                    ->attribute(['id' => 'min_percentage']);
 
-        $form->number('luckyGift.min_percentag', __('min percentage'))
-            ->min(0)
-            ->max(100)
-            ->placeholder(__('Enter min_percentage'))
-            ->default(function ($form) {
-                $value = @$form->model()->luckyGift->min_percentage;
-                return @explode(',', $value)[0] ?? 0;
+                $form->number('luckyGift.mid_percentag', __('mid percentage'))
+                    ->min(0)->max(100)
+                    ->placeholder(__('Enter mid_percentage'))
+                    ->attribute(['id' => 'mid_percentage']);
+
+                $form->number('luckyGift.max_percentag', __('max percentage'))
+                    ->min(0)->max(100)
+                    ->placeholder(__('Enter max_percentage'))
+                    ->attribute(['id' => 'max_percentage']);
             })
-            ->attribute(['id' => 'min_percentage']);
-        $form->number('luckyGift.mid_percentag', __('mid percentage'))
-            ->min(0)
-            ->max(100)
-            ->placeholder(__('Enter mid_percentage'))
-            ->default(function ($form) {
-                $value = @$form->model()->luckyGift->min_percentage;
-                return @explode(',', $value)[1] ?? 0;
-            })
-            ->attribute(['id' => 'mid_percentage']);
-        $form->number('luckyGift.max_percentag', __('max percentage'))
-            ->min(0)
-            ->max(100)
-            ->placeholder(__('Enter max_percentage'))
-            ->default(function ($form) {
-                $value = @$form->model()->luckyGift->min_percentage;
-                return @explode(',', $value)[2] ?? 0;
-            })
-            ->attribute(['id' => 'max_percentage']);
+            ->when(9, function() use ($form) {
+                $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
+            });
 
-        // Add custom JS
-        $script = <<<SCRIPT
-             $(document).ready(function() {
-                 function toggleWinProbability() {
-                     var type = $('#type').val();
-                     if(type == '6') {
-                         $('#win_probability').closest('.form-group').show();
-                         $('#min_percentage').closest('.form-group').show();
-                         $('#mid_percentage').closest('.form-group').show();
-                         $('#max_percentage').closest('.form-group').show();
-                     } else if(type == '9'){
-                       $('#vip_level').closest('.form-group').show();
-                        $('#win_probability').closest('.form-group').hide();
-                         $('#min_percentage').closest('.form-group').hide();
-                         $('#mid_percentage').closest('.form-group').hide();
-                         $('#max_percentage').closest('.form-group').hide();
-                      }
-                         else {
-                         $('#win_probability').closest('.form-group').hide();
-                         $('#min_percentage').closest('.form-group').hide();
-                         $('#mid_percentage').closest('.form-group').hide();
-                         $('#max_percentage').closest('.form-group').hide();
-                         $('#vip_level').closest('.form-group').hide();
-                     }
-                 }
-                 toggleWinProbability();
+        $form->currency('price', __('price'))->symbol('💎');
+        $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
-                 $('#type').change(function() {
-                     toggleWinProbability();
-                 });
-             });
-             SCRIPT;
-        Admin::script($script);
+        $form->file('img', __('img'));
+        $form->file('show_img', __('show_img'))->name(function ($file) {
+            return 'svga_' . \Str::random(6) . '.' . $file->getClientOriginalExtension();
+        })->required();
+        $form->select('image_type', __('image_type'))->options([
+            'svga' => __('svga'),
+            'alpha' => __('alpha'),
+            'mp4' => __('mp4'),
+            'vap' => __('vap'),
+        ])->required();
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_gift_price') || Admin::user()->can('*')) {

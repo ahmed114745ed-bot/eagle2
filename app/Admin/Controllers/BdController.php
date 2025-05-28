@@ -108,10 +108,7 @@ class BdController extends MainController
         // $grid->column('username', __('username'));
         // $grid->column('name', __('Name'));
         $grid->column('username', __('Bd'))->display(function ($name) {
-<<<<<<< HEAD
-=======
             
->>>>>>> 16913da47 (.)
            
 
             $id = $this->id ?? '-';
@@ -139,13 +136,10 @@ class BdController extends MainController
                 </div>
             ";
         });
-<<<<<<< HEAD
-=======
-        $grid->column('default', __('status'))->display(function () {
+        $grid->column('default', __('default_status'))->display(function () {
             if ($this->default == 1) {
                 return <<<HTML
                     <span style="display: flex; align-items: center;">
-                        <strong style="color: green; margin-right: 5px;">✔</strong>
                         <span style="
                             font-size: smaller;
                             background: red;
@@ -163,7 +157,6 @@ class BdController extends MainController
         });
         
 
->>>>>>> 16913da47 (.)
 
         $grid->column('appUser.name', __('المستخدم المرتبط'))->display(function ($name) {
             $user = $this->appUser;
@@ -198,11 +191,8 @@ class BdController extends MainController
             return $this->agencies_count;
         });
 
-<<<<<<< HEAD
-        $grid->column('total_salary', __('total salary'))->display(function () {
-=======
+
         $grid->column('total_salary', __('total proft'))->display(function () {
->>>>>>> 16913da47 (.)
             return number_format($this->total_salary, 2);
         });
 
@@ -222,7 +212,7 @@ class BdController extends MainController
             $actions->disableDelete();
             $model = $actions->row;
             $actions->add(new \App\Admin\Actions\DeleteBdAction());
-            $actions->add(new MakeBdDefultAction($model->id));
+            // $actions->add(new MakeBdDefultAction($model->id));
         });
 
 

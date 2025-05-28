@@ -625,7 +625,7 @@ class AgencyController extends MainController
                         $ops2[$user->id] = $user->uuid . '_' . $user->name;
                     }
                     return $ops2;
-                })->ajax('/api/search/users-bd2', 'id', 'name')->rules('required');
+                })->ajax('/api/search/users-bd2', 'id', 'name');
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
                     $ops2 = [];
                     foreach (User::Where('id', $value)->get() as $user) {
@@ -654,7 +654,7 @@ class AgencyController extends MainController
                         $ops2[$user->id] = $user->uuid . '_' . $user->name;
                     }
                     return $ops2;
-                })->ajax('/api/search/users-bd2', 'id', 'name')->rules('required');
+                })->ajax('/api/search/users-bd2', 'id', 'name');
 
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
                     $ops2 = [];

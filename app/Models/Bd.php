@@ -13,6 +13,7 @@ class Bd extends Model
 
     protected static function booted(): void
     {
+
         static::addGlobalScope('bdOnly', function (Builder $builder) {
             $builder->where('type', 'bd');
         });
@@ -28,6 +29,11 @@ class Bd extends Model
             } else {
                 throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
             }
+            $userApp = \App\Models\User::find($bd->app_id);
+                if ($userApp) {
+                    $userApp->is_bd = 0;
+                    $userApp->save();
+                }
         });
     }
 
@@ -37,14 +43,24 @@ class Bd extends Model
 
 
         static::creating(function ($model) {
+            $model->type = 'bd';
+
             if ($model->default) {
                 static::query()->update(['default' => 0]);
+                Agency::where(function ($query) {
+                    $query->whereNull('bd_id')
+                          ->orWhere('bd_id', 0);
+                })->update(['bd_id' => $model->app_id]);
             }
         });
 
         static::updating(function ($model) {
             if ($model->default) {
                 static::where('id', '!=', $model->id)->update(['default' => 0]);
+                Agency::where(function ($query) {
+                    $query->whereNull('bd_id')
+                          ->orWhere('bd_id', 0);
+                })->update(['bd_id' => $model->app_id]);
             }
         });
     }

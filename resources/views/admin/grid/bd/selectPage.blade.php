@@ -36,18 +36,14 @@
  
 <p>
 &#9432;  
-        <strong>
+        <!-- <strong> -->
        
             {{ __('default_current') }}:
             <span title="{{ __('default_current_info') }}" style="cursor: help; color: #007bff;">
               
             </span>
-        </strong>
-        @if($defaultBd)
-            {{ $defaultBd->username }}
-        @else
-            {{ __('no_default_set') }}
-        @endif
+        <!-- </strong> -->
+       
     </p>
 </div>
 

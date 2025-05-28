@@ -8,15 +8,16 @@ use App\Models\User;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use Illuminate\Http\Request;
-use GuzzleHttp\Promise\Utils;
 use Illuminate\Routing\Controller;
+use App\Facades\CustomNotification;
 use Modules\Moment\Entities\Moment;
-use App\Classes\Gifts\SendGiftService;
+
 use App\Exceptions\NotInfMoneyException;
+use Modules\Moment\Entities\MomentUserGift;
 use Illuminate\Contracts\Support\Renderable;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Facades\CustomNotification;
-use Modules\Moment\Transformers\MomentGiftsResource;
+use Modules\Moment\Transformers\MomentGiftUserResource;
+
 
 class MomentUserGiftsController extends Controller
 {
@@ -26,7 +27,7 @@ class MomentUserGiftsController extends Controller
      */
     public function index($momentId)
     {
-//        Moment::query()->where('id')
+        //        Moment::query()->where('id')
 
     }
 
@@ -58,7 +59,7 @@ class MomentUserGiftsController extends Controller
 
         //validation parameter
         if (!$data['gift_id']  || !$data['num'])
-        return Common::apiResponse(0, __('missing params'), $data->all());
+            return Common::apiResponse(0, __('missing params'), $data->all());
 
         //validation if pass num < 1
         if ($data['num'] < 1) return Common::apiResponse(0, 'The number of gifts cannot be less than 1', null, 422);
@@ -67,14 +68,21 @@ class MomentUserGiftsController extends Controller
 
         //get the gift data from id in the parameter
         $gift = Gift::query()->select([
-            'id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img',
+            'id',
+            'name',
+            'type',
+            'price',
+            'vip_level',
+            'is_play',
+            'img',
+            'show_img',
             'show_img2'
         ])->where('id', $giftId)->where('enable', 1)->first();
         // Validation if gift return null
         if (!$gift) return Common::apiResponse(0, 'Gift does not exist or has been removed', null, 404);
-       // attached moments and gifts
-        $moment->gifts()->attach($gift, ['user_id' => $user->id , 'num' => $number]);
-       // receivers ids
+        // attached moments and gifts
+        $moment->gifts()->attach($gift, ['user_id' => $user->id, 'num' => $number]);
+        // receivers ids
         $receiversIds = explode(',', $data['toUid']);
         $numberOfGift = $number * count($receiversIds);
 
@@ -149,12 +157,12 @@ class MomentUserGiftsController extends Controller
     }
 
 
-    public function sendGift($number,$momentId ,Gift $gift, User $senderUser, $receivedUser,  $isPlay = 0, $totalPrice = null)
+    public function sendGift($number, $momentId, Gift $gift, User $senderUser, $receivedUser,  $isPlay = 0, $totalPrice = null)
     {
         if ($totalPrice == null) $totalPrice = $gift->price * $number;
 
         $info['giftId']       = $gift->id;
-        $info['roomowner_id'] =0;
+        $info['roomowner_id'] = 0;
         $info['giftNum']      = $number;
         $info['giftName']     = $gift->name ?: '_';
         $info['giftPrice']    = $totalPrice;
@@ -174,24 +182,31 @@ class MomentUserGiftsController extends Controller
 
 
         GiftLog::query()->create($info);
-        CustomNotification::sendMomentGift($senderUser, $gift, $receivedUser,$momentId);
-
+        CustomNotification::sendMomentGift($senderUser, $gift, $receivedUser, $momentId);
     }
 
     public function getGifts($id)
     {
 
-      $moment = Moment::with('gifts')->find($id);
-      if (!$moment) {
-        return Common::apiResponse(0, 'Moment does not exist or has been removed', null, 404);
+        $moment = Moment::with('gifts')->find($id);
+        if (!$moment) {
+            return Common::apiResponse(0, 'Moment does not exist or has been removed', null, 404);
+        }
+        $data = $moment->gifts()->select('gifts.img', DB::raw('CAST(sum(moment_user_gifts.num) AS INT) as num_gift'))
+            ->groupBy('gifts.id', 'gifts.img', 'moment_user_gifts.moment_id', 'moment_user_gifts.gift_id')->orderByDesc('num_gift')
+            ->get();
+
+        return Common::apiResponse(1, 'successful', $data, 200);
     }
-      $data = $moment->gifts()->select('gifts.img', DB::raw('CAST(sum(moment_user_gifts.num) AS INT) as num_gift'))
-      ->groupBy('gifts.id', 'gifts.img', 'moment_user_gifts.moment_id', 'moment_user_gifts.gift_id' )->orderByDesc('num_gift')
-      ->get();
 
-      return Common::apiResponse(1, 'successful', $data, 200);
+    public function userGift($id)
+    {
+       $momentsGift = MomentUserGift::selectRaw('user_id, moment_id, SUM(num) as num')
+        ->where('moment_id', $id)
+        ->groupBy('user_id', 'moment_id')
+        ->with('user')
+        ->get();
+
+        return Common::apiResponse(1, 'successful', MomentGiftUserResource::collection($momentsGift), 200);
     }
-
-
-
 }
