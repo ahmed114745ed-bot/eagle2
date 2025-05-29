@@ -4,6 +4,7 @@ namespace Modules\Events\Http\Controllers\web;
 
 use App\Models\OVip;
 use App\Models\Ware;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -31,6 +32,10 @@ class WeeklyEventGiftNController extends MainController
     }
     public function index(Content $content)
     {
+        if (!\Encore\Admin\Facades\Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_name);
+        }
+
         $url = url('/admin/weekly-events-new'); // Define your button URL
         $translation = __(' back');
 
