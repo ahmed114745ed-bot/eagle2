@@ -39,10 +39,9 @@ class MallController extends Controller
         return Common::apiResponse(true, '', WareResource::collection($bubble), 200);
     }
 
-    public function wabbleAll(Request $request)
+    public function wabbleAll()
     {
-        $type = 12;
-        $bubble = $this->mallService->ware($type);
+        $bubble = $this->mallService->getWabbles();
         return Common::apiResponse(true, '', WareResourceAll::collection($bubble), 200);
     }
 

@@ -8,7 +8,7 @@ use App\Bd\Controllers\WalletController;
 // use App\Bd\Controllers\RequestAgencyController;
 // use App\Bd\Controllers\ChargeController;
 // use App\Bd\Controllers\BdSalariesController;
-// use App\Bd\Controllers\AgencyController;
+use App\Bd\Controllers\AgencyController;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\Bd\Controllers\RequestAgencyController;
 
@@ -52,8 +52,10 @@ Route::group(
         'namespace' => 'App\\Bd\\Controllers',
         'middleware' => [
             'web',
-            'admin',
-            'adminIp',
+'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',            'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
         ],

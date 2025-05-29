@@ -69,7 +69,7 @@ return [
             'web',
             'admin',
             'multiLanguage',
-            // 'admin.permission:deny,agency',
+            'admin.permission:deny,agency',
             'production.error'
         ],
 
