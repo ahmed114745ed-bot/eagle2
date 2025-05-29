@@ -107,8 +107,8 @@ class VipService
             'is_used' => 0
         ];
         $this->userVipRepository->create($data);
-        dd("dddd");
         $countWares = $this->wareRepository->countWareByLevel($vip->level);
+        dd("dddd");
         return [$user, $countWares, $request->user(), $vip->exp];
     }
 
