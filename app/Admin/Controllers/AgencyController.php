@@ -443,7 +443,7 @@ class AgencyController extends MainController
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
