@@ -107,7 +107,7 @@ class MallService
     public function updatePack($user, $pack, $ware, $quantity, $totalPrice, $type)
     {
         if ($pack->expire == 0) return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
-        if ($pack->expire > now()->timestamp) { // expire pack not finished 
+        if ($pack->expire > now()->timestamp) { // expire pack not finished
             if ($ware->expire != 0) {
 
                 try {
@@ -157,5 +157,10 @@ class MallService
     public function ware($type)
     {
         return $this->wareRepository->all(0, $type);
+    }
+
+    public function getWabbles()
+    {
+        return $this->wareRepository->getFromType(12);
     }
 }

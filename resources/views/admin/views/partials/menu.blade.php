@@ -79,7 +79,8 @@
 
                     
                     @if (Admin::user()->type != 'bd')
-                        <a href="{{ admin_url($item['uri']) }}">
+                    <a href="{{ admin_url($item['uri']) }}">
+
                     @endif
                        
                             @endif

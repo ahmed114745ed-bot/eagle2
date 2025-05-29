@@ -2,6 +2,7 @@
 
 namespace Modules\DailyPrize\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
 use App\Models\OVip;
 use App\Models\Ware;
@@ -14,7 +15,7 @@ use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Layout\Content;
 
-class DailyPrizeController extends AdminController
+class DailyPrizeController extends MainController
 {
     /**
      * Title for current resource.
@@ -22,6 +23,54 @@ class DailyPrizeController extends AdminController
      * @var string
      */
     protected $title = 'DailyGift';
+    public $permission_name = 'daily-gift';
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('daily prize'))
+            ->body($this->grid()));
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id,$content
+            ->title(trans('daily prize'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        $id = request()->route('id');
+        $model = DailyGift::findOrFail($id);
+
+        $form = $this->form()->edit($id);
+
+        return parent::edit($id,$content
+            ->title(trans('daily prize'))
+            ->body($form));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('daily prize'))
+            ->body($this->form()));
+    }
 
     /**
      * Make a grid builder.
@@ -97,36 +146,12 @@ class DailyPrizeController extends AdminController
         return $show;
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    public function edit($id, Content $content)
-    {
-        $id = request()->route('id');
-        $model = DailyGift::findOrFail($id);
-
-        $form = $this->form()->edit($id);
-
-        return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
-            ->body($form);
-    }
     public function update($id)
     {
         $id = request()->route('id');
         return $this->form()->update($id);
     }
 
-    public function show($id, Content $content)
-    {
-        return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
-            ->body($this->detail($id));
-    }
 
     protected function form()
     {

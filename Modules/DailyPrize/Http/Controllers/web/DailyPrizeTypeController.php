@@ -2,6 +2,7 @@
 
 namespace Modules\DailyPrize\Http\Controllers\web;
 
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -82,11 +83,14 @@ class DailyPrizeTypeController extends MainController
             return $weeks[$type] ?? $type; // عرض النص بدلاً من الرقم
         });
 
-        $grid->column( __('procedures'))->display(function () {
-            $url1 = url('admin/daily-gifts/'.$this->type);
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('create')."</a>";
-            return $button1;
-        });
+        if (Admin::user()->can('browse-' . 'daily-gift-types') || Admin::user()->can('*')) {
+            $grid->column( __('procedures'))->display(function () {
+                $url1 = url('admin/daily-gifts/'.$this->type);
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('create')."</a>";
+                return $button1;
+            });
+        }
+
         return $grid;
     }
 
@@ -123,7 +127,7 @@ class DailyPrizeTypeController extends MainController
             3 => __('third_week'),
             4 => __('fourth_week'),
         ]);
-        
+
         return $form;
     }
 }

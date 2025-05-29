@@ -60,7 +60,7 @@ class AdminNewPermission extends Seeder
             'vip-gift',
             'families',
             'families-level',
-            'countries-where-salary-payments-are-available',
+            'salary-payment-countries',
             'salary-requests',
             'rejected-agent-request-switch',
             'accept-agent-request-switch',
@@ -83,9 +83,67 @@ class AdminNewPermission extends Seeder
             'agencies-join-requests',
             'target',
             'agencies-request',
-            'deleted-accounts'
-
-
+            'deleted-accounts',
+            'accept-agency',
+            'refuse-agency',
+            'request-agencies',
+            'request-agency-history',
+            'appear-charger-agency',
+            'charge-agency',
+            'payment-gat-way',
+            'managers',
+            'agency-settings',
+            'rooms',
+            'room-actions',
+            'room-pin-switch',
+            'close-room-switch',
+            'categories',
+            'room-vip',
+            'room-background',
+            'emoji',
+            'gift',
+            'room-settings',
+            'achievement',
+            'achievement_level',
+            'user_achievement_level',
+            'user-parent',
+            'group-chat',
+            'updates_group_chat',
+            'update_setting_button',
+            'boxes',
+            'box-use',
+            'event-period',
+            'weekly-star',
+            'weekly_star_rewards',
+            'target-event',
+            'gift-target-event',
+            'pk-event',
+            'pk-event-rewards',
+            'general-roles',
+            'event_report',
+            'Real',
+            'report-real',
+            'Moment',
+            'report-moment',
+            'auth-users',
+            'delete-account-details',
+            'questions',
+            'country',
+            'page',
+            'payment-coin',
+            'coins',
+            'exchange',
+            'gold-coins',
+            'updates',
+            'config',
+            'settings',
+            'language',
+            'language-switch',
+            'daily-prize',
+            'daily-gift',
+            'level',
+            'level-interval',
+            'reward-level-interval'
         ];
 
         $methods = [
@@ -110,24 +168,25 @@ class AdminNewPermission extends Seeder
             ['name' => 'Distinguished identifier', 'sort' => 8, 'permissions' => ['featured-ids','details-of-unique-identifiers','id-color']],
             ['name' => 'Vip', 'sort' => 9, 'permissions' => ['VIPs','vip-gift']],
             ['name' => 'families', 'sort' => 10, 'permissions' => ['families','families-level']],
-            ['name' => 'Agency System', 'sort' => 11, 'permissions' => []],
-            ['name' => 'Internal Sales System', 'sort' => 12, 'permissions' => ['countries-where-salary-payments-are-available','accept-agent-request-switch','salary-requests','internal-sales-system-report','rejected-agent-request-switch']],
+            ['name' => 'Agency System', 'sort' => 11, 'permissions' => ['agency-settings']],
+            ['name' => 'Internal Sales System', 'sort' => 12, 'permissions' => ['salary-payment-countries','accept-agent-request-switch','salary-requests','internal-sales-system-report','rejected-agent-request-switch']],
             ['name' => 'Host Agencies', 'sort' => 13, 'permissions' => ['reports','achieved-Target','change-users-agency-Switch','delete-agency-Switch','agencies','host-agencies-report','users-Wallet','hosts-target','hosts','host-charge-switch','host-chang-agency-Switch','host-invite-switch','host-can-Play-Switch','host-kick-agency-Switch','host-kick-family-Switch']],
-            ['name' => 'Agency Settings', 'sort' => 14, 'permissions' => ['agencies-join-requests','target']],
-            ['name' => 'Charging Agencies', 'sort' => 15, 'permissions' => []],
-            ['name' => 'Agency Manager', 'sort' => 16, 'permissions' => []],
-            ['name' => 'Room', 'sort' => 17, 'permissions' => []],
-            ['name' => 'Achievements', 'sort' => 18, 'permissions' => []],
-            ['name' => 'Group chat', 'sort' => 19, 'permissions' => []],
-            ['name' => 'Lucky box', 'sort' => 20, 'permissions' => []],
-            ['name' => 'Events', 'sort' => 21, 'permissions' => []],
-            ['name' => 'Reels', 'sort' => 22, 'permissions' => []],
-            ['name' => 'Moment', 'sort' => 23, 'permissions' => []],
-            ['name' => 'Work Settings', 'sort' => 24, 'permissions' => []],
-            ['name' => 'Sensitive Settings', 'sort' => 25, 'permissions' => []],
-            ['name' => 'System Settings', 'sort' => 26, 'permissions' => []],
-            ['name' => 'Level', 'sort' => 27, 'permissions' => []],
-            ['name' => 'user parent', 'sort' => 28, 'permissions' => []],
+            ['name' => 'Agency Settings', 'sort' => 14, 'permissions' => ['agencies-join-requests','target', 'request-agencies', 'accept-agency', 'refuse-agency', 'request-agency-history']],
+            ['name' => 'Charging Agencies', 'sort' => 15, 'permissions' => ['appear-charger-agency', 'charge-agency', 'payment-gat-way']],
+            ['name' => 'Agency Manager', 'sort' => 16, 'permissions' => ['managers']],
+            ['name' => 'Room', 'sort' => 17, 'permissions' => ['rooms', 'room-actions', 'room-pin-switch', 'close-room-switch', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings']],
+            ['name' => 'Achievements', 'sort' => 18, 'permissions' => ['achievement', 'achievement_level', 'user_achievement_level']],
+            ['name' => 'Group chat', 'sort' => 19, 'permissions' => ['group-chat',  'updates_group_chat', 'update_setting_button']],
+            ['name' => 'Lucky box', 'sort' => 20, 'permissions' => ['boxes', 'box-use']],
+            ['name' => 'Events', 'sort' => 21, 'permissions' => ['event-period', 'weekly-star', 'weekly_star_rewards', 'target-event', 'gift-target-event', 'pk-event', 'pk-event-rewards', 'general-roles', 'event_report']],
+            ['name' => 'Reels', 'sort' => 22, 'permissions' => ['Real', 'report-real']],
+            ['name' => 'Moment', 'sort' => 23, 'permissions' => ['Moment', 'report-moment']],
+            ['name' => 'Employees and Permissions', 'sort' => 25, 'permissions' => ['auth-users', 'roles']],
+            ['name' => 'Work Settings', 'sort' => 24, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'coins', 'exchange', 'gold-coins']],
+            ['name' => 'Sensitive Settings', 'sort' => 25, 'permissions' => ['updates', 'config']],
+            ['name' => 'System Settings', 'sort' => 26, 'permissions' => ['settings', 'language', 'language-switch', 'daily-prize', 'daily-gift']],
+            ['name' => 'Level', 'sort' => 27, 'permissions' => ['level', 'level-interval', 'reward-level-interval']],
+            ['name' => 'user parent', 'sort' => 28, 'permissions' => ['user-parent']],
         ];
 
         // Step 2: Save categories to rolecategories table
@@ -188,7 +247,17 @@ class AdminNewPermission extends Seeder
 
         DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
         $actions = ['create', 'edit', 'delete', 'show'];
-        $targets = ['dashboard', 'delete-agency-Switch','deleted-accounts','reports','change-users-agency-Switch','achieved-Target','internal-sales-system-report','delete-bd-Switch','host-agencies-report','salary-requests','users-Wallet','hosts-target','host-chang-agency-Switch','host-kick-family-Switch','host-charge-switch','host-kick-agency-Switch','host-can-Play-Switch','host-invite-switch','accept-agent-request-switch','rejected-agent-request-switch','charger-reports','restore-user-account-Switch','delete-user-account-Switch','charge-switch','kick-agency-Switch','kick-family-Switch','invite-switch','can-Play-Switch','user-actions','charge-settings','charge-report-Switch','coin-recharge','add-coins-Switch','app-wallet' ,'gift-VIP-Switch','gift-VIP','choose-bd-Switch','gift-store-Switch','gift-from-the-store'];
+        $targets = ['dashboard', 'delete-agency-Switch','deleted-accounts','reports','change-users-agency-Switch','achieved-Target','internal-sales-system-report','delete-bd-Switch','host-agencies-report','salary-requests','users-Wallet','hosts-target','host-chang-agency-Switch','host-kick-family-Switch','host-charge-switch','host-kick-agency-Switch','host-can-Play-Switch','host-invite-switch','accept-agent-request-switch','rejected-agent-request-switch','charger-reports','restore-user-account-Switch','delete-user-account-Switch','charge-switch','kick-agency-Switch','kick-family-Switch','invite-switch','can-Play-Switch','user-actions','charge-settings','charge-report-Switch','coin-recharge','add-coins-Switch','app-wallet' ,'gift-VIP-Switch','gift-VIP','choose-bd-Switch','gift-store-Switch','gift-from-the-store', 'accept-agency', 'refuse-agency', 'request-agency-history', 'request-agencies', 'room-actions', 'room-pin-switch', 'close-room-switch', 'updates_group_chat', 'language', 'language-switch'];
+
+        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
+            foreach ($actions as $action) {
+                foreach ($targets as $target) {
+                    $query->orWhere('slug', 'like', "{$action}-{$target}");
+                }
+            }
+        })->delete();
+        $actions = ['create', 'browse', 'delete', 'show'];
+        $targets = ['update_setting_button'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -199,7 +268,7 @@ class AdminNewPermission extends Seeder
         })->delete();
 
         $actions = ['create', 'delete', 'show'];
-        $targets = ['edit-level',];
+        $targets = ['edit-level', 'agency-settings', 'room-settings', 'settings'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -210,18 +279,7 @@ class AdminNewPermission extends Seeder
         })->delete();
 
         $actions = ['create', 'edit', 'show'];
-        $targets = ['details-of-unique-identifiers',];
-
-        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
-            foreach ($actions as $action) {
-                foreach ($targets as $target) {
-                    $query->orWhere('slug', 'like', "{$action}-{$target}");
-                }
-            }
-        })->delete();
-
-        $actions = ['create', 'delete', 'show'];
-        $targets = [];
+        $targets = ['details-of-unique-identifiers', 'Real', 'report-real'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -232,7 +290,7 @@ class AdminNewPermission extends Seeder
         })->delete();
 
         $actions = ['edit', 'delete', 'show'];
-        $targets = ['gift-a-medal'];
+        $targets = ['gift-a-medal', 'user-parent', 'general-roles', 'Moment', 'report-moment'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -244,7 +302,7 @@ class AdminNewPermission extends Seeder
 
 
         $actions = ['create'];
-        $targets = ['hosts','agencies-join-requests'];
+        $targets = ['hosts','agencies-join-requests', 'rooms', 'box-use', 'payment-coin'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -255,6 +313,17 @@ class AdminNewPermission extends Seeder
         })->delete();
         $actions = ['show', 'edit'];
         $targets = ['bans', 'close-room','vip-gift',];
+
+        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
+            foreach ($actions as $action) {
+                foreach ($targets as $target) {
+                    $query->orWhere('slug', 'like', "{$action}-{$target}");
+                }
+            }
+        })->delete();
+
+        $actions = ['create', 'delete'];
+        $targets = ['achievement'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
