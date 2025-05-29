@@ -16,7 +16,7 @@ class WareResourceAll extends JsonResource
         return [
             'id'        =>  $this->id,
             'image'     =>  $this->show_img == null ? '' : $this->show_img,
-            // 'img'       =>  $this->img1 == null ? '' : $this->img1,
+            'img'       =>  $this->img1 == null ? '' : $this->img1,
             'image_type' => $this->image_type ?? "",
             'key_json'  => $this->key_json,
         ];
