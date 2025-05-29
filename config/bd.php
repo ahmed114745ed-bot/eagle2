@@ -6,6 +6,6 @@ return [
     'route' => [
         'prefix' => 'bd',
     ],
-    'https' => env('BD_HTTPS', false),
-    'secure' => env('BD_SECURE', false),
+    'https' => env('BD_HTTPS', true),
+    'secure' => env('BD_SECURE', true),
 ];
