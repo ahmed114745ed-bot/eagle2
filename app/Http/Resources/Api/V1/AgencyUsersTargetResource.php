@@ -25,8 +25,10 @@ class AgencyUsersTargetResource extends JsonResource
         $month = request('month') ?? Carbon::now()->month;
 
 
-        $target = $this->targets()->latest()->first();
-     
+        $target = $this->targets()
+        ->where('agency_id', $this->agency_id)    
+        ->latest()
+        ->first();
 
         // $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
         //     ->select('id', 'user_diamonds')->get();
@@ -58,7 +60,10 @@ class AgencyUsersTargetResource extends JsonResource
             });
 
 
-        $salary = UserSallary::query()->where('user_id', $this->id)
+        $salary = UserSallary::query()
+
+            ->where('user_agency_id', $this->agency_id)
+            ->where('user_id', $this->id)
             ->where(function ($query) use ($year, $month) {
                 $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
             })->sum(DB::raw('sallary - cut_amount'));
@@ -73,13 +78,13 @@ class AgencyUsersTargetResource extends JsonResource
             'salary'  =>(int) $salary ?? 0,
             'target' => [
                 'id' => @$target->target_id ?? 0,
-            'user_diamonds' => @$target->user_diamonds ?? 0,
-            'user_hours' => @$target->user_hours ?? 0,
-            'user_days' => @$target->user_days ?? 0,
+                'user_diamonds' => @$target->user_diamonds ?? 0,
+                'user_hours' => @$target->user_hours ?? 0,
+                'user_days' => @$target->user_days ?? 0,
                 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
-            'old_targets'  => $result,
+                  'old_targets'  => $result,
             ],
-            'top_users' => SenderGiftLogResource::collection($giftLog),
+            // 'top_users' => SenderGiftLogResource::collection($giftLog),
            'top_users' => $giftLog->map(function ($log) {
                 return $log->sender?->profile?->avatar ?? '';
             })->filter()->values()->toArray(),
