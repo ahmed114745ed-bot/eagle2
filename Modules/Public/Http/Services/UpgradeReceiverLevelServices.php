@@ -42,13 +42,15 @@ class UpgradeReceiverLevelServices
         ]);
     }
 
+ 
+
     public function checkUserLevelUpgrated(User &$user)
     {
         $oldReceiverLevel = $user->received_level;
         $subReceivedLevel = $user->sub_receiver_level;
 
         $receiverLevel = (new UpdateUserWhenSendGift())->getReceiverLevel($user->total_received_diamonds, 0, $subReceivedLevel);
-        if ($receiverLevel != $oldReceiverLevel) {
+        if ($receiverLevel > $oldReceiverLevel) {
             $user->received_level = $receiverLevel;
             $hadNotRewards = $this->hadNotRewards($user->id, $user->total_received_level);
             if ($hadNotRewards) {
