@@ -79,5 +79,7 @@ class WeeklyStarUpdate extends Command
 
         Reward::query()->insert($previousRewards);
 
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 }

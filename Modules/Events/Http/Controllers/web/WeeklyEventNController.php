@@ -5,6 +5,7 @@ namespace Modules\Events\Http\Controllers\web;
 use App\Models\Gift;
 use App\Models\OVip;
 use App\Models\Ware;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Column;
@@ -76,16 +77,18 @@ class WeeklyEventNController extends MainController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        $grid->column(__('procedures'))->display(function () {
-            // توليد الروابط
-            $url1 = url('admin/weekly-events-gift/' . $this->id);
 
-            // إنشاء أزرار HTML
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
-            // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1;
-        });
+        if (Admin::user()->can('browse-' . 'weekly_star_rewards') || Admin::user()->can('*')) {
+            $grid->column(__('procedures'))->display(function () {
+                // توليد الروابط
+                $url1 = url('admin/weekly-events-gift/' . $this->id);
 
+                // إنشاء أزرار HTML
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
+                // دمج الأزرار في سلسلة واحدة وإرجاعها
+                return $button1;
+            });
+        }
 
         return $grid;
     }

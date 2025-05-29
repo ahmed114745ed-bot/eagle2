@@ -35,6 +35,9 @@ class SetDataFromJob extends Command
                 Redis::del($cleanKey);
             }
         }
+
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 
 }

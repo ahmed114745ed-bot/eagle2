@@ -289,7 +289,7 @@ Route::group(
         $router->resource('countries', 'CountryController');
         $router->resource('backgrounds', 'BackgroundController');
         $router->resource('official_msgs', 'OfficialMessageController');
-        $router->resource('emojis', 'EmfojiController');
+        $router->resource('emojis', 'EmojiController');
         $router->resource('home_carousels', 'HomeCarouselController');
         $router->resource('vip_prev', 'VipAuthController');
         $router->resource('agencies', 'AgencyController');

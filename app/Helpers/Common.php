@@ -1312,9 +1312,9 @@ class Common
         // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
         $usd = $diamonds / $coins;
         $userUsd = $usd *  $percentage  / 100;
-
         $usd = Common::roundToTwoDecimalPlaces($userUsd);
-        return $userUsd;
+
+        return $usd;
     }
 
     public  static function getMaxCoins()
