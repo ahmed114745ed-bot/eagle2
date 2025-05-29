@@ -51,7 +51,7 @@ Route::group(
         'prefix' => 'bd',
         'namespace' => 'App\\Bd\\Controllers',
         'middleware' => [
-            'web',
+            // 'web',
             'admin',
             'adminIp',
             //            'adminGeneralBan',
