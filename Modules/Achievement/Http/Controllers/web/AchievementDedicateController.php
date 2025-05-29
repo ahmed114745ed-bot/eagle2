@@ -28,7 +28,7 @@ class AchievementDedicateController extends MainController
      *
      * @var string
      */
-    public $permission_name = 'achievement_dedicate';
+    public $permission_name = 'gift-a-medal';
 
     public function index(Content $content)
     {

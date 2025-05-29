@@ -20,7 +20,7 @@ class CoreWalletsController extends MainController
      */
 
 
-    public $permission_name = 'core-wallets';
+    public $permission_name = 'app-wallet';
 
     // public function index(Content $content)
     // {

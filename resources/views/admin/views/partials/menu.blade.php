@@ -75,9 +75,9 @@
             @if(url()->isValidUrl($item['uri']))
                 <a href="{{ $item['uri'] }}" target="_blank">
                     @else
-                    @if (Admin::user()->type == 'bd')
-                        <a href="{{ bd_url($item['uri']) }}">
-                    @endif
+               
+
+                    
                     @if (Admin::user()->type != 'bd')
                         <a href="{{ admin_url($item['uri']) }}">
                     @endif

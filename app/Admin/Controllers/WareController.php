@@ -379,6 +379,7 @@ class WareController extends MainController
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
         $form->text('key', trans('key'));
+        $form->keyValue('key_json', 'key_json');
         $form->select('image_type1', __('image_type'))->options(
             [
                 'svga' => __('svga'),

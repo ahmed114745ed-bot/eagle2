@@ -6,8 +6,9 @@ use DB;
 use App\Traits\PreventDeleteIfCreatedByDeveloper;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Arr;
 use Modules\Reals\Entities\Real;
+use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\PaymentGetWayTrait;
 use Modules\Moment\Entities\Moment;
@@ -15,21 +16,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Modules\Chat\Traits\ChatUserTrait;
 use App\Traits\MomentRelationshipTrait;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
+use Illuminate\Support\Facades\Storage;
 use Modules\SpecialId\Traits\SpecialId;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Moment\Entities\MomentUserGift;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\AgencyApp\Entities\AdditionalInfo;
 use Modules\Reals\Traits\RealRelationshipTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Achievement\Http\Traits\AchievementUser;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @method static withoutAppends()
@@ -639,7 +640,7 @@ class User extends Authenticatable
     public function UserVip()
     {
         return $this->hasOne(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            $q/*->where("is_used", 1)*/->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 
@@ -1315,6 +1316,11 @@ class User extends Authenticatable
         return $this->hasOne(UserWallet::class);
     }
 
+    public function momentUserGift()
+    {
+        return $this->hasMany(MomentUserGift::class, 'user_id');
+    }
+
     public function walletTransactions()
     {
         return $this->hasMany(WalletTransaction::class);
@@ -1367,7 +1373,7 @@ class User extends Authenticatable
         return false;
     }
 
-    public function getUserTypesAttribute() : array
+    public function getUserTypesAttribute(): array
     {
         $userTypes = match (true) {
             in_array($this->type_user, [2, 4]) => [1, 2],

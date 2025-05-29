@@ -19,7 +19,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class RequestBackgroundImageController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'background-image-request';
+    public $permission_name = 'request-backgrounds-image';
 
     /**
      * Index interface.

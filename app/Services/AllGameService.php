@@ -35,6 +35,7 @@ class AllGameService
         $key = [
             "baishun_channel" => config('app.baishun_channel') ?? '',
             "baishun_app_id" => config('app.baishun_app_id') ?? '',
+            "baishun_gsp" => (int)(config('app.baishun_gsp') ?? 101),
         ];
         return [
             'full' => $fullGames,

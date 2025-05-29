@@ -24,7 +24,7 @@ class BannerController extends MainController
      */
 
 
-    public $permission_name = 'banners';
+    public $permission_name = 'splash';
 
     public function index(Content $content)
     {

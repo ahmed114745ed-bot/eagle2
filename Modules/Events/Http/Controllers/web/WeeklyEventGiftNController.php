@@ -39,16 +39,16 @@ class WeeklyEventGiftNController extends MainController
             <i class="fa fa-arrow-left"></i> {$translation}
         </a>
         HTML;
-        return parent::index($content
+        return $content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
             ->breadcrumb(
                 ['text' => trans('admin.eventGift')]
             )
             ->row($buttonHTML)
-            ->row($this->grid1())); // First grid
-            // ->row($this->grid2()) // Second grid
-            // ->row($this->grid3())); // Third grid
+            ->row($this->grid1()) // First grid
+            ->row($this->grid2()) // Second grid
+            ->row($this->grid3()); // Third grid
 
 
     }
@@ -91,35 +91,35 @@ class WeeklyEventGiftNController extends MainController
         $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        // $grid->column('gift_id', __('gifts'))->display(function () {
-        //     if ($this->type == "ware") {
-        //         return @$this->ware->name ?? '';
-        //     } elseif ($this->type == "vip") {
-        //         return @$this->vip->name ?? '';
-        //     } elseif ($this->type == "coins") {
-        //         return @$this->target;
-        //     } elseif ($this->type == "achievement") {
-        //         $value = getDriverUrl() . '/' . @$this->target;
-        //         return "<img src='$value' width='80' height='80'>";
-        //     }
-        // });
-        // $grid->column('image', __('image'))->display(function ($path) {
-        //     if ($this->type == 'ware') {
-        //         $ware = Ware::find($this->target);
-        //         $path = $ware->img2 ?? ($ware->show_img ?? "");
-        //     } elseif ($this->type == 'vip') {
-        //         $vips = OVip::find($this->target);
-        //         $path = $vips->img ?? '';
-        //     } elseif ($this->type == 'achievement') {
-        //         $path = $this->target;
-        //     } else {
-        //         $path = 'coin.png';
-        //     }
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
+                return @$this->ware->name ?? '';
+            } elseif ($this->type == "vip") {
+                return @$this->vip->name ?? '';
+            } elseif ($this->type == "coins") {
+                return @$this->target;
+            } elseif ($this->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
+        });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? ($ware->show_img ?? "");
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img ?? '';
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = 'coin.png';
+            }
 
-        //     /** @var Gift $this */
-        //     $url = getImagePath($path);
-        //     return handleShowImageWithTypes($this->id, $url, 50, 50);
-        // });
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
@@ -136,7 +136,7 @@ class WeeklyEventGiftNController extends MainController
                 <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
-                <h3 style="margin-right: 10px;">{ $gifts}</h3>
+                <h3 style="margin-right: 10px;">$gifts</h3>
 
             HTML;
             $tools->append($customButtonHTML);
@@ -158,35 +158,35 @@ class WeeklyEventGiftNController extends MainController
         $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        // $grid->column('gift_id', __('gifts'))->display(function () {
-        //     if ($this->type == "ware") {
-        //         return @$this->ware->name ?? '';
-        //     } elseif ($this->type == "vip") {
-        //         return @$this->vip->name ?? '';
-        //     } elseif ($this->type == "coins") {
-        //         return @$this->target;
-        //     } elseif ($this->type == "achievement") {
-        //         $value = getDriverUrl() . '/' . @$this->target;
-        //         return "<img src='$value' width='80' height='80'>";
-        //     }
-        // });
-        // $grid->column('image', __('image'))->display(function ($path) {
-        //     if ($this->type == 'ware') {
-        //         $ware = Ware::find($this->target);
-        //         $path = $ware->img2 ?? ($ware->show_img ?? '');
-        //     } elseif ($this->type == 'vip') {
-        //         $vips = OVip::find($this->target);
-        //         $path = $vips->img ?? '';
-        //     } elseif ($this->type == 'achievement') {
-        //         $path = $this->target;
-        //     } else {
-        //         $path = 'coin.png';
-        //     }
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
+                return @$this->ware->name ?? '';
+            } elseif ($this->type == "vip") {
+                return @$this->vip->name ?? '';
+            } elseif ($this->type == "coins") {
+                return @$this->target;
+            } elseif ($this->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
+        });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? ($ware->show_img ?? '');
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img ?? '';
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = 'coin.png';
+            }
 
-        //     /** @var Gift $this */
-        //     $url = getImagePath($path);
-        //     return handleShowImageWithTypes($this->id, $url, 50, 50);
-        // });
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
@@ -223,35 +223,35 @@ class WeeklyEventGiftNController extends MainController
         $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        // $grid->column('gift_id', __('gifts'))->display(function () {
-        //     if ($this->type == "ware") {
-        //         return @$this->ware->name ?? '';
-        //     } elseif ($this->type == "vip") {
-        //         return @$this->vip->name ?? '';
-        //     } elseif ($this->type == "coins") {
-        //         return @$this->target;
-        //     } elseif ($this->type == "achievement") {
-        //         $value = getDriverUrl() . '/' . @$this->target;
-        //         return "<img src='$value' width='80' height='80'>";
-        //     }
-        // });
-        // $grid->column('image', __('image'))->display(function ($path) {
-        //     if ($this->type == 'ware') {
-        //         $ware = Ware::find($this->target);
-        //         $path = $ware->img2 ?? ($ware->show_img ?? "");
-        //     } elseif ($this->type == 'vip') {
-        //         $vips = OVip::find($this->target);
-        //         $path = $vips->img ?? '';
-        //     } elseif ($this->type == 'achievement') {
-        //         $path = $this->target;
-        //     } else {
-        //         $path = 'coin.png';
-        //     }
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
+                return @$this->ware->name ?? '';
+            } elseif ($this->type == "vip") {
+                return @$this->vip->name ?? '';
+            } elseif ($this->type == "coins") {
+                return @$this->target;
+            } elseif ($this->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
+        });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? ($ware->show_img ?? "");
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img ?? '';
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = 'coin.png';
+            }
 
-        //     /** @var Gift $this */
-        //     $url = getImagePath($path);
-        //     return handleShowImageWithTypes($this->id, $url, 50, 50);
-        // });
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 

@@ -19,7 +19,7 @@ class ReportUserController extends MainController
      * @var string
      */
 
-    public $permission_name = 'report-user';
+    public $permission_name = 'host-agencies-report';
 
     public function index(Content $content)
     {
