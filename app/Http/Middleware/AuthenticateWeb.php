@@ -33,7 +33,7 @@ class AuthenticateWeb
 
         $user = Admin::user();
         
-        if (Str::contains($uri, 'bd') && !$user->inRoles(['bd'])) {
+        if (Str::contains($uri, 'bd') && !$user->type != 'bd') {
             abort(403, 'غير مصرح بالدخول');
         }
         
