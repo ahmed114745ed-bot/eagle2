@@ -68,6 +68,7 @@ class AgencyUsersTargetResource extends JsonResource
         //         $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
         //     })->sum(DB::raw('sallary - cut_amount'));
         $agencySallary = UserSallary::query()
+        ->where('user_id', $this->id)
         ->where('user_agency_id', $this->agency_id)
         ->where(function ($query) use ($year, $month) {
             $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
