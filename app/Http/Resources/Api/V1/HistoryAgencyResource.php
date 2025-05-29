@@ -50,10 +50,13 @@ class HistoryAgencyResource extends JsonResource
                 ->where('month', $month)
                 ->sum('sallary');
 
-            $target = $this->userSalaries()
-                ->where('year', $year)
-                ->where('month', $month)
-                ->sum('target_diamonds');
+            // $target = $this->userSalaries()
+            //     ->where('year', $year)
+            //     ->where('month', $month)
+            //     ->sum('target_diamonds');
+            $totalExp = $giftLog->sum('exp');
+            $heroTotalExp = $heroGiftLog->sum('exp');
+            $target = $totalExp + $heroTotalExp;
         }
 
 
