@@ -799,7 +799,7 @@ trait CalcsTrait
 
     }
 
-    public static function wareUserVip($user_id, $type, $item)
+    public static function wareUserVip($user_id, $type, $item, $isLatest = false)
     {
 
 

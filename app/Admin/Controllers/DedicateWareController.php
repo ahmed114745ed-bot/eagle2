@@ -20,7 +20,7 @@ use Encore\Admin\Facades\Admin;
 class DedicateWareController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'wares-dedicate';
+    public $permission_name = 'gift-from-the-store';
 
     public function index(Content $content)
     {
@@ -135,11 +135,13 @@ class DedicateWareController extends MainController
         if ($typeSpecial) {
             $grid->value(__('value'));
         }
+        if (Admin::user()->can('browse-' . 'gift-store-Switch') || Admin::user()->can('*')) {
+            $grid->column('return', __('dedicate'))->display(function () {
 
-        $grid->column('return', __('dedicate'))->display(function () {
+                return (new \App\Admin\Actions\WareDedicateAction($this->id))->render();
+            });
+        }
 
-            return (new \App\Admin\Actions\WareDedicateAction($this->id))->render();
-        });
         $grid->disableExport();
         $grid->disableActions();
         $grid->actions(function ($actions) {

@@ -39,15 +39,17 @@ class ChargeController extends AdminController
         $grid = new Grid(new Charge());
 
         $grid->model()->where('user_charger_type','bd')
+                      ->with('shippingAgency')
                       ->where('charger_id', Auth::user()->app_id);
     
         // $grid->column('id', __('Id'));
         $grid->column('amount', __('Amount'));
         // $grid->column('amount_type', __('Amount type'));
-    
+        
         $grid->column('agency_id', __('receiver'))->display(function () {
-            if ($this->agency) {
-                $agency = $this->agency;
+            // dd($this->agency_id );
+            if ($this->shippingAgency) {
+                $agency = $this->shippingAgency;
     
                 $cacheKey = "agency_image_{$agency->id}";
                 $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {

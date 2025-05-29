@@ -18,7 +18,7 @@ use function request;
 
 class SallariesController extends MainController
 {
-    public $permission_name = 'sailer';
+    public $permission_name = 'users-Wallet';
 
     public function index(Content $content)
     {

@@ -20,7 +20,7 @@ use App\Admin\Controllers\MainController;
 
 class ReportController extends MainController
 {
-    public $permission_name = 'report';
+    public $permission_name = 'reports';
 
     public function index(Content $content)
     {

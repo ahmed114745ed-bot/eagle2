@@ -638,7 +638,7 @@ class User extends Authenticatable
     public function UserVip()
     {
         return $this->hasOne(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            $q/*->where("is_used", 1)*/->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 

@@ -401,7 +401,9 @@ class ChargeController extends Controller
     public function chargeFromAgencyToAnother(Request $request)
     {
         $from = $request->user();
-
+        if (!$request->id || !$request->amount ) return Common::apiResponse(false, 'missing_params');
+        if($request->amount < 0) return Common::apiResponse(false, 'value not allow');
+        
         try {
             $this->chargeService->chargeAgencyToAnother($from, $request);
 

@@ -24,7 +24,7 @@ class SpecialWareController extends  MainController
      */
     use HasResourceActions;
     protected $title = 'Ware';
-    public $permission_name = 'special-Ware';
+    public $permission_name = 'featured-ids';
 
     public function index(Content $content)
     {
