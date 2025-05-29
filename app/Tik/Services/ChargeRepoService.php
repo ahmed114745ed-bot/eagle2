@@ -366,9 +366,6 @@ class ChargeRepoService
 
     public function chargeAgencyToAnother(User $auth, $request)
     {
-
-        \Log::info(json_encode($request->all()));
-
         DB::beginTransaction();
 
         try {

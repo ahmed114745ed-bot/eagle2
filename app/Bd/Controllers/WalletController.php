@@ -292,29 +292,33 @@ class WalletController extends MainController
     
     public function charge(Request $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0.01',
-            'target_id' => 'nullable',    
-            'target_type' => 'required|string',
-        ]);
-       
-
-        $types = [
-            'user' => [$this, 'chargeToUser'],
-            'agency' => [$this, 'chargeToAgency']
-        ];
-      
-        $type = $request->input('target_type');
-     
-        if (!array_key_exists($type, $types)) {
-            admin_toastr('نوع الوجهة غير موجود', 'error');
-            return back();
-        }
-       
         try {
+            $request->validate([
+                'amount' => 'required|integer|min:1',
+                'target_id' => 'nullable',    
+                'target_type' => 'required|string',
+            ]);
+        
+
+            $types = [
+                'user' => [$this, 'chargeToUser'],
+                'agency' => [$this, 'chargeToAgency']
+            ];
+        
+            $type = $request->input('target_type');
+        
+            if (!array_key_exists($type, $types)) {
+                admin_toastr('نوع الوجهة غير موجود', 'error');
+                return back();
+            }
+        
+       
           
             $data = call_user_func($types[$type], $request->all());
             admin_toastr('تم الشحن بنجاح', 'success');
+            return back();
+        } catch (\Exception $e) {
+            admin_toastr($e->getMessage(), 'error');
             return back();
         } catch (\Throwable $e) {
             admin_toastr('حدث خطأ أثناء الشحن: ' . $e->getMessage(), 'error');
