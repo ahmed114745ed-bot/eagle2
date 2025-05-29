@@ -38,7 +38,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Controllers\AdminController;
 
 
-class AgencyController extends AdminController
+class AgencyController extends MainController
 {
     use HasResourceActions, AdminUserTrait;
 
