@@ -60,7 +60,7 @@ class AdminNewPermission extends Seeder
             'vip-gift',
             'families',
             'families-level',
-            'countries-where-salary-payments-are-available',
+            'salary-payment-countries',
             'salary-requests',
             'rejected-agent-request-switch',
             'accept-agent-request-switch',
@@ -169,7 +169,7 @@ class AdminNewPermission extends Seeder
             ['name' => 'Vip', 'sort' => 9, 'permissions' => ['VIPs','vip-gift']],
             ['name' => 'families', 'sort' => 10, 'permissions' => ['families','families-level']],
             ['name' => 'Agency System', 'sort' => 11, 'permissions' => ['agency-settings']],
-            ['name' => 'Internal Sales System', 'sort' => 12, 'permissions' => ['countries-where-salary-payments-are-available','accept-agent-request-switch','salary-requests','internal-sales-system-report','rejected-agent-request-switch']],
+            ['name' => 'Internal Sales System', 'sort' => 12, 'permissions' => ['salary-payment-countries','accept-agent-request-switch','salary-requests','internal-sales-system-report','rejected-agent-request-switch']],
             ['name' => 'Host Agencies', 'sort' => 13, 'permissions' => ['reports','achieved-Target','change-users-agency-Switch','delete-agency-Switch','agencies','host-agencies-report','users-Wallet','hosts-target','hosts','host-charge-switch','host-chang-agency-Switch','host-invite-switch','host-can-Play-Switch','host-kick-agency-Switch','host-kick-family-Switch']],
             ['name' => 'Agency Settings', 'sort' => 14, 'permissions' => ['agencies-join-requests','target', 'request-agencies', 'accept-agency', 'refuse-agency', 'request-agency-history']],
             ['name' => 'Charging Agencies', 'sort' => 15, 'permissions' => ['appear-charger-agency', 'charge-agency', 'payment-gat-way']],
@@ -256,7 +256,6 @@ class AdminNewPermission extends Seeder
                 }
             }
         })->delete();
-
         $actions = ['create', 'browse', 'delete', 'show'];
         $targets = ['update_setting_button'];
 
@@ -281,17 +280,6 @@ class AdminNewPermission extends Seeder
 
         $actions = ['create', 'edit', 'show'];
         $targets = ['details-of-unique-identifiers', 'Real', 'report-real'];
-
-        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
-            foreach ($actions as $action) {
-                foreach ($targets as $target) {
-                    $query->orWhere('slug', 'like', "{$action}-{$target}");
-                }
-            }
-        })->delete();
-
-        $actions = ['create', 'delete', 'show'];
-        $targets = [];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {

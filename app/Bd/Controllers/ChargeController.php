@@ -41,28 +41,28 @@ class ChargeController extends AdminController
         $grid->model()->where('user_charger_type','bd')
                       ->with('shippingAgency')
                       ->where('charger_id', Auth::user()->app_id);
-    
+
         // $grid->column('id', __('Id'));
         $grid->column('amount', __('Amount'));
         // $grid->column('amount_type', __('Amount type'));
-        
+
         $grid->column('agency_id', __('receiver'))->display(function () {
             // dd($this->agency_id );
             if ($this->shippingAgency) {
                 $agency = $this->shippingAgency;
-    
+
                 $cacheKey = "agency_image_{$agency->id}";
                 $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {
                     $path = @$agency->img;
                     $defaultImage = asset("images/icon-agency.jpg");
                     $url = getImagePath($path) ?? $defaultImage;
                     if (!isImageExists($url)) $url = $defaultImage;
-    
+
                     return handleShowImageWithTypes($agency->id, $url, 40, 40);
                 });
-    
+
                 $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
-    
+
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                         <div style='display: flex; align-items: center; gap: 10px;'>
@@ -75,17 +75,17 @@ class ChargeController extends AdminController
                     </a>
                 ";
             }
-    
+
             $user = \App\Models\User::find($this->user_id);
             if ($user) {
                 $path = $user->profile?->avatar ?? null;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
                 if (!isImageExists($url)) $url = $defaultImage;
-    
+
                 $image = handleShowImageWithTypes($user->id ?? 0, $url, 40, 40);
                 $showUrl = url("admin/users/{$user->id}");
-    
+
                 return "
                     <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                         <div style='display: flex; align-items: center; gap: 10px;'>
@@ -98,18 +98,18 @@ class ChargeController extends AdminController
                     </a>
                 ";
             }
-    
+
             return "<span class='text-danger'>".__('لا يوجد مستلم')."</span>";
         });
-    
+
         $grid->column('created_at', __('تاريخ الإنشاء'))->display(function ($value) {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
-    
+
         $grid->column('usd', __('Usd'));
-    
+
         $grid->disableCreateButton();
-       
+
         $grid->tools(function (Grid\Tools $tools) {
             $url = 'salaries';
             $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
