@@ -81,7 +81,7 @@ class AgencyController extends AdminController
     //     $year = $request->year ?? Carbon::now()->year;
     //     $month = $request->month ?? Carbon::now()->month;
     //     $tab = request('tab') ?? null;
-      
+
     //     $cacheKey = "agency_profile_{$id}";
     //     $agency = Agency::with([
     //         'admins',
@@ -139,7 +139,7 @@ class AgencyController extends AdminController
     //     $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
     //     $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
     //     $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
-     
+
     //     return $content->title(__('agency profile'))
     //         ->view('agency_profile', $data);
 
@@ -150,13 +150,13 @@ class AgencyController extends AdminController
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab') ?? 'members';
-    
+
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::with(['admins', 'owner:id,name,uuid'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
         });
-    
+
         $path = $agency->img;
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($path) ?? $defaultImage;
@@ -164,11 +164,11 @@ class AgencyController extends AdminController
             $imageUrl = $defaultImage;
         }
         $agency->display_image = $imageUrl;
-    
+
         $agencyId = $agency->id;
-    
+
         $members = $charges = $salaries = $agencyJoinRequests = $giftLog = $memberTargets = $agencyTarget = $rate = $stars = $heroes = null;
-    
+
         switch ($tab) {
             case 'members':
                 $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
@@ -178,7 +178,7 @@ class AgencyController extends AdminController
                         ->paginate(10, ['*'], 'members_page');
                 });
                 break;
-    
+
             case 'charges':
                 $charges = Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
                     return $agency->charges()
@@ -187,7 +187,7 @@ class AgencyController extends AdminController
                         ->paginate(10, ['*'], 'charges_page');
                 });
                 break;
-    
+
             case 'salary':
                 $salaries = Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
                     return AgencySallary::where('agency_id', $id)
@@ -196,7 +196,7 @@ class AgencyController extends AdminController
                         ->paginate(10, ['*'], 'salary_page');
                 });
                 break;
-    
+
             case 'requests':
                 $agencyJoinRequests = Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
                     return AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
@@ -206,7 +206,7 @@ class AgencyController extends AdminController
                         ->paginate(10, ['*'], 'join_page');
                 });
                 break;
-    
+
             case 'targets':
                 $memberTargets = Cache::remember("agency_{$id}_targets_{$month}_{$year}_page_" . request('target_page', 1), 600, function () use ($agency, $agencyId, $month, $year) {
                     return $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
@@ -215,14 +215,14 @@ class AgencyController extends AdminController
                             ->whereYear('created_at', $year);
                     }])->paginate(10, ['*'], 'target_page');
                 });
-    
+
                 [$agencyTarget, $rate] = Cache::remember("agency_{$id}_rate_{$month}_{$year}", 600, fn() => $this->rateAgency($agencyId, $month, $year));
                 $stars = Cache::remember("agency_{$id}_stars_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'));
                 $heroes = Cache::remember("agency_{$id}_heroes_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'));
-    
+
                 break;
         }
-    
+
         $giftLog = Cache::remember("agency_{$id}_giftlog", 600, function () use ($id) {
             return GiftLog::where('agency_id', $id)
                 ->selectRaw("SUM(giftPrice) as exp, receiver_id")
@@ -232,13 +232,13 @@ class AgencyController extends AdminController
                 ->orderByDesc('exp')
                 ->get();
         });
-    
+
         $data = compact(
             'agency', 'members', 'charges', 'salaries',
             'agencyJoinRequests', 'giftLog', 'memberTargets',
             'agencyTarget', 'rate', 'stars', 'heroes', 'tab'
         );
-    
+
         return $content->title(__('agency profile'))
             ->view('agency_profile', $data);
     }
@@ -337,7 +337,7 @@ class AgencyController extends AdminController
             // ->where('Host_agency',  1)
             ->where('bd_id',  Auth::user()->app_id)
             ->orderByDesc('id');
-            
+
         if (request("active") == true) {
             $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)
@@ -441,7 +441,7 @@ class AgencyController extends AdminController
         });
         $grid->disableExport();
 
-        $this->extendGrid($grid);
+//        $this->extendGrid($grid);
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -541,7 +541,7 @@ class AgencyController extends AdminController
         $grid->column('img', trans('img'))->image('', 30);
         $grid->disableActions();
         $grid->disableCreateButton();
-        $this->extendGrid($grid);
+//        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -565,7 +565,7 @@ class AgencyController extends AdminController
         $show->field('url', __('url'));
         $show->field('img', __('image'))->image('', 200);
         $show->field('contents', __('contents'));
-        $this->extendShow($show);
+//        $this->extendShow($show);
         return $show;
     }
 
@@ -641,7 +641,7 @@ class AgencyController extends AdminController
                 }
             });
         }
-      
+
         if (Session::has('show_alert')) {
             $form->html('<script>
              $(document).ready(function () {
@@ -650,7 +650,7 @@ class AgencyController extends AdminController
          </script>');
         }
 
-        
+
 
         Admin::script(<<<'JS'
         function initPhoneInput() {
@@ -658,13 +658,13 @@ class AgencyController extends AdminController
             if (input && !input.classList.contains('iti-initialized')) {
                 const parentDiv = input.parentElement;
                 parentDiv.style.position = 'relative';
-    
+
                 const iti = window.intlTelInput(input, {
                     separateDialCode: true,
                     preferredCountries: ["eg"],
                     utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
                 });
-    
+
                 document.head.insertAdjacentHTML('beforeend', `
                     <style>
                         .iti { width: 100%;  }
@@ -676,21 +676,21 @@ class AgencyController extends AdminController
                         .fields-group .form-group { overflow: visible; }
                     </style>
                 `);
-    
+
                 input.classList.add('iti-initialized');
-    
+
                 const form = input.closest('form');
                 if (form && !form.classList.contains('phone-init')) {
                     form.addEventListener('submit', function () {
                         if (iti) {
                             const dialCode = iti.getSelectedCountryData().dialCode;
                             const nationalNumber = input.value.replace(/\s/g, '');
-    
+
                             const hiddenInput = document.createElement('input');
                             hiddenInput.name = 'phone_code';
                             hiddenInput.value = `+${dialCode}`;
                             form.appendChild(hiddenInput);
-    
+
                             input.value = nationalNumber;
                         }
                     });
@@ -698,7 +698,7 @@ class AgencyController extends AdminController
                 }
             }
         }
-    
+
         initPhoneInput();
         $(document).on('pjax:complete', function () {
             setTimeout(initPhoneInput, 100);
