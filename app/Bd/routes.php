@@ -61,7 +61,7 @@ Route::group(
     ],
     function (Router $router) {
 
-                $router->get('/', [HomeController::class,'index'])->name('home');
+                $router->get('/home', [HomeController::class,'index'])->name('home');
                 $router->get('/charges', [ChargeController::class, 'index'])->name('charges');
                 $router->resource('/agencies', AgencyController::class);
                 $router->resource('/salaries', BdSalariesController::class);
