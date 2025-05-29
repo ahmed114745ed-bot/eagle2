@@ -54,9 +54,7 @@ class HistoryAgencyResource extends JsonResource
             //     ->where('year', $year)
             //     ->where('month', $month)
             //     ->sum('target_diamonds');
-            $totalExp = $giftLog->sum('exp');
-            $heroTotalExp = $heroGiftLog->sum('exp');
-            $target = $totalExp + $heroTotalExp;
+            $target = $heroGiftLog->sum('exp');
         }
 
 
