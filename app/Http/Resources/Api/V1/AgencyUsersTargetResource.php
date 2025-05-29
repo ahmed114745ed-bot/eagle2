@@ -80,7 +80,7 @@ class AgencyUsersTargetResource extends JsonResource
             'uuid' => $this->uuid ?? '',
             'image' => $this->profile->avatar ?? '',
             'is_host' => $this->is_host,
-            'salary'  =>(int) $agencySallary ?? 0,
+            'salary' => round((float) $agencySallary, 2),
             'target' => [
                 'id' => @$target->target_id ?? 0,
                 'user_diamonds' => @$target->user_diamonds ?? 0,
