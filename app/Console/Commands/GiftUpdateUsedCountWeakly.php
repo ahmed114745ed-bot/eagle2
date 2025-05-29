@@ -38,5 +38,7 @@ class GiftUpdateUsedCountWeakly extends Command
             }
 //        }
 
+        $this->info('update-gift-weakly:cron Command Run Successfully !');
+
     }
 }

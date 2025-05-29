@@ -49,5 +49,6 @@ class ResetUserTodayDays extends Command
             SET today_days = 0;
         ");
 
+        $this->info('users:reset-today-days Command Run Successfully !');
     }
 }

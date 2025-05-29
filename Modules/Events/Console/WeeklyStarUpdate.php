@@ -79,5 +79,6 @@ class WeeklyStarUpdate extends Command
 
         Reward::query()->insert($previousRewards);
 
+        $this->info($this->signature . ' Run successfully');
     }
 }

@@ -35,6 +35,8 @@ class SetDataFromJob extends Command
                 Redis::del($cleanKey);
             }
         }
+
+        $this->info('redis:get_data Command Run Successfully !');
     }
 
 }

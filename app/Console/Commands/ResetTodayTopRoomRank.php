@@ -32,5 +32,7 @@ class ResetTodayTopRoomRank extends Command
             UPDATE rooms
             SET  top_user_id = null
         ");
+
+        $this->info('app:reset-top-room-rank Command Run Successfully !');
     }
 }

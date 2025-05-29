@@ -95,5 +95,6 @@ class WeeklyStarWinner extends Command
 
             }
         }
+        $this->info('weekly-star-winner Command Run Successfully !');
     }
 }

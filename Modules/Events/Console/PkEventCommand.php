@@ -64,6 +64,6 @@ class PkEventCommand extends Command
         }
 
         PkReward::query()->insert($previousRewards);
-
+        $this->info($this->signature . ' Run successfully');
     }
 }

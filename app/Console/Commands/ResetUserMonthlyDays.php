@@ -42,5 +42,7 @@ class ResetUserMonthlyDays extends Command
             UPDATE users
             SET monthly_days = 0
         ");
+
+        $this->info('users:reset-monthly-days Command Run Successfully !');
     }
 }

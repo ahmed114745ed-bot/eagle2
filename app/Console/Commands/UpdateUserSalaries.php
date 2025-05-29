@@ -44,7 +44,7 @@ class UpdateUserSalaries extends Command
     {
         $this->calculateUserSalary();
 
-
+        $this->info($this->signature . ' Run successfully');
         return Command::SUCCESS;
     }
 

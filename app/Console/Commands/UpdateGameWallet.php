@@ -37,5 +37,8 @@ class UpdateGameWallet extends Command
             "balance" => $remaining,
             "used" => 0,
         ]);
+
+
+        $this->info($this->signature . ' Run successfully');
     }
 }
