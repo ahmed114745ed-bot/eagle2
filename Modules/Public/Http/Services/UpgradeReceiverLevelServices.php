@@ -6,6 +6,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Helpers\Common;
 use App\Models\EarnedDiamond;
 use App\Models\User;
+use Log;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Public\Jobs\RewardWinnerLevel;
 
@@ -31,6 +32,7 @@ class UpgradeReceiverLevelServices
     }
     public function earnedDiamond($userId,$diamond,$actionType,$config,$type=null)
     {
+        Log::info("goooooooooooooooood");
         $diamonds = $diamond ==null? $config:$diamond;
         EarnedDiamond::create([
             'action_mode' =>$actionType,
