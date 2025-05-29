@@ -3,6 +3,7 @@
 namespace Modules\Public\Http\Controllers\web;
 
 
+use App\Admin\Controllers\MainController;
 use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -13,7 +14,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Entities\RewardLevelInterval;
 
-class RewardLevelIntervalController extends AdminController
+class RewardLevelIntervalController extends MainController
 {
     /**
      * Title for current resource.
@@ -21,44 +22,58 @@ class RewardLevelIntervalController extends AdminController
      * @var string
      */
     protected $title = 'RewardLevelInterval';
+    public $permission_name = 'reward-level-interval';
+
     use HasResourceActions;
 
     public function index(Content $content)
     {
-        return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
-            ->body($this->grid());
+        return parent::index($content
+            ->title(trans('Level Gifts'))
+            ->body($this->grid()));
     }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id,$content
+            ->title(trans('Level Gifts'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        $id = request()->route('id');
+
+        return parent::edit($id,$content
+            ->title(trans('Level Gifts'))
+            ->body($this->form()->edit($id)));
+    }
+
     public function create(Content $content)
     {
-        return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
-            ->body($this->form());
+        return parent::create($content
+            ->title(trans('Level Gifts'))
+            ->body($this->form()));
     }
 
     public function update($id)
     {
         $id = request()->route('id');
         return $this->form()->update($id);
-    }
-
-    public function edit($id, Content $content)
-    {
-        $id = request()->route('id');
-        return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
-    }
-
-    public function show($id, Content $content)
-    {
-        return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
-            ->body($this->detail($id));
     }
 
     /**

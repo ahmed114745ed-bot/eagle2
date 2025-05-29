@@ -146,7 +146,7 @@ class PkEventGiftController extends MainController
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
-                <h3 style="margin-right: 10px;">{ $gifts}</h3>
+                <h3 style="margin-right: 10px;">$gifts</h3>
 
             HTML;
             $tools->append($customButtonHTML);
@@ -211,7 +211,7 @@ class PkEventGiftController extends MainController
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                 <i class="fa fa-plus"></i>{$add}
             </a>
-            <h3 style="margin-right: 10px;">{$gifts}</h3>
+            <h3 style="margin-right: 10px;">$gifts</h3>
             HTML;
             $tools->append($customButtonHTML);
         });
@@ -278,7 +278,7 @@ class PkEventGiftController extends MainController
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                 <i class="fa fa-plus"></i>{$add}
             </a>
-            <h3 style="margin-right: 10px;"> {$gifts}</h3>
+            <h3 style="margin-right: 10px;"> $gifts</h3>
             HTML;
             $tools->append($customButtonHTML);
         });

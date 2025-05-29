@@ -18,6 +18,10 @@ class AddTargetToJsonController extends Controller
 
     public function targetPercentage(Request $request)
     {
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_name);
+        }
+
         $hours =  $request->hours;
         $days =  $request->days;
         $reels =  $request->reels;
