@@ -379,19 +379,38 @@ class VipService
 
     public function vipUserList($userId)
     {
-        $userVip = $this->userVipRepository->getAllByUserId($userId);
-        $vipPrivileges = $this->vipPrivilegeRepository->all();
-        $oVips =  $userVip->pluck('OVip');
-        $wares = $this->wareRepository->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
-        $oVips = $oVips->map(function ($oVip) use ($wares) {
+        // $userVip = $this->userVipRepository->getAllByUserId($userId);
+        // $vipPrivileges = $this->vipPrivilegeRepository->all();
+        // $oVips =  $userVip->pluck('OVip');
+        // $wares = $this->wareRepository->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
+        // $oVips = $oVips->map(function ($oVip) use ($wares) {
+        //     $filteredWares = $wares->where('level', $oVip->level);
+        //     $oVip->setRelation('wares', $filteredWares);
+        //     return $oVip;
+        // });
+
+    $userVips = $this->userVipRepository->getAllByUserId($userId);
+    $vipPrivileges = $this->vipPrivilegeRepository->all();
+
+    $oVips = $userVips->pluck('OVip')->filter();
+
+    $wares = $this->wareRepository->getOVip(
+        $oVips->pluck('level')->unique(),
+        $vipPrivileges->pluck('type')->unique()
+    );
+
+    $userVips->each(function ($userVip) use ($wares) {
+        $oVip = $userVip->OVip;
+        if ($oVip) {
             $filteredWares = $wares->where('level', $oVip->level);
             $oVip->setRelation('wares', $filteredWares);
-            return $oVip;
-        });
-        $data = [
-            'all_privileges' => $vipPrivileges,
-            'o_vips' => $oVips,
-        ];
-        return $data;
+        }
+    });
+
+    return [
+        'all_privileges' => $vipPrivileges,
+        'o_vips' => $userVips,
+    ];
+
     }
 }

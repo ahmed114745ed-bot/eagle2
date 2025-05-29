@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Resources\Api\V1;
+
+use App\Models\UserVip;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
+
+class OVipNewResource extends JsonResource
+{
+
+    public function toArray($request)
+    {
+        $oVip = $this->OVip;
+
+        $activePrivilegeIds = [];
+        $wares = collect();
+        $vipPrivileges = $request->vipPrivileges ?? collect();
+        
+        if ($oVip) {
+            $activePrivilegeIds = $oVip->privilegs?->pluck('id')?->toArray() ?? [];
+            $wares = $oVip->wares ?? collect();
+        }
+        $diff = Carbon::now()->diff(Carbon::createFromTimestamp($this->expire));
+
+        return [
+            "target_id" => $this->id,
+            "is_buyed" => true,
+            "is_used" => $this->is_used == 1,
+            "using" => $this->using == 1,
+            'expire' => $this->expire != 0 ? date("Y-m-d H:i:s", $this->expire) : 0,
+            'remaining_time' => sprintf('%dy %dm %dd %dh %di %ds', $diff->y, $diff->m, $diff->d, $diff->h, $diff->i, $diff->s),
+
+            'vip' => [
+                'id' => $oVip->id,
+                'level' => $oVip->level,
+                'sort' => $oVip->sort,
+                'name' => $oVip->name,
+                'img' => $oVip->img,
+                'price' => $oVip->price,
+                'expire' => $oVip->expire,
+                'exp' => $oVip->exp,
+
+                'privilegs' => VipPrivilegeResource::collection(
+                    $vipPrivileges->map(function ($p) use ($wares, $activePrivilegeIds, $oVip) {
+                        $priv = clone $p;
+                        $priv->item = $wares->where('type', $priv->type)->first();
+                        $priv->level = $oVip->level;
+                        $priv->active = in_array($priv->id, $activePrivilegeIds);
+                        return $priv;
+                    })->sortByDesc('active')
+                ),
+            ]
+        ];
+    }
+}
