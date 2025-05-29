@@ -39,6 +39,7 @@ class UpdateGameWallet extends Command
         ]);
 
 
-        $this->info($this->signature . ' Run successfully');
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 }

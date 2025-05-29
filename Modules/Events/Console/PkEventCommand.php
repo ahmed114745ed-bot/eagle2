@@ -34,6 +34,9 @@ class PkEventCommand extends Command
         $newPkEvent->save();
 
         $this->repeatRewards($pkEvent, $newPkEvent->id);
+
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 
 

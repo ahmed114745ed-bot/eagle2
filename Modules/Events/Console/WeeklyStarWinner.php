@@ -95,6 +95,7 @@ class WeeklyStarWinner extends Command
 
             }
         }
-        $this->info('weekly-star-winner Command Run Successfully !');
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 }

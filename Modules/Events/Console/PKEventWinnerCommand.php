@@ -30,7 +30,8 @@ class PKEventWinnerCommand extends Command
         $this->processEventParticipants($pkEvent, 'receiver', 'pk-star');
         $this->processEventParticipants($pkEvent, 'roomowner', 'pk-room');
 
-        $this->info($this->signature . ' Run successfully');
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 
     protected function getCurrentPkEvent()

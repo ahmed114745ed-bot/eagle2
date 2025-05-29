@@ -76,6 +76,6 @@ class ResetUserMonthlyDiamond extends Command
 
 
 
-        $this->info('update-room-user-now:cron Command Run Successfully !');
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 }

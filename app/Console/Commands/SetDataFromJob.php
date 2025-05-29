@@ -36,7 +36,8 @@ class SetDataFromJob extends Command
             }
         }
 
-        $this->info('redis:get_data Command Run Successfully !');
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 
 }

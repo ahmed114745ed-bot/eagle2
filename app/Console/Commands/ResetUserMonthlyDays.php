@@ -43,6 +43,7 @@ class ResetUserMonthlyDays extends Command
             SET monthly_days = 0
         ");
 
-        $this->info('users:reset-monthly-days Command Run Successfully !');
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 }

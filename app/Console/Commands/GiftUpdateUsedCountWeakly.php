@@ -38,7 +38,8 @@ class GiftUpdateUsedCountWeakly extends Command
             }
 //        }
 
-        $this->info('update-gift-weakly:cron Command Run Successfully !');
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
 
     }
 }
