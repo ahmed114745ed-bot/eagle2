@@ -412,9 +412,8 @@ class WalletController extends MainController
             throw new \Exception(__('api_responses.freez_charge'));
         }
 
-        if (!is_numeric($usd) || $usd <= 0 || fmod($usd, 1) != 0) {
-            throw new \Exception(__('api_responses.This value is not allowed'));
-
+        if (!is_numeric($usd) || $usd <= 0) {
+            throw new \Exception(__('This value is not allowed'));
         }
 
         $to = ShippingAgency::find($toId);
