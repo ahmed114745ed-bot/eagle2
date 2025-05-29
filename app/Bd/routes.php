@@ -52,8 +52,10 @@ Route::group(
         'namespace' => 'App\\Bd\\Controllers',
         'middleware' => [
             'web',
-            'admin',
-            'adminIp',
+'admin.auth',
+            'admin.pjax',
+            'admin.log',
+            'admin.bootstrap',            'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
         ],
