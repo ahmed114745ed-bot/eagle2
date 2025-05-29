@@ -57,11 +57,6 @@ class VipService
         return $data;
     }
 
-
-
-
-
-
     public function buyVip($request)
     {
         $vip = $this->ovipRepository->findById($request->vip_id);
