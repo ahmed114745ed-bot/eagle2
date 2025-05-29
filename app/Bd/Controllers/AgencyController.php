@@ -3,6 +3,7 @@
 namespace App\Bd\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -38,12 +39,14 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Controllers\AdminController;
 
 
-class AgencyController extends MainController
+class AgencyController extends Controller
 {
     use HasResourceActions, AdminUserTrait;
 
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
+
+    protected $title = 'Agency';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
@@ -51,7 +54,7 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
+        return $content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
@@ -59,21 +62,21 @@ class AgencyController extends MainController
 
 
                 $row->column(12, $this->grid());
-            }));
+            });
     }
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id, $content
-            ->title(__($this->title))
-            ->body($this->form()->edit($id)));
+        return  $content
+            ->title(__(@$this->title ?? ''))
+            ->body($this->form()->edit($id));
     }
 
     public function create(Content $content)
     {
-        return parent::create($content
+        return $content
             ->title(__($this->title))
-            ->body($this->form()));
+            ->body($this->form());
     }
 
     // public function profile($id, Request $request, Content $content)
