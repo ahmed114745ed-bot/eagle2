@@ -251,7 +251,7 @@ class OvipGiftTapController extends MainController
         //
         //            ]
         //        )->attribute(['id' => 'profile_frame'])->required();
-
+ $form->keyValue('key_json', 'key_json');
         if ($form->isEditing()){
             $form->select('image_type1', __('image_type'))->options(
                 [

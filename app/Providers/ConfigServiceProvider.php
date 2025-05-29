@@ -42,6 +42,10 @@ class ConfigServiceProvider extends ServiceProvider
             Config::set('admin.route.middleware',$get);
              Config::set('admin.auth.controller', \App\Admin\Controllers\Preview\AuthController::class);
          }
+
+
+         // Timezone value
+        Config::set('app.owner_timezone', getTimezone());
     }
 
     public function getReceivedAndSanderPercentage(): array

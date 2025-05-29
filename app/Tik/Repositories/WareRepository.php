@@ -119,4 +119,10 @@ class WareRepository extends AbstractRepository
     {
         return $this->model->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1)->first();
     }
+
+
+    public function getFromType(int $type, int $pagination = 10)
+    {
+        return $this->model->where('type', $type)->paginate($pagination);
+    }
 }
