@@ -69,17 +69,17 @@ class AgencyUsersTargetResource extends JsonResource
             'name' => $this->name ?? '',
             'uuid' => $this->uuid ?? '',
             'image' => $this->profile->avatar ?? '',
-            // 'is_host' => $this->is_host,
+            'is_host' => $this->is_host,
             'salary'  =>(int) $salary ?? 0,
-            // 'target' => [
-                // 'id' => @$target->target_id ?? 0,
+            'target' => [
+                'id' => @$target->target_id ?? 0,
             'user_diamonds' => @$target->user_diamonds ?? 0,
             'user_hours' => @$target->user_hours ?? 0,
             'user_days' => @$target->user_days ?? 0,
-                // 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
+                'diamonds_next_target'   => @$target?->next_diamond ?? 0,
             'old_targets'  => $result,
-            // ],
-            // 'top_users' => SenderGiftLogResource::collection($giftLog),
+            ],
+            'top_users' => SenderGiftLogResource::collection($giftLog),
            'top_users' => $giftLog->map(function ($log) {
                 return $log->sender?->profile?->avatar ?? '';
             })->filter()->values()->toArray(),
