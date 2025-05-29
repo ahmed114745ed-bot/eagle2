@@ -298,7 +298,7 @@ class AgencyController extends Controller
             }
         }
 
-        return parent::update($id);
+        $this->form()->update($id);
     }
 
     // public function show($id, Content $content)
