@@ -18,13 +18,14 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class HomeController extends Controller
 {
 
     public function index(Content $content)
     {
-
+        Log::info("gooooooooooooooooooooooooooooooooooooood");
         $appID = Auth::user()->app_id;
         $agencyCount = Agency::where('bd_id', $appID)->count();
 
