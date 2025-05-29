@@ -8,7 +8,7 @@ use App\Bd\Controllers\WalletController;
 // use App\Bd\Controllers\RequestAgencyController;
 // use App\Bd\Controllers\ChargeController;
 // use App\Bd\Controllers\BdSalariesController;
-// use App\Bd\Controllers\AgencyController;
+use App\Bd\Controllers\AgencyController;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\Bd\Controllers\RequestAgencyController;
 
