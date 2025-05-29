@@ -947,7 +947,7 @@ class RoomController extends Controller
         // if vip 8 not allawed to kickout
 
         if (!$uid || !$black_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        if (Common::pack_get(9, $black_id)) return Common::apiResponse(0, 'cant kick this user', null, 403);
+        if (Common::pack_get(9, $black_id)) return Common::apiResponse(0, 'cant kick this user', null, 422);
         //        if (!Common::can_kick ($black_id)) return Common::apiResponse (0,'cant kick this user',null,403);
         $black_list = @DB::table('rooms')->where('uid', $uid)->first()->room_black;
         $room_id    = @DB::table('rooms')->where('uid', $uid)->first()->id;
