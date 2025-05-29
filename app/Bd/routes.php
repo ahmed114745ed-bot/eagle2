@@ -48,7 +48,7 @@ Route::group(
 
 Route::group(
     [
-        'prefix' => 'bdtest',
+        'prefix' => 'bd',
         'namespace' => 'App\\Bd\\Controllers',
         'middleware' => [
             'web',
