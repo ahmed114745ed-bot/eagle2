@@ -60,14 +60,19 @@ class AgencyUsersTargetResource extends JsonResource
             });
 
 
-        $salary = UserSallary::query()
+        // $salary = UserSallary::query()
 
-            ->where('user_agency_id', $this->agency_id)
-            ->where('user_id', $this->id)
-            ->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
-            })->sum(DB::raw('sallary - cut_amount'));
-
+        //     ->where('user_agency_id', $this->agency_id)
+        //     ->where('user_id', $this->id)
+        //     ->where(function ($query) use ($year, $month) {
+        //         $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+        //     })->sum(DB::raw('sallary - cut_amount'));
+        $agencySallary = UserSallary::query()
+        ->where('user_agency_id', $this->agency_id)
+        ->where(function ($query) use ($year, $month) {
+            $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+        })
+        ->value('agency_sallary');
 
         return [
             'id' => $this->id ?? 0,
@@ -75,14 +80,14 @@ class AgencyUsersTargetResource extends JsonResource
             'uuid' => $this->uuid ?? '',
             'image' => $this->profile->avatar ?? '',
             'is_host' => $this->is_host,
-            'salary'  =>(int) $salary ?? 0,
+            'salary'  =>(int) $agencySallary ?? 0,
             'target' => [
                 'id' => @$target->target_id ?? 0,
                 'user_diamonds' => @$target->user_diamonds ?? 0,
                 'user_hours' => @$target->user_hours ?? 0,
                 'user_days' => @$target->user_days ?? 0,
                 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
-                  'old_targets'  => $result,
+                'old_targets'  => $result,
             ],
             // 'top_users' => SenderGiftLogResource::collection($giftLog),
            'top_users' => $giftLog->map(function ($log) {
