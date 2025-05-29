@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\Api\V1\OVipNewResource;
 use Exception;
 use App\Helpers\Common;
 
@@ -46,7 +47,7 @@ class VipController extends Controller
 
         \request()->vipPrivileges = $data['all_privileges'];
 
-        return Common::apiResponse(1, '', OVipResource::collection($data['o_vips']), 200);
+        return Common::apiResponse(1, '', OVipNewResource::collection($data['o_vips']), 200);
     }
 
     public function buyVip(Request $request)

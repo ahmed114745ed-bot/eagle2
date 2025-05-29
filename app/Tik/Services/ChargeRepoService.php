@@ -419,7 +419,7 @@ class ChargeRepoService
         $receiver = $this->userRepository->searchUserById($request->id);
 
         if (!$receiver) throw new \Exception(__('api.notUser'));
-        if ($receiver->id == $auth->id) throw new \Exception(__('api.notYourself'));
+        // if ($receiver->id == $auth->id) throw new \Exception(__('api.notYourself'));
 
         $this->processUserCharge($authAgency, $receiver, $request->amount);
     }
