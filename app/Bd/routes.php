@@ -48,7 +48,7 @@ Route::group(
 
 Route::group(
     [
-        'prefix' => 'bd',
+        'prefix' => 'bdtest',
         'namespace' => 'App\\Bd\\Controllers',
         'middleware' => [
             'web',
@@ -61,7 +61,7 @@ Route::group(
     ],
     function (Router $router) {
 
-                $router->get('/home', [HomeController::class,'index'])->name('home');
+                $router->get('/', [HomeController::class,'index'])->name('home');
                 $router->get('/charges', [ChargeController::class, 'index'])->name('charges');
                 $router->resource('/agencies', AgencyController::class);
                 $router->resource('/salaries', BdSalariesController::class);
