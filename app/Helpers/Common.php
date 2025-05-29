@@ -1314,7 +1314,7 @@ class Common
         $userUsd = $usd *  $percentage  / 100;
         $usd = Common::roundToTwoDecimalPlaces($userUsd);
 
-        return $usd;
+        return $userUsd;
     }
 
     public  static function getMaxCoins()
