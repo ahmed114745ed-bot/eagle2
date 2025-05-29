@@ -35,10 +35,10 @@ use App\Admin\Actions\DeleteAgencyAction;
 use App\Traits\AdminTraits\AdminUserTrait;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Controllers\AdminController;
+use App\Http\Controllers\Controller;
 
 
-class AgencyController extends AdminController
+class AgencyController extends Controller
 {
     use HasResourceActions, AdminUserTrait;
 
