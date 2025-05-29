@@ -303,16 +303,9 @@ class AgencyController extends Controller
 
     public function show($id, Content $content)
     {
-
-        return parent::show($id, $content
-            ->title(__("agency details"))
-            ->row(function ($row) use ($id) {
-                $agency = Agency::find($id);
-                $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
-                $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
-                $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
-                    ->groupByRaw('agency_id,add_month,add_year')->count()));
-            }));
+       return parent::show($id, $content
+            ->title(trans(''))
+            ->body($this->detail($id)));
     }
 
 
