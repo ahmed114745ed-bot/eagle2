@@ -15,14 +15,16 @@ class WareObserver
      */
     public function created(Ware $ware)
     {
+       
+        
         if ($ware->enable){
-            if ($ware->type = 6 ){
+            if ($ware->type == 6 ){
                 settings()->set('intro_updated_at', time());
-            }elseif ($ware->type = 4){
+            }elseif ($ware->type == 4){
                 settings()->set('frame_updated_at', time());
-            }elseif ($ware->type = 1){
+            }elseif ($ware->type == 1){
                 settings()->set('extra_updated_at', time());
-            }elseif ($ware->type = 5){
+            }elseif ($ware->type == 5){
                 settings()->set('bubble_frame_updated_at', time());
             }
         }
@@ -49,7 +51,7 @@ class WareObserver
                 settings()->set('extra_updated_at', time());
             }elseif ($ware->type == 28){
                 settings()->set('profile_frame_updated', time());
-            }elseif ($ware->type = 5){
+            }elseif ($ware->type == 5){
                 settings()->set('bubble_frame_updated_at', time());
             }
         }
@@ -71,13 +73,13 @@ class WareObserver
     public function deleted(Ware $ware)
     {
         if ($ware->enable){
-            if ($ware->type = 6 ){
+            if ($ware->type == 6 ){
                 settings()->set('intro_updated_at', time());
-            }elseif ($ware->type = 4){
+            }elseif ($ware->type == 4){
                 settings()->set('frame_updated_at', time());
-            }elseif ($ware->type = 1){
+            }elseif ($ware->type == 1){
                 settings()->set('extra_updated_at', time());
-            }elseif ($ware->type = 5){
+            }elseif ($ware->type == 5){
                 settings()->set('bubble_frame_updated_at', time());
             }
 
