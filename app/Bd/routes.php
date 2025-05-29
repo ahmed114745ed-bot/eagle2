@@ -52,7 +52,7 @@ Route::group(
         'namespace' => 'App\\Bd\\Controllers',
         'middleware' => [
             'web',
-            // 'admin',
+            'admin',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
