@@ -76,10 +76,11 @@
                 <a href="{{ $item['uri'] }}" target="_blank">
                     @else
                
-                    <a href="{{ admin_url($item['uri']) }}">
 
                     
                     @if (Admin::user()->type != 'bd')
+                    <a href="{{ admin_url($item['uri']) }}">
+
                     @endif
                        
                             @endif
