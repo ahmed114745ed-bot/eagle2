@@ -5,6 +5,7 @@ namespace Modules\Events\Http\Controllers\web;
 use App\Admin\Controllers\MainController;
 use App\Models\OVip;
 use App\Models\Ware;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Column;
@@ -89,28 +90,30 @@ class PkEventController extends MainController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        $grid->column('الاجرائات')->display(function () {
-            // توليد الروابط
-            $url1 = url('admin/pk-events-gift/pk-star/' . $this->id);
-            $url2 = url('admin/pk-events-gift/pk-king/' . $this->id);
-            $url3 = url('admin/pk-events-gift/pk-room/' . $this->id);
+        if (Admin::user()->can('browse-' . 'pk-event-rewards') || Admin::user()->can('*')) {
+            $grid->column('الاجرائات')->display(function () {
+                // توليد الروابط
+                $url1 = url('admin/pk-events-gift/pk-star/' . $this->id);
+                $url2 = url('admin/pk-events-gift/pk-king/' . $this->id);
+                $url3 = url('admin/pk-events-gift/pk-room/' . $this->id);
 
-            $pk_star = 'النجم PK  هداية ';
-            $pk_king = 'الملك PK  هداية ';
-            $pk_owner = 'الغرفة pk هداية ';
-            if(app()->getLocale() == 'en'){
-                $pk_star = 'star PK gift';
-                $pk_king = 'king PK gift';
-                $pk_owner = 'room PK gift';
-            }
-            // إنشاء أزرار HTML
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". $pk_star . "  </a>";
-            $button2 = "<a href='{$url2}' class='btn btn-sm btn-danger'>". $pk_king. " </a>";
-            $button3 = "<a href='{$url3}' class='btn btn-sm btn-primary'>". $pk_owner. " </a>";
+                $pk_star = 'النجم PK  هداية ';
+                $pk_king = 'الملك PK  هداية ';
+                $pk_owner = 'الغرفة pk هداية ';
+                if(app()->getLocale() == 'en'){
+                    $pk_star = 'star PK gift';
+                    $pk_king = 'king PK gift';
+                    $pk_owner = 'room PK gift';
+                }
+                // إنشاء أزرار HTML
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". $pk_star . "  </a>";
+                $button2 = "<a href='{$url2}' class='btn btn-sm btn-danger'>". $pk_king. " </a>";
+                $button3 = "<a href='{$url3}' class='btn btn-sm btn-primary'>". $pk_owner. " </a>";
 
-            // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1 . ' ' . $button2 . ' ' . $button3;
-        });
+                // دمج الأزرار في سلسلة واحدة وإرجاعها
+                return $button1 . ' ' . $button2 . ' ' . $button3;
+            });
+        }
 
         return $grid;
     }

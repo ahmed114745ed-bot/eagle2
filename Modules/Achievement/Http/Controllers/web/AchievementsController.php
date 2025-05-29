@@ -2,6 +2,7 @@
 
 namespace Modules\Achievement\Http\Controllers\web;
 
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -63,7 +64,11 @@ class AchievementsController extends MainController
             if($lang == 'en'){
                 $add = 'Add gifts users ';
             }
-            $button = '<a href="' . $baseUrl . '?achievement_id=' . $this->getKey() . '" class="btn btn-xs btn-primary">'. $add . '</a>';
+
+            $button = '';
+            if (Admin::user()->can('browse-' . 'user_achievement_level') || Admin::user()->can('*')) {
+                $button = '<a href="' . $baseUrl . '?achievement_id=' . $this->getKey() . '" class="btn btn-xs btn-primary">'. $add . '</a>';
+            }
             $button2 = ($value === 'gift_target') ? $button : null;
 
             return $value . '<br>' . $button2;
@@ -82,24 +87,26 @@ class AchievementsController extends MainController
         });
         // $grid->column('description', __('description'));
 
-        $grid->column(__('redirect_button'))->display(function ($value) {
+        if (Admin::user()->can('browse-' . 'achievement_level') || Admin::user()->can('*')) {
+            $grid->column(__('redirect_button'))->display(function ($value) {
 
-           // $prefix = request()->route()->getPrefix();
-           // $baseUrl = ($prefix === '/preview/admin') ? url('preview/admin/achievement-levels/') :
-            $baseUrl =   url('admin/achievements-levels/');
-            $url1 = url($baseUrl .'/'. $this->id);
-            $lang = app()->getLocale();
-            $add = 'اضف انواع';
+                // $prefix = request()->route()->getPrefix();
+                // $baseUrl = ($prefix === '/preview/admin') ? url('preview/admin/achievement-levels/') :
+                $baseUrl =   url('admin/achievements-levels/');
+                $url1 = url($baseUrl .'/'. $this->id);
+                $lang = app()->getLocale();
+                $add = 'اضف انواع';
 
-            if($lang == 'en'){
-                $add = 'add types';
-            }
+                if($lang == 'en'){
+                    $add = 'add types';
+                }
 
-            $button =
-                //'<a href="' . $baseUrl . '/' . $this->id . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
-                "<a href='{$url1}' class='btn btn-xs btn-primary'>". $add . "</a>";
-            return $button;
-        });
+                $button =
+                    //'<a href="' . $baseUrl . '/' . $this->id . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
+                    "<a href='{$url1}' class='btn btn-xs btn-primary'>". $add . "</a>";
+                return $button;
+            });
+        }
 
         // $grid->column('type', __('Type'));
 

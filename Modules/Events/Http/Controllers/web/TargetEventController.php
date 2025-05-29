@@ -3,6 +3,7 @@
 namespace Modules\Events\Http\Controllers\web;
 
 
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Column;
@@ -87,16 +88,19 @@ class TargetEventController extends MainController
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->column(__('procedures'))->display(function () {
-            // توليد الروابط
-            $url1 = url('admin/target-events-gift/' . $this->id);
-            $gifts = __('gifts');
-            // إنشاء أزرار HTML
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
 
-            // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1;
-        });
+        if (Admin::user()->can('browse-' . 'gift-target-event') || Admin::user()->can('*')) {
+            $grid->column(__('procedures'))->display(function () {
+                // توليد الروابط
+                $url1 = url('admin/target-events-gift/' . $this->id);
+                $gifts = __('gifts');
+                // إنشاء أزرار HTML
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
+
+                // دمج الأزرار في سلسلة واحدة وإرجاعها
+                return $button1;
+            });
+        }
 
         return $grid;
     }

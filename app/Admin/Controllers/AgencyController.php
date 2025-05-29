@@ -438,12 +438,12 @@ class AgencyController extends MainController
               <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
         </div>";
         });
-        $grid->column('alary', __('Agency wallet'))->display(function ($coin) {
+        $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $coin = $this->salary;
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
