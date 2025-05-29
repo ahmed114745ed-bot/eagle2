@@ -1,4 +1,4 @@
-<?php 
+<?php
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Bd\Controllers\HomeController;
@@ -41,7 +41,7 @@ Route::group(
         }
         Route::post('login', [\App\Bd\Controllers\AuthController::class, 'postLogin']);
         Route::get('logout', [\App\Bd\Controllers\AuthController::class, 'logout']);
-      
+
     }
 
 );
