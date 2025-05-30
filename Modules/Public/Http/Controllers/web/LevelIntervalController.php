@@ -2,6 +2,7 @@
 
 namespace Modules\Public\Http\Controllers\web;
 
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -77,16 +78,19 @@ class LevelIntervalController extends MainController
         });
         $grid->column('min', __('min'));
         $grid->column('max', __('max'));
-        $grid->column(__('Procedures'))->display(function () {
-            // توليد الروابط
-            $url1 = url('admin/reward_level_interval/' . $this->id);
-            $gifts = __('Gifts');
-            // إنشاء أزرار HTML
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". $gifts ." </a>";
 
-            // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1;
-        });
+        if (Admin::user()->can('browse-' . 'reward_level_interval') || Admin::user()->can('*')) {
+            $grid->column(__('Procedures'))->display(function () {
+                // توليد الروابط
+                $url1 = url('admin/reward_level_interval/' . $this->id);
+                $gifts = __('Gifts');
+                // إنشاء أزرار HTML
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". $gifts ." </a>";
+
+                // دمج الأزرار في سلسلة واحدة وإرجاعها
+                return $button1;
+            });
+        }
 
         return $grid;
     }

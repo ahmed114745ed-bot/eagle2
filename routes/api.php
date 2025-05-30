@@ -472,6 +472,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('best-sale', [MallController::class, 'bestWareSale']);
 
                 Route::get('wabble', [MallController::class, 'wabbleWare']);
+                Route::get('wabbleAll', [MallController::class, 'wabbleAll']);
             });
             //start games
             Route::prefix('all-games1')->group(function () {

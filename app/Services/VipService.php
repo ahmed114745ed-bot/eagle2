@@ -57,11 +57,6 @@ class VipService
         return $data;
     }
 
-
-
-
-
-
     public function buyVip($request)
     {
         $vip = $this->ovipRepository->findById($request->vip_id);
@@ -113,7 +108,7 @@ class VipService
         ];
         $this->userVipRepository->create($data);
         $countWares = $this->wareRepository->countWareByLevel($vip->level);
-        return [$user, $countWares, $request->user(), $vip->exp];
+        return [$user, $countWares, $request->user(), $vip->price];
     }
 
     public function userVip($request)

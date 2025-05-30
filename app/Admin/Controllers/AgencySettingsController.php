@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
@@ -21,6 +23,10 @@ class AgencySettingsController extends MainController
 
     public function index(Content $content)
     {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_name);
+        }
+
         checkAgencyFeature();
         // $hours =  settings()->get('hours');
         // $days =  settings()->get('days');

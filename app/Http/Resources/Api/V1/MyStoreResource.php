@@ -54,7 +54,7 @@ class MyStoreResource extends JsonResource
                 'coins' => (string)$this->di,
                 'diamonds' =>  (string)$diamonds,
                 'silver_coins' => (string)$this->gold,
-                'usd' => (string)$sallary,
+                'usd' => (double)$sallary,
                 'user_usd' => (string) $userSalary ?? '',
                 'host_usd' => (string) @$hostSalary ?? '',
                 'pending_dollar' => (string) $pendingDollar ?? '',

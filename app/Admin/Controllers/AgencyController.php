@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Target;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -58,9 +59,6 @@ class AgencyController extends MainController
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
-
-
-
                 $row->column(12, $this->grid());
             }));
     }
@@ -150,6 +148,10 @@ class AgencyController extends MainController
 
     public function profile($id, Request $request, Content $content)
     {
+        if (! Admin::user()->can('*')) {
+            Permission::check('show-' . $this->permission_name);
+        }
+
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab') ?? 'members';
@@ -438,12 +440,12 @@ class AgencyController extends MainController
               <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
         </div>";
         });
-        $grid->column('alary', __('Agency wallet'))->display(function ($coin) {
+        $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $coin = $this->salary;
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>

@@ -47,10 +47,10 @@ class ResetUserMonthlyDiamond extends Command
         $dt = new \DateTime('now', new \DateTimeZone($timezone));
         if ($dt->format('j') == 1){
             $carbon = $dt->subDay();
-           
+
             $this->calculateUserSalary(month: $carbon->month, year: $carbon->year);
         }else{
-         
+
             $this->calculateUserSalary();
         }
 
@@ -76,6 +76,6 @@ class ResetUserMonthlyDiamond extends Command
 
 
 
-        //$this->info('update-room-user-now:cron Command Run Successfully !');
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 }
