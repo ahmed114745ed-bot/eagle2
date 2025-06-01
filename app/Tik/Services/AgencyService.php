@@ -355,7 +355,36 @@ class AgencyService
         return $agency;
     }
 
-    public function userHandlingRequest($userId, $agencyId)
+    public function userHandlingRequest($userId, $agencyId ,$type =null)
+    {
+        $operator = $this->userRepository->findById($userId);
+
+        // if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
+       
+        if (!empty($type) && $type == 'remove'){
+               $this->agencyUserJobRepository->deleteAdmin($operator->id ,$agencyId) ;
+               $tokens_notfacion[] = $operator->notification_id;
+               $title = $operator->name;
+               $body = 'تم ازالتك من مشرفين الوكالة';
+               $type = $message->type ?? 'text';
+                Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
+                return 'تم ازالة  المستخدم بنجاح';
+           }
+
+        if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
+            throw new CValidationException(__('This user already has an agency job requested!'));
+        }
+
+        $data = [
+            'agency_id' => $agencyId,
+            'user_id' => $operator->id,
+            'type' => "requestManger",
+        ];
+        $this->agencyUserJobRepository->create($data);
+        return 'تم اضافه المستخدم بنجاح';
+    }
+
+    public function RuserHandlingRequest($userId, $agencyId)
     {
         $operator = $this->userRepository->findById($userId);
 
