@@ -23,10 +23,9 @@ class AdminsAgencyResource extends JsonResource
         return [
             'id' => $this->user->id ?? 0,
             'name' => @$this->user->name ?? '', // both
-            'uuid' => $this->user->uuid ?? 0,
-            'image' => $this->user->profile->avatar ?? '',
-          
-
+            'uuid' => $this->user->uuid ?? '',
+            'image' => @$this->user->profile->avatar ?? '',
+            'exp'   => '0' ,
         ];
     }
 }

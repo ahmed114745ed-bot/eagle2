@@ -3,6 +3,7 @@
 namespace App\Bd\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -38,12 +39,14 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Controllers\AdminController;
 
 
-class AgencyController extends AdminController
+class AgencyController extends Controller
 {
     use HasResourceActions, AdminUserTrait;
 
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
+
+    protected $title = 'Agency';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
@@ -51,7 +54,7 @@ class AgencyController extends AdminController
 
     public function index(Content $content)
     {
-        return parent::index($content
+        return $content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
@@ -59,21 +62,21 @@ class AgencyController extends AdminController
 
 
                 $row->column(12, $this->grid());
-            }));
+            });
     }
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id, $content
-            ->title(__($this->title))
-            ->body($this->form()->edit($id)));
+        return  $content
+            ->title(__(@$this->title ?? ''))
+            ->body($this->form()->edit($id));
     }
 
     public function create(Content $content)
     {
-        return parent::create($content
+        return $content
             ->title(__($this->title))
-            ->body($this->form()));
+            ->body($this->form());
     }
 
     // public function profile($id, Request $request, Content $content)
@@ -295,22 +298,15 @@ class AgencyController extends AdminController
             }
         }
 
-        return parent::update($id);
+        return $this->form()->update($id);
     }
 
-    // public function show($id, Content $content)
-    // {
-
-    //     return parent::show($id, $content
-    //         ->title(__("agency details"))
-    //         ->row(function ($row) use ($id) {
-    //             $agency = Agency::find($id);
-    //             $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
-    //             $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
-    //             $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
-    //                 ->groupByRaw('agency_id,add_month,add_year')->count()));
-    //         }));
-    // }
+    public function show($id, Content $content)
+    {
+       return parent::show($id, $content
+            ->title(trans(''))
+            ->body($this->detail($id)));
+    }
 
 
     /**
