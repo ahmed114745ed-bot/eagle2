@@ -633,7 +633,8 @@ class AgencyService
         });
 
         $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
-        $userInfoArray = $user->getSallaryInfo();
+        $userInfoArray = $user->getSallaryInfoByMonth();
+        
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
 
