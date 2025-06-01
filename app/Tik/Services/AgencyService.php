@@ -682,7 +682,8 @@ class AgencyService
 
             $data['daly_reports'][] = [
                 'day' => sprintf('%02d-%02d', $startDay, $month),
-                'live_minutes' => (string)$formatted,
+                'live_minutes' => (int)$minutes,
+                'live_minutes_formatted' => (string)$formatted,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,
                 'is_for_current_agency' => $isForCurrentAgency,
