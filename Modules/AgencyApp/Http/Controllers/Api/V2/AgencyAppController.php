@@ -181,6 +181,7 @@ class AgencyAppController extends Controller
         $user  = \Auth::user();
         $month = request()->month ? (int) request()->month : now()->month;
         $year = request()->year ? (int) request()->year : now()->year;
+        $agencyId = request()->agency_id ?? $user->agency_id ;
 
         if (!$user instanceof User) return;
         $userId        = $user->id;
@@ -191,7 +192,7 @@ class AgencyAppController extends Controller
             ($targetService)->calculateTarget();
         }
 
-        $data = $this->agencyService->dailyReport($user, $month, $year);
+        $data = $this->agencyService->dailyReport($user, $month, $year ,$agencyId);
         $data = empty($data) ? new \stdClass() : $data;
         return Common::apiResponse(true, 'success', $data);
     }

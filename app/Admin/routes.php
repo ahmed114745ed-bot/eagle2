@@ -539,8 +539,10 @@ Route::group(
         });
 
         $router->resource('user-charges', UsersChargeController::class);
-         $router->resource('user-charges-report/{id}', UserChargeReportController::class);
-
+//         $router->resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
+         $router->group(['prefix' => 'user-charges-report'], function (){
+             Route::get('/{id}', [UserChargeReportController::class, 'index']);
+         });
 
 
 

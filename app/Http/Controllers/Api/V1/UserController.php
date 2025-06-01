@@ -269,7 +269,7 @@ class UserController extends Controller
 
         return response()->json($users);
     }
-    
+
     public function agencies(Request $request)
     {
         $key = $request->q;
