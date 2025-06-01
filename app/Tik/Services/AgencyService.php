@@ -51,6 +51,7 @@ use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
+use App\Models\UsersJoinedAgency;
 
 
 
@@ -114,6 +115,14 @@ class AgencyService
         return $agency;
     }
 
+    public function gitOldAgencies($userId)
+    {
+        $user = $this->agencyRepository->gitOldAgencies($userId);
+        return $user;
+    }
+
+
+    
     public function agencyTarget($userId, $user, $request)
     {
         $year = $request->year ?? Carbon::now()->year;
@@ -346,7 +355,36 @@ class AgencyService
         return $agency;
     }
 
-    public function userHandlingRequest($userId, $agencyId)
+    public function userHandlingRequest($userId, $agencyId ,$type =null)
+    {
+        $operator = $this->userRepository->findById($userId);
+
+        // if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
+       
+        if (!empty($type) && $type == 'remove'){
+               $this->agencyUserJobRepository->deleteAdmin($operator->id ,$agencyId) ;
+               $tokens_notfacion[] = $operator->notification_id;
+               $title = $operator->name;
+               $body = 'تم ازالتك من مشرفين الوكالة';
+               $type = $message->type ?? 'text';
+                Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
+                return 'تم ازالة  المستخدم بنجاح';
+           }
+
+        if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
+            throw new CValidationException(__('This user already has an agency job requested!'));
+        }
+
+        $data = [
+            'agency_id' => $agencyId,
+            'user_id' => $operator->id,
+            'type' => "requestManger",
+        ];
+        $this->agencyUserJobRepository->create($data);
+        return 'تم اضافه المستخدم بنجاح';
+    }
+
+    public function RuserHandlingRequest($userId, $agencyId)
     {
         $operator = $this->userRepository->findById($userId);
 
@@ -600,7 +638,7 @@ class AgencyService
         return [$agencies, $agencyManger];
     }
 
-    public function dailyReport($user, $month, $year)
+    public function dailyReport($user, $month, $year ,$agencyId = null)
     {
         $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
@@ -609,18 +647,36 @@ class AgencyService
             return [];
         }
 
+        $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
+        ->where('agency_id', $agencyId)
+        ->whereMonth('join_date', $month)
+        ->whereYear('join_date', $year)
+        ->latest('join_date')
+        ->first();
+
+            if (!$joinRecord) {
+                return [];
+            }
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
+        $joinedDate = Carbon::parse($joinRecord->join_date)->startOfDay();
+        $leaveDate = $joinRecord->leave_date 
+            ? Carbon::parse($joinRecord->leave_date)->endOfDay()
+            : $endOfMonth;
+        
 
         $reportStart = 1;
 
         $isThisMonth = $month == now()->month && $year == now()->year;
         $endDay = $isThisMonth ? now()->day : $endOfMonth->day;
 
-        $startDate = Carbon::create($year, $month, $reportStart)->startOfDay();
-        $endDate = Carbon::create($year, $month, $endDay)->endOfDay();
+        // $startDate = Carbon::create($year, $month, $reportStart)->startOfDay();
+        // $endDate = Carbon::create($year, $month, $endDay)->endOfDay();
 
-        $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $user->agency_id, $startDate, $endDate);
+        $startDate = $joinedDate->greaterThan($startOfMonth) ? $joinedDate : $startOfMonth;
+        $endDate = $leaveDate->lessThan($endOfMonth) ? $leaveDate : $endOfMonth;
+
+        $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) {
@@ -641,14 +697,25 @@ class AgencyService
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
 
+        $minutes = (float) $minutes;
+        $totalSeconds = (int) round($minutes * 60);
+        
+        $hours = floor($totalSeconds / 3600);
+        $minutesPart = floor(($totalSeconds % 3600) / 60);
+        $secondsPart = $totalSeconds % 60;
+        
+        $formatted = sprintf('%02d:%02d:%02d', $hours, $minutesPart, $secondsPart);
+        
+
+
         $data = [
             'user_salary' => [
                 'cut_amount' => (int)$totalCutAmount,
                 'salary' => intval($totalSalary),
             ],
-            'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
+            'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $agencyId),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => (string)$minutes,
+            'live_minutes' => (string)$formatted,
             'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
@@ -657,11 +724,17 @@ class AgencyService
             $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
+
+           
+
+
             $data['daly_reports'][] = [
                 'day' => sprintf('%02d-%02d', $startDay, $month),
                 'live_minutes' => (int)$minutes,
+                'live_minutes_formatted' => (string)$formatted,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,
+
             ];
         }
 

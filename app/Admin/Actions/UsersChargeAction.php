@@ -39,7 +39,7 @@ class UsersChargeAction extends Action
 
 
     private function getUser($userId)
-    { 
+    {
         return User::where('id', $userId)->first();
     }
 

@@ -66,7 +66,7 @@ class UserChargeReportController extends MainController
     protected function grid()
     {
         $name = "result";
-      
+
 
 
         $grid = $name;
@@ -212,9 +212,9 @@ class UserChargeReportController extends MainController
         if ($charger_type == "dash") {
             $grid->column('usd', __('amount $'))->display(function ($coin) {
                 $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-             
-                
-             
+
+
+
                 return "
                     <div style='display: flex; align-items: center; gap: 5px;'>
                         <span>" . number_format($coin) . "</span>
@@ -247,7 +247,7 @@ class UserChargeReportController extends MainController
         } elseif ((request("name") == "host") || (request("name") == "app")) {
             $grid->column('amount', __('amount'))->display(function ($coin) {
                 $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-                
+
                 return "
                     <div style='display: flex; align-items: center; gap: 5px;'>
                         <span>" . number_format($coin) . "</span>
@@ -290,7 +290,7 @@ class UserChargeReportController extends MainController
 
 
 
-   
+
     private function tabsComponent()
     {
         return view('admin.grid.common.report.usersCharge')->render();

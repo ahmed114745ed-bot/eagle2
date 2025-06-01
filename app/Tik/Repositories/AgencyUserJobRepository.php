@@ -32,4 +32,8 @@ class AgencyUserJobRepository extends AbstractRepository
         return $this->model->where('user_id', $userId)->where('type', 'requestManger')->delete();
     }
 
+    public function deleteAdmin(int $userId ,$agency_id)
+    {
+        return $this->model->where('user_id', $userId)->where('agency_id', $agency_id)->delete();
+    }
 }
