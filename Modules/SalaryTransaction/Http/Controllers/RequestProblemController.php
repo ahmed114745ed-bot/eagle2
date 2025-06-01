@@ -19,7 +19,7 @@ class RequestProblemController extends MainController
 {
     use HasResourceActions;
 
-    public $permission_name = 'request-problem';
+    public $permission_name = 'transaction-request-problem';
 
     public function index(Content $content)
     {
