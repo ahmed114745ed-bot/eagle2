@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use Modules\AgencyApp\Emails\SendAgencyEmail;
 use Modules\AgencyApp\Services\TargetService;
 use Modules\AgencyApp\Classes\Agencies\AgencyDataSearch;
+use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Transformers\FilterAgancyResource;
 use Modules\SalaryTransaction\Transformers\FilterAgencyMangerResource;
 
@@ -188,7 +189,7 @@ class AgencyAppController extends Controller
 
         $cacheKey = 'cache-data-my-store-' . $user->id;
         if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
-            $targetService = new TargetService($user);
+            $targetService = new FixedTargetService($user);
             ($targetService)->calculateTarget();
         }
 
