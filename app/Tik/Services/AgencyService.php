@@ -641,6 +641,14 @@ class AgencyService
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
 
+            if ($minutes >= 60) {
+                $hours = floor($minutes / 60);
+                $remainingMinutes = $minutes % 60;
+                $formatted = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
+            } else {
+                $formatted = $minutes;
+            }
+
         $data = [
             'user_salary' => [
                 'cut_amount' => (int)$totalCutAmount,
@@ -648,7 +656,7 @@ class AgencyService
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => (string)$minutes,
+            'live_minutes' => (string)$formatted,
             'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
@@ -659,7 +667,7 @@ class AgencyService
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
             $data['daly_reports'][] = [
                 'day' => sprintf('%02d-%02d', $startDay, $month),
-                'live_minutes' => (int)$minutes,
+                'live_minutes' => (string)$formatted,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,
             ];
