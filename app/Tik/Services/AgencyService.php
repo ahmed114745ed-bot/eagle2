@@ -115,6 +115,14 @@ class AgencyService
         return $agency;
     }
 
+    public function gitOldAgencies($userId)
+    {
+        $user = $this->agencyRepository->gitOldAgencies($userId);
+        return $user;
+    }
+
+
+    
     public function agencyTarget($userId, $user, $request)
     {
         $year = $request->year ?? Carbon::now()->year;
