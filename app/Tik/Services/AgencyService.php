@@ -610,12 +610,14 @@ class AgencyService
             return [];
         }
 
-        $startOfMonth = Carbon::create($year, $month, 1);
-        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
         $joinDate = UsersJoinedAgency::where('user_id', $user->id)
         ->where('agency_id', $user->agency_id)
         ->latest()
         ->value('join_date'); 
+
+        $startOfMonth = Carbon::create($year, $month, 1);
+        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
+        $joinedDate = Carbon::parse($joinDate);
 
         $reportStart = 1;
 
@@ -626,7 +628,7 @@ class AgencyService
         $endDate = Carbon::create($year, $month, $endDay)->endOfDay();
 
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $user->agency_id, $startDate, $endDate);
-        $dailyTimes = $this->liveTimeRepository->getByDailyByAgency($user->id,$joinDate, $startDate, $endDate);
+        $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) {
             $data->day = Carbon::parse($data->date)->day;
@@ -673,11 +675,18 @@ class AgencyService
             $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
+
+            $currentDayDate = Carbon::create($year, $month, $startDay)->startOfDay();
+            $isForCurrentAgency = $currentDayDate->greaterThanOrEqualTo($joinedDate);
+
+
             $data['daly_reports'][] = [
                 'day' => sprintf('%02d-%02d', $startDay, $month),
                 'live_minutes' => (string)$formatted,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,
+                'is_for_current_agency' => $isForCurrentAgency,
+
             ];
         }
 
