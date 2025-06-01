@@ -509,6 +509,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
+                Route::post('remove-admin', [AgencyController::class, 'remove_admin']);
+                Route::get('old-agencies/{userid}', [AgencyController::class, 'gitOldAgencies']);
+
+                
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);

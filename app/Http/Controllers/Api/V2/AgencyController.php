@@ -312,4 +312,27 @@ class AgencyController extends Controller
     //     $data = $this->agencyService->showAgencyRequest($user, $type);
     //     return Common::apiResponse(1, '',$data);
     // }
+
+
+    public function remove_admin($id)
+    {
+        try {
+            $agency = $this->agencyService->find($id);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '', AdminsAgencyResource::collection($agency->admins));
+    }
+
+    public function gitOldAgencies($id)
+    {
+        try {
+            $agency = $this->agencyService->gitOldAgencies($id);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '', $agency);
+    }
 }
