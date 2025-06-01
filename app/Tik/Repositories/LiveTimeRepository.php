@@ -91,6 +91,25 @@ class LiveTimeRepository extends AbstractRepository
             ->get();
     }
 
+    // public function getByDailybyAgency($userId, $userJoinedData, $start, $end)
+    // {
+        // $joinedDate = Carbon::parse($userJoinedData);
+
+    //     $startDate = Carbon::parse($start);
+    //     $endDate = Carbon::parse($end);
+    
+    //     if ($joinedDate->greaterThan($startDate)) {
+    //         $startDate = $joinedDate;
+    //     }
+    //     return $this->model->query()
+    //         ->selectRaw('sum(hours) as hours, max(created_at) as date')
+    //         ->where('uid', $userId)
+    //         ->whereBetween('created_at', [$startDate->toDateTimeString(), $endDate->toDateTimeString()])
+    //         ->groupBy(\DB::raw('date(created_at)'))
+    //         ->orderBy('date', 'asc')
+    //         ->get();
+    // }
+
     public function sumUserHoursByDate($userId,$date)
     {
         return $this->model->query()->where('uid', $userId)->whereDate('created_at', $date) ->sum('hours');

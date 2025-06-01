@@ -153,13 +153,13 @@ class UserResource extends JsonResource
             'visit_hidden'         => $this->getPackWithType(19), // both ------------
             'room_hidden'          => $this->getPackWithType(16), // both ------------
             'type_user'            => intval($this->type_user) ?: 0, // both
-            'my_store'             => [
-                'id'           => $this->id,
-                'coins'        => $this->di,
-                'diamonds'     => $this->total_diamond_received,
-                'silver_coins' => $this->gold,
-                'usd'          => (float)$this->sallary,
-            ], // my
+            // 'my_store'             => [
+            //     'id'           => $this->id,
+            //     'coins'        => $this->di,
+            //     'diamonds'     => $this->total_diamond_received,
+            //     'silver_coins' => $this->gold,
+            //     'usd'          => (float)$this->sallary,
+            // ], // my
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->manager),

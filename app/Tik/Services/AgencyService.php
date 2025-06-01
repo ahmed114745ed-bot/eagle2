@@ -51,6 +51,7 @@ use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
+use App\Models\UsersJoinedAgency;
 
 
 
@@ -114,6 +115,14 @@ class AgencyService
         return $agency;
     }
 
+    public function gitOldAgencies($userId)
+    {
+        $user = $this->agencyRepository->gitOldAgencies($userId);
+        return $user;
+    }
+
+
+    
     public function agencyTarget($userId, $user, $request)
     {
         $year = $request->year ?? Carbon::now()->year;
@@ -609,8 +618,14 @@ class AgencyService
             return [];
         }
 
+        $joinDate = UsersJoinedAgency::where('user_id', $user->id)
+        ->where('agency_id', $user->agency_id)
+        ->latest()
+        ->value('join_date'); 
+
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
+        $joinedDate = Carbon::parse($joinDate);
 
         $reportStart = 1;
 
@@ -633,12 +648,24 @@ class AgencyService
         });
 
         $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
-        $userInfoArray = $user->getSallaryInfo();
+        $userInfoArray = $user->getSallaryInfoByMonth();
+        
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
 
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
+
+        $minutes = (float) $minutes;
+        $totalSeconds = (int) round($minutes * 60);
+        
+        $hours = floor($totalSeconds / 3600);
+        $minutesPart = floor(($totalSeconds % 3600) / 60);
+        $secondsPart = $totalSeconds % 60;
+        
+        $formatted = sprintf('%02d:%02d:%02d', $hours, $minutesPart, $secondsPart);
+        
+
 
         $data = [
             'user_salary' => [
@@ -647,7 +674,7 @@ class AgencyService
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => (string)$minutes,
+            'live_minutes' => (string)$formatted,
             'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
@@ -656,11 +683,19 @@ class AgencyService
             $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
+
+            $currentDayDate = Carbon::create($year, $month, $startDay)->startOfDay();
+            $isForCurrentAgency = $currentDayDate->toDateString() >= $joinedDate->toDateString();
+
+
             $data['daly_reports'][] = [
                 'day' => sprintf('%02d-%02d', $startDay, $month),
                 'live_minutes' => (int)$minutes,
+                'live_minutes_formatted' => (string)$formatted,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,
+                'is_for_current_agency' => $isForCurrentAgency,
+
             ];
         }
 
