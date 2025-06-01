@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Country;
 use App\Models\Room;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -122,6 +123,7 @@ class RoomController extends MainController
                 'pk'        => __('PK'),
                 'party'     => __('Party'),
                 'festival'  => __('Festival'),
+                'top_gift'  => __('Top Gift'),
             ];
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
@@ -154,8 +156,20 @@ class RoomController extends MainController
 
             return $html;
         });
-        $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
-            ->whereHas('owner')->orderByDesc('pin');
+        $grid->model()
+            ->select('*', \DB::raw("CASE room_status
+                WHEN 1 THEN 100
+                WHEN 2 THEN 10
+                ELSE 80
+            END AS status_priority"))
+            ->with('owner.profile', 'owner:uuid,id,name')
+            ->withCount('roomVisitors')
+            ->whereHas('owner')
+            ->orderByDesc('status_priority')
+            ->orderByDesc('pin')
+            ->orderBy('id')
+        ;
+
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
         if ($topRooms) {
             $grid->model()->orderByDesc('room_visitors_count');
@@ -245,6 +259,12 @@ class RoomController extends MainController
                     ->orderBy('distance');
                 break;
 
+            case 'top_gift':
+                $grid->model()
+                    ->withSum('gifts as total_gift_exp', 'giftPrice')
+                    ->orderByDesc('total_gift_exp');
+                break;
+
             default:
                 $grid->model()->orderByDesc('hour_hot');
                 //                $grid->model()->orderByDesc('rooms.pin')
@@ -253,19 +273,35 @@ class RoomController extends MainController
                 //                    ->orderByDesc('count_room_socket');
                 break;
         }
-        // Filters UI
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
-
                     $query->whereHas('owner', function ($query) use ($input) {
                         $query->where('name', 'like', "%$input%")
                             ->orWhere('uuid', 'like', "%$input%");
                     });
                 }, __('User'))->placeholder(__('Search by name or numId'));
+
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->whereHas('owner', function ($query) {
+                            $query->where('country_id', $this->input);
+                        });
+                    }
+                }, __('Country'))->select(
+                    Country::query()->pluck('name', 'id')
+                );
+
+//                $filter->equal('room_status', __('Room Status'))->select([
+//                    1 => __('Active'),
+//                    0 => __('Inactive'),
+//                    2 => __('Closed'),
+//                    3 => __('Banned'),
+//                    4 => __('Closed'),
+//                ]);
             });
         });
 
