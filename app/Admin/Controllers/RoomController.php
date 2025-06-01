@@ -167,7 +167,6 @@ class RoomController extends MainController
             ->whereHas('owner')
             ->orderByDesc('status_priority')
             ->orderByDesc('pin')
-            ->orderBy('id')
         ;
 
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
