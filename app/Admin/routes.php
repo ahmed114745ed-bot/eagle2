@@ -539,7 +539,7 @@ Route::group(
         });
 
         $router->resource('user-charges', UsersChargeController::class);
-        $router->resource('user-charges-report/{id}', UserChargeReportController::class);
+        // $router->resource('user-charges-report/{id}', UserChargeReportController::class);
 
         
         
