@@ -143,7 +143,9 @@ class AdminNewPermission extends Seeder
             'daily-gift',
             'level',
             'level-interval',
-            'reward-level-interval'
+            'reward-level-interval',
+            'vip-privilege'
+
         ];
 
         $methods = [
@@ -166,7 +168,7 @@ class AdminNewPermission extends Seeder
             ['name' => 'Advertisements', 'sort' => 6, 'permissions' => ['banner','splash','official-messages','advertising-space']],
             ['name' => 'Store', 'sort' => 7, 'permissions' => ['store']],
             ['name' => 'Distinguished identifier', 'sort' => 8, 'permissions' => ['featured-ids','details-of-unique-identifiers','id-color']],
-            ['name' => 'Vip', 'sort' => 9, 'permissions' => ['VIPs','vip-gift']],
+            ['name' => 'Vip', 'sort' => 9, 'permissions' => ['VIPs','vip-gift','vip-privilege']],
             ['name' => 'families', 'sort' => 10, 'permissions' => ['families','families-level']],
             ['name' => 'Agency System', 'sort' => 11, 'permissions' => ['agency-settings']],
             ['name' => 'Internal Sales System', 'sort' => 12, 'permissions' => ['salary-payment-countries','accept-agent-request-switch','salary-requests','internal-sales-system-report','rejected-agent-request-switch']],
