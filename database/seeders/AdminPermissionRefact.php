@@ -535,7 +535,8 @@ class AdminPermissionRefact extends Seeder
             }
 
             $action = $parts[0];
-            $type = strtolower($parts[1]);
+           // $type = strtolower($parts[1]);
+           $type = strtolower(substr($raw, strlen($action) + 1));
 
             return "{$action}-{$type}-{$mainKey}";
         }
