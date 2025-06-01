@@ -14,15 +14,18 @@ class AdminNewPermission extends Seeder
      */
     public function run(): void
     {
-        DB::table('admin_permissions')->insert([
-                        'name' => 'all permissions',
-                        'slug' => '*',
-                        'http_method' => null,
-                        'http_path' => '*',
-                        'category' => null,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+       DB::table('admin_permissions')->updateOrInsert(
+            ['slug' => '*'], // الشرط
+            [
+                'name' => 'all permissions',
+                'http_method' => null,
+                'http_path' => '*',
+                'category' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
         $permissions = [
 
             'dashboard',
