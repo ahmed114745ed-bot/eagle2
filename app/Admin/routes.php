@@ -445,7 +445,7 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@infoBox')->name('home');
             $router->resource('/users', UserController::class);
-            
+
             // $router->get('/users/{id}/edit', 'UserController@edit');
             // $router->get('/users/{id}', 'UserController@show');
             $router->get('/userTarget', 'UserTargetController@index')->name('userTarget');
@@ -539,10 +539,10 @@ Route::group(
         });
 
         $router->resource('user-charges', UsersChargeController::class);
-        // $router->resource('user-charges-report/{id}', UserChargeReportController::class);
+         $router->resource('user-charges-report/{id}', UserChargeReportController::class);
 
-        
-        
+
+
 
 
     }
