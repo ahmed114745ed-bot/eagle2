@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V2;
 
 
+use App\Http\Resources\JoinedAgencyResource;
 use Cache;
 use App\Models\User;
 use App\Models\Agency;
@@ -257,6 +258,18 @@ class AgencyController extends Controller
         return Common::apiResponse(1, 'تم اضافه المستخدم بنجاح', []);
     }
 
+    public function remove_user_handling_requests(Request $request)
+    {
+        $user = $request->user();
+        $agency = $user->ownAgency;
+        if (!$user->ownAgency)   return Common::apiResponse(0, 'لا يوجد وكاله!', []);
+
+        $this->agencyService->userHandlingRequest($request->user_id, $agency->id);
+      
+
+        return Common::apiResponse(1, 'تم اضافه المستخدم بنجاح', []);
+    }
+
     public function showAgencyRequest(Request $request)
     {
         $user   = $request->user();
@@ -314,10 +327,11 @@ class AgencyController extends Controller
     // }
 
 
-    public function remove_admin($id)
+    public function remove_admin(Request $request)
     {
+        $userId   = $request->user()->id;
         try {
-            $agency = $this->agencyService->find($id);
+            $agency = $this->agencyService->find($userId);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -325,14 +339,15 @@ class AgencyController extends Controller
         return Common::apiResponse(1, '', AdminsAgencyResource::collection($agency->admins));
     }
 
-    public function gitOldAgencies($id)
-    {
+    public function gitOldAgencies(Request $request)
+    {       
+         $userId   = $request->user()->id;
         try {
-            $agency = $this->agencyService->gitOldAgencies($id);
+            $agency = $this->agencyService->gitOldAgencies($userId);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return Common::apiResponse(1, '', $agency);
+        return Common::apiResponse(1, '', JoinedAgencyResource::collection( $agency));
     }
 }
