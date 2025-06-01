@@ -510,7 +510,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
                 Route::post('remove-admin', [AgencyController::class, 'remove_admin']);
-                Route::get('old-agencies/{userid}', [AgencyController::class, 'gitOldAgencies']);
+                Route::get('old-agencies', [AgencyController::class, 'gitOldAgencies']);
 
                 
             });
