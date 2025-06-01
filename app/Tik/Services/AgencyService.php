@@ -641,13 +641,21 @@ class AgencyService
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
 
-            if ($minutes >= 60) {
-                $hours = floor($minutes / 60);
-                $remainingMinutes = $minutes % 60;
-                $formatted = sprintf('%02d:%02d:00', $hours, $remainingMinutes);
-            } else {
-                $formatted = $minutes;
-            }
+        $minutes = (float) $minutes;
+        $totalSeconds = (int) round($minutes * 60);
+
+        if ($totalSeconds === 0) {
+            $formatted = null; // أو لا ترجع المفتاح
+        } elseif ($totalSeconds >= 3600) {
+            $hours = floor($totalSeconds / 3600);
+            $minutesPart = floor(($totalSeconds % 3600) / 60);
+            $formatted = sprintf('%02d:%02d:00', $hours, $minutesPart);
+        } else {
+            $minutesPart = floor($totalSeconds / 60);
+            $secondsPart = $totalSeconds % 60;
+            $formatted = sprintf('%02d:%02d', $minutesPart, $secondsPart);
+        }
+
 
         $data = [
             'user_salary' => [
