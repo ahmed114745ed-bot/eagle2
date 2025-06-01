@@ -299,7 +299,7 @@ class AppearChargerAgencyController extends MainController
 
         $grid->actions(function ($actions) {
             $actions->disableView();
-            if (Admin::user()->can('browse-' . 'delete-shipping-agency-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('delete-switch-' . $this->permission_name) || Admin::user()->can('*')) {
 
                 $actions->add(new DeleteShippingAgencyAction());
             }

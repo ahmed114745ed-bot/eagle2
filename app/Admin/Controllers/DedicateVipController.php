@@ -115,7 +115,7 @@ class DedicateVipController extends MainController
         });
         $grid->column('level', __('level'));
         $grid->column('expire', __('expire'));
-        if (Admin::user()->can('browse-' . 'gift-VIP-Switch') || Admin::user()->can('*')) {
+        if (Admin::user()->can('gift-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
 
                 return (new \App\Admin\Actions\VipDedicateAction($this->id))->render();

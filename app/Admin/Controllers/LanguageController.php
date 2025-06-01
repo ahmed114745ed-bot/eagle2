@@ -68,7 +68,7 @@ class LanguageController extends MainController
             'RTL' => __('Right to Left (RTL)')
         ]);
 
-        if (Admin::user()->can('browse-' . 'language-switch') || Admin::user()->can('*')) {
+        if (Admin::user()->can('edit-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('is_enabled', __('Is enabled'))->switch();
         }
 

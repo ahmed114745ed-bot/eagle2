@@ -32,7 +32,7 @@ class RoomController extends MainController
     {
         $content = $content->title(trans('Rooms'));
 
-        if (Admin::user()->can('browse-room-actions') || Admin::user()->can('*')) {
+        if (Admin::user()->can('actions-' . $this->permission_name) || Admin::user()->can('*')) {
             $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             });
@@ -452,11 +452,11 @@ class RoomController extends MainController
             $pin = $action->row->pin;
             $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
-            if (Admin::user()->can('browse-' . 'room-pin-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('pin-switch-' . $this->permission_name) || Admin::user()->can('*')) {
 
                 $action->add(new RoomPinAction($action->row->id, $pin));
             }
-            if (Admin::user()->can('browse-' . 'close-room-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('close-switch-' . $this->permission_name) || Admin::user()->can('*')) {
 
                 $action->add(new CloseRoomAction($model->id));
             }

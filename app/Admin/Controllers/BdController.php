@@ -210,14 +210,14 @@ class BdController extends MainController
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $model = $actions->row;
-            if (Admin::user()->can('browse-' . 'delete-bd-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('delete-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $actions->add(new \App\Admin\Actions\DeleteBdAction());
             }
 
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
-        if (Admin::user()->can('browse-' . 'choose-bd-Switch') || Admin::user()->can('*')) {
+        if (Admin::user()->can('choose-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
 
                 $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');

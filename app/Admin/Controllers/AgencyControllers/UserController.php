@@ -576,27 +576,26 @@ class UserController extends MainController
         $grid->actions(function ($actions) {
             $model = $actions->row;
 
-             if (Admin::user()->can('browse-' . 'host-charge-switch') || Admin::user()->can('*')) {
+             if (Admin::user()->can('charge-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $actions->add(new ChargeSwitchAction());
             }
-            if (Admin::user()->can('browse-' . 'host-invite-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('invite-switch-' . $this->permission_name) || Admin::user()->can('*')) {
 
                 $actions->add(new InviteSwitchAction());
             }
-            if (Admin::user()->can('browse-' . 'host-can-Play-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('can-Play-switch-' . $this->permission_name) || Admin::user()->can('*')) {
 
                 $actions->add(new CanPlaySwitchAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'host-kick-agency-Switch') || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $this->permission_name) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
             }
-            if ($model->family_id >= 1 && (Admin::user()->can('browse-' . 'host-kick-family-Switch') || Admin::user()->can('*'))) {
+            if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $this->permission_name) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'host-chang-agency-Switch') || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $this->permission_name) || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
-
 /*             $actions->add(new class extends \Encore\Admin\Actions\RowAction {
                 public $name = 'Status User';
 

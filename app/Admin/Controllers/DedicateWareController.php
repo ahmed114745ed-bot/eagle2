@@ -135,7 +135,7 @@ class DedicateWareController extends MainController
         if ($typeSpecial) {
             $grid->value(__('value'));
         }
-        if (Admin::user()->can('browse-' . 'gift-store-Switch') || Admin::user()->can('*')) {
+        if (Admin::user()->can('gift-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
 
                 return (new \App\Admin\Actions\WareDedicateAction($this->id))->render();
