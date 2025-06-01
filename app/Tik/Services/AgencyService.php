@@ -363,6 +363,11 @@ class AgencyService
        
         if (!empty($type) && $type == 'remove'){
                $this->agencyUserJobRepository->deleteAdmin($operator->id ,$agencyId) ;
+               $tokens_notfacion[] = $operator->notification_id;
+               $title = $operator->name;
+               $body = 'تم ازالتك من مشرفين الوكالة';
+               $type = $message->type ?? 'text';
+                Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
                 return 'تم ازالة  المستخدم بنجاح';
            }
 
