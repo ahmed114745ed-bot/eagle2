@@ -8,14 +8,24 @@
 
     // Pre-process all permissions by category and group
     $allGroupedPermissions = [];
-    foreach($grouped as $categorySlug => $categoryPermissions) {
-        $allGroupedPermissions[$categorySlug] = $categoryPermissions->groupBy(function($permission) {
-            $parts = explode('-', $permission->slug);
+ foreach ($grouped as $categorySlug => $categoryPermissions) {
+    $allGroupedPermissions[$categorySlug] = $categoryPermissions->groupBy(function ($permission) {
+        $slug = $permission->slug;
+
+        if (str_contains($slug, '-switch-')) {
+            // Split by '-switch-'
+            $parts = explode('-switch-', $slug);
+            // $parts[1] is what comes after 'switch-'
+            return $parts[1];  // group by 'user' or 'agency' or whatever after switch-
+        } else {
+            // Normal grouping: remove first part and group by the rest
+            $parts = explode('-', $slug);
             array_shift($parts);
             return implode('-', $parts);
-        });
-    }
-
+        }
+    });
+}
+//dd($allGroupedPermissions);
     $firstCategory = $categories->first()->slug ?? null;
 @endphp
 
