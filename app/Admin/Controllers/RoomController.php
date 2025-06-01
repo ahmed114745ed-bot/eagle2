@@ -33,7 +33,7 @@ class RoomController extends MainController
     {
         $content = $content->title(trans('Rooms'));
 
-        if (Admin::user()->can('actions-' . $this->permission_name) || Admin::user()->can('*')) {
+        if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
             $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             });

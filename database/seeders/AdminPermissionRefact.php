@@ -253,7 +253,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 7,
                 'permissions' => [
                     ['key' => 'deleted-accounts', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['delete-user-account-switch', 'restore-user-account-switch']],
-                    ['key' => 'users', 'except' => [], 'additional' => ['actions', 'chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch',]],
+                    ['key' => 'users', 'except' => [], 'additional' => ['actions-switch', 'chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch',]],
                     ['key' => 'complaints', 'except' => [], 'additional' => []],
 
                 ],
@@ -364,7 +364,7 @@ class AdminPermissionRefact extends Seeder
                 'name' => 'Room',
                 'sort' => 19,
                 'permissions' => [
-                    ['key' => 'rooms', 'except' => ['create'], 'additional' => ['actions', 'pin-switch', 'close-switch']],
+                    ['key' => 'rooms', 'except' => ['create'], 'additional' => ['actions-switch', 'pin-switch', 'close-switch']],
                     ['key' => 'categories', 'except' => [], 'additional' => []],
                     ['key' => 'room-vip', 'except' => [], 'additional' => []],
                     ['key' => 'room-background', 'except' => [], 'additional' => []],
