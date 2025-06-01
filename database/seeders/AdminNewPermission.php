@@ -147,7 +147,8 @@ class AdminNewPermission extends Seeder
             'vip-privilege',
             'transaction-request-problem',
             'agency-manger-setting',
-            'Payment-methods-for-shipping-agencies'
+            'Payment-methods-for-shipping-agencies',
+            'roles'
 
         ];
 
