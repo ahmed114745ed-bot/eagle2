@@ -24,6 +24,7 @@ use Modules\AgencyApp\Entities\AdditionalInfo;
 use Modules\AgencyApp\Entities\AgencyUserJob;
 use Modules\AgencyApp\Entities\LeaveAgencyRequest;
 use Modules\AgencyApp\Services\TargetService;
+use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Transformers\FilterAgancyResource;
 use Modules\SalaryTransaction\Transformers\FilterAgencyMangerResource;
 
@@ -284,7 +285,7 @@ class AgencyAppController extends Controller
 
         $cacheKey = 'cache-data-my-store-' . $user->id;
         if (Cache::add($cacheKey, true, now()->addSeconds(30)))  {
-            $targetService = new TargetService($user);
+            $targetService = new FixedTargetService($user);
             ($targetService)->calculateTarget();
         }
 

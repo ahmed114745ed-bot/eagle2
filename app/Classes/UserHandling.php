@@ -42,8 +42,9 @@ class UserHandling
 
 
             $hours = (int)$user_hours;
-
-            if ($hours >= 1 && $user->today_days == 0) {
+            $num = \Cache::get('hours_days');  
+             
+            if ($hours >= $num && $user->today_days == 0) {
                 DB::statement("
                 UPDATE users
                 SET today_days = 1
