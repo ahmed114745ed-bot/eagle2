@@ -677,7 +677,7 @@ class AgencyService
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
 
             $currentDayDate = Carbon::create($year, $month, $startDay)->startOfDay();
-            $isForCurrentAgency = $currentDayDate->greaterThanOrEqualTo($joinedDate);
+            $isForCurrentAgency = $currentDayDate->toDateString() >= $joinedDate->toDateString();
 
 
             $data['daly_reports'][] = [
