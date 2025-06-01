@@ -166,7 +166,6 @@ class RoomController extends MainController
             ->withCount('roomVisitors')
             ->whereHas('owner')
             ->orderByDesc('status_priority')
-            ->orderByDesc('pin')
         ;
 
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
@@ -181,38 +180,43 @@ class RoomController extends MainController
                     ->orderByDesc('entered_at')
                     ->pluck('rid')
                     ->toArray();
-                $grid->model()->whereIn('id', $roomIds);
+                $grid->model()->orderByDesc('pin')->whereIn('id', $roomIds);
                 break;
 
             case 'trend':
                 $grid->model()->orderByDesc('top_room')
+                    ->orderByDesc('pin')
                     ->orderByDesc('room_visitors_count')
                     ->orderByDesc('session');
                 break;
 
             case 'popular':
                 $grid->model()->orderByDesc('top_room')
+                    ->orderByDesc('pin')
                     ->orderByDesc('room_visitors_count');
                 break;
 
             case 'last_create':
                 $grid->model()->whereDate('created_at', '>=', Carbon::now()->subDays(3))
+                    ->orderByDesc('pin')
                     ->orderByDesc('id');
                 break;
 
             case 'pk':
-                $grid->model()->has('lastPk');
+                $grid->model()->has('lastPk')->orderByDesc('pin');
                 break;
 
             case 'party':
                 $grid->model()->whereHas('roomCategory', function ($query) {
                     $query->where('type', 'party');
-                });
+                })->orderByDesc('pin');
                 break;
 
             case 'festival':
             case 'recently':
-                $grid->model()->orderByDesc('top_room')
+                $grid->model()
+                    ->orderByDesc('pin')
+                    ->orderByDesc('top_room')
                     ->orderByDesc('room_visitors_count')
                     ->orderByDesc('session');
                 break;
@@ -226,6 +230,7 @@ class RoomController extends MainController
                     ->pluck('room.room_type')
                     ->unique();
                 $grid->model()->whereIn('room_type', $roomTypes)
+                    ->orderByDesc('pin')
                     ->orderByDesc('top_room')
                     ->orderByDesc('session');
                 break;
@@ -255,6 +260,7 @@ class RoomController extends MainController
                     [$userLat, $userLong, $userLat]
                 )
                     ->join('users as owner', 'rooms.uid', '=', 'owner.id')
+                    ->orderByDesc('pin')
                     ->orderBy('distance');
                 break;
 
@@ -265,7 +271,9 @@ class RoomController extends MainController
                 break;
 
             default:
-                $grid->model()->orderByDesc('hour_hot');
+                $grid->model()
+                    ->orderByDesc('pin')
+                    ->orderByDesc('hour_hot');
                 //                $grid->model()->orderByDesc('rooms.pin')
                 //                    ->orderByDesc('rooms.top_room')
                 //                    ->orderByDesc('session')
