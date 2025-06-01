@@ -51,6 +51,7 @@ use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
+use App\Models\UsersJoinedAgency;
 
 
 
@@ -611,6 +612,10 @@ class AgencyService
 
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
+        $joinDate = UsersJoinedAgency::where('user_id', $user->id)
+        ->where('agency_id', $user->agency_id)
+        ->latest()
+        ->value('join_date'); 
 
         $reportStart = 1;
 
@@ -621,7 +626,7 @@ class AgencyService
         $endDate = Carbon::create($year, $month, $endDay)->endOfDay();
 
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $user->agency_id, $startDate, $endDate);
-        $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
+        $dailyTimes = $this->liveTimeRepository->getByDailyByAgency($user->id,$joinDate, $startDate, $endDate);
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) {
             $data->day = Carbon::parse($data->date)->day;
