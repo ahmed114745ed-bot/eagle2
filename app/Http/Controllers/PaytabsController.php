@@ -60,7 +60,9 @@ class Paytabs
     }
 
     function is_valid_redirect($post_values)
-    {                  \Log::info("📬  post_values:", ['post_values' => $post_values]);
+    {                 
+         \Log::info("📬  post_values:", ['post_values' => $post_values]);
+        \Log::info("📬 هيدر الطلب:", request()->headers->all());
 
         $serverKey = $this->getConfig('server_key');
         $requestSignature = $post_values["signature"];
