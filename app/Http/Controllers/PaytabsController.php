@@ -65,7 +65,12 @@ class Paytabs
         \Log::info("📬 هيدر الطلب:", request()->headers->all());
 
         $serverKey = $this->getConfig('server_key');
-        $requestSignature = request()->header('signature');
+        $requestSignature = request()->header('signature') ?? request()->headers->get('signature');
+
+        if (!$requestSignature) {
+            \Log::error("📬 لم يتم العثور على التوقيع في الهيدر.");
+            return false;
+        }
         unset($post_values["signature"]);
         $fields = array_filter($post_values);
         ksort($fields);
