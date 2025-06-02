@@ -175,48 +175,65 @@ class PaytabsController extends Controller
 
     public function callback(Request $request)
     {
+ 
         \Log::info("📬 هيدر الطلب:", $request->headers->all());
-        \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($request->all()));
-        $transRef = $request->input('tranRef') 
-        ?? $request->query('tranRef') 
-        ?? $request->post('tranRef');
-        \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
-        $plugin = new Paytabs();
-        $response_data = $_POST;
-        $transRef = filter_input(INPUT_POST, 'tranRef');
+
+        $response_data = $request->post();
+        \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($response_data));
+    
+        $transRef = $response_data['tran_ref'] ?? null;
+        $cartId = $response_data['cart_id'] ?? null; 
         
-        \Log::info("تم callback بنجاح للطلب رقم: " . $transRef);
-
+        \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
+    
+        $invoiceNumber = null;
+        if ($cartId) {
+            $parts = explode('_', $cartId);
+            if (isset($parts[1])) {
+                $invoiceNumber = $parts[1];  // رقم الفاتورة مثل "245"
+            }
+        }
+        \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
+    
         if (!$transRef) {
-            return Common::apiResponse(0, 'try leter', null, 200);
+            return Common::apiResponse(0, 'try later', null, 200);
         }
+        $plugin = new Paytabs();
 
-        $is_valid = $plugin->is_valid_redirect($response_data);
-        if (!$is_valid) {
-            return Common::apiResponse(0, 'try leter', null, 200);
-        }
-
+        // $is_valid = $plugin->is_valid_redirect($response_data);
+        // if (!$is_valid) {
+        //     return Common::apiResponse(0, 'try later', null, 200);
+        // }
+    
         $request_url = 'payment/query';
-        $data = [
-            "tran_ref" => $transRef
-        ];
+        $data = ["tran_ref" => $transRef];
         $verify_result = $plugin->send_api_request($request_url, $data);
-        $is_success = $verify_result['payment_result']['response_status'] === 'A';
-        if ($is_success) {
-            $this->coinLogRepository->getCoinsById($request['payment_id'])->update([
+    
+
+     \Log::info("📬  النتائج:", $verify_result);
+
+    $is_success = isset($verify_result['payment_result']['response_status']) &&
+                  $verify_result['payment_result']['response_status'] === 'A';
+
+    $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
+
+    if ($is_success) {
+        if ($payment_data) {
+            $payment_data->update([
                 'pid' => 1,
+                'trx' => $transRef,
             ]);
-            $payment_data = $this->coinLogRepository->getCoinsById([ $request['payment_id']]);
-            if (isset($payment_data) && $payment_data->pid == 1 ) {
+            if ($payment_data->pid == 1) {
                 $this->onPaymentSuccess($payment_data);
             }
-            return $this->payment_response($payment_data,'success');
         }
-        $payment_data =$this->coinLogRepository->getCoinsById([ $request['payment_id']]);
-        if (isset($payment_data) && $payment_data->pid == 0 ) {
+        return $this->payment_response($payment_data, 'success');
+    } else {
+        if ($payment_data && $payment_data->pid == 0) {
             $this->onPaymentFailure($payment_data);
         }
-        return $this->payment_response($payment_data,'fail');
+        return $this->payment_response($payment_data, 'fail');
+    }
     }
 
 
