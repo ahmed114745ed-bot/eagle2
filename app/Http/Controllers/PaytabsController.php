@@ -61,31 +61,44 @@ class Paytabs
 
     function is_valid_redirect($post_values)
     {                 
-         \Log::info("📬  post_values:", ['post_values' => $post_values]);
-        \Log::info("📬 هيدر الطلب:", request()->headers->all());
 
         $serverKey = $this->getConfig('server_key');
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true);
+    
+        \Log::info("📬 Raw input JSON:", ['raw' => $raw]);
+        \Log::info("📬 Decoded data:", $data);
+        \Log::info("📬 هيدر الطلب:", request()->headers->all());
+    
         $requestSignature = request()->header('signature') ?? request()->headers->get('signature');
-
+    
         if (!$requestSignature) {
             \Log::error("📬 لم يتم العثور على التوقيع في الهيدر.");
             return false;
         }
-        unset($post_values["signature"]);
-        $fields = array_filter($post_values);
+    
+        if (isset($data['signature'])) {
+            unset($data['signature']);
+        }
+    
+        $fields = array_filter($data);
         ksort($fields);
+    
         $query = http_build_query($fields);
+    
+        \Log::info("📬 Query used to generate signature:", ['query' => $query]);
+    
         $signature = hash_hmac('sha256', $query, $serverKey);
-
-       \Log::info("📬 التوقيع المتوقع:", ['generated_signature' => $signature]);
-       \Log::info("📬 التوقيع القادم:", ['received_signature' => $requestSignature]);
-
+    
+        \Log::info("📬 التوقيع المتوقع:", ['generated_signature' => $signature]);
+        \Log::info("📬 التوقيع القادم:", ['received_signature' => $requestSignature]);
+    
         return hash_equals($signature, $requestSignature);
-        // if (hash_equals($signature, $requestSignature) === TRUE) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
+        if (hash_equals($signature, $requestSignature) === TRUE) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
