@@ -217,7 +217,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('black-list', [RoomController::class, 'blackList']);
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
                 Route::post('add-block', [RoomController::class, 'addBlock']);
-                Route::patch('{Room}/comment_status', [RoomController::class, 'commentStatus']);
+                Route::post('{Room}/comment_status', [RoomController::class, 'commentStatus']);
                 Route::post('/yellow-banner', [RoomController::class, 'sendComment']);
 
                 //Pk

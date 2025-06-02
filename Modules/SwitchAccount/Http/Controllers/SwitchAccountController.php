@@ -5,12 +5,14 @@ namespace Modules\SwitchAccount\Http\Controllers;
 use App\Models\User;
 use Dotenv\Util\Str;
 use App\Helpers\Common;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Entities\ChatMessage;
 use Illuminate\Contracts\Support\Renderable;
+use Laravel\Sanctum\PersonalAccessToken;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\SwitchAccount\Transformers\AccountResource;
 
@@ -153,7 +155,9 @@ class SwitchAccountController extends Controller
         $user_account = UserAccount::query()->where("key", $request->key)->first();
         if (!$user_account) return Common::apiResponse(0, 'missing params', null, 422);
 
-        //        $new_account_signin_id = $user_account->parent_user_id == $user->id ? $user_account->child_user_id : $user_account->parent_user_id;
+        $validToken = $this->isTokenFromLastTwoWeeks($request->token);
+        if (!$validToken) return Common::apiResponse(0, 'token not valid', null, 422);
+
         $new_account = User::find($request->id);
         $token = $new_account->createToken('api_token')->plainTextToken;
         $new_account->auth_token = $token;
@@ -164,6 +168,22 @@ class SwitchAccountController extends Controller
             'auth_token'    => $new_account->auth_token
         ];
         return Common::apiResponse(1, 'success', $data, 200);
+    }
+
+    public function isTokenFromLastTwoWeeks($tokenString)
+    {
+        [$id, $plainToken] = explode('|', $tokenString);
+
+        $token = PersonalAccessToken::find($id);
+        if (
+            $token &&
+            hash_equals($token->token, hash('sha256', $plainToken)) &&
+            $token->created_at >= Carbon::now()->subDays(14)
+        ) {
+            return true; 
+        }
+
+        return false;
     }
 
     public function myAccounts()
