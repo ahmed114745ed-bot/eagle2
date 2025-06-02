@@ -289,7 +289,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 11,
                 'permissions' => [
                     ['key' => 'VIPs', 'except' => [], 'additional' => []],
-                    ['key' => 'vip-gift', 'except' => ['show', 'edit'], 'additional' => []],
+                    ['key' => 'vip-gift', 'except' => ['show', ], 'additional' => []],
                     ['key' => 'vip-privilege', 'except' => [], 'additional' => []],
                 ],
             ],
