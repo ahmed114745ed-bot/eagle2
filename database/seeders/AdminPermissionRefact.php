@@ -180,17 +180,12 @@ class AdminPermissionRefact extends Seeder
                     ],
                     [
                         'key' => 'bans',
-                        'except' => [],
+                        'except' => ['show', 'edit'],
                         'additional' => [],
                     ],
                     [
                         'key' => 'close-room',
-                        'except' => [],
-                        'additional' => [],
-                    ],
-                    [
-                        'key' => 'bans',
-                        'except' => [],
+                        'except' => ['show','edit'],
                         'additional' => [],
                     ],
                     [
