@@ -60,8 +60,9 @@ class Paytabs
     }
 
     function is_valid_redirect($post_values)
-    {
-        $serverKey = $this->config_values->server_key;
+    {                  \Log::info("📬  post_values:", ['post_values' => $post_values]);
+
+        $serverKey = $this->getConfig('server_key');
         $requestSignature = $post_values["signature"];
         unset($post_values["signature"]);
         $fields = array_filter($post_values);
@@ -193,7 +194,6 @@ class PaytabsController extends Controller
                 $invoiceNumber = $parts[1];  // رقم الفاتورة مثل "245"
             }
         }
-        // \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
     
         if (!$transRef) {
             return Common::apiResponse(0, 'try later', null, 200);
@@ -206,28 +206,28 @@ class PaytabsController extends Controller
         $data = ["tran_ref" => $transRef];
         $verify_result = $plugin->send_api_request($request_url, $data);
     
+        $is_valid = $plugin->is_valid_redirect($response_data);
+                \Log::info("📬  is_valid_redirect:", ['is_valid' => $is_valid]);
 
-    //  \Log::info("📬  النتائج:", $verify_result);
+        if (!$is_valid) {
+            return Common::apiResponse(0, 'try later', null, 200);
+        }
+        
 
     $is_success = isset($verify_result['payment_result']['response_status']) &&
                   $verify_result['payment_result']['response_status'] === 'A';
 
     $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
-    // \Log::info("📬  coinLogRepository:", $payment_data);
 
-    if ($payment_data) {
-        \Log::info("📬  coinLogRepository:", ['payment_data' => $payment_data->toArray()]);
-    } else {
-        \Log::info("📬  coinLogRepository: null");
-    }
+        if ($payment_data) {
+            // \Log::info("📬  coinLogRepository:", ['payment_data' => $payment_data->toArray()]);
+        } else {
+            // \Log::info("📬  coinLogRepository: null");
+        }
     
-    \Log::info("📬  is_success:", ['is_success' => $is_success]);
-        \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
 
     if ($is_success) {
-        \Log::info("📬  payment_data:", ['payment_data' => $payment_data]);
         if ($payment_data) {
-        \Log::info("📬 update payment_data:", ['on' => $payment_data]);
 
             $payment_data->update([
                 'status' => 1,
