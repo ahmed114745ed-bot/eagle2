@@ -200,10 +200,7 @@ class PaytabsController extends Controller
         }
         $plugin = new Paytabs();
 
-        // $is_valid = $plugin->is_valid_redirect($response_data);
-        // if (!$is_valid) {
-        //     return Common::apiResponse(0, 'try later', null, 200);
-        // }
+        
     
         $request_url = 'payment/query';
         $data = ["tran_ref" => $transRef];
@@ -217,7 +214,10 @@ class PaytabsController extends Controller
 
     $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
     \Log::info("📬  coinLogRepository:", $payment_data);
+
+    \Log::info("📬  coinLogRepository:", $payment_data);
     \Log::info("📬  is_success:", ['is_success' => $is_success]);
+    \Log::info("رقم الفاتورة:", $invoiceNumber);
 
     if ($is_success) {
         if ($payment_data) {
