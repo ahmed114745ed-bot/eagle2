@@ -519,7 +519,7 @@ Route::group(
 
         $router->resource('banners', BannerController::class);
         $router->resource('languages', LanguageController::class);
-        $router->resource('settings', SettingController::class);
+        $router->resource('settings', SettingController::class)->except(['update']);
         $router->resource('room-settings', RoomSettingsController::class);
         $router->resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
