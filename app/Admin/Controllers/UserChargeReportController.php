@@ -38,7 +38,7 @@ class UserChargeReportController extends MainController
             ->row(function (Row $row) {
                 $row->column(12, function (Column $column) {
                     $box = new Box();
-                    $box->title(__('Fields'));
+                    $box->title(__('user'));
                     $box->content($this->combinedContent());
                     $column->append($box);
                 });
@@ -236,15 +236,14 @@ class UserChargeReportController extends MainController
             //             </div>";
             //     });
 
-                $grid->column('usd', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
-                   ->display(function ($coin) {
-                    $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+                // $grid->column('usd', __('amount') . ' ' . "")
+                //    ->display(function ($coin) {
+                //     $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
 
-                    return "<div style='display: flex; align-items: center; gap: 5px;'>
-                            <span>{$coin}</span>
-                            <img src='{$image}' alt='USD' width='20' height='20'>
-                        </div>";
-                });
+                //     return "<div style='display: flex; align-items: center; gap: 5px;'>
+                //             <span>{$coin}</span>
+                //         </div>";
+                // });
 
                 $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
                 ->display(function ($coin) {

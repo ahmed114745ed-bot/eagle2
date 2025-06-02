@@ -26,6 +26,7 @@ class Paytabs
             'server_key'        => Common::getSettingValue('paytabs_server_key'),
             'base_url'          => Common::getSettingValue('paytabs_base_url'),
             'payment_address'   => Common::getSettingValue('paytabs_payment_address'),
+          
         ];
         
     }
@@ -174,6 +175,7 @@ class PaytabsController extends Controller
 
     public function callback(Request $request)
     {
+        \Log::info("📬 هيدر الطلب:", $request->headers->all());
         \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($request->all()));
         $transRef = $request->input('tranRef') 
         ?? $request->query('tranRef') 
