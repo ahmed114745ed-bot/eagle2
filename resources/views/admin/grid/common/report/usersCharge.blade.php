@@ -1,97 +1,41 @@
 <div class="box-body no-padding">
     <div class="nav-scroll-container">
-        <ul class="nav nav-pills">
-            <li class="{{ request()->name == 'dash' || request()->name == null ? 'active' : '' }}">
-                <a href="?name=" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('dash_repo') }}
-                </a>
-            </li>
-            <!-- <li class="{{ request()->name == 'app' ? 'active' : '' }}">
-                <a href="?name=app" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('app_repo') }}
-                </a>
-            </li> -->
-            <!-- <li class="{{ request()->name == 'host' ? 'active' : '' }}">
-                <a href="?name=host" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('charge host agent') }}
-                </a>
-            </li>
-            <li class="{{ request()->name == 'stripe' ? 'active' : '' }}">
-                <a href="?name=stripe" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('payment gateway') }}
-                </a>
-            </li>
-            <li class="{{ request()->name == 'in-app-purchas' ? 'active' : '' }}">
-                <a href="?name=in-app-purchas" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('Recharge for self') }}
-                </a>
-            </li>
-            <li class="{{ request()->name == 'exchange' ? 'active' : '' }}">
-                <a href="?name=exchange" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('Convert diamonds to coins') }}
-                </a>
-            </li> -->
-        </ul>
+        
+    </div>
+    
+
+    <div class="box-body no-padding">
+    <div class="nav-scroll-container">
     </div>
     <div class="col">
-        <h4 class="details-title">{{__('Details')}}</h4>
+        <h4 class="details-title">{{ __('Details') }}</h4>
+
         @php
-            // Determine the current request name
-            $isDashboard = request()->name == 'dash' || request()->name == null;
-            $isApp = request()->name == 'app';
-            $isStripe = request()->name == 'stripe';
-            $isStripeNew = request()->name == 'stripenew';
-            $isInApp = request()->name == 'in-app-purchas';
+            $name = $user->name ?? '';
+            $uid = $user->uuid ?? 0;
+            $path = $user->profile->avatar ?? null;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-            // Anonymous function to get user based on UUID
-            $getUserByUuid = function ($uuid) {
-                return \App\Models\User::where('uuid', $uuid)->first();
-            };
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
 
-            // Function to calculate receiver value based on conditions
-            $calculateReceiverValue = function ($user, $request) use ($isDashboard, $isApp, $isStripe, $isStripeNew, $isInApp) {
-                if ($isDashboard || $isApp) {
-                    return \App\Models\Charge::where('user_id', $user?->id)->sum('amount');
-                } 
-
-                return 0; // Default return value
-            };
+            $image = handleShowImageWithTypes($user->id ?? 0, $url, 40, 40);
         @endphp
-        <div class="row my-1 form-Roles" style="overflow-x: auto;">
-            <div class="d-flex">
-                @foreach (['receiver' => __('admin.receiver'), 'sender' => __('admin.sender'), 'gameCoins' => __('admin.gameCoins'), 'luckyGiftCoin' => __('admin.luckyGiftCoin')] as $name => $label)
-                    <div class="col-md-3 flex-shrink-0">
-                        <label class="form-label">{{ $label }}</label>
-                        @php
-                            $uuid = request($name)['uuid'] ?? '0';
-                            $user = $getUserByUuid($uuid);
-                            $value = 0;
 
-                            if ($name === 'receiver') {
-                                $value = $calculateReceiverValue($user, request());
-                            } elseif ($name === 'sender') {
-                                $value = \App\Models\Charge::where('charger_id', $user?->id)->sum('amount');
-                            } elseif ($name === 'gameCoins') {
-                                $coinResult = \App\Models\CoinGameUser::select(
-                                    \DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as sum_type_1"),
-                                    \DB::raw("SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as sum_type_0")
-                                )->where('user_id', $user?->id)->first();
-                                $value = ($coinResult->sum_type_1 ?? 0) - ($coinResult->sum_type_0 ?? 0);
-                            } elseif ($name === 'luckyGiftCoin') {
-                                $giftResult = \App\Models\UserLuckyGift::select(
-                                    \DB::raw("SUM(CASE WHEN type = 1 THEN value ELSE 0 END) as sum_type_1"),
-                                    \DB::raw("SUM(CASE WHEN type = 0 THEN value ELSE 0 END) as sum_type_0")
-                                )->where('user_id', $user?->id)->first();
-                                $value = ($giftResult->sum_type_1 ?? 0) - ($giftResult->sum_type_0 ?? 0);
-                            }
-
-                        @endphp
-                        <input type="text" class="form-control" name="{{ $name }}" id="{{ $name }}" value="{{ $value }}" readonly>
-
-
-                    </div>
-                @endforeach
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px;">
+            {!! $image !!}
+            <div>
+                <strong>{{ $name }}</strong><br>
+                <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
             </div>
+        </div>
+    </div>
+</div>
+
+
+
         </div>
     </div>
 </div>
