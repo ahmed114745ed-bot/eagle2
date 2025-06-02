@@ -61,26 +61,48 @@ class Paytabs
 
     function is_valid_redirect($post_values)
     {                 
-         \Log::info("📬  post_values:", ['post_values' => $post_values]);
-        \Log::info("📬 هيدر الطلب:", request()->headers->all());
 
         $serverKey = $this->getConfig('server_key');
+        $data = $post_values;
+    
+        \Log::info("📬 Decoded data:", $data);
+        \Log::info("📬 هيدر الطلب:", request()->headers->all());
+    
         $requestSignature = request()->header('signature') ?? request()->headers->get('signature');
-
         if (!$requestSignature) {
             \Log::error("📬 لم يتم العثور على التوقيع في الهيدر.");
             return false;
         }
-        unset($post_values["signature"]);
-        $fields = array_filter($post_values);
-        ksort($fields);
-        $query = http_build_query($fields);
-        $signature = hash_hmac('sha256', $query, $serverKey);
-        if (hash_equals($signature, $requestSignature) === TRUE) {
-            return true;
-        } else {
-            return false;
+    
+        // إزالة التوقيع من البيانات
+        if (isset($data['signature'])) {
+            unset($data['signature']);
         }
+    
+        // فلترة القيم الفارغة
+        $filtered = array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+    
+        ksort($filtered);
+    
+        $signature_string = '';
+        foreach ($filtered as $key => $value) {
+            if (is_array($value)) {
+                $value = json_encode($value); // التعامل الآمن مع أي قيمة مصفوفة
+            }
+        
+            $signature_string .= ($signature_string !== '' ? '&' : '') . $key . '=' . $value;
+        }
+    
+        \Log::info("📬 Signature string used:", ['string' => $signature_string]);
+    
+        $generatedSignature = hash_hmac('sha256', $signature_string, $serverKey);
+    
+        \Log::info("📬 التوقيع المتوقع:", ['generated_signature' => $generatedSignature]);
+        \Log::info("📬 التوقيع المستقبل:", ['received_signature' => $requestSignature]);
+    
+        return hash_equals($generatedSignature, $requestSignature);
     }
 }
 
