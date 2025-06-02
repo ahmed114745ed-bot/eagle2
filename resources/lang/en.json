@@ -919,7 +919,84 @@
     "Daily Prize": "Login Reward",
     "Level Interval": "Level Gifts",
     "bdDescription": "To ensure smooth operations, it's essential to create a virtual BD that you manage. All agencies that aren't affiliated with a specific BD are automatically assigned to this virtual BD.\nWhen a BD is deleted, the agencies associated with it are transferred to the virtual BD, ensuring uninterrupted management. If there isn't a virtual BD, the user will need to enter the BD ID when requesting to open an agency, but they won't be able to operate it without a specific BD.\nTherefore, it's always advisable to create and manage a virtual BD to ensure continuity of operations.",
-    "default_status":"Default BD"
+    "default_status":"Default BD",
+      "Create close room": "close room ",
+       "Delete close room": "Delete close ",
+ "Gift switch gift from the store": " Gift a gift from the store",
+   "Gift switch gift VIP": " Gift a gift VIP ",
+     "Gift switch gift a medal": "Gift a gift a medal",
+       "Charge report switch coin recharge":" report  coin recharge",
+       "Delete user account switch deleted accounts": "Delete deleted user accounts",
+  "Restore user account switch deleted accounts": "Restore deleted user accounts",
+    "Actions switch users" :"Actions",
+  "Chang agency switch users": "Change users in the agency",
+  "Charge switch users": "Charge users",
+  "Invite switch users": "Invite users",
+  "Can play switch users": "Allow users to play",
+  "Kick family switch users": "Kick users from the family",
+  "Kick agency switch users": "Kick users from the agency",
+  "Rejected request switch internal sales system report": "Reject internal sales system report request",
+  "Accept request switch internal sales system report": "Accept internal sales system report request",
+  "Delete user account switch deleted accounts": "Delete deleted user accounts",
+  "Restore user account switch deleted accounts": "Restore deleted user accounts",
+  "Chang agency switch users": "Change agency for users",
+  "Charge switch users": "Charge users",
+  "Invite switch users": "Invite users",
+  "Can play switch users": "Enable play for users",
+  "Kick family switch users": "Kick users from family",
+  "Kick agency switch users": "Kick users from agency",
+  "Rejected request switch internal sales system report": "Reject internal sales system report request",
+  "Accept request switch internal sales system report": "Accept internal sales system report request",
+  "Delete switch agencies": "Delete agencies",
+  "Change users agency switch agencies": "Change users' agency",
+  "Charge switch hosts": "Charge hosts",
+  "Chang agency switch hosts": "Change agency for hosts",
+  "Invite switch hosts": "Invite hosts",
+  "Can play host switch hosts": "Enable play for hosts",
+  "Kick agency host switch hosts": "Kick hosts from agency",
+  "Kick family host switch hosts": "Kick hosts from family",
+    "Actions switch rooms":" actions",
+"Browse user_achievement_level": "Browse achievement reports",
+  "Create user_achievement_level": "Create achievement reports",
+  "Edit user_achievement_level": "Edit achievement reports",
+  "Delete user_achievement_level": "Delete achievement reports",
+  "Show user_achievement_level": "Show achievement reports",
+  "Gift Target Event": "charge Event Gifts",
+  "Create gift target event": "Create gift charge event",
+  "Edit gift target event": "Edit gift charge event",
+  "Delete gift target event": "Delete gift charge event",
+  "Show gift target event": "Show gift charge event",
+  "Create auth users": "Create users",
+  "Edit auth users": "Edit users",
+  "Delete auth users": "Delete users",
+  "Show auth users": "View users",
+    "Create questions": "Create FAQ",
+  "Edit questions": "Edit FAQ",
+  "Delete questions": "Delete FAQ",
+  "Show questions": "View FAQ",
+    "Browse level interval": "Browse level gifts",
+  "Show level": "Show level",
+  "Create level interval": "Create level gift",
+  "Edit level interval": "Edit level gift",
+  "Delete level interval": "Delete level gift",
+  "Show level interval": "Show level gift",
+    "Create user parent": "Create user",
+  "Browse user parent": "Browse user"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
