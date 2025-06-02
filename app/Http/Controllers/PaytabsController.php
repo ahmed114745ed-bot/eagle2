@@ -63,46 +63,43 @@ class Paytabs
     {                 
 
         $serverKey = $this->getConfig('server_key');
-        $data = $post_values;
     
-        \Log::info("📬 Decoded data:", $data);
+        \Log::info("📬  data:", $post_values);
         \Log::info("📬 هيدر الطلب:", request()->headers->all());
     
-        $requestSignature = request()->header('signature') ?? request()->headers->get('signature');
-        if (!$requestSignature) {
-            \Log::error("📬 لم يتم العثور على التوقيع في الهيدر.");
+        // $requestSignature = request()->header('signature') ?? request()->headers->get('signature');
+        if (empty($post_values) || !array_key_exists('signature', $post_values)) {
             return false;
         }
-    
-        // إزالة التوقيع من البيانات
-        if (isset($data['signature'])) {
-            unset($data['signature']);
+
+
+        // Request body include a signature post Form URL encoded field
+        // 'signature' (hexadecimal encoding for hmac of sorted post form fields)
+        $requestSignature = $post_values["signature"];
+        unset($post_values["signature"]);
+        $fields = array_filter($post_values);
+
+        // Sort form fields
+        ksort($fields);
+
+        // Generate URL-encoded query string of Post fields except signature field.
+        $query = http_build_query($fields);
+
+        return $this->is_genuine($query, $requestSignature, $serverKey);
+    }
+
+
+ private function is_genuine($data, $requestSignature, $serverKey)
+    {
+        $signature = hash_hmac('sha256', $data, $serverKey);
+
+        if (hash_equals($signature, $requestSignature) === TRUE) {
+            // VALID Redirect
+            return true;
+        } else {
+            // INVALID Redirect
+            return false;
         }
-    
-        // فلترة القيم الفارغة
-        $filtered = array_filter($data, function ($value) {
-            return $value !== null && $value !== '';
-        });
-    
-        ksort($filtered);
-    
-        $signature_string = '';
-        foreach ($filtered as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value); // التعامل الآمن مع أي قيمة مصفوفة
-            }
-        
-            $signature_string .= ($signature_string !== '' ? '&' : '') . $key . '=' . $value;
-        }
-    
-        \Log::info("📬 Signature string used:", ['string' => $signature_string]);
-    
-        $generatedSignature = hash_hmac('sha256', $signature_string, $serverKey);
-    
-        \Log::info("📬 التوقيع المتوقع:", ['generated_signature' => $generatedSignature]);
-        \Log::info("📬 التوقيع المستقبل:", ['received_signature' => $requestSignature]);
-    
-        return hash_equals($generatedSignature, $requestSignature);
     }
 }
 
