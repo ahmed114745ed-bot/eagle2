@@ -215,7 +215,12 @@ class PaytabsController extends Controller
     $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
     // \Log::info("📬  coinLogRepository:", $payment_data);
 
-    \Log::info("📬  coinLogRepository:", $payment_data);
+    if ($payment_data) {
+        \Log::info("📬  coinLogRepository:", ['payment_data' => $payment_data->toArray()]);
+    } else {
+        \Log::info("📬  coinLogRepository: null");
+    }
+    
     \Log::info("📬  is_success:", ['is_success' => $is_success]);
         \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
 
