@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\UsersJoinedAgency;
 use Carbon\Carbon;
 use App\Models\GiftLog;
 use App\Models\LiveTime;
@@ -24,6 +25,30 @@ class AgencyUsersTargetResource extends JsonResource
         $year = request('year') ?? Carbon::now()->year;
         $month = request('month') ?? Carbon::now()->month;
 
+        $endOfMonth = Carbon::create($year, $month)->endOfMonth();
+
+        $joinRecord = UsersJoinedAgency::where('user_id', $this->id)
+        ->where('agency_id', $this->agency_id)
+        ->whereMonth('join_date', $month)
+        ->whereYear('join_date', $year)
+        ->latest('join_date')
+        ->first();
+    
+        $joinedDate = $joinRecord ? Carbon::parse($joinRecord->join_date)->startOfDay() : null;
+        $leaveDate = $joinRecord && $joinRecord->leave_date
+        ? Carbon::parse($joinRecord->leave_date)->endOfDay()
+        : $endOfMonth;
+    
+        $totalMinutes = $this->liveTime()
+        ->whereBetween('created_at', [$joinedDate, $leaveDate])
+        ->get()
+        ->reduce(function ($carry, $session) {
+            $start = Carbon::parse($session->start_time);
+            $end = Carbon::parse($session->end_time);
+            return $carry + $end->diffInMinutes($start);
+        }, 0);
+        $hours = floor($totalMinutes / 60);
+        $minutes = $totalMinutes % 60;
 
         $target = $this->targets()
         ->where('agency_id', $this->agency_id)
@@ -58,7 +83,7 @@ class AgencyUsersTargetResource extends JsonResource
             ->filter(function ($q) {
                 return $q->exp > 0;
             });
-
+     
 
         // $salary = UserSallary::query()
 
@@ -84,10 +109,10 @@ class AgencyUsersTargetResource extends JsonResource
             'salary' => (float) $agencySallary ?? 0,
             'target' => [
                 'id' => @$target->target_id ?? 0,
-                'user_diamonds' => @$target->user_diamonds ?? 0,
-                'user_hours' => @$target->user_hours ?? 0,
-                'user_days' => @$target->user_days ?? 0,
-                'diamonds_next_target'   => @$target?->next_diamond ?? 0,
+                'user_diamonds' => @$this->monthly_diamond_received ?? 0,
+                'user_hours' => @$hours ?? 0,
+                'user_days' => @$this->getTotalDays() ?? 0,
+                // 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
                 'old_targets'  => $result,
             ],
             // 'top_users' => SenderGiftLogResource::collection($giftLog),
