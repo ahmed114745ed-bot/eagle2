@@ -64,43 +64,28 @@ class Paytabs
 
         $serverKey = $this->getConfig('server_key');
     
-        \Log::info("📬  data:", $post_values);
-        \Log::info("📬 هيدر الطلب:", request()->headers->all());
-    
-        // $requestSignature = request()->header('signature') ?? request()->headers->get('signature');
-        if (empty($post_values) || !array_key_exists('signature', $post_values)) {
-            return false;
-        }
+        $serverKey = $this->getConfig('server_key');
 
+    // 📥 Get raw JSON body
+    $rawPayload = file_get_contents('php://input');
+    \Log::info("📬 Raw Payload:", [$rawPayload]);
 
-        // Request body include a signature post Form URL encoded field
-        // 'signature' (hexadecimal encoding for hmac of sorted post form fields)
-        $requestSignature = $post_values["signature"];
-        unset($post_values["signature"]);
-        $fields = array_filter($post_values);
+    // 📦 Get signature from header
+    $requestSignature = request()->header('signature');
+    \Log::info("📬 Signature from Header:", [$requestSignature]);
 
-        // Sort form fields
-        ksort($fields);
+    // 🔐 Calculate HMAC
+    $calculatedSignature = hash_hmac('sha256', $rawPayload, $serverKey);
 
-        // Generate URL-encoded query string of Post fields except signature field.
-        $query = http_build_query($fields);
+    \Log::info("📬 Calculated Signature:", [$calculatedSignature]);
+    \Log::info("📬  Signature:", [$requestSignature]);
 
-        return $this->is_genuine($query, $requestSignature, $serverKey);
+    // 🔍 Compare
+    return hash_equals($calculatedSignature, $requestSignature);
     }
 
 
- private function is_genuine($data, $requestSignature, $serverKey)
-    {
-        $signature = hash_hmac('sha256', $data, $serverKey);
 
-        if (hash_equals($signature, $requestSignature) === TRUE) {
-            // VALID Redirect
-            return true;
-        } else {
-            // INVALID Redirect
-            return false;
-        }
-    }
 }
 
 class PaytabsController extends Controller
@@ -232,7 +217,7 @@ class PaytabsController extends Controller
         $data = ["tran_ref" => $transRef];
         $verify_result = $plugin->send_api_request($request_url, $data);
     
-        $is_valid = $plugin->is_valid_redirect($response_data);
+        $is_valid = $plugin->is_valid_redirect($request);
                 \Log::info("📬  is_valid_redirect:", ['is_valid' => $is_valid]);
 
         if (!$is_valid) {
