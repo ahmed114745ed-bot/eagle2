@@ -22,21 +22,21 @@ class PaymentGatewaysSeeder extends Seeder
             'opay.png',
             'cashfree.jpg',
             'applepay.png',
-            'mada.png',
-            'liqpay.png',
-            'paypal.png',
-            'paytm.png',
+//            'mada.png',
+//            'liqpay.png',
+//            'paypal.png',
+//            'paytm.png',
             'paytabs.webp',
-            'bkash.png',
-            'razorpay.webp',
-            'senangpay.png',
-            'paymob.png',
-            'flutterwave.jpg',
-            'paystack.png',
-            'sslcommerz.png',
+//            'bkash.png',
+//            'razorpay.webp',
+//            'senangpay.png',
+//            'paymob.png',
+//            'flutterwave.jpg',
+//            'paystack.png',
+//            'sslcommerz.png',
             'googlepay.png',
-            'huaweipay.png',
-            'zinipay.jpg',
+//            'huaweipay.png',
+//            'zinipay.jpg',
         ];
 
         foreach ($images as $img) {
@@ -368,192 +368,192 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //mada
-        $mada_id = PaymentCoin::updateOrCreate([
-            'title' => 'mada',
-        ], [
-            'photo' => 'images/mada.png',
-            'status' => 1,
-            'type' => 'mada',
-        ]);
-
-        $mada_fields = [
-            'new_2' => [
-                "name" => "mada_access_token",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "mada_public_key",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "mada_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "mada_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($mada_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $mada_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $mada_id = PaymentCoin::updateOrCreate([
+//            'title' => 'mada',
+//        ], [
+//            'photo' => 'images/mada.png',
+//            'status' => 1,
+//            'type' => 'mada',
+//        ]);
+//
+//        $mada_fields = [
+//            'new_2' => [
+//                "name" => "mada_access_token",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "mada_public_key",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "mada_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "mada_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
 
 
-
-        //liqpay
-        $liqpay_id = PaymentCoin::updateOrCreate([
-            'title' => 'liqpay',
-        ], [
-            'photo' => 'images/liqpay.png',
-            'status' => 1,
-            'type' => 'liq_pay',
-        ]);
-
-        $liqpay_fields = [
-            'new_2' => [
-                "name" => "liqpay_public_key",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "liqpay_private_key",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "liqpay_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "liqpay_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
+//        foreach ($mada_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $mada_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
-        foreach ($liqpay_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $liqpay_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+
+//        //liqpay
+//        $liqpay_id = PaymentCoin::updateOrCreate([
+//            'title' => 'liqpay',
+//        ], [
+//            'photo' => 'images/liqpay.png',
+//            'status' => 1,
+//            'type' => 'liq_pay',
+//        ]);
+//
+//        $liqpay_fields = [
+//            'new_2' => [
+//                "name" => "liqpay_public_key",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "liqpay_private_key",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "liqpay_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "liqpay_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($liqpay_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $liqpay_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
 
         //paypal
-        $paypal_id = PaymentCoin::updateOrCreate([
-            'title' => 'paypal',
-        ], [
-            'photo' => 'images/paypal.png',
-            'status' => 1,
-            'type' => 'paypal',
-        ]);
-
-        $paypal_fields = [
-            'new_2' => [
-                "name" => "paypal_client_id",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "paypal_client_secret",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "paypal_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "paypal_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($paypal_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $paypal_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
-
-
-
-
-        //paytm
-        $paytm_id = PaymentCoin::updateOrCreate([
-            'title' => 'paytm',
-        ], [
-            'photo' => 'images/paytm.png',
-            'status' => 1,
-            'type' => 'paytm',
-        ]);
-
-        $paytm_fields = [
-            'new_2' => [
-                "name" => "paytm_merchant_key",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "paytm_merchant_id",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "paytm_merchant_website_link",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "paytm_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_6' => [
-                "name" => "paytm_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($paytm_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $paytm_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $paypal_id = PaymentCoin::updateOrCreate([
+//            'title' => 'paypal',
+//        ], [
+//            'photo' => 'images/paypal.png',
+//            'status' => 1,
+//            'type' => 'paypal',
+//        ]);
+//
+//        $paypal_fields = [
+//            'new_2' => [
+//                "name" => "paypal_client_id",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "paypal_client_secret",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "paypal_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "paypal_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($paypal_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $paypal_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
+//
+//
+//
+//
+//        //paytm
+//        $paytm_id = PaymentCoin::updateOrCreate([
+//            'title' => 'paytm',
+//        ], [
+//            'photo' => 'images/paytm.png',
+//            'status' => 1,
+//            'type' => 'paytm',
+//        ]);
+//
+//        $paytm_fields = [
+//            'new_2' => [
+//                "name" => "paytm_merchant_key",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "paytm_merchant_id",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "paytm_merchant_website_link",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "paytm_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_6' => [
+//                "name" => "paytm_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($paytm_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $paytm_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
 
@@ -610,370 +610,370 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //BKash
-        $bkash_id = PaymentCoin::updateOrCreate([
-            'title' => 'bkash',
-        ], [
-            'photo' => 'images/bkash.png',
-            'status' => 1,
-            'type' => 'bkash',
-        ]);
-
-        $bkash_fields = [
-            'new_2' => [
-                "name" => "bkash_appkey",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "bkash_app_secret",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "bkash_username",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "bkash_password",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_6' => [
-                "name" => "bkash_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_7' => [
-                "name" => "bkash_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($bkash_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $bkash_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $bkash_id = PaymentCoin::updateOrCreate([
+//            'title' => 'bkash',
+//        ], [
+//            'photo' => 'images/bkash.png',
+//            'status' => 1,
+//            'type' => 'bkash',
+//        ]);
+//
+//        $bkash_fields = [
+//            'new_2' => [
+//                "name" => "bkash_appkey",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "bkash_app_secret",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "bkash_username",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "bkash_password",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_6' => [
+//                "name" => "bkash_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_7' => [
+//                "name" => "bkash_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($bkash_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $bkash_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
         //razorpay
-        $razorpay_id = PaymentCoin::updateOrCreate([
-            'title' => 'razorpay',
-        ], [
-            'photo' => 'images/razorpay.webp',
-            'status' => 1,
-            'type' => 'razor_pay',
-        ]);
-
-        $razorpay_fields = [
-            'new_2' => [
-                "name" => "razorpay_api_key",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "razorpay_api_secret",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "razorpay_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "razorpay_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($razorpay_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $razorpay_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $razorpay_id = PaymentCoin::updateOrCreate([
+//            'title' => 'razorpay',
+//        ], [
+//            'photo' => 'images/razorpay.webp',
+//            'status' => 1,
+//            'type' => 'razor_pay',
+//        ]);
+//
+//        $razorpay_fields = [
+//            'new_2' => [
+//                "name" => "razorpay_api_key",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "razorpay_api_secret",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "razorpay_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "razorpay_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($razorpay_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $razorpay_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
 
         //senangpay
-        $senangpay_id = PaymentCoin::updateOrCreate([
-            'title' => 'senangpay',
-        ], [
-            'photo' => 'images/senangpay.png',
-            'status' => 1,
-            'type' => 'senang_pay',
-        ]);
-
-        $senangpay_fields = [
-            'new_2' => [
-                "name" => "senangpay_callback_url",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "senangpay_secret_key",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "senangpay_merchant_id",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "senangpay_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_6' => [
-                "name" => "senangpay_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($senangpay_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $senangpay_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $senangpay_id = PaymentCoin::updateOrCreate([
+//            'title' => 'senangpay',
+//        ], [
+//            'photo' => 'images/senangpay.png',
+//            'status' => 1,
+//            'type' => 'senang_pay',
+//        ]);
+//
+//        $senangpay_fields = [
+//            'new_2' => [
+//                "name" => "senangpay_callback_url",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "senangpay_secret_key",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "senangpay_merchant_id",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "senangpay_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_6' => [
+//                "name" => "senangpay_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($senangpay_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $senangpay_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
 
 
         //paymob_accept
-        $paymob_accept_id = PaymentCoin::updateOrCreate([
-            'title' => 'paymob_accept',
-        ], [
-            'photo' => 'images/paymob.png',
-            'status' => 1,
-            'type' => 'paymob_accept',
-        ]);
-
-        $paymob_accept_fields = [
-            'new_2' => [
-                "name" => "paymob_accept_callback_url",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "paymob_accept_api_key",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "paymob_accept_iframe_id",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "paymob_accept_integration_id",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_6' => [
-                "name" => "paymob_accept_hmac",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_7' => [
-                "name" => "paymob_accept_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_8' => [
-                "name" => "paymob_accept_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($paymob_accept_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $paymob_accept_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $paymob_accept_id = PaymentCoin::updateOrCreate([
+//            'title' => 'paymob_accept',
+//        ], [
+//            'photo' => 'images/paymob.png',
+//            'status' => 1,
+//            'type' => 'paymob_accept',
+//        ]);
+//
+//        $paymob_accept_fields = [
+//            'new_2' => [
+//                "name" => "paymob_accept_callback_url",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "paymob_accept_api_key",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "paymob_accept_iframe_id",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "paymob_accept_integration_id",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_6' => [
+//                "name" => "paymob_accept_hmac",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_7' => [
+//                "name" => "paymob_accept_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_8' => [
+//                "name" => "paymob_accept_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($paymob_accept_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $paymob_accept_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
 
         //flutterwave
-        $flutterwave_id = PaymentCoin::updateOrCreate([
-            'title' => 'flutterwave',
-        ], [
-            'photo' => 'images/flutterwave.jpg',
-            'status' => 1,
-            'type' => 'flutter_wave',
-        ]);
-
-        $flutterwave_fields = [
-            'new_2' => [
-                "name" => "flutterwave_secret_key",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "flutterwave_public_key",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "flutterwave_hash",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "flutterwave_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_6' => [
-                "name" => "flutterwave_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($flutterwave_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $flutterwave_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $flutterwave_id = PaymentCoin::updateOrCreate([
+//            'title' => 'flutterwave',
+//        ], [
+//            'photo' => 'images/flutterwave.jpg',
+//            'status' => 1,
+//            'type' => 'flutter_wave',
+//        ]);
+//
+//        $flutterwave_fields = [
+//            'new_2' => [
+//                "name" => "flutterwave_secret_key",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "flutterwave_public_key",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "flutterwave_hash",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "flutterwave_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_6' => [
+//                "name" => "flutterwave_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($flutterwave_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $flutterwave_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
 
 
         //paystack
-        $paystack_id = PaymentCoin::updateOrCreate([
-            'title' => 'paystack',
-        ], [
-            'photo' => 'images/paystack.png',
-            'status' => 1,
-            'type' => 'pay_stack',
-        ]);
-
-        $paystack_fields = [
-            'new_2' => [
-                "name" => "paystack_public_key",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "paystack_secret_key",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "paystack_merchant_email",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "paystack_return_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_6' => [
-                "name" => "paystack_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_7' => [
-                "name" => "paystack_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($paystack_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $paystack_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $paystack_id = PaymentCoin::updateOrCreate([
+//            'title' => 'paystack',
+//        ], [
+//            'photo' => 'images/paystack.png',
+//            'status' => 1,
+//            'type' => 'pay_stack',
+//        ]);
+//
+//        $paystack_fields = [
+//            'new_2' => [
+//                "name" => "paystack_public_key",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "paystack_secret_key",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "paystack_merchant_email",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "paystack_return_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_6' => [
+//                "name" => "paystack_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_7' => [
+//                "name" => "paystack_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($paystack_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $paystack_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
 
 
         //sslcommerz
-        $sslcommerz_id = PaymentCoin::updateOrCreate([
-            'title' => 'sslcommerz',
-        ], [
-            'photo' => 'images/sslcommerz.png',
-            'status' => 1,
-            'type' => 'ssl_commerz',
-        ]);
-
-        $sslcommerz_fields = [
-            'new_2' => [
-                "name" => "sslcommerz_store_id",
-                "type" => "input",
-                "value" => "apple team"
-
-            ],
-            'new_3' => [
-                "name" => "sslcommerz_store_password",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
-            'new_4' => [
-                "name" => "sslcommerz_payment_address",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-            'new_5' => [
-                "name" => "sslcommerz_webhook_url",
-                "type" => "input",
-                "value" => 'asdasd'
-            ],
-        ];
-
-
-        foreach ($sslcommerz_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $sslcommerz_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],'input_type' => $value['type']
-            ]);
-        }
+//        $sslcommerz_id = PaymentCoin::updateOrCreate([
+//            'title' => 'sslcommerz',
+//        ], [
+//            'photo' => 'images/sslcommerz.png',
+//            'status' => 1,
+//            'type' => 'ssl_commerz',
+//        ]);
+//
+//        $sslcommerz_fields = [
+//            'new_2' => [
+//                "name" => "sslcommerz_store_id",
+//                "type" => "input",
+//                "value" => "apple team"
+//
+//            ],
+//            'new_3' => [
+//                "name" => "sslcommerz_store_password",
+//                "type" => "input",
+//                "value" => "Sit dignissimos aliq"
+//            ],
+//            'new_4' => [
+//                "name" => "sslcommerz_payment_address",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//            'new_5' => [
+//                "name" => "sslcommerz_webhook_url",
+//                "type" => "input",
+//                "value" => 'asdasd'
+//            ],
+//        ];
+//
+//
+//        foreach ($sslcommerz_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $sslcommerz_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],'input_type' => $value['type']
+//            ]);
+//        }
 
         // Google Pay
         $google_pay_id = PaymentCoin::updateOrCreate([
@@ -1014,75 +1014,75 @@ class PaymentGatewaysSeeder extends Seeder
         }
 
         //huawei pay
-        $huawei_pay_id = PaymentCoin::updateOrCreate([
-            'title' => 'huawei_pay',
-        ], [
-            'photo' => 'images/huaweipay.png',
-            'status' => 1,
-            'type' => 'huawei_pay',
-        ]);
-
-        $huawei_pay_fields = [
-            'new_1' => [
-                "name" => "huawei_pay_merchant_id",
-                "type" => "input",
-                "value" => "123"
-            ],
-            'new_2' => [
-                "name" => "huawei_pay_webhook_url",
-                "type" => "input",
-                "value" => "123"
-            ],
-        ];
-
-        foreach ($huawei_pay_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $huawei_pay_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],
-                'input_type' => $value['type']
-            ]);
-        }
+//        $huawei_pay_id = PaymentCoin::updateOrCreate([
+//            'title' => 'huawei_pay',
+//        ], [
+//            'photo' => 'images/huaweipay.png',
+//            'status' => 1,
+//            'type' => 'huawei_pay',
+//        ]);
+//
+//        $huawei_pay_fields = [
+//            'new_1' => [
+//                "name" => "huawei_pay_merchant_id",
+//                "type" => "input",
+//                "value" => "123"
+//            ],
+//            'new_2' => [
+//                "name" => "huawei_pay_webhook_url",
+//                "type" => "input",
+//                "value" => "123"
+//            ],
+//        ];
+//
+//        foreach ($huawei_pay_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $huawei_pay_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],
+//                'input_type' => $value['type']
+//            ]);
+//        }
 
         //zinipay
-        $zinipay_id = PaymentCoin::updateOrCreate([
-            'title' => 'zinipay',
-        ], [
-            'photo' => 'images/zinipay.jpg',
-            'status' => 1,
-            'type' => 'zinipay',
-        ]);
-
-        $zinipay_fields = [
-            'new_1' => [
-                "name" => "zinipay_api_key",
-                "type" => "input",
-                "value" => "123"
-            ],
-            'new_2' => [
-                "name" => "zinipay_url",
-                "type" => "input",
-                "value" => "test"
-            ],
-            'new_3' => [
-                "name" => "zinipay_webhook_url",
-                "type" => "input",
-                "value" => "test"
-            ],
-        ];
-
-        foreach ($zinipay_fields as $key => $value) {
-            Setting::updateOrCreate([
-                'key' => $value['name'],
-                'item_id' => $zinipay_id->id,
-                'type' => 'payment'
-            ], [
-                'value' => $value['value'],
-                'input_type' => $value['type']
-            ]);
-        }
+//        $zinipay_id = PaymentCoin::updateOrCreate([
+//            'title' => 'zinipay',
+//        ], [
+//            'photo' => 'images/zinipay.jpg',
+//            'status' => 1,
+//            'type' => 'zinipay',
+//        ]);
+//
+//        $zinipay_fields = [
+//            'new_1' => [
+//                "name" => "zinipay_api_key",
+//                "type" => "input",
+//                "value" => "123"
+//            ],
+//            'new_2' => [
+//                "name" => "zinipay_url",
+//                "type" => "input",
+//                "value" => "test"
+//            ],
+//            'new_3' => [
+//                "name" => "zinipay_webhook_url",
+//                "type" => "input",
+//                "value" => "test"
+//            ],
+//        ];
+//
+//        foreach ($zinipay_fields as $key => $value) {
+//            Setting::updateOrCreate([
+//                'key' => $value['name'],
+//                'item_id' => $zinipay_id->id,
+//                'type' => 'payment'
+//            ], [
+//                'value' => $value['value'],
+//                'input_type' => $value['type']
+//            ]);
+//        }
 
     }
 }
