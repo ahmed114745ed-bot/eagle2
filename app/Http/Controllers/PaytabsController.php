@@ -65,7 +65,7 @@ class Paytabs
         \Log::info("📬 هيدر الطلب:", request()->headers->all());
 
         $serverKey = $this->getConfig('server_key');
-        $requestSignature = $post_values["signature"];
+        $requestSignature = request()->header('signature');
         unset($post_values["signature"]);
         $fields = array_filter($post_values);
         ksort($fields);
