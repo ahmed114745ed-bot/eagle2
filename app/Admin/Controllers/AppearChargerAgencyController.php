@@ -296,10 +296,11 @@ class AppearChargerAgencyController extends MainController
                 return $this->is_frozen ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
+        $permission = $this->permission_name;
 
-        $grid->actions(function ($actions) {
+        $grid->actions(function ($actions) use($permission){
             $actions->disableView();
-            if (Admin::user()->can('delete-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new DeleteShippingAgencyAction());
             }

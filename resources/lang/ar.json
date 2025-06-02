@@ -3110,6 +3110,28 @@
   "Delete switch appear charger agency": "حذف تبديل ظهور وكالة الشحن",
   "Pin switch rooms": "تثبيت التبديل للغرف",
   "Close switch rooms": "إغلاق التبديل للغرف",
-  "Return switch event_report": "إرجاع تبديل تقرير الحدث"
+  "Return switch event_report": "إرجاع تبديل تقرير الحدث",
+  "Request Backgrounds Image": "طلب صور الخلفيات",
+  "Close Room": "إغلاق الغرفة",
+  "Special Uuid Requests": "طلبات UUID الخاصة",
+  "Gift From The Store": "هدية من المتجر",
+  "Gift A Medal": "إهداء ميدالية",
+  "Charger Reports": "تقارير الشواحن",
+  "Details Of Unique Identifiers": "تفاصيل المعرفات الفريدة",
+  "Id Color": "لون المعرف",
+  "Vip Gift": "هدية كبار الشخصيات",
+  "Salary Payment Countries": "دول صرف الرواتب",
+  "Salary Requests": "طلبات الرواتب",
+  "Internal Sales System Report": "تقرير نظام المبيعات الداخلي",
+  "Transaction Request Problem": "مشكلة في طلب المعاملة",
+  "Host Agencies Report": "تقرير وكالات المضيفين",
+  "Agencies Join Requests": "طلبات انضمام الوكالات",
+  "Agency Request Agencies": "الوكالات المطلوبة من الوكالات",
+  "Payment Methods For Shipping Agencies": "طرق الدفع لوكالات الشحن",
+  "Pk Event": "حدث PK",
+  "Pk Event Rewards": "مكافآت حدث PK",
+  "Language": "اللغة",
+  "Reward Level Interval": "فاصل مستوى المكافأة"
+
 
 }
