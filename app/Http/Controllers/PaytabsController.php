@@ -91,14 +91,10 @@ class Paytabs
         $signature_string = '';
         foreach ($filtered as $key => $value) {
             if (is_array($value)) {
-                $value = json_encode($value);  
+                $value = json_encode($value); // التعامل الآمن مع أي قيمة مصفوفة
             }
         
-            if ($signature_string !== '') {
-                $signature_string .= '&';
-            }
-        
-            $signature_string .= $key . '=' . $value;
+            $signature_string .= ($signature_string !== '' ? '&' : '') . $key . '=' . $value;
         }
     
         \Log::info("📬 Signature string used:", ['string' => $signature_string]);
