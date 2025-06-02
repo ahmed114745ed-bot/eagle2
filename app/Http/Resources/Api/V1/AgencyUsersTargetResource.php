@@ -160,7 +160,7 @@ class AgencyUsersTargetResource extends JsonResource
             'salary' => (float) $agencySallary ?? 0,
             'target' => [
                 'id' => @$target->target_id ?? 0,
-                'user_diamonds' => @$this->monthly_diamond_received ?? 0,
+                'user_diamonds' => @$giftLog->sum('giftPrice') ?? 0,
                 'user_hours' => @$hours ?? 0,
                 'user_days' => @$this->getTotalDays() ?? 0,
                 // 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
