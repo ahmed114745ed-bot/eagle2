@@ -2539,10 +2539,6 @@
   "Delete games": "Oyunu sil",
   "Edit games": "Oyunu düzenle",
   "Show games": "Oyunu göster",
-  "Create BD": "Veritabanı oluştur",
-  "Delete BD": "Veritabanını sil",
-  "Edit BD": "Veritabanını düzenle",
-  "Show BD": "Veritabanını göster",
   "Create request backgrounds image": "Arka plan resmi isteği oluştur",
   "Delete request backgrounds image": "Arka plan resmi isteğini sil",
   "Edit request backgrounds image": "Arka plan resmi isteğini düzenle",
@@ -2649,10 +2645,6 @@
   "Edit charge agency": "Şarj ajansını düzenle",
   "Delete charge agency": "Şarj ajansını sil",
   "Show charge agency": "Şarj ajansını göster",
-  "Create payment gat way": "Ödeme geçidi oluştur",
-  "Edit payment gat way": "Ödeme geçidini düzenle",
-  "Delete payment gat way": "Ödeme geçidini sil",
-  "Show payment gat way": "Ödeme geçidini göster",
   "Create Payment methods for shipping agencies": "Nakliye ajansları için ödeme yöntemleri oluştur",
   "Edit Payment methods for shipping agencies": "Nakliye ajansları için ödeme yöntemlerini düzenle",
   "Delete Payment methods for shipping agencies": "Nakliye ajansları için ödeme yöntemlerini sil",
@@ -2877,7 +2869,6 @@
   "Browse request agency history": "Ajans Talep Geçmişini Görüntüle",
   "Browse appear charger agency": "Görünen Şarj Ajanslarını Görüntüle",
   "Browse charge agency": "Şarj Ajanslarını Görüntüle",
-  "Browse payment gat way": "Ödeme Geçitlerini Görüntüle",
   "Browse agency manger setting": "Ajans Yöneticisi Ayarlarını Görüntüle",
   "Browse managers": "Yöneticileri Görüntüle",
   "Browse rooms": "Odaları Görüntüle",
@@ -2986,7 +2977,16 @@
 "Achievement Level": "Başarı Seviyesi",
 "Updates Group Chat": "Grup Sohbeti Güncellemeleri",
 "Event Report": "Etkinlik Raporu",
-"Weekly Star Rewards": "Haftalık Yıldız Ödülleri"
+"Weekly Star Rewards": "Haftalık Yıldız Ödülleri",
+ "Create BD": "BD Oluştur",
+  "Delete BD": "BD Sil",
+  "Edit BD": "BD Düzenle",
+  "Show BD": "BD Göster",
+  "Browse payment gat way": "Kargo acenteleri için ödeme yöntemlerini gözden geçir",
+  "Create payment gat way": "Kargo acenteleri için ödeme yöntemi oluştur",
+  "Edit payment gat way": "Kargo acenteleri için ödeme yöntemini düzenle",
+  "Delete payment gat way": "Kargo acenteleri için ödeme yöntemini sil",
+  "Show payment gat way": "Kargo acenteleri için ödeme yöntemini göster"
 
 
 
