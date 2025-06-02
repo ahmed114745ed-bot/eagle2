@@ -200,10 +200,10 @@ class PaytabsController extends Controller
         }
         $plugin = new Paytabs();
 
-        $is_valid = $plugin->is_valid_redirect($response_data);
-        if (!$is_valid) {
-            return Common::apiResponse(0, 'try later', null, 200);
-        }
+        // $is_valid = $plugin->is_valid_redirect($response_data);
+        // if (!$is_valid) {
+        //     return Common::apiResponse(0, 'try later', null, 200);
+        // }
     
         $request_url = 'payment/query';
         $data = ["tran_ref" => $transRef];
