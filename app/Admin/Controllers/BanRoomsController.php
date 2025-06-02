@@ -190,7 +190,7 @@ class BanRoomsController extends MainController
         $grid->disableRowSelector();
         // $grid->disableActions();
         $grid->disableCreateButton();
-         $grid->actions(function ($actions) {
+        $grid->actions(function ($actions) {
             $actions->disableEdit();
             $actions->disableView();
             // $actions->add(new DedicateAction());
@@ -203,9 +203,11 @@ class BanRoomsController extends MainController
             });
         });
 
-
-        $grid->tools(function (Grid\Tools $tools) {
-            $tools->append((new BanRoomAction())->render());
+        $permission = $this->permission_name;
+        $grid->tools(function (Grid\Tools $tools) use ($permission) {
+            if (Admin::user()->can('create-' . $permission)) {
+                $tools->append((new BanRoomAction())->render());
+            }
         });
 
         return $grid;
