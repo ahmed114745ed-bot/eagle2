@@ -485,21 +485,19 @@ class RoomController extends MainController
             return $html;
         });
 
+        $permissionName = $this->permission_name;
 
-
-
-
-
-        $grid->actions(function ($action) {
+        $grid->actions(function ($action) use ($permissionName){
             $action->disableView();
             $pin = $action->row->pin;
             $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
-            if (Admin::user()->can('pin-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('pin-switch-' . $permissionName) || Admin::user()->can('*')) {
+                info('no');
 
                 $action->add(new RoomPinAction($action->row->id, $pin));
             }
-            if (Admin::user()->can('close-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('close-switch-' . $permissionName) || Admin::user()->can('*')) {
 
                 $action->add(new CloseRoomAction($model->id));
             }

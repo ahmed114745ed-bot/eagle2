@@ -24,6 +24,7 @@ class ChargeAgentResource extends JsonResource
 
         $frame = Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img2', true) ?: Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img1', true);
         return [
+            'agency_id' => $this->id,
             'id' => $user->id ?? 0,
             'name' => $user->name ?? '',
             'phone' => $user->phone ?? '',

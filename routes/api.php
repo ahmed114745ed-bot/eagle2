@@ -585,3 +585,7 @@ Route::get('/languages', [LanguageController::class, 'index']);
     });
 });
 
+Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
+Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
+
+

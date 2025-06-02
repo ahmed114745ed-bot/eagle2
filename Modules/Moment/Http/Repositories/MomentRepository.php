@@ -59,12 +59,11 @@ class MomentRepository
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
-            ->orderByRaw('YEAR(created_at) DESC')
-            ->orderByRaw('MONTH(created_at) DESC')
-            ->when($page == 1, function ($query) {
-                $seed = rand(1000, 2000);
-                $query->orderBy(DB::raw('RAND(' . $seed . ')'));
-            })
+            ->orderBy('created_at', 'desc')
+            // ->when($page == 1, function ($query) {
+            //     $seed = rand(1000, 2000);
+            //     $query->orderBy(DB::raw('RAND(' . $seed . ')'));
+            // })
             ->paginate(10);
     }
 
