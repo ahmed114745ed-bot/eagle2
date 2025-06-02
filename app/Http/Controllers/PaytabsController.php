@@ -60,20 +60,27 @@ class Paytabs
     }
 
     function is_valid_redirect($post_values)
-    {
-        $serverKey = $this->config_values->server_key;
-        $requestSignature = $post_values["signature"];
-        unset($post_values["signature"]);
-        $fields = array_filter($post_values);
-        ksort($fields);
-        $query = http_build_query($fields);
-        $signature = hash_hmac('sha256', $query, $serverKey);
-        if (hash_equals($signature, $requestSignature) === TRUE) {
-            return true;
-        } else {
-            return false;
-        }
+    {                 
+
+    
+        $serverKey = $this->getConfig('server_key');
+
+        $rawPayload = file_get_contents('php://input');
+        // \Log::info("📬 Raw Payload:", [$rawPayload]);
+
+        $requestSignature = request()->header('signature');
+        // \Log::info("📬 Signature from Header:", [$requestSignature]);
+
+        $calculatedSignature = hash_hmac('sha256', $rawPayload, $serverKey);
+
+        // \Log::info("📬 Calculated Signature:", [$calculatedSignature]);
+        // \Log::info("📬  Signature:", [$requestSignature]);
+
+        return hash_equals($calculatedSignature, $requestSignature);
     }
+
+
+
 }
 
 class PaytabsController extends Controller
@@ -143,26 +150,26 @@ class PaytabsController extends Controller
                 "name" => $user->name,
                 "email" => $user->email,
                 "phone" => $user->phone ?? "000000",
-                "street1" => "N/A",
-                "city" => "N/A",
-                "state" => "N/A",
-                "country" => "N/A",
-                "zip" => "00000"
+                // "street1" => "N/A",
+                // "city" => "N/A",
+                // "state" => "N/A",
+                // "country" => "N/A",
+                // "zip" => "00000"
             ],
-            "shipping_details" => [
-                "name" => "N/A",
-                "email" => "N/A",
-                "phone" => "N/A",
-                "street1" => "N/A",
-                "city" => "N/A",
-                "state" => "N/A",
-                "country" => "N/A",
-                "zip" => "0000"
-            ],
-            "user_defined" => [
-                "udf9" => "UDF9",
-                "udf3" => "UDF3"
-            ]
+            // "shipping_details" => [
+            //     "name" => "N/A",
+            //     "email" => "N/A",
+            //     "phone" => "N/A",
+            //     "street1" => "N/A",
+            //     "city" => "N/A",
+            //     "state" => "N/A",
+            //     "country" => "N/A",
+            //     "zip" => "0000"
+            // ],
+            // "user_defined" => [
+            //     "udf9" => "UDF9",
+            //     "udf3" => "UDF3"
+            // ]
         ];
 
         $page = $plugin->send_api_request($request_url, $data);
@@ -176,58 +183,65 @@ class PaytabsController extends Controller
     public function callback(Request $request)
     {
  
-        \Log::info("📬 هيدر الطلب:", $request->headers->all());
+        // \Log::info("📬 هيدر الطلب:", $request->headers->all());
 
         $response_data = $request->post();
-        \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($response_data));
     
         $transRef = $response_data['tran_ref'] ?? null;
         $cartId = $response_data['cart_id'] ?? null; 
         
-        \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
     
         $invoiceNumber = null;
         if ($cartId) {
             $parts = explode('_', $cartId);
             if (isset($parts[1])) {
-                $invoiceNumber = $parts[1];  // رقم الفاتورة مثل "245"
+                $invoiceNumber = $parts[1];  
             }
         }
-        \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
     
         if (!$transRef) {
             return Common::apiResponse(0, 'try later', null, 200);
         }
         $plugin = new Paytabs();
 
-        // $is_valid = $plugin->is_valid_redirect($response_data);
-        // if (!$is_valid) {
-        //     return Common::apiResponse(0, 'try later', null, 200);
-        // }
+        
     
         $request_url = 'payment/query';
         $data = ["tran_ref" => $transRef];
         $verify_result = $plugin->send_api_request($request_url, $data);
     
+        $is_valid = $plugin->is_valid_redirect($request);
 
-     \Log::info("📬  النتائج:", $verify_result);
+        if (!$is_valid) {
+            return Common::apiResponse(0, 'try later', null, 200);
+        }
+        
 
-    $is_success = isset($verify_result['payment_result']['response_status']) &&
-                  $verify_result['payment_result']['response_status'] === 'A';
+        $is_success = isset($verify_result['payment_result']['response_status']) &&
+                    $verify_result['payment_result']['response_status'] === 'A';
 
-    $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
-    \Log::info("📬  coinLogRepository:", $payment_data);
-    \Log::info("📬  is_success:", ['is_success' => $is_success]);
+        $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
+
+        if ($payment_data) {
+            // \Log::info("📬  coinLogRepository:", ['payment_data' => $payment_data->toArray()]);
+        } else {
+            // \Log::info("📬  coinLogRepository: null");
+        }
+    
 
     if ($is_success) {
         if ($payment_data) {
+
             $payment_data->update([
-                'pid' => 1,
+                'status' => 1,
                 'trx' => $transRef,
             ]);
             if ($payment_data->pid == 1) {
+
                 $this->onPaymentSuccess($payment_data);
             }
+            \Log::info("📬 end payment_data:", ['on' => $payment_data]);
+
         }
         return $this->payment_response($payment_data, 'success');
     } else {

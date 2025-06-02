@@ -30,6 +30,9 @@
 @endphp
 
 <style>
+    .label-small-font {
+    font-size: 12px;
+}
     .nav-tabs{
         background: var(--box-background-color);
     }
@@ -54,16 +57,16 @@
         padding: 15px;
     }
     .permission-group-title {
-        text-align: center;
+        /* text-align: center; */
         font-size: 16px;
         font-weight: bold;
         color: #333;
-        margin-bottom: 15px;
+        /* margin-bottom: 15px; */
         padding-bottom: 10px;
         border-bottom: 1px solid #ccc;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        /* align-items: center;
+        justify-content: center; */
         gap: 10px;
     }
     .group-select-all {
@@ -147,7 +150,7 @@
                                    data-group="{{ $group }}"
                                    data-category="{{ $categorySlug }}"
                                    id="group-{{ $categorySlug }}-{{ $group }}">
-                            <label for="group-{{ $categorySlug }}-{{ $group }}">
+                            <label for="group-{{ $categorySlug }}-{{ $group }}"class="label-small-font">
                                 {{ __(ucwords(str_replace(['-', '_'], ' ', $group))) }}
                             </label>
                         </h6>

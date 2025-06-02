@@ -455,9 +455,22 @@ class RoomRepoService
         return  $this->repository->roomUsers($userId);
     }
 
-    public function commentStatus($roomId): bool
+    /**
+     * @throws \Exception
+     */
+    public function commentStatus($roomId, $request): bool
     {
-        return  $this->repository->commentStatus($roomId);
+        $room = $this->repository->findRoom($roomId);
+
+        if (!$room)  throw new \Exception(__('room not founded'));
+
+        if (auth()->id() != $room->uid && ! in_array(auth()->id(), $room->admins)){
+            throw new \Exception(__('you dont have permission'));
+        }
+
+        $room->update(['is_comment_closed' => $request['status']]);
+
+        return $room->is_comment_closed;
     }
 
     public function index2()

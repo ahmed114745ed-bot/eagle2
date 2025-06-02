@@ -468,6 +468,12 @@ class User extends Authenticatable
         return $this->hasMany(LiveTime::class, 'uid');
     }
 
+
+    public function UserliveTime()
+    {
+        return $this->hasMany(LiveTime::class);
+    }
+
     public function scopeOfAgency($q)
     {
         $user = Auth::user();
@@ -686,6 +692,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Follow::class, 'user_id', 'id');
     }
+
+    public function isFollowedBy($userId): bool
+    {
+        return $this->followers()
+            ->where('user_id', $userId)
+            ->where('status', 1)
+            ->exists();
+    }
+
     public function followBack(User $user)
     {
         $userId = $user->id;
