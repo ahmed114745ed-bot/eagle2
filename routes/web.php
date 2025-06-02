@@ -33,8 +33,6 @@ use App\Http\Controllers\NowPaymentsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
-Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
 
 Route::get('applications/{id}', [SettingsController::class, 'downloadApp']);
 

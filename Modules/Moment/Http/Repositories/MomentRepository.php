@@ -61,10 +61,10 @@ class MomentRepository
             }])
             ->orderByRaw('YEAR(created_at) DESC')
             ->orderByRaw('MONTH(created_at) DESC')
-            ->when($page == 1, function ($query) {
-                $seed = rand(1000, 2000);
-                $query->orderBy(DB::raw('RAND(' . $seed . ')'));
-            })
+            // ->when($page == 1, function ($query) {
+            //     $seed = rand(1000, 2000);
+            //     $query->orderBy(DB::raw('RAND(' . $seed . ')'));
+            // })
             ->paginate(10);
     }
 
