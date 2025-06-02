@@ -90,9 +90,14 @@ class Paytabs
     
         $signature_string = '';
         foreach ($filtered as $key => $value) {
+            if (is_array($value)) {
+                $value = json_encode($value);  
+            }
+        
             if ($signature_string !== '') {
                 $signature_string .= '&';
             }
+        
             $signature_string .= $key . '=' . $value;
         }
     
