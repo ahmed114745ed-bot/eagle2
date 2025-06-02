@@ -468,6 +468,12 @@ class User extends Authenticatable
         return $this->hasMany(LiveTime::class, 'uid');
     }
 
+
+    public function UserliveTime()
+    {
+        return $this->hasMany(LiveTime::class);
+    }
+
     public function scopeOfAgency($q)
     {
         $user = Auth::user();

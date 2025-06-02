@@ -674,8 +674,8 @@ class AgencyService
         }
 
 
-        $startOfMonth = Common::applyTimezoneToDateValue($startOfMonth);
-        $endOfMonth = Common::applyTimezoneToDateValue($endOfMonth);
+        // $startOfMonth = Common::applyTimezoneToDateValue($startOfMonth);
+        // $endOfMonth = Common::applyTimezoneToDateValue($endOfMonth);
 
 
         $reportStart = 1;
@@ -734,8 +734,18 @@ class AgencyService
         ];
 
         for ($startDay = $reportStart; $startDay <= $endDay; $startDay++) {
-            $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
-            $minutes = $hours * 60;
+            
+            $dailyHours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
+            $dailyMinutes = $dailyHours * 60;
+            $dailyTotalSeconds = (int) round($dailyMinutes * 60);
+
+            $dailyHoursPart = floor($dailyTotalSeconds / 3600);
+            $dailyMinutesPart = floor(($dailyTotalSeconds % 3600) / 60);
+            $dailySecondsPart = $dailyTotalSeconds % 60;
+
+            $dailyFormatted = sprintf('%02d:%02d:%02d', $dailyHoursPart, $dailyMinutesPart, $dailySecondsPart);
+
+
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
 
 
@@ -743,10 +753,10 @@ class AgencyService
 
             $data['daly_reports'][] = [
                 'day' => sprintf('%02d-%02d', $startDay, $month),
-                'live_minutes' => (int)$minutes,
-                'live_minutes_formatted' => (string)$formatted,
+                'live_minutes' => (int)$dailyMinutes,
+                'live_minutes_formatted' => (string)$dailyFormatted,
                 'diamonds' => numToString((int)$diamonds),
-                'is_active_day' => $hours >= 1,
+                'is_active_day' => $dailyHours >= 2, 
 
             ];
         }
