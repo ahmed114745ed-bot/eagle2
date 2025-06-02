@@ -674,8 +674,8 @@ class AgencyService
         }
 
 
-        $startOfMonth = Common::applyTimezoneToDateValue($startOfMonth);
-        $endOfMonth = Common::applyTimezoneToDateValue($endOfMonth);
+        // $startOfMonth = Common::applyTimezoneToDateValue($startOfMonth);
+        // $endOfMonth = Common::applyTimezoneToDateValue($endOfMonth);
 
 
         $reportStart = 1;
@@ -734,8 +734,7 @@ class AgencyService
         ];
 
         for ($startDay = $reportStart; $startDay <= $endDay; $startDay++) {
-            // $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
-            // $minutes = $hours * 60;
+            
             $dailyHours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $dailyMinutes = $dailyHours * 60;
             $dailyTotalSeconds = (int) round($dailyMinutes * 60);
@@ -757,7 +756,7 @@ class AgencyService
                 'live_minutes' => (int)$dailyMinutes,
                 'live_minutes_formatted' => (string)$dailyFormatted,
                 'diamonds' => numToString((int)$diamonds),
-                'is_active_day' => $hours >= 2,
+                'is_active_day' => $dailyHours >= 2, 
 
             ];
         }
