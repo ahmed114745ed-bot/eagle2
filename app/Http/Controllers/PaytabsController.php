@@ -63,10 +63,8 @@ class Paytabs
     {                 
 
         $serverKey = $this->getConfig('server_key');
-        $raw = file_get_contents('php://input');
-        $data = json_decode($raw, true);
+        $data = $post_values;
     
-        \Log::info("📬 Raw input JSON:", ['raw' => $raw]);
         \Log::info("📬 Decoded data:", $data);
         \Log::info("📬 هيدر الطلب:", request()->headers->all());
     
