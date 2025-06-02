@@ -122,7 +122,7 @@ class AgencyService
     }
 
 
-    
+
     public function agencyTarget($userId, $user, $request)
     {
         $year = $request->year ?? Carbon::now()->year;
@@ -132,7 +132,7 @@ class AgencyService
         $result = (@$minValue->agency_share / 100) * @$target;
         $usersTargetDetails = $this->userRepository->agencyUsers($userId, $month, $year, 10, $request->page);
 
-        $hours =   LiveTime::query()
+        $hours = LiveTime::query()
             ->selectRaw('sum(hours) as hours, max(created_at) as date')
             ->where('uid', $user->id)
             ->whereYear('created_at', $year)
@@ -360,7 +360,7 @@ class AgencyService
         $operator = $this->userRepository->findById($userId);
 
         // if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
-       
+
         if (!empty($type) && $type == 'remove'){
                $this->agencyUserJobRepository->deleteAdmin($operator->id ,$agencyId) ;
                $tokens_notfacion[] = $operator->notification_id;
@@ -660,10 +660,10 @@ class AgencyService
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
         $joinedDate = Carbon::parse($joinRecord->join_date)->startOfDay();
-        $leaveDate = $joinRecord->leave_date 
+        $leaveDate = $joinRecord->leave_date
             ? Carbon::parse($joinRecord->leave_date)->endOfDay()
             : $endOfMonth;
-        
+
 
         $reportStart = 1;
 
@@ -690,7 +690,7 @@ class AgencyService
 
         $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
         $userInfoArray = $user->getSallaryInfoByMonth();
-        
+
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
 
@@ -699,13 +699,13 @@ class AgencyService
 
         $minutes = (float) $minutes;
         $totalSeconds = (int) round($minutes * 60);
-        
+
         $hours = floor($totalSeconds / 3600);
         $minutesPart = floor(($totalSeconds % 3600) / 60);
         $secondsPart = $totalSeconds % 60;
-        
+
         $formatted = sprintf('%02d:%02d:%02d', $hours, $minutesPart, $secondsPart);
-        
+
 
 
         $data = [
@@ -725,7 +725,7 @@ class AgencyService
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
 
-           
+
 
 
             $data['daly_reports'][] = [

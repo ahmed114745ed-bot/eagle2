@@ -120,7 +120,6 @@ class AgencyController extends Controller
 
     public function agencyTargetDetails($agencyId, Request $request)
     {
-        $id = User::whereId(auth()->id())->where('type_user', '!=', 0)->firstOrFail()->id;
         $user = $request->user();
         try {
             $response = $this->agencyService->agencyTarget($user->agency_id, $user, $request);
@@ -321,7 +320,7 @@ class AgencyController extends Controller
 
 
     public function gitOldAgencies(Request $request)
-    {       
+    {
          $userId   = $request->user()->id;
         try {
             $agency = $this->agencyService->gitOldAgencies($userId);
