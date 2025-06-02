@@ -206,18 +206,18 @@ class BdController extends MainController
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
         });
 
-
-        $grid->actions(function ($actions) {
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
             $actions->disableDelete();
             $model = $actions->row;
-            if (Admin::user()->can('delete-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new \App\Admin\Actions\DeleteBdAction());
             }
 
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
-        if (Admin::user()->can('choose-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+        if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
 
                 $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
@@ -274,7 +274,7 @@ class BdController extends MainController
             })->ajax('/api/search/users-bd', 'id', 'name');
 
             $form->switch('default', __('set_as_default'))
-            ->help(__('make_bd_default'));
+                ->help(__('make_bd_default'));
         }
 
         $form->hidden('type', __('Type'))->value('bd');

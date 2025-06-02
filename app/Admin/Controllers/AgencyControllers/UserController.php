@@ -572,28 +572,29 @@ class UserController extends MainController
 //            return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
 //        });
 
+        $permission = $this->permission_name;
 
-        $grid->actions(function ($actions) {
+        $grid->actions(function ($actions) use($permission) {
             $model = $actions->row;
 
-             if (Admin::user()->can('charge-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+             if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new ChargeSwitchAction());
             }
-            if (Admin::user()->can('invite-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new InviteSwitchAction());
             }
-            if (Admin::user()->can('can-Play-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new CanPlaySwitchAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $this->permission_name) || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
             }
-            if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $this->permission_name) || Admin::user()->can('*'))) {
+            if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $this->permission_name) || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
 /*             $actions->add(new class extends \Encore\Admin\Actions\RowAction {
