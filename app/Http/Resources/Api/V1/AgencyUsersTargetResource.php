@@ -34,27 +34,34 @@ class AgencyUsersTargetResource extends JsonResource
         ->latest('join_date')
         ->first();
     
-        $joinedDate = $joinRecord ? Carbon::parse($joinRecord->join_date)->startOfDay() : null;
+        $startOfMonth = Carbon::create($year, $month, 1)->startOfDay();
+        $endOfMonth = Carbon::create($year, $month)->endOfMonth()->endOfDay();
+        
+        $joinedDate = $joinRecord ? Carbon::parse($joinRecord->join_date)->startOfDay() : $startOfMonth;
         $leaveDate = $joinRecord && $joinRecord->leave_date
-        ? Carbon::parse($joinRecord->leave_date)->endOfDay()
-        : $endOfMonth;
+            ? Carbon::parse($joinRecord->leave_date)->endOfDay()
+            : $endOfMonth;
+        
+        $from = $joinedDate->greaterThan($startOfMonth) ? $joinedDate : $startOfMonth;
+        $to = $leaveDate->lessThan($endOfMonth) ? $leaveDate : $endOfMonth;
     
-        $totalMinutes = $this->liveTime()
-        ->whereBetween('created_at', [$joinedDate, $leaveDate])
+        $totalSeconds = $this->liveTime()
+        ->whereBetween('created_at', [$from, $to])
         ->get()
-        ->reduce(function ($carry, $session) {
-            $start = is_numeric($session->start_time)
-                ? Carbon::createFromTimestamp($session->start_time)
-                : Carbon::parse($session->start_time);
-    
-            $end = is_numeric($session->end_time)
-                ? Carbon::createFromTimestamp($session->end_time)
-                : Carbon::parse($session->end_time);
-    
-            return $carry + $end->diffInMinutes($start);
-        }, 0);
-        $hours = floor($totalMinutes / 60);
-        $minutes = $totalMinutes % 60;
+            ->reduce(function ($carry, $session) {
+                $start = is_numeric($session->start_time)
+                    ? Carbon::createFromTimestamp($session->start_time)
+                    : Carbon::parse($session->start_time);
+        
+                $end = is_numeric($session->end_time)
+                    ? Carbon::createFromTimestamp($session->end_time)
+                    : Carbon::parse($session->end_time);
+        
+                return $carry + $end->diffInSeconds($start);
+            }, 0);
+        
+        $hours = floor($totalSeconds / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
 
         $target = $this->targets()
         ->where('agency_id', $this->agency_id)
