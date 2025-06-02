@@ -42,7 +42,7 @@ class RequestBackgroundImageController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::index($content
+        return parent::show($id, $content
             ->title(trans('request-background-image'))
             ->body($this->detail($id)));
     }
@@ -56,7 +56,7 @@ class RequestBackgroundImageController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::index($content
+        return parent::edit($id, $content
             ->title(trans('request-background-image'))
             ->body($this->form()->edit($id)));
     }
@@ -69,7 +69,7 @@ class RequestBackgroundImageController extends MainController
      */
     public function create(Content $content)
     {
-        return parent::index($content
+        return parent::create($content
             ->title(trans('request-background-image'))
             ->body($this->form()));
     }
