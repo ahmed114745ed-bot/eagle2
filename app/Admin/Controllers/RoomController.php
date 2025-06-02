@@ -493,7 +493,6 @@ class RoomController extends MainController
             $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
             if (Admin::user()->can('pin-switch-' . $permissionName) || Admin::user()->can('*')) {
-                info('no');
 
                 $action->add(new RoomPinAction($action->row->id, $pin));
             }
