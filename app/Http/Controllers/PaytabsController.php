@@ -76,11 +76,16 @@ class Paytabs
         ksort($fields);
         $query = http_build_query($fields);
         $signature = hash_hmac('sha256', $query, $serverKey);
-        if (hash_equals($signature, $requestSignature) === TRUE) {
-            return true;
-        } else {
-            return false;
-        }
+
+       \Log::info("📬 التوقيع المتوقع:", ['generated_signature' => $signature]);
+       \Log::info("📬 التوقيع القادم:", ['received_signature' => $requestSignature]);
+
+        return hash_equals($signature, $requestSignature);
+        // if (hash_equals($signature, $requestSignature) === TRUE) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
     }
 }
 
