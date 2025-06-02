@@ -45,7 +45,7 @@ class AgencyUsersTargetResource extends JsonResource
         $from = $joinedDate->greaterThan($startOfMonth) ? $joinedDate : $startOfMonth;
         $to = $leaveDate->lessThan($endOfMonth) ? $leaveDate : $endOfMonth;
     
-        $totalSeconds = $this->liveTime()
+        $totalSeconds = $this->UserliveTime()
         ->whereBetween('created_at', [$from, $to])
         ->get()
             ->reduce(function ($carry, $session) {
