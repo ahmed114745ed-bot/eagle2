@@ -63,25 +63,63 @@ class AgencyUsersTargetResource extends JsonResource
 
         // $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
         //     ->select('id', 'user_diamonds')->get();
-        $months = collect(range($month - 2, $month - 1))
-        ->filter(fn($m) => $m > 0)
-        ->values();
+        // $months = collect(range($month - 2, $month - 1))
+        // ->filter(fn($m) => $m > 0)
+        // ->values();
 
-        $userTargets = UserTarget::where('user_id', $this->id)
-            ->where('agency_id', $this->agency_id)
-            ->where('add_year', $year)
-            ->whereIn('add_month', $months)
-            ->select('add_month', 'user_diamonds')
-            ->pluck('user_diamonds', 'add_month');
+        // $userTargets = UserTarget::where('user_id', $this->id)
+        //     ->where('agency_id', $this->agency_id)
+        //     ->where('add_year', $year)
+        //     ->whereIn('add_month', $months)
+        //     ->select('add_month', 'user_diamonds')
+        //     ->pluck('user_diamonds', 'add_month');
 
-        $result = [];
+        // $result = [];
 
-        foreach ($months as $m) {
-            $result[] = [
-                'month_number' => $m,
-                'diamonds'     => $userTargets->get($m, 0),
-            ];
-        }
+        // foreach ($months as $m) {
+        //     $result[] = [
+        //         'month_number' => $m,
+        //         'diamonds'     => $userTargets->get($m, 0),
+        //     ];
+        // }
+        $currentDate = Carbon::create($year, $month, 1);
+
+            $monthsWithYears = collect();
+
+            for ($i = 2; $i >= 0; $i--) {
+                $date = $currentDate->copy()->subMonths($i);
+                $monthsWithYears->push([
+                    'year' => $date->year,
+                    'month' => $date->month,
+                ]);
+            }
+
+            $userTargets = UserTarget::where('user_id', $this->id)
+                ->where('agency_id', $this->agency_id)
+                ->where(function($query) use ($monthsWithYears) {
+                    foreach ($monthsWithYears as $item) {
+                        $query->orWhere(function($q) use ($item) {
+                            $q->where('add_year', $item['year'])
+                            ->where('add_month', $item['month']);
+                        });
+                    }
+                })
+                ->select('add_year', 'add_month', 'user_diamonds')
+                ->get()
+                ->keyBy(function($item) {
+                    return $item->add_year . '-' . $item->add_month;
+                });
+
+            $result = [];
+
+            foreach ($monthsWithYears as $item) {
+                $key = $item['year'] . '-' . $item['month'];
+                $result[] = [
+                    // 'year' => $item['year'],
+                    'month_number' => $item['month'],
+                    'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
+                ];
+            }
         $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
             ->selectRaw("sum(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')->orderByRaw("exp desc")->limit(3)
