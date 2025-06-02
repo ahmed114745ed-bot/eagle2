@@ -71,34 +71,39 @@ class Paytabs
         \Log::info("📬 هيدر الطلب:", request()->headers->all());
     
         $requestSignature = request()->header('signature') ?? request()->headers->get('signature');
-    
         if (!$requestSignature) {
             \Log::error("📬 لم يتم العثور على التوقيع في الهيدر.");
             return false;
         }
     
+        // إزالة التوقيع من البيانات
         if (isset($data['signature'])) {
             unset($data['signature']);
         }
     
-        $fields = array_filter($data);
-        ksort($fields);
+        // فلترة القيم الفارغة
+        $filtered = array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
     
-        $query = http_build_query($fields);
+        ksort($filtered);
     
-        \Log::info("📬 Query used to generate signature:", ['query' => $query]);
-    
-        $signature = hash_hmac('sha256', $query, $serverKey);
-    
-        \Log::info("📬 التوقيع المتوقع:", ['generated_signature' => $signature]);
-        \Log::info("📬 التوقيع القادم:", ['received_signature' => $requestSignature]);
-    
-        return hash_equals($signature, $requestSignature);
-        if (hash_equals($signature, $requestSignature) === TRUE) {
-            return true;
-        } else {
-            return false;
+        $signature_string = '';
+        foreach ($filtered as $key => $value) {
+            if ($signature_string !== '') {
+                $signature_string .= '&';
+            }
+            $signature_string .= $key . '=' . $value;
         }
+    
+        \Log::info("📬 Signature string used:", ['string' => $signature_string]);
+    
+        $generatedSignature = hash_hmac('sha256', $signature_string, $serverKey);
+    
+        \Log::info("📬 التوقيع المتوقع:", ['generated_signature' => $generatedSignature]);
+        \Log::info("📬 التوقيع المستقبل:", ['received_signature' => $requestSignature]);
+    
+        return hash_equals($generatedSignature, $requestSignature);
     }
 }
 
