@@ -177,16 +177,20 @@ class PaytabsController extends Controller
     {
         \Log::info("📬 هيدر الطلب:", $request->headers->all());
         \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($request->all()));
-        $transRef = $request->input('tranRef') 
-        ?? $request->query('tranRef') 
-        ?? $request->post('tranRef');
         \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
         $plugin = new Paytabs();
-        $response_data = $_POST;
-        $transRef = filter_input(INPUT_POST, 'tranRef');
+        $response_data = $request->post(); 
+        $data = $response_data;             
+        $transRef = $data['tran_ref'] ?? null;
+        $cartId = $data['cart_id'] ?? null; 
         
-        \Log::info("تم callback بنجاح للطلب رقم: " . $transRef);
-
+        $invoiceNumber = null;
+        if ($cartId) {
+            $parts = explode('_', $cartId);
+            if (isset($parts[1])) {
+                $invoiceNumber = $parts[1];  // "245"
+            }
+        }
         if (!$transRef) {
             return Common::apiResponse(0, 'try leter', null, 200);
         }
@@ -203,16 +207,17 @@ class PaytabsController extends Controller
         $verify_result = $plugin->send_api_request($request_url, $data);
         $is_success = $verify_result['payment_result']['response_status'] === 'A';
         if ($is_success) {
-            $this->coinLogRepository->getCoinsById($request['payment_id'])->update([
+            $this->coinLogRepository->getCoinsById($invoiceNumber)->update([
                 'pid' => 1,
+                'trx' =>  $transRef,
             ]);
-            $payment_data = $this->coinLogRepository->getCoinsById([ $request['payment_id']]);
+            $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
             if (isset($payment_data) && $payment_data->pid == 1 ) {
                 $this->onPaymentSuccess($payment_data);
             }
             return $this->payment_response($payment_data,'success');
         }
-        $payment_data =$this->coinLogRepository->getCoinsById([ $request['payment_id']]);
+        $payment_data =$this->coinLogRepository->getCoinsById($invoiceNumber);
         if (isset($payment_data) && $payment_data->pid == 0 ) {
             $this->onPaymentFailure($payment_data);
         }
