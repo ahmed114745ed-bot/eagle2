@@ -62,26 +62,21 @@ class Paytabs
     function is_valid_redirect($post_values)
     {                 
 
-        $serverKey = $this->getConfig('server_key');
     
         $serverKey = $this->getConfig('server_key');
 
-    // 📥 Get raw JSON body
-    $rawPayload = file_get_contents('php://input');
-    \Log::info("📬 Raw Payload:", [$rawPayload]);
+        $rawPayload = file_get_contents('php://input');
+        // \Log::info("📬 Raw Payload:", [$rawPayload]);
 
-    // 📦 Get signature from header
-    $requestSignature = request()->header('signature');
-    \Log::info("📬 Signature from Header:", [$requestSignature]);
+        $requestSignature = request()->header('signature');
+        // \Log::info("📬 Signature from Header:", [$requestSignature]);
 
-    // 🔐 Calculate HMAC
-    $calculatedSignature = hash_hmac('sha256', $rawPayload, $serverKey);
+        $calculatedSignature = hash_hmac('sha256', $rawPayload, $serverKey);
 
-    \Log::info("📬 Calculated Signature:", [$calculatedSignature]);
-    \Log::info("📬  Signature:", [$requestSignature]);
+        // \Log::info("📬 Calculated Signature:", [$calculatedSignature]);
+        // \Log::info("📬  Signature:", [$requestSignature]);
 
-    // 🔍 Compare
-    return hash_equals($calculatedSignature, $requestSignature);
+        return hash_equals($calculatedSignature, $requestSignature);
     }
 
 
@@ -191,18 +186,16 @@ class PaytabsController extends Controller
         // \Log::info("📬 هيدر الطلب:", $request->headers->all());
 
         $response_data = $request->post();
-        // \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($response_data));
     
         $transRef = $response_data['tran_ref'] ?? null;
         $cartId = $response_data['cart_id'] ?? null; 
         
-        // \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
     
         $invoiceNumber = null;
         if ($cartId) {
             $parts = explode('_', $cartId);
             if (isset($parts[1])) {
-                $invoiceNumber = $parts[1];  // رقم الفاتورة مثل "245"
+                $invoiceNumber = $parts[1];  
             }
         }
     
@@ -218,17 +211,16 @@ class PaytabsController extends Controller
         $verify_result = $plugin->send_api_request($request_url, $data);
     
         $is_valid = $plugin->is_valid_redirect($request);
-                \Log::info("📬  is_valid_redirect:", ['is_valid' => $is_valid]);
 
         if (!$is_valid) {
             return Common::apiResponse(0, 'try later', null, 200);
         }
         
 
-    $is_success = isset($verify_result['payment_result']['response_status']) &&
-                  $verify_result['payment_result']['response_status'] === 'A';
+        $is_success = isset($verify_result['payment_result']['response_status']) &&
+                    $verify_result['payment_result']['response_status'] === 'A';
 
-    $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
+        $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
 
         if ($payment_data) {
             // \Log::info("📬  coinLogRepository:", ['payment_data' => $payment_data->toArray()]);
