@@ -176,15 +176,15 @@ class PaytabsController extends Controller
     public function callback(Request $request)
     {
  
-        \Log::info("📬 هيدر الطلب:", $request->headers->all());
+        // \Log::info("📬 هيدر الطلب:", $request->headers->all());
 
         $response_data = $request->post();
-        \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($response_data));
+        // \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($response_data));
     
         $transRef = $response_data['tran_ref'] ?? null;
         $cartId = $response_data['cart_id'] ?? null; 
         
-        \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
+        // \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
     
         $invoiceNumber = null;
         if ($cartId) {
@@ -193,7 +193,7 @@ class PaytabsController extends Controller
                 $invoiceNumber = $parts[1];  // رقم الفاتورة مثل "245"
             }
         }
-        \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
+        // \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
     
         if (!$transRef) {
             return Common::apiResponse(0, 'try later', null, 200);
@@ -207,17 +207,17 @@ class PaytabsController extends Controller
         $verify_result = $plugin->send_api_request($request_url, $data);
     
 
-     \Log::info("📬  النتائج:", $verify_result);
+    //  \Log::info("📬  النتائج:", $verify_result);
 
     $is_success = isset($verify_result['payment_result']['response_status']) &&
                   $verify_result['payment_result']['response_status'] === 'A';
 
     $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
-    \Log::info("📬  coinLogRepository:", $payment_data);
+    // \Log::info("📬  coinLogRepository:", $payment_data);
 
     \Log::info("📬  coinLogRepository:", $payment_data);
     \Log::info("📬  is_success:", ['is_success' => $is_success]);
-    \Log::info("رقم الفاتورة:", $invoiceNumber);
+        \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
 
     if ($is_success) {
         if ($payment_data) {
