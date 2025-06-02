@@ -1700,7 +1700,7 @@
     "Charging Agencies": "Şarj Ajansları",
     "Verified Charging Agents": "Doğrulanmış Şarj Temsilcileri",
     "Payment Methods for Charging Agents": "Şarj Temsilcileri için Ödeme Yöntemleri",
-    "Agency Manager": "बीडी",
+    "Agency Manager": "Ajans Yöneticisi",
     "VIP Privileges": "VIP Ayrıcalıkları",
     "Managers": "Yöneticiler",
     "Charging Events": "Şarj Etkinlikleri",
@@ -2981,8 +2981,12 @@
   "Language": "Dil",
   "Reward Level Interval": "Ödül seviye aralığı",
   "Actions switch users": "İşlemler",
-  "Edit vip gift": "VIP hediyesini düzenle"
-
+  "Edit vip gift": "VIP hediyesini düzenle",
+ "User Achievement Level": "Kullanıcı Başarı Seviyesi",
+"Achievement Level": "Başarı Seviyesi",
+"Updates Group Chat": "Grup Sohbeti Güncellemeleri",
+"Event Report": "Etkinlik Raporu",
+"Weekly Star Rewards": "Haftalık Yıldız Ödülleri"
 
 
 
