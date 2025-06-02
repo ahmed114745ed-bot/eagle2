@@ -225,14 +225,20 @@ class PaytabsController extends Controller
         \Log::info("📬  المعرف:", ['invoiceNumber' => $invoiceNumber]);
 
     if ($is_success) {
+        \Log::info("📬  payment_data:", ['payment_data' => $payment_data]);
         if ($payment_data) {
+        \Log::info("📬 update payment_data:", ['on' => $payment_data]);
+
             $payment_data->update([
                 'pid' => 1,
                 'trx' => $transRef,
             ]);
             if ($payment_data->pid == 1) {
+
                 $this->onPaymentSuccess($payment_data);
             }
+            \Log::info("📬 end payment_data:", ['on' => $payment_data]);
+
         }
         return $this->payment_response($payment_data, 'success');
     } else {
