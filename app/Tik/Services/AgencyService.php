@@ -738,12 +738,14 @@ class AgencyService
             // $minutes = $hours * 60;
             $dailyHours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $dailyMinutes = $dailyHours * 60;
+            $dailyTotalSeconds = (int) round($dailyMinutes * 60);
+
             $dailyHoursPart = floor($dailyTotalSeconds / 3600);
             $dailyMinutesPart = floor(($dailyTotalSeconds % 3600) / 60);
             $dailySecondsPart = $dailyTotalSeconds % 60;
-        
+
             $dailyFormatted = sprintf('%02d:%02d:%02d', $dailyHoursPart, $dailyMinutesPart, $dailySecondsPart);
-        
+
 
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
 
