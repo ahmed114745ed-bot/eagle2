@@ -127,13 +127,19 @@ class AgencyUsersTargetResource extends JsonResource
                     'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
                 ];
             }
-        $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
+           $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
             ->selectRaw("sum(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')->orderByRaw("exp desc")->limit(3)
             ->get()
             ->filter(function ($q) {
                 return $q->exp > 0;
             });
+
+            $totalGiftPrice = GiftLog::where('agency_id', $this->agency_id)
+            ->where('receiver_id', $this->id)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->sum('giftPrice');
      
 
         // $salary = UserSallary::query()
@@ -160,7 +166,7 @@ class AgencyUsersTargetResource extends JsonResource
             'salary' => (float) $agencySallary ?? 0,
             'target' => [
                 'id' => @$target->target_id ?? 0,
-                'user_diamonds' => @$giftLog->sum('giftPrice') ?? 0,
+                'user_diamonds' => @$agencySallary ?? 0,
                 'user_hours' => @$hours ?? 0,
                 'user_days' => @$this->getTotalDays() ?? 0,
                 // 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
