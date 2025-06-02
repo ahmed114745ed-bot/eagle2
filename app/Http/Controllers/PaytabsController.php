@@ -230,7 +230,7 @@ class PaytabsController extends Controller
         \Log::info("📬 update payment_data:", ['on' => $payment_data]);
 
             $payment_data->update([
-                'pid' => 1,
+                'status' => 1,
                 'trx' => $transRef,
             ]);
             if ($payment_data->pid == 1) {
