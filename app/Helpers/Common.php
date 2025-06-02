@@ -1467,4 +1467,13 @@ class Common
 
         Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
     }
+
+
+
+    public static function applyTimezoneToDateValue(\Carbon\Carbon $date, ?string $timezone = null): \Carbon\Carbon
+    {
+        $timezone = $timezone ?? self::timeZone();
+        return $date->setTimezone($timezone);
+    }
+
 }
