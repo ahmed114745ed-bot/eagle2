@@ -216,6 +216,8 @@ class PaytabsController extends Controller
                   $verify_result['payment_result']['response_status'] === 'A';
 
     $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
+    \Log::info("📬  coinLogRepository:", $payment_data);
+    \Log::info("📬  is_success:", ['is_success' => $is_success]);
 
     if ($is_success) {
         if ($payment_data) {
