@@ -458,7 +458,7 @@ class RoomRepoService
     /**
      * @throws \Exception
      */
-    public function commentStatus($roomId): bool
+    public function commentStatus($roomId, $request): bool
     {
         $room = $this->repository->findRoom($roomId);
 
@@ -468,7 +468,7 @@ class RoomRepoService
             throw new \Exception(__('you dont have permission'));
         }
 
-        $room->update(['is_comment_closed' => !$room->is_comment_closed]);
+        $room->update(['is_comment_closed' => $request['status']]);
 
         return $room->is_comment_closed;
     }
