@@ -146,26 +146,26 @@ class PaytabsController extends Controller
                 "name" => $user->name,
                 "email" => $user->email,
                 "phone" => $user->phone ?? "000000",
-                "street1" => "N/A",
-                "city" => "N/A",
-                "state" => "N/A",
-                "country" => "N/A",
-                "zip" => "00000"
+                // "street1" => "N/A",
+                // "city" => "N/A",
+                // "state" => "N/A",
+                // "country" => "N/A",
+                // "zip" => "00000"
             ],
-            "shipping_details" => [
-                "name" => "N/A",
-                "email" => "N/A",
-                "phone" => "N/A",
-                "street1" => "N/A",
-                "city" => "N/A",
-                "state" => "N/A",
-                "country" => "N/A",
-                "zip" => "0000"
-            ],
-            "user_defined" => [
-                "udf9" => "UDF9",
-                "udf3" => "UDF3"
-            ]
+            // "shipping_details" => [
+            //     "name" => "N/A",
+            //     "email" => "N/A",
+            //     "phone" => "N/A",
+            //     "street1" => "N/A",
+            //     "city" => "N/A",
+            //     "state" => "N/A",
+            //     "country" => "N/A",
+            //     "zip" => "0000"
+            // ],
+            // "user_defined" => [
+            //     "udf9" => "UDF9",
+            //     "udf3" => "UDF3"
+            // ]
         ];
 
         $page = $plugin->send_api_request($request_url, $data);
