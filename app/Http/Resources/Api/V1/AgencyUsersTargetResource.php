@@ -43,8 +43,14 @@ class AgencyUsersTargetResource extends JsonResource
         ->whereBetween('created_at', [$joinedDate, $leaveDate])
         ->get()
         ->reduce(function ($carry, $session) {
-            $start = Carbon::parse($session->start_time);
-            $end = Carbon::parse($session->end_time);
+            $start = is_numeric($session->start_time)
+                ? Carbon::createFromTimestamp($session->start_time)
+                : Carbon::parse($session->start_time);
+    
+            $end = is_numeric($session->end_time)
+                ? Carbon::createFromTimestamp($session->end_time)
+                : Carbon::parse($session->end_time);
+    
             return $carry + $end->diffInMinutes($start);
         }, 0);
         $hours = floor($totalMinutes / 60);
