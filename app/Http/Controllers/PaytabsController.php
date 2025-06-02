@@ -62,48 +62,25 @@ class Paytabs
     function is_valid_redirect($post_values)
     {                 
 
+    
         $serverKey = $this->getConfig('server_key');
-        $data = $post_values;
-    
-        \Log::info("📬 Decoded data:", $data);
-        \Log::info("📬 هيدر الطلب:", request()->headers->all());
-    
-        $requestSignature = request()->header('signature') ?? request()->headers->get('signature');
-        if (!$requestSignature) {
-            \Log::error("📬 لم يتم العثور على التوقيع في الهيدر.");
-            return false;
-        }
-    
-        // إزالة التوقيع من البيانات
-        if (isset($data['signature'])) {
-            unset($data['signature']);
-        }
-    
-        // فلترة القيم الفارغة
-        $filtered = array_filter($data, function ($value) {
-            return $value !== null && $value !== '';
-        });
-    
-        ksort($filtered);
-    
-        $signature_string = '';
-        foreach ($filtered as $key => $value) {
-            if (is_array($value)) {
-                $value = json_encode($value); // التعامل الآمن مع أي قيمة مصفوفة
-            }
-        
-            $signature_string .= ($signature_string !== '' ? '&' : '') . $key . '=' . $value;
-        }
-    
-        \Log::info("📬 Signature string used:", ['string' => $signature_string]);
-    
-        $generatedSignature = hash_hmac('sha256', $signature_string, $serverKey);
-    
-        \Log::info("📬 التوقيع المتوقع:", ['generated_signature' => $generatedSignature]);
-        \Log::info("📬 التوقيع المستقبل:", ['received_signature' => $requestSignature]);
-    
-        return hash_equals($generatedSignature, $requestSignature);
+
+        $rawPayload = file_get_contents('php://input');
+        // \Log::info("📬 Raw Payload:", [$rawPayload]);
+
+        $requestSignature = request()->header('signature');
+        // \Log::info("📬 Signature from Header:", [$requestSignature]);
+
+        $calculatedSignature = hash_hmac('sha256', $rawPayload, $serverKey);
+
+        // \Log::info("📬 Calculated Signature:", [$calculatedSignature]);
+        // \Log::info("📬  Signature:", [$requestSignature]);
+
+        return hash_equals($calculatedSignature, $requestSignature);
     }
+
+
+
 }
 
 class PaytabsController extends Controller
@@ -209,18 +186,16 @@ class PaytabsController extends Controller
         // \Log::info("📬 هيدر الطلب:", $request->headers->all());
 
         $response_data = $request->post();
-        // \Log::info("تم callback بنجاح للطلب رقم: " . json_encode($response_data));
     
         $transRef = $response_data['tran_ref'] ?? null;
         $cartId = $response_data['cart_id'] ?? null; 
         
-        // \Log::info("تم callback بنجاح للطلب رقم: " . ($transRef ?? 'غير معروف'));
     
         $invoiceNumber = null;
         if ($cartId) {
             $parts = explode('_', $cartId);
             if (isset($parts[1])) {
-                $invoiceNumber = $parts[1];  // رقم الفاتورة مثل "245"
+                $invoiceNumber = $parts[1];  
             }
         }
     
@@ -235,18 +210,17 @@ class PaytabsController extends Controller
         $data = ["tran_ref" => $transRef];
         $verify_result = $plugin->send_api_request($request_url, $data);
     
-        $is_valid = $plugin->is_valid_redirect($response_data);
-                \Log::info("📬  is_valid_redirect:", ['is_valid' => $is_valid]);
+        $is_valid = $plugin->is_valid_redirect($request);
 
         if (!$is_valid) {
             return Common::apiResponse(0, 'try later', null, 200);
         }
         
 
-    $is_success = isset($verify_result['payment_result']['response_status']) &&
-                  $verify_result['payment_result']['response_status'] === 'A';
+        $is_success = isset($verify_result['payment_result']['response_status']) &&
+                    $verify_result['payment_result']['response_status'] === 'A';
 
-    $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
+        $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
 
         if ($payment_data) {
             // \Log::info("📬  coinLogRepository:", ['payment_data' => $payment_data->toArray()]);
