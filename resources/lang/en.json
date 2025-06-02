@@ -981,7 +981,12 @@
   "Delete level interval": "Delete level gift",
   "Show level interval": "Show level gift",
     "Create user parent": "Create user",
-  "Browse user parent": "Browse user"
+  "Browse user parent": "Browse user",
+     "Browse payment gat way": "Browse payment methods for shipping agents",
+  "Create payment gat way": "Create payment methods for shipping agents",
+  "Edit payment gat way": "Edit payment methods for shipping agents",
+  "Delete payment gat way": "Delete payment methods for shipping agents",
+  "Show payment gat way": "Show payment methods for shipping agents"
 
 
 

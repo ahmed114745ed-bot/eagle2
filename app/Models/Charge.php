@@ -55,6 +55,9 @@ class Charge extends Model
 
     public function sender()
     {
+        if ($this->charger_type == 'agency') {
+            return $this->hasOne(ShippingAgency::class, 'id', 'charger_id');
+        }
         return $this->hasOne(User::class, 'id', 'charger_id');
     }
 

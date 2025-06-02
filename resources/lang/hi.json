@@ -2118,10 +2118,6 @@
   "Delete games": "खेल हटाएँ",
   "Edit games": "खेल संपादित करें",
   "Show games": "खेल दिखाएँ",
-  "Create BD": "डेटाबेस बनाएँ",
-  "Delete BD": "डेटाबेस हटाएँ",
-  "Edit BD": "डेटाबेस संपादित करें",
-  "Show BD": "डेटाबेस दिखाएँ",
   "Create request backgrounds image": "रिक्वेस्ट बैकग्राउंड छवि बनाएँ",
   "Delete request backgrounds image": "रिक्वेस्ट बैकग्राउंड छवि हटाएँ",
   "Edit request backgrounds image": "रिक्वेस्ट बैकग्राउंड छवि संपादित करें",
@@ -2228,10 +2224,6 @@
   "Edit charge agency": "चार्ज एजेंसी संपादित करें",
   "Delete charge agency": "चार्ज एजेंसी हटाएँ",
   "Show charge agency": "चार्ज एजेंसी दिखाएँ",
-  "Create payment gat way": "भुगतान गेटवे बनाएँ",
-  "Edit payment gat way": "भुगतान गेटवे संपादित करें",
-  "Delete payment gat way": "भुगतान गेटवे हटाएँ",
-  "Show payment gat way": "भुगतान गेटवे दिखाएँ",
   "Create Payment methods for shipping agencies": "शिपिंग एजेंसियों के लिए भुगतान विधियाँ बनाएँ",
   "Edit Payment methods for shipping agencies": "शिपिंग एजेंसियों के लिए भुगतान विधियाँ संपादित करें",
   "Delete Payment methods for shipping agencies": "शिपिंग एजेंसियों के लिए भुगतान विधियाँ हटाएँ",
@@ -2457,7 +2449,6 @@
   "Browse request agency history": "एजेंसी अनुरोध इतिहास ब्राउज़ करें",
   "Browse appear charger agency": "प्रकट चार्जर एजेंसी ब्राउज़ करें",
   "Browse charge agency": "चार्ज एजेंसी ब्राउज़ करें",
-  "Browse payment gat way": "भुगतान गेटवे ब्राउज़ करें",
   "Browse agency manger setting": "एजेंसी प्रबंधक सेटिंग्स ब्राउज़ करें",
   "Browse managers": "प्रबंधक ब्राउज़ करें",
   "Browse rooms": "रूम ब्राउज़ करें",
@@ -2568,7 +2559,16 @@
   "Achievement Level": "उपलब्धि स्तर",
   "Updates Group Chat": "समूह चैट अपडेट्स",
   "Weekly Star Rewards": "साप्ताहिक स्टार पुरस्कार",
-  "Event Report": "ईवेंट रिपोर्ट"
+  "Event Report": "ईवेंट रिपोर्ट",
+    "Create BD": "बीडी बनाएँ",
+  "Delete BD": "बीडी हटाएँ",
+  "Edit BD": "बीडी संपादित करें",
+  "Show BD": "बीडी दिखाएँ",
+    "Browse payment gat way": "शिपिंग एजेंटों के लिए भुगतान विधियाँ ब्राउज़ करें",
+  "Create payment gat way": "शिपिंग एजेंटों के लिए भुगतान विधियाँ बनाएँ",
+  "Edit payment gat way": "शिपिंग एजेंटों के लिए भुगतान विधियाँ संपादित करें",
+  "Delete payment gat way": "शिपिंग एजेंटों के लिए भुगतान विधियाँ हटाएँ",
+  "Show payment gat way": "शिपिंग एजेंटों के लिए भुगतान विधियाँ दिखाएँ"
   
 
 
