@@ -231,6 +231,7 @@ class RequestBackgroundImageController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+        $this->extendGrid($grid);
         return $grid;
     }
 
