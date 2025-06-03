@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Scopes\HostAgencyScope;
 class Charge extends Model
 {
     use HasFactory;
@@ -100,7 +101,8 @@ class Charge extends Model
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'agency_id');
+        return $this->belongsTo(Agency::class, 'agency_id')
+        ->withoutGlobalScope(HostAgencyScope::class); 
     }
     public function shippingAgency()
     {
