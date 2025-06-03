@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('admin_permissions', function (Blueprint $table) {
-            $table->longText('slug')->change();
+       Schema::table('admin_permissions', function (Blueprint $table) {
+            $table->string('slug', 255)->change();
         });
     }
 
