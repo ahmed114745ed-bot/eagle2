@@ -26,6 +26,23 @@ class MyDataResource extends JsonResource
 
         if ($family) {
 
+            $starsImagesFamily = GiftLog::
+            selectRaw("SUM(giftPrice) as exp, receiver_id")
+            ->with(['receiver.profile'])
+            ->whereHas('receiver', function ($query) use ($family) {
+                $query->where('family_id', $family->id)->whereHas('profile');
+            })
+            ->groupBy('receiver_id')
+            ->orderByDesc('exp')
+            ->take(3)
+            ->get()
+            ->map(function ($log) {
+                return optional($log->receiver->profile)->avatar;
+            })
+            ->filter()
+            ->values()
+            ->toArray();
+
             $f = [
                 'owner_id' => $family->user_id,
                 'family_name' => $family->name,
@@ -33,6 +50,8 @@ class MyDataResource extends JsonResource
                 'img' => $family->image,
                 'num_of_members' => $family->members_count,
                 'level' => $family->level,
+                'top_stars' => $starsImagesFamily,
+
             ];
         }
 
