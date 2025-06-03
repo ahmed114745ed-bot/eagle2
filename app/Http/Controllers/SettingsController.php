@@ -182,7 +182,7 @@ class SettingsController extends Controller
                 $cacheKey = 'colors_updated_at';
                 settings()->set($cacheKey, true);
             } elseif ((common::getSettingValue('background_type') !== $request->background_type || $request->hasFile('app_background_image') || common::getSettingValue('background_color') !== $request->background_color || common::getSettingValue('gradient_2') !== $request->gradient_2 || common::getSettingValue('gradient_3') !== $request->gradient_3 || common::getSettingValue('gradient_1') !== $request->gradient_1)) {
-                Log::info($key, ['value' => $value],123);
+                // Log::info($key, ['value' => $value],123);
                 $cacheKey = 'ground_updated_at';
                 settings()->set($cacheKey, true);
             } else {
