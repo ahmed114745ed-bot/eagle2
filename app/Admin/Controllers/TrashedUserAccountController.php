@@ -79,10 +79,10 @@ class TrashedUserAccountController extends  MainController
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
-            if ($model->agency_id >= 1 && (Admin::user()->can('restore-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
+            if ( (Admin::user()->can('restore-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new RestoreUserAccount($model->id));
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('delete-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
+            if ( (Admin::user()->can('delete-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new SoftDeleteUserAccount($model->id));
             }
             $actions->disableEdit();
