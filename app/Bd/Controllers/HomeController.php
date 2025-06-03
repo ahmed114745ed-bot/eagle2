@@ -25,7 +25,7 @@ class HomeController extends Controller
 
     public function index(Content $content)
     {
-        Log::info("gooooooooooooooooooooooooooooooooooooood");
+        // Log::info("gooooooooooooooooooooooooooooooooooooood");
         $appID = Auth::user()->app_id;
         $agencyCount = Agency::where('bd_id', $appID)->count();
 

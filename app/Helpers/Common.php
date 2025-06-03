@@ -805,7 +805,7 @@ class Common
     }
 
 
-    public static function handelVip($vip, $user, $expire = null)
+    public static function handelVip($vip, $user, $expire = null,  $userVip)
     {
         $type = $vip->privilegs()->pluck('type')->toArray();
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
@@ -817,7 +817,7 @@ class Common
             $pack =  Pack::query()
                 ->where('user_id', $user->id)
                 ->where('get_type', 1)
-                ->where('target_id', $ware->id)
+                ->where('target_id', $ware->id)->where('vip_user_id', $userVip->id)
                 ->where(function ($q) {
                     $q->where('expire', '>=', now()->timestamp)
                         ->orWhere('expire', 0);
@@ -827,13 +827,14 @@ class Common
                 $expire = $vip->expire;
             }
             if ($pack) {
-                if ($pack->expire == 0) {
-                    //                    throw new \Exception('already exists');
-                } else {
+                // if ($pack->expire == 0) {
+                //     //                    throw new \Exception('already exists');
+                // } else {
 
-                    $pack->expire = $vip->expire ? $pack->expire + ($expire * 86400) : 0;
-                    $pack->save();
-                }
+                //     $pack->expire = $vip->expire ? $pack->expire + ($expire * 86400) : 0;
+                $pack->is_used = $userVip->is_used;
+                $pack->save();
+                // }
             } else {
                 Pack::query()->create(
                     [
@@ -843,7 +844,10 @@ class Common
                         'target_id' => $ware->id,
                         'num' => 1,
                         'expire' => $vip->expire ? now()->addDays($expire)->timestamp : 0,
-                        'use_num' => $ware->num
+                        'use_num' => $ware->num,
+                        'vip_user_id' => $userVip->id,
+                        'is_used' => $userVip->is_used,
+                        'using' => 1,
                     ]
                 );
             }
@@ -1382,7 +1386,7 @@ class Common
     public static function searchAgency($id)
     {
         $agency = ShippingAgency::find($id);
-        return $agency ?? 0 ;
+        return $agency ?? 0;
     }
 
 
@@ -1475,5 +1479,4 @@ class Common
         $timezone = $timezone ?? self::timeZone();
         return $date->setTimezone($timezone);
     }
-
 }
