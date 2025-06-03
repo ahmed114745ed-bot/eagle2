@@ -77,7 +77,7 @@ class LanguageController extends MainController
         $grid->disableActions();       // تعطيل زر العرض والتعديل والحذف لكل صف
         $grid->disableRowSelector();   // تعطيل تحديد الصفوف للحذف الجماعي
         $grid->disableExport();        // تعطيل زر التصدير (اختياري)
-
+     
         // $grid->column('is_enabled', __('Is enabled'));
         // $grid->column('created_at', __('Created at'));
         // $grid->column('updated_at', __('Updated at'));

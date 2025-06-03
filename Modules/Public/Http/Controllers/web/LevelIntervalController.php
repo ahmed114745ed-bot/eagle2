@@ -91,7 +91,7 @@ class LevelIntervalController extends MainController
                 return $button1;
             });
         }
-
+        $this->extendGrid($grid);
         return $grid;
     }
 

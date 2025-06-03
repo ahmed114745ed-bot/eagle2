@@ -97,6 +97,7 @@ class EventPeriodController extends MainController
         if ($check_event_period != null){
             $grid->disableCreateButton();
         }
+        $this->extendGrid($grid);
         return $grid;
     }
 

@@ -76,6 +76,7 @@ class PaymentGetWayController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
         $grid->column('photo', __('Photo'))->image('', 50);
+        $this->extendGrid($grid);
         return $grid;
     }
 

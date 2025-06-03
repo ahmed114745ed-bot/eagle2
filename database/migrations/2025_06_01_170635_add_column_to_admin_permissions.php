@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('admin_permissions', function (Blueprint $table) {
-            $table->longText('name')->change();
+            $table->string('name', 255)->change();
         });
     }
 
