@@ -94,7 +94,7 @@ class PageController extends MainController
             // For simplicity, let's just return the entire decoded content
             return $decodedContent;
         });
-
+       $this->extendGrid($grid);
 
         return $grid;
     }

@@ -41,7 +41,7 @@ class BoxController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('boxes'))
             ->body($this->detail($id)));
     }
@@ -55,7 +55,7 @@ class BoxController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return  parent::edit($id,$content
+        return  parent::edit($id, $content
             ->title(trans('boxes'))
             ->body($this->form()->edit($id)));
     }
@@ -98,7 +98,7 @@ class BoxController extends MainController
         $grid->column('has_label', __('has_label'));
         $grid->column('duration', __('duration'));
         $grid->disableExport();
-
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -143,13 +143,13 @@ class BoxController extends MainController
         $form->decimal('coins', __('coins'));
         $form->decimal('users', __('users'))->attribute(['id' => 'users_field']);
         $form->decimal('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
-       
-  
+
+
         $addPlaceholder = __('Enter users count');
         $deleteText = __('Delete');
 
         $form->dynamicFields('dynamic_users_values', __('Dynamic Fields'))
-        ->attribute(['name' => 'dynamic_users_values'])
+            ->attribute(['name' => 'dynamic_users_values'])
         ;
 
         $form->image('image', __('image'));
@@ -171,8 +171,8 @@ class BoxController extends MainController
         };
     </script>
 ");
-        
-        
+
+
         $form->saving(function (Form $form) {
             $dynamicFields = request('dynamic_fields', []);
             $combinedValues = implode(',', array_filter($dynamicFields));
@@ -185,8 +185,8 @@ class BoxController extends MainController
 
     public function box_settings(Content $content)
     {
-        if (!Admin::user()->can('*')){
-            Permission::check('browse-'.$this->permission_setting);
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_setting);
         }
         $config = Config::whereIn('name', ['app_wallet_lucky_box', 'normal_box_duration'])->pluck('value', 'name')->toArray();
         return $content->view('box_settings', compact('config'));
