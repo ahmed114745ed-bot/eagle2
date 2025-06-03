@@ -36,6 +36,22 @@ class UserRepository extends AbstractRepository
     {
         return $this->model->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$userUuId}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])->fitterByUuid($userUuId)->get();
     }
+    public function filterUserNew($userUuId)
+    {
+        return $this->model->select([
+            '*',
+            DB::raw("
+                CASE 
+                    WHEN users.uuid LIKE '{$userUuId}%' THEN 100 
+                    WHEN users.uuid LIKE '%{$userUuId}%' THEN 50 
+                    ELSE 0 
+                END AS matching_score
+            ")
+        ])
+        ->where('uuid', 'like', "%$userUuId%")
+        ->orderByDesc('matching_score')
+        ->get();
+    }
 
     public function searchUserById($userUuId)
     {
