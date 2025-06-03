@@ -76,9 +76,8 @@ class TrashedUserAccountController extends  MainController
 
         // $grid->column('phone', __('Phone'));
         $grid->column('deleted_at', __('Deleted at'))->diffForHumans();
-       
-        $grid->actions(function ($actions) {
-             $permission = $this->permission_name;
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
             if ($model->agency_id >= 1 && (Admin::user()->can('restore-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new RestoreUserAccount($model->id));
