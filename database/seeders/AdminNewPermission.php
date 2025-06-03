@@ -19,35 +19,35 @@ class AdminNewPermission extends Seeder
             'dashboard',
             'games',
             'BD',
-            'delete-bd-Switch',
-            'choose-bd-Switch',
+           // 'delete-bd-Switch',
+          //  'choose-bd-Switch',
             'request-backgrounds-image',
             'bans',
             'close-room',
             'special-uuid-requests',
             'edit-level',
-            'gift-store-Switch',
+         //   'gift-store-Switch',
             'gift-from-the-store',
             'gift-VIP',
-            'gift-VIP-Switch',
+           // 'gift-VIP-Switch',
             'gift-a-medal',
             'app-wallet',
-            'charge-report-Switch',
-            'add-coins-Switch',
+          //  'charge-report-Switch',
+          //  'add-coins-Switch',
             'coin-recharge',
             'charger-reports',
             'charge-settings',
             'users',
             'user-actions',
-            'charge-switch',
-            'invite-switch',
-            'can-Play-Switch',
-            'kick-agency-Switch',
-            'kick-family-Switch',
-            'chang-agency-Switch',
+           // 'charge-switch',
+           // 'invite-switch',
+          //  'can-Play-Switch',
+           // 'kick-agency-Switch',
+          //  'kick-family-Switch',
+          //  'chang-agency-Switch',
             'complaints',
-            'restore-user-account-Switch',
-            'delete-user-account-Switch',
+          //  'restore-user-account-Switch',
+         //   'delete-user-account-Switch',
             'banner',
             'splash',
             'official-messages',
@@ -62,15 +62,15 @@ class AdminNewPermission extends Seeder
             'families-level',
             'salary-payment-countries',
             'salary-requests',
-            'rejected-agent-request-switch',
-            'accept-agent-request-switch',
+           // 'rejected-agent-request-switch',
+          //  'accept-agent-request-switch',
             'hosts',
-            'host-charge-switch',
-            'host-invite-switch',
-            'host-can-Play-Switch',
-            'host-kick-agency-Switch',
-            'host-kick-family-Switch',
-            'host-chang-agency-Switch',
+           // 'host-charge-switch',
+           // 'host-invite-switch',
+           // 'host-can-Play-Switch',
+           // 'host-kick-agency-Switch',
+           // 'host-kick-family-Switch',
+           // 'host-chang-agency-Switch',
             'hosts-target',
             'users-Wallet',
             'host-agencies-report',
@@ -138,12 +138,18 @@ class AdminNewPermission extends Seeder
             'config',
             'settings',
             'language',
-            'language-switch',
+            //'language-switch',
             'daily-prize',
             'daily-gift',
             'level',
             'level-interval',
-            'reward-level-interval'
+            'reward-level-interval',
+            'vip-privilege',
+            'transaction-request-problem',
+            'agency-manger-setting',
+            'Payment-methods-for-shipping-agencies',
+            'roles'
+
         ];
 
         $methods = [
@@ -151,42 +157,43 @@ class AdminNewPermission extends Seeder
             'create',
             'delete',
             'edit',
+            'show'
         ];
 
 
         // Step 1: Category definitions with sort number
         $categories = [
             ['name' => 'Dashboard', 'sort' => 1, 'permissions' => ['dashboard']],
-            ['name' => 'Games', 'sort' => 1, 'permissions' => ['games']],
-            ['name' => 'BD Management', 'sort' => 1, 'permissions' => ['BD', 'delete-bd-Switch', 'choose-bd-Switch']],
-            ['name' => 'Fast orders', 'sort' => 1, 'permissions' => ['request-backgrounds-image', 'gift-VIP-Switch','bans', 'close-room', 'special-uuid-requests','edit-level','gift-store-Switch','gift-from-the-store','gift-VIP']],
-            ['name' => 'Wallet', 'sort' => 2, 'permissions' => ['app-wallet']],
-            ['name' => 'charge system', 'sort' => 3, 'permissions' => ['charge-report-Switch','add-coins-Switch','coin-recharge','charge-settings','charger-reports']],
-            ['name' => 'users', 'sort' => 4, 'permissions' => ['deleted-accounts','users','user-actions','chang-agency-Switch','charge-switch','invite-switch','can-Play-Switch','kick-family-Switch','kick-agency-Switch','complaints','delete-user-account-Switch','restore-user-account-Switch']],
-            ['name' => 'Advertisements', 'sort' => 6, 'permissions' => ['banner','splash','official-messages','advertising-space']],
-            ['name' => 'Store', 'sort' => 7, 'permissions' => ['store']],
-            ['name' => 'Distinguished identifier', 'sort' => 8, 'permissions' => ['featured-ids','details-of-unique-identifiers','id-color']],
-            ['name' => 'Vip', 'sort' => 9, 'permissions' => ['VIPs','vip-gift']],
-            ['name' => 'families', 'sort' => 10, 'permissions' => ['families','families-level']],
-            ['name' => 'Agency System', 'sort' => 11, 'permissions' => ['agency-settings']],
-            ['name' => 'Internal Sales System', 'sort' => 12, 'permissions' => ['salary-payment-countries','accept-agent-request-switch','salary-requests','internal-sales-system-report','rejected-agent-request-switch']],
-            ['name' => 'Host Agencies', 'sort' => 13, 'permissions' => ['reports','achieved-Target','change-users-agency-Switch','delete-agency-Switch','agencies','host-agencies-report','users-Wallet','hosts-target','hosts','host-charge-switch','host-chang-agency-Switch','host-invite-switch','host-can-Play-Switch','host-kick-agency-Switch','host-kick-family-Switch']],
-            ['name' => 'Agency Settings', 'sort' => 14, 'permissions' => ['agencies-join-requests','target', 'request-agencies', 'accept-agency', 'refuse-agency', 'request-agency-history']],
-            ['name' => 'Charging Agencies', 'sort' => 15, 'permissions' => ['appear-charger-agency', 'charge-agency', 'payment-gat-way']],
-            ['name' => 'Agency Manager', 'sort' => 16, 'permissions' => ['managers']],
-            ['name' => 'Room', 'sort' => 17, 'permissions' => ['rooms', 'room-actions', 'room-pin-switch', 'close-room-switch', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings']],
-            ['name' => 'Achievements', 'sort' => 18, 'permissions' => ['achievement', 'achievement_level', 'user_achievement_level']],
-            ['name' => 'Group chat', 'sort' => 19, 'permissions' => ['group-chat',  'updates_group_chat', 'update_setting_button']],
-            ['name' => 'Lucky box', 'sort' => 20, 'permissions' => ['boxes', 'box-use']],
-            ['name' => 'Events', 'sort' => 21, 'permissions' => ['event-period', 'weekly-star', 'weekly_star_rewards', 'target-event', 'gift-target-event', 'pk-event', 'pk-event-rewards', 'general-roles', 'event_report']],
-            ['name' => 'Reels', 'sort' => 22, 'permissions' => ['Real', 'report-real']],
-            ['name' => 'Moment', 'sort' => 23, 'permissions' => ['Moment', 'report-moment']],
-            ['name' => 'Employees and Permissions', 'sort' => 25, 'permissions' => ['auth-users', 'roles']],
-            ['name' => 'Work Settings', 'sort' => 24, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'coins', 'exchange', 'gold-coins']],
-            ['name' => 'Sensitive Settings', 'sort' => 25, 'permissions' => ['updates', 'config']],
-            ['name' => 'System Settings', 'sort' => 26, 'permissions' => ['settings', 'language', 'language-switch', 'daily-prize', 'daily-gift']],
-            ['name' => 'Level', 'sort' => 27, 'permissions' => ['level', 'level-interval', 'reward-level-interval']],
-            ['name' => 'user parent', 'sort' => 28, 'permissions' => ['user-parent']],
+            ['name' => 'Games', 'sort' => 2, 'permissions' => ['games']],
+            ['name' => 'BD Management', 'sort' => 3, 'permissions' => ['BD', 'delete-bd-Switch', 'choose-bd-Switch']],
+            ['name' => 'Fast orders', 'sort' => 4, 'permissions' => ['request-backgrounds-image', 'gift-VIP-Switch', 'bans', 'close-room', 'special-uuid-requests', 'edit-level', 'gift-store-Switch', 'gift-from-the-store', 'gift-VIP']],
+            ['name' => 'Wallet', 'sort' => 5, 'permissions' => ['app-wallet']],
+            ['name' => 'charge system', 'sort' => 6, 'permissions' => ['charge-report-Switch', 'add-coins-Switch', 'coin-recharge', 'charge-settings', 'charger-reports']],
+            ['name' => 'users', 'sort' => 7, 'permissions' => ['deleted-accounts', 'users', 'user-actions', 'chang-agency-Switch', 'charge-switch', 'invite-switch', 'can-Play-Switch', 'kick-family-Switch', 'kick-agency-Switch', 'complaints', 'delete-user-account-Switch', 'restore-user-account-Switch']],
+            ['name' => 'Advertisements', 'sort' => 8, 'permissions' => ['banner', 'splash', 'official-messages', 'advertising-space']],
+            ['name' => 'Store', 'sort' => 9, 'permissions' => ['store']],
+            ['name' => 'Distinguished identifier', 'sort' => 10, 'permissions' => ['featured-ids', 'details-of-unique-identifiers', 'id-color']],
+            ['name' => 'Vip', 'sort' => 11, 'permissions' => ['VIPs', 'vip-gift', 'vip-privilege']],
+            ['name' => 'families', 'sort' => 12, 'permissions' => ['families', 'families-level']],
+            ['name' => 'Agency System', 'sort' => 13, 'permissions' => ['agency-settings']],
+            ['name' => 'Internal Sales System', 'sort' => 14, 'permissions' => ['salary-payment-countries', 'accept-agent-request-switch', 'salary-requests', 'internal-sales-system-report', 'transaction-request-problem','rejected-agent-request-switch']],
+            ['name' => 'Host Agencies', 'sort' => 15, 'permissions' => ['reports', 'achieved-Target', 'change-users-agency-Switch', 'delete-agency-Switch', 'agencies', 'host-agencies-report', 'users-Wallet', 'hosts-target', 'hosts', 'host-charge-switch', 'host-chang-agency-Switch', 'host-invite-switch', 'host-can-Play-Switch', 'host-kick-agency-Switch', 'host-kick-family-Switch']],
+            ['name' => 'Agency Settings', 'sort' => 16, 'permissions' => ['agencies-join-requests', 'target', 'request-agencies', 'accept-agency', 'refuse-agency', 'request-agency-history']],
+            ['name' => 'Charging Agencies', 'sort' => 17, 'permissions' => ['appear-charger-agency', 'charge-agency', 'payment-gat-way','agency-manger-setting', 'Payment-methods-for-shipping-agencies']],
+            ['name' => 'Agency Manager', 'sort' => 18, 'permissions' => ['managers']],
+            ['name' => 'Room', 'sort' => 19, 'permissions' => ['rooms', 'room-actions', 'room-pin-switch', 'close-room-switch', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings']],
+            ['name' => 'Achievements', 'sort' => 20, 'permissions' => ['achievement', 'achievement_level', 'user_achievement_level']],
+            ['name' => 'Group chat', 'sort' => 21, 'permissions' => ['group-chat',  'updates_group_chat', 'update_setting_button']],
+            ['name' => 'Lucky box', 'sort' => 22, 'permissions' => ['boxes', 'box-use']],
+            ['name' => 'Events', 'sort' => 23, 'permissions' => ['event-period', 'weekly-star', 'weekly_star_rewards', 'target-event', 'gift-target-event', 'pk-event', 'pk-event-rewards', 'general-roles', 'event_report']],
+            ['name' => 'Reels', 'sort' => 24, 'permissions' => ['Real', 'report-real']],
+            ['name' => 'Moment', 'sort' => 25, 'permissions' => ['Moment', 'report-moment']],
+            ['name' => 'Employees and Permissions', 'sort' => 26, 'permissions' => ['auth-users', 'roles']],
+            ['name' => 'Work Settings', 'sort' => 27, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'coins', 'exchange', 'gold-coins']],
+            ['name' => 'Sensitive Settings', 'sort' => 28, 'permissions' => ['updates', 'config']],
+            ['name' => 'System Settings', 'sort' => 29, 'permissions' => ['settings', 'language', 'language-switch', 'daily-prize', 'daily-gift']],
+            ['name' => 'Level', 'sort' => 30, 'permissions' => ['level', 'level-interval', 'reward-level-interval']],
+            ['name' => 'user parent', 'sort' => 30, 'permissions' => ['user-parent']],
         ];
 
         // Step 2: Save categories to rolecategories table
@@ -247,7 +254,7 @@ class AdminNewPermission extends Seeder
 
         DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
         $actions = ['create', 'edit', 'delete', 'show'];
-        $targets = ['dashboard', 'delete-agency-Switch','deleted-accounts','reports','change-users-agency-Switch','achieved-Target','internal-sales-system-report','delete-bd-Switch','host-agencies-report','salary-requests','users-Wallet','hosts-target','host-chang-agency-Switch','host-kick-family-Switch','host-charge-switch','host-kick-agency-Switch','host-can-Play-Switch','host-invite-switch','accept-agent-request-switch','rejected-agent-request-switch','charger-reports','restore-user-account-Switch','delete-user-account-Switch','charge-switch','kick-agency-Switch','kick-family-Switch','invite-switch','can-Play-Switch','user-actions','charge-settings','charge-report-Switch','coin-recharge','add-coins-Switch','app-wallet' ,'gift-VIP-Switch','gift-VIP','choose-bd-Switch','gift-store-Switch','gift-from-the-store', 'accept-agency', 'refuse-agency', 'request-agency-history', 'request-agencies', 'room-actions', 'room-pin-switch', 'close-room-switch', 'updates_group_chat', 'language', 'language-switch'];
+        $targets = ['dashboard', 'delete-agency-Switch','agency-manger-setting', 'deleted-accounts', 'reports', 'change-users-agency-Switch', 'achieved-Target', 'internal-sales-system-report', 'delete-bd-Switch', 'host-agencies-report', 'salary-requests', 'users-Wallet', 'hosts-target', 'host-chang-agency-Switch', 'host-kick-family-Switch', 'host-charge-switch', 'host-kick-agency-Switch', 'host-can-Play-Switch', 'host-invite-switch', 'accept-agent-request-switch', 'rejected-agent-request-switch', 'charger-reports', 'restore-user-account-Switch', 'delete-user-account-Switch', 'charge-switch', 'kick-agency-Switch', 'kick-family-Switch', 'invite-switch', 'can-Play-Switch', 'user-actions', 'charge-settings', 'charge-report-Switch', 'coin-recharge', 'add-coins-Switch', 'app-wallet', 'gift-VIP-Switch', 'gift-VIP', 'choose-bd-Switch', 'gift-store-Switch', 'gift-from-the-store', 'accept-agency', 'refuse-agency', 'request-agency-history', 'request-agencies', 'room-actions', 'room-pin-switch', 'close-room-switch', 'updates_group_chat', 'language', 'language-switch'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -302,7 +309,7 @@ class AdminNewPermission extends Seeder
 
 
         $actions = ['create'];
-        $targets = ['hosts','agencies-join-requests', 'rooms', 'box-use', 'payment-coin'];
+        $targets = ['hosts', 'agencies-join-requests', 'rooms', 'box-use', 'payment-coin'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -312,7 +319,7 @@ class AdminNewPermission extends Seeder
             }
         })->delete();
         $actions = ['show', 'edit'];
-        $targets = ['bans', 'close-room','vip-gift',];
+        $targets = ['bans', 'close-room', 'vip-gift',];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -347,6 +354,17 @@ class AdminNewPermission extends Seeder
 
         $actions = ['show'];
         $targets = ['special-uuid-requests'];
+
+        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
+            foreach ($actions as $action) {
+                foreach ($targets as $target) {
+                    $query->orWhere('slug', 'like', "{$action}-{$target}");
+                }
+            }
+        })->delete();
+
+        $actions = ['browse'];
+        $targets = ['Payment-methods-for-shipping-agencies'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {

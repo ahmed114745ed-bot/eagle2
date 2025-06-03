@@ -349,7 +349,7 @@ class ChargeRepoService
         try {
 
             $agencies = $this->shippingAgencyRepository->filterAgency($request->id);
-            $users = $this->userRepository->filterUser($request->id);
+            $users = $this->userRepository->filterUserNew($request->id);
             $data = [
                 'agency' => GeneralAgencyResource::collection($agencies),
                 'user' => GeneralUserResource::collection($users),
@@ -391,6 +391,7 @@ class ChargeRepoService
             }
 
             DB::commit();
+
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -404,7 +405,6 @@ class ChargeRepoService
         // if ($authAgency->id == $request->id) {
         //     throw new \Exception(__('api.notYourself'));
         // }
-
         $chargeAgency = $this->shippingAgencyRepository->findOrFail($request->id);
         if (!$chargeAgency) throw new \Exception(__('api.notAgencyFound'));
         if (!$chargeAgency->status) throw new \Exception(__('api.notActive'));

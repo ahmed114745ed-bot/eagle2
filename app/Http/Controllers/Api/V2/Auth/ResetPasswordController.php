@@ -26,6 +26,7 @@ class ResetPasswordController extends Controller
         if ($user->phone != $request->phone) return Common::apiResponse (0,'phone number not register with your account',null,404);
 
         $rules = [
+            'type' => ['required', 'boolean'],
             'phone' => [
                 'required',
                 Rule::unique('users', 'phone')->ignore($user->id),
@@ -34,6 +35,10 @@ class ResetPasswordController extends Controller
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return Common::apiResponse(0, 'Validation failed', $validator->errors(), 422);
+        }
+
+        if ($request->type){
+            $user->tokens()->delete();
         }
 
         $whatsappOtpService = new WhatsappOtp();

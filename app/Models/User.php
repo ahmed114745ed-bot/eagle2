@@ -256,6 +256,20 @@ class User extends Authenticatable
 
         return $userSallary?->toArray() ?? [];
     }
+    public function getSallaryInfoByMonth(): array
+    {
+        $month = now()->month;
+        $year  = now()->year;
+
+        $userSallary = UserSallary::query()
+            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
+            ->where('user_id', $this->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+
+        return $userSallary?->toArray() ?? [];
+    }
 
     public function additionalInfo()
     {
@@ -452,6 +466,12 @@ class User extends Authenticatable
     public function liveTime()
     {
         return $this->hasMany(LiveTime::class, 'uid');
+    }
+
+
+    public function UserliveTime()
+    {
+        return $this->hasMany(LiveTime::class);
     }
 
     public function scopeOfAgency($q)
@@ -673,6 +693,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Follow::class, 'user_id', 'id');
     }
+
+    public function isFollowedBy($userId): bool
+    {
+        return $this->followers()
+            ->where('user_id', $userId)
+            ->where('status', 1)
+            ->exists();
+    }
+
     public function followBack(User $user)
     {
         $userId = $user->id;
@@ -1382,6 +1411,10 @@ class User extends Authenticatable
 
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
+        }
+
+        if ($this->is_bd){
+            $userTypes[] = 4;
         }
 
         $userTypes = array_unique($userTypes);

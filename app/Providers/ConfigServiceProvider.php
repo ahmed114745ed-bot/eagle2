@@ -60,7 +60,7 @@ class ConfigServiceProvider extends ServiceProvider
             ];
 
             $collection = Common::getConfFromKey($keys);
-            \Log::info($collection);
+            // \Log::info($collection);
             $values = [];
 
             foreach ($keys as $key) {

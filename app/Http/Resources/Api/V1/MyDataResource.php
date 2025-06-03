@@ -26,6 +26,23 @@ class MyDataResource extends JsonResource
 
         if ($family) {
 
+            $starsImagesFamily = GiftLog::
+            selectRaw("SUM(giftPrice) as exp, receiver_id")
+            ->with(['receiver.profile'])
+            ->whereHas('receiver', function ($query) use ($family) {
+                $query->where('family_id', $family->id)->whereHas('profile');
+            })
+            ->groupBy('receiver_id')
+            ->orderByDesc('exp')
+            ->take(3)
+            ->get()
+            ->map(function ($log) {
+                return optional($log->receiver->profile)->avatar;
+            })
+            ->filter()
+            ->values()
+            ->toArray();
+
             $f = [
                 'owner_id' => $family->user_id,
                 'family_name' => $family->name,
@@ -33,6 +50,8 @@ class MyDataResource extends JsonResource
                 'img' => $family->image,
                 'num_of_members' => $family->members_count,
                 'level' => $family->level,
+                'top_stars' => $starsImagesFamily,
+
             ];
         }
 
@@ -55,7 +74,21 @@ class MyDataResource extends JsonResource
         //         'owner' => $owner,
         //     ];
         // }
+
         if ($agency_joined) {
+
+            $starsImages = GiftLog::where('agency_id', $agency_joined->id)
+                    ->selectRaw("SUM(giftPrice) as exp, receiver_id")
+                    ->with(['receiver.profile']) 
+                    ->whereHas('receiver.profile') 
+                    ->groupBy('receiver_id')
+                    ->orderByDesc('exp')
+                    ->take(3)
+                    ->get()
+                    ->pluck('receiver.profile.avatar') 
+                    ->filter() 
+                    ->values();
+
             $owner = $agency_joined->app_owner_id == $this->id
                 ? new \stdClass()
                 : new MiniUserResource($agency_joined->owner);
@@ -67,6 +100,7 @@ class MyDataResource extends JsonResource
                 'image' => $agency_joined->img,
                 'member_count' => count($agency_joined->mempers),
                 'owner' => $owner,
+                'top_stars' => $starsImages,
             ];
         } else {
             $agency_joined = (object)[];
@@ -135,7 +169,27 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
+        $starsImagesShippingAgency = [];
 
+        if ($this->shippingAgency && $this->shippingAgency->id) {
+            $giftLogs = GiftLog::where('agency_id', $this->shippingAgency->id)
+                ->selectRaw("SUM(giftPrice) as exp, receiver_id")
+                ->with(['receiver.profile'])
+                ->whereHas('receiver.profile')
+                ->groupBy('receiver_id')
+                ->orderByDesc('exp')
+                ->take(3)
+                ->get();
+        
+            $starsImagesShippingAgency = $giftLogs
+                ->map(function ($log) {
+                    return optional($log->receiver->profile)->avatar;
+                })
+                ->filter()
+                ->values()
+                ->toArray(); 
+            
+            }
 
         $data = [
             'id' => @$this->id,
@@ -224,8 +278,10 @@ class MyDataResource extends JsonResource
                 "name" => $this->shippingAgency->name ?? '',
                 "image" => $this->shippingAgency->img ?? '',
                 "complete-transactions" => $this->shippingAgency->charges?->count() ?? 0,
-            ] : null,
+                "top_stars" => $starsImagesShippingAgency ?? (object)[],
 
+            ] : null,
+            
         ];
 
         $data['auth_token'] = $this->auth_token;

@@ -118,7 +118,7 @@ class UserController extends MainController
         $content = $content->title(__($this->title));
 
         // Conditionally add the first row
-        if (Admin::user()->can('browse-' . 'user-actions') || Admin::user()->can('*')) {
+        if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
             $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             });
@@ -139,12 +139,12 @@ class UserController extends MainController
         $stop_invite_code = settings()->get('stop_invite_code');
         $stop_charge = settings()->get('stop_charge');
         $make_rooms_top = settings()->get('make_rooms_top');
-         $make_gift_top = settings()->get('close_open_gifts');
+        $make_gift_top = settings()->get('close_open_gifts');
 
 
         return (new Box(
             title: __('admin.Actions'),
-            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary','make_gift_top'])),
+            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary', 'make_gift_top'])),
         ));
     }
 
@@ -518,31 +518,35 @@ class UserController extends MainController
         //                $rows->toArray()
         //            );
         //        });
-
-        $grid->actions(function ($actions) {
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            if (Admin::user()->can('browse-' . 'charge-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new ChargeSwitchAction());
             }
-            if (Admin::user()->can('browse-' . 'invite-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new InviteSwitchAction());
             }
-            if (Admin::user()->can('browse-' . 'can-Play-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new CanPlaySwitchAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'kick-agency-Switch') || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
             }
-            if ($model->family_id >= 1 && (Admin::user()->can('browse-' . 'kick-family-Switch') || Admin::user()->can('*'))) {
+            if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'chang-agency-Switch') || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
             if ($model->phone = '+201000100010') {
+                $actions->disableDelete();
+            }
+
+            if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
         });
@@ -1036,7 +1040,7 @@ class UserController extends MainController
 
         $pack->delete();
 
-         return Redirect::back();
+        return Redirect::back();
     }
 
     public function free(Request $request)

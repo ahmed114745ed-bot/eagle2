@@ -328,9 +328,12 @@
                 <h3>{{ __('Payment Gateways') }}</h3>
 
                 <div class="table-responsive">
-                    <a  href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
-                        {{ __('Add') }}
-                    </a>
+                  @if (Admin::user()->can('*') || Admin::user()->can('create-Payment-methods-for-shipping-agencies'))
+
+                        <a  href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
+                            {{ __('Add') }}
+                        </a>
+                    @endif 
                     <table class="table" style="background-color: var(--box-background-color) !important;">
                         <thead>
                             <tr>
@@ -349,15 +352,21 @@
                                 </td>
                                 <td>{{ $gateway->title }}</td>
                                 <td>
-                                    <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}"
-                                       class="btn btn-sm btn-primary">
-                                        {{ __('Edit') }}
-                                    </a>
+                                    @if (Admin::user()->can('*') || Admin::user()->can('edit-Payment-methods-for-shipping-agencies'))
+                                        <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}"
+                                        class="btn btn-sm btn-primary">
+                                            {{ __('Edit') }}
+                                        </a>
+                                    @endif
 
-                                        <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}" class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Are you sure?')">
+                                    @if (Admin::user()->can('*') || Admin::user()->can('delete-Payment-methods-for-shipping-agencies'))
+                                        <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Are you sure?')">
                                             {{ __('Delete') }}
                                         </a>
+                                    @endif
+
                                 </td>
                             </tr>
                             @endforeach

@@ -199,7 +199,7 @@ class BoxUseController extends MainController
 
         $grid->disableCreateButton();
         $grid->disableExport();
-
+        $this->extendGrid($grid);
         return $grid;
     }
 
