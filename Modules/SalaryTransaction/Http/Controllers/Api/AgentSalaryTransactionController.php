@@ -99,6 +99,7 @@ class AgentSalaryTransactionController extends Controller
                   });
             
         })->orderByDesc('id')->paginate();
+        dd($data);
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }
 

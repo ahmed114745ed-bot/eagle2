@@ -62,10 +62,15 @@ class Charge extends Model
     }
     public function senderAll()
     {
-        if ($this->charger_type == 'agency') {
-            return $this->belongsTo(ShippingAgency::class, 'charger_id', 'id');
-        }
-        return $this->belongsTo(User::class, 'charger_id', 'id');
+       
+            return $this->belongsTo(
+                $this->charger_type === 'agency'
+                    ? ShippingAgency::class
+                    : User::class,
+                'charger_id',
+                'id'
+            );
+        
     }
 
     public function receiver()
