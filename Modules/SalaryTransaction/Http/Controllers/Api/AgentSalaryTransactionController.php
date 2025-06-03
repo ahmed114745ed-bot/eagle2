@@ -88,12 +88,12 @@ class AgentSalaryTransactionController extends Controller
                     $q2->fitterByUuid($search);
                 });
         })
-            ->when($type == 'received', function ($q) use ($search, $usrAuth) {
-                $q->where('agency_id', $usrAuth->agency_id)
-                    ->whereHas('sender', function ($q2) use ($search) {
-                        $q2->fitterByUuid($search);
-                    });
-            })->orderByDesc('id')->paginate();
+        ->when($type == 'received', function ($q) use ($search, $usrAuth) {
+            $q->where('agency_id', $usrAuth->agency_id)
+              ->whereHas('sender', function ($q2) use ($search) {
+                  $q2->fitterByUuid($search);
+              });
+        })->orderByDesc('id')->paginate();
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }
 
