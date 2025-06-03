@@ -38,19 +38,23 @@ class UserRepository extends AbstractRepository
     }
     public function filterUserNew($userUuId)
     {
-        return $this->model->select([
-            '*',
-            DB::raw("
-                CASE 
-                    WHEN users.uuid LIKE '{$userUuId}%' THEN 100 
-                    WHEN users.uuid LIKE '%{$userUuId}%' THEN 50 
-                    ELSE 0 
-                END AS matching_score
-            ")
-        ])
-        ->where('uuid', 'like', "%$userUuId%")
-        ->orderByDesc('matching_score')
-        ->get();
+    
+            return $this->model->select([
+                '*',
+                DB::raw("
+                    CASE
+                        WHEN uuid = '{$userUuId}' THEN 3
+                        WHEN uuid LIKE '{$userUuId}%' THEN 2
+                        WHEN uuid LIKE '%{$userUuId}%' THEN 1
+                        ELSE 0
+                    END AS matching_score
+                ")
+            ])
+            ->where('uuid', 'like', "%{$userUuId}%")
+            ->orderByDesc('matching_score')
+            ->orderBy('uuid')
+            ->get();
+        
     }
 
     public function searchUserById($userUuId)
