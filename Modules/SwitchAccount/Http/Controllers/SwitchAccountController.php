@@ -96,13 +96,13 @@ class SwitchAccountController extends Controller
         if (empty($deviceToken)) return [];
 
         $accounts = UserAccount::where('device_token', $deviceToken)->get();
-    
+
         $userIds = $accounts->flatMap(function ($account) {
             return [$account->parent_user_id, $account->child_user_id];
-        })->unique()->filter(function ($id,$userId) {
-            return $id !== $userId; 
+        })->unique()->filter(function ($id, $userId) {
+            return $id !== $userId;
         })->values();
-    
+
         return User::whereIn('id', $userIds)->get();
         // if (empty($deviceToken))  return  [];
 
@@ -135,14 +135,14 @@ class SwitchAccountController extends Controller
     {
         $bearerToken = $request->token_new_account;
 
-               if (strpos($bearerToken, '|') !== false) {
-                   [$id, $bearerToken] = explode('|', $bearerToken, 2);
-               }
-               $token = hash('sha256', $bearerToken);
-               
+        if (strpos($bearerToken, '|') !== false) {
+            [$id, $bearerToken] = explode('|', $bearerToken, 2);
+        }
+        $token = hash('sha256', $bearerToken);
+
         $tokenAccount = DB::table('personal_access_tokens')->where('tokenable_type', "App\Models\User")->where('token', $token)->first();
-       // dd($token,$tokenAccount);
-        if (!$tokenAccount) throw new \Exception( 'user token not found');
+        // dd($token,$tokenAccount);
+        if (!$tokenAccount) throw new \Exception('user token not found');
         $otherUser = User::find($tokenAccount->tokenable_id);
         return $otherUser;
     }
@@ -150,8 +150,8 @@ class SwitchAccountController extends Controller
     public function switch_account(Request $request)
     {
         $user = $request->user();
-        if (!$request->key || !$request->token) return Common::apiResponse(0, 'missing params', null, 422);
-
+        if (!$request->key) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!$request->token) return Common::apiResponse(0, 'token not valid', null, 422);
         $user_account = UserAccount::query()->where("key", $request->key)->first();
         if (!$user_account) return Common::apiResponse(0, 'missing params', null, 422);
 
@@ -180,7 +180,7 @@ class SwitchAccountController extends Controller
             hash_equals($token->token, hash('sha256', $plainToken)) &&
             $token->created_at >= Carbon::now()->subDays(14)
         ) {
-            return true; 
+            return true;
         }
 
         return false;
