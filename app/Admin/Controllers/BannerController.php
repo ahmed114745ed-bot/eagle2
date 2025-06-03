@@ -38,7 +38,7 @@ class BannerController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('banners'))
             ->body($this->detail($id)));
     }
@@ -52,11 +52,11 @@ class BannerController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('banners'))
             ->body($this->form()->edit($id)));
     }
-    
+
 
 
     /**
@@ -78,6 +78,7 @@ class BannerController extends MainController
         $grid->column('publish_at', __('Publish at'));
         $grid->column('is_active', __('Is active'))->switch();
         $grid->column('updated_at', __('Updated at'));
+        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -115,7 +116,7 @@ class BannerController extends MainController
     {
 
         $form = new Form(new Banner());
-        
+
         $form->image('image_url', __('Image url'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->required()->dir('banners');
@@ -125,18 +126,18 @@ class BannerController extends MainController
         return $form;
     }
 
-//     public function store()
-//     {
-//          $data = request()->all();
-//         (new BannerServices())->store($data);
-//     }
+    //     public function store()
+    //     {
+    //          $data = request()->all();
+    //         (new BannerServices())->store($data);
+    //     }
 
-//     public function update($id)
-//     {
-//         $data = request()->all();
-// //        dd($data);
-//         (new BannerServices())->update($id, $data);
-//     }
+    //     public function update($id)
+    //     {
+    //         $data = request()->all();
+    // //        dd($data);
+    //         (new BannerServices())->update($id, $data);
+    //     }
 
     public function create(Content $content)
     {

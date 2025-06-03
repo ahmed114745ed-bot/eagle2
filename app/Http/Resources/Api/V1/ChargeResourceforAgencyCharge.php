@@ -18,7 +18,7 @@ class ChargeResourceforAgencyCharge extends JsonResource
     public function toArray($request)
     {
         $sender = $this->sender;
-        $receiver = $this->receiver ?? $this->shippingAgency ;
+        $receiver = $this->receiver ? $this->shippingAgency : [] ;
         if ($this->charger_type == 'dash' && $this->user_type == 'dash') {
             $sender_data = [
                 'id'  => $this->admin?->id ?: 0,

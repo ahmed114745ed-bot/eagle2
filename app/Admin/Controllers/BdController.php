@@ -223,6 +223,7 @@ class BdController extends MainController
                 $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
             });
         }
+        $this->extendGrid($grid);
         return $grid;
     }
 

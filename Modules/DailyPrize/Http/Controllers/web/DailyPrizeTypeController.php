@@ -37,7 +37,7 @@ class DailyPrizeTypeController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('daily prize'))
             ->body($this->detail($id)));
     }
@@ -51,7 +51,7 @@ class DailyPrizeTypeController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('daily prize'))
             ->body($this->form()->edit($id)));
     }
@@ -73,24 +73,24 @@ class DailyPrizeTypeController extends MainController
 
         // $grid->column('type', __('Type'));
         $grid->column('type', __('Type'))
-        ->display(function ($type) {
-            $weeks = [
-                1 => __('first_week'),
-                2 => __('second_week'),
-                3 => __('third_week'),
-                4 => __('fourth_week'),
-            ];
-            return $weeks[$type] ?? $type; // عرض النص بدلاً من الرقم
-        });
+            ->display(function ($type) {
+                $weeks = [
+                    1 => __('first_week'),
+                    2 => __('second_week'),
+                    3 => __('third_week'),
+                    4 => __('fourth_week'),
+                ];
+                return $weeks[$type] ?? $type; // عرض النص بدلاً من الرقم
+            });
 
         if (Admin::user()->can('browse-' . 'daily-gift-types') || Admin::user()->can('*')) {
-            $grid->column( __('procedures'))->display(function () {
-                $url1 = url('admin/daily-gifts/'.$this->type);
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('create')."</a>";
+            $grid->column(__('procedures'))->display(function () {
+                $url1 = url('admin/daily-gifts/' . $this->type);
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('create') . "</a>";
                 return $button1;
             });
         }
-
+        $this->extendGrid($grid);
         return $grid;
     }
 

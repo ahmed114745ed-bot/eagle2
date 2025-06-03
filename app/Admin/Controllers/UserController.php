@@ -545,6 +545,10 @@ class UserController extends MainController
             if ($model->phone = '+201000100010') {
                 $actions->disableDelete();
             }
+
+            if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
+                $actions->disableDelete();
+            }
         });
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();

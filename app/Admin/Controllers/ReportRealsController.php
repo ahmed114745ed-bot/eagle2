@@ -30,75 +30,75 @@ class ReportRealsController extends MainController
      * @return Grid
      */
 
-     public function index(Content $content)
-     {
+    public function index(Content $content)
+    {
         return parent::index($content
-        ->title(trans('Report Reel'))
-        ->body($this->grid()));
-     }
+            ->title(trans('Report Reel'))
+            ->body($this->grid()));
+    }
 
 
-     protected function grid()
-{
-    $grid = new Grid(new ReportReals());
-    $grid->model()->whereHas('reel')->orderByDesc('id');
+    protected function grid()
+    {
+        $grid = new Grid(new ReportReals());
+        $grid->model()->whereHas('reel')->orderByDesc('id');
 
-    $grid->column('id', __('ID'));
+        $grid->column('id', __('ID'));
 
-    $grid->column('reporter.name', __('Reporter'))->display(function () {
-        $reporter = $this->reporter;
-        if (!$reporter) return '-';
+        $grid->column('reporter.name', __('Reporter'))->display(function () {
+            $reporter = $this->reporter;
+            if (!$reporter) return '-';
 
-        $name = $reporter->name;
-        $uuid = $reporter->uuid;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $avatarPath = @$reporter->avatar;
-        $avatar = getImagePath($avatarPath) ?? $defaultImage;
+            $name = $reporter->name;
+            $uuid = $reporter->uuid;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $avatarPath = @$reporter->avatar;
+            $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-        $userUrl = admin_url('users/' . $reporter->id);
+            $userUrl = admin_url('users/' . $reporter->id);
 
-        return "<div style='display: flex; align-items: center; gap: 10px;'>
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
                 <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                 <div>
                     <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
                     <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
                 </div>
             </div>";
-    });
+        });
 
-    $grid->column('reportedUser.name', __('Reported User'))->display(function () {
-        $reportedUser = $this->reportedUser;
-        if (!$reportedUser) return '-';
+        $grid->column('reportedUser.name', __('Reported User'))->display(function () {
+            $reportedUser = $this->reportedUser;
+            if (!$reportedUser) return '-';
 
-        $name = $reportedUser->name;
-        $uuid = $reportedUser->uuid;
+            $name = $reportedUser->name;
+            $uuid = $reportedUser->uuid;
 
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $avatarPath = @$reportedUser->avatar;
-        $avatar = getImagePath($avatarPath) ?? $defaultImage;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $avatarPath = @$reportedUser->avatar;
+            $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
 
-        $userUrl = admin_url('users/' . $reportedUser->id);
+            $userUrl = admin_url('users/' . $reportedUser->id);
 
-        return "<div style='display: flex; align-items: center; gap: 10px;'>
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
                 <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                 <div>
                     <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
                     <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
                 </div>
             </div>";
-    });
+        });
 
-    $grid->column('description', __('Description'))->display(function ($description) {
-        $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-        return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-    });
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+        });
 
-    Admin::script("
+        Admin::script("
     $(document).ready(function () {
         $('.view-description').click(function (e) {
             e.preventDefault();
@@ -120,54 +120,59 @@ class ReportRealsController extends MainController
     }); ");
 
 
-    if (Admin::user()->can('delete-' . 'Real') || Admin::user()->can('*')) {
-        $grid->column(__('redirect_button'))->display(function () {
-            $redirectRoute = 'delete-reel';
-            return '<a href="'.route($redirectRoute, ['real_id' => $this->real_id, 'id' => $this->id]).'" class="btn btn-xs btn-danger">'.__('admin.delete_video').'</a>';
+        if (Admin::user()->can('delete-' . 'Real') || Admin::user()->can('*')) {
+            $grid->column(__('redirect_button'))->display(function () {
+                $redirectRoute = 'delete-reel';
+                return '<a href="' . route($redirectRoute, ['real_id' => $this->real_id, 'id' => $this->id]) . '" class="btn btn-xs btn-danger">' . __('admin.delete_video') . '</a>';
+            });
+        }
+
+        $grid->column('real_id', __('View Reel'))->modal('Video Preview', function ($model) {
+            return self::getRoomsShow($model->reel);
         });
+
+        $grid->disableCreateButton();
+        $grid->disableExport();
+        $permission_name = $this->permission_name;
+
+        $grid->actions(function ($actions)  use ($permission_name) {
+            $actions->disableEdit();
+            if (! Admin::user()->can('delete-' . $permission_name) || !Admin::user()->can('*')) {
+                $actions->disableDelete();
+            }
+        });
+
+        return $grid;
     }
 
-    $grid->column('real_id', __('View Reel'))->modal('Video Preview', function ($model) {
-        return self::getRoomsShow($model->reel);
-    });
+    public static function getRoomsShow(Real $reel)
+    {
+        $show = new Show($reel);
 
-    $grid->disableCreateButton();
-    $grid->disableExport();
-    $grid->actions(function ($actions) {
-        $actions->disableEdit();
-    });
-
-    return $grid;
-}
-
-public static function getRoomsShow(Real $reel)
-{
-    $show = new Show($reel);
-
-    $show->field('url', __('Video'))->unescape()->as(function ($path) {
-        $url = getImagePath($path);
-        return "<video width='100%' controls>
+        $show->field('url', __('Video'))->unescape()->as(function ($path) {
+            $url = getImagePath($path);
+            return "<video width='100%' controls>
                     <source src='$url' type='video/mp4'>
                     Your browser does not support the video tag.
                 </video>";
-    });
+        });
 
 
 
-    $show->panel()->tools(function ($tools) {
-        $tools->disableEdit();
-        $tools->disableList();
-        $tools->disableDelete();
-    });
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableList();
+            $tools->disableDelete();
+        });
 
-    Admin::script("
+        Admin::script("
         if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
         }
     ");
 
-    return $show;
-}
+        return $show;
+    }
 
 
 
