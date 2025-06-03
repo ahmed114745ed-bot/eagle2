@@ -62,8 +62,12 @@ class Charge extends Model
     }
 
     public function receiver()
-    {
-        return $this->hasOne(User::class, 'id', 'user_id');
+    { 
+        if ($this->user_type == 'agency') {
+            return $this->belongsTo(ShippingAgency::class, 'agency_id', 'id');
+        }
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    
     }
 
     public function admin()
