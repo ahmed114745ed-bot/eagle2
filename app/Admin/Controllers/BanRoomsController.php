@@ -188,13 +188,13 @@ class BanRoomsController extends MainController
 
         $grid->disableExport();
         $grid->disableRowSelector();
-        // $grid->disableActions();
+         $grid->disableActions();
         $grid->disableCreateButton();
-        $grid->actions(function ($actions) {
-            $actions->disableEdit();
-            $actions->disableView();
-            // $actions->add(new DedicateAction());
-        });
+        // $grid->actions(function ($actions) {
+        //     $actions->disableEdit();
+        //     $actions->disableView();
+        //     // $actions->add(new DedicateAction());
+        // });
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
