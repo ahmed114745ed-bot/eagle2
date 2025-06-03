@@ -3,6 +3,7 @@
 use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\PaytabsController;
 use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
@@ -216,7 +217,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('black-list', [RoomController::class, 'blackList']);
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
                 Route::post('add-block', [RoomController::class, 'addBlock']);
-                Route::patch('{Room}/comment_status', [RoomController::class, 'commentStatus']);
+                Route::post('{Room}/comment_status', [RoomController::class, 'commentStatus']);
                 Route::post('/yellow-banner', [RoomController::class, 'sendComment']);
 
                 //Pk
@@ -509,8 +510,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
-                Route::post('remove-admin', [AgencyController::class, 'remove_admin']);
-                Route::get('old-agencies/{userid}', [AgencyController::class, 'gitOldAgencies']);
+                Route::get('old-agencies', [AgencyController::class, 'gitOldAgencies']);
 
                 
             });
@@ -565,6 +565,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::get('app_feature', [AppFeatureController::class, 'show']);
+
+
+            Route::group(['prefix' => 'paytabs', 'as' => 'paytabs.'], function () {
+                Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');
+                // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
+                Route::any('response', [PaytabsController::class, 'response'])->name('response');
+            });
+
+
         }
     );
 
@@ -575,4 +584,8 @@ Route::get('/languages', [LanguageController::class, 'index']);
         return response()->json(['html' => $Page]);
     });
 });
+
+Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
+Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
+
 

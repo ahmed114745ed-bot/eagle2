@@ -124,32 +124,46 @@ class OvipGiftTapController extends MainController
 
         $grid->title(__('title'));
         $grid->expire(__('expire'));
+        if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('delete-' . $this->permission_name)) {
+            $grid->column('actions', __('Actions'))->display(function () use ($type) {
+                $id = $this->id;
 
+                $editUrl = url("admin/ware-gifts/{$id}/edit");
+                $deleteUrl = url("admin/ware-gifts/{$id}");
+                $csrf = csrf_token();
 
-        $grid->column('actions', __('Actions'))->display(function () use ($type) {
-            $id = $this->id;
+                $editText = __('admin.edit');
+                $deleteText = __('admin.delete');
+                $confirmText = __('Are you sure?');
 
-            $editUrl = url("admin/ware-gifts/{$id}/edit");
-            $deleteUrl = url("admin/ware-gifts/{$id}");
-            $csrf = csrf_token();
+                $editBtn = '';
+                $deleteBtn = '';
 
-            $editText = __('admin.edit');
-            $deleteText = __('admin.delete');
-            $confirmText = __('Are you sure?');
+                // Check permission for EDIT button
+                if (\Admin::user()->can('edit-' . $this->permission_name) || \Admin::user()->can('*')) {
+                    $editBtn = <<<HTML
+            <a href="{$editUrl}" class="btn btn-xs btn-primary" style="margin-right: 5px">
+                <i class="fa fa-edit"></i> {$editText}
+            </a>
+        HTML;
+                }
 
-            return <<<HTML
-                <a href="{$editUrl}" class="btn btn-xs btn-primary" style="margin-right: 5px">
-                    <i class="fa fa-edit"></i> {$editText}
-                </a>
-                <form action="{$deleteUrl}" method="POST" style="display:inline-block;" onsubmit="return confirm('{$confirmText}')">
-                    <input type="hidden" name="_token" value="{$csrf}">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="btn btn-xs btn-danger">
-                        <i class="fa fa-trash"></i> {$deleteText}
-                    </button>
-                </form>
-            HTML;
-        })->style('min-width:120px')->setAttributes(['style' => 'text-align:center']);
+                // Check permission for DELETE button
+                if (\Admin::user()->can('delete-' . $this->permission_name) || \Admin::user()->can('*')) {
+                    $deleteBtn = <<<HTML
+            <form action="{$deleteUrl}" method="POST" style="display:inline-block;" onsubmit="return confirm('{$confirmText}')">
+                <input type="hidden" name="_token" value="{$csrf}">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="btn btn-xs btn-danger">
+                    <i class="fa fa-trash"></i> {$deleteText}
+                </button>
+            </form>
+        HTML;
+                }
+
+                return $editBtn . $deleteBtn;
+            })->style('min-width:120px')->setAttributes(['style' => 'text-align:center']);
+        }
 
         $grid->disableActions();
         $grid->actions(function ($actions) {
@@ -160,7 +174,8 @@ class OvipGiftTapController extends MainController
         $grid->disableCreateButton();
         $this->extendGrid($grid);
         $grid->disableExport();
-        if ($firstType) {
+        if ($firstType && (Admin::user()->can('create-' . $this->permission_name) || Admin::user()->can('*') )) {
+
 
             $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
                 $level = $level ?? request('level');
@@ -251,8 +266,8 @@ class OvipGiftTapController extends MainController
         //
         //            ]
         //        )->attribute(['id' => 'profile_frame'])->required();
- $form->keyValue('key_json', 'key_json');
-        if ($form->isEditing()){
+        $form->keyValue('key_json', 'key_json');
+        if ($form->isEditing()) {
             $form->select('image_type1', __('image_type'))->options(
                 [
                     'svga' => __('svga'),

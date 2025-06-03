@@ -426,11 +426,11 @@ class AgencyController extends Controller
             $model = $actions->row;
             // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
-            if (Admin::user()->can('browse-' . 'delete-agency-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('delete-switch-' . $this->permission_name) || Admin::user()->can('*')) {
 
                 $actions->add(new DeleteAgencyAction());
             }
-            if (Admin::user()->can('browse-' . 'change-users-agency-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('change-users-agency-Switch-' . $this->permission_name) || Admin::user()->can('*')) {
 
                 $actions->add(new ChangeUsersAgencyAction($model->id));
             }

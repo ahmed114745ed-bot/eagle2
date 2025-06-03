@@ -445,7 +445,7 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@infoBox')->name('home');
             $router->resource('/users', UserController::class);
-            
+
             // $router->get('/users/{id}/edit', 'UserController@edit');
             // $router->get('/users/{id}', 'UserController@show');
             $router->get('/userTarget', 'UserTargetController@index')->name('userTarget');
@@ -519,7 +519,7 @@ Route::group(
 
         $router->resource('banners', BannerController::class);
         $router->resource('languages', LanguageController::class);
-        $router->resource('settings', SettingController::class);
+        $router->resource('settings', SettingController::class)->except(['update']);
         $router->resource('room-settings', RoomSettingsController::class);
         $router->resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
@@ -539,10 +539,12 @@ Route::group(
         });
 
         $router->resource('user-charges', UsersChargeController::class);
-        // $router->resource('user-charges-report/{id}', UserChargeReportController::class);
+//         $router->resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
+         $router->group(['prefix' => 'user-charges-report'], function (){
+             Route::get('/{id}', [UserChargeReportController::class, 'index']);
+         });
 
-        
-        
+
 
 
     }

@@ -1686,11 +1686,19 @@ class RoomController extends Controller
         }
     }
 
-    public function commentStatus($roomId): JsonResponse
+    public function commentStatus($roomId, Request $request): JsonResponse
     {
-        $result = $this->roomService->commentStatus($roomId);
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|boolean',
+        ]);
 
-        $message = ($result == 1) ? 'comment_opened' : 'comment_closed';
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        $result = $this->roomService->commentStatus($roomId, $request);
+
+        $message = ($result == 1) ? 'comment_closed' : 'comment_opened';
 
         return Common::apiResponse(true, "messages.$message", [], 200);
     }
@@ -1828,7 +1836,7 @@ class RoomController extends Controller
 
         if (!$room) return;
         if ($result) {
-          
+
             (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
         }
     }

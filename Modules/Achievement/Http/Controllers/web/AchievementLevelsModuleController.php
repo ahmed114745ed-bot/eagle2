@@ -30,11 +30,9 @@ class AchievementLevelsModuleController extends Controller
         $gift = request('gift_achievement_id');
 
         $adminId = Auth::user()->id;
-       
 
         $achievementLevel = AchievementLevel::find($achievementLevel_id);
         if ($achievementLevel_id == null && $request->hasFile('custom_image')) {
-            dd( $adminId,11);
             $customImage = Common::upload('custom_image', $request->file('custom_image'));
             $attributes = [
                 'user_id'       => $userId,
@@ -50,7 +48,6 @@ class AchievementLevelsModuleController extends Controller
                 'type' => 'user',
             ]);
         } elseif ($achievementLevel_id == null && $request->hasFile('custom_file')) {
-            dd( $adminId,22);
             $custom_file = Common::upload('custom_file', $request->file('custom_file'));
             $attributes = [
                 'user_id'       => $userId,
@@ -66,7 +63,6 @@ class AchievementLevelsModuleController extends Controller
                 'type' => 'user',
             ]);
         } elseif ($achievementLevel_id == null && request('custom_image')) {
-         //   dd( $adminId,33);
             $customImagepath = request('custom_image');
             $attributes = [
                 'user_id'       => $userId,

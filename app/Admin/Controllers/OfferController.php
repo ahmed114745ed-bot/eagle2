@@ -35,7 +35,7 @@ class OfferController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('offers'))
             ->body($this->detail($id)));
     }
@@ -49,7 +49,7 @@ class OfferController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('offers'))
             ->body($this->form()->edit($id)));
     }
@@ -80,6 +80,7 @@ class OfferController extends MainController
             $grid->column('title_en', __('title'));
             $grid->column('body_en', __('body'));
         }
+        $this->extendGrid($grid);
         return $grid;
     }
 

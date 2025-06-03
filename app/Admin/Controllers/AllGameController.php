@@ -131,6 +131,7 @@ class AllGameController extends MainController
         $grid->column('url', __('Full Url'));
         $grid->column('mini_url', __('Mini Url'));
         $grid->column('image', __('Image'))->image('', 50);
+        $this->extendGrid($grid);
         return $grid;
     }
 

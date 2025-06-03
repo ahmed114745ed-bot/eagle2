@@ -150,10 +150,10 @@ class AgentRequestController extends MainController
         $grid->actions(function ($actions) {
             $actions->disableEdit();
             $actions->disableDelete();
-            if (Admin::user()->can('browse-' . 'accept-agent-request-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('accept-request-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $actions->add(new AcceptAgentRequestAction());
             }
-            if (Admin::user()->can('browse-' . 'rejected-agent-request-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('rejected-request-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $actions->add(new RejectedAgentRequestAction());
             }
         });

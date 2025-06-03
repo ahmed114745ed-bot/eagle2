@@ -32,7 +32,6 @@ class UpgradeReceiverLevelServices
     }
     public function earnedDiamond($userId,$diamond,$actionType,$config,$type=null)
     {
-        Log::info("goooooooooooooooood");
         $diamonds = $diamond ==null? $config:$diamond;
         EarnedDiamond::create([
             'action_mode' =>$actionType,
