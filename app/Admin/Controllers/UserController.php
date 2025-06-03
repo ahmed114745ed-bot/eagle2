@@ -807,7 +807,7 @@ class UserController extends MainController
     public function show($id, Content $content)
     {
         $user = User::with('profile')->find($id);
-        $packs = Pack::where('user_id', $id)->with(['ware' => function ($q) {
+        $packs = Pack::where('user_id', $id)->where('is_used', 1)->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)

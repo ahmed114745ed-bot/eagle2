@@ -35,6 +35,7 @@ class UpdateSendCharismaToZigo implements ShouldQueue
     {
 
         $room = Room::where(['uid' => $this->roomId])->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')->first();
+        \Log::info(get_class($this) . ' - This is room id : ' .$room->id);
         $data =
             (new UserCharismaService())->addTotalEarnedCoinsInUserRoom($room, $this->userIds, $this->earnedCoinsPerUser);
         $ms = [
@@ -45,7 +46,7 @@ class UpdateSendCharismaToZigo implements ShouldQueue
         ];
         $json = json_encode ($ms);
 
-        Common::sendToZego('SendCustomCommand', $this->room->id, $this->userId, $json);
+        Common::sendToZego('SendCustomCommand', $room->id, $this->userId, $json);
 
     }
 }
