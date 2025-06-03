@@ -1412,6 +1412,10 @@ class User extends Authenticatable
             $userTypes[] = 3;
         }
 
+        if ($this->is_bd){
+            $userTypes[] = 4;
+        }
+
         $userTypes = array_unique($userTypes);
 
         return empty($userTypes) ? [0] : $userTypes;
