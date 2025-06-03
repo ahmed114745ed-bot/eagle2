@@ -150,7 +150,7 @@ class SwitchAccountController extends Controller
     public function switch_account(Request $request)
     {
         $user = $request->user();
-        if (!$request->key) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!$request->key || !$request->token) return Common::apiResponse(0, 'missing params', null, 422);
 
         $user_account = UserAccount::query()->where("key", $request->key)->first();
         if (!$user_account) return Common::apiResponse(0, 'missing params', null, 422);
