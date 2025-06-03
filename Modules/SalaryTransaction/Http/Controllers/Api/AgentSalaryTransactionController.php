@@ -93,7 +93,7 @@ class AgentSalaryTransactionController extends Controller
             //   ->whereHas('senderAll', function ($q2) use ($search) {
             //       $q2->fitterByUuid($search);
             //   });
-                $q->where('agency_id', $agency->id)
+                $q->where('agency_id', $agency->id);
         })->orderByDesc('id')->paginate();
         dd($data);
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
