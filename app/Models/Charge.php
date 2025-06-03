@@ -60,19 +60,23 @@ class Charge extends Model
         }
         return $this->hasOne(User::class, 'id', 'charger_id');
     }
-    public function senderAll()
+ 
+    public function getReceiverAttribute()
     {
-       
-            return $this->belongsTo(
-                $this->charger_type === 'agency'
-                    ? ShippingAgency::class
-                    : User::class,
-                'charger_id',
-                'id'
-            );
-        
+        if ($this->user_type === 'agency') {
+            return ShippingAgency::find($this->agency_id);
+        }
+    
+        return User::find($this->user_id);
     }
+    public function getSenderAllAttribute()
+    {
+        if ($this->charger_type === 'agency') {
+            return ShippingAgency::find($this->charger_id);
+        }
 
+        return User::find($this->charger_id);
+    }
     public function receiver()
     { 
         if ($this->user_type == 'agency') {

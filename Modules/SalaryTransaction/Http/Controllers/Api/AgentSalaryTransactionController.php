@@ -89,13 +89,57 @@ class AgentSalaryTransactionController extends Controller
                 });
         })
         ->when($type == 'received', function ($q) use ($search, $agency) {
-            // $q->where('agency_id', $agency->id)
-            //   ->whereHas('senderAll', function ($q2) use ($search) {
-            //       $q2->fitterByUuid($search);
-            //   });
-                $q->where('agency_id', $agency->id);
+            $q->where('agency_id', $agency->id)
+              ->whereHas('senderAll', function ($q2) use ($search) {
+                  $q2->fitterByUuid($search);
+              });
         })->orderByDesc('id')->paginate();
-        dd($data);
+        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
+    }
+
+    public function chargeCoForUserHistoryNew(Request $request)
+    {
+        $usrAuth = $request->user();
+        $agency = $usrAuth->shippingAgency;
+        $search = $request->search;
+        $type = $request->type;
+
+        if (!$agency) {
+            return Common::apiResponse(0, __("api_responses.agency"));
+        }
+
+        $query = Charge::where('is_used_transferred', false)
+            ->where('charger_type', 'agency')
+            ->where('charger_id', $agency->id);
+
+        if ($type === 'sent') {
+            $query->where('charger_id', $agency->id)->where('charger_type', 'agency');
+        } elseif ($type === 'received') {
+            $query->where(function ($q) use ($agency) {
+                $q->where('agency_id', $agency->id)->where('user_type', 'agency')
+                ->orWhere(function ($q2) use ($agency) {
+                    $q2->where('user_id', $agency->user_id)->where('user_type', 'user');
+                });
+            });
+        }
+
+        $results = $query->orderByDesc('id')->get();
+
+        // فلترة بالبحث (بشكل يدوي بعد الاستعلام)
+        if ($search) {
+            $results = $results->filter(function ($item) use ($search, $type) {
+                if ($type === 'sent') {
+                    return $item->receiver && str_contains($item->receiver->uuid, $search);
+                } elseif ($type === 'received') {
+                    return $item->senderAll && str_contains($item->senderAll->uuid, $search);
+                }
+                return true;
+            })->values();
+        }
+
+        // تحويل إلى Collection جاهزة للـ Resource
+        $data = collect($results)->paginate(15); // أو استخدم LengthAwarePaginator لو أردت تقسيماً أدق
+
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }
 
