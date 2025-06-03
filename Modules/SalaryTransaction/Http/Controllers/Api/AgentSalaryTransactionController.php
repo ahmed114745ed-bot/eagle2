@@ -77,7 +77,7 @@ class AgentSalaryTransactionController extends Controller
         if (!$agency) {
             return Common::apiResponse(0, __("api_responses.agency"));
         }
-dd($agency->id);
+
         $data = Charge::with('receiver', 'sender')->where('is_used_transferred', false)
                         ->where("charger_type", 'agency')
                         ->where("charger_id", $agency->id);
