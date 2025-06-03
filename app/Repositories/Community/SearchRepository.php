@@ -27,7 +27,7 @@ class SearchRepository implements SearchRepositoryInterface
 
     public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|array
     {
-        $user = User::where('uuid', $keywords)->first();
+        $user = User::searchByUuid($keywords)->first();
 
         if (!$user) {
             return [];
