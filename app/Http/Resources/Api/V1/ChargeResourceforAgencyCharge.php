@@ -17,43 +17,44 @@ class ChargeResourceforAgencyCharge extends JsonResource
      */
     public function toArray($request)
     {
-        $sender = $this->senderAll;
-    $receiver = $this->receiver;
+        $sender = $this->sender;
+        $receiver = $this->receiver ?? $this->shippingAgency  ;
+        if ($this->charger_type == 'dash' && $this->user_type == 'dash') {
+            $sender_data = [
+                'id'  => $this->admin?->id ?: 0,
+                'uuid' =>  '',
+                'name' => $this->admin?->name ?: "",
+                'img' => $this->admin?->avatar ?? "",
+                'type' => $this->user_type
+            ];
+        } else {
+            $sender_data   = [
+                'id'  => @$sender->id ?: 0,
+                'uuid' => @$sender->uuid ?: '',
+                'name' => @$sender->name ?: "",
+                'img' => @$sender->profile?->avatar ?? "",
+                'type' => @$this->charger_type
+            ];
+        }
 
-    if ($this->charger_type === 'dash' && $this->user_type === 'dash') {
-        $sender_data = [
-            'id' => $this->admin?->id ?? 0,
-            'uuid' => '',
-            'name' => $this->admin?->name ?? '',
-            'img' => $this->admin?->avatar ?? '',
-            'type' => 'dash'
+        $receiver_data = [
+            'id'  => $receiver?->id ?: 0,
+            'uuid' => @$receiver?->uuid ?: '',
+            'name' => $receiver?->name ?: "",
+            'img' => $receiver?->profile?->avatar ?? "",
+            'type' => $this->user_type
         ];
-    } else {
-        $sender_data = [
-            'id' => $sender?->id ?? 0,
-            'uuid' => $sender?->uuid ?? '',
-            'name' => $sender?->name ?? '',
-            'img' => $sender?->profile?->avatar ?? '',
-            'type' => $this->charger_type
+
+
+
+        return [
+            'id'   => $this->id ?: 0,
+            'sender' => $sender_data,
+            'receiver' => $receiver_data,
+            'value' => (int) $this->amount,
+            'time' => ($this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d h:i:s A') : null),
+            'coins' =>  (int)$this->amount ?? 0,
+            'usd' => $this->usd ?? 0,
         ];
-    }
-
-    $receiver_data = [
-        'id' => $receiver?->id ?? 0,
-        'uuid' => $receiver?->uuid ?? '',
-        'name' => $receiver?->name ?? '',
-        'img' => $receiver?->profile?->avatar ?? '',
-        'type' => $this->user_type
-    ];
-
-    return [
-        'id' => $this->id ?? 0,
-        'sender' => $sender_data,
-        'receiver' => $receiver_data,
-        'value' => (int) $this->amount,
-        'time' => optional($this->created_at)->format('Y-m-d h:i:s A'),
-        'coins' => (int) $this->amount,
-        'usd' => $this->usd ?? 0,
-    ];
     }
 }
