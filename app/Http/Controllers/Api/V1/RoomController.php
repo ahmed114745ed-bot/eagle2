@@ -1698,7 +1698,7 @@ class RoomController extends Controller
 
         $result = $this->roomService->commentStatus($roomId, $request);
 
-        $message = ($result == 1) ? 'comment_opened' : 'comment_closed';
+        $message = ($result == 1) ? 'comment_closed' : 'comment_opened';
 
         return Common::apiResponse(true, "messages.$message", [], 200);
     }
