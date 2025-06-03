@@ -61,7 +61,7 @@ class Charge extends Model
         return $this->hasOne(User::class, 'id', 'charger_id');
     }
  
-    public function getReceiverAttribute()
+    public function getReceiverAllAttribute()
     {
         if ($this->user_type === 'agency') {
             return ShippingAgency::find($this->agency_id);
