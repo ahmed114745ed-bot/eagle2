@@ -120,16 +120,18 @@ class VipService
         $user = $request->user();
 
         $isUsed = (bool)$request->type;
+       
         if ($isUsed) $this->userVipRepository->updateIsUsedForUser($user->id);
 
         // update is used
         $this->userVipRepository->updateIsUsedWithNum($user_vip, $isUsed);
+        $user_vip = $this->userVipRepository->findByIdWithOVip($request->vip_id);
 
         $vip = $user_vip->OVip;
-        if ($user_vip->num_used <= 1) {
+       // if ($user_vip->num_used <= 1) {
             // add vip data to user
-            Common::handelVip($vip, $user);
-        }
+            Common::handelVip($vip, $user, null, $user_vip);
+       // }
         return  $data['target_id'] = $user_vip->id;
     }
 
@@ -335,7 +337,7 @@ class VipService
 
             $data = $this->userVipRepository->create($data);
             // }
-            Common::handelVip($vip, $user);
+            Common::handelVip($vip, $user ,null,$data);
             DB::commit();
             $ex = Carbon::parse($ex)->diffInDays(now());
             CustomNotification::vips($user, $ex, $vip->img);
@@ -384,28 +386,27 @@ class VipService
         //     return $oVip;
         // });
 
-    $userVips = $this->userVipRepository->getAllByUserId($userId);
-    $vipPrivileges = $this->vipPrivilegeRepository->all();
+        $userVips = $this->userVipRepository->getAllByUserId($userId);
+        $vipPrivileges = $this->vipPrivilegeRepository->all();
 
-    $oVips = $userVips->pluck('OVip')->filter();
+        $oVips = $userVips->pluck('OVip')->filter();
 
-    $wares = $this->wareRepository->getOVip(
-        $oVips->pluck('level')->unique(),
-        $vipPrivileges->pluck('type')->unique()
-    );
+        $wares = $this->wareRepository->getOVip(
+            $oVips->pluck('level')->unique(),
+            $vipPrivileges->pluck('type')->unique()
+        );
 
-    $userVips->each(function ($userVip) use ($wares) {
-        $oVip = $userVip->OVip;
-        if ($oVip) {
-            $filteredWares = $wares->where('level', $oVip->level);
-            $oVip->setRelation('wares', $filteredWares);
-        }
-    });
+        $userVips->each(function ($userVip) use ($wares) {
+            $oVip = $userVip->OVip;
+            if ($oVip) {
+                $filteredWares = $wares->where('level', $oVip->level);
+                $oVip->setRelation('wares', $filteredWares);
+            }
+        });
 
-    return [
-        'all_privileges' => $vipPrivileges,
-        'o_vips' => $userVips,
-    ];
-
+        return [
+            'all_privileges' => $vipPrivileges,
+            'o_vips' => $userVips,
+        ];
     }
 }
