@@ -97,44 +97,7 @@ class AgentSalaryTransactionController extends Controller
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }
 
-    public function chargeCoForUserHistoryNew(Request $request)
-    {
-        $usrAuth = $request->user();
-        $agency = $usrAuth->shippingAgency;
-        $search = $request->search;
-        $type = $request->type;
-    
-        if (!$agency) {
-            return Common::apiResponse(0, __("api_responses.agency"));
-        }
-    
-        $data = Charge::with('receiverAll', 'senderAll')
-            ->where('is_used_transferred', false);
-    
-        if ($type == 'sent') {
-            $data->where('charger_type', 'agency')
-                ->where('charger_id', $agency->id)
-                ->when($search, function ($q) use ($search) {
-                    $q->whereHas('receiver', function ($q2) use ($search) {
-                        $q2->where('uuid', 'like', "%{$search}%")
-                           ->orWhere('name', 'like', "%{$search}%");
-                    });
-                });
-        } elseif ($type == 'received') {
-            $data->where('agency_id', $agency->id)
-                ->when($search, function ($q) use ($search) {
-                    $q->whereHas('senderAll', function ($q2) use ($search) {
-                        $q2->where('uuid', 'like', "%{$search}%")
-                           ->orWhere('name', 'like', "%{$search}%");
-                    });
-                });
-        }
-    
-        $data = $data->orderByDesc('id')->paginate(15);
-    
-        dd($data);
-        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
-    }
+ 
 
     public function send_money_for_the_host(Request $request)
     {
