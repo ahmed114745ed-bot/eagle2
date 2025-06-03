@@ -266,6 +266,8 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+
+        \Log::info(get_class($this) . ' - This is body ' . json_encode($request->all()));
         $close_open_gifts = settings()->get('close_open_gifts');
         if ($close_open_gifts == 1) {
             return Common::apiResponse(0, 'some thing wrong');
