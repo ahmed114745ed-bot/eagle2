@@ -17,9 +17,9 @@ class RecevingReportResource extends JsonResource
             $image = $this->admin->avatar ?? '';
             $uuid = $this->sender->uuid ?? '';
         } elseif($this->charger_type == 'agency') {
-            $name = $this->sender->name ?? '';
-            $image = $this->sender->img ?? '';
-            $uuid = $this->sender->id ?? '';
+            $name = $this->senderAll->name ?? '';
+            $image = $this->senderAll->img ?? '';
+            $uuid = $this->senderAll->id ?? '';
         } else {
             $name = $this->sender->name ?? '';
             $image = $this->sender->profile->avatar ?? '';
