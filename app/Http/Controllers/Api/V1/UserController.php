@@ -124,7 +124,7 @@ class UserController extends Controller
         if (! $user) return Common::apiResponse(false, 'user not found', 400);
         $dr = '';
         $pack = self::checkPack($user->id, 6, $user->dress_3);
-        $pack->where('is_used', 1)->exists();
+        $pack = $pack->exists();
 
         if (!$pack) return Common::apiResponse(false, 'active product not found', 400);
         $ware = Ware::query()
