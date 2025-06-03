@@ -45,7 +45,7 @@ class UpdateSendCharismaToZigo implements ShouldQueue
         ];
         $json = json_encode ($ms);
 
-        Common::sendToZego('SendCustomCommand', $this->room->id, $this->userId, $json);
+        Common::sendToZego('SendCustomCommand', $room->id, $this->userId, $json);
 
     }
 }
