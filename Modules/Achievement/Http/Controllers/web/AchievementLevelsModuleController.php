@@ -25,17 +25,14 @@ class AchievementLevelsModuleController extends Controller
 
     public function store(Request $request)
     {
-        info($request);
         $achievementLevel_id = request('achievement_level_id');
         $userId = request('user_id');
         $gift = request('gift_achievement_id');
 
         $adminId = Auth::user()->id;
 
-
         $achievementLevel = AchievementLevel::find($achievementLevel_id);
         if ($achievementLevel_id == null && $request->hasFile('custom_image')) {
-            info(1);
             $customImage = Common::upload('custom_image', $request->file('custom_image'));
             $attributes = [
                 'user_id'       => $userId,
@@ -51,7 +48,6 @@ class AchievementLevelsModuleController extends Controller
                 'type' => 'user',
             ]);
         } elseif ($achievementLevel_id == null && $request->hasFile('custom_file')) {
-            info(2);
             $custom_file = Common::upload('custom_file', $request->file('custom_file'));
             $attributes = [
                 'user_id'       => $userId,
@@ -67,7 +63,6 @@ class AchievementLevelsModuleController extends Controller
                 'type' => 'user',
             ]);
         } elseif ($achievementLevel_id == null && request('custom_image')) {
-            info(3);
             $customImagepath = request('custom_image');
             $attributes = [
                 'user_id'       => $userId,
@@ -78,7 +73,6 @@ class AchievementLevelsModuleController extends Controller
 
            UserAchievementLevel::create($attributes);
         } elseif ($achievementLevel != null) {
-            info(4);
             $res = $this->userAchievementService->assignAchievementLevelToUserByAdmin($userId, $achievementLevel);
             if (!$res) {
                 $error = new MessageBag([
@@ -89,7 +83,6 @@ class AchievementLevelsModuleController extends Controller
                 return redirect()->route(nameRoute('admin.get-view-page'), compact('error')); // Error message added
             }
         } elseif ($achievementLevel_id == null && $gift) {
-            info(5);
             $attributes = [
                 'user_id'       => $userId,
                 'gift_achievement_id' => $gift,
