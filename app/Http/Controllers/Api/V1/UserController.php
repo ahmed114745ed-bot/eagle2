@@ -1127,7 +1127,6 @@ class UserController extends Controller
         $id = $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
         $data = $this->userService->dataUser($id);
-        info($data);
         return Common::apiResponse(true, 'done', new DataUserResource($data));
     }
 }
