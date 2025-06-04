@@ -46,8 +46,9 @@ class VipDedicateAction extends Action
 
             DB::beginTransaction();
 
-            $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
-            $is_used = $enableVipAuto === "true" ? 1 : 0;
+            $enableVipAuto = config('admin.isUsed_vip');
+
+            $is_used = $enableVipAuto === true ? 1 : 0;
             $uniqueAttributes = [
                 'sender_id' => 0,
                 'user_id'   => $user->id,
@@ -67,6 +68,7 @@ class VipDedicateAction extends Action
                 'total'  => 0,
                 'is_used'  => $is_used,
                 'dash_user_id'  => auth()->id(),
+                'using' => $is_used,
             ]);
             // } else {
             //     $userVip->qty++;
