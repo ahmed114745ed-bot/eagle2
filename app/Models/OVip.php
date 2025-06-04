@@ -23,14 +23,14 @@ class OVip extends Model
 
     protected $hidden = ['privileges'];
 
-    protected static function boot()
+/*    protected static function boot()
     {
         parent::boot();
 
         static::deleting(function ($oVip){
             $oVip->privilegs()->detach();
         });
-    }
+    }*/
 
     public function getCreatedAtAttribute($value)
     {
