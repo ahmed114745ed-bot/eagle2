@@ -269,7 +269,7 @@ class VipService
 
                 $data = $this->userVipRepository->create($data);
             }
-            Common::handelVip($vip, $user, userVip: $userVip);
+            Common::handelVip($vip, $user,null, userVip: $userVip);
             DB::commit();
             $ex = Carbon::parse($ex)->diffInDays(now());
             CustomNotification::vips($user, $ex, $vip->img);

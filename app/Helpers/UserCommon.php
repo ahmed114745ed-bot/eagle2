@@ -273,7 +273,7 @@ class UserCommon
                     'total' => 0
                 ]
             );
-            Common::handelVip($vip, $user, userVip: $userVip);
+            Common::handelVip($vip, $user,null, userVip: $userVip);
         }
     }
 
