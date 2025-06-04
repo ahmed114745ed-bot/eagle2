@@ -74,11 +74,11 @@ class DedicateVipController extends MainController
         .table {
             background-color: var(--table-background-color) !important;
         }
-    
+
         .table th, .table td {
             background-color: var(--table-background-color) !important;
         }
-    
+
         .table tbody tr:hover {
             background-color: var(--primary-hover-alpha) !important;
         }
