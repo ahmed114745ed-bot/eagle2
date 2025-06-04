@@ -28,6 +28,7 @@ class VipDedicateAction extends Action
 
     public function handle(Request $request)
     {
+
         $user = User::query()->searchByUuid($request->user_uuid)->first();
         if (!$user) {
             return $this->response()->error(__('dashboard.userNotFound'))->refresh();
@@ -77,7 +78,7 @@ class VipDedicateAction extends Action
                 }
                 $userVip->save();
             }
-            Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+            Common::handelVip($vip, $user, expire: $request->days ?? 1);
 
             DB::commit();
             CustomNotification::vips($user, $request->days, $vip->img);
