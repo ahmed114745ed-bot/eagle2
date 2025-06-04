@@ -175,7 +175,7 @@ class HomeController extends Controller
         $user         = $request->user();
         $privilegeArr = [
             'has_color_name' => 18,
-//            'anonymous'      => 17,
+            //            'anonymous'      => 17,
             'country'        => 13,
             'last_active'    => 20,
             'visit'          => 19,
@@ -245,12 +245,14 @@ class HomeController extends Controller
             $user         = $request->user();
             $privilegeArr = [
                 'has_color_name' => 18,
-//                'anonymous'      => 17,
+             // 'anonymous'      => 17,
                 'country'        => 13,
                 'last_active'    => 20,
                 'visit'          => 19,
                 'room'           => 16,
-                'sound_effect'   => 21
+                'sound_effect'   => 21,
+                'being_kicked'   => 29,
+                'anti_ban'       => 30,
             ];
             $type         = $request->type;
             $this->homeService->changePackMode($type, $privilegeArr, $user, true);
@@ -266,7 +268,7 @@ class HomeController extends Controller
         $user = $request->user();
         $privilegeArr = [
             'has_color_name' => 18,
-//            'anonymous'      => 17,
+            //            'anonymous'      => 17,
             'country'        => 13,
             'last_active'    => 20,
             'visit'          => 19,
