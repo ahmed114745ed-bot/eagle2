@@ -260,7 +260,7 @@ class UserCommon
         }
 
         if (!$user_vip_check) {
-            UserVip::query()->create(
+            $userVip = UserVip::query()->create(
                 [
                     'type' => 0,
                     'sender_id' => 0,
@@ -273,7 +273,7 @@ class UserCommon
                     'total' => 0
                 ]
             );
-            Common::handelVip($vip, $user);
+            Common::handelVip($vip, $user, userVip: $userVip);
         }
     }
 
@@ -367,7 +367,7 @@ class UserCommon
         $vipp->price = 0;
         $vipp->total = 0;
         $vipp->save();
-        Common::handelVip($vip, $user, $expir);
+        Common::handelVip($vip, $user, $expir, $vipp);
         DB::commit();
 
         Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
