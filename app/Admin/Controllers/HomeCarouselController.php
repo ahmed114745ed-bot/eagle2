@@ -14,7 +14,7 @@ use Encore\Admin\Layout\Content;
 class HomeCarouselController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'carousel';
+    public $permission_name = 'banner';
     public function index(Content $content)
     {
         return parent::index($content

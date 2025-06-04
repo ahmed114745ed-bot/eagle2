@@ -3,6 +3,7 @@
 namespace App\Tik\Repositories;
 
 
+use App\Helpers\Common;
 use App\Models\Charge;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,7 +44,9 @@ class ChargeRepository extends AbstractRepository
             }, 'receiver' => function ($query) {
                 $query->withoutAppends();
             }
-        ])->where('charger_type', $type);
+        ])->where('charger_type', $type)
+        
+        ->with(Common::chargerRelationsQuery());
     }
 
 
@@ -51,15 +54,18 @@ class ChargeRepository extends AbstractRepository
     {
         $perPage = request('per_page', 10);
         $page = request('page', 1);
-    
+        
         return $this->model
             ->where('charger_id', Auth::user()->id)
+            ->where('charger_type', 'user')
+            ->where('user_type', 'user')
             ->whereNotNull('user_id')
-            ->with([
-                'receiver:id,uuid',
-                'receiver.profile:id,user_id,avatar'
-            ])
-            ->select('id', 'user_id', 'amount', 'usd', 'created_at')
+            // ->with([
+            //     'receiver:id,uuid',
+            //     'receiver.profile:id,user_id,avatar'
+            // ])
+            ->with(Common::chargerRelationsQuery())
+            ->select('id', 'user_id', 'amount', 'usd', 'created_at','charger_type','user_type')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
@@ -71,9 +77,12 @@ class ChargeRepository extends AbstractRepository
     
         return $this->model
             ->where('charger_id', Auth::user()->id)
+            ->where('charger_type', 'user')
+            ->where('user_type', 'agency')
             ->whereNotNull('agency_id')
             ->with('agency:id,name,img')
-            ->select('id', 'agency_id', 'amount', 'usd', 'created_at')
+            ->with(Common::chargerRelationsQuery())
+            ->select('id', 'agency_id', 'amount', 'usd', 'created_at','charger_type','user_type')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }

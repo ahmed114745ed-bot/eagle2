@@ -55,7 +55,7 @@ class LanguageController extends MainController
             ->title(trans('Languages'))
             ->body($this->detail($id)));
     }
- 
+
     protected function grid()
     {
         $grid = new Grid(new Language());
@@ -67,17 +67,17 @@ class LanguageController extends MainController
             'LTR' => __('Left to Right (LTR)'),
             'RTL' => __('Right to Left (RTL)')
         ]);
-        
-        
-        $grid->column('is_enabled', __('Is enabled'))->switch();
 
-       
+        if (Admin::user()->can('edit-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('is_enabled', __('Is enabled'))->switch();
+        }
+
 
         $grid->disableCreateButton();  // تعطيل زر الإنشاء
         $grid->disableActions();       // تعطيل زر العرض والتعديل والحذف لكل صف
         $grid->disableRowSelector();   // تعطيل تحديد الصفوف للحذف الجماعي
         $grid->disableExport();        // تعطيل زر التصدير (اختياري)
-
+     
         // $grid->column('is_enabled', __('Is enabled'));
         // $grid->column('created_at', __('Created at'));
         // $grid->column('updated_at', __('Updated at'));
@@ -105,7 +105,7 @@ class LanguageController extends MainController
 
         return $show;
     }
-    
+
     /**
      * Make a form builder.
      *

@@ -28,7 +28,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','appFeatureE
     Route::prefix('agencies')->group(function () {
         Route::post('request-leave-agency', [AgencyAppController::class, 'leave_agency']);
         Route::post('history-data-agency', [AgencyAppController::class, 'historyDataAgency']);
-        //Route::post('make-user-as-operator', [AgencyAppController::class, 'make_user_handling_requests']);
+        // Route::post('make-user-as-operator', [AgencyAppController::class, 'make_user_handling_requests']);
         Route::post('kick-of-agency', [AgencyAppController::class, 'kick_of_agency']);
         Route::post('/filter', [AgencyAppController::class, 'agency_filter']);
         Route::post('host-reports', [AgencyAppController::class, 'dailyReport']);
@@ -44,3 +44,4 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','appFeatureE
     Route::post('/action-invite-agency', [AgencyHostInviteController::class, 'actionInvitation']);
     Route::post('/host-agency-edit', [ApiAgencyAppController::class, 'host_agency_edit']);
 });
+

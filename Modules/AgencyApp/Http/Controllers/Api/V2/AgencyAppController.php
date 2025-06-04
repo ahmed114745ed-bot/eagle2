@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use Modules\AgencyApp\Emails\SendAgencyEmail;
 use Modules\AgencyApp\Services\TargetService;
 use Modules\AgencyApp\Classes\Agencies\AgencyDataSearch;
+use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Transformers\FilterAgancyResource;
 use Modules\SalaryTransaction\Transformers\FilterAgencyMangerResource;
 
@@ -179,19 +180,20 @@ class AgencyAppController extends Controller
     public function dailyReport()
     {
         $user  = \Auth::user();
-        $month = request()->month ? (int) request()->month : now()->month;
-        $year = request()->year ? (int) request()->year : now()->year;
+        $month = request()->month ?? now()->format('m'); 
+        $year = request()->year ?? now()->year;
+        $agencyId = request()->agency_id ?? $user->agency_id ;
 
         if (!$user instanceof User) return;
         $userId        = $user->id;
 
         $cacheKey = 'cache-data-my-store-' . $user->id;
         if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
-            $targetService = new TargetService($user);
+            $targetService = new FixedTargetService($user);
             ($targetService)->calculateTarget();
         }
 
-        $data = $this->agencyService->dailyReport($user, $month, $year);
+        $data = $this->agencyService->dailyReport($user, $month, $year ,$agencyId);
         $data = empty($data) ? new \stdClass() : $data;
         return Common::apiResponse(true, 'success', $data);
     }

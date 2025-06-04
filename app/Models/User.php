@@ -5,8 +5,9 @@ namespace App\Models;
 use DB;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Arr;
 use Modules\Reals\Entities\Real;
+use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\PaymentGetWayTrait;
 use Modules\Moment\Entities\Moment;
@@ -14,21 +15,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Modules\Chat\Traits\ChatUserTrait;
 use App\Traits\MomentRelationshipTrait;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
+use Illuminate\Support\Facades\Storage;
 use Modules\SpecialId\Traits\SpecialId;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Moment\Entities\MomentUserGift;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\AgencyApp\Entities\AdditionalInfo;
 use Modules\Reals\Traits\RealRelationshipTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Achievement\Http\Traits\AchievementUser;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @method static withoutAppends()
@@ -255,6 +256,32 @@ class User extends Authenticatable
 
         return $userSallary?->toArray() ?? [];
     }
+    public function getSallaryInfoByMonth(): array
+    {
+        $month = now()->month;
+        $year  = now()->year;
+
+        $userSallary = UserSallary::query()
+            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
+            ->where('user_id', $this->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+
+        return $userSallary?->toArray() ?? [];
+    }
+
+    public function getSallaryInfoByMonth2($month, $year): array
+    {
+        $userSallary = UserSallary::query()
+            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
+            ->where('user_id', $this->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+
+        return $userSallary?->toArray() ?? [];
+    }
 
     public function additionalInfo()
     {
@@ -451,6 +478,12 @@ class User extends Authenticatable
     public function liveTime()
     {
         return $this->hasMany(LiveTime::class, 'uid');
+    }
+
+
+    public function UserliveTime()
+    {
+        return $this->hasMany(LiveTime::class);
     }
 
     public function scopeOfAgency($q)
@@ -671,6 +704,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Follow::class, 'user_id', 'id');
     }
+
+    public function isFollowedBy($userId): bool
+    {
+        return $this->followers()
+            ->where('user_id', $userId)
+            ->where('status', 1)
+            ->exists();
+    }
+
     public function followBack(User $user)
     {
         $userId = $user->id;
@@ -1313,6 +1355,11 @@ class User extends Authenticatable
         return $this->hasOne(UserWallet::class);
     }
 
+    public function momentUserGift()
+    {
+        return $this->hasMany(MomentUserGift::class, 'user_id');
+    }
+
     public function walletTransactions()
     {
         return $this->hasMany(WalletTransaction::class);
@@ -1365,7 +1412,7 @@ class User extends Authenticatable
         return false;
     }
 
-    public function getUserTypesAttribute() : array
+    public function getUserTypesAttribute(): array
     {
         $userTypes = match (true) {
             in_array($this->type_user, [2, 4]) => [1, 2],
@@ -1373,12 +1420,27 @@ class User extends Authenticatable
             default => []
         };
 
+        if ($this->is_bd){
+            return  [4];
+        }
+        
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
         }
 
+
+
         $userTypes = array_unique($userTypes);
 
         return empty($userTypes) ? [0] : $userTypes;
+    }
+    public function sallariesByMonth()
+    {
+        return $this->hasMany(\App\Models\UserSallary::class, 'user_id')
+                    ->where('user_agency_id', $this->agency_id);
+    }
+    public function lastSallary()
+    {
+        return $this->hasOne(UserSallary::class, 'user_id')->latestOfMany();
     }
 }

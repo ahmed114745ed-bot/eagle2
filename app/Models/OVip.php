@@ -15,11 +15,19 @@ class OVip extends Model
         'price',
         'exp',
         'expire',
-
         'img'
     ];
 
     protected $hidden = ['privileges'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($oVip){
+            $oVip->privilegs()->detach();
+        });
+    }
 
     public function getCreatedAtAttribute($value)
     {

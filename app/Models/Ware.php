@@ -12,6 +12,9 @@ class Ware extends Model
     protected $table = 'wares';
     protected $guarded = ['id'];
     protected $appends = ['image_type1', 'profile_frame_type'];
+    protected $casts = [
+    'key_json' => 'array',
+];
 
     public function getCreatedAtAttribute($value)
     {

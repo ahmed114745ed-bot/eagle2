@@ -9,6 +9,7 @@ use App\Models\Agency;
 use App\Models\Charge;
 use App\Http\Controllers\Controller;
 use App\Models\BDSallary;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Models\UserWallet;
 use App\Models\WalletTransaction;
@@ -291,29 +292,33 @@ class WalletController extends MainController
     
     public function charge(Request $request)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0.01',
-            'target_id' => 'nullable',    
-            'target_type' => 'required|string',
-        ]);
-       
-
-        $types = [
-            'user' => [$this, 'chargeToUser'],
-            'agency' => [$this, 'chargeToAgency']
-        ];
-      
-        $type = $request->input('target_type');
-     
-        if (!array_key_exists($type, $types)) {
-            admin_toastr('نوع الوجهة غير موجود', 'error');
-            return back();
-        }
-       
         try {
+            $request->validate([
+                'amount' => 'required|integer|min:1',
+                'target_id' => 'nullable',    
+                'target_type' => 'required|string',
+            ]);
+        
+
+            $types = [
+                'user' => [$this, 'chargeToUser'],
+                'agency' => [$this, 'chargeToAgency']
+            ];
+        
+            $type = $request->input('target_type');
+        
+            if (!array_key_exists($type, $types)) {
+                admin_toastr('نوع الوجهة غير موجود', 'error');
+                return back();
+            }
+        
+       
           
             $data = call_user_func($types[$type], $request->all());
             admin_toastr('تم الشحن بنجاح', 'success');
+            return back();
+        } catch (\Exception $e) {
+            admin_toastr($e->getMessage(), 'error');
             return back();
         } catch (\Throwable $e) {
             admin_toastr('حدث خطأ أثناء الشحن: ' . $e->getMessage(), 'error');
@@ -332,7 +337,7 @@ class WalletController extends MainController
         // if (!$wallet || ($wallet->value - $wallet->cut_amount) < $amount) {
         //     throw new \Exception(__('balance not enough'));
         // }
-        $totalSalary = $sender->bdSalary;
+        $totalSalary = $sender?->bdSalary ?? 0;
         if ($totalSalary < $amount) {
             throw new \Exception(__('balance not enough'));
            }
@@ -378,7 +383,7 @@ class WalletController extends MainController
 
             $data = [
                 'charger_id' => $sender->id,
-                'charger_type' => 'user',
+                'charger_type' => 'bd',
                 'user_id' => $receiver->id,
                 'agency_id' => null,
                 'user_type' => $receiverType,
@@ -411,12 +416,12 @@ class WalletController extends MainController
             throw new \Exception(__('api_responses.freez_charge'));
         }
 
-        if (!is_numeric($usd) || $usd <= 0 || fmod($usd, 1) != 0) {
-            throw new \Exception(__('api_responses.This value is not allowed'));
-
+        if (!is_numeric($usd) || $usd <= 0) {
+            throw new \Exception(__('This value is not allowed'));
         }
 
-        $to = Common::searchAgency($toId);
+        $to = ShippingAgency::find($toId);
+    
         if (!$to || $to->is_frozen == 1) {
             throw new \Exception(__('api_responses.freez_charge'));
 
@@ -444,7 +449,7 @@ class WalletController extends MainController
        
     }
     
-    private function performAgencyCharge(User $fromUser, Agency $toAgency, $coins, $usd)
+    private function performAgencyCharge(User $fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
         
     
@@ -465,8 +470,8 @@ class WalletController extends MainController
         $data = [
             'charger_id' => $fromUser->id,
             'charger_type' => 'bd',
-            'user_id' => null,
-            'agency_id' => $toAgency->id,
+            'user_id' => $toAgency->id,
+            'agency_id' => null,
             'user_type' => 'agency',
             'amount' => $coins,
             'amount_type' => 2,

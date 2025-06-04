@@ -21,7 +21,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 class WareTabController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'wares';
+    public $permission_name = 'store';
     public function index(Content $content)
     {
         session(['last_ware_type' => request()->get('type', 1)]);
@@ -90,9 +90,8 @@ class WareTabController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('level', __('level'));
-            });
+             $filter->disableIdFilter();
+           
         });
 
         $grid->id(__('ID'));

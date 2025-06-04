@@ -10,25 +10,23 @@ class OVipResource extends JsonResource
 
     public function toArray($request)
     {
-        $userVip = UserVip::where("user_id",auth()->user()->id)
-            ->where("vip_id",$this->id)
+        $userVip = UserVip::where("user_id", auth()->user()->id)
+            ->where("vip_id", $this->id)
             ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
-            ->first();
+            ->get();
 
         $activePrivilegeIds = $this->privilegs->pluck('id')->toArray();
 
         return [
             'id' => $this->id,
             'level' => $this->level,
-            "sort"=> $this->sort,
-            "name"=> $this->name,
-            "img"=> $this->img,
-            "price"=> $this->price,
-            "expire"=> $this->expire,
-            "exp"=> $this->exp,
-            "target_id"=> $userVip?->id ,
-            "is_buyed"=> $userVip != null ? true : false,
-            "is_used"=> ($userVip != null && $userVip->is_used == 1 ? true : false),
+            "sort" => $this->sort,
+            "name" => $this->name,
+            "img" => $this->img,
+            "price" => $this->price,
+            "expire" => $this->expire,
+            "exp" => $this->exp,
+            'user_vip' => UserVipResource::collection($userVip),
             'privilegs' => VipPrivilegeResource::collection(
                 $request->vipPrivileges->map(function ($p) use ($activePrivilegeIds) {
                     $priv = clone  $p;

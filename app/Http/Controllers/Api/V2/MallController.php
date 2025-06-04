@@ -9,6 +9,7 @@ use App\Tik\Services\MallService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\WareResource;
 use App\Http\Resources\BestWareSaleResource;
+use App\Http\Resources\WareResourceAll;
 use Modules\Public\Http\Services\UserCounterServices;
 
 
@@ -29,6 +30,19 @@ class MallController extends Controller
         $wares = $this->mallService->getWares($user->id, $request->type);
 
         return Common::apiResponse(true, '', WareResource::collection($wares), 200);
+    }
+
+    public function wabbleWare(Request $request)
+    {
+        $type = $request->type ?? 12;
+        $bubble = $this->mallService->ware($type);
+        return Common::apiResponse(true, '', WareResource::collection($bubble), 200);
+    }
+
+    public function wabbleAll()
+    {
+        $bubble = $this->mallService->getWabbles();
+        return Common::apiResponse(true, '', WareResourceAll::collection($bubble), 200);
     }
 
     public function buyWare(Request $request)

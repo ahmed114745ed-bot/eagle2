@@ -32,6 +32,7 @@ class WareResource extends JsonResource
             'video'     =>  $this->img3  == null ? '' : $this->img3,
             'image_type' => $this->image_type ?? "",
             'type'       => $this->type,
+            'key_json'  => $this->key_json,
         ];
     }
 }

@@ -5,12 +5,14 @@ namespace Modules\SwitchAccount\Http\Controllers;
 use App\Models\User;
 use Dotenv\Util\Str;
 use App\Helpers\Common;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Entities\ChatMessage;
 use Illuminate\Contracts\Support\Renderable;
+use Laravel\Sanctum\PersonalAccessToken;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\SwitchAccount\Transformers\AccountResource;
 
@@ -94,13 +96,13 @@ class SwitchAccountController extends Controller
         if (empty($deviceToken)) return [];
 
         $accounts = UserAccount::where('device_token', $deviceToken)->get();
-    
+
         $userIds = $accounts->flatMap(function ($account) {
             return [$account->parent_user_id, $account->child_user_id];
-        })->unique()->filter(function ($id,$userId) {
-            return $id !== $userId; 
+        })->unique()->filter(function ($id, $userId) {
+            return $id !== $userId;
         })->values();
-    
+
         return User::whereIn('id', $userIds)->get();
         // if (empty($deviceToken))  return  [];
 
@@ -133,14 +135,14 @@ class SwitchAccountController extends Controller
     {
         $bearerToken = $request->token_new_account;
 
-               if (strpos($bearerToken, '|') !== false) {
-                   [$id, $bearerToken] = explode('|', $bearerToken, 2);
-               }
-               $token = hash('sha256', $bearerToken);
-               
+        if (strpos($bearerToken, '|') !== false) {
+            [$id, $bearerToken] = explode('|', $bearerToken, 2);
+        }
+        $token = hash('sha256', $bearerToken);
+
         $tokenAccount = DB::table('personal_access_tokens')->where('tokenable_type', "App\Models\User")->where('token', $token)->first();
-       // dd($token,$tokenAccount);
-        if (!$tokenAccount) throw new \Exception( 'user token not found');
+        // dd($token,$tokenAccount);
+        if (!$tokenAccount) throw new \Exception('user token not found');
         $otherUser = User::find($tokenAccount->tokenable_id);
         return $otherUser;
     }
@@ -149,11 +151,13 @@ class SwitchAccountController extends Controller
     {
         $user = $request->user();
         if (!$request->key) return Common::apiResponse(0, 'missing params', null, 422);
-
+        if (!$request->token) return Common::apiResponse(0, 'token not valid', null, 422);
         $user_account = UserAccount::query()->where("key", $request->key)->first();
         if (!$user_account) return Common::apiResponse(0, 'missing params', null, 422);
 
-        //        $new_account_signin_id = $user_account->parent_user_id == $user->id ? $user_account->child_user_id : $user_account->parent_user_id;
+        $validToken = $this->isTokenFromLastTwoWeeks($request->token);
+        if (!$validToken) return Common::apiResponse(0, 'token not valid', null, 422);
+
         $new_account = User::find($request->id);
         $token = $new_account->createToken('api_token')->plainTextToken;
         $new_account->auth_token = $token;
@@ -164,6 +168,22 @@ class SwitchAccountController extends Controller
             'auth_token'    => $new_account->auth_token
         ];
         return Common::apiResponse(1, 'success', $data, 200);
+    }
+
+    public function isTokenFromLastTwoWeeks($tokenString)
+    {
+        [$id, $plainToken] = explode('|', $tokenString);
+
+        $token = PersonalAccessToken::find($id);
+        if (
+            $token &&
+            hash_equals($token->token, hash('sha256', $plainToken)) &&
+            $token->created_at >= Carbon::now()->subDays(14)
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     public function myAccounts()

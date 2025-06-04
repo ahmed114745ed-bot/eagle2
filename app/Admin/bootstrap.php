@@ -64,3 +64,12 @@ view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
 
 Form::extend('dynamicFields', DynamicFields::class);
 
+if (request()->is('admin*')) {
+    if (auth()->check() && auth()->user()->type === 'bd') {
+        abort(403, 'Invalid request');
+    }
+
+    if (auth('bd')->check()) {
+        abort(403, 'Invalid request');
+    }
+}

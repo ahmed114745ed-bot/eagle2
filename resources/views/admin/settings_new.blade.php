@@ -1037,7 +1037,7 @@ use App\Models\Vip;
                                 @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.lucky_flex') }}</h4>
+                                        <h4 class="m-0">{{ __('lucky phonix') }}</h4>
                                         <div class="d-flex align-items-center">
                                             <input type="radio" id="luckyFlexRadio"
                                                 class="custom-radio libraryRealTime" name="games_library"
@@ -1068,7 +1068,7 @@ use App\Models\Vip;
                                 @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.guess_the_word') }}</h4>
+                                        <h4 class="m-0">{{ __('Zynga') }}</h4>
                                         <div class="ribbon-banner-card">
                                             <span>{{ __('soon') }}</span>
                                         </div>
@@ -1426,11 +1426,11 @@ use App\Models\Vip;
                                     <div class="card p-3 shadow" style="height: 580px;">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.' . $coin->title) }}</h4>
-                                            @if (!$coin->status)
-                                                <div class="ribbon-banner-card">
-                                                    <span>{{ __('soon') }}</span>
-                                                </div>
-                                            @endif
+{{--                                            @if (!$coin->status)--}}
+{{--                                                <div class="ribbon-banner-card">--}}
+{{--                                                    <span>{{ __('soon') }}</span>--}}
+{{--                                                </div>--}}
+{{--                                            @endif--}}
                                             <div class="d-flex align-items-center">
                                                 <input type="hidden" name="is_{{ $coin->title }}_active"
                                                     value="0">
@@ -1732,30 +1732,6 @@ use App\Models\Vip;
                                                         </div>
                                                     </div>
                                                 @endif
-                                            @if ($coin->type == 'huawei_pay')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="huawei_pay_merchant_id">{{ __('admin.merchant_id') }}:</label>
-                                                        <input type="text" id="huawei_pay_merchant_id"
-                                                            name="huawei_pay_merchant_id" placeholder="merchant_id"
-                                                            value="{{ $settings['huawei_pay_merchant_id'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="huawei_pay_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="huawei_pay_webhook_url" name="huawei_pay_webhook_url"
-                                                                       placeholder="huawei_pay_webhook_url"
-                                                                       value="{{ $settings['huawei_pay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="huawei_pay_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
                                             @if ($coin->type == 'sky_pay')
                                                 <div class="col-md-6">
                                                     <div class="form-group">
@@ -1810,67 +1786,67 @@ use App\Models\Vip;
                                                         </div>
                                                     </div>
                                                 @endif
-                                            @if ($coin->type == 'opay')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="opay_currency">{{ __('admin.currency') }}:</label>
-                                                        <input type="text" id="opay_currency" name="opay_currency"
-                                                            placeholder="currency"
-                                                            value="{{ $settings['opay_currency'] ?? '' }}"
-                                                            class="form-control" required>
+                                                @if ($coin->type == 'opay')
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="opay_currency">{{ __('admin.currency') }}:</label>
+                                                            <input type="text" id="opay_currency" name="opay_currency"
+                                                                   placeholder="currency"
+                                                                   value="{{ $settings['opay_currency'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="opay_secret_key">{{ __('admin.server_secret') }}:</label>
-                                                        <input type="text" id="opay_secret_key"
-                                                            name="opay_secret_key" placeholder="server_secret"
-                                                            value="{{ $settings['opay_secret_key'] ?? '' }}"
-                                                            class="form-control">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="opay_secret_key">{{ __('admin.server_secret') }}:</label>
+                                                            <input type="text" id="opay_secret_key"
+                                                                   name="opay_secret_key" placeholder="server_secret"
+                                                                   value="{{ $settings['opay_secret_key'] ?? '' }}"
+                                                                   class="form-control">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="opay_public_key">{{ __('admin.public_key') }}:</label>
-                                                        <input type="text" id="opay_public_key"
-                                                            name="opay_public_key" placeholder="public_key"
-                                                            value="{{ $settings['opay_public_key'] ?? '' }}"
-                                                            class="form-control" required>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="opay_public_key">{{ __('admin.public_key') }}:</label>
+                                                            <input type="text" id="opay_public_key"
+                                                                   name="opay_public_key" placeholder="public_key"
+                                                                   value="{{ $settings['opay_public_key'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="opay_merchant_id">{{ __('admin.merchant_id') }}:</label>
-                                                        <input type="text" id="opay_merchant_id"
-                                                            name="opay_merchant_id" placeholder="merchant_id"
-                                                            value="{{ $settings['opay_merchant_id'] ?? '' }}"
-                                                            class="form-control" required>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="opay_merchant_id">{{ __('admin.merchant_id') }}:</label>
+                                                            <input type="text" id="opay_merchant_id"
+                                                                   name="opay_merchant_id" placeholder="merchant_id"
+                                                                   value="{{ $settings['opay_merchant_id'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="opay_country_code">{{ __('admin.country_code') }}:</label>
-                                                        <input type="text" id="opay_country_code"
-                                                            name="country_code" placeholder="server_secret"
-                                                            value="{{ $settings['country_code'] ?? '' }}"
-                                                            class="form-control" required>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="opay_country_code">{{ __('admin.country_code') }}:</label>
+                                                            <input type="text" id="opay_country_code"
+                                                                   name="country_code" placeholder="server_secret"
+                                                                   value="{{ $settings['country_code'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="opay_base_url">{{ __('admin.base_url') }}:</label>
-                                                        <input type="text" id="opay_base_url" name="opay_base_url"
-                                                            placeholder="base_url"
-                                                            value="{{ $settings['opay_base_url'] ?? '' }}"
-                                                            class="form-control" required>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="opay_base_url">{{ __('admin.base_url') }}:</label>
+                                                            <input type="text" id="opay_base_url" name="opay_base_url"
+                                                                   placeholder="base_url"
+                                                                   value="{{ $settings['opay_base_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
                                                     </div>
-                                                </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="opay_webhook_url">{{ __('admin.webhook_url') }}:</label>
@@ -1884,246 +1860,50 @@ use App\Models\Vip;
                                                         </div>
                                                     </div>
                                                 @endif
-                                            @if ($coin->type == 'mada')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="mada_access_token">{{ __('admin.access_token') }}:</label>
-                                                        <input type="text" id="mada_access_token"
-                                                            name="mada_access_token" placeholder="mada_access_token"
-                                                            value="{{ $settings['mada_access_token'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="mada_public_key">{{ __('admin.public_key') }}:</label>
-                                                        <input type="text" id="mada_public_key"
-                                                            name="mada_public_key" placeholder="mada_public_key"
-                                                            value="{{ $settings['mada_public_key'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="mada_payment_address"
-                                                            name="mada_payment_address"
-                                                            placeholder="mada_payment_address"
-                                                            value="{{ $settings['mada_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
+                                                @if ($coin->type == 'paytabs')
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="mada_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="mada_webhook_url" name="mada_webhook_url"
-                                                                       placeholder="mada_webhook_url"
-                                                                       value="{{ $settings['mada_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="mada_webhook_url" title="Copy">📋</button>
-                                                            </div>
+                                                            <label
+                                                                for="profile_id">{{ __('admin.profile_id') }}:</label>
+                                                            <input type="text" id="paytabs_profile_id"
+                                                                   name="paytabs_profile_id"
+                                                                   placeholder="paytabs_profile_id"
+                                                                   value="{{ $settings['paytabs_profile_id'] ?? '' }}"
+                                                                   class="form-control">
                                                         </div>
                                                     </div>
-                                                @endif
-                                            @if ($coin->type == 'liq_pay')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="liqpay_public_key">{{ __('admin.public_key') }}:</label>
-                                                        <input type="text" id="liqpay_public_key"
-                                                            name="liqpay_public_key" placeholder="liqpay_public_key"
-                                                            value="{{ $settings['liqpay_public_key'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="liqpay_private_key">{{ __('admin.private_key') }}:</label>
-                                                        <input type="text" id="liqpay_private_key"
-                                                            name="liqpay_private_key" placeholder="liqpay_private_key"
-                                                            value="{{ $settings['liqpay_private_key'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="liqpay_payment_address"
-                                                            name="liqpay_payment_address"
-                                                            placeholder="liqpay_payment_address"
-                                                            value="{{ $settings['liqpay_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="liqpay_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="liqpay_webhook_url" name="liqpay_webhook_url"
-                                                                       placeholder="liqpay_webhook_url"
-                                                                       value="{{ $settings['liqpay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="liqpay_webhook_url" title="Copy">📋</button>
-                                                            </div>
+                                                            <label
+                                                                for="paytabs_server_key">{{ __('admin.server_key') }}:</label>
+                                                            <input type="text" id="paytabs_server_key"
+                                                                   name="paytabs_server_key"
+                                                                   placeholder="paytabs_server_key"
+                                                                   value="{{ $settings['paytabs_server_key'] ?? '' }}"
+                                                                   class="form-control" required>
                                                         </div>
                                                     </div>
-                                                @endif
-                                            @if ($coin->type == 'paypal')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paypal__client_id">{{ __('admin.client_id') }}:</label>
-                                                        <input type="text" id="paypal_client_id"
-                                                            name="paypal_client_id" placeholder="paypal_client_id"
-                                                            value="{{ $settings['paypal_client_id'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paypal_client_secret">{{ __('admin.client_secret') }}:</label>
-                                                        <input type="text" id="paypal_client_secret"
-                                                            name="paypal_client_secret"
-                                                            placeholder="paypal_client_secret"
-                                                            value="{{ $settings['paypal_client_secret'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="paypal_payment_address"
-                                                            name="paypal_payment_address"
-                                                            placeholder="paypal_payment_address"
-                                                            value="{{ $settings['paypal_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="paypal_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="paypal_webhook_url" name="paypal_webhook_url"
-                                                                       placeholder="paypal_webhook_url"
-                                                                       value="{{ $settings['paypal_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="paypal_webhook_url" title="Copy">📋</button>
-                                                            </div>
+                                                            <label
+                                                                for="paytabs_base_url">{{ __('admin.base_url') }}:</label>
+                                                            <input type="text" id="paytabs_base_url"
+                                                                   name="paytabs_base_url" placeholder="paytabs_base_url"
+                                                                   value="{{ $settings['paytabs_base_url'] ?? '' }}"
+                                                                   class="form-control" required>
                                                         </div>
                                                     </div>
-                                                @endif
-                                            @if ($coin->type == 'paytm')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paytm_merchant_key">{{ __('admin.merchant_key') }}:</label>
-                                                        <input type="text" id="paytm_merchant_key"
-                                                            name="paytm_merchant_key" placeholder="paytm_merchant_key"
-                                                            value="{{ $settings['paytm_merchant_key'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paytm_merchant_id">{{ __('admin.merchant_id') }}:</label>
-                                                        <input type="text" id="paytm_merchant_id"
-                                                            name="paytm_merchant_id" placeholder="paytm_merchant_id"
-                                                            value="{{ $settings['paytm_merchant_id'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paytm_merchant_website_link">{{ __('admin.merchant_website_link') }}:</label>
-                                                        <input type="text" id="paytm_merchant_website_link"
-                                                            name="paytm_merchant_website_link"
-                                                            placeholder="paytm_merchant_website_link"
-                                                            value="{{ $settings['paytm_merchant_website_link'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="paytm_payment_address"
-                                                            name="paytm_payment_address"
-                                                            placeholder="paytm_payment_address"
-                                                            value="{{ $settings['paytm_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="paytm_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="paytm_webhook_url" name="paytm_webhook_url"
-                                                                       placeholder="paytm_webhook_url"
-                                                                       value="{{ $settings['paytm_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="paytm_webhook_url" title="Copy">📋</button>
-                                                            </div>
+                                                            <label
+                                                                for="payment_address">{{ __('admin.payment_address') }}:</label>
+                                                            <input type="text" id="paytabs_payment_address"
+                                                                   name="paytabs_payment_address"
+                                                                   placeholder="paytabs_payment_address"
+                                                                   value="{{ $settings['paytabs_payment_address'] ?? '' }}"
+                                                                   class="form-control" required>
                                                         </div>
                                                     </div>
-                                                @endif
-                                            @if ($coin->type == 'paytabs')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="profile_id">{{ __('admin.profile_id') }}:</label>
-                                                        <input type="text" id="paytabs_profile_id"
-                                                            name="paytabs_profile_id"
-                                                            placeholder="paytabs_profile_id"
-                                                            value="{{ $settings['paytabs_profile_id'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paytabs_server_key">{{ __('admin.server_key') }}:</label>
-                                                        <input type="text" id="paytabs_server_key"
-                                                            name="paytabs_server_key"
-                                                            placeholder="paytabs_server_key"
-                                                            value="{{ $settings['paytabs_server_key'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paytabs_base_url">{{ __('admin.base_url') }}:</label>
-                                                        <input type="text" id="paytabs_base_url"
-                                                            name="paytabs_base_url" placeholder="paytabs_base_url"
-                                                            value="{{ $settings['paytabs_base_url'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="paytabs_payment_address"
-                                                            name="paytabs_payment_address"
-                                                            placeholder="paytabs_payment_address"
-                                                            value="{{ $settings['paytabs_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label for="paytabs_webhook_url">{{ __('admin.webhook_url') }}:</label>
@@ -2137,460 +1917,682 @@ use App\Models\Vip;
                                                         </div>
                                                     </div>
                                                 @endif
-                                            @if ($coin->type == 'bkash')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="profile_id">{{ __('admin.appkey') }}:</label>
-                                                        <input type="text" id="bkash_appkey"
-                                                            name="bkash_appkey" placeholder="bkash_appkey"
-                                                            value="{{ $settings['bkash_appkey'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="bkash_app_secret">{{ __('admin.app_secret') }}:</label>
-                                                        <input type="text" id="bkash_app_secret"
-                                                            name="bkash_app_secret" placeholder="bkash_app_secret"
-                                                            value="{{ $settings['bkash_app_secret'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="bkash_username">{{ __('admin.username') }}:</label>
-                                                        <input type="text" id="bkash_username"
-                                                            name="bkash_username" placeholder="bkash_username"
-                                                            value="{{ $settings['bkash_username'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="bkash_password">{{ __('admin.password') }}:</label>
-                                                        <input type="text" id="bkash_password"
-                                                            name="bkash_password" placeholder="bkash_password"
-                                                            value="{{ $settings['bkash_password'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="bkash_payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="bkash_payment_address"
-                                                            name="bkash_payment_address"
-                                                            placeholder="bkash_payment_address"
-                                                            value="{{ $settings['bkash_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="bkash_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="bkash_webhook_url" name="bkash_webhook_url"
-                                                                       placeholder="bkash_webhook_url"
-                                                                       value="{{ $settings['bkash_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="bkash_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @if ($coin->type == 'razor_pay')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="api_key">{{ __('admin.api_key') }}:</label>
-                                                        <input type="text" id="razorpay_api_key"
-                                                            name="razorpay_api_key" placeholder="razorpay_api_key"
-                                                            value="{{ $settings['razorpay_api_key'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="razorpay_api_secret">{{ __('admin.api_secret') }}:</label>
-                                                        <input type="text" id="razorpay_api_secret"
-                                                            name="razorpay_api_secret"
-                                                            placeholder="razorpay_api_secret"
-                                                            value="{{ $settings['razorpay_api_secret'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="razorpay_payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="razorpay_payment_address"
-                                                            name="razorpay_payment_address"
-                                                            placeholder="razorpay_payment_address"
-                                                            value="{{ $settings['razorpay_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="razorpay_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="razorpay_webhook_url" name="razorpay_webhook_url"
-                                                                       placeholder="razorpay_webhook_url"
-                                                                       value="{{ $settings['razorpay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="razorpay_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @if ($coin->type == 'senang_pay')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="api_key">{{ __('admin.callback_url') }}:</label>
-                                                        <input type="text" id="senangpay_callback_url"
-                                                            name="senangpay_callback_url"
-                                                            placeholder="senangpay_callback_url"
-                                                            value="{{ $settings['senangpay_callback_url'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="senangpay_secret_key">{{ __('admin.secret_key') }}:</label>
-                                                        <input type="text" id="senangpay_secret_key"
-                                                            name="senangpay_secret_key"
-                                                            placeholder="senangpay_secret_key"
-                                                            value="{{ $settings['senangpay_secret_key'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="senangpay_merchant_id">{{ __('admin.merchant_id') }}:</label>
-                                                        <input type="text" id="senangpay_merchant_id"
-                                                            name="senangpay_merchant_id"
-                                                            placeholder="senangpay_merchant_id"
-                                                            value="{{ $settings['senangpay_merchant_id'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="senangpay_payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="senangpay_payment_address"
-                                                            name="senangpay_payment_address"
-                                                            placeholder="senangpay_payment_address"
-                                                            value="{{ $settings['senangpay_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="senangpay_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="senangpay_webhook_url" name="senangpay_webhook_url"
-                                                                       placeholder="senangpay_webhook_url"
-                                                                       value="{{ $settings['senangpay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="senangpay_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @if ($coin->type == 'paymob_accept')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="callback_url">{{ __('admin.callback_url') }}:</label>
-                                                        <input type="text" id="paymob_accept_callback_url"
-                                                            name="paymob_accept_callback_url"
-                                                            placeholder="paymob_accept_callback_url"
-                                                            value="{{ $settings['paymob_accept_callback_url'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paymob_accept_api_key">{{ __('admin.api_key') }}:</label>
-                                                        <input type="text" id="paymob_accept_api_key"
-                                                            name="paymob_accept_api_key"
-                                                            placeholder="paymob_accept_api_key"
-                                                            value="{{ $settings['paymob_accept_api_key'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paymob_accept_iframe_id">{{ __('admin.iframe_id') }}:</label>
-                                                        <input type="text" id="paymob_accept_iframe_id"
-                                                            name="paymob_accept_iframe_id"
-                                                            placeholder="paymob_accept_iframe_id"
-                                                            value="{{ $settings['paymob_accept_iframe_id'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paymob_accept_integration_id">{{ __('admin.integration_id') }}:</label>
-                                                        <input type="text" id="paymob_accept_integration_id"
-                                                            name="paymob_accept_integration_id"
-                                                            placeholder="paymob_accept_integration_id"
-                                                            value="{{ $settings['paymob_accept_integration_id'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paymob_accept_hmac">{{ __('admin.hmac') }}:</label>
-                                                        <input type="text" id="paymob_accept_hmac"
-                                                            name="paymob_accept_hmac"
-                                                            placeholder="paymob_accept_hmac"
-                                                            value="{{ $settings['paymob_accept_hmac'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paymob_accept_payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="paymob_accept_payment_address"
-                                                            name="paymob_accept_payment_address"
-                                                            placeholder="paymob_accept_payment_address"
-                                                            value="{{ $settings['paymob_accept_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="paymob_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="paymob_webhook_url" name="paymob_webhook_url"
-                                                                       placeholder="paymob_webhook_url"
-                                                                       value="{{ $settings['paymob_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="paymob_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @if ($coin->type == 'flutter_wave')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="secret_key">{{ __('admin.secret_key') }}:</label>
-                                                        <input type="text" id="flutterwave_secret_key"
-                                                            name="flutterwave_secret_key"
-                                                            placeholder="flutterwave_secret_key"
-                                                            value="{{ $settings['flutterwave_secret_key'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="flutterwave_public_key">{{ __('admin.public_key') }}:</label>
-                                                        <input type="text" id="flutterwave_public_key"
-                                                            name="flutterwave_public_key"
-                                                            placeholder="flutterwave_public_key"
-                                                            value="{{ $settings['flutterwave_public_key'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="flutterwave_hash">{{ __('admin.hash') }}:</label>
-                                                        <input type="text" id="flutterwave_hash"
-                                                            name="flutterwave_hash" placeholder="flutterwave_hash"
-                                                            value="{{ $settings['flutterwave_hash'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="flutterwave_payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="flutterwave_payment_address"
-                                                            name="flutterwave_payment_address"
-                                                            placeholder="flutterwave_payment_address"
-                                                            value="{{ $settings['flutterwave_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="flutterwave_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="flutterwave_webhook_url" name="flutterwave_webhook_url"
-                                                                       placeholder="flutterwave_webhook_url"
-                                                                       value="{{ $settings['flutterwave_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="flutterwave_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @if ($coin->type == 'pay_stack')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="public key">{{ __('admin.public_key') }}:</label>
-                                                        <input type="text" id="paystack_public_key"
-                                                            name="paystack_public_key"
-                                                            placeholder="paystack_public_key"
-                                                            value="{{ $settings['paystack_public_key'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paystack_secret_key">{{ __('admin.secret_key') }}:</label>
-                                                        <input type="text" id="paystack_secret_key"
-                                                            name="paystack_secret_key"
-                                                            placeholder="paystack_secret_key"
-                                                            value="{{ $settings['paystack_secret_key'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="merchant_email">{{ __('admin.merchant_email') }}:</label>
-                                                        <input type="text" id="paystack_merchant_email"
-                                                            name="paystack_merchant_email"
-                                                            placeholder="paystack_merchant_email"
-                                                            value="{{ $settings['paystack_merchant_email'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="return_url">{{ __('admin.return_url') }}:</label>
-                                                        <input type="text" id="paystack_return_url"
-                                                            name="paystack_return_url"
-                                                            placeholder="paystack_return_url"
-                                                            value="{{ $settings['paystack_return_url'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="paystack_payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="paystack_payment_address"
-                                                            name="paystack_payment_address"
-                                                            placeholder="paystack_payment_address"
-                                                            value="{{ $settings['paystack_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="paystack_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="paystack_webhook_url" name="paystack_webhook_url"
-                                                                       placeholder="paystack_webhook_url"
-                                                                       value="{{ $settings['paystack_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="paystack_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @if ($coin->type == 'ssl_commerz')
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="store id">{{ __('admin.store_id') }}:</label>
-                                                        <input type="text" id="sslcommerz_store_id"
-                                                            name="sslcommerz_store_id"
-                                                            placeholder="sslcommerz_store_id"
-                                                            value="{{ $settings['sslcommerz_store_id'] ?? '' }}"
-                                                            class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="store_password">{{ __('admin.store_password') }}:</label>
-                                                        <input type="text" id="sslcommerz_store_password"
-                                                            name="sslcommerz_store_password"
-                                                            placeholder="sslcommerz_store_password"
-                                                            value="{{ $settings['sslcommerz_store_password'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label
-                                                            for="sslcommerz_payment_address">{{ __('admin.payment_address') }}:</label>
-                                                        <input type="text" id="sslcommerz_payment_address"
-                                                            name="sslcommerz_payment_address"
-                                                            placeholder="sslcommerz_payment_address"
-                                                            value="{{ $settings['sslcommerz_payment_address'] ?? '' }}"
-                                                            class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="sslcommerz_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="sslcommerz_webhook_url" name="sslcommerz_webhook_url"
-                                                                       placeholder="sslcommerz_webhook_url"
-                                                                       value="{{ $settings['sslcommerz_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="sslcommerz_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                                @if ($coin->type == 'zinipay')
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="store id">{{ __('admin.api_key') }}:</label>
-                                                            <input type="text" id="zinipay_api_key"
-                                                                   name="zinipay_api_key"
-                                                                   placeholder="zinipay_api_key"
-                                                                   value="{{ $settings['zinipay_api_key'] ?? '' }}"
-                                                                   class="form-control">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label
-                                                                for="store_password">{{ __('admin.url') }}:</label>
-                                                            <input type="text" id="zinipay_url"
-                                                                   name="zinipay_url"
-                                                                   placeholder="zinipay_url"
-                                                                   value="{{ $settings['zinipay_url'] ?? '' }}"
-                                                                   class="form-control" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label for="zinipay_webhook_url">{{ __('admin.webhook_url') }}:</label>
-                                                            <div class="copy-container">
-                                                                <input type="text" id="zinipay_webhook_url" name="zinipay_webhook_url"
-                                                                       placeholder="zinipay_webhook_url"
-                                                                       value="{{ $settings['zinipay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
-                                                                <button type="button" class="copy-button" data-copy-target="zinipay_webhook_url" title="Copy">📋</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
+
+
+{{--                                            @if ($coin->type == 'huawei_pay')--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label--}}
+{{--                                                                for="huawei_pay_merchant_id">{{ __('admin.merchant_id') }}:</label>--}}
+{{--                                                            <input type="text" id="huawei_pay_merchant_id"--}}
+{{--                                                                   name="huawei_pay_merchant_id" placeholder="merchant_id"--}}
+{{--                                                                   value="{{ $settings['huawei_pay_merchant_id'] ?? '' }}"--}}
+{{--                                                                   class="form-control" required>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="huawei_pay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="huawei_pay_webhook_url" name="huawei_pay_webhook_url"--}}
+{{--                                                                       placeholder="huawei_pay_webhook_url"--}}
+{{--                                                                       value="{{ $settings['huawei_pay_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="huawei_pay_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'mada')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="mada_access_token">{{ __('admin.access_token') }}:</label>--}}
+{{--                                                        <input type="text" id="mada_access_token"--}}
+{{--                                                            name="mada_access_token" placeholder="mada_access_token"--}}
+{{--                                                            value="{{ $settings['mada_access_token'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="mada_public_key">{{ __('admin.public_key') }}:</label>--}}
+{{--                                                        <input type="text" id="mada_public_key"--}}
+{{--                                                            name="mada_public_key" placeholder="mada_public_key"--}}
+{{--                                                            value="{{ $settings['mada_public_key'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="mada_payment_address"--}}
+{{--                                                            name="mada_payment_address"--}}
+{{--                                                            placeholder="mada_payment_address"--}}
+{{--                                                            value="{{ $settings['mada_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="mada_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="mada_webhook_url" name="mada_webhook_url"--}}
+{{--                                                                       placeholder="mada_webhook_url"--}}
+{{--                                                                       value="{{ $settings['mada_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="mada_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'liq_pay')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="liqpay_public_key">{{ __('admin.public_key') }}:</label>--}}
+{{--                                                        <input type="text" id="liqpay_public_key"--}}
+{{--                                                            name="liqpay_public_key" placeholder="liqpay_public_key"--}}
+{{--                                                            value="{{ $settings['liqpay_public_key'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="liqpay_private_key">{{ __('admin.private_key') }}:</label>--}}
+{{--                                                        <input type="text" id="liqpay_private_key"--}}
+{{--                                                            name="liqpay_private_key" placeholder="liqpay_private_key"--}}
+{{--                                                            value="{{ $settings['liqpay_private_key'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="liqpay_payment_address"--}}
+{{--                                                            name="liqpay_payment_address"--}}
+{{--                                                            placeholder="liqpay_payment_address"--}}
+{{--                                                            value="{{ $settings['liqpay_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="liqpay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="liqpay_webhook_url" name="liqpay_webhook_url"--}}
+{{--                                                                       placeholder="liqpay_webhook_url"--}}
+{{--                                                                       value="{{ $settings['liqpay_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="liqpay_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'paypal')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paypal__client_id">{{ __('admin.client_id') }}:</label>--}}
+{{--                                                        <input type="text" id="paypal_client_id"--}}
+{{--                                                            name="paypal_client_id" placeholder="paypal_client_id"--}}
+{{--                                                            value="{{ $settings['paypal_client_id'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paypal_client_secret">{{ __('admin.client_secret') }}:</label>--}}
+{{--                                                        <input type="text" id="paypal_client_secret"--}}
+{{--                                                            name="paypal_client_secret"--}}
+{{--                                                            placeholder="paypal_client_secret"--}}
+{{--                                                            value="{{ $settings['paypal_client_secret'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="paypal_payment_address"--}}
+{{--                                                            name="paypal_payment_address"--}}
+{{--                                                            placeholder="paypal_payment_address"--}}
+{{--                                                            value="{{ $settings['paypal_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="paypal_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="paypal_webhook_url" name="paypal_webhook_url"--}}
+{{--                                                                       placeholder="paypal_webhook_url"--}}
+{{--                                                                       value="{{ $settings['paypal_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="paypal_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'paytm')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paytm_merchant_key">{{ __('admin.merchant_key') }}:</label>--}}
+{{--                                                        <input type="text" id="paytm_merchant_key"--}}
+{{--                                                            name="paytm_merchant_key" placeholder="paytm_merchant_key"--}}
+{{--                                                            value="{{ $settings['paytm_merchant_key'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paytm_merchant_id">{{ __('admin.merchant_id') }}:</label>--}}
+{{--                                                        <input type="text" id="paytm_merchant_id"--}}
+{{--                                                            name="paytm_merchant_id" placeholder="paytm_merchant_id"--}}
+{{--                                                            value="{{ $settings['paytm_merchant_id'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paytm_merchant_website_link">{{ __('admin.merchant_website_link') }}:</label>--}}
+{{--                                                        <input type="text" id="paytm_merchant_website_link"--}}
+{{--                                                            name="paytm_merchant_website_link"--}}
+{{--                                                            placeholder="paytm_merchant_website_link"--}}
+{{--                                                            value="{{ $settings['paytm_merchant_website_link'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="paytm_payment_address"--}}
+{{--                                                            name="paytm_payment_address"--}}
+{{--                                                            placeholder="paytm_payment_address"--}}
+{{--                                                            value="{{ $settings['paytm_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="paytm_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="paytm_webhook_url" name="paytm_webhook_url"--}}
+{{--                                                                       placeholder="paytm_webhook_url"--}}
+{{--                                                                       value="{{ $settings['paytm_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="paytm_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'bkash')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label for="profile_id">{{ __('admin.appkey') }}:</label>--}}
+{{--                                                        <input type="text" id="bkash_appkey"--}}
+{{--                                                            name="bkash_appkey" placeholder="bkash_appkey"--}}
+{{--                                                            value="{{ $settings['bkash_appkey'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="bkash_app_secret">{{ __('admin.app_secret') }}:</label>--}}
+{{--                                                        <input type="text" id="bkash_app_secret"--}}
+{{--                                                            name="bkash_app_secret" placeholder="bkash_app_secret"--}}
+{{--                                                            value="{{ $settings['bkash_app_secret'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="bkash_username">{{ __('admin.username') }}:</label>--}}
+{{--                                                        <input type="text" id="bkash_username"--}}
+{{--                                                            name="bkash_username" placeholder="bkash_username"--}}
+{{--                                                            value="{{ $settings['bkash_username'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="bkash_password">{{ __('admin.password') }}:</label>--}}
+{{--                                                        <input type="text" id="bkash_password"--}}
+{{--                                                            name="bkash_password" placeholder="bkash_password"--}}
+{{--                                                            value="{{ $settings['bkash_password'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="bkash_payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="bkash_payment_address"--}}
+{{--                                                            name="bkash_payment_address"--}}
+{{--                                                            placeholder="bkash_payment_address"--}}
+{{--                                                            value="{{ $settings['bkash_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="bkash_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="bkash_webhook_url" name="bkash_webhook_url"--}}
+{{--                                                                       placeholder="bkash_webhook_url"--}}
+{{--                                                                       value="{{ $settings['bkash_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="bkash_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'razor_pay')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label for="api_key">{{ __('admin.api_key') }}:</label>--}}
+{{--                                                        <input type="text" id="razorpay_api_key"--}}
+{{--                                                            name="razorpay_api_key" placeholder="razorpay_api_key"--}}
+{{--                                                            value="{{ $settings['razorpay_api_key'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="razorpay_api_secret">{{ __('admin.api_secret') }}:</label>--}}
+{{--                                                        <input type="text" id="razorpay_api_secret"--}}
+{{--                                                            name="razorpay_api_secret"--}}
+{{--                                                            placeholder="razorpay_api_secret"--}}
+{{--                                                            value="{{ $settings['razorpay_api_secret'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="razorpay_payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="razorpay_payment_address"--}}
+{{--                                                            name="razorpay_payment_address"--}}
+{{--                                                            placeholder="razorpay_payment_address"--}}
+{{--                                                            value="{{ $settings['razorpay_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="razorpay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="razorpay_webhook_url" name="razorpay_webhook_url"--}}
+{{--                                                                       placeholder="razorpay_webhook_url"--}}
+{{--                                                                       value="{{ $settings['razorpay_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="razorpay_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'senang_pay')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="api_key">{{ __('admin.callback_url') }}:</label>--}}
+{{--                                                        <input type="text" id="senangpay_callback_url"--}}
+{{--                                                            name="senangpay_callback_url"--}}
+{{--                                                            placeholder="senangpay_callback_url"--}}
+{{--                                                            value="{{ $settings['senangpay_callback_url'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="senangpay_secret_key">{{ __('admin.secret_key') }}:</label>--}}
+{{--                                                        <input type="text" id="senangpay_secret_key"--}}
+{{--                                                            name="senangpay_secret_key"--}}
+{{--                                                            placeholder="senangpay_secret_key"--}}
+{{--                                                            value="{{ $settings['senangpay_secret_key'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="senangpay_merchant_id">{{ __('admin.merchant_id') }}:</label>--}}
+{{--                                                        <input type="text" id="senangpay_merchant_id"--}}
+{{--                                                            name="senangpay_merchant_id"--}}
+{{--                                                            placeholder="senangpay_merchant_id"--}}
+{{--                                                            value="{{ $settings['senangpay_merchant_id'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="senangpay_payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="senangpay_payment_address"--}}
+{{--                                                            name="senangpay_payment_address"--}}
+{{--                                                            placeholder="senangpay_payment_address"--}}
+{{--                                                            value="{{ $settings['senangpay_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="senangpay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="senangpay_webhook_url" name="senangpay_webhook_url"--}}
+{{--                                                                       placeholder="senangpay_webhook_url"--}}
+{{--                                                                       value="{{ $settings['senangpay_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="senangpay_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'paymob_accept')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="callback_url">{{ __('admin.callback_url') }}:</label>--}}
+{{--                                                        <input type="text" id="paymob_accept_callback_url"--}}
+{{--                                                            name="paymob_accept_callback_url"--}}
+{{--                                                            placeholder="paymob_accept_callback_url"--}}
+{{--                                                            value="{{ $settings['paymob_accept_callback_url'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paymob_accept_api_key">{{ __('admin.api_key') }}:</label>--}}
+{{--                                                        <input type="text" id="paymob_accept_api_key"--}}
+{{--                                                            name="paymob_accept_api_key"--}}
+{{--                                                            placeholder="paymob_accept_api_key"--}}
+{{--                                                            value="{{ $settings['paymob_accept_api_key'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paymob_accept_iframe_id">{{ __('admin.iframe_id') }}:</label>--}}
+{{--                                                        <input type="text" id="paymob_accept_iframe_id"--}}
+{{--                                                            name="paymob_accept_iframe_id"--}}
+{{--                                                            placeholder="paymob_accept_iframe_id"--}}
+{{--                                                            value="{{ $settings['paymob_accept_iframe_id'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paymob_accept_integration_id">{{ __('admin.integration_id') }}:</label>--}}
+{{--                                                        <input type="text" id="paymob_accept_integration_id"--}}
+{{--                                                            name="paymob_accept_integration_id"--}}
+{{--                                                            placeholder="paymob_accept_integration_id"--}}
+{{--                                                            value="{{ $settings['paymob_accept_integration_id'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paymob_accept_hmac">{{ __('admin.hmac') }}:</label>--}}
+{{--                                                        <input type="text" id="paymob_accept_hmac"--}}
+{{--                                                            name="paymob_accept_hmac"--}}
+{{--                                                            placeholder="paymob_accept_hmac"--}}
+{{--                                                            value="{{ $settings['paymob_accept_hmac'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paymob_accept_payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="paymob_accept_payment_address"--}}
+{{--                                                            name="paymob_accept_payment_address"--}}
+{{--                                                            placeholder="paymob_accept_payment_address"--}}
+{{--                                                            value="{{ $settings['paymob_accept_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="paymob_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="paymob_webhook_url" name="paymob_webhook_url"--}}
+{{--                                                                       placeholder="paymob_webhook_url"--}}
+{{--                                                                       value="{{ $settings['paymob_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="paymob_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'flutter_wave')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="secret_key">{{ __('admin.secret_key') }}:</label>--}}
+{{--                                                        <input type="text" id="flutterwave_secret_key"--}}
+{{--                                                            name="flutterwave_secret_key"--}}
+{{--                                                            placeholder="flutterwave_secret_key"--}}
+{{--                                                            value="{{ $settings['flutterwave_secret_key'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="flutterwave_public_key">{{ __('admin.public_key') }}:</label>--}}
+{{--                                                        <input type="text" id="flutterwave_public_key"--}}
+{{--                                                            name="flutterwave_public_key"--}}
+{{--                                                            placeholder="flutterwave_public_key"--}}
+{{--                                                            value="{{ $settings['flutterwave_public_key'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="flutterwave_hash">{{ __('admin.hash') }}:</label>--}}
+{{--                                                        <input type="text" id="flutterwave_hash"--}}
+{{--                                                            name="flutterwave_hash" placeholder="flutterwave_hash"--}}
+{{--                                                            value="{{ $settings['flutterwave_hash'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="flutterwave_payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="flutterwave_payment_address"--}}
+{{--                                                            name="flutterwave_payment_address"--}}
+{{--                                                            placeholder="flutterwave_payment_address"--}}
+{{--                                                            value="{{ $settings['flutterwave_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="flutterwave_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="flutterwave_webhook_url" name="flutterwave_webhook_url"--}}
+{{--                                                                       placeholder="flutterwave_webhook_url"--}}
+{{--                                                                       value="{{ $settings['flutterwave_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="flutterwave_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'pay_stack')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="public key">{{ __('admin.public_key') }}:</label>--}}
+{{--                                                        <input type="text" id="paystack_public_key"--}}
+{{--                                                            name="paystack_public_key"--}}
+{{--                                                            placeholder="paystack_public_key"--}}
+{{--                                                            value="{{ $settings['paystack_public_key'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paystack_secret_key">{{ __('admin.secret_key') }}:</label>--}}
+{{--                                                        <input type="text" id="paystack_secret_key"--}}
+{{--                                                            name="paystack_secret_key"--}}
+{{--                                                            placeholder="paystack_secret_key"--}}
+{{--                                                            value="{{ $settings['paystack_secret_key'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="merchant_email">{{ __('admin.merchant_email') }}:</label>--}}
+{{--                                                        <input type="text" id="paystack_merchant_email"--}}
+{{--                                                            name="paystack_merchant_email"--}}
+{{--                                                            placeholder="paystack_merchant_email"--}}
+{{--                                                            value="{{ $settings['paystack_merchant_email'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="return_url">{{ __('admin.return_url') }}:</label>--}}
+{{--                                                        <input type="text" id="paystack_return_url"--}}
+{{--                                                            name="paystack_return_url"--}}
+{{--                                                            placeholder="paystack_return_url"--}}
+{{--                                                            value="{{ $settings['paystack_return_url'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="paystack_payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="paystack_payment_address"--}}
+{{--                                                            name="paystack_payment_address"--}}
+{{--                                                            placeholder="paystack_payment_address"--}}
+{{--                                                            value="{{ $settings['paystack_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="paystack_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="paystack_webhook_url" name="paystack_webhook_url"--}}
+{{--                                                                       placeholder="paystack_webhook_url"--}}
+{{--                                                                       value="{{ $settings['paystack_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="paystack_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                            @if ($coin->type == 'ssl_commerz')--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label for="store id">{{ __('admin.store_id') }}:</label>--}}
+{{--                                                        <input type="text" id="sslcommerz_store_id"--}}
+{{--                                                            name="sslcommerz_store_id"--}}
+{{--                                                            placeholder="sslcommerz_store_id"--}}
+{{--                                                            value="{{ $settings['sslcommerz_store_id'] ?? '' }}"--}}
+{{--                                                            class="form-control">--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="store_password">{{ __('admin.store_password') }}:</label>--}}
+{{--                                                        <input type="text" id="sslcommerz_store_password"--}}
+{{--                                                            name="sslcommerz_store_password"--}}
+{{--                                                            placeholder="sslcommerz_store_password"--}}
+{{--                                                            value="{{ $settings['sslcommerz_store_password'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="col-md-6">--}}
+{{--                                                    <div class="form-group">--}}
+{{--                                                        <label--}}
+{{--                                                            for="sslcommerz_payment_address">{{ __('admin.payment_address') }}:</label>--}}
+{{--                                                        <input type="text" id="sslcommerz_payment_address"--}}
+{{--                                                            name="sslcommerz_payment_address"--}}
+{{--                                                            placeholder="sslcommerz_payment_address"--}}
+{{--                                                            value="{{ $settings['sslcommerz_payment_address'] ?? '' }}"--}}
+{{--                                                            class="form-control" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="sslcommerz_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="sslcommerz_webhook_url" name="sslcommerz_webhook_url"--}}
+{{--                                                                       placeholder="sslcommerz_webhook_url"--}}
+{{--                                                                       value="{{ $settings['sslcommerz_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="sslcommerz_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
+{{--                                                @if ($coin->type == 'zinipay')--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="store id">{{ __('admin.api_key') }}:</label>--}}
+{{--                                                            <input type="text" id="zinipay_api_key"--}}
+{{--                                                                   name="zinipay_api_key"--}}
+{{--                                                                   placeholder="zinipay_api_key"--}}
+{{--                                                                   value="{{ $settings['zinipay_api_key'] ?? '' }}"--}}
+{{--                                                                   class="form-control">--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label--}}
+{{--                                                                for="store_password">{{ __('admin.url') }}:</label>--}}
+{{--                                                            <input type="text" id="zinipay_url"--}}
+{{--                                                                   name="zinipay_url"--}}
+{{--                                                                   placeholder="zinipay_url"--}}
+{{--                                                                   value="{{ $settings['zinipay_url'] ?? '' }}"--}}
+{{--                                                                   class="form-control" required>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="zinipay_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
+{{--                                                            <div class="copy-container">--}}
+{{--                                                                <input type="text" id="zinipay_webhook_url" name="zinipay_webhook_url"--}}
+{{--                                                                       placeholder="zinipay_webhook_url"--}}
+{{--                                                                       value="{{ $settings['zinipay_webhook_url'] ?? '' }}"--}}
+{{--                                                                       class="form-control" required>--}}
+{{--                                                                <button type="button" class="copy-button" data-copy-target="zinipay_webhook_url" title="Copy">📋</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endif--}}
                                             {{--                                                @foreach ($coin->settings as $setting) --}}
                                             {{--                                                    <div class="col-md-6"> --}}
                                             {{--                                                        <div class="form-group"> --}}

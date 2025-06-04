@@ -150,6 +150,7 @@ class GroupChatController extends MainController
 
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         $grid->disableExport();
+        $this->extendGrid($grid);
         return $grid;
     }
 

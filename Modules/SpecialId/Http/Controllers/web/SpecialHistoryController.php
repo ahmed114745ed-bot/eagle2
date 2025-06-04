@@ -17,7 +17,7 @@ class SpecialHistoryController extends MainController
      *
      * @var string
      */
-    public $permission_name = 'special-history';
+    public $permission_name = 'details-of-unique-identifiers';
 
     public function index(Content $content)
     {
@@ -81,28 +81,30 @@ class SpecialHistoryController extends MainController
 
             return '
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="'.$url.'" alt="User Image" style="width: 40px; height: 40px;">
+                    <img src="' . $url . '" alt="User Image" style="width: 40px; height: 40px;">
                     <div>
-                        <a href="/admin/users/'.$this->user_id.'" style="text-decoration: none; color:rgb(253, 253, 253); font-weight: bold;">'.$name.'</a>
-                        <div style="font-size: 12px; color: #fff;">' .'Uuid: '.$this->user?->uuid.'</div>
+                        <a href="/admin/users/' . $this->user_id . '" style="text-decoration: none; color:rgb(253, 253, 253); font-weight: bold;">' . $name . '</a>
+                        <div style="font-size: 12px; color: #fff;">' . 'Uuid: ' . $this->user?->uuid . '</div>
                     </div>
                 </div>
             ';
         });
         $grid->column('ware.show_img', __('image'))->image('', 50);
         $grid->column('status', __('status'))->display(function ($status) {
-         // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
-            return $status == 1 ? "<span class='label-success' " .'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"'.
-                "></span>" : "<span class='label-warning' " .'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"'.
+            // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
+            return $status == 1 ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
+                "></span>" : "<span class='label-warning' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
                 "></span>";
         });
 
-        $grid->column('created_at', trans('admin.created_at'))->diffForHumans ();
+        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableEdit();
             $actions->disableView();
         });
         $grid->disableCreateButton();
+        $this->extendGrid($grid);
+
 
         return $grid;
     }

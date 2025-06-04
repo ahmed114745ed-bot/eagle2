@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Http\Resources\Api\V1\ChargeAgentResource;
 use App\Models\PaymentGateway;
+use App\Models\ShippingAgency;
 use App\Tik\Repositories\UserRepository;
 use Modules\SalaryTransaction\Helpers\TransactionCustomNotification;
 use App\Http\Controllers\Controller;
@@ -77,20 +78,58 @@ class AgentSalaryTransactionController extends Controller
             return Common::apiResponse(0, __("api_responses.agency"));
         }
 
-        $data = Charge::with('receiver', 'sender')->where('is_used_transferred', false)->where("agency_id", $agency->id);
+        $data = Charge::where('is_used_transferred', false)
+                        ->where("charger_type", 'agency')
+                        ->where("charger_id", $agency->id);
 
-        $data = $data->when($type == 'sent', function ($q) use ($search, $usrAuth) {
-            $q->where("charger_id", $usrAuth->id)->where('agency_id', $usrAuth->agency_id)->where('charger_type', '!=', 'dash')
-                ->whereHas('receiver', function ($q2) use ($search) {
-                    $q2->fitterByUuid($search);
+        // $data = $data->when($type == 'sent', function ($q) use ($search, $agency) {
+        //     $q->where("charger_id", $agency->id)->where('charger_type',  'agency');
+        //         // ->whereHas('receiver', function ($q2) use ($search) {
+        //         //     $q2->fitterByUuid($search);
+        //         // });
+        // })
+        // ->when($type == 'received', function ($q) use ($search, $agency) {
+        //     $q->where('agency_id', $agency->id);
+        //     //   ->whereHas('sender', function ($q2) use ($search) {
+        //     //       $q2->fitterByUuid($search);
+        //     //   });
+        // })->orderByDesc('id')->paginate();
+
+
+        $data = $data->when($type == 'sent', function ($q) use ($search, $agency) {
+            $q->where("charger_id", $agency->id)->where('charger_type',  'agency');
+        
+            if ($search) {
+                $q->whereHasMorph('receiver', [\App\Models\User::class, \App\Models\ShippingAgency::class], function ($query) use ($search) {
+                    $query->where('uuid', 'like', "%$search%");
                 });
+            }
         })
-            ->when($type == 'received', function ($q) use ($search, $usrAuth) {
-                $q->where("user_id", $usrAuth->id)->where('agency_id', $usrAuth->agency_id)
-                    ->whereHas('sender', function ($q2) use ($search) {
-                        $q2->fitterByUuid($search);
+        ->when($type == 'received', function ($q) use ($search, $agency) {
+            $q->where('agency_id', $agency->id);
+        
+            if ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where(function ($subQuery) use ($search) {
+                        $subQuery->where('charger_type', 'agency')
+                            ->whereIn('charger_id', function ($subSubQuery) use ($search) {
+                                $subSubQuery->select('id')
+                                    ->from('shipping_agencies')
+                                    ->where('uuid', 'like', "%$search%");
+                            });
+                    })->orWhere(function ($subQuery) use ($search) {
+                        $subQuery->where('charger_type', 'user')
+                            ->whereIn('charger_id', function ($subSubQuery) use ($search) {
+                                $subSubQuery->select('id')
+                                    ->from('users')
+                                    ->where('uuid', 'like', "%$search%");
+                            });
                     });
-            })->orderByDesc('id')->paginate();
+                });
+            }
+        })->orderByDesc('id')->paginate();
+
+      
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }
 
@@ -158,7 +197,7 @@ class AgentSalaryTransactionController extends Controller
 
             $charge = Charge::query()->create([
                 'charger_id'  => $user->id,
-                'charger_type' => 'freight forwarder',
+                'charger_type' => 'agency',
                 'user_id'     => $user_id,
                 'user_type' => $type,
                 'amount' => $count,
@@ -187,7 +226,7 @@ class AgentSalaryTransactionController extends Controller
         $countryId = $request->country_id;
         $paymentId = $request->payment_id;
 
-        $agencies = Agency::with("Countries", "AgencypaymentGateways")->has("chargeAgency")->withCount(['salaryRequests' => function ($query) {
+        $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")->withCount(['salaryRequests' => function ($query) {
             $query->where('status', 3);
         }])->whereHas('owner')
             ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))

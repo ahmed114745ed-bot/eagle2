@@ -3,6 +3,7 @@
 use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\PaytabsController;
 use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
@@ -108,7 +109,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('/image-intro/{id}', [UserController::class, 'image_intro']);
     Route::get('colors', [ColorController::class, 'index']);
     Route::get('all-servers', [RegisterController::class, 'all_servers']);
-    
+
     // v2
     Route::prefix('search')->name('search.')->group(function () {
         Route::get('users', [UserController::class, 'search'])->name('users');
@@ -216,7 +217,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('black-list', [RoomController::class, 'blackList']);
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
                 Route::post('add-block', [RoomController::class, 'addBlock']);
-                Route::patch('{Room}/comment_status', [RoomController::class, 'commentStatus']);
+                Route::post('{Room}/comment_status', [RoomController::class, 'commentStatus']);
                 Route::post('/yellow-banner', [RoomController::class, 'sendComment']);
 
                 //Pk
@@ -443,6 +444,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // start vips
             Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
                 Route::get('/list', [VipController::class, 'vipList']);
+                Route::get('/user/list', [VipController::class, 'vipUserList']);
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
                 Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
@@ -467,6 +469,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('buy', [MallController::class, 'buyWare']);
                 Route::post('send', [MallController::class, 'sendWare']);
                 Route::get('best-sale', [MallController::class, 'bestWareSale']);
+
+                Route::get('wabble', [MallController::class, 'wabbleWare']);
+                Route::get('wabbleAll', [MallController::class, 'wabbleAll']);
             });
             //start games
             Route::prefix('all-games1')->group(function () {
@@ -501,11 +506,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
                 Route::post('charges-history', [ChargeController::class, 'chargeToHistory']);
-                 Route::get('history/{id}', [AgencyController::class, 'history']);
+                Route::get('history/{id}', [AgencyController::class, 'history']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
-               
+                Route::get('old-agencies', [AgencyController::class, 'gitOldAgencies']);
+
+                
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
@@ -558,9 +565,19 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::get('app_feature', [AppFeatureController::class, 'show']);
+
+
+            Route::group(['prefix' => 'paytabs', 'as' => 'paytabs.'], function () {
+                Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');
+                // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
+                Route::any('response', [PaytabsController::class, 'response'])->name('response');
+            });
+
+
         }
     );
 
+Route::get('/languages', [LanguageController::class, 'index']);
 
     Route::get('/privacy-policy', function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
@@ -568,5 +585,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     });
 });
 
+Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
+Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
 
-Route::get('/languages', [LanguageController::class, 'index']);
+

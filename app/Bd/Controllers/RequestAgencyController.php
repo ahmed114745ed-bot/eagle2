@@ -16,9 +16,9 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Widgets\Table as WidgetsTable;
 use Illuminate\Support\Facades\Auth;
 
-class RequestAgencyController extends MainController
+class RequestAgencyController extends AdminController
 {
-     public $permission_name = 'request-agencies';
+     public $permission_name = 'agencies-request';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");

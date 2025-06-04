@@ -11,6 +11,7 @@ use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
 use Illuminate\Support\Facades\Log;
 use App\Classes\Gifts\SendGiftService;
+use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
 use App\Jobs\AllOpeningRoomsZegoRequest;
@@ -123,13 +124,15 @@ class GiftLogService
         if ($room->lastPk != null) {
 
             dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))->onQueue('updatePk');
-        } else if ($room->charizma_status) {
-            dispatch(new UpdateUsersAndSendCharismaToZigo($room, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))->onQueue('default');
+        }
+
+        if ($room->charizma_status) {
+            dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))->onQueue('default');
         }
 
 
         $realPrice = (int)($number * $gift->price);
-    
+
         $price = ceil($realPrice);
         $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
 
@@ -139,7 +142,7 @@ class GiftLogService
 
         $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
 
-       
+
 
         if ($room->mode != '1' && $room->mode != '2') {
             $this->updateRoomCoinsToUser($userId, $room, $totalPrice);

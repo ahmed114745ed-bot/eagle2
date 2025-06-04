@@ -39,9 +39,11 @@ class VersionController extends Controller
         $isBan          = $this->haveBan(@$user->uuid);
         $isGiftUpdated  = $this->isUpdated('gifts_update_at', @$request->gift_time);
         $isIntroUpdated = $this->isUpdated('intro_updated_at', @$request->intro_time);
+        $isBubbleFrameUpdated = $this->isUpdated('bubble_frame_updated_at', @$request->bubble_frame_time);
         $isFrameUpdated = $this->isUpdated('frame_updated_at', @$request->frame_time);
         $isEmojiUpdated = $this->isUpdated('emoji_updated_at', @$request->emoji_time);
         $isExtraUpdated = $this->isUpdated('extra_updated_at', @$request->extra_time);
+        
         $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
 
@@ -58,6 +60,7 @@ class VersionController extends Controller
                 'frames' => $isFrameUpdated,
                 'extras' => $isExtraUpdated,
                 'profile_frame_updated' => $ProfileFrameUpdated,
+                'bubble_frame' => $isBubbleFrameUpdated,
                 'colors' => settings()->get('colors_updated_at') ?? false,
                 'background' => settings()->get('ground_updated_at') ?? false,
                 'host_agency' => (bool)\Cache::get('host_agency'),

@@ -1025,7 +1025,7 @@
                                         <td>{{ count($member->reals) ?? 0 }}</td>
                                         <td>{{ $member->liveTime->sum("hours") }}</td>
                                         <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                        <td>{{ $member->userSallary->sallary ?? 0 }}</td>
+                                        <td>{{ $member->salary ?? 0 }}</td>
                                         <td>
                                             @if($isOwner)
                                                 <span class="role-badge owner">{{ __('Owner') }}</span>

@@ -13,7 +13,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class DedicateVipController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'vips-dedicate';
+    public $permission_name = 'gift-VIP';
 
     public function index(Content $content)
     {
@@ -67,18 +67,22 @@ class DedicateVipController extends MainController
         $grid->column('price', __('price'));
         $grid->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
-            $url = getImagePath($path);
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         Admin::style("
         .table {
             background-color: var(--table-background-color) !important;
         }
-    
+
         .table th, .table td {
             background-color: var(--table-background-color) !important;
         }
-    
+
         .table tbody tr:hover {
             background-color: var(--primary-hover-alpha) !important;
         }
@@ -115,18 +119,19 @@ class DedicateVipController extends MainController
         });
         $grid->column('level', __('level'));
         $grid->column('expire', __('expire'));
+        if (Admin::user()->can('gift-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('return', __('dedicate'))->display(function () {
 
-        $grid->column ('return',__ ('dedicate'))->display (function (){
-
-          return (new \App\Admin\Actions\VipDedicateAction($this->id))->render ();
-        });
+                return (new \App\Admin\Actions\VipDedicateAction($this->id))->render();
+            });
+        }
         $grid->disableCreateButton();
         $grid->disableActions();
-          $grid->actions(function ($actions) {
+        $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
-           // $actions->add(new DedicateAction());
+            // $actions->add(new DedicateAction());
         });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens

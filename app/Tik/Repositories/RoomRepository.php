@@ -54,7 +54,6 @@ class RoomRepository extends AbstractRepository
         return $this->model->find($roomId);
     }
 
-
     public function getRooms($ids)
     {
         return $this->model->whereIn('uid', $ids)->where(function ($q) {
@@ -248,15 +247,6 @@ class RoomRepository extends AbstractRepository
     {
         $room->room_black = trim($roomBlack, ',');
         $this->updateRoomUser($room);
-    }
-
-    public function commentStatus($roomId): bool
-    {
-        $room = $this->model->where('id', $roomId)->first();
-
-        $room->update(['is_comment_closed' => !$room->is_comment_closed]);
-
-        return $room->is_comment_closed;
     }
 
     public function roomUsers($userId)

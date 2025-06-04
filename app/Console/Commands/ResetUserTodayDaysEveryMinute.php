@@ -42,5 +42,8 @@ class ResetUserTodayDaysEveryMinute extends Command
             UPDATE users
             SET today_days = 0
         ");
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
+
     }
 }

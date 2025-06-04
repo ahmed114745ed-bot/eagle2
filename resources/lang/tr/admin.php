@@ -208,7 +208,7 @@ return [
     "country_code" => 'Ülke Kodu',
     "Tencent" => 'Tencent',
     "lucky_flex" => "Lucky Flex",
-    "guess_the_word" => "Kelimeyi Tahmin Et",
+    "chess" => "Satranç",
 
     // Fawry
     "fawry_secret" => "Gizli Anahtar",

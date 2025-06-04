@@ -16,9 +16,11 @@ use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Controllers\AdminController;
 
 
-class BdSalariesController extends MainController
+
+class BdSalariesController extends AdminController
 {
     use HasResourceActions;
 

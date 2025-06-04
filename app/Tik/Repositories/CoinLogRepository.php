@@ -24,4 +24,11 @@ class CoinLogRepository extends AbstractRepository
             ->when($searchKey, fn($q) => $q->where('trx', 'like', $searchKey))
             ->orderByDesc('id')->get();
     }
+
+
+    public function getCoinsById($id)
+    {
+        return $this->model::find($id);
+            
+    }
 }

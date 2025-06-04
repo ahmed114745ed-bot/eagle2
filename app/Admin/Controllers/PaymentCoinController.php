@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 
 use Config;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -75,11 +76,15 @@ class PaymentCoinController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
         $grid->column('photo', __('image'))->image('', 50);
-        $grid->column(__('procedures'))->display(function () {
-            $url1 = url('admin/coins/' . $this->id);
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('coins') . "</a>";
-            return $button1;
-        });
+
+        if (Admin::user()->can('browse-' . 'coins') || Admin::user()->can('*')) {
+            $grid->column(__('procedures'))->display(function () {
+                $url1 = url('admin/coins/' . $this->id);
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('coins') . "</a>";
+                return $button1;
+            });
+        }
+
         $status = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
@@ -138,6 +143,7 @@ class PaymentCoinController extends MainController
         //            return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
         //        });
         $grid->disableCreateButton();
+        $this->extendGrid($grid);
         return $grid;
     }
 
