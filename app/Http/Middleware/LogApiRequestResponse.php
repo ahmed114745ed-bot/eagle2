@@ -21,7 +21,7 @@ class LogApiRequestResponse
         $user = \Auth::user();
 
         if ($user && $user->id === 2) {
-            \Log::channel('custom_log')->info('API Request by User ID 2 ', [
+            \Log::channel('custom_log')->info('API Request by User ID 2 '. PHP_EOL, [
                 'user_id' => $user->id,
                 'url' => $request->fullUrl(),
                 'method' => $request->method(),
