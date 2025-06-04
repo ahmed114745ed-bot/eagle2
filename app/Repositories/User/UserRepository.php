@@ -62,6 +62,7 @@ class UserRepository extends Repository
             ->whereDoesntHave('hostAgency', function ($query) {
                 $query->where('type', 1);
             })
+            ->whereDoesntHave('shippingAgency') 
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('uuid', 'like', '%' . $key . '%')
@@ -82,6 +83,7 @@ class UserRepository extends Repository
             ->whereDoesntHave('hostAgency', function ($query) {
                 $query->where('type', 1);
             })
+            ->whereDoesntHave('shippingAgency') 
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('uuid', 'like', '%' . $key . '%')
