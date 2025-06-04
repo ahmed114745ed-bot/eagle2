@@ -220,6 +220,7 @@ class FixedTargetService
             'dB' =>  $db_usd * $percentageAchieved,
             'achieved_hours' =>   $hours,
             'achieved_days' =>  $days,
+            'achieved_diamond' =>  $month_received,
         ];
         if (0 < $t) $values['sallary'] = $t;
 
