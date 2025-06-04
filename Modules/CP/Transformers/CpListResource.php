@@ -16,6 +16,7 @@ class CpListResource extends JsonResource
 {
     public function toArray($request)
     {
+        info(request('user_id'));
         $loginUserId = request('user_id') ?? Auth::id();
         if ($this->user_one_id == $loginUserId) {
             $user = $this->toUser;

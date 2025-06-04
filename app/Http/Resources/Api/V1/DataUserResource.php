@@ -19,7 +19,6 @@ class DataUserResource extends JsonResource
         $family = $this->family;
         $f = null;
 
-        info($family);
         if ($family) {
 
             $f = [
