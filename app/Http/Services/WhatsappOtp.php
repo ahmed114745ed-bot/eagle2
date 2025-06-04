@@ -61,8 +61,8 @@ class WhatsappOtp
         Log::info("Code matches: " . Code::query()->where('code', $code)->exists());
         Log::info("now hour: " . Carbon::now()->subHour()->toDateTimeString());
         Log::info("created at: " .  Code::query()->where('code', $code)->value('created_at'));
-       dd(Code::query()->where('phone', $phone)->where('code', $code))->get();
-        return Code::query()->where('phone', $phone)->where('code', $code)->where('created_at', '>', Carbon::now()->subHours()->toDate())->exists();
+      // dd(Code::query()->where('phone', $phone)->where('code', $code))->get();
+        return Code::query()->where('phone', $phone)->where('code', $code)->where('created_at', '>', Carbon::now()->subHours()->toDateTimeString())->exists();
     }
 
     public function resetCodes(string $phone)
