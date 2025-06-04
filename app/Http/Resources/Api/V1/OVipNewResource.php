@@ -29,7 +29,7 @@ class OVipNewResource extends JsonResource
             "is_used" => $this->is_used == 1,
             "using" => $this->using == 1,
             'expire' => $this->expire != 0 ? date("Y-m-d H:i:s", $this->expire) : 0,
-            'remaining_time' => $diff->d == 0 ? ($diff->h  == 0 ? sprintf('%dm',  $diff->i) : sprintf('%dh %dm',  $diff->h, $diff->i)) : sprintf('%dd %dh %dm %ds',  $diff->d, $diff->h, $diff->i,),
+            'remaining_time' => sprintf('%dd %dh %dm', $diff->d, $diff->h, $diff->i),
 
             'vip' => [
                 'id' => $oVip->id,
