@@ -822,7 +822,6 @@ class Common
                     $q->where('expire', '>=', now()->timestamp)
                         ->orWhere('expire', 0);
                 })->first();
-
             if ($expire == null) {
                 $expire = $vip->expire;
             }
