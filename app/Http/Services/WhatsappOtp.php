@@ -66,7 +66,12 @@ dd(Code::query()
         ->where('code', $code)
         ->where('created_at', '>', Carbon::now()->subHour())
         ->latest()
-        ->first(),$phone,$code);
+        ->first(),$phone,$code,Code::query()
+        ->where('phone', $phone)
+        ->where('code', $code)
+       
+        ->latest()
+        ->first());
         return Code::query()
         ->where('phone', $phone)
         ->where('code', $code)
