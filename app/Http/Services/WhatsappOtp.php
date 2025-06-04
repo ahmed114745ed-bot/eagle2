@@ -64,7 +64,7 @@ class WhatsappOtp
 dd(Code::query()
     ->where('phone', $phone)
     ->where('code', $code)
-    ->first());
+    ->first(), $code,$phone);
         return Code::query()->where('phone', $phone)->where('code', $code)->where('created_at', '>', Carbon::now()->subHours())->exists();
     }
 
