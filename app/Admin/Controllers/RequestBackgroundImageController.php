@@ -43,9 +43,9 @@ class RequestBackgroundImageController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('request-background-image'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -57,9 +57,9 @@ class RequestBackgroundImageController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('request-background-image'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -70,9 +70,9 @@ class RequestBackgroundImageController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('request-background-image'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**
@@ -232,6 +232,7 @@ class RequestBackgroundImageController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+        $this->extendGrid($grid);
         return $grid;
     }
 

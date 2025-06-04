@@ -258,6 +258,32 @@ class User extends Authenticatable
 
         return $userSallary?->toArray() ?? [];
     }
+    public function getSallaryInfoByMonth(): array
+    {
+        $month = now()->month;
+        $year  = now()->year;
+
+        $userSallary = UserSallary::query()
+            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
+            ->where('user_id', $this->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+
+        return $userSallary?->toArray() ?? [];
+    }
+
+    public function getSallaryInfoByMonth2($month, $year): array
+    {
+        $userSallary = UserSallary::query()
+            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
+            ->where('user_id', $this->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+
+        return $userSallary?->toArray() ?? [];
+    }
 
     public function additionalInfo()
     {
@@ -454,6 +480,12 @@ class User extends Authenticatable
     public function liveTime()
     {
         return $this->hasMany(LiveTime::class, 'uid');
+    }
+
+
+    public function UserliveTime()
+    {
+        return $this->hasMany(LiveTime::class);
     }
 
     public function scopeOfAgency($q)
@@ -674,6 +706,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Follow::class, 'user_id', 'id');
     }
+
+    public function isFollowedBy($userId): bool
+    {
+        return $this->followers()
+            ->where('user_id', $userId)
+            ->where('status', 1)
+            ->exists();
+    }
+
     public function followBack(User $user)
     {
         $userId = $user->id;
@@ -1381,12 +1422,27 @@ class User extends Authenticatable
             default => []
         };
 
+        if ($this->is_bd){
+            return  [4];
+        }
+        
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
         }
 
+
+
         $userTypes = array_unique($userTypes);
 
         return empty($userTypes) ? [0] : $userTypes;
+    }
+    public function sallariesByMonth()
+    {
+        return $this->hasMany(\App\Models\UserSallary::class, 'user_id')
+                    ->where('user_agency_id', $this->agency_id);
+    }
+    public function lastSallary()
+    {
+        return $this->hasOne(UserSallary::class, 'user_id')->latestOfMany();
     }
 }

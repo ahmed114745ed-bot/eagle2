@@ -74,7 +74,7 @@ class GeneralRoleController extends MainController
         $grid->desc_ar(__('Description ar'));
         $grid->desc_tr(__('Description tr'));
         $grid->desc_hi(__('Description hi'));
-
+        $this->extendGrid($grid);
         return $grid;
     }
 

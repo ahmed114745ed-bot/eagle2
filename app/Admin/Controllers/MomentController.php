@@ -171,6 +171,7 @@ class MomentController extends MainController
     });
 
     $grid->disableCreateButton();
+    $this->extendGrid($grid);
     return $grid;
 
 

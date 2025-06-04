@@ -48,21 +48,21 @@ class OvipGiftController extends MainController
             $content->row($this->gridDynamic($ovip->level, $privileg->type, $privileg->name));
         }
 
-        return $content;
+        return parent::index($content);
     }
     public function create(Content $content)
     {
-        return $content
+        return parent::create( $content
             ->header(trans('admin.create'))
             ->description(trans('admin.description'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('gift'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     protected function gridDynamic($level, $type, $name)

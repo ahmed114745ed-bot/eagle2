@@ -90,9 +90,8 @@ class WareTabController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('level', __('level'));
-            });
+             $filter->disableIdFilter();
+           
         });
 
         $grid->id(__('ID'));

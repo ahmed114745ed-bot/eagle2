@@ -143,6 +143,7 @@ class PaymentCoinController extends MainController
         //            return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
         //        });
         $grid->disableCreateButton();
+        $this->extendGrid($grid);
         return $grid;
     }
 

@@ -22,9 +22,9 @@ class CashFreeController extends Controller
         try {
             $order = @$request['data']['order'];
             $payment = @$request['data']['payment'];
-            Log::info('this is body $order ' . json_encode($order));
-            Log::info('this is body $payment ' . json_encode($payment));
-            Log::info('this is body $payment status ' . json_encode(@$payment['payment_status']));
+            // Log::info('this is body $order ' . json_encode($order));
+            // Log::info('this is body $payment ' . json_encode($payment));
+            // Log::info('this is body $payment status ' . json_encode(@$payment['payment_status']));
             if ($order && $payment) {
 
                 $orderId = $order['order_id'];
@@ -45,7 +45,7 @@ class CashFreeController extends Controller
                 }
             }
         } catch (Exception $e) {
-            Log::info($e->getMessage());
+            // Log::info($e->getMessage());
 
         }
         return response()->json();
@@ -65,7 +65,7 @@ class CashFreeController extends Controller
         $mode = config('payment.cashfree.mode');
         $url = (($mode == 'test') ? "https://sandbox.cashfree.com" : 'https://api.cashfree.com') . "/pg/orders";
 
-        Log::info('this is url '. $url);
+        // Log::info('this is url '. $url);
         $headers = ["Content-Type: application/json", "x-api-version: 2023-08-01", //2022-01-01, 2023-08-01
             "x-client-id: " . config('payment.cashfree.app_id'), "x-client-secret: " . config('payment.cashfree.secret_key')];
 

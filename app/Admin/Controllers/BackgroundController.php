@@ -38,7 +38,7 @@ class BackgroundController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('backgrounds'))
             ->body($this->detail($id)));
     }
@@ -52,7 +52,7 @@ class BackgroundController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('backgrounds'))
             ->body($this->form()->edit($id)));
     }
@@ -120,6 +120,7 @@ class BackgroundController extends MainController
         });
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         $grid->disableExport();
+        $this->extendGrid($grid);
 
         return $grid;
     }

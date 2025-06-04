@@ -466,7 +466,7 @@
     border: none;
     border-bottom: 3px solid transparent;
     font-weight: 600;
-   
+
     cursor: pointer;
     transition: all 0.3s;
     white-space: nowrap;
@@ -537,7 +537,7 @@
     /* text-align: left; */
     padding: 12px 15px;
     background: var(--secondary-color);
-   
+
     font-weight: 600;
     text-transform: uppercase;
     font-size: 12px;
@@ -732,7 +732,7 @@
         width: 108%;
 
     }
-    
+
     .avatar-grid {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     }
@@ -744,7 +744,7 @@
             margin-bottom: 35px;
         }
 
-    
+
     .stat-icon {
             width: 50px;
             height: 50px;
@@ -759,7 +759,7 @@
 
     }
 
-    
+
     .target-card-stat {
          width: 92%;
 
@@ -775,7 +775,7 @@
         margin-bottom: 31px;
 
     }
-    .card-target-filter-phone  .col-md-7{  
+    .card-target-filter-phone  .col-md-7{
        float: none;
     }
 
@@ -836,14 +836,14 @@
                         <span class="meta-label">{{__("Phone")}}:</span>
                         <span class="meta-value">{{ @$user->phone ?? 'N/A' }}</span>
                     </div>
-                    
+
                 </div>
                 <div class="agency-stats">
                     <div class="agency-meta">
                         <div class="meta-item">
                                 <span class="meta-label">{{ __('Balance') }}:</span>
                                 <span class="meta-value">{{ $user->salary }}</span>
-                    
+
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">{{__('Level')}}:</span>
@@ -853,14 +853,14 @@
                             <span class="meta-label">{{__('worth')}}:</span>
                             <span class="meta-value">{{\App\Helpers\Common::level_center($user)['receiver_level'] }}</span>
                         </div>
-                        
+
                     </div>
 
                     <div class="agency-meta">
                         <div class="meta-item">
                                 <span class="meta-label">{{ __('diamonds') }}:</span>
                                 <span class="meta-value">{{ $user->getTotalDiamond() }}</span>
-                    
+
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">{{__('coins')}}:</span>
@@ -870,7 +870,7 @@
                             <span class="meta-label">{{__('type')}}:</span>
                             <span class="meta-value">{{$user->userType() }}</span>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -878,16 +878,16 @@
                 <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
             </button>
         </div>
-    
-       
-        
-       
+
+
+
+
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
             <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
              <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
-            
-           
+
+
 
         </div>
         <div id="tab-loading" style="
@@ -908,10 +908,10 @@
             {{ __('Loading...') }}
         </div>
 
-           
-    
-              
-       
+
+
+
+
 
             <!-- packs Section -->
             <div class="tab-content active" id="packs-tab">
@@ -919,7 +919,7 @@
                     <div class="card-header">
                         <h4 class="card-title" style="text-align: left;">{{ __('pack') }}</h4>
                     </div>
-                    
+
                             <div class="table-responsive">
                                 <div class="box-body ">
                                     <table class="data-table" id="pack">
@@ -930,16 +930,16 @@
                                                 <th>{{ __('type') }}</th>
                                                 <th>{{ __('img') }}</th>
                                                 <th>{{ __('expire') }}</th>
-                                                 <th>{{ __('action') }}</th>
+                                                <th>{{ __('action') }}</th>
                                             </tr>
                                         </thead>
                                         @if($packs && $packs->count())
-                                       
+
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($packs as $index => $pack)
                                                 @php
                                                     $path = @$pack->ware?->show_img ?? '';
-                                                   
+
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $packs->firstItem() + $index }}</td>
@@ -947,7 +947,7 @@
                                                     <td>{{ $pack->getType() }}</td>
                                                     <td>
                                                         <img src="{{ getImagePath(@$path) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                       
+
                                                     </td>
                                                     <td>{{\Carbon\Carbon::createFromTimestamp($pack->expire)->format('Y-m-d H:i:s') }}</td>
                                                     <td>
@@ -964,7 +964,7 @@
                                             @endforeach
                                         </tbody>
                                         @endif
-                                      
+
                                     </table>
                                 </div>
                             </div>
@@ -975,7 +975,7 @@
                                 ])->links('vendor.pagination.default') }}
                             </div>
 
-                    
+
                 </div>
 
             </div>
@@ -995,8 +995,8 @@
                                                 <th>{{ __('level') }}</th>
                                                 <th>{{ __('expire') }}</th>
                                                 <th>{{ __('qty') }}</th>
-                                                 <th>{{ __('total Price') }}</th>
-
+                                                <th>{{ __('total Price') }}</th>
+                                                <th>{{ __('action') }}</th>
 
                                             </tr>
                                         </thead>
@@ -1009,7 +1009,14 @@
                                                         <td>{{\Carbon\Carbon::createFromTimestamp($userVip->expire)->format('Y-m-d H:i:s')}}</td>
                                                         <td>{{ @$userVip->qty ?? 0 }}</td>
                                                         <td>{{ @$userVip->total ?? 0 }}</td>
-
+                                                         <td>
+                                                        <div class="d-flex">
+                                                            
+                                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ $userVip->id }}">
+                                                                {{ __('dashboard.delete') }}
+                                                            </button>
+                                                        </div>
+                                                    </td>
 
                                                     </tr>
                                                 @endforeach
@@ -1021,25 +1028,25 @@
                                             <div class="pagination-container">
                                                 {{ $userVips->appends([
                                                     'pack_page' => $packs?->currentPage(),
-                                                    
+
                                                 ])->links('vendor.pagination.bootstrap-4') }}
                                             </div>
                                         @endif
                                 </div>
                             </div>
 
-                   
+
 
                 </div>
             </div>
 
-            
 
-            
-            
-       
 
-        
+
+
+
+
+
     </div>
 
 
@@ -1097,7 +1104,7 @@
             </div>
         </div>
     </div>
- 
+
 <!-- jQuery أولاً -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -1155,7 +1162,7 @@
                 // Remove active class from all buttons and content
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
+
                 // Add active class to clicked button and corresponding content
                 btn.classList.add('active');
                 const target = btn.getAttribute('data-target');
@@ -1302,6 +1309,41 @@ function confirmAction(message, onConfirm) {
     });
 });
 
+   $(document).on('click', '.delete-vip-btn', function () {
+    let itemId = $(this).data('id');
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                url: '/admin/delete-user-vip/' + itemId,
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    Swal.fire('Deleted!', response.message, 'success').then(() => {
+                        location.reload();
+                    });
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message || 'An error occurred.'
+                    });
+                }
+            });
+        }
+    });
+});
+
 
 
     // رفض الطلب
@@ -1360,8 +1402,8 @@ function confirmAction(message, onConfirm) {
         });
     });
 
-  
-        
+
+
 
 });
 

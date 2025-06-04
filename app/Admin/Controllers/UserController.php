@@ -2,12 +2,10 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\CanPlaySwitchAction;
-use App\Admin\Actions\ChargeSwitchAction;
-use App\Admin\Actions\InviteSwitchAction;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
+use App\Models\Ware;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -22,7 +20,6 @@ use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
@@ -32,18 +29,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Selectable\ImageColors;
+use Illuminate\Support\Facades\Cache;
 use App\Admin\Actions\DeletePackAction;
 use App\Admin\Actions\DenyDeleteAction;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
+use App\Admin\Actions\ChargeSwitchAction;
+use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
+use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
 use App\Admin\Widgets\Table as TableWidget;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
-use Illuminate\Support\Facades\Redirect;
 
 
 class UserController extends MainController
@@ -122,7 +123,7 @@ class UserController extends MainController
         $content = $content->title(__($this->title));
 
         // Conditionally add the first row
-        if (Admin::user()->can('browse-' . 'user-actions') || Admin::user()->can('*')) {
+        if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
             $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             });
@@ -143,12 +144,12 @@ class UserController extends MainController
         $stop_invite_code = settings()->get('stop_invite_code');
         $stop_charge = settings()->get('stop_charge');
         $make_rooms_top = settings()->get('make_rooms_top');
-         $make_gift_top = settings()->get('close_open_gifts');
+        $make_gift_top = settings()->get('close_open_gifts');
 
 
         return (new Box(
             title: __('admin.Actions'),
-            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary','make_gift_top'])),
+            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary', 'make_gift_top'])),
         ));
     }
 
@@ -522,32 +523,35 @@ class UserController extends MainController
         //                $rows->toArray()
         //            );
         //        });
-
-        $grid->actions(function ($actions) {
-            $actions->disableDelete();
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            if (Admin::user()->can('browse-' . 'charge-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new ChargeSwitchAction());
             }
-            if (Admin::user()->can('browse-' . 'invite-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new InviteSwitchAction());
             }
-            if (Admin::user()->can('browse-' . 'can-Play-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new CanPlaySwitchAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'kick-agency-Switch') || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
             }
-            if ($model->family_id >= 1 && (Admin::user()->can('browse-' . 'kick-family-Switch') || Admin::user()->can('*'))) {
+            if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('browse-' . 'chang-agency-Switch') || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
             if ($model->phone = '+201000100010') {
+                $actions->disableDelete();
+            }
+
+            if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
         });
@@ -808,11 +812,10 @@ class UserController extends MainController
     public function show($id, Content $content)
     {
         $user = User::with('profile')->find($id);
-        $packs = Pack::where('user_id', $id)->with(['ware' => function ($q) {
+        $packs = Pack::where('user_id', $id)->where('is_used', 1)->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->paginate(10, ['*'], 'pack_page');
-        $userVips = UserVip::where('user_id', $id)
-            ->select(['id', 'user_id', 'level', 'expire', 'qty', 'total'])->paginate(10, ['*'], 'vip_page');
+        $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
 
         $data = compact('user', 'packs', 'userVips');
 
@@ -1041,7 +1044,7 @@ class UserController extends MainController
 
         $pack->delete();
 
-         return Redirect::back();
+        return Redirect::back();
     }
 
     public function free(Request $request)
@@ -1065,6 +1068,26 @@ class UserController extends MainController
             $pack->use_num -= $num;
         }
         $pack->save();
+        return Redirect::back();
+    }
+
+    public function deleteUserVip($id)
+    {
+        $userVip = UserVip::find($id);
+        // dd($userVip,$id );
+       // $wares = Ware::query()->where('get_type', 1)->where('level', $userVip->level)->pluck('id')->toArray();
+        $userVip->packs()->delete();
+        $user = User::query()->find($userVip->user_id);
+        if ($user) {
+            if ($user->vip == $userVip->id) {
+                $uvip = UserVip::query()->where('user_id', $user->id)->where('id', '!=', $userVip->id)->orderByDesc('level')->first();
+                if ($uvip) {
+                    $user->vip = $uvip->id;
+                    $user->save();
+                }
+            }
+        }
+        $userVip->delete();
         return Redirect::back();
     }
 }

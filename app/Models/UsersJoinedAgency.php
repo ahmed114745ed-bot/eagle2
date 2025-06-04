@@ -9,4 +9,9 @@ class UsersJoinedAgency extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class);
+    }
 }

@@ -805,7 +805,7 @@ class Common
     }
 
 
-    public static function handelVip($vip, $user, $expire = null)
+    public static function handelVip($vip, $user, $expire = null,  $userVip)
     {
         $type = $vip->privilegs()->pluck('type')->toArray();
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
@@ -817,23 +817,23 @@ class Common
             $pack =  Pack::query()
                 ->where('user_id', $user->id)
                 ->where('get_type', 1)
-                ->where('target_id', $ware->id)
+                ->where('target_id', $ware->id)->where('vip_user_id', $userVip->id)
                 ->where(function ($q) {
                     $q->where('expire', '>=', now()->timestamp)
                         ->orWhere('expire', 0);
                 })->first();
-
             if ($expire == null) {
                 $expire = $vip->expire;
             }
             if ($pack) {
-                if ($pack->expire == 0) {
-                    //                    throw new \Exception('already exists');
-                } else {
+                // if ($pack->expire == 0) {
+                //     //                    throw new \Exception('already exists');
+                // } else {
 
-                    $pack->expire = $vip->expire ? $pack->expire + ($expire * 86400) : 0;
-                    $pack->save();
-                }
+                //     $pack->expire = $vip->expire ? $pack->expire + ($expire * 86400) : 0;
+                $pack->is_used = $userVip->is_used;
+                $pack->save();
+                // }
             } else {
                 Pack::query()->create(
                     [
@@ -843,7 +843,10 @@ class Common
                         'target_id' => $ware->id,
                         'num' => 1,
                         'expire' => $vip->expire ? now()->addDays($expire)->timestamp : 0,
-                        'use_num' => $ware->num
+                        'use_num' => $ware->num,
+                        'vip_user_id' => $userVip->id,
+                        'is_used' => $userVip->is_used,
+                        'using' => 1,
                     ]
                 );
             }
@@ -1382,7 +1385,7 @@ class Common
     public static function searchAgency($id)
     {
         $agency = ShippingAgency::find($id);
-        return $agency ?? 0 ;
+        return $agency ?? 0;
     }
 
 
@@ -1466,5 +1469,107 @@ class Common
         $json = json_encode($ms);
 
         Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
+    }
+
+
+
+    public static function applyTimezoneToDateValue(\Carbon\Carbon $date, ?string $timezone = null): \Carbon\Carbon
+    {
+        $timezone = $timezone ?? self::timeZone();
+        return $date->setTimezone($timezone);
+    }
+
+
+    public static function getChargerInfo($resource)
+    {
+        switch ($resource->charger_type) {
+            case 'dash':
+                return [
+                    'name' => $resource->admin->name ?? '',
+                    'image' => $resource->admin->avatar ?? '',
+                    'uuid' => $resource->admin->uuid ?? '',
+                    'id' => $resource->admin->id ?? '',
+                    'type' => 'dash',
+                ];
+            case 'agency':
+                return [
+                    'name' => $resource->senderShippingAgency->name ?? '',
+                    'image' => $resource->senderShippingAgency->img ?? '',
+                    'uuid' => $resource->senderShippingAgency->id ?? '',
+                    'id' => $resource->senderShippingAgency->id ?? '',
+                    'type' => 'agency',
+                ];
+            case 'host_agency':
+                return [
+                    'name' => $resource->senderAgency->name ?? '',
+                    'image' => $resource->senderAgency->img ?? '',
+                    'uuid' => $resource->senderAgency->id ?? '',
+                    'id' => $resource->senderAgency->id ?? '',
+                    'type' => 'host_agency',
+                ];
+            case 'user':
+            case 'bd':
+                return [
+                    'name' => $resource->senderUser->name ?? '',
+                    'image' => $resource->senderUser->profile->avatar ?? '',
+                    'uuid' => $resource->senderUser->uuid ?? '',
+                    'id' => $resource->senderUser->id ?? '',
+                    'type' => 'user',
+                ];
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                    'type_name' => '',
+                ];
+        }
+    }
+
+    public static function getReceiverInfo($resource)
+    {
+        switch ($resource->user_type ??  '') {
+            case 'agency':
+                return [
+                    'name' => $resource->receiveragency->name ?? '',
+                    'image' => $resource->receiveragency->img ?? '',
+                    'uuid' => $resource->receiveragency->id ?? '',
+                    'id' => $resource->receiveragency->id ?? '',
+                    'type' => 'agency',
+                ];
+            case 'user':
+                return [
+                    'id' => $resource->receiverUser->id ?? '',
+                    'name' => $resource->receiverUser->name ?? '',
+                    'image' => $resource->receiverUser->profile->avatar ?? '',
+                    'uuid' => $resource->receiverUser->uuid ?? '',
+                    'type' => 'user',
+                ];
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                ];
+        }
+    }
+
+
+    public static function chargerRelationsQuery()
+    {
+        return [
+            'admin',
+            'senderUser',
+            'senderUser.profile',
+            'senderAgency',
+            'senderShippingAgency',
+            'receiverUser'  ,   
+            'receiverUser.profile',
+            'receiveragency'  ,   
+        ];
     }
 }

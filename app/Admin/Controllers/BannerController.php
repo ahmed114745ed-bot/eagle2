@@ -42,7 +42,7 @@ class BannerController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('banners'))
             ->body($this->detail($id)));
     }
@@ -56,11 +56,11 @@ class BannerController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('banners'))
             ->body($this->form()->edit($id)));
     }
-    
+
 
 
     /**
@@ -82,6 +82,7 @@ class BannerController extends MainController
         $grid->column('publish_at', __('Publish at'));
         $grid->column('is_active', __('Is active'))->switch();
         $grid->column('updated_at', __('Updated at'));
+        $this->extendGrid($grid);
 
         $grid->actions(function ($actions) {
             $model = $actions->row;

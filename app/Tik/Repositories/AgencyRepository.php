@@ -7,6 +7,7 @@ use App\Models\AgencyJoinRequest;
 use App\Models\AgencyUserJob;
 use App\Models\Scopes\HostAgencyScope;
 use App\Models\ShippingAgency;
+use App\Models\UsersJoinedAgency;
 
 class AgencyRepository extends AbstractRepository
 {
@@ -54,6 +55,17 @@ class AgencyRepository extends AbstractRepository
             ->withCount('mempers')
             ->where('id', $id)->first();
     }
+
+    public function gitOldAgencies($id)
+    {
+        return UsersJoinedAgency::where('user_id', $id)
+        ->whereHas('agency')
+        ->with(['agency:id,img'])  
+        ->select('join_date', 'leave_date', 'agency_id')    
+        ->get();
+    }
+
+    
     public function findByStatus($id)
     {
         return $this->model->with('additionalInfo')->where('id', $id)->where('status', 1)->first();

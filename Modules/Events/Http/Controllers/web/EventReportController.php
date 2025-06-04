@@ -9,6 +9,7 @@ use App\Admin\Controllers\MainController;
 use Modules\Events\Entities\UserChargeEvent;
 use Modules\Events\Entities\WinnerReward;
 use Modules\Events\Entities\RewardWinnerPk;
+use Encore\Admin\Facades\Admin;
 
 class EventReportController extends MainController
 {
@@ -52,20 +53,20 @@ class EventReportController extends MainController
         $grid->model()->where('type', 'weekly_star')->orWhere('type', null);
         $grid->column('id', __('ID'));
 
-            $grid->column ('winner.name',__ ('name'))->display (function ($name){
-                $name =  $this->winner?->name ?? '';
-                 $uid = @$this->winner?->uuid ?? 0;
-                 $path = @$this->winner?->profile?->avatar;
-                 $defaultImage = asset("images/businessman-icon.jpg");
-                 $url = getImagePath($path) ?? $defaultImage;
+        $grid->column('winner.name', __('name'))->display(function ($name) {
+            $name =  $this->winner?->name ?? '';
+            $uid = @$this->winner?->uuid ?? 0;
+            $path = @$this->winner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-                 // Check if the image exists
-                 if (!isImageExists($url)) {
-                     $url = $defaultImage;
-                 }
-                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-                 return "
+            return "
                  <div style='display: flex; align-items: center; gap: 10px;'>
                      $image
                      <div>
@@ -74,8 +75,7 @@ class EventReportController extends MainController
                      </div>
                  </div>
              ";
-
-             });
+        });
 
 
         $grid->column('reward.level', __('level'));
@@ -95,10 +95,10 @@ class EventReportController extends MainController
         });
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->reward->type == 'ware') {
-               // $ware = Ware::find($this->reward->target);
+                // $ware = Ware::find($this->reward->target);
                 $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
             } elseif ($this->reward->type == 'vip') {
-             //   $vips = OVip::find($this->reward->target);
+                //   $vips = OVip::find($this->reward->target);
                 $path = $this->reward->vip->img;
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
@@ -110,11 +110,12 @@ class EventReportController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column(__('return'))->display(function () {
-            $options = ['user' => __('user')];
-            return (new \Modules\Events\Http\Actions\EventReportAction($this->id, 'weekly'))->render();
-        });
-
+        if (Admin::user()->can('return-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column(__('return'))->display(function () {
+                $options = ['user' => __('user')];
+                return (new \Modules\Events\Http\Actions\EventReportAction($this->id, 'weekly'))->render();
+            });
+        }
         return $grid;
     }
 
@@ -123,20 +124,20 @@ class EventReportController extends MainController
         $grid = new Grid(new RewardWinnerPk());
 
         $grid->column('id', __('ID'));
-        $grid->column ('winner.name',__ ('name'))->display (function ($name){
+        $grid->column('winner.name', __('name'))->display(function ($name) {
             $name =  $this->winner?->name ?? '';
-             $uid = @$this->winner?->uuid ?? 0;
-             $path = @$this->winner?->profile?->avatar;
-             $defaultImage = asset("images/businessman-icon.jpg");
-             $url = getImagePath($path) ?? $defaultImage;
+            $uid = @$this->winner?->uuid ?? 0;
+            $path = @$this->winner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-             // Check if the image exists
-             if (!isImageExists($url)) {
-                 $url = $defaultImage;
-             }
-             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-             return "
+            return "
              <div style='display: flex; align-items: center; gap: 10px;'>
                  $image
                  <div>
@@ -145,8 +146,7 @@ class EventReportController extends MainController
                  </div>
              </div>
          ";
-
-         });
+        });
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
         $grid->column(__('gifts'))->display(function () {
@@ -179,11 +179,14 @@ class EventReportController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column(__('return'))->display(function () {
-            $options = ['user' => __('user')];
-            return (new \Modules\Events\Http\Actions\EventReportAction($this->id, 'pk'))->render();
-        });
 
+        if (Admin::user()->can('return-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+
+            $grid->column(__('return'))->display(function () {
+                $options = ['user' => __('user')];
+                return (new \Modules\Events\Http\Actions\EventReportAction($this->id, 'pk'))->render();
+            });
+        }
         return $grid;
     }
 
@@ -192,20 +195,20 @@ class EventReportController extends MainController
         $grid = new Grid(new WinnerReward());
         $grid->model()->where('type', 'event_period');
         $grid->column('id', __('ID'));
-        $grid->column ('winner.name',__ ('name'))->display (function ($name){
+        $grid->column('winner.name', __('name'))->display(function ($name) {
             $name =  $this->winner?->name ?? '';
-             $uid = @$this->winner?->uuid ?? 0;
-             $path = @$this->winner?->profile?->avatar;
-             $defaultImage = asset("images/businessman-icon.jpg");
-             $url = getImagePath($path) ?? $defaultImage;
+            $uid = @$this->winner?->uuid ?? 0;
+            $path = @$this->winner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-             // Check if the image exists
-             if (!isImageExists($url)) {
-                 $url = $defaultImage;
-             }
-             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-             return "
+            return "
              <div style='display: flex; align-items: center; gap: 10px;'>
                  $image
                  <div>
@@ -214,8 +217,7 @@ class EventReportController extends MainController
                  </div>
              </div>
          ";
-
-         });
+        });
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
         $grid->column(__('gifts'))->display(function () {
@@ -233,11 +235,11 @@ class EventReportController extends MainController
         });
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->reward->type == 'ware') {
-               // $ware = Ware::find($this->reward->target);
+                // $ware = Ware::find($this->reward->target);
                 $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
             } elseif ($this->reward->type == 'vip') {
-              //  $vips = OVip::find($this->reward->target);
-                $path =$this->reward->vip->img;
+                //  $vips = OVip::find($this->reward->target);
+                $path = $this->reward->vip->img;
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {
@@ -248,47 +250,50 @@ class EventReportController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column(__('return'))->display(function () {
-            $options = ['user' => __('user')];
-            return (new \Modules\Events\Http\Actions\EventReportAction($this->id, 'weekly'))->render();
-        });
 
+        if (Admin::user()->can('return-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+
+            $grid->column(__('return'))->display(function () {
+                $options = ['user' => __('user')];
+                return (new \Modules\Events\Http\Actions\EventReportAction($this->id, 'weekly'))->render();
+            });
+        }
         return $grid;
     }
 
 
     protected function charges_reports()
     {
-            $grid = new Grid(new UserChargeEvent());
+        $grid = new Grid(new UserChargeEvent());
 
-            $grid->model()
-                ->whereHas('rewardCharge')
-                ->with(['user', 'rewardCharge']);
+        $grid->model()
+            ->whereHas('rewardCharge')
+            ->with(['user', 'rewardCharge']);
 
-            $grid->disableExport();
-            $grid->disableCreateButton();
-            $grid->disableRowSelector();
+        $grid->disableExport();
+        $grid->disableCreateButton();
+        $grid->disableRowSelector();
 
-            $grid->filter(function($filter) {
-                $filter->equal('charge_event_id', __('Target ID'));
-            });
+        $grid->filter(function ($filter) {
+            $filter->equal('charge_event_id', __('Target ID'));
+        });
 
-            $grid->column('id', __('ID'));
+        $grid->column('id', __('ID'));
 
-            $grid->column('user.name', __('Name'))->display(function ($name) {
-                $uid = @$this->user->uuid;
-                $path = @$this?->user->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+        $grid->column('user.name', __('Name'))->display(function ($name) {
+            $uid = @$this->user->uuid;
+            $path = @$this?->user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
 
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = ($this->user) ? url("admin/users/{$this->user->id}") : 0;
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = ($this->user) ? url("admin/users/{$this->user->id}") : 0;
 
-                return "
+            return "
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         $image
                         <div>
@@ -299,50 +304,50 @@ class EventReportController extends MainController
                         </div>
                     </div>
                 ";
-            });
+        });
 
 
         $grid->column('ChargeEvents.tile', __('title'));
         $grid->column('ChargeEvents.value', __('value'));
-            $grid->column('rewards', __('Gifts'))->display(function () {
-                if (!$this->rewardCharges || count($this->rewardCharges) == 0) {
-                    return '-';
+        $grid->column('rewards', __('Gifts'))->display(function () {
+            if (!$this->rewardCharges || count($this->rewardCharges) == 0) {
+                return '-';
+            }
+
+            $html = '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
+            foreach ($this->rewardCharges as $reward) {
+                if ($reward->type == "ware") {
+                    $name = @$reward->ware->name;
+                    $img = getImagePath($reward->ware->img2 ?? $reward->ware->show_img);
+                } elseif ($reward->type == "vip") {
+                    $name = @$reward->vip->name;
+                    $img = getImagePath($reward->vip->img);
+                } elseif ($reward->type == "coins") {
+                    $name = @$reward->target;
+                    $img = asset('coin.png');
+                } elseif ($reward->type == "achievement") {
+                    $name = "Achievement";
+                    $img = getDriverUrl() . '/' . $reward->target;
+                } else {
+                    $name = "-";
+                    $img = asset('coin.png');
                 }
 
-                $html = '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
-                foreach ($this->rewardCharges as $reward) {
-                    if ($reward->type == "ware") {
-                        $name = @$reward->ware->name;
-                        $img = getImagePath($reward->ware->img2 ?? $reward->ware->show_img);
-                    } elseif ($reward->type == "vip") {
-                        $name = @$reward->vip->name;
-                        $img = getImagePath($reward->vip->img);
-                    } elseif ($reward->type == "coins") {
-                        $name = @$reward->target;
-                        $img = asset('coin.png');
-                    } elseif ($reward->type == "achievement") {
-                        $name = "Achievement";
-                        $img = getDriverUrl() . '/' . $reward->target;
-                    } else {
-                        $name = "-";
-                        $img = asset('coin.png');
-                    }
-
-                    $html .= "
+                $html .= "
                         <div style='text-align: center; width: 80px;'>
                             <img src='{$img}' width='50' height='50' style='border-radius: 8px;'><br>
                             <small>{$name}</small>
                         </div>
                     ";
-                }
-                $html .= '</div>';
+            }
+            $html .= '</div>';
 
-                return $html;
-            });
-            $grid->column('created_at', __('Created at'))->display(function ($date) {
-                return date('Y-m', strtotime($date)); // فقط السنة والشهر
-            });
+            return $html;
+        });
+        $grid->column('created_at', __('Created at'))->display(function ($date) {
+            return date('Y-m', strtotime($date)); // فقط السنة والشهر
+        });
 
-            return $grid;
-        }
+        return $grid;
+    }
 }

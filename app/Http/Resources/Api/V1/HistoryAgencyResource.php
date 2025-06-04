@@ -34,7 +34,7 @@ class HistoryAgencyResource extends JsonResource
 
 
         $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->take(3)->get();
+            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->having('exp', '>', 0)->orderByDesc('exp')->take(3)->get();
         $heroGiftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, sender_id")
             ->with('sender')->groupBy('sender_id')->whereHas('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->take(3)->get();
         // if (request()->is_onwer_agency) {
@@ -44,7 +44,8 @@ class HistoryAgencyResource extends JsonResource
         $salary = 0;
         $target = 0;
 
-        if ( Auth::user()->id == $this->app_owner_id) {
+        $isOwner = Auth::user()->id == $this->app_owner_id;
+        if ($isOwner) {
             $salary = AgencySallary::where('agency_id', $this->id)
                 ->where('year', $year)
                 ->where('month', $month)
@@ -60,14 +61,12 @@ class HistoryAgencyResource extends JsonResource
 
         // UserSallary::join('targets', 'targets.id', '=', 'user_sallaries.target_id')->where('user_sallaries.user_agency_id', $this->id)->where('user_sallaries.year', $year)->where('user_sallaries.month', $month)->whereHas('target')->sum('targets.diamonds');
 
+
         return [
             'star' => ReceiverGiftLogResource::collection($giftLog),
             'heroes' => SenderGiftLogResource::collection($heroGiftLog),
-            $this->mergeWhen( Auth::user()->id  == $this->app_owner_id,
-            [
-                'salary' => $salary,
-                'target' => $target,
-            ])
+            'salary' => $isOwner ? $salary : 0,
+            'target' => $isOwner ? $target : 0,
             // $this->mergeWhen(request()->is_onwer_agency,
             //     [
             //         'salary' => @$salary ?? 0,

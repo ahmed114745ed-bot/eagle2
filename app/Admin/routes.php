@@ -5,6 +5,8 @@ use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BDControllers\WalletController;
+use App\Admin\Controllers\UserChargeReportController;
+use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\WareController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Models\Room;
@@ -181,7 +183,7 @@ Route::group(
         $router->post('agency-user-job/{agency_id}', 'AgencyUserJobController@store');
         $router->get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         $router->get('agency-statistic', 'AgencyStatisticController@index');
-    //    $router->get('agency-settings', 'AgencySettingController@index');
+        //    $router->get('agency-settings', 'AgencySettingController@index');
 
         $router->resource('test-test', 'TestTestController');
         $router->get('profile', [AdminAuthController::class, 'index']);
@@ -224,9 +226,10 @@ Route::group(
         ]);
 
         $router->post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);
-         $router->post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
+        $router->post('/delete-user-vip/{id}', [UsersAppController::class, 'deleteUserVip']);
+        $router->post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
-         $router->get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
+        $router->get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         $router->resource('free-users', 'FreeUserController');
 
@@ -443,6 +446,7 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@infoBox')->name('home');
             $router->resource('/users', UserController::class);
+
             // $router->get('/users/{id}/edit', 'UserController@edit');
             // $router->get('/users/{id}', 'UserController@show');
             $router->get('/userTarget', 'UserTargetController@index')->name('userTarget');
@@ -516,7 +520,7 @@ Route::group(
 
         $router->resource('banners', BannerController::class);
         $router->resource('languages', LanguageController::class);
-        $router->resource('settings', SettingController::class);
+        $router->resource('settings', SettingController::class)->except(['update']);
         $router->resource('room-settings', RoomSettingsController::class);
         $router->resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
@@ -535,11 +539,11 @@ Route::group(
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
 
-
-
-  
-
-
+        $router->resource('user-charges', UsersChargeController::class);
+        //         $router->resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
+        $router->group(['prefix' => 'user-charges-report'], function () {
+            Route::get('/{id}', [UserChargeReportController::class, 'index']);
+        });
     }
 
 
