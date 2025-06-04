@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Scopes\HostAgencyScope;
 class Charge extends Model
 {
     use HasFactory;
@@ -54,11 +55,29 @@ class Charge extends Model
     }
 
     public function sender()
-    {
+    {  
         if ($this->charger_type == 'agency') {
             return $this->hasOne(ShippingAgency::class, 'id', 'charger_id');
         }
         return $this->hasOne(User::class, 'id', 'charger_id');
+    }
+
+    public function getSenderAllAttribute()
+    {
+        if ($this->charger_type === 'agency') {
+            return ShippingAgency::find($this->charger_id);
+        }
+    
+        return User::find($this->charger_id);
+    }
+
+    public function getReceiverAllAttribute()
+    {
+        if ($this->user_type === 'agency') {
+            return ShippingAgency::find($this->charger_id);
+        }
+
+        return User::find($this->charger_id);
     }
 
     public function receiver()
@@ -82,7 +101,8 @@ class Charge extends Model
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'agency_id');
+        return $this->belongsTo(Agency::class, 'agency_id')
+        ->withoutGlobalScope(HostAgencyScope::class); 
     }
     public function shippingAgency()
     {

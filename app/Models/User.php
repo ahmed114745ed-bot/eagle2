@@ -1420,4 +1420,13 @@ class User extends Authenticatable
 
         return empty($userTypes) ? [0] : $userTypes;
     }
+    public function sallariesByMonth()
+    {
+        return $this->hasMany(\App\Models\UserSallary::class, 'user_id')
+                    ->where('user_agency_id', $this->agency_id);
+    }
+    public function lastSallary()
+    {
+        return $this->hasOne(UserSallary::class, 'user_id')->latestOfMany(); 
+    }
 }

@@ -421,16 +421,16 @@ class AgencyController extends Controller
                 </div>
             ";
         });
-
-         $grid->actions(function ($actions) {
+       $permission =$this->permission_name;
+         $grid->actions(function ($actions)use($permission) {
             $model = $actions->row;
             // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
-            if (Admin::user()->can('delete-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new DeleteAgencyAction());
             }
-            if (Admin::user()->can('change-users-agency-Switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('change-users-agency-Switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new ChangeUsersAgencyAction($model->id));
             }

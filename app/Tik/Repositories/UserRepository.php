@@ -50,7 +50,11 @@ class UserRepository extends AbstractRepository
                     END AS matching_score
                 ")
             ])
-            ->where('uuid', 'like', "%{$userUuId}%")
+           // ->where('uuid', 'like', "%{$userUuId}%")
+           ->where(function ($query) use ($userUuId) {
+                $query->where('uuid', 'like', '%' . $userUuId . '%')
+                      ->orWhere('special_id', 'like', '%' . $userUuId . '%');
+            })
             ->orderByDesc('matching_score')
             ->orderBy('uuid')
             ->get();
