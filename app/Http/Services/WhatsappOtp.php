@@ -24,18 +24,17 @@ class WhatsappOtp
 
         if ($data?->count >= 10) {
             throw new \Exception(__('you spend all chances'));
-        }else if (Carbon::createFromTimeString($data?->created_at ?? now()->copy()->subDay()->toDateTimeString())->addMinutes(2) > now()) {
+        } else if (Carbon::createFromTimeString($data?->created_at ?? now()->copy()->subDay()->toDateTimeString())->addMinutes(2) > now()) {
             throw new Exception(__('whatsapp.wait-2-minutes'));
         }
 
 
         $delay   = now();
         $otp     = $this->generateOtp($phone);
-//
+        //
         $message = $otp->code;
-       // $message ='verification code is : '. $otp->code;
-        dispatch(new WhatsAppJob($phone ,$message));
-
+        // $message ='verification code is : '. $otp->code;
+        dispatch(new WhatsAppJob($phone, $message));
     }
 
     /**
@@ -51,7 +50,7 @@ class WhatsappOtp
         $this->resetCodes($phone);
         $otp = new Code();
         $otp->phone = $phone;
-        $otp->code = rand(100000 , 900000);
+        $otp->code = rand(100000, 900000);
         $otp->save();
         return $otp;
     }
@@ -59,15 +58,15 @@ class WhatsappOtp
     public function isValidate(string $phone, string $code): bool
     {
         //error_log("Phone matches: " . [Code::query()->where('phone', $phone)->exists()]);
-       Log::info("Code matches: " . Code::query()->where('code', $code)->exists());
-Log::info("Created at matches: " . Code::query()->where('created_at', '>', Carbon::now()->subHours()->toDate())->exists());
+        Log::info("Code matches: " . Code::query()->where('code', $code)->exists());
+        Log::info("now hour: " .  Carbon::now()->subHours()->toDate());
+        Log::info("created at: " .  Code::query()->where('code', $code)->value('created_at'));
 
-        return Code::query()->where('phone',$phone)->where('code', $code)->where('created_at', '>', Carbon::now()->subHours()->toDate())->exists();
+        return Code::query()->where('phone', $phone)->where('code', $code)->where('created_at', '>', Carbon::now()->subHours()->toDate())->exists();
     }
 
     public function resetCodes(string $phone)
     {
         return Code::where('phone', $phone)->delete();
     }
-
 }
