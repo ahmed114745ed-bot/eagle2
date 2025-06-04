@@ -55,17 +55,25 @@ class WhatsappOtp
         return $otp;
     }
 
-    public function isValidate(string $phone, string $code): bool
+    public function isValidate(string $phone, string $code)
     {
         //error_log("Phone matches: " . [Code::query()->where('phone', $phone)->exists()]);
         Log::info("Code matches: " . Code::query()->where('code', $code)->exists());
         Log::info("now hour: " . Carbon::now()->subHour()->toDateTimeString());
         Log::info("created at: " .  Code::query()->where('code', $code)->value('created_at'));
 dd(Code::query()
-    ->where('phone', $phone)
-    ->where('code', $code)
-    ->first(), $code,$phone);
-        return Code::query()->where('phone', $phone)->where('code', $code)->where('created_at', '>', Carbon::now()->subHours())->exists();
+        ->where('phone', $phone)
+        ->where('code', $code)
+        ->where('created_at', '>', Carbon::now()->subHour())
+        ->latest()
+        ->first());
+        return Code::query()
+        ->where('phone', $phone)
+        ->where('code', $code)
+        ->where('created_at', '>', Carbon::now()->subHour())
+        ->latest()
+        ->first();
+      //  return Code::query()->where('phone', $phone)->where('code', $code)->where('created_at', '>', Carbon::now()->subHours())->latest()->first();
     }
 
     public function resetCodes(string $phone)
