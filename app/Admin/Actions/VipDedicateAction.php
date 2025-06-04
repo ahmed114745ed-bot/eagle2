@@ -68,6 +68,7 @@ class VipDedicateAction extends Action
                 'total'  => 0,
                 'is_used'  => $is_used,
                 'dash_user_id'  => auth()->id(),
+                'using' => $is_used,
             ]);
             // } else {
             //     $userVip->qty++;
