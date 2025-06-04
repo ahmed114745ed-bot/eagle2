@@ -180,8 +180,8 @@ class AgencyAppController extends Controller
     public function dailyReport()
     {
         $user  = \Auth::user();
-        $month = request()->month ? (int) request()->month : now()->month;
-        $year = request()->year ? (int) request()->year : now()->year;
+        $month = request()->month ?? now()->format('m'); 
+        $year = request()->year ?? now()->year;
         $agencyId = request()->agency_id ?? $user->agency_id ;
 
         if (!$user instanceof User) return;
