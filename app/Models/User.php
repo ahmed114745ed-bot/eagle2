@@ -1420,13 +1420,15 @@ class User extends Authenticatable
             default => []
         };
 
+        if ($this->is_bd){
+            return  [4];
+        }
+        
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
         }
 
-        if ($this->is_bd){
-            $userTypes[] = 4;
-        }
+
 
         $userTypes = array_unique($userTypes);
 
@@ -1439,6 +1441,6 @@ class User extends Authenticatable
     }
     public function lastSallary()
     {
-        return $this->hasOne(UserSallary::class, 'user_id')->latestOfMany(); 
+        return $this->hasOne(UserSallary::class, 'user_id')->latestOfMany();
     }
 }
