@@ -3,11 +3,8 @@
 namespace App\Services;
 
 use App\Models\Pk;
-use App\Models\User;
-use App\Models\Ware;
+;
 use App\Helpers\Common;
-use App\Models\AppFeature;
-use Modules\CP\Entities\CpRelation;
 use App\Repositories\RankingRepository;
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
@@ -101,7 +98,7 @@ class RankingService
             return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
         } elseif ($class == 6) {
             $data = $this->rankingRepo->getUserGameCoins($type, $limit);
-            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+            return \App\Http\Resources\RankingResource::collection($data);
         }
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
@@ -273,7 +270,7 @@ class RankingService
         $kong['achievement_images'] = [];
         $kong['color_name'] = '';
 
-        
+
 
         $data[0] = isset($data[0]) ? $data[0] : $kong;
         $data[1] = isset($data[1]) ? $data[1] : $kong;
