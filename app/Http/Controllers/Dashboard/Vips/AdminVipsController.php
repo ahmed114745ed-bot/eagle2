@@ -110,7 +110,7 @@ class AdminVipsController extends Controller
             }
             $userVip->save();
         }
-        Common::handelVip($vip, $user, expire: $request->days ?? 1);
+        Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
         DB::commit();
         CustomNotification::vips($user, $request->days, $vip->img);
          return 200;

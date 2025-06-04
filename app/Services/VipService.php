@@ -120,7 +120,7 @@ class VipService
         $user = $request->user();
 
         $isUsed = (bool)$request->type;
-       
+
         if ($isUsed) $this->userVipRepository->updateIsUsedForUser($user->id);
 
         // update is used
@@ -269,7 +269,7 @@ class VipService
 
                 $data = $this->userVipRepository->create($data);
             }
-            Common::handelVip($vip, $user);
+            Common::handelVip($vip, $user,null, userVip: $userVip);
             DB::commit();
             $ex = Carbon::parse($ex)->diffInDays(now());
             CustomNotification::vips($user, $ex, $vip->img);

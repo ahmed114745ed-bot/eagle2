@@ -119,7 +119,7 @@ class UserService
         return $this->userRepository->user_bd2($key, $page, $perPage);
     }
 
-    
+
     public function searchInAgency($key, $page)
     {
         $perPage = 10;
@@ -485,18 +485,18 @@ class UserService
     public function myStore($user, $request)
     {
         $cacheKey = 'cache-data-mystore-' . $user->id;
-        // if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
+         if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
 
-        $app_feature = Cache::get('host_agency');
-        if ($app_feature) {
-            $targetService = new FixedTargetService($user);
-            $targetService->calculateTarget();
-        }
-        if ($user->ownerRoom != null) {
-            $roomTarget = new RoomGameServices();
-            $roomTarget->CalculateRoomSalaries($user->ownerRoom);
-        }
-        // }
+            $app_feature = Cache::get('host_agency');
+            if ($app_feature) {
+                $targetService = new FixedTargetService($user);
+                $targetService->calculateTarget();
+            }
+            if ($user->ownerRoom != null) {
+                $roomTarget = new RoomGameServices();
+                $roomTarget->CalculateRoomSalaries($user->ownerRoom);
+            }
+         }
 
         if ($user->device_token  != $request->header('X-Device-Token')) {
             $user->enableSaving = true;
