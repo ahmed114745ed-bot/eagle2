@@ -716,11 +716,11 @@ class AgencyController extends Controller
             $modelExists = $form->model()->exists;
             if (!$modelExists)  Common::createUserAdmin($appOwnerId);
 
-            if ($modelExists && $newOwnerId != $originalOwnerId) {
+            if ($modelExists && $appOwnerId != $originalOwnerId) {
                 Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
-                Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
+                Common::userJoinAgency($originalOwnerId, $appOwnerId, $agencyId);
 
                 Admin::where('username', $user->uuid)->delete();
                 $user->update([

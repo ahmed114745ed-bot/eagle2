@@ -68,7 +68,7 @@ use Modules\Achievement\Http\Controllers\web\AchievementLevelsModuleController;
 
 
 Admin::routes();
-Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => ['web', 'admin', 'adminIp', //            'adminGeneralBan',
+Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => ['web', 'admin','prevent-delete', 'adminIp', //            'adminGeneralBan',
         'multiLanguage',], 'as' => config('admin.route.prefix') . '.',], function (Router $router) {
         $router->post('_handle_form_', 'HandleController@handleForm')->name('admin.handle-form');
         $router->post('_handle_action_', 'HandleController@handleAction')->name('admin.handle-action');
@@ -90,7 +90,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => '', 'midd
 });
 
 
-Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => ['web', 'admin', 'adminIp', //            'adminGeneralBan',
+Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => ['web', 'admin','prevent-delete', 'adminIp', //            'adminGeneralBan',
         'multiLanguage',], 'as' => config('admin.route.prefix') . '.',], function (Router $router) {
     Route::post('/locale', MultiLanguageController::class . '@locale');
 //    if (MultiLanguage::config("show-login-page", true)) {
