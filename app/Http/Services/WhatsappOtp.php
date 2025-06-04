@@ -69,7 +69,6 @@ dd(Code::query()
         ->first(),$phone,$code,Code::query()
         ->where('phone', $phone)
         ->where('code', $code)
-       
         ->latest()
         ->first());
         return Code::query()
