@@ -48,7 +48,7 @@ class UpdateUserWhenSendGift
 //            $receivedUser->exchange_diamonds += $totalCoins;
         }
 
-        User::where('id', $receivedUser->id)
+        User::where('id', $receivedUser->id)->lockForUpdate()
             ->update($values);
 
         $lastReceivedLevel = $receivedUser->total_received_level;
