@@ -15,6 +15,7 @@ return [
     */
     'name' => env('APP_NAME', 'Laravel').'_Admin',
     'company_name' => env('COMPANY_NAME', 'UTD Company'),
+    'isUsed_vip' => env('IS_USED_VIP', 'false'),
 
     /*
     |--------------------------------------------------------------------------

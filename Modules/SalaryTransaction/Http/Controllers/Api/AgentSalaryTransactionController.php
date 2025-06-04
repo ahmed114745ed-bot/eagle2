@@ -197,7 +197,7 @@ class AgentSalaryTransactionController extends Controller
 
             $charge = Charge::query()->create([
                 'charger_id'  => $user->id,
-                'charger_type' => 'freight forwarder',
+                'charger_type' => 'agency',
                 'user_id'     => $user_id,
                 'user_type' => $type,
                 'amount' => $count,

@@ -38,69 +38,66 @@ class ChargeController extends AdminController
     {
         $grid = new Grid(new Charge());
 
-        $grid->model()->where('user_charger_type','bd')
-                      ->with('shippingAgency')
+        $grid->model()->where('charger_type','bd')
+                      ->with('receiverUser','receiveragency')
                       ->where('charger_id', Auth::user()->app_id);
 
         // $grid->column('id', __('Id'));
         $grid->column('amount', __('Amount'));
         // $grid->column('amount_type', __('Amount type'));
 
-        $grid->column('agency_id', __('receiver'))->display(function () {
-            // dd($this->agency_id );
-            if ($this->shippingAgency) {
-                $agency = $this->shippingAgency;
+$grid->column('user_id', __('receiver'))->display(function () {
+    $info = \App\Helpers\Common::getReceiverInfo($this);
 
-                $cacheKey = "agency_image_{$agency->id}";
-                $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {
-                    $path = @$agency->img;
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
+    if ($info['type'] === 'agency') {
+        $cacheKey = "agency_image_{$info['uuid']}";
+        $image = \Cache::remember($cacheKey, 3600, function () use ($info) {
+            $path = $info['image'];
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) $url = $defaultImage;
+            return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+        });
+
+        $profileUrl = route('admin.agency.profile', ['id' => $info['uuid']]);
+
+                    return "
+                        <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                            <div style='display: flex; align-items: center; gap: 10px;'>
+                                {$image}
+                                <div>
+                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
+                                    <span style='font-size: smaller;'>ID: {$info['uuid']}</span>
+                                </div>
+                            </div>
+                        </a>
+                    ";
+                }
+
+                if ($info['type'] === 'user') {
+                    $defaultImage = asset("images/businessman-icon.jpg");
+                    $url = getImagePath($info['image']) ?? $defaultImage;
                     if (!isImageExists($url)) $url = $defaultImage;
 
-                    return handleShowImageWithTypes($agency->id, $url, 40, 40);
-                });
+                    $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+                    $showUrl = url("admin/users/{$info['uuid']}");
 
-                $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
-
-                return "
-                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            {$image}
-                            <div style='display: flex; flex-direction: column;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$agency->name}</span>
-                                <span style='font-size: smaller;'>ID: {$agency->id}</span>
+                    return "
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
+                            <div style='display: flex; align-items: center; gap: 10px;'>
+                                {$image}
+                                <div>
+                                    <span style='text-decoration: underline; cursor: pointer;'>{$info['name']}</span><br>
+                                    <span style='color: #aaa; font-size: smaller;'>UUID: {$info['uuid']}</span>
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                ";
-            }
+                        </a>
+                    ";
+                }
 
-            $user = \App\Models\User::find($this->user_id);
-            if ($user) {
-                $path = $user->profile?->avatar ?? null;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-                if (!isImageExists($url)) $url = $defaultImage;
+                return "<span class='text-danger'>".__('لا يوجد مستلم')."</span>";
+            });
 
-                $image = handleShowImageWithTypes($user->id ?? 0, $url, 40, 40);
-                $showUrl = url("admin/users/{$user->id}");
-
-                return "
-                    <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            {$image}
-                            <div>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$user->name}</span><br>
-                                <span style='color: #aaa; font-size: smaller;'>UUID: {$user->uuid}</span>
-                            </div>
-                        </div>
-                    </a>
-                ";
-            }
-
-            return "<span class='text-danger'>".__('لا يوجد مستلم')."</span>";
-        });
 
         $grid->column('created_at', __('تاريخ الإنشاء'))->display(function ($value) {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
