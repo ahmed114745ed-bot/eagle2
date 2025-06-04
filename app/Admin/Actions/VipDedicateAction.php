@@ -46,8 +46,9 @@ class VipDedicateAction extends Action
 
             DB::beginTransaction();
 
-            $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
-            $is_used = $enableVipAuto === "true" ? 1 : 0;
+            $enableVipAuto = config('admin.isUsed_vip');
+
+            $is_used = $enableVipAuto === true ? 1 : 0;
             $uniqueAttributes = [
                 'sender_id' => 0,
                 'user_id'   => $user->id,
