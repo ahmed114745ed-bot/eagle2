@@ -841,19 +841,7 @@ class AgencyController extends MainController
             $user = User::find($form->model()->app_owner_id);
             $user->monthly_diamond_received = 0;
             $user->save();
-            $checkAgencyUser = UsersJoinedAgency::where([
-                'user_id' => $form->model()->app_owner_id,
-                'agency_id' => $form->model()->id,
-                'type' => 1,
-            ])->where('leave_date', null)->exists();
-            if (!$checkAgencyUser) {
-                UsersJoinedAgency::create([
-                    'user_id' => $form->model()->app_owner_id,
-                    'agency_id' => $form->model()->id,
-                    'type' => 1,
-                    'join_date' => now(),
-                ]);
-            }
+            
         });
         // Add this to your admin view
         $form->footer(function ($footer) {
