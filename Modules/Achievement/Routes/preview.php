@@ -25,7 +25,7 @@ Route::group(
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
-            'prevent-delete',
+          //  'prevent-delete',
             'appFeatureEnable:achievement',
         ],
         'as'         => config('admin.route.prefix') . '.',
