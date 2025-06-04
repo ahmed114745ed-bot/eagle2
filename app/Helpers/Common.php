@@ -1479,4 +1479,98 @@ class Common
         $timezone = $timezone ?? self::timeZone();
         return $date->setTimezone($timezone);
     }
+
+
+    public static function getChargerInfo($resource)
+    {
+        switch ($resource->charger_type) {
+            case 'dash':
+                return [
+                    'name' => $resource->admin->name ?? '',
+                    'image' => $resource->admin->avatar ?? '',
+                    'uuid' => $resource->admin->uuid ?? '',
+                    'id' => $resource->admin->id ?? '',
+                    'type' => 'dash',
+                ];
+            case 'agency':
+                return [
+                    'name' => $resource->senderShippingAgency->name ?? '',
+                    'image' => $resource->senderShippingAgency->img ?? '',
+                    'uuid' => $resource->senderShippingAgency->id ?? '',
+                    'id' => $resource->senderShippingAgency->id ?? '',
+                    'type' => 'agency',
+                ];
+            case 'host_agency':
+                return [
+                    'name' => $resource->senderAgency->name ?? '',
+                    'image' => $resource->senderAgency->img ?? '',
+                    'uuid' => $resource->senderAgency->id ?? '',
+                    'id' => $resource->senderAgency->id ?? '',
+                    'type' => 'host_agency',
+                ];
+            case 'user':
+            case 'bd':
+                return [
+                    'name' => $resource->senderUser->name ?? '',
+                    'image' => $resource->senderUser->profile->avatar ?? '',
+                    'uuid' => $resource->senderUser->uuid ?? '',
+                    'id' => $resource->senderUser->id ?? '',
+                    'type' => 'user',
+                ];
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                    'type_name' => '',
+                ];
+        }
+    }
+
+    public static function getReceiverInfo($resource)
+    {
+        switch ($resource->user_type ??  '') {
+            case 'agency':
+                return [
+                    'name' => $resource->receiveragency->name ?? '',
+                    'image' => $resource->receiveragency->img ?? '',
+                    'uuid' => $resource->receiveragency->id ?? '',
+                    'id' => $resource->receiveragency->id ?? '',
+                    'type' => 'agency',
+                ];
+            case 'user':
+                return [
+                    'id' => $resource->receiverUser->id ?? '',
+                    'name' => $resource->receiverUser->name ?? '',
+                    'image' => $resource->receiverUser->profile->avatar ?? '',
+                    'uuid' => $resource->receiverUser->uuid ?? '',
+                    'type' => 'user',
+                ];
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                ];
+        }
+    }
+
+
+    public static function chargerRelationsQuery()
+    {
+        return [
+            'admin',
+            'senderUser',
+            'senderUser.profile',
+            'senderAgency',
+            'senderShippingAgency',
+            'receiverUser'  ,   
+            'receiverUser.profile',
+            'receiveragency'  ,   
+        ];
+    }
 }
