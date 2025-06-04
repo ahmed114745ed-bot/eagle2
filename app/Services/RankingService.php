@@ -98,6 +98,7 @@ class RankingService
             return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
         } elseif ($class == 6) {
             $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            return $this->prepareResponse2($data, $user, $type, $user->id, $class);
             return \App\Http\Resources\RankingResource::collection($data);
         }
 
@@ -220,7 +221,43 @@ class RankingService
         });
     }
 
+    protected function prepareResponse2($data, $user)
+    {
+        $emptyItems = collect(array_fill(0, 4, [
+            'user_id' => 0,
+            'uuid' => '',
+            'exp' => '0',
+            'exp_int' => 0,
+            'remaining' => '0',
+            'remaining_int' => 0,
+            'name' => '',
+            'avatar' => '',
+            'frame' => '',
+            'frame_id' => 0,
+            'sender_img' => '',
+            'reseverimg' => '',
+            'vip_level' => 0,
+            'sender_level' => 0,
+            'reciver_level' => 0,
+            'vip_level_img' => '',
+            'sender_level_img' => '',
+            'reciver_level_img' => '',
+            'age' => 0,
+            'type_user' => 0,
+            'manger_type' => null,
+            'achievement_images' => [],
+            'color_name' => ''
+        ]));
 
+        $toArray = $data->toArray();
+        $countData = count($data);
+        $firstThree = $data->take(3);
+        $fromThird = $data->slice(3)->values();
+        $arr['user'] = new \stdClass();
+        $arr['top'] =   \App\Http\Resources\RankingResource::collection($firstThree);
+        $arr['other'] = \App\Http\Resources\RankingResource::collection($fromThird);
+        return $arr;
+    }
 
     protected function prepareResponse($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
