@@ -23,7 +23,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class ChargeController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'charge';
+    public $permission_name = 'coin-recharge';
 
 
     /**
@@ -278,7 +278,7 @@ class ChargeController extends MainController
                 </div>
             ";
         });
-        if (\Encore\Admin\Facades\Admin::user()->can('add-coins-Switch') || \Encore\Admin\Facades\Admin::user()->can('*') || \Encore\Admin\Facades\Admin::user()->can('charge-report-Switch')) {
+        if (\Encore\Admin\Facades\Admin::user()->can('add-Switch-' . $this->permission_name) || \Encore\Admin\Facades\Admin::user()->can('*') || \Encore\Admin\Facades\Admin::user()->can('charge-report-Switch-' . $this->permission_name)) {
             $grid->column('actions', __('Actions'))
                 ->display(function () {
 

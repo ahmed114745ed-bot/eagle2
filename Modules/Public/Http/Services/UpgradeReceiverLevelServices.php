@@ -6,6 +6,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Helpers\Common;
 use App\Models\EarnedDiamond;
 use App\Models\User;
+use Log;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Public\Jobs\RewardWinnerLevel;
 

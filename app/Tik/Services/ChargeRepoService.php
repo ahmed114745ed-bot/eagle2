@@ -68,7 +68,7 @@ class ChargeRepoService
 
             $data = [
                 'userId' => $userId,
-                'chargeType' => 'Host agent',
+                'chargeType' => 'host_agency',
                 'receiverId' => $user_id,
                 'type' => $userType,
                 'amount' => $coins,
@@ -93,7 +93,7 @@ class ChargeRepoService
 
     public function chargeTo(User $fromUser, User $toUser, $coins, $isRoomTarget, $usd)
     {
-        $chargeType = $isRoomTarget ? 'room_owner' : 'host';
+        $chargeType = 'user';
 
         try {
 
@@ -118,8 +118,9 @@ class ChargeRepoService
 
     public function chargeToAgency(User $fromUser, ShippingAgency $toAgency, $coins, $isRoomTarget, $usd)
     {
-        $chargeType = $isRoomTarget ? 'room_owner' : 'host';
-
+        // $chargeType = $isRoomTarget ? 'room_owner' : 'host';
+        $chargeType ='user';
+        
         try {
 
             if (!$isRoomTarget) {
@@ -128,10 +129,12 @@ class ChargeRepoService
             } else {
                 $this->roomSalaryRepo->incrementCutAmount($fromUser->ownerRoom?->id, $usd);
             }
+        
             $this->chargeAgencyNew($fromUser, $toAgency, $chargeType, $coins, $usd);
             return true;
         } catch (\Exception $e) {
             \DB::rollBack();
+            
             throw new \Exception('An error occurred, please try again later');
         }
     }
@@ -155,7 +158,7 @@ class ChargeRepoService
         $percentage = Common::getCoinsValue("user_coins");
 
         $usd = $count / $percentage;
-        $this->charge($sender, $userReceiver, 'freight forwarder', $count, $usd);
+        $this->charge($sender, $userReceiver, 'agency', $count, $usd);
         return $userReceiver;
     }
 
@@ -167,7 +170,7 @@ class ChargeRepoService
             $charge = $charge/*->where('user_type', $charger_type)*/->where('user_id', $userId);
         }
         if ($type == 'sent') {
-            $charge = $charge/*->where('charger_type', $charger_type)*/->where('charger_id', $userId);
+            $charge = $charge/*->where('charger_type', $charger_type)*/->where('action_user_id', $userId);
         }
 
         if ($searchKey != null) {
@@ -204,7 +207,7 @@ class ChargeRepoService
 
             $coinPrise = Common::getCoinsValue('user_coins');
             $numDi = $coinPrise * $count;
-            $this->charge(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, usd: $count, transferred: true);
+            $this->charge(sender: $agency, receiver: $receiver, chargeType: 'host_agency', amount: $numDi, usd: $count, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
             return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {
@@ -247,7 +250,7 @@ class ChargeRepoService
 
             $coinPrise = Common::getCoinsValue('shipping_coins');
             $numDi = $coinPrise * $count;
-            $this->chargeAgency(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, usd: $count, transferred: true);
+            $this->chargeAgency(sender: $agency, receiver: $receiver, chargeType: 'host_agency', amount: $numDi, usd: $count, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
             return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {
@@ -255,7 +258,7 @@ class ChargeRepoService
             throw new \Exception($e->getMessage());
         }
     }
-    public function charge(User $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function charge( $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
 
         WalletService::storeTransaction(
@@ -269,17 +272,18 @@ class ChargeRepoService
 
          );
 
-        $type = $receiver->user_type;
+        // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
             'charger_id' => $sender->id,
             'charger_type' => $chargeType,
             'user_id' => $receiver->id,
-            'user_type' => $type,
+            'user_type' => 'user',
             'amount' => $amount,
             'amount_type' => 2,
             "usd" => $usd != null ? $usd : $amount,
             'is_used_transferred' => $transferred,
+            'action_user_id'=>auth()->user()->id
         ];
         $this->create($data);
     }
@@ -296,7 +300,7 @@ class ChargeRepoService
         $type = $receiver->owner?->user_type ?? '';
 
         $receiver->increment('coins', $amount);
-
+    
         WalletService::storeTransaction(
             $sender->id,
             'cut',
@@ -306,18 +310,19 @@ class ChargeRepoService
             ['agency_id' => $receiver->id],
                              'charge_to_agency'
          );
-
+        
         $data = [
             'charger_id' => $sender->id,
             'charger_type' => $chargeType,
             'user_id' => $receiver->id,
-            'agency_id' => $receiver->id,
+            'agency_id' =>null,
             'user_type' => 'agency',
             'amount' => $amount,
             'amount_type' => 2,
             "usd" =>  $usd ?? 0,
             'is_used_transferred' => $transferred,
         ];
+       
         $this->create($data);
     }
 
@@ -326,20 +331,22 @@ class ChargeRepoService
 
     public function chargeAgency(User $sender,Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-        $type = $receiver->owner?->user_type ?? '';
+      
 
         $receiver->increment('coins', $amount);
 
         $data = [
             'charger_id' => $sender->id,
             'charger_type' => $chargeType,
-            'user_id' => null,
-            'agency_id' => $receiver->id,
-            'user_type' => $type,
+            'user_id' => $receiver->id,
+            'agency_id' => null,
+            'user_type' => 'agency',
             'amount' => $amount,
             'amount_type' => 2,
             "usd" => $usd != null ? $usd : $amount,
             'is_used_transferred' => $transferred,
+            'action_user_id'=>auth()->user()->id
+
         ];
         $this->create($data);
     }
@@ -349,7 +356,7 @@ class ChargeRepoService
         try {
 
             $agencies = $this->shippingAgencyRepository->filterAgency($request->id);
-            $users = $this->userRepository->filterUser($request->id);
+            $users = $this->userRepository->filterUserNew($request->id);
             $data = [
                 'agency' => GeneralAgencyResource::collection($agencies),
                 'user' => GeneralUserResource::collection($users),
@@ -366,25 +373,26 @@ class ChargeRepoService
 
     public function chargeAgencyToAnother(User $auth, $request)
     {
-
-        if (!$request->id || $request->amount ) return Common::apiResponse(false, 'missing_params');
         DB::beginTransaction();
 
         try {
-            $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
-
-            if (!$authAgency) throw new \Exception(__('api.notAgency'));
-            if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
-            if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
-            if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
-            if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
 
             switch ($request->type) {
                 case 'agency':
+                     $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
+                    if (!$authAgency) throw new \Exception(__('api.notAgency'));
+                    if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozenMassForYou'));
+                    if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
+                    if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
+                    if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
                     $this->handleAgencyCharge($authAgency, $request);
                     break;
 
                 case 'user':
+                    $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
+                    if (!$authAgency) throw new \Exception(__('api.notAgency'));
+                    if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozenMassForYou'));
+
                     $this->handleUserCharge($authAgency, $auth, $request);
                     break;
 
@@ -393,6 +401,7 @@ class ChargeRepoService
             }
 
             DB::commit();
+
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -403,14 +412,13 @@ class ChargeRepoService
 
     private function handleAgencyCharge($authAgency, $request)
     {
-        if ($authAgency->id == $request->id) {
-            throw new \Exception(__('api.notYourself'));
-        }
-
+        // if ($authAgency->id == $request->id) {
+        //     throw new \Exception(__('api.notYourself'));
+        // }
         $chargeAgency = $this->shippingAgencyRepository->findOrFail($request->id);
         if (!$chargeAgency) throw new \Exception(__('api.notAgencyFound'));
         if (!$chargeAgency->status) throw new \Exception(__('api.notActive'));
-        if ($chargeAgency->is_frozen) throw new \Exception(__('api_responses.frozen'));
+        if ($chargeAgency->is_frozen) throw new \Exception(__('api_responses.frozenMass'));
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }
@@ -421,7 +429,7 @@ class ChargeRepoService
         $receiver = $this->userRepository->searchUserById($request->id);
 
         if (!$receiver) throw new \Exception(__('api.notUser'));
-        if ($receiver->id == $auth->id) throw new \Exception(__('api.notYourself'));
+        // if ($receiver->id == $auth->id) throw new \Exception(__('api.notYourself'));
 
         $this->processUserCharge($authAgency, $receiver, $request->amount);
     }
@@ -439,7 +447,8 @@ class ChargeRepoService
             amount: $amount,
             type: 'agency',
             usd: null,
-            chargeType: 'agency'
+            chargeType: 'agency',
+            agencyId: null,
         );
     }
 
@@ -452,9 +461,10 @@ class ChargeRepoService
             chargerId: $authAgency->id,
             userId: $receiver->id,
             amount: $amount,
-            type: 'app',
+            type: 'user',
             usd: null,
-            chargeType: 'agency'
+            chargeType: 'agency',
+            agencyId: null,
         );
 
         if ($receiver instanceof User) {
@@ -465,8 +475,8 @@ class ChargeRepoService
     }
 
 
-    public function agencyCharge($chargerId, $userId, $amount, $type, $usd = null, $chargeType, $transferred = false)
-    {
+    public function agencyCharge($chargerId, $userId, $amount, $type, $usd = null, $chargeType, $transferred = false ,$agencyId=null)
+    {  
         $data = [
             'charger_id' => $chargerId,
             'charger_type' => $chargeType,
@@ -476,6 +486,7 @@ class ChargeRepoService
             'amount_type' => 2,
             "usd" => $usd != null ? $usd : $amount,
             'is_used_transferred' => $transferred,
+            'agency_id' => $agencyId,
         ];
         $this->create($data);
     }

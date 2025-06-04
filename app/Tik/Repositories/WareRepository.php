@@ -38,7 +38,7 @@ class WareRepository extends AbstractRepository
     {
         return $this->model->where('type', $type)->exists();
     }
-    public function all($userId, $type)
+    public function all($userId = 0, $type)
     {
         $wares = $this->model->query()
             ->where('enable', 1)
@@ -113,10 +113,16 @@ class WareRepository extends AbstractRepository
     }
     public function profile_frame_wares($page, $perPage)
     {
-        return $this->model->where('get_type', 1)->where('type', 28)->orderByDesc('is_active_for_vip')->select('id', 'img2', 'level', 'image_type','half_image_profile')->paginate($perPage, ['*'], 'page', $page);
+        return $this->model->where('get_type', 1)->where('type', 28)->orderByDesc('is_active_for_vip')->select('id', 'img2', 'level', 'image_type', 'half_image_profile')->paginate($perPage, ['*'], 'page', $page);
     }
     public function giftOVip($level, $type)
     {
         return $this->model->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1)->first();
+    }
+
+
+    public function getFromType(int $type, int $pagination = 10)
+    {
+        return $this->model->where('type', $type)->paginate($pagination);
     }
 }

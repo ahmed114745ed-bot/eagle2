@@ -265,7 +265,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
             {{ __('Charge') }}
         </button>
-        <strong>{{ $translated }}: </strong> {{ number_format($finalSalary) }} 💰
+        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
     </div>
 </div>
 
@@ -288,7 +288,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         <select id="target_type" name="target_type" class="form-control" required onchange="toggleTargetFields()">
             <option value="">{{ __('select') }}</option>
             <option value="user">{{ __('user') }}</option>
-            <option value="agency">{{ __('agency') }}</option>
+            <option value="agency">{{ __('Shipping agency') }}</option>
         </select>
     </div>
 
@@ -367,7 +367,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             return;
         }
 
-        let url = targetType === 'user' ? '/api/search/users3' : '/api/search/agencies';
+        let url = targetType === 'user' ? '/api/search/users2' : '/api/search/agencies';
 
         searchTimeout = setTimeout(() => {
             fetch(`${url}?q=${encodeURIComponent(query)}`)

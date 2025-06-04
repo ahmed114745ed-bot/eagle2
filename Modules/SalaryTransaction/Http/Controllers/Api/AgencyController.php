@@ -35,8 +35,13 @@ class AgencyController extends Controller
 
     public function update_info(Request $request)
     {
-        $agency = Agency::query()->find($request->agency_id);
+        // $agency = Agency::query()->find($request->agency_id);
+        $agency = ShippingAgency::query()->find($request->agency_id);
         if (!$agency) {
+            $agency = Agency::query()->find($request->agency_id);
+            }
+        if (!$agency) {
+
             return Common::apiResponse(1, __("api_responses.agency_not_found"), []);
         }
         if ($request->has('phone')) {

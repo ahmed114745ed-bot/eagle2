@@ -21,7 +21,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class BanRoomsController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'ban-rooms';
+    public $permission_name = 'close-room';
 
     /**
      * Index interface.
@@ -179,7 +179,7 @@ class BanRoomsController extends MainController
             $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
             return now()->diffForHumans($banExpiration, true);
         });
-        if (Admin::user()->can('delete-' . $this->permission_name)) {
+        if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('Delete'))->display(function () {
                 return (new \App\Admin\Actions\DeleteBansRoom($this->id))->render();
             });
@@ -188,8 +188,13 @@ class BanRoomsController extends MainController
 
         $grid->disableExport();
         $grid->disableRowSelector();
-        // $grid->disableActions();
+         $grid->disableActions();
         $grid->disableCreateButton();
+        // $grid->actions(function ($actions) {
+        //     $actions->disableEdit();
+        //     $actions->disableView();
+        //     // $actions->add(new DedicateAction());
+        // });
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -198,9 +203,11 @@ class BanRoomsController extends MainController
             });
         });
 
-
-        $grid->tools(function (Grid\Tools $tools) {
-            $tools->append((new BanRoomAction())->render());
+        $permission = $this->permission_name;
+        $grid->tools(function (Grid\Tools $tools) use ($permission) {
+            if (Admin::user()->can('create-' . $permission) || Admin::user()->can('*')) {
+                $tools->append((new BanRoomAction())->render());
+            }
         });
 
         return $grid;

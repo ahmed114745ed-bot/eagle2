@@ -183,7 +183,7 @@ class AdminPermission extends Seeder
         // Step 1: Category definitions with sort number
         $categories = [
             ['name' => 'Dashboard', 'sort' => 1, 'permissions' => ['all-statistic']],
-            ['name' => 'Fast orders', 'sort' => 2, 'permissions' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate']],
+            ['name' => 'Fast orders', 'sort' => 2, 'permissions' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate', 'background-image-request']],
             ['name' => 'Wallet', 'sort' => 3, 'permissions' => ['core-wallets']],
             ['name' => 'charge system', 'sort' => 4, 'permissions' => ['charge', 'charge-report-Switch', 'add-coins-Switch', 'charger-report', 'charge-settings']],
             ['name' => 'users', 'sort' => 5, 'permissions' => ['users', 'chang-agency-Switch', 'kick-agency-Switch', 'kick-family-Switch', 'can-Play-Switch', 'ticket', 'invite-switch', 'trashed-account-user', 'user-actions', 'charge-switch']],

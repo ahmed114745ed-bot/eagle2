@@ -301,6 +301,7 @@
                 <button onclick="showSection('PercentageTarget')"
                     style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Percentage target') }}</button>
                 <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
+                <button onclick="showSection('user_days')">{{ __('user days') }}</button>
 
             </div>
         </div>
@@ -336,6 +337,29 @@
                 </form>
             </div>
 
+            <div id="user_days" class="settings-section ">
+
+            <!-- <h3> {{ __('Percentage target') }}</h3> -->
+
+            <form id="target-percentage-form" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                     <div class="alert alert-danger text-center" style="margin-bottom: 20px;"> {{ $errorMessage }}
+                    </div>;
+                @endif
+                <div class="form">
+                    <label>{{ __('Hours:') }} </label>
+                    <input type="text" name="hours_days" value="{{ Cache::get('hours_days') }}" class="form-control">
+                  
+                    <button type="submit">{{ __('Save') }}</button>
+
+                </div>
+
+            </form>
+            </div>
             <div id="Badges" class="settings-section">
                 <h3>{{ __('Badges') }}</h3>
 
@@ -476,6 +500,8 @@
         </div>
 
 
+         
+
         <script>
             function previewImage(input, previewId) {
                 const preview = document.getElementById(previewId);
@@ -536,11 +562,12 @@
             });
 
             function showSection(sectionId) {
+
                 // Remove active class from all sections
                 document.querySelectorAll('.settings-section').forEach(section => {
                     section.classList.remove('active');
                 });
-
+            
                 // Add active class to the selected section
                 document.getElementById(sectionId).classList.add('active');
 
@@ -564,7 +591,13 @@
                         EnglishTabBtn.click(); // fire real click event
                     }
                 }
-
+                // if (sectionId === 'user_days') {
+                //     const EnglishTabBtn = document.querySelector('.tab-button[onclick*="en"]');
+                //     if (EnglishTabBtn) {
+                //         EnglishTabBtn.click(); 
+                //     }
+                // }
+                
                 // Update the URL with the selected tab without reloading
                 const url = new URL(window.location);
                 url.searchParams.set("firsttab", sectionId);

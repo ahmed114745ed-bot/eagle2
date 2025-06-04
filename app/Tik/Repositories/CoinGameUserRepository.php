@@ -3,6 +3,7 @@
 namespace App\Tik\Repositories;
 
 use App\Models\CoinGameUser;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class CoinGameUserRepository extends AbstractRepository
@@ -23,6 +24,6 @@ class CoinGameUserRepository extends AbstractRepository
         return $this->model->select(
             'user_id',
             DB::raw(" SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp")
-        )->groupBy('user_id')->with('user')->orderByRaw("exp desc")->limit(3)->get();
+        )->groupBy('user_id')->with('user')->orderByRaw("exp desc")->whereDate('created_at', Carbon::today())->limit(3)->get();
     }
 }

@@ -18,7 +18,8 @@ class AgencyResource extends JsonResource
 
         $owner = new \stdClass();
         if ($request->user () && ($isOwner)){
-            $owner = new \stdClass();
+            // $owner = new \stdClass();
+            $owner = new MiniUserResource($request->user ());
         }else{
             $owner = new MiniUserResource($this->owner);
         }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V2;
 
 
+use App\Http\Resources\JoinedAgencyResource;
 use Cache;
 use App\Models\User;
 use App\Models\Agency;
@@ -119,7 +120,6 @@ class AgencyController extends Controller
 
     public function agencyTargetDetails($agencyId, Request $request)
     {
-        $id = User::whereId(auth()->id())->where('type_user', '!=', 0)->firstOrFail()->id;
         $user = $request->user();
         try {
             $response = $this->agencyService->agencyTarget($user->agency_id, $user, $request);
@@ -243,19 +243,22 @@ class AgencyController extends Controller
     public function make_user_handling_requests(Request $request)
     {
         $user = $request->user();
+        $type = $request->type ?? null;
         $agency = $user->ownAgency;
         if (!$user->ownAgency)   return Common::apiResponse(0, 'لا يوجد وكاله!', []);
 
         //        try {
-        $this->agencyService->userHandlingRequest($request->user_id, $agency->id);
+       $mass=  $this->agencyService->userHandlingRequest($request->user_id, $agency->id ,$type);
         /*  } catch (ValidationException $exception){
             return Common::apiResponse(0, $exception->getMessage(), null, 422);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), null, 500);
         }*/
 
-        return Common::apiResponse(1, 'تم اضافه المستخدم بنجاح', []);
+        return Common::apiResponse(1, $mass, []);
     }
+
+
 
     public function showAgencyRequest(Request $request)
     {
@@ -312,4 +315,19 @@ class AgencyController extends Controller
     //     $data = $this->agencyService->showAgencyRequest($user, $type);
     //     return Common::apiResponse(1, '',$data);
     // }
+
+
+
+
+    public function gitOldAgencies(Request $request)
+    {
+         $userId   = $request->user()->id;
+        try {
+            $agency = $this->agencyService->gitOldAgencies($userId);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '', JoinedAgencyResource::collection( $agency));
+    }
 }

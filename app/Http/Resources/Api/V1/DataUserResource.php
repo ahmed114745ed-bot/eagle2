@@ -71,7 +71,7 @@ class DataUserResource extends JsonResource
             'achievement_images' => $achievement_images,
             'gifts' =>  GiftLogResource::collection($gifts),
             'cp' => $mainCp ? new CpListResource($mainCp) : null,
-
+            'is_followed' => $this->isFollowedBy(auth()->id())
         ];
     }
 }

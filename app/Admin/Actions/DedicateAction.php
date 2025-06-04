@@ -82,10 +82,10 @@ class DedicateAction extends RowAction
                 $arr['num'] = 1; //$qty;
                 $arr['expire'] = $request->days ? time() + (($request->days ?? $ware->expire) * 86400) : 0;
                 $arr['is_read'] = 1;
-                
+
                 $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
                 $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;
-                
+
                 Pack::query()->create($arr);
                 if ($ware->type == 25) {
                     $user->special_id = $ware->value;
@@ -108,7 +108,7 @@ class DedicateAction extends RowAction
             }
             DB::beginTransaction();
 
-            
+
             $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
             $is_used = $enableVipAuto === "true" ? 1 : 0;
 
@@ -145,7 +145,7 @@ class DedicateAction extends RowAction
                     }
                     $userVip->save();
                 }
-                Common::handelVip($vip, $user, expire: $request->days ?? 1);
+                Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
                 DB::commit();
                 CustomNotification::vips($user, $request->days, $vip->img);

@@ -3,6 +3,7 @@
 namespace App\Bd\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -35,14 +36,17 @@ use App\Admin\Actions\DeleteAgencyAction;
 use App\Traits\AdminTraits\AdminUserTrait;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Controllers\AdminController;
 
 
-class AgencyController extends MainController
+class AgencyController extends Controller
 {
     use HasResourceActions, AdminUserTrait;
 
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
+
+    protected $title = 'Agency';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
@@ -50,7 +54,7 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
+        return $content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
@@ -58,21 +62,21 @@ class AgencyController extends MainController
 
 
                 $row->column(12, $this->grid());
-            }));
+            });
     }
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id, $content
-            ->title(__($this->title))
-            ->body($this->form()->edit($id)));
+        return  $content
+            ->title(__(@$this->title ?? ''))
+            ->body($this->form()->edit($id));
     }
 
     public function create(Content $content)
     {
-        return parent::create($content
+        return $content
             ->title(__($this->title))
-            ->body($this->form()));
+            ->body($this->form());
     }
 
     // public function profile($id, Request $request, Content $content)
@@ -80,7 +84,7 @@ class AgencyController extends MainController
     //     $year = $request->year ?? Carbon::now()->year;
     //     $month = $request->month ?? Carbon::now()->month;
     //     $tab = request('tab') ?? null;
-      
+
     //     $cacheKey = "agency_profile_{$id}";
     //     $agency = Agency::with([
     //         'admins',
@@ -138,7 +142,7 @@ class AgencyController extends MainController
     //     $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
     //     $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
     //     $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
-     
+
     //     return $content->title(__('agency profile'))
     //         ->view('agency_profile', $data);
 
@@ -149,13 +153,13 @@ class AgencyController extends MainController
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab') ?? 'members';
-    
+
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::with(['admins', 'owner:id,name,uuid'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
         });
-    
+
         $path = $agency->img;
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($path) ?? $defaultImage;
@@ -163,11 +167,11 @@ class AgencyController extends MainController
             $imageUrl = $defaultImage;
         }
         $agency->display_image = $imageUrl;
-    
+
         $agencyId = $agency->id;
-    
+
         $members = $charges = $salaries = $agencyJoinRequests = $giftLog = $memberTargets = $agencyTarget = $rate = $stars = $heroes = null;
-    
+
         switch ($tab) {
             case 'members':
                 $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
@@ -177,7 +181,7 @@ class AgencyController extends MainController
                         ->paginate(10, ['*'], 'members_page');
                 });
                 break;
-    
+
             case 'charges':
                 $charges = Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
                     return $agency->charges()
@@ -186,7 +190,7 @@ class AgencyController extends MainController
                         ->paginate(10, ['*'], 'charges_page');
                 });
                 break;
-    
+
             case 'salary':
                 $salaries = Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
                     return AgencySallary::where('agency_id', $id)
@@ -195,7 +199,7 @@ class AgencyController extends MainController
                         ->paginate(10, ['*'], 'salary_page');
                 });
                 break;
-    
+
             case 'requests':
                 $agencyJoinRequests = Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
                     return AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
@@ -205,7 +209,7 @@ class AgencyController extends MainController
                         ->paginate(10, ['*'], 'join_page');
                 });
                 break;
-    
+
             case 'targets':
                 $memberTargets = Cache::remember("agency_{$id}_targets_{$month}_{$year}_page_" . request('target_page', 1), 600, function () use ($agency, $agencyId, $month, $year) {
                     return $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
@@ -214,14 +218,14 @@ class AgencyController extends MainController
                             ->whereYear('created_at', $year);
                     }])->paginate(10, ['*'], 'target_page');
                 });
-    
+
                 [$agencyTarget, $rate] = Cache::remember("agency_{$id}_rate_{$month}_{$year}", 600, fn() => $this->rateAgency($agencyId, $month, $year));
                 $stars = Cache::remember("agency_{$id}_stars_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'));
                 $heroes = Cache::remember("agency_{$id}_heroes_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'));
-    
+
                 break;
         }
-    
+
         $giftLog = Cache::remember("agency_{$id}_giftlog", 600, function () use ($id) {
             return GiftLog::where('agency_id', $id)
                 ->selectRaw("SUM(giftPrice) as exp, receiver_id")
@@ -231,13 +235,13 @@ class AgencyController extends MainController
                 ->orderByDesc('exp')
                 ->get();
         });
-    
+
         $data = compact(
             'agency', 'members', 'charges', 'salaries',
             'agencyJoinRequests', 'giftLog', 'memberTargets',
             'agencyTarget', 'rate', 'stars', 'heroes', 'tab'
         );
-    
+
         return $content->title(__('agency profile'))
             ->view('agency_profile', $data);
     }
@@ -279,37 +283,30 @@ class AgencyController extends MainController
             $newUser = User::find($data['app_owner_id']);
             if ($newUser) {
                 $newUser->agency_id = $agency->id;
-                if ($agency->Host_agency == 1 && $agency->Shipping_agency == 1) {
-                    $newUser->type_user = 4;
-                } elseif ($agency->Host_agency == 1 && $agency->Shipping_agency == 0) {
-                    $newUser->type_user = 2;
-                } elseif (
-                    $agency->Host_agency == 0 && $agency->Shipping_agency == 1
-                ) {
-                    $newUser->type_user = 3;
-                }
-
+                // if ($agency->Host_agency == 1 && $agency->Shipping_agency == 1) {
+                //     $newUser->type_user = 4;
+                // } elseif ($agency->Host_agency == 1 && $agency->Shipping_agency == 0) {
+                //     $newUser->type_user = 2;
+                // } elseif (
+                //     $agency->Host_agency == 0 && $agency->Shipping_agency == 1
+                // ) {
+                //     $newUser->type_user = 3;
+                // }
+                $newUser->type_user = 2;
                 $newUser->is_host = 1;
                 $newUser->save();
             }
         }
 
-        return parent::update($id);
+        return $this->form()->update($id);
     }
 
-    // public function show($id, Content $content)
-    // {
-
-    //     return parent::show($id, $content
-    //         ->title(__("agency details"))
-    //         ->row(function ($row) use ($id) {
-    //             $agency = Agency::find($id);
-    //             $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
-    //             $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
-    //             $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
-    //                 ->groupByRaw('agency_id,add_month,add_year')->count()));
-    //         }));
-    // }
+    public function show($id, Content $content)
+    {
+       return parent::show($id, $content
+            ->title(trans(''))
+            ->body($this->detail($id)));
+    }
 
 
     /**
@@ -336,7 +333,7 @@ class AgencyController extends MainController
             // ->where('Host_agency',  1)
             ->where('bd_id',  Auth::user()->app_id)
             ->orderByDesc('id');
-            
+
         if (request("active") == true) {
             $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)
@@ -424,23 +421,23 @@ class AgencyController extends MainController
                 </div>
             ";
         });
-
-         $grid->actions(function ($actions) {
+       $permission =$this->permission_name;
+         $grid->actions(function ($actions)use($permission) {
             $model = $actions->row;
             // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
-            if (Admin::user()->can('browse-' . 'delete-agency-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new DeleteAgencyAction());
             }
-            if (Admin::user()->can('browse-' . 'change-users-agency-Switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('change-users-agency-Switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new ChangeUsersAgencyAction($model->id));
             }
         });
         $grid->disableExport();
 
-        $this->extendGrid($grid);
+//        $this->extendGrid($grid);
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -540,7 +537,7 @@ class AgencyController extends MainController
         $grid->column('img', trans('img'))->image('', 30);
         $grid->disableActions();
         $grid->disableCreateButton();
-        $this->extendGrid($grid);
+//        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -564,7 +561,7 @@ class AgencyController extends MainController
         $show->field('url', __('url'));
         $show->field('img', __('image'))->image('', 200);
         $show->field('contents', __('contents'));
-        $this->extendShow($show);
+//        $this->extendShow($show);
         return $show;
     }
 
@@ -607,10 +604,10 @@ class AgencyController extends MainController
                 $row->width(12)->switch('status', __('status'));
                 $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                $row->width(12)->hidden('Host_agency')->default(1);
+                // $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->hidden('Shipping_agency')->default(0);
+                    // $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         } else {
@@ -632,15 +629,15 @@ class AgencyController extends MainController
                 $row->width(12)->switch('status', __('status'));
                 $row->width(12)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                $row->width(12)->hidden('Host_agency')->default(1);
+                // $row->width(12)->hidden('Host_agency')->default(1);
 
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
+                    // $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
                 }
             });
         }
-      
+
         if (Session::has('show_alert')) {
             $form->html('<script>
              $(document).ready(function () {
@@ -649,7 +646,7 @@ class AgencyController extends MainController
          </script>');
         }
 
-        
+
 
         Admin::script(<<<'JS'
         function initPhoneInput() {
@@ -657,13 +654,13 @@ class AgencyController extends MainController
             if (input && !input.classList.contains('iti-initialized')) {
                 const parentDiv = input.parentElement;
                 parentDiv.style.position = 'relative';
-    
+
                 const iti = window.intlTelInput(input, {
                     separateDialCode: true,
                     preferredCountries: ["eg"],
                     utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
                 });
-    
+
                 document.head.insertAdjacentHTML('beforeend', `
                     <style>
                         .iti { width: 100%;  }
@@ -675,21 +672,21 @@ class AgencyController extends MainController
                         .fields-group .form-group { overflow: visible; }
                     </style>
                 `);
-    
+
                 input.classList.add('iti-initialized');
-    
+
                 const form = input.closest('form');
                 if (form && !form.classList.contains('phone-init')) {
                     form.addEventListener('submit', function () {
                         if (iti) {
                             const dialCode = iti.getSelectedCountryData().dialCode;
                             const nationalNumber = input.value.replace(/\s/g, '');
-    
+
                             const hiddenInput = document.createElement('input');
                             hiddenInput.name = 'phone_code';
                             hiddenInput.value = `+${dialCode}`;
                             form.appendChild(hiddenInput);
-    
+
                             input.value = nationalNumber;
                         }
                     });
@@ -697,7 +694,7 @@ class AgencyController extends MainController
                 }
             }
         }
-    
+
         initPhoneInput();
         $(document).on('pjax:complete', function () {
             setTimeout(initPhoneInput, 100);
@@ -708,9 +705,9 @@ class AgencyController extends MainController
             $form->input('bd_id', Auth::user()->app_id);
             $form->model()->bd_id =Auth::user()->app_id;
             $appOwnerId = $form->input('app_owner_id');
-            $Host_agency = $form->input('Host_agency');
+            // $Host_agency = $form->input('Host_agency');
 
-            $Shipping_agency = $form->input('Shipping_agency') ;
+            // $Shipping_agency = $form->input('Shipping_agency') ;
             $host = 0;
 
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
@@ -719,11 +716,11 @@ class AgencyController extends MainController
             $modelExists = $form->model()->exists;
             if (!$modelExists)  Common::createUserAdmin($appOwnerId);
 
-            if ($modelExists && $newOwnerId != $originalOwnerId) {
+            if ($modelExists && $appOwnerId != $originalOwnerId) {
                 Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
-                Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
+                Common::userJoinAgency($originalOwnerId, $appOwnerId, $agencyId);
 
                 Admin::where('username', $user->uuid)->delete();
                 $user->update([
@@ -733,48 +730,48 @@ class AgencyController extends MainController
                     'is_host' => 0,
                 ]);
 
-                if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 2,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 4,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 3,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                }
+                // if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 2,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 4,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 3,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // }
             }
 
 
 
-            if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
+            // if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
 
-                session()->flash('show_alert', 'Your alert message');
-                return redirect()->back();
-            }
-
-
+            //     session()->flash('show_alert', 'Your alert message');
+            //     return redirect()->back();
+            // }
 
 
-            if ($Host_agency == 'on' || $Host_agency == 1) {
-                $host += 2;
-            }
 
-            if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
-                $host += 3;
-            }
+
+            // if ($Host_agency == 'on' || $Host_agency == 1) {
+            //     $host += 2;
+            // }
+
+            // if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
+            //     $host += 3;
+            // }
             if ($host > 3) {
                 $host = 4;
             }

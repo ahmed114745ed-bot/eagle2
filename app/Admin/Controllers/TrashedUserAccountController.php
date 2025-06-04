@@ -11,6 +11,7 @@ use App\Admin\Actions\RestoreUserAccount;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\SoftDeleteUserAccount;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 
 class TrashedUserAccountController extends  MainController
 {
@@ -19,7 +20,7 @@ class TrashedUserAccountController extends  MainController
      *
      * @var string
      */
-    public $permission_name = 'trashed-account-user';
+    public $permission_name = 'deleted-accounts';
     use HasResourceActions;
 
 
@@ -75,10 +76,15 @@ class TrashedUserAccountController extends  MainController
 
         // $grid->column('phone', __('Phone'));
         $grid->column('deleted_at', __('Deleted at'))->diffForHumans();
-        $grid->actions(function ($actions) {
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
-            $actions->add(new RestoreUserAccount($model->id));
-            $actions->add(new SoftDeleteUserAccount($model->id));
+            if ( (Admin::user()->can('restore-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
+                $actions->add(new RestoreUserAccount($model->id));
+            }
+            if ( (Admin::user()->can('delete-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
+                $actions->add(new SoftDeleteUserAccount($model->id));
+            }
             $actions->disableEdit();
             $actions->disableView();
             $actions->disableDelete();

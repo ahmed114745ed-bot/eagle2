@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 
 use App\Models\AchievementValidImage;
-
+use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\AchievementDedicate;
 use Modules\Achievement\Entities\Achievement;
@@ -28,7 +28,7 @@ class AchievementDedicateController extends MainController
      *
      * @var string
      */
-    public $permission_name = 'achievement_dedicate';
+    public $permission_name = 'gift-a-medal';
 
     public function index(Content $content)
     {
@@ -164,7 +164,9 @@ class AchievementDedicateController extends MainController
             'off' => ['value' => 0, 'text' => 'no', 'color' => 'danger'],
             'on' => ['value' => 1, 'text' => 'yes', 'color' => 'success'],
         ];
-        $grid->column('is_enable',__('is enabled'))->switch($states);
+        if (Admin::user()->can('edit-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('is_enable', __('is enabled'))->switch($states);
+        }
         $grid->column('created_at', trans('admin.created_at'));
 
         $grid->disableActions();

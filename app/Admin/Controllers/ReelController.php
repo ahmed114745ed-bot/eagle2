@@ -72,7 +72,7 @@ class ReelController extends MainController
                     $input = $this->input;
 
                     $query->whereHas('user', function ($query) use ($input) {
-//                        $query->where('name', 'like', "%$input%")
+                        //                        $query->where('name', 'like', "%$input%")
                         $query->where('uuid',  trim($input));
                     });
                 }, __('User'))->placeholder(__('Search by name or UUID'));
@@ -120,7 +120,7 @@ class ReelController extends MainController
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         $grid->column('video', __('video'))->display(function () {
             // Assuming you have a 'video_path' field in your model
-            $videoPath = getDriverUrl().'/'.$this->url;
+            $videoPath = getDriverUrl() . '/' . $this->url;
 
             // You can customize the HTML to embed the video
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
@@ -154,8 +154,12 @@ class ReelController extends MainController
         }); ");
 
         $grid->disableCreateButton();
-        $grid->actions(function ($actions) {
+        $permission_name = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission_name) {
             $actions->disableEdit();
+            if (! Admin::user()->can('delete-' . $permission_name) || !Admin::user()->can('*')) {
+                $actions->disableDelete();
+            }
         });
         $grid->disableExport();
 
@@ -184,11 +188,11 @@ class ReelController extends MainController
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
         $show->field('video', __('Video'))->as(function () {
-             // Assuming you have a 'video_path' field in your model
-             $videoPath = getDriverUrl().'/'.$this->url;
+            // Assuming you have a 'video_path' field in your model
+            $videoPath = getDriverUrl() . '/' . $this->url;
 
-             // You can customize the HTML to embed the video
-             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
+            // You can customize the HTML to embed the video
+            return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
         });
 
         return $show;

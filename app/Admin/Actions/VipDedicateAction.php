@@ -13,14 +13,12 @@ use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 
-
 class VipDedicateAction extends Action
 {
     protected $selector = '.salary_action';
     public $id;
 
-
-    public function __construct($id = 0)
+    public function __construct($id = null)
     {
         $this->id = $id;
         parent::__construct();
@@ -28,85 +26,89 @@ class VipDedicateAction extends Action
 
     public function handle(Request $request)
     {
-
-        $user = User::query()->searchByUuid($request->user_uuid)->first();
-        if (!$user) {
-            return $this->response()->error(__('dashboard.userNotFound'))->refresh();
-        }
-        // dd(request('id'));
-        $vip = OVip::find(request('id'));
-        // dd(123, $vip);
-        // admin only put to user vip greater than 30 days
-        if (!Admin::user()->can('*') && $request->days > 30) {
-            return $this->response()->error(__('dashboard.addAchivement'))->refresh();
-        }
-        DB::beginTransaction();
-
-
-        $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
-        $is_used = $enableVipAuto === "true" ? 1 : 0;
-
         try {
+            // Validate user
+            $user = User::query()->searchByUuid($request->user_uuid)->first();
+            if (!$user) {
+                return $this->response()->error(__('dashboard.userNotFound'))->refresh();
+            }
+
+            // Get VIP
+            $vip = OVip::find($request->get('id'));
+            if (!$vip) {
+                return $this->response()->error('VIP not found')->refresh();
+            }
+
+            // Check admin permissions
+            if (!Admin::user()->can('*') && $request->days > 30) {
+                return $this->response()->error(__('dashboard.addAchivement'))->refresh();
+            }
+
+            DB::beginTransaction();
+
+            $enableVipAuto = config('admin.isUsed_vip');
+
+            $is_used = $enableVipAuto === true ? 1 : 0;
             $uniqueAttributes = [
                 'sender_id' => 0,
                 'user_id'   => $user->id,
                 'vip_id'    => $vip->id,
                 'level'     => $vip->level,
             ];
-            $userVip = UserVip::query()->where($uniqueAttributes)->first();
-            if (!$userVip) {
-                UserVip::query()->create(
-                    [
-                        ...$uniqueAttributes,
-                        'type'   => 1,
-                        'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
-                        'qty'    => 1,
-                        'price'  => 0,
-                        'total'  => 0,
-                        'is_used'  => $is_used,
-                        'dash_user_id'  => \auth()->user()->id,
-                    ]
-                );
-            } else {
-                $userVip->qty++;
-                if ($userVip->expire > now()->timestamp) {
-                    $userVip->expire += ($request->days * 86400);
-                    $userVip->is_used += $is_used;
-                } else {
-                    $userVip->expire = now()->timestamp + ($request->days * 86400);
-                    $userVip->is_used += $is_used;
-                }
-                $userVip->save();
-            }
-            Common::handelVip($vip, $user, expire: $request->days ?? 1);
+
+            //  $userVip = UserVip::query()->where($uniqueAttributes)->first();
+
+            // if (!$userVip) {
+            $userVip = UserVip::create([
+                ...$uniqueAttributes,
+                'type'   => 1,
+                'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
+                'qty'    => 1,
+                'price'  => 0,
+                'total'  => 0,
+                'is_used'  => $is_used,
+                'dash_user_id'  => auth()->id(),
+                'using' => $is_used,
+            ]);
+            // } else {
+            //     $userVip->qty++;
+            //     if ($userVip->expire > now()->timestamp) {
+            //         $userVip->expire += ($request->days * 86400);
+            //     } else {
+            //         $userVip->expire = now()->timestamp + ($request->days * 86400);
+            //     }
+            //     $userVip->is_used += $is_used;
+            //     $userVip->save();
+            // }
+
+            Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
             DB::commit();
+
             CustomNotification::vips($user, $request->days, $vip->img);
+
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
-
-            echo ($exception->getMessage());
             DB::rollBack();
-            return $this->response()->error('خطا.')->refresh();
+            \Log::error('VIP dedication error: ' . $exception->getMessage());
+            return $this->response()->error(__('dashboard.error'))->refresh();
         }
     }
 
     public function form()
     {
-        $this->hidden('id', __('id'))->attribute('id', 'vid');
-        $this->integer('days', __('days'));
-        $this->text('user_uuid', __('user uuid'));
+        $this->hidden('id')->default($this->id);
+        $this->integer('days', __('days'))->required();
+        $this->text('user_uuid', __('user uuid'))->required();
     }
 
     public function html()
     {
-        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" class="btn btn-sm btn-info salary_action ">' . __('dedicate') . '</a>
-<script>
-function pu(val) {
-
-  $("#vid").val(val)
-}
-</script>
-';
+        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" class="btn btn-sm btn-info salary_action">' . __('dedicate') . '</a>
+    <script>
+    function pu(val) {
+        $("input[name=\'id\']").val(val);
+    }
+    </script>';
     }
 }

@@ -32,5 +32,8 @@ class ResetTodayTopRoomRank extends Command
             UPDATE rooms
             SET  top_user_id = null
         ");
+
+        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
     }
 }

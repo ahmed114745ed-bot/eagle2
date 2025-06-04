@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Country;
 use App\Models\Room;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -32,7 +33,7 @@ class RoomController extends MainController
     {
         $content = $content->title(trans('Rooms'));
 
-        if (Admin::user()->can('browse-room-actions') || Admin::user()->can('*')) {
+        if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
             $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             });
@@ -122,6 +123,7 @@ class RoomController extends MainController
                 'pk'        => __('PK'),
                 'party'     => __('Party'),
                 'festival'  => __('Festival'),
+                'top_gift'  => __('Top Gift'),
             ];
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
@@ -154,8 +156,18 @@ class RoomController extends MainController
 
             return $html;
         });
-        $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
-            ->whereHas('owner')->orderByDesc('pin');
+        $grid->model()
+            ->select('*', \DB::raw("CASE room_status
+                WHEN 1 THEN 100
+                WHEN 2 THEN 10
+                ELSE 80
+            END AS status_priority"))
+            ->with('owner.profile', 'owner:uuid,id,name')
+            ->withCount('roomVisitors')
+            ->whereHas('owner')
+            ->orderByDesc('status_priority')
+        ;
+
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
         if ($topRooms) {
             $grid->model()->orderByDesc('room_visitors_count');
@@ -168,38 +180,43 @@ class RoomController extends MainController
                     ->orderByDesc('entered_at')
                     ->pluck('rid')
                     ->toArray();
-                $grid->model()->whereIn('id', $roomIds);
+                $grid->model()->orderByDesc('pin')->whereIn('id', $roomIds);
                 break;
 
             case 'trend':
                 $grid->model()->orderByDesc('top_room')
+                    ->orderByDesc('pin')
                     ->orderByDesc('room_visitors_count')
                     ->orderByDesc('session');
                 break;
 
             case 'popular':
                 $grid->model()->orderByDesc('top_room')
+                    ->orderByDesc('pin')
                     ->orderByDesc('room_visitors_count');
                 break;
 
             case 'last_create':
                 $grid->model()->whereDate('created_at', '>=', Carbon::now()->subDays(3))
+                    ->orderByDesc('pin')
                     ->orderByDesc('id');
                 break;
 
             case 'pk':
-                $grid->model()->has('lastPk');
+                $grid->model()->has('lastPk')->orderByDesc('pin');
                 break;
 
             case 'party':
                 $grid->model()->whereHas('roomCategory', function ($query) {
                     $query->where('type', 'party');
-                });
+                })->orderByDesc('pin');
                 break;
 
             case 'festival':
             case 'recently':
-                $grid->model()->orderByDesc('top_room')
+                $grid->model()
+                    ->orderByDesc('pin')
+                    ->orderByDesc('top_room')
                     ->orderByDesc('room_visitors_count')
                     ->orderByDesc('session');
                 break;
@@ -213,6 +230,7 @@ class RoomController extends MainController
                     ->pluck('room.room_type')
                     ->unique();
                 $grid->model()->whereIn('room_type', $roomTypes)
+                    ->orderByDesc('pin')
                     ->orderByDesc('top_room')
                     ->orderByDesc('session');
                 break;
@@ -242,30 +260,55 @@ class RoomController extends MainController
                     [$userLat, $userLong, $userLat]
                 )
                     ->join('users as owner', 'rooms.uid', '=', 'owner.id')
+                    ->orderByDesc('pin')
                     ->orderBy('distance');
                 break;
 
+            case 'top_gift':
+                $grid->model()
+                    ->withSum('gifts as total_gift_exp', 'giftPrice')
+                    ->orderByDesc('total_gift_exp');
+                break;
+
             default:
-                $grid->model()->orderByDesc('hour_hot');
+                $grid->model()
+                    ->orderByDesc('pin')
+                    ->orderByDesc('hour_hot');
                 //                $grid->model()->orderByDesc('rooms.pin')
                 //                    ->orderByDesc('rooms.top_room')
                 //                    ->orderByDesc('session')
                 //                    ->orderByDesc('count_room_socket');
                 break;
         }
-        // Filters UI
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
-
                     $query->whereHas('owner', function ($query) use ($input) {
                         $query->where('name', 'like', "%$input%")
                             ->orWhere('uuid', 'like', "%$input%");
                     });
                 }, __('User'))->placeholder(__('Search by name or numId'));
+
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->whereHas('owner', function ($query) {
+                            $query->where('country_id', $this->input);
+                        });
+                    }
+                }, __('Country'))->select(
+                    Country::query()->pluck('name', 'id')
+                );
+
+//                $filter->equal('room_status', __('Room Status'))->select([
+//                    1 => __('Active'),
+//                    0 => __('Inactive'),
+//                    2 => __('Closed'),
+//                    3 => __('Banned'),
+//                    4 => __('Closed'),
+//                ]);
             });
         });
 
@@ -442,21 +485,18 @@ class RoomController extends MainController
             return $html;
         });
 
+        $permissionName = $this->permission_name;
 
-
-
-
-
-        $grid->actions(function ($action) {
+        $grid->actions(function ($action) use ($permissionName){
             $action->disableView();
             $pin = $action->row->pin;
             $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
-            if (Admin::user()->can('browse-' . 'room-pin-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('pin-switch-' . $permissionName) || Admin::user()->can('*')) {
 
                 $action->add(new RoomPinAction($action->row->id, $pin));
             }
-            if (Admin::user()->can('browse-' . 'close-room-switch') || Admin::user()->can('*')) {
+            if (Admin::user()->can('close-switch-' . $permissionName) || Admin::user()->can('*')) {
 
                 $action->add(new CloseRoomAction($model->id));
             }

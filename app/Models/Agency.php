@@ -14,10 +14,12 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Http\Controllers\ChargeAgencyController;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
+use App\Traits\DefaultBdAssignmentTrait;
+
 
 class Agency extends Model
 {
-    use SoftDeletes, AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait;
+    use SoftDeletes, AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait ,DefaultBdAssignmentTrait;
     protected $guarded = [];
 
     protected $hidden = [
@@ -177,7 +179,9 @@ class Agency extends Model
 
     public function getSalaryAttribute()
     {
-        $salary = AgencySallary::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(\DB::raw('sallary - cut_amount'));
+        $salary = AgencySallary::query()->where('agency_id', $this->id)
+        // ->where('is_paid', 0)
+        ->sum(\DB::raw('sallary - cut_amount'));
         return $salary;
     }
 
@@ -202,7 +206,7 @@ class Agency extends Model
         static::addGlobalScope(new HostAgencyScope);
 
         static::saving(function ($model) {
-
+            $model->type =1;     
 
             if (request()->has('phone_code')) {
                 $model->phone_code = request('phone_code');

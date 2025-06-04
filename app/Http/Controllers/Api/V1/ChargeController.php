@@ -157,6 +157,9 @@ class ChargeController extends Controller
         $from = $request->user();
         $isRoomTarget = false;
 
+        if ($from->transfer_salary == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+        }
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
         if ($to->is_frozen == 1) {
@@ -187,10 +190,12 @@ class ChargeController extends Controller
         }
         DB::beginTransaction();
         try {
-
+           
+           
             $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd);
+           
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
-
+         
             DB::commit();
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
@@ -238,7 +243,7 @@ class ChargeController extends Controller
     {
         $userId = $request->user()->id;
         if (!$request->type) return Common::apiResponse(0, 'missing params', null, 422);
-        $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'freight forwarder');
+        $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'agency');
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
     }
 
@@ -345,14 +350,14 @@ class ChargeController extends Controller
 
         $userId = $request->user()->id;
         if (!$request->type) return Common::apiResponse(0, 'missing params', null, 422);
-        $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'Host agent');
+        $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'host_agency');
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
     }
 
     public function chargeHistory(Request $request)
     {
         $userId = $request->user()->id;
-        $charge = $this->chargeService->getChargeUserHistory($userId, $request->type, $request->by_date, 'Host agent');
+        $charge = $this->chargeService->getChargeUserHistory($userId, $request->type, $request->by_date, 'host_agency');
 
         return Common::apiResponse(1, '', ChargeResource::collection($charge), 200);
     }
@@ -362,7 +367,7 @@ class ChargeController extends Controller
     {
         $userId = $request->user()->id;
         $searchKey = $request->search_key ?? null;
-        $charge = $this->chargeService->getChargeUserHistory($userId, 'received', null, 'Host agent');
+        $charge = $this->chargeService->getChargeUserHistory($userId, 'received', null, 'host_agency');
 
         $charge = $charge->with(['sender'])->when($searchKey, fn($query) => $query->whereHas('sender', fn($q) => $q->where('uuid', 'like', $searchKey)));
         if ($request->by_date) {
@@ -375,7 +380,7 @@ class ChargeController extends Controller
     {
         $userId = $request->user()->id;
         $searchKey = $request->search_key ?? null;
-        $charge = $this->chargeService->getChargeUserHistory($userId, 'received', $request->by_date, 'Host agent', $searchKey);
+        $charge = $this->chargeService->getChargeUserHistory($userId, 'received', $request->by_date, 'host_agency', $searchKey);
 
         return Common::apiResponse(1, '', ChargeRecievedInfoResource::collection($charge), 200);
     }
@@ -401,7 +406,9 @@ class ChargeController extends Controller
     public function chargeFromAgencyToAnother(Request $request)
     {
         $from = $request->user();
-
+        if (!$request->id || !$request->amount ) return Common::apiResponse(false, 'missing_params');
+        if($request->amount < 0) return Common::apiResponse(false, 'value not allow');
+        
         try {
             $this->chargeService->chargeAgencyToAnother($from, $request);
 

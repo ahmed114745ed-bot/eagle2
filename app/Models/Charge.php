@@ -5,7 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Scopes\HostAgencyScope;
 class Charge extends Model
 {
     use HasFactory;
@@ -13,7 +13,7 @@ class Charge extends Model
     protected $casts = [
         'created_at' => 'datetime',
     ];
-    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred','usd','user_charger_type'];
+    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred','usd','user_charger_type','action_user_id'];
 
     public function getCreatedAtAttribute($value)
     {
@@ -55,19 +55,46 @@ class Charge extends Model
     }
 
     public function sender()
-    {
+    {  
+        if ($this->charger_type == 'agency') {
+            return $this->hasOne(ShippingAgency::class, 'id', 'charger_id');
+        }
         return $this->hasOne(User::class, 'id', 'charger_id');
     }
 
-    public function receiver()
+    
+
+    public function getSenderAllAttribute()
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        if ($this->charger_type === 'agency') {
+            return ShippingAgency::find($this->charger_id);
+        }
+    
+        return User::find($this->charger_id);
     }
 
-    public function admin()
+    public function getReceiverAllAttribute()
     {
-        return $this->belongsTo(Admin::class, 'charger_id');
+        if ($this->user_type === 'agency') {
+            return ShippingAgency::find($this->charger_id);
+        }
+
+        return User::find($this->charger_id);
     }
+
+    public function receiver()
+    { 
+        if ($this->user_type == 'agency') {
+            return $this->belongsTo(ShippingAgency::class, 'agency_id', 'id');
+        }
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    
+    }
+
+    // public function admin()
+    // {
+    //     return $this->belongsTo(Admin::class, 'charger_id');
+    // }
 
     public function admin_user()
     {
@@ -76,9 +103,13 @@ class Charge extends Model
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'agency_id');
+        return $this->belongsTo(Agency::class, 'agency_id')
+        ->withoutGlobalScope(HostAgencyScope::class); 
     }
-
+    public function shippingAgency()
+    {
+        return $this->belongsTo(ShippingAgency ::class, 'agency_id');
+    }
     protected static function booted()
     {
         static::saved(function ($model) {
@@ -93,5 +124,63 @@ class Charge extends Model
             }
         });
     }
+
+
+
+    public function receiverage()
+    {
+        return $this->belongsTo(Agency::class, 'agency_id')
+        ->withoutGlobalScope(HostAgencyScope::class);   
+    
+    }
+
+
+    /**           
+     * 
+     * receiver ############################ 
+     * 
+     */
+    public function receiverUser()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+ 
+
+    public function receiveragency()
+    {
+        return $this->belongsTo(Agency::class, 'user_id')
+        ->withoutGlobalScope(HostAgencyScope::class);  
+    }
+
+ 
+
+
+    /**           
+     * 
+     * sender ############################ 
+     * 
+     */
+
+    public function senderUser()
+    {
+        return $this->belongsTo(User::class, 'charger_id');
+    }
+
+    public function senderAgency()
+    {
+        return $this->belongsTo(Agency::class, 'charger_id');  
+    }
+
+    public function senderShippingAgency()
+    {
+        return $this->belongsTo(ShippingAgency::class, 'charger_id');  
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'charger_id');
+    }
+
+
 
 }

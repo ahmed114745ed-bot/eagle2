@@ -153,21 +153,21 @@ class UserResource extends JsonResource
             'visit_hidden'         => $this->getPackWithType(19), // both ------------
             'room_hidden'          => $this->getPackWithType(16), // both ------------
             'type_user'            => intval($this->type_user) ?: 0, // both
-            'my_store'             => [
-                'id'           => $this->id,
-                'coins'        => $this->di,
-                'diamonds'     => $this->total_diamond_received,
-                'silver_coins' => $this->gold,
-                'usd'          => (float)$this->sallary,
-            ], // my
+            // 'my_store'             => [
+            //     'id'           => $this->id,
+            //     'coins'        => $this->di,
+            //     'diamonds'     => $this->total_diamond_received,
+            //     'silver_coins' => $this->gold,
+            //     'usd'          => (float)$this->sallary,
+            // ], // my
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->manager),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
             'level' => Common::level_center($this->id),
-            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame' => common::wareUserVip($this->id, 28, 'img2', isLatest: true),
+            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id', isLatest: true),
             'image_color'          => @$this->color_image,
-            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
             "multi_images" => $this->images?->select("img"),
             'user_types' => $this->user_types,
             "shipping-agency" => $this->shippingAgency ? [

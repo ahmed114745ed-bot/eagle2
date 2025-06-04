@@ -116,6 +116,14 @@
                     <span class="slider round"></span>
                 </label>
             </div>
+
+             <div class="switch-item">
+                <label for="stopGiftCheckbox" class="switch-label">ايقاف ارسال الهدايا للجميع</label>
+                <label class="switch">
+                    <input type="checkbox" id="stopGiftCheckbox" {{ $make_gift_top == 1 ? 'checked' : '' }}>
+                    <span class="slider round"></span>
+                </label>
+            </div>
         </div>
     </div>
 
@@ -132,6 +140,17 @@
                     error: function(error) { console.error(error); }
                 });
             }); */
+
+            $('#stopGiftCheckbox').on('change', function() {
+                var isChecked = $(this).is(':checked');
+                $.ajax({
+                    url: '/admin/close-open-gift',
+                    method: 'POST',
+                    data: { make_rooms_top: isChecked },
+                    success: function(response) { console.log(response); },
+                    error: function(error) { console.error(error); }
+                });
+            });
 
             // Handle change event for stopCharge
             $('#stopCharge').on('change', function() {

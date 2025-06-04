@@ -160,7 +160,7 @@ class ReportMomentController extends MainController
 
 
         $grid->column('type', __('Type'));
-        if (!Admin::user()->can('*') || !Admin::user()->can('delete-' . $this->permission_name)) {
+        if (!Admin::user()->can('*') || !Admin::user()->can('delete-' . 'Moment')) {
             $grid->column(__('redirect_button'))->display(function () {
                 $delete_moment = 'حذف اللحظة';
                 if (app()->getLocale() == 'en') {
@@ -170,6 +170,7 @@ class ReportMomentController extends MainController
                 return '<a href="' . route($redirectRoute, ['moment_id' => $this->moment_id, 'id' => $this->id]) . '" class="btn btn-xs btn-primary">' . $delete_moment . ' </a>';
             });
         }
+        $this->extendGrid($grid);
         return $grid;
     }
 

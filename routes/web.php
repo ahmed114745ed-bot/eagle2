@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Common;
+use App\Http\Controllers\PaytabsController;
 use App\Models\DeleteAccount;
 use App\Models\Room;
 use Encore\Admin\Controllers\AdminController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\NowPaymentsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::get('applications/{id}', [SettingsController::class, 'downloadApp']);
 
 Route::get('/now-payment', [NowPaymentsController::class, 'rechargeForm']);
@@ -236,7 +238,7 @@ Route::group(
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
 
-        Route::get('/app-settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
@@ -339,6 +341,11 @@ Route::get('/test-fcm/{userid}', function($userId) {
         'fcm_response' => $result
     ]);
 });
+
+
+
+use App\Http\Resources\MyStoreResource;
+
 
 
 

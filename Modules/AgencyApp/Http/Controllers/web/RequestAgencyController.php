@@ -4,6 +4,7 @@ namespace Modules\AgencyApp\Http\Controllers\web;
 
 
 use App\Models\Agency;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -211,15 +212,22 @@ class RequestAgencyController extends MainController
             $actions->disableEdit();
             $actions->disableView();
             $actions->disableDelete();
-            $actions->add(new AcceptAgencyAction($model->id));
-            $actions->add(new RefuseAgencyAction($model->id));
+            if (Admin::user()->can('browse-' . 'accept-agency') || Admin::user()->can('*')) {
+                $actions->add(new AcceptAgencyAction($model->id));
+            }
+            if (Admin::user()->can('browse-' . 'refuse-agency') || Admin::user()->can('*')) {
+                $actions->add(new RefuseAgencyAction($model->id));
+            }
+
         });
         $grid->disableCreateButton();
 
         $grid->tools(function (Grid\Tools $tools) {
-            $url = '/admin/request-agencies-filteration';
-            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
-            $tools->append($button);
+            if (Admin::user()->can('browse-' . 'request-agency-history') || Admin::user()->can('*')) {
+                $url = '/admin/request-agencies-filteration';
+                $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
+                $tools->append($button);
+            }
         });
 
         return $grid;

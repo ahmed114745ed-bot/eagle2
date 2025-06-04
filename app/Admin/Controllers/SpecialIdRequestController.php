@@ -32,7 +32,7 @@ use Modules\SwitchAccount\Entities\UserAccount;
 class SpecialIdRequestController extends MainController
 {
 
-    public $permission_name = 'special-id-request';
+    public $permission_name = 'special-uuid-requests';
 
     public function index(Content $content)
     {
@@ -118,6 +118,12 @@ class SpecialIdRequestController extends MainController
         $grid->disableCreateButton();
 
         $grid->disableExport();
+
+        $grid->disableActions();
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+            // $actions->add(new DedicateAction());
+        });
 
         return $grid;
     }

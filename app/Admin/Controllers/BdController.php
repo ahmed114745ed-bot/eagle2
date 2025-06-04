@@ -14,11 +14,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
-use App\Admin\Actions\MakeBdDefultAction;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use App\Admin\Widgets\InfoBox;
+use Encore\Admin\Facades\Admin;
 
 
 
@@ -38,22 +37,22 @@ class BdController extends MainController
         // return parent::index($content
         //     ->title(trans('BD'))
         //     ->body($this->grid()));
-        return $content
-        ->title(__($this->title))
-        ->row(function (Row $row) {
-            $row->column(12, $this->grid2());
-        })
-        ->row(function ($row) {
-            $row->column(12, $this->grid());
-        });
+        return parent::index($content
+            ->title(__($this->title))
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            })
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            }));
     }
 
 
- 
+
 
     protected function grid2()
     {
-     
+
         return (new Box(
             title: __('admin.description'),
             content: view('admin.grid.bd.description'),
@@ -108,8 +107,8 @@ class BdController extends MainController
         // $grid->column('username', __('username'));
         // $grid->column('name', __('Name'));
         $grid->column('username', __('Bd'))->display(function ($name) {
-            
-           
+
+
 
             $id = $this->id ?? '-';
             $name = $this->username ?? 'غير معروف';
@@ -136,11 +135,10 @@ class BdController extends MainController
                 </div>
             ";
         });
-        $grid->column('default', __('status'))->display(function () {
+        $grid->column('default', __('default_status'))->display(function () {
             if ($this->default == 1) {
                 return <<<HTML
                     <span style="display: flex; align-items: center;">
-                        <strong style="color: green; margin-right: 5px;">✔</strong>
                         <span style="
                             font-size: smaller;
                             background: red;
@@ -156,7 +154,7 @@ class BdController extends MainController
                 return '<span style="color: #999;"></span>';
             }
         });
-        
+
 
 
         $grid->column('appUser.name', __('المستخدم المرتبط'))->display(function ($name) {
@@ -208,19 +206,24 @@ class BdController extends MainController
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
         });
 
-
-        $grid->actions(function ($actions) {
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
             $actions->disableDelete();
             $model = $actions->row;
-            $actions->add(new \App\Admin\Actions\DeleteBdAction());
-            $actions->add(new MakeBdDefultAction($model->id));
+            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new \App\Admin\Actions\DeleteBdAction());
+            }
+
+            // $actions->add(new MakeBdDefultAction($model->id));
         });
 
+        if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
+            $grid->tools(function (Grid\Tools $tools) {
 
-        $grid->tools(function (Grid\Tools $tools) {
-         
-            $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
-        });
+                $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
+            });
+        }
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -246,12 +249,12 @@ class BdController extends MainController
     {
         $form = new Form(new Bd());
 
-        $form->text('username', __('username'))->rules('required');
+        $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
         $form->password('password', __('Password'))->rules('required');
         // $form->text('name', __('Name'));
         $form->image('avatar', __('img'));
-        $form->switch('default', __('set_as_default'))
-        ->help(__('make_bd_default'));
+        // $form->switch('default', __('set_as_default'))
+        //     ->help(__('make_bd_default'));
 
 
         if ($form->isEditing()) {
@@ -270,6 +273,9 @@ class BdController extends MainController
                 }
                 return $ops2;
             })->ajax('/api/search/users-bd', 'id', 'name');
+
+            $form->switch('default', __('set_as_default'))
+                ->help(__('make_bd_default'));
         }
 
         $form->hidden('type', __('Type'))->value('bd');
@@ -295,11 +301,11 @@ class BdController extends MainController
             $userAppId = $form->model()->app_id;
 
             $userApp = User::find($userAppId);
-            if(isset($userApp)){
-                $userApp->is_bd=1;
+            if (isset($userApp)) {
+                $userApp->is_bd = 1;
                 $userApp->save();
             }
-          
+
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();
 

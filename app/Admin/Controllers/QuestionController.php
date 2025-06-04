@@ -62,7 +62,8 @@ class QuestionController extends AdminController
         $grid->column('id', __('Id'));
         $grid->column('question', __('question'));
         $grid->column('answer', __('answer'));
-        $grid->column('status', __('status'))->switch (Common::getSwitchStates ());;
+        $grid->column('status', __('status'))->switch (Common::getSwitchStates ());
+        $this->extendGrid($grid);
         return $grid;
     }
 
