@@ -821,7 +821,7 @@
         <img src="{{ $bd->display_image }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
-        <h1 class="agency-name">{{ $bd->name }}</h1>
+        <h1 class="agency-name">{{ $bd->name ??'' }}</h1>
         <div class="agency-meta">
             <div class="meta-item">
                 <span class="meta-label">{{ __("ID") }}:</span>
@@ -921,19 +921,19 @@
                                     <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
                                     <td class="user-cell">
                                         <div class="user-avatar">
-                                            <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name }}">
+                                            <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ??''}}">
                                         </div>
                                         <div class="user-info">
-                                            <strong>{{ $agency->name }}</strong>
+                                            <strong>{{ $agency->name ??'' }}</strong>
                                             <!-- <small>UID: {{ $agency->notice ?? '' }}</small> -->
                                         </div>
                                     </td>
                                     <td class="user-cell">
                                         <div class="user-avatar">
-                                            <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->name }}">
+                                            <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->name ??''}}">
                                         </div>
                                         <div class="user-info">
-                                            <strong>{{ $agency->owner->name }}</strong>
+                                            <strong>{{ $agency->owner->name ??''}}</strong>
                                         </div>
                                     </td>
                                     <td>{{ $agency->status }}</td>
@@ -1018,14 +1018,14 @@
                                     if (!isImageExists($url)) $url = $defaultImage;
                                     return handleShowImageWithTypes($agency->id, $url, 40, 40);
                                 });
-
+                               $name = $agency->name ?? '';
                                 $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
                                 $receiverHtml = "
                                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                                         <div style='display: flex; align-items: center; gap: 10px;'>
                                             {$image}
                                             <div style='display: flex; flex-direction: column;'>
-                                                <span style='text-decoration: underline; cursor: pointer;'>{$agency->name}</span>
+                                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
                                                 <span style='font-size: smaller;'>ID: {$agency->id}</span>
                                             </div>
                                         </div>
@@ -1045,13 +1045,13 @@
                                 if (!isImageExists($url)) $url = $defaultImage;
                                 $image = handleShowImageWithTypes($receiverUser->id, $url, 40, 40);
                                 $showUrl = url("admin/users/{$receiverUser->id}");
-
+                                $name =$receiverUser->name ??'';
                                 $receiverHtml = "
                                     <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                                         <div style='display: flex; align-items: center; gap: 10px;'>
                                             {$image}
                                             <div>
-                                                <span style='text-decoration: underline; cursor: pointer;'>{$receiverUser->name}</span><br>
+                                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span><br>
                                                 <span style='color: #aaa; font-size: smaller;'>UUID: {$receiverUser->uuid}</span>
                                             </div>
                                         </div>
