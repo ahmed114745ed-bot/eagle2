@@ -67,7 +67,11 @@ class DedicateVipController extends MainController
         $grid->column('price', __('price'));
         $grid->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
-            $url = getImagePath($path);
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         Admin::style("
