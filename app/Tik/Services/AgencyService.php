@@ -640,6 +640,8 @@ class AgencyService
 
     public function dailyReport($user, $month, $year ,$agencyId = null)
     {
+
+      
         $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
         $joinedAgency = $member ??  $owner;
@@ -702,7 +704,9 @@ class AgencyService
         });
 
         $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
-        $userInfoArray = $user->getSallaryInfoByMonth();
+     
+        $saMonth = ltrim($month, '0');
+        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year);
 
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
@@ -724,7 +728,7 @@ class AgencyService
         $data = [
             'user_salary' => [
                 'cut_amount' => (int)$totalCutAmount,
-                'salary' => intval($totalSalary),
+                'salary' => doubleval($totalSalary),
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $agencyId),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),

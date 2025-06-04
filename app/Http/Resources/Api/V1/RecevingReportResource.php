@@ -12,28 +12,29 @@ class RecevingReportResource extends JsonResource
     public function toArray($request)
     {
         $user = auth()->user();
-        if ($this->charger_type == 'dash') {
-            $name = $this->admin->name ?? '';
-            $image = $this->admin->avatar ?? '';
-            $uuid = $this->sender->uuid ?? '';
-        } elseif($this->charger_type == 'agency') {
-            $name = $this->sender->name ?? '';
-            $image = $this->sender->img ?? '';
-            $uuid = $this->sender->id ?? '';
-        } else {
-            $name = $this->sender->name ?? '';
-            $image = $this->sender->profile->avatar ?? '';
-            $uuid = $this->sender->uuid ?? '';
-        }
+        // if ($this->charger_type == 'dash') {
+        //     $name = $this->admin->name ?? '';
+        //     $image = $this->admin->avatar ?? '';
+        //     $uuid = $this->sender->uuid ?? '';
+        // } elseif($this->charger_type == 'agency') {
+        //     $name = $this->senderAll->name ?? '';
+        //     $image = $this->senderAll->img ?? '';
+        //     $uuid = $this->senderAll->id ?? '';
+        // } else {
+        //     $name = $this->sender->name ?? '';
+        //     $image = $this->sender->profile->avatar ?? '';
+        //     $uuid = $this->sender->uuid ?? '';
+        // }
+        $charger = Common::getChargerInfo($this);
 
         return [
             'id'            => $this->user_id,
-            'uuid'          => $uuid,
+            'uuid'          => $charger['uuid'],
             'diamonds'      => numToStringNew($this->amount),
             'operation_no'  => (int)$this->id,
             'created_at'    => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A'),
-            'name'          => $name ?? '',
-            'image'         => $image ?? '',
+            'name'          => $charger['name'] ?? '',
+            'image'         => $charger['image'] ?? '',
         ];
     }
 }

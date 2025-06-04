@@ -108,14 +108,14 @@ class UserController extends Controller
 
     public static function checkPack($userId, $type, $dress = null)
     {
-        $pack = Pack::query()->with('ware')
+        return Pack::query()->with('ware')
             ->where('user_id', $userId)
             ->where('type', $type)
             ->where(function ($q) {
                 $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
             });
-        if ($dress != null) $pack->where('target_id', $dress);
-        return $pack;
+//        if ($dress != null) $pack->where('target_id', $dress);
+//        return $pack;
     }
     public function image_intro($id)
     {
@@ -124,11 +124,11 @@ class UserController extends Controller
         if (! $user) return Common::apiResponse(false, 'user not found', 400);
         $dr = '';
         $pack = self::checkPack($user->id, 6, $user->dress_3);
-        $pack = $pack->exists();
+        $pack = $pack->pluck('target_id');
 
-        if (!$pack) return Common::apiResponse(false, 'active product not found', 400);
+//        if (!$pack) return Common::apiResponse(false, 'active product not found', 400);
         $ware = Ware::query()
-            ->where('id', $user->dress_3)
+            ->whereIn('id', $pack)
             ->where('type', 6)
             ->get();
         if (! $ware) return Common::apiResponse(false, ' not found', 400);
@@ -1127,7 +1127,6 @@ class UserController extends Controller
         $id = $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
         $data = $this->userService->dataUser($id);
-        info($data);
         return Common::apiResponse(true, 'done', new DataUserResource($data));
     }
 }

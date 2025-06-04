@@ -16,7 +16,7 @@ class OVipNewResource extends JsonResource
         $activePrivilegeIds = [];
         $wares = collect();
         $vipPrivileges = $request->vipPrivileges ?? collect();
-        
+
         if ($oVip) {
             $activePrivilegeIds = $oVip->privilegs?->pluck('id')?->toArray() ?? [];
             $wares = $oVip->wares ?? collect();
@@ -29,7 +29,7 @@ class OVipNewResource extends JsonResource
             "is_used" => $this->is_used == 1,
             "using" => $this->using == 1,
             'expire' => $this->expire != 0 ? date("Y-m-d H:i:s", $this->expire) : 0,
-            'remaining_time' => sprintf('%dy %dm %dd %dh %di %ds', $diff->y, $diff->m, $diff->d, $diff->h, $diff->i, $diff->s),
+            'remaining_time' => sprintf('%dd %dh %dm', $diff->d, $diff->h, $diff->i),
 
             'vip' => [
                 'id' => $oVip->id,

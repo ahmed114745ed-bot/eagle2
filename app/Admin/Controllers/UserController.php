@@ -2,12 +2,10 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\CanPlaySwitchAction;
-use App\Admin\Actions\ChargeSwitchAction;
-use App\Admin\Actions\InviteSwitchAction;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
+use App\Models\Ware;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -22,7 +20,6 @@ use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
@@ -30,16 +27,20 @@ use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use App\Admin\Selectable\ImageColors;
+use Illuminate\Support\Facades\Cache;
 use App\Admin\Actions\DeletePackAction;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
+use App\Admin\Actions\ChargeSwitchAction;
+use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
+use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
-use Illuminate\Support\Facades\Redirect;
 
 
 class UserController extends MainController
@@ -807,11 +808,10 @@ class UserController extends MainController
     public function show($id, Content $content)
     {
         $user = User::with('profile')->find($id);
-        $packs = Pack::where('user_id', $id)->with(['ware' => function ($q) {
+        $packs = Pack::where('user_id', $id)->where('is_used', 1)->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->paginate(10, ['*'], 'pack_page');
-        $userVips = UserVip::where('user_id', $id)
-            ->select(['id', 'user_id', 'level', 'expire', 'qty', 'total'])->paginate(10, ['*'], 'vip_page');
+        $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
 
         $data = compact('user', 'packs', 'userVips');
 
@@ -1064,6 +1064,26 @@ class UserController extends MainController
             $pack->use_num -= $num;
         }
         $pack->save();
+        return Redirect::back();
+    }
+
+    public function deleteUserVip($id)
+    {
+        $userVip = UserVip::find($id);
+        // dd($userVip,$id );
+       // $wares = Ware::query()->where('get_type', 1)->where('level', $userVip->level)->pluck('id')->toArray();
+        $userVip->packs()->delete();
+        $user = User::query()->find($userVip->user_id);
+        if ($user) {
+            if ($user->vip == $userVip->id) {
+                $uvip = UserVip::query()->where('user_id', $user->id)->where('id', '!=', $userVip->id)->orderByDesc('level')->first();
+                if ($uvip) {
+                    $user->vip = $uvip->id;
+                    $user->save();
+                }
+            }
+        }
+        $userVip->delete();
         return Redirect::back();
     }
 }

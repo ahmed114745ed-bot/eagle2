@@ -930,7 +930,7 @@
                                                 <th>{{ __('type') }}</th>
                                                 <th>{{ __('img') }}</th>
                                                 <th>{{ __('expire') }}</th>
-                                                 <th>{{ __('action') }}</th>
+                                                <th>{{ __('action') }}</th>
                                             </tr>
                                         </thead>
                                         @if($packs && $packs->count())
@@ -995,8 +995,8 @@
                                                 <th>{{ __('level') }}</th>
                                                 <th>{{ __('expire') }}</th>
                                                 <th>{{ __('qty') }}</th>
-                                                 <th>{{ __('total Price') }}</th>
-
+                                                <th>{{ __('total Price') }}</th>
+                                                <th>{{ __('action') }}</th>
 
                                             </tr>
                                         </thead>
@@ -1009,7 +1009,14 @@
                                                         <td>{{\Carbon\Carbon::createFromTimestamp($userVip->expire)->format('Y-m-d H:i:s')}}</td>
                                                         <td>{{ @$userVip->qty ?? 0 }}</td>
                                                         <td>{{ @$userVip->total ?? 0 }}</td>
-
+                                                         <td>
+                                                        <div class="d-flex">
+                                                            
+                                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ $userVip->id }}">
+                                                                {{ __('dashboard.delete') }}
+                                                            </button>
+                                                        </div>
+                                                    </td>
 
                                                     </tr>
                                                 @endforeach
@@ -1281,6 +1288,41 @@ function confirmAction(message, onConfirm) {
         if (result.value) {
             $.ajax({
                 url: '/admin/delete-pack/' + itemId,
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    Swal.fire('Deleted!', response.message, 'success').then(() => {
+                        location.reload();
+                    });
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message || 'An error occurred.'
+                    });
+                }
+            });
+        }
+    });
+});
+
+   $(document).on('click', '.delete-vip-btn', function () {
+    let itemId = $(this).data('id');
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.value) {
+            $.ajax({
+                url: '/admin/delete-user-vip/' + itemId,
                 type: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

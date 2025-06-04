@@ -80,6 +80,7 @@ class FixedTargetService
                 $user = $this->calculateFixedTarget($month_received, $user);
             }
         } else {*/
+         
         $user = $this->calculateRegularTarget($month_received, $user);
         //        }
         $user->salary_is_updated = false;
@@ -217,6 +218,9 @@ class FixedTargetService
             'extras'               => $extra !==  null ? json_encode($extra) : 0,
             'app_profit' => $app_profit_usd * $percentageAchieved,
             'dB' =>  $db_usd * $percentageAchieved,
+            'achieved_hours' =>   $hours,
+            'achieved_days' =>  $days,
+            'achieved_diamond' =>  $month_received,
         ];
         if (0 < $t) $values['sallary'] = $t;
 
@@ -261,7 +265,7 @@ class FixedTargetService
     {
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
-
+            
 
             if ($target) {
                 $hours = 0;

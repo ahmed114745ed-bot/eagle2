@@ -79,14 +79,14 @@ class MyDataResource extends JsonResource
 
             $starsImages = GiftLog::where('agency_id', $agency_joined->id)
                     ->selectRaw("SUM(giftPrice) as exp, receiver_id")
-                    ->with(['receiver.profile']) 
-                    ->whereHas('receiver.profile') 
+                    ->with(['receiver.profile'])
+                    ->whereHas('receiver.profile')
                     ->groupBy('receiver_id')
                     ->orderByDesc('exp')
                     ->take(3)
                     ->get()
-                    ->pluck('receiver.profile.avatar') 
-                    ->filter() 
+                    ->pluck('receiver.profile.avatar')
+                    ->filter()
                     ->values();
 
             $owner = $agency_joined->app_owner_id == $this->id
@@ -180,15 +180,15 @@ class MyDataResource extends JsonResource
                 ->orderByDesc('exp')
                 ->take(3)
                 ->get();
-        
+
             $starsImagesShippingAgency = $giftLogs
                 ->map(function ($log) {
                     return optional($log->receiver->profile)->avatar;
                 })
                 ->filter()
                 ->values()
-                ->toArray(); 
-            
+                ->toArray();
+
             }
 
         $data = [
@@ -227,7 +227,7 @@ class MyDataResource extends JsonResource
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
             'image' => @$this->UserVip->OVip->img,
-            'family_id' => @$this->family_id,
+            'family_id' => $f == null ? null : @$this->family_id,
             'uuid' => @$this->uuid,
             'special_color'    => @$this->color_id ?? '',
             'bio' => @$this->bio ?: '',
@@ -281,7 +281,7 @@ class MyDataResource extends JsonResource
                 "top_stars" => $starsImagesShippingAgency ?? (object)[],
 
             ] : null,
-            
+
         ];
 
         $data['auth_token'] = $this->auth_token;

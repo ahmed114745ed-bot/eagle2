@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,11 +15,14 @@ class DollarChargeLogResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+        $receiver=   Common::getReceiverInfo($this);
+      
         return [
-            'id'         => $this->user->id ?? 0,
-            'uuid'       => $this->user->uuid ?? '',
-            'image'      => $this->user->avatar ?? '',
-            'name'       => $this->user->name ?? '',
+            'id'        => $receiver['id'] ?? 0,
+            'uuid'      => $receiver['uuid'] ?? '',
+            'image'     => $receiver['avatar'] ?? '',
+            'name'      => $receiver['name'] ?? '',
             'date'       => $this->created_at ?? '',
             'totalUsed'  => (int) ($this->usd ?? 0),
             'coins'      => $this->amount ?? 0,

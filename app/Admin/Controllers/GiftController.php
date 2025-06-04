@@ -93,15 +93,45 @@ class GiftController extends MainController
         $grid = new Grid(new Gift);
         $grid->model()->orderBy("use_count", "desc");
 
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->disableIdFilter();
-            // $filter->like('type', __('type'));
-            $filter->in('type', __('type'))->multipleSelect(
-                translate(TYPE_GIFT)
-            );
+        $filterType = request('filter', 'all');
 
-            $filter->expand();
+        $grid->header(function () use ($filterType) {
+            $tabs = translate(TYPE_GIFT);
+            $tabs = ['all' => __('All')] + $tabs;
+
+            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+            foreach ($tabs as $key => $label) {
+                $active = $filterType === (string)$key ? 'active' : '';
+                $url = request()->fullUrlWithQuery(['filter' => $key]);
+                $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
+            }
+            $html .= '</ul></div>';
+
+            $html .= <<<HTML
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const tabLinks = document.querySelectorAll('.tab-link');
+
+                    tabLinks.forEach(function (tab) {
+                        tab.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            tabLinks.forEach(t => t.style.pointerEvents = 'none');
+                            setTimeout(() => {
+                                window.location.href = tab.getAttribute('href');
+                            }, 300);
+                        });
+                    });
+                });
+            </script>
+        HTML;
+
+            return $html;
         });
+
+        if ($filterType !== 'all') {
+            $grid->model()->where('type', $filterType);
+        }
+
         $grid->id(__('ID'));
         $grid->name(__('Name'));
 

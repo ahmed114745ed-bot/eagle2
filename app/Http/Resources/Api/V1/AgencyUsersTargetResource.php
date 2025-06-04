@@ -125,6 +125,7 @@ class AgencyUsersTargetResource extends JsonResource
                     // 'year' => $item['year'],
                     'month_number' => $item['month'],
                     'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
+                    'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
                 ];
             }
            $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
@@ -166,16 +167,61 @@ class AgencyUsersTargetResource extends JsonResource
             'salary' => (float) $agencySallary ?? 0,
             'target' => [
                 'id' => @$target->target_id ?? 0,
-                'user_diamonds' => (float) $totalGiftPrice ?? 0,
-                'user_hours' => @$hours ?? 0,
-                'user_days' => @$this->getTotalDays() ?? 0,
-                // 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
-                'old_targets'  => $result,
+                'user_diamonds' => (float) ($this->lastSallary?->achieved_diamond ?? 0),
+                'user_hours'    =>  $this->lastSallary?->achieved_hours ?? 0,
+                'user_days'     =>  $this->lastSallary?->achieved_days ?? 0,
+                'old_targets'  => $this->latestOldTarget(),
             ],
             // 'top_users' => SenderGiftLogResource::collection($giftLog),
            'top_users' => $giftLog->map(function ($log) {
                 return $log->sender?->profile?->avatar ?? '';
             })->filter()->values()->toArray(),
         ];
+    }
+
+
+
+    protected function latestOldTarget()
+    {
+        $currentDate = now();
+        $monthsWithYears = collect();
+
+        for ($i = 2; $i >= 0; $i--) {
+            $date = $currentDate->copy()->subMonths($i);
+            $monthsWithYears->push([
+                'year' => $date->year,
+                'month' => $date->month,
+            ]);
+        }
+
+        $monthKeys = $monthsWithYears->map(function ($m) {
+            return $m['year'] . '-' . $m['month'];
+        })->toArray();
+
+        $latestIds = $this->sallariesByMonth()
+            ->selectRaw('MAX(id) as id')
+            ->whereIn(DB::raw("CONCAT(year,'-',month)"), $monthKeys)
+            ->groupBy('year', 'month');
+
+        $userSallaries = $this->sallariesByMonth()
+            ->whereIn('id', $latestIds->pluck('id'))
+            ->select('year', 'month', 'target_diamonds')
+            ->get()
+            ->keyBy(function ($row) {
+                return $row->year . '-' . $row->month;
+            });
+
+        $result = [];
+
+        foreach ($monthsWithYears as $item) {
+            $key = $item['year'] . '-' . $item['month'];
+
+            $result[] = [
+                'month_number' => $item['month'],
+                'diamonds'     => $userSallaries[$key]->target_diamonds ?? 0,
+            ];
+        }
+
+        return $result;
     }
 }

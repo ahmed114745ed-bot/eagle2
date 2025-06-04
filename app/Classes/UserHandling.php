@@ -42,8 +42,8 @@ class UserHandling
 
 
             $hours = (int)$user_hours;
-            $num = \Cache::get('hours_days');  
-             
+            $num = \Cache::get('hours_days');
+
             if ($hours >= $num && $user->today_days == 0) {
                 DB::statement("
                 UPDATE users
@@ -67,7 +67,7 @@ class UserHandling
         $vip = OVip::query()->whereLevel(2)->first();
 
         if($vip){
-            UserVip::query()->create(
+            $userVip = UserVip::query()->create(
                 [
                     'type' => 1,
                     'sender_id' => 0,
@@ -81,7 +81,7 @@ class UserHandling
                     'type_send' => $type,
                 ]
             );
-            Common::handelVip($vip, $user);
+            Common::handelVip($vip, $user,null, userVip: $userVip);
         }
     }
     public function kickUserFromAgency(User &$user)
@@ -217,7 +217,7 @@ class UserHandling
     public function getUserBan(string $uuid, $request)
     {
         $now = now();
-        
+
         return Ban::query()->where('type', '!=', 'action')
             ->where(fn ($q) => $q->where('uid', $uuid)->orWhere(fn ($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))->orWhere(fn ($q) => $q->where('device_number', '!=', null)->where('device_number', $request->device_token)))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
