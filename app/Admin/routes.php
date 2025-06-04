@@ -183,7 +183,7 @@ Route::group(
         $router->post('agency-user-job/{agency_id}', 'AgencyUserJobController@store');
         $router->get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         $router->get('agency-statistic', 'AgencyStatisticController@index');
-    //    $router->get('agency-settings', 'AgencySettingController@index');
+        //    $router->get('agency-settings', 'AgencySettingController@index');
 
         $router->resource('test-test', 'TestTestController');
         $router->get('profile', [AdminAuthController::class, 'index']);
@@ -226,9 +226,10 @@ Route::group(
         ]);
 
         $router->post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);
-         $router->post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
+        $router->post('/delete-user-vip/{id}', [UsersAppController::class, 'deleteUserVip']);
+        $router->post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
-         $router->get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
+        $router->get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         $router->resource('free-users', 'FreeUserController');
 
@@ -539,14 +540,10 @@ Route::group(
         });
 
         $router->resource('user-charges', UsersChargeController::class);
-//         $router->resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
-         $router->group(['prefix' => 'user-charges-report'], function (){
-             Route::get('/{id}', [UserChargeReportController::class, 'index']);
-         });
-
-
-
-
+        //         $router->resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
+        $router->group(['prefix' => 'user-charges-report'], function () {
+            Route::get('/{id}', [UserChargeReportController::class, 'index']);
+        });
     }
 
 

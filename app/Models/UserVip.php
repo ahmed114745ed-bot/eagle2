@@ -49,5 +49,10 @@ class UserVip extends Model
         return $this->belongsTo(OVip::class, 'vip_id','id');
     }
 
+    public function packs()
+    {
+        return $this->hasMany(Pack::class, 'vip_user_id');
+    }
+
 
 }
