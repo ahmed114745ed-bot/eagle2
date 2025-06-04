@@ -22,7 +22,6 @@ class MyDataResource extends JsonResource
     {
 
         $family = $this->family;
-        info($family);
         $f = null;
 
         if ($family) {
@@ -228,7 +227,7 @@ class MyDataResource extends JsonResource
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
             'image' => @$this->UserVip->OVip->img,
-            'family_id' => @$this->family_id,
+            'family_id' => $f == null ? null : @$this->family_id,
             'uuid' => @$this->uuid,
             'special_color'    => @$this->color_id ?? '',
             'bio' => @$this->bio ?: '',

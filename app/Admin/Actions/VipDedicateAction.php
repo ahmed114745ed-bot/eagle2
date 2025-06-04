@@ -46,9 +46,9 @@ class VipDedicateAction extends Action
 
             DB::beginTransaction();
 
-            $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
-            $is_used = $enableVipAuto === "true" ? 1 : 0;
+            $enableVipAuto = config('admin.isUsed_vip');
 
+            $is_used = $enableVipAuto === true ? 1 : 0;
             $uniqueAttributes = [
                 'sender_id' => 0,
                 'user_id'   => $user->id,
@@ -56,29 +56,30 @@ class VipDedicateAction extends Action
                 'level'     => $vip->level,
             ];
 
-            $userVip = UserVip::query()->where($uniqueAttributes)->first();
+            //  $userVip = UserVip::query()->where($uniqueAttributes)->first();
 
-            if (!$userVip) {
-                $userVip = UserVip::create([
-                    ...$uniqueAttributes,
-                    'type'   => 1,
-                    'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
-                    'qty'    => 1,
-                    'price'  => 0,
-                    'total'  => 0,
-                    'is_used'  => $is_used,
-                    'dash_user_id'  => auth()->id(),
-                ]);
-            } else {
-                $userVip->qty++;
-                if ($userVip->expire > now()->timestamp) {
-                    $userVip->expire += ($request->days * 86400);
-                } else {
-                    $userVip->expire = now()->timestamp + ($request->days * 86400);
-                }
-                $userVip->is_used += $is_used;
-                $userVip->save();
-            }
+            // if (!$userVip) {
+            $userVip = UserVip::create([
+                ...$uniqueAttributes,
+                'type'   => 1,
+                'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
+                'qty'    => 1,
+                'price'  => 0,
+                'total'  => 0,
+                'is_used'  => $is_used,
+                'dash_user_id'  => auth()->id(),
+                'using' => $is_used,
+            ]);
+            // } else {
+            //     $userVip->qty++;
+            //     if ($userVip->expire > now()->timestamp) {
+            //         $userVip->expire += ($request->days * 86400);
+            //     } else {
+            //         $userVip->expire = now()->timestamp + ($request->days * 86400);
+            //     }
+            //     $userVip->is_used += $is_used;
+            //     $userVip->save();
+            // }
 
             Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
@@ -87,7 +88,6 @@ class VipDedicateAction extends Action
             CustomNotification::vips($user, $request->days, $vip->img);
 
             return $this->response()->success(__('dashboard.successful'));
-
         } catch (\Exception $exception) {
             DB::rollBack();
             \Log::error('VIP dedication error: ' . $exception->getMessage());

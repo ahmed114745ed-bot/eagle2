@@ -9,6 +9,7 @@ use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\VipPrivilege;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -288,6 +289,16 @@ class OvipGiftTapController extends MainController
         }
 
         $form->saving(function (Form $form) {
+
+            if (!$form->show_img && !$form->img2) {
+                $error = new MessageBag([
+                    'title'   => 'Error',
+                    'message' => 'Please upload at least one image',
+                ]);
+
+                return back()->with(compact('error'));
+            }
+
             if ($form->show_img instanceof UploadedFile) {
                 $form->image_type1 = $form->show_img->guessExtension();
             }

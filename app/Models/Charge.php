@@ -13,7 +13,7 @@ class Charge extends Model
     protected $casts = [
         'created_at' => 'datetime',
     ];
-    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred','usd','user_charger_type'];
+    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred','usd','user_charger_type','action_user_id'];
 
     public function getCreatedAtAttribute($value)
     {
@@ -62,6 +62,8 @@ class Charge extends Model
         return $this->hasOne(User::class, 'id', 'charger_id');
     }
 
+    
+
     public function getSenderAllAttribute()
     {
         if ($this->charger_type === 'agency') {
@@ -89,10 +91,10 @@ class Charge extends Model
     
     }
 
-    public function admin()
-    {
-        return $this->belongsTo(Admin::class, 'charger_id');
-    }
+    // public function admin()
+    // {
+    //     return $this->belongsTo(Admin::class, 'charger_id');
+    // }
 
     public function admin_user()
     {
@@ -122,5 +124,63 @@ class Charge extends Model
             }
         });
     }
+
+
+
+    public function receiverage()
+    {
+        return $this->belongsTo(Agency::class, 'agency_id')
+        ->withoutGlobalScope(HostAgencyScope::class);   
+    
+    }
+
+
+    /**           
+     * 
+     * receiver ############################ 
+     * 
+     */
+    public function receiverUser()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+ 
+
+    public function receiveragency()
+    {
+        return $this->belongsTo(Agency::class, 'user_id')
+        ->withoutGlobalScope(HostAgencyScope::class);  
+    }
+
+ 
+
+
+    /**           
+     * 
+     * sender ############################ 
+     * 
+     */
+
+    public function senderUser()
+    {
+        return $this->belongsTo(User::class, 'charger_id');
+    }
+
+    public function senderAgency()
+    {
+        return $this->belongsTo(Agency::class, 'charger_id');  
+    }
+
+    public function senderShippingAgency()
+    {
+        return $this->belongsTo(ShippingAgency::class, 'charger_id');  
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'charger_id');
+    }
+
+
 
 }

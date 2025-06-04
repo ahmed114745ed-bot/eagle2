@@ -383,7 +383,7 @@ class WalletController extends MainController
 
             $data = [
                 'charger_id' => $sender->id,
-                'charger_type' => 'user',
+                'charger_type' => 'bd',
                 'user_id' => $receiver->id,
                 'agency_id' => null,
                 'user_type' => $receiverType,
@@ -470,8 +470,8 @@ class WalletController extends MainController
         $data = [
             'charger_id' => $fromUser->id,
             'charger_type' => 'bd',
-            'user_id' => null,
-            'agency_id' => $toAgency->id,
+            'user_id' => $toAgency->id,
+            'agency_id' => null,
             'user_type' => 'agency',
             'amount' => $coins,
             'amount_type' => 2,

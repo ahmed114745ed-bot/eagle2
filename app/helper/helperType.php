@@ -51,12 +51,14 @@ const TYPE_WARE =
     19 => 'profile visitors hide in',
     20 => 'hide last active',
     28 => 'profile frame',
+    29 => 'being kicked',
+    30 => 'anti ban',
 
 ];
 
 const MORE_Used_WARE =
 [
-  
+
     4 => 'Avatar Frame',
     5 => 'Bubble Frame',
     6 => 'Entering Special Effects',
@@ -64,12 +66,13 @@ const MORE_Used_WARE =
     8 => 'Badge',
     13 => 'hide country',
     16 => 'hidden room',
-   // 17 => 'anonymous man',
+    // 17 => 'anonymous man',
     18 => 'colored name',
     19 => 'profile visitors hide in',
     20 => 'hide last active',
     28 => 'profile frame',
-
+    29 => 'being kicked',
+    30 => 'anti ban',
 ];
 
 const WARE_DEDICATE =
