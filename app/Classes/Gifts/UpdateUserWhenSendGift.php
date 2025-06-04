@@ -29,6 +29,14 @@ class UpdateUserWhenSendGift
 
         $receivedUser->enableSaving = false;
 
+
+        $values = [
+            'salary_is_updated' => 1,
+            'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
+            'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
+
+        ];
+
         // add is salary updated
         $receivedUser->salary_is_updated = true;
         //update monthly diamond for received user
@@ -36,8 +44,12 @@ class UpdateUserWhenSendGift
         $receivedUser->total_diamond_received   += $totalCoins;
         // update levels
         if ($receivedUser->type_user == 0 && $receivedUser->agency_id == 0) {
-            $receivedUser->exchange_diamonds += $totalCoins;
+            $values['exchange_diamonds'] =  DB::raw('exchange_diamonds + ' . $totalCoins);
+//            $receivedUser->exchange_diamonds += $totalCoins;
         }
+
+        User::where('id', $receivedUser->id)->lockForUpdate()
+            ->update($values);
 
         $lastReceivedLevel = $receivedUser->total_received_level;
 
@@ -45,8 +57,8 @@ class UpdateUserWhenSendGift
         if ($receivedUser->total_received_level > $lastReceivedLevel) {
             dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
         }
-        $receivedUser->save();
-        $receivedUser->enableSaving = true;
+        /*$receivedUser->save();
+        $receivedUser->enableSaving = true;*/
 
 
         return $receivedUser;

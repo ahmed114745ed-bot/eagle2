@@ -33,7 +33,7 @@ class MyDataForAgancyResource extends JsonResource
             'vip'=>@Common::ovip_center ($this->id), // refactor
             'level'=>Common::level_center_min (@$this->id), // refactor
             'profile' => new ProfileForAjancyResource(@$this->profile), // both
-            'has_color_name'=>Common::hasInPack ($this->id,18,true),
+            'has_color_name'=> false,
             'gender'=>$this->gender,
         ];
 
