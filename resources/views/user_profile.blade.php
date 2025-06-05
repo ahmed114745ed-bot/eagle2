@@ -1171,7 +1171,7 @@
                         <h4 class="card-title" style="text-align: left;">{{ __('user wallet') }}</h4>
                     </div>
                 
-                    <div class="card-body">
+                    {{-- <div class="card-body">
                         <div class="filter-container">
                             <form method="GET" action="{{ url('admin/users/' . $user->id ) }}" class="filter-form">
                                 <input type="hidden" name="tab" value="salary">
@@ -1219,7 +1219,67 @@
                             </form>
                         </div>
 
-                    </div>     
+                    </div>      --}}
+
+                   <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" pjax-container="">
+                      <input type="hidden" name="tab" value="salary">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="box-body">
+                                    <div class="fields-group">
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">السنة</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control year" placeholder="السنة" name="year" value="{{ request('year') }}" style="text-align: right;">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">الشهر</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control month" placeholder="الشهر" name="month" value="{{ request('month') }}" style="text-align: right;">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                            <!-- /.box-body -->
+                            <div class="box-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-8">
+                                            <div class="btn-group pull-left">
+                                                <button class="btn btn-info submit btn-sm">
+                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;بحث
+                                                </button>
+                                            </div>
+                                            <div class="btn-group pull-left" style="margin-left: 10px;">
+                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}" class="btn btn-default btn-sm">
+                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;تفريغ
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                     </form>
+
                             <div class="table-responsive">
                                 <div class="box-body ">
                                     <table class="data-table" id="vip">
