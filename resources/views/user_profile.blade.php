@@ -1254,7 +1254,7 @@
                                                             }
 
                                                             $image = handleShowImageWithTypes($user->id, $url, 40, 40);
-                                                            $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
+                                                            $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
                                                         @endphp
 
                                                         <tr>
