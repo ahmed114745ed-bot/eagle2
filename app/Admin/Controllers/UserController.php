@@ -39,6 +39,7 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
+use App\Models\UserSallary;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -812,11 +813,15 @@ class UserController extends MainController
             $q->select('id', 'show_img');
         }])->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
+        $salaries = UserSallary::where('user_id', $id)
+            ->with('agency')
+            ->whereHas('user', function ($query) {
+                $query->where('agency_id', '!=', 0)->whereNotNull('agency_id');
+            })->orderByDesc('id')->paginate(10, ['*'], 'salary_page');
+        $data = compact('user', 'packs', 'userVips', 'salaries');
 
-        $data = compact('user', 'packs', 'userVips');
-
-        return $content->title(__('user profile'))
-            ->view('user_profile', $data);
+        return  parent::show($id, $content->title(__('user profile'))
+            ->view('user_profile', $data));
     }
 
     /**
@@ -1071,7 +1076,7 @@ class UserController extends MainController
     {
         $userVip = UserVip::find($id);
         // dd($userVip,$id );
-       // $wares = Ware::query()->where('get_type', 1)->where('level', $userVip->level)->pluck('id')->toArray();
+        // $wares = Ware::query()->where('get_type', 1)->where('level', $userVip->level)->pluck('id')->toArray();
         $userVip->packs()->delete();
         $user = User::query()->find($userVip->user_id);
         if ($user) {
