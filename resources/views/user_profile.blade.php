@@ -1058,6 +1058,9 @@
                                                 <th>{{ __('salary') }}</th>
                                                 <th>{{ __('expenses') }}</th>
                                                 <th>{{ __('net salary') }}</th>
+                                                <th>{{ __('days') }}</th>
+                                                <th>{{ __('hours') }}</th>
+                                                <th>{{ __('diamonds') }}</th>
                                                 <th>{{ __('date') }}</th>
 
                                             </tr>
@@ -1091,6 +1094,9 @@
                                                         <td>{{$salary->sallary}}</td>
                                                         <td>{{ $salary->cut_amount}}</td>
                                                         <td>{{ $salary->sallary - $salary->cut_amount }}</td>
+                                                        <td>{{ $salary->achieved_days }}</td>
+                                                        <td>{{ $salary->achieved_hours }}</td>
+                                                        <td>{{ $salary->achieved_diamond }}</td>
                                                         <td>{{ $salary->month .'/'. $salary->year }}</td>
                                                     </tr>
                                                 @endforeach
