@@ -1265,7 +1265,7 @@
                                                                         {!! $image !!}
                                                                         <div style="display: flex; flex-direction: column;">
                                                                             <span style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                                            <span style="font-size: smaller;">ID: {{ $agency->id }}</span>
+                                                                            <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
                                                                         </div>
                                                                     </div>
                                                                 </a>
