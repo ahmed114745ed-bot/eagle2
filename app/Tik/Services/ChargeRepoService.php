@@ -258,7 +258,7 @@ class ChargeRepoService
             throw new \Exception($e->getMessage());
         }
     }
-    public function charge(Agency $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function charge( $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
 
         WalletService::storeTransaction(
@@ -381,7 +381,7 @@ class ChargeRepoService
                 case 'agency':
                      $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
                     if (!$authAgency) throw new \Exception(__('api.notAgency'));
-                    if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
+                    if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozenMassForYou'));
                     if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
                     if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
                     if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
@@ -390,6 +390,9 @@ class ChargeRepoService
 
                 case 'user':
                     $authAgency = $this->shippingAgencyRepository->getAgencyByOwnerId($auth->id);
+                    if (!$authAgency) throw new \Exception(__('api.notAgency'));
+                    if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozenMassForYou'));
+
                     $this->handleUserCharge($authAgency, $auth, $request);
                     break;
 
@@ -415,7 +418,7 @@ class ChargeRepoService
         $chargeAgency = $this->shippingAgencyRepository->findOrFail($request->id);
         if (!$chargeAgency) throw new \Exception(__('api.notAgencyFound'));
         if (!$chargeAgency->status) throw new \Exception(__('api.notActive'));
-        if ($chargeAgency->is_frozen) throw new \Exception(__('api_responses.frozen'));
+        if ($chargeAgency->is_frozen) throw new \Exception(__('api_responses.frozenMass'));
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }

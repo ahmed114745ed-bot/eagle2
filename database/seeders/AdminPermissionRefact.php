@@ -238,7 +238,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 6,
                 'permissions' => [
                     ['key' => 'deleted-accounts', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['delete-user-account-switch', 'restore-user-account-switch']],
-                    ['key' => 'users', 'except' => [], 'additional' => ['actions-switch', 'chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch',]],
+                    ['key' => 'users', 'except' => [], 'additional' => ['actions-switch', 'chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch','salary-switch']],
                     ['key' => 'complaints', 'except' => [], 'additional' => []],
 
                 ],

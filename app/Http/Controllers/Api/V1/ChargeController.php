@@ -36,9 +36,9 @@ class ChargeController extends Controller
         $user = $request->user();
         $count = $request->amount;
         $userUuid = $request->id;
-//        if ($user->charge_status == 0) {
-//            return Common::apiResponse(0, __('api.freez_charge'), 404);
-//        }
+        //        if ($user->charge_status == 0) {
+        //            return Common::apiResponse(0, __('api.freez_charge'), 404);
+        //        }
         if ($count < 0 || !is_numeric($count)) {
             return Common::apiResponse(0, 'this value not allow', 422);
         }
@@ -59,7 +59,7 @@ class ChargeController extends Controller
     public function chargeTo(Request $request)
     {
         $app_feature = \Cache::get('host_agency');
-        if (!$app_feature){
+        if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
 
@@ -76,7 +76,6 @@ class ChargeController extends Controller
         }
         $data = call_user_func($instance, $request);
         return $data;
-
     }
 
     public function chargeToUser(Request $request)
@@ -157,6 +156,9 @@ class ChargeController extends Controller
         $from = $request->user();
         $isRoomTarget = false;
 
+        if ($from->transfer_salary == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+        }
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
         if ($to->is_frozen == 1) {
@@ -187,12 +189,12 @@ class ChargeController extends Controller
         }
         DB::beginTransaction();
         try {
-           
-           
+
+
             $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd);
-           
+
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
-         
+
             DB::commit();
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
@@ -212,6 +214,8 @@ class ChargeController extends Controller
         //        }
 
         $user = $request->user();
+        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+
         $count = $request->amount;
         $userUuid = $request->user_id;
 
@@ -248,7 +252,7 @@ class ChargeController extends Controller
     public function ChargeDollarForOwner(Request $request)
     {
         $app_feature = \Cache::get('host_agency');
-        if (!$app_feature){
+        if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
         $stop_all_charge = settings()->get("stop_charge") ?? 0;
@@ -276,6 +280,8 @@ class ChargeController extends Controller
         //done
         //        return Common::apiResponse(0, 'try again');
         $user = $request->user();
+        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+
         $count = $request->amount;
         $userUuid = $request->id;
         // if ($user->transfer_salary == 1) {
@@ -309,6 +315,8 @@ class ChargeController extends Controller
         //done
         //        return Common::apiResponse(0, 'try again');
         $user = $request->user();
+        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+
         $count = $request->amount;
         $userUuid = $request->id;
         // if ($user->transfer_salary == 1) {
@@ -326,7 +334,7 @@ class ChargeController extends Controller
         if ($receiver->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-      
+
         try {
             [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);
 
@@ -403,9 +411,9 @@ class ChargeController extends Controller
     public function chargeFromAgencyToAnother(Request $request)
     {
         $from = $request->user();
-        if (!$request->id || !$request->amount ) return Common::apiResponse(false, 'missing_params');
-        if($request->amount < 0) return Common::apiResponse(false, 'value not allow');
-        
+        if (!$request->id || !$request->amount) return Common::apiResponse(false, 'missing_params');
+        if ($request->amount < 0) return Common::apiResponse(false, 'value not allow');
+
         try {
             $this->chargeService->chargeAgencyToAnother($from, $request);
 
@@ -419,7 +427,7 @@ class ChargeController extends Controller
 
     public function chargeToHistory(Request $request)
     {
- 
+
 
         $types = [
             'user' => [$this, 'chargeToUserHistory'],
@@ -434,23 +442,21 @@ class ChargeController extends Controller
         }
         $data = call_user_func($instance, $request);
         return $data;
-
     }
-    
 
-    public function chargeToUserHistory($request){
+
+    public function chargeToUserHistory($request)
+    {
         $userId = auth()->user()->id;
         $charge = $this->chargeService->getChargeToUserHistory();
         return Common::apiResponse(1, '', DollarChargeLogResource::collection($charge), 200);
     }
-    
 
-    public function chargeToAgencyHistory($request){
-        
+
+    public function chargeToAgencyHistory($request)
+    {
+
         $charge = $this->chargeService->getChargeAgencyHistory();
         return Common::apiResponse(1, '', DollarChargeAgencyResource::collection($charge), 200);
-  
     }
-
-
 }

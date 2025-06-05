@@ -31,7 +31,16 @@ class ShippingAgencyRepository extends AbstractRepository
 
     public function filterAgency($id)
     {
-        return $this->model->whereRaw('CAST(id AS CHAR) LIKE ?', [$id . '%'])->with('owner','AgencypaymentGateways')->get();
+        // return $this->model->whereRaw('CAST(id AS CHAR) LIKE ?', [$id . '%'])->with('owner','AgencypaymentGateways')->get();   
+            return $this->model
+                ->whereRaw('CAST(id AS CHAR) LIKE ?', [$id . '%'])
+                // ->whereHas('chargeAgency')  
+                // ->whereHas('owner', function ($query) {
+                //     $query->where('appear_charger_agency', 1);
+                // })
+                ->with(['owner', 'AgencypaymentGateways'])
+                ->get(); 
+   
     }
     public function findById($id)
     {

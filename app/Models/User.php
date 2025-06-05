@@ -271,6 +271,18 @@ class User extends Authenticatable
         return $userSallary?->toArray() ?? [];
     }
 
+    public function getSallaryInfoByMonth2($month, $year): array
+    {
+        $userSallary = UserSallary::query()
+            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
+            ->where('user_id', $this->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->first();
+
+        return $userSallary?->toArray() ?? [];
+    }
+
     public function additionalInfo()
     {
         return $this->hasMany(AdditionalInfo::class, 'user_id');
@@ -1408,13 +1420,15 @@ class User extends Authenticatable
             default => []
         };
 
+        if ($this->is_bd){
+            return  [4];
+        }
+        
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
         }
 
-        if ($this->is_bd){
-            $userTypes[] = 4;
-        }
+
 
         $userTypes = array_unique($userTypes);
 
