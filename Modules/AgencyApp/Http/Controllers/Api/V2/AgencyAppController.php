@@ -31,7 +31,7 @@ class AgencyAppController extends Controller
 
     public function createAgency(Request $request)
     {
-        $userId = $request->user()->id;
+        $user = $request->user();
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'required',
@@ -59,9 +59,9 @@ class AgencyAppController extends Controller
             $errors = implode(',', $validator->errors()->all());
             return Common::apiResponse(0, $errors,  200);
         }
-
+        if ($user->is_bd) return Common::apiResponse(false, 'You are BD ,You can\'t create agency', null, 407);
         try {
-            $agencyWithAdditionalInfo =  $this->agencyService->create($userId, $request);
+            $agencyWithAdditionalInfo =  $this->agencyService->create($user->id, $request);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
@@ -164,7 +164,7 @@ class AgencyAppController extends Controller
     public function agency_filter(Request $request)
     {
         $app_feature = Cache::get('host_agency');
-        if (!$app_feature){
+        if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
 
@@ -180,9 +180,9 @@ class AgencyAppController extends Controller
     public function dailyReport()
     {
         $user  = \Auth::user();
-        $month = request()->month ?? now()->format('m'); 
+        $month = request()->month ?? now()->format('m');
         $year = request()->year ?? now()->year;
-        $agencyId = request()->agency_id ?? $user->agency_id ;
+        $agencyId = request()->agency_id ?? $user->agency_id;
 
         if (!$user instanceof User) return;
         $userId        = $user->id;
@@ -193,7 +193,7 @@ class AgencyAppController extends Controller
             ($targetService)->calculateTarget();
         }
 
-        $data = $this->agencyService->dailyReport($user, $month, $year ,$agencyId);
+        $data = $this->agencyService->dailyReport($user, $month, $year, $agencyId);
         $data = empty($data) ? new \stdClass() : $data;
         return Common::apiResponse(true, 'success', $data);
     }
