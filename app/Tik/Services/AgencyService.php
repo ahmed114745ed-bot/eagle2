@@ -495,7 +495,7 @@ class AgencyService
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
-        Common::createUserAdmin($agency->app_owner_id);
+      ///  Common::createUserAdmin($agency->app_owner_id);
         $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
         if (!$checkAgencyUser) {
             $joinAgencyData = [
@@ -1025,7 +1025,7 @@ class AgencyService
         ];
 
         $agency =  $this->agencyRepository->create($data);
-        Common::createUserAdmin($request->app_owner_id);
+        //Common::createUserAdmin($request->app_owner_id);
 
         if ($request->type == 1 ) {
 
@@ -1057,7 +1057,7 @@ class AgencyService
             $this->userRepository->update($data, $agency->app_owner_id);
             $user = User::find($agency->app_owner_id);
             Admin::where('username', $user->uuid)->delete();
-            Common::createUserAdmin($request->app_owner_id);
+            //Common::createUserAdmin($request->app_owner_id);
         }
 
         if ($request->type == 1 ) {
