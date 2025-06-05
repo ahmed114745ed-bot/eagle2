@@ -806,8 +806,10 @@ class UserController extends MainController
         return $this->form()->update($id);
     }
 
-    public function show($id, Content $content)
+    public function show($id, Content $content,)
     {
+        $month = request('month'); // e.g., "5" for May
+        $year = request('year');
         $user = User::with('profile')->find($id);
         $packs = Pack::where('user_id', $id)->where('is_used', 1)->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
@@ -815,8 +817,10 @@ class UserController extends MainController
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
         $salaries = UserSallary::where('user_id', $id)
             ->with('agency')
-            ->whereHas('user', function ($query) {
-                $query->where('agency_id', '!=', 0)->whereNotNull('agency_id');
+            ->when(isset($year), function ($query) use ($year) {
+                $query->where('year', $year);
+            })->when(isset($month), function ($query) use ($month) {
+                $query->where('month', $month);
             })->orderByDesc('id')->paginate(10, ['*'], 'salary_page');
         $data = compact('user', 'packs', 'userVips', 'salaries');
 
