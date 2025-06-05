@@ -714,10 +714,10 @@ class AgencyController extends Controller
             $newOwnerId = $form->model()->app_owner_id;
             // Create admin dashboard for agency when accept it
             $modelExists = $form->model()->exists;
-          //  if (!$modelExists)  Common::createUserAdmin($appOwnerId);
+            if (!$modelExists)  Common::createUserAdmin($appOwnerId);
 
             if ($modelExists && $appOwnerId != $originalOwnerId) {
-              //  Common::createUserAdmin($appOwnerId);
+                Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $appOwnerId, $agencyId);
