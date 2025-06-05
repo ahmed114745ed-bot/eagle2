@@ -38,7 +38,7 @@ class UserRepository extends AbstractRepository
     }
     public function filterUserNew($userUuId)
     {
-    
+
             return $this->model->select([
                 '*',
                 DB::raw("
@@ -58,12 +58,17 @@ class UserRepository extends AbstractRepository
             ->orderByDesc('matching_score')
             ->orderBy('uuid')
             ->get();
-        
+
     }
 
     public function searchUserById($userUuId)
     {
         return $this->model->find($userUuId);
+    }
+
+    public function searchUserByUUId($userUuId)
+    {
+        return $this->model->SearchByUuid($userUuId)->first();
     }
 
 

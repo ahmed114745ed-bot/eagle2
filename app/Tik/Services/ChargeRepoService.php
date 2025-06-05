@@ -120,7 +120,7 @@ class ChargeRepoService
     {
         // $chargeType = $isRoomTarget ? 'room_owner' : 'host';
         $chargeType ='user';
-        
+
         try {
 
             if (!$isRoomTarget) {
@@ -129,12 +129,12 @@ class ChargeRepoService
             } else {
                 $this->roomSalaryRepo->incrementCutAmount($fromUser->ownerRoom?->id, $usd);
             }
-        
+
             $this->chargeAgencyNew($fromUser, $toAgency, $chargeType, $coins, $usd);
             return true;
         } catch (\Exception $e) {
             \DB::rollBack();
-            
+
             throw new \Exception('An error occurred, please try again later');
         }
     }
@@ -300,7 +300,7 @@ class ChargeRepoService
         $type = $receiver->owner?->user_type ?? '';
 
         $receiver->increment('coins', $amount);
-    
+
         WalletService::storeTransaction(
             $sender->id,
             'cut',
@@ -310,7 +310,7 @@ class ChargeRepoService
             ['agency_id' => $receiver->id],
                              'charge_to_agency'
          );
-        
+
         $data = [
             'charger_id' => $sender->id,
             'charger_type' => $chargeType,
@@ -322,7 +322,7 @@ class ChargeRepoService
             "usd" =>  $usd ?? 0,
             'is_used_transferred' => $transferred,
         ];
-       
+
         $this->create($data);
     }
 
@@ -331,7 +331,7 @@ class ChargeRepoService
 
     public function chargeAgency(User $sender,Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-      
+
 
         $receiver->increment('coins', $amount);
 
@@ -426,7 +426,7 @@ class ChargeRepoService
 
     private function handleUserCharge($authAgency, $auth, $request)
     {
-        $receiver = $this->userRepository->searchUserById($request->id);
+        $receiver = $this->userRepository->searchUserByUUId($request->id);
 
         if (!$receiver) throw new \Exception(__('api.notUser'));
         // if ($receiver->id == $auth->id) throw new \Exception(__('api.notYourself'));
@@ -476,7 +476,7 @@ class ChargeRepoService
 
 
     public function agencyCharge($chargerId, $userId, $amount, $type, $usd = null, $chargeType, $transferred = false ,$agencyId=null)
-    {  
+    {
         $data = [
             'charger_id' => $chargerId,
             'charger_type' => $chargeType,
