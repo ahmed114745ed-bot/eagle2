@@ -62,6 +62,28 @@ class LuckyGift extends Model
         return intval(@explode(',', $this->min_percentage)[2] ?? 0);
     }
 
+
+    public function setMinPercentagAttribute($value): void
+    {
+        $parts = explode(',', $this->min_percentage ?? '0,0,0');
+        $parts[0] = $value;
+        $this->min_percentage = implode(',', $parts);
+    }
+
+    public function setMidPercentagAttribute($value): void
+    {
+        $parts = explode(',', $this->min_percentage ?? '0,0,0');
+        $parts[1] = $value;
+        $this->min_percentage = implode(',', $parts);
+    }
+
+    public function setMaxPercentagAttribute($value): void
+    {
+        $parts = explode(',', $this->min_percentage ?? '0,0,0');
+        $parts[2] = $value;
+        $this->min_percentage = implode(',', $parts);
+    }
+
     protected static function boot() {
         parent::boot();
         static::creating(function ($model) {
