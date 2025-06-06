@@ -69,6 +69,15 @@ class Common
 
     use CalcsTrait, AdminTrait, MoneyTrait, RoomTrait, AttributesTrait, ZegoTrait, InfoTrait, FilterTrait;
 
+    public static function getCachedWares($cacheKey, $vip, $type)
+    {
+        return Cache::remember($cacheKey, 60, function () use ($vip, $type) {
+            return Ware::where('level', $vip->level)
+                ->where('type', $type)
+                ->where('get_type', 1)
+                ->first();
+        });
+    }
 
     public static function switch_events($event_type)
     {
@@ -1047,6 +1056,15 @@ class Common
         return $ch->exists();
     }
 
+    public static function hasInPackV2($userPacks, $type, $use_status = false)
+    {
+        $ch =  self::checkPackV2($userPacks, $type);
+        if ($use_status) {
+            $ch = $ch->where('is_used', 1);
+        }
+
+        return $ch;
+    }
     public static function hasProfileFramePack($user_id, $type, $use_status = false)
     {
         $ch =  self::checkPack($user_id, $type);
@@ -1067,6 +1085,14 @@ class Common
         })->where('is_used', 1)->exists();
     }
 
+    public static function checkUserPacks($packs, $type)
+    {
+        return $packs->where('type', $type)
+            ->where('is_used', 1)
+            ->filter(function ($item){
+                return $item->expire == 0 || $item->expire >= time();
+            });
+    }
 
 
     public static function AddUsdToHistoryForsUsers($user_id, $usd)
@@ -1567,9 +1593,9 @@ class Common
             'senderUser.profile',
             'senderAgency',
             'senderShippingAgency',
-            'receiverUser'  ,   
+            'receiverUser'  ,
             'receiverUser.profile',
-            'receiveragency'  ,   
+            'receiveragency'  ,
         ];
     }
 }
