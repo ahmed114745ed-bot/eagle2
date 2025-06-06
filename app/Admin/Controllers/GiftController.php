@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Forms\TabsFrom;
 use App\Models\Gift;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -63,6 +64,11 @@ class GiftController extends MainController
      */
     public function edit($id, Content $content)
     {
+
+        if (url()->previous() != url()) {
+            session(['return_url' => url()->previous()]);
+        }
+
         return parent::edit($id, $content
             ->title(trans('Gifts'))
             ->body($this->form()->edit($id)));
@@ -222,7 +228,7 @@ class GiftController extends MainController
      */
     protected function form()
     {
-        $form = new Form(new Gift);
+        $form = new TabsFrom(new Gift);
         $form->display(__('ID'));
         $form->text('name', __('name'));
 
