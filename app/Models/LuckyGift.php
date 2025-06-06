@@ -45,6 +45,23 @@ class LuckyGift extends Model
     // Parse the date and set the timezone
     return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
+
+
+    public function getMinPercentagAttribute() : int
+    {
+        return intval(@explode(',', $this->min_percentage)[0] ?? 0);
+    }
+
+    public function getMidPercentagAttribute() : int
+    {
+        return intval(@explode(',', $this->min_percentage)[1] ?? 0);
+    }
+
+    public function getMaxPercentagAttribute() : int
+    {
+        return intval(@explode(',', $this->min_percentage)[2] ?? 0);
+    }
+
     protected static function boot() {
         parent::boot();
         static::creating(function ($model) {
