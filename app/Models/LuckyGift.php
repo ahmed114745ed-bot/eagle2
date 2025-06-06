@@ -11,6 +11,8 @@ class LuckyGift extends Model
     use HasFactory;
     protected $fillable = ['gift_id', 'win_probability'];
 
+
+    protected $appends = ['min_percentag','mid_percentag','max_percentag',];
     public function getCreatedAtAttribute($value)
     {
         $cacheKey = 'timezone';
