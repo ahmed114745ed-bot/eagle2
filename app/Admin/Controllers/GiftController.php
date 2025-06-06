@@ -257,25 +257,9 @@ class GiftController extends MainController
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
-        $form->file('img', __('img'));
-        $form->file('show_img', __('show_img'))->name(function ($file) {
-            return 'svga_' . \Str::random(6) . '.' . $file->getClientOriginalExtension();
-        })->required();
-        $form->select('image_type', __('image_type'))->options([
-            'svga' => __('svga'),
-            'alpha' => __('alpha'),
-            'mp4' => __('mp4'),
-            'vap' => __('vap'),
-        ])->required();
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_gift_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('💎');
-                $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
-            }
-        }
-        if ($form->isEditing()) {
-            if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'))->symbol('💎');
                 $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
             }
