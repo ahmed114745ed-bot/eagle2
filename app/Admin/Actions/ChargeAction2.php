@@ -27,7 +27,7 @@ class ChargeAction2 extends Action
 
     public function handle(Request $request)
     {
-        if (!Admin::user()->can('add-switch-' .'coin-recharge') || !Admin::user()->can('*')) {
+        if (!Admin::user()->can('add-switch-' .'coin-recharge') && !Admin::user()->can('*')) {
              return $this->response()->error(__('you dont have permission'))->refresh();
         }
         $agency = $this->getAgency($request->agency_id);
