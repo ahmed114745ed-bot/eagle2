@@ -1503,7 +1503,7 @@ use App\Models\Vip;
                                                         <div class="copy-container">
                                                             <input type="text" id="fawry_webhook_url" name="fawry_webhook_url"
                                                                    placeholder="fawry_webhook_url"
-                                                                   value="{{ $settings['fawry_webhook_url'] ?? '' }}"
+                                                                   value="{{ url('/api/fawry-callback') }}"
                                                                    class="form-control" readonly>
                                                             <button type="button" class="copy-button" data-copy-target="fawry_webhook_url" title="Copy">📋</button>
                                                         </div>
@@ -1568,7 +1568,7 @@ use App\Models\Vip;
                                                             <div class="copy-container">
                                                                 <input type="text" id="stripe_webhook_url" name="stripe_webhook_url"
                                                                        placeholder="stripe_webhook_url"
-                                                                       value="{{ $settings['stripe_webhook_url'] ?? '' }}"
+                                                                       value="{{ url('/api/stripe-callback') }}"
                                                                        class="form-control" readonly>
                                                                 <button type="button" class="copy-button" data-copy-target="stripe_webhook_url" title="Copy">📋</button>
                                                             </div>
