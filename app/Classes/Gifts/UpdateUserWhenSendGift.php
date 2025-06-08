@@ -48,17 +48,27 @@ class UpdateUserWhenSendGift
 //            $receivedUser->exchange_diamonds += $totalCoins;
         }
 
-        User::where('id', $receivedUser->id)->lockForUpdate()
-            ->update($values);
+
 
         $lastReceivedLevel = $receivedUser->total_received_level;
 
-        (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($receivedUser);
-        if ($receivedUser->total_received_level > $lastReceivedLevel) {
-            dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
+        try {
+
+            (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($receivedUser);
+
+            if ($receivedUser->total_received_level > $lastReceivedLevel) {
+                dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
+            }
+
+        } catch (\Exception $e) {
         }
-        /*$receivedUser->save();
-        $receivedUser->enableSaving = true;*/
+
+        $values['received_level'] = $receivedUser->received_level;
+
+        User::where('id', $receivedUser->id)->lockForUpdate()
+            ->update($values);
+        $receivedUser->save();
+        $receivedUser->enableSaving = true;
 
 
         return $receivedUser;
