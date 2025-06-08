@@ -136,12 +136,12 @@ Route::get('/clear_clear', function () {
     return "Cleared!";
 });
 
-//Route::get('/seed', function () {
-//
-//    Artisan::call('db:seed');
-//
-//    return "Seeded!";
-//});
+Route::get('/seed', function () {
+
+    Artisan::call('db:seed');
+
+    return "Seeded!";
+});
 
 Route::get('/change_agencies_type_test', function () {
 
