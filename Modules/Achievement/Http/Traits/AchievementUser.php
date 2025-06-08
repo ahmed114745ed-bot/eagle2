@@ -12,5 +12,9 @@ trait AchievementUser
         return $this->hasMany(UserAchievementLevel::class, 'user_id');
     }
 
+    public function enabledMedals(): HasMany
+    {
+        return $this->hasMany(UserAchievementLevel::class, 'user_id')->where('is_enable', true);
+    }
 }
 

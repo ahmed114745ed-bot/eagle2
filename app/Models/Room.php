@@ -207,6 +207,7 @@ class Room extends Model
                 $q->where('packs.expire', 0)->orWhere('packs.expire', '>=', time());
             })
             ->count();
+        /** is it okay the id = 0 */
         foreach ($ids as $indes => $id) {
             if ($id == '' || $id < 0) {
                 unset($ids[$indes]);
@@ -214,6 +215,22 @@ class Room extends Model
         }
 
         return count($ids) - $countPacks;
+    }
+
+    public function getCountRoomSocketV2Attribute()
+    {
+        $validVisitors = $this->roomVisitors;
+
+        $packCount = $validVisitors
+            ->flatMap(fn($validVisitor) => $validVisitor->user->packs)
+            ->filter(fn($pack) =>
+                $pack->is_used == 1 &&
+                $pack->type == 17 &&
+                ($pack->expire == 0 || $pack->expire >= time())
+            )
+            ->count();
+
+        return $validVisitors->count() - $packCount;
     }
 
     public function roomVisitors(): HasMany

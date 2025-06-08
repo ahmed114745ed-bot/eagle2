@@ -1171,6 +1171,24 @@ class User extends Authenticatable
         return $this->loadedPacks;
     }
 
+    public function eligiblePacks(): HasMany
+    {
+        return $this->hasMany(Pack::class)
+            ->where('is_used', 1)
+            ->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+            })
+            ->with('ware');
+    }
+
+    public function getUuidV2Attribute()
+    {
+        $pack = $this->eligiblePacks
+            ->where('ware.value', $this->special_id)
+            ->first();
+
+        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
+    }
 
     /**
      * Custom accessor for UUID with special pack conditions.
@@ -1423,7 +1441,7 @@ class User extends Authenticatable
         if ($this->is_bd){
             return  [4];
         }
-        
+
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
         }
