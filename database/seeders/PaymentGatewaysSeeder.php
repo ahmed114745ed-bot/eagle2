@@ -59,7 +59,7 @@ class PaymentGatewaysSeeder extends Seeder
                 ->orderBy('id')
                 ->get();
 
-            $settings->skip(1)->each->delete();
+            $settings->each->delete();
         }
 
         $fawry_id = PaymentCoin::updateOrCreate([
