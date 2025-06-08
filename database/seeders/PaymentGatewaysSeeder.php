@@ -101,7 +101,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_7' => [
                 "name" => "fawry_webhook_url",
                 "type" => "input",
-                "value" => 'https://www.google.com'
+                "value" => url('/api/fawry-callback')
             ],
         ];
 
@@ -203,7 +203,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_7' => [
                 "name" => "stripe_webhook_url",
                 "type" => "input",
-                "value" => 'webhook'
+                "value" => url('/api/stripe-callback')
             ],
         ];
 

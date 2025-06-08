@@ -104,6 +104,7 @@ class AppServiceProvider extends ServiceProvider
                 'services.fawry.utd_url' => $settings['fawry_utd_url'] ?? '',
                 'services.fawry.fawry_return_url' => $settings['fawry_return_url'] ?? '',
                 'services.fawry.fawry_url' => $settings['fawry_url'] ?? '',
+                'services.fawry.fawry_webhook_url' => $settings['fawry_webhook_url'] ?? '',
 
                 'paysky.api_key'     => $settings['paysky_api_key'] ?? '',
                 'paysky.merchant_id' => $settings['paysky_merchant_id'] ?? '',
@@ -115,6 +116,7 @@ class AppServiceProvider extends ServiceProvider
                 'stripe.cancel_url' => $settings['stripe_cancel_url'] ?? '',
                 'stripe.currency' => $settings['stripe_currency'] ?? '',
                 'stripe.webhook_secret' => $settings['stripe_webhook_secret'] ?? '',
+                'stripe.webhook_url' => $settings['stripe_webhook_url'] ?? '',
 
                 'nafezly-payments.OPAY_CURRENCY' => $settings['opay_currency'] ?? '',
                 'nafezly-payments.OPAY_SECRET_KEY' => $settings['opay_secret_key'] ?? '',

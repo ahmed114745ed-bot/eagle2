@@ -47,6 +47,7 @@ return [
         "utd_url"               => env('UTD_URL','http://utd_backend.test/api/fawry-initial'),
         "fawry_return_url"      => env('FAWRY_RETURN_URL','/admin/payment-with-method'),
         "fawry_url"        => env('FAWRY_URL','https://atfawry.fawrystaging.com/fawrypay-api/api/payments/init'),
+        "fawry_webhook_url"        => env('FAWRY_WEBHOOK_URL','https://'),
     ],
 
     'zinipay' => [

@@ -8,4 +8,5 @@ return [
     'cancel_url' => env('STRIPE_CANCEL_URL'),
     'currency' => env('STRIPE_CURRENCY'),
     'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    'webhook_url' => env('STRIPE_WEBHOOK_URL'),
 ];
