@@ -72,7 +72,7 @@ class DataUserResource extends JsonResource
             'gifts' =>  GiftLogResource::collection($gifts),
             'cp' => $mainCp ? new CpListResource($mainCp) : null,
             'is_followed' => $this->isFollowedBy(auth()->id()),
-            'colored_name' => ''
+            'colored_name' => $this->color_image
         ];
     }
 }
