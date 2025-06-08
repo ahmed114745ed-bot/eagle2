@@ -222,7 +222,7 @@ class Room extends Model
         $validVisitors = $this->roomVisitors;
 
         $packCount = $validVisitors
-            ->flatMap(fn($validVisitor) => $validVisitor->user->packs)
+            ->flatMap(fn($validVisitor) => $validVisitor?->user?->packs)
             ->filter(fn($pack) =>
                 $pack->is_used == 1 &&
                 $pack->type == 17 &&
