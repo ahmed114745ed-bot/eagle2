@@ -29,8 +29,8 @@ class RoomResource extends JsonResource
         $data = [
             'id' => $this->id,
             'owner_id' => $this->uid ?: 0,
-            'owner_uuid' => $this->owner?->uuid ?: 0,
-//            'owner_uuid' => $this->owner?->uuid_v2 ?: 0,
+//            'owner_uuid' => $this->owner?->uuid ?: 0,
+            'owner_uuid' => $this->owner?->uuid_v2 ?: 0,
             'room_id' => (string)($this->id ?: 0),
             'name' => $this->room_name ?: '',
             "mode" => $this->mode,
