@@ -66,8 +66,8 @@ class RoomResource extends JsonResource
             'have_luck_box' => (bool) $have_luck_box,
             'achievement_images' => $achievement_images,
             /** refactored */
-            'medals'               =>  @$this->owner?->enabledMedals ?? [],
-//            'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
+//            'medals'               =>  @$this->owner?->enabledMedals ?? [],
+            'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
             $this->mergeWhen($this->distance, [
                 'distance' => $this->distance,
             ]),
