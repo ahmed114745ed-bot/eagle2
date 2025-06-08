@@ -30,12 +30,10 @@ class RoomResource extends JsonResource
             'id' => $this->id,
             'owner_id' => $this->uid ?: 0,
             'owner_uuid' => $this->owner?->uuid ?: 0,
-//            'owner_uuid' => $this->owner?->uuid_v2 ?: 0,
             'room_id' => (string)($this->id ?: 0),
             'name' => $this->room_name ?: '',
             "mode" => $this->mode,
             'visitors_count' => $this->count_room_socket,
-//            'visitors_count' => $this->count_room_socket_v2,
             'cover' => $this->room_cover ?: '',
             'class' => $this->myClass ?: new \stdClass(),
             'type' => $this->myType ?: new \stdClass(),
@@ -65,8 +63,6 @@ class RoomResource extends JsonResource
                 ],
             'have_luck_box' => (bool) $have_luck_box,
             'achievement_images' => $achievement_images,
-            /** refactored */
-//            'medals'               =>  @$this->owner?->enabledMedals ?? [],
             'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
             $this->mergeWhen($this->distance, [
                 'distance' => $this->distance,
