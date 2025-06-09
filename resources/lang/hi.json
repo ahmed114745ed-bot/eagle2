@@ -2575,10 +2575,17 @@
   "anti ban": "प्रतिबंध विरोधी",
   "net salary": "शुद्ध वेतन",
     "Salary switch users": "प्रयुक्त वेतन",
+
+    "Default Image": "डिफ़ॉल्ट छवि",
+    "Priority": "प्राथमिकता",
+    "Localized Images": "स्थानीयकृत छवियाँ",
+    "Image for": "लिए छवि",
+    "Badge Name": "बैज का नाम",
+
     "user wallet": "उपयोगकर्ता वॉलेट"
 
 
-  
+
 
 
 }

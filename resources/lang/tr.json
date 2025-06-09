@@ -2533,7 +2533,7 @@
 
 
 
-    
+
   "All permission": "Tüm izinler",
   "Create games": "Oyun oluştur",
   "Delete games": "Oyunu sil",
@@ -2993,6 +2993,13 @@
   "anti ban": "yasak koruması",
    "net salary": "net maaş",
     "Salary switch users": "kullanılmış maaş",
+
+    "Default Image": "Varsayılan Resim",
+    "Priority": "Öncelik",
+    "Localized Images": "Yerelleştirilmiş Resimler",
+    "Image for": "için resim",
+    "Badge Name": "Rozet Adı",
+
     "user wallet": "kullanıcı cüzdanı"
 
 
