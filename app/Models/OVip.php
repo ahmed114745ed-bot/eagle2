@@ -26,6 +26,8 @@ class OVip extends Model
 
         static::deleting(function ($oVip){
             $oVip->privilegs()->detach();
+
+            $oVip->wares()->forceDelete();
         });
     }
 
@@ -73,6 +75,11 @@ class OVip extends Model
         return $this->hasOne(Ware::class, 'level', 'level')
             ->where('type', 12)
             ->where('get_type', 1);
+    }
+
+    public function wares()
+    {
+        return $this->hasMany(Ware::class, 'level', 'level');
     }
 
     function getTranslation($key) {
