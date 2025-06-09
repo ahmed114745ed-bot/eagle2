@@ -70,6 +70,14 @@ class SpecialHistoryController extends MainController
     {
         $grid = new Grid(new SpecialHistory());
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user.uuid', 'User UUID');
+            });
+        });
+
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))->display(function () {
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -83,8 +91,8 @@ class SpecialHistoryController extends MainController
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <img src="' . $url . '" alt="User Image" style="width: 40px; height: 40px;">
                     <div>
-                        <a href="/admin/users/' . $this->user_id . '" style="text-decoration: none; color:rgb(253, 253, 253); font-weight: bold;">' . $name . '</a>
-                        <div style="font-size: 12px; color: #fff;">' . 'Uuid: ' . $this->user?->uuid . '</div>
+                        <a href="/admin/users/' . $this->user_id . '" style="text-decoration: none; font-weight: bold;">' . $name . '</a>
+                        <div style="font-size: 12px;">' . 'Uuid: ' . $this->user?->uuid . '</div>
                     </div>
                 </div>
             ';
