@@ -8,6 +8,8 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Http\UploadedFile;
+
 class BadgeController extends MainController
 {
     public $permission_name = 'badges';
@@ -52,7 +54,14 @@ class BadgeController extends MainController
         $grid->column('id', __('ID'))->sortable();
         $grid->column('name', __('Name'))->sortable();
         $grid->column('default_image', __('Default Image'))->display(function ($image) {
-            return "<img src='{$image}' style='max-height:40px;max-width:40px;' />";
+            $defaultImage = asset("images/background_room.jpg");
+            $path = getImagePath($image);
+            if (!isImageExists(@$path)) {
+                $path = $defaultImage;
+            }
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+            return "<img src='{$correctUrl}' style='max-height:40px;max-width:40px;' />";
         });
         $grid->column('priority', __('Priority'))->sortable();
 
@@ -124,7 +133,7 @@ class BadgeController extends MainController
 
             if (is_array($localizedImagesInput)) {
                 foreach ($localizedImagesInput as $langCode => $file) {
-                    if ($file instanceof \Illuminate\Http\UploadedFile) {
+                    if ($file instanceof UploadedFile) {
                         $path = $file->store('images');
                         $storedImages[$langCode] = $path;
                     } elseif (is_string($file)) {
