@@ -1243,6 +1243,11 @@ class User extends Authenticatable
         return $packs->where('type', $type)->isNotEmpty();
     }
 
+    public function getPackWithTypeV2($type)
+    {
+        return $this->eligiblePacks->where('type', $type)->isNotEmpty();
+    }
+
     public function nowGame()
     {
         return $this->belongsTo(AllGame::class, 'game_id');

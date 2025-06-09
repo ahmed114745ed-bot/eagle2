@@ -57,7 +57,7 @@ class UserResource extends JsonResource
         $intro  = $this->getUserDress(6, $this->dress_3, 'img2') ?? $this->getUserDress(6, $this->dress_3, 'img1');
         $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
 
-        $isHideCountry = $this->getPackWithType(13);
+        $isHideCountry = $this->getPackWithTypeV2(13);
         $userHandling = new \App\Classes\UserHandling();
         $color_image = @$this->color_image;
         $chat_setting = \App\Models\ChatSetting::where("user_id", $this->id)->first();
@@ -79,13 +79,13 @@ class UserResource extends JsonResource
         }
         $data      = [
             'id'      => @$this->id,
-            'uuid'    => @$this->uuid,
+            'uuid'    => @$this->uuid_v2,
             'special_color'    => @$this->color_id ?? '',
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'chat_id' => @$this->chat_id ?: "",
             'notification_id'      => @$this->notification_id ?: "",
-            'name'                 => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid,
+            'name'                 => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid_v2,
             'nick_name'            => @$this->nick_name,
             'number_of_fans'       => $this->numberOfFans(),
             'number_of_followings' => $this->numberOfFollowings(),
@@ -106,7 +106,8 @@ class UserResource extends JsonResource
             'lang'                 => @$this->lang,
             'country'              => !$isHideCountry ? ($this->country ?? (object)[]) : (object)[],
             'have_country'         => ($this->country != null),
-            'medals'               => $this->medals()->where('is_enable', true)->get(),
+            'medals'               =>  @$this->enabledMedals ?? [],
+//            'medals'               => $this->medals()->where('is_enable', true)->get(),
 
             'frame'                => $frame,
             'intro'                => $intro,
@@ -121,14 +122,14 @@ class UserResource extends JsonResource
             'image_color'          => $color_image,
             'my_agency'            => $this->ownAgency()->select('id', 'name', 'notice', 'status', 'phone', 'url', 'img', 'contents')->first(),
 
-            'online_time'          => !$this->getPackWithType(20) ? ($this->online_time ? $timeDifferenceFormatted : '') : '',
+            'online_time'          => !$this->getPackWithTypeV2(20) ? ($this->online_time ? $timeDifferenceFormatted : '') : '',
 
-            'has_color_name'       => $this->getPackWithType(18),
-            'anonymous'            => $this->getPackWithType(17),
+            'has_color_name'       => $this->getPackWithTypeV2(18),
+            'anonymous'            => $this->getPackWithTypeV2(17),
             'country_hidden'       => $isHideCountry, // both
-            'last_active_hidden'   => $this->getPackWithType(19),
-            'visit_hidden'         => $this->getPackWithType(19),
-            'room_hidden'          => $this->getPackWithType(16),
+            'last_active_hidden'   => $this->getPackWithTypeV2(19),
+            'visit_hidden'         => $this->getPackWithTypeV2(19),
+            'room_hidden'          => $this->getPackWithTypeV2(16),
             'type_user'            => intval($this->type_user) ?: 0,
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),

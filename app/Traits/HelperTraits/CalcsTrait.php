@@ -871,7 +871,7 @@ trait CalcsTrait
             'expire'    => $vip->expire ?? 0,
             'ware_id' => $vipIcon?->id ?? 0,
             'color' => '',
-            'colored_name' => $hasColor ? common::wareUserVipV2($user->id, 18, 'color') ?? '' : '',
+            'colored_name' => $hasColor ? common::wareUserVipV2($user_id, 18, 'color') ?? '' : '',
         ];
     }
 

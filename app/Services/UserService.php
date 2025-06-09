@@ -542,7 +542,7 @@ class UserService
     {
         $user = $this->userRepository->findOrFail($userId, ['packs' /* => function ($q) {
             $q->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5])->where('is_used', 1)->with('ware');
-        } */, 'profile', 'room.backgroundImage','room.background', 'family', 'UserVip.OVip', 'userVips']);
+        } */, 'profile','myroom', 'room.backgroundImage','room.background', 'family', 'UserVip.OVip', 'userVips', 'eligiblePacks.ware']);
         if (!$user) throw new \Exception('not found');
         if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
         $request['user_id'] = $userId;
