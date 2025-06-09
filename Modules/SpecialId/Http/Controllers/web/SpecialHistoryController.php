@@ -2,6 +2,7 @@
 
 namespace Modules\SpecialId\Http\Controllers\web;
 
+use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -74,7 +75,7 @@ class SpecialHistoryController extends MainController
             $filter->disableIdFilter();
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('user.uuid', 'User UUID');
+                $filter->equal('user.uuid', __('UUID'));
             });
         });
 
@@ -105,7 +106,11 @@ class SpecialHistoryController extends MainController
                 "></span>";
         });
 
-        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
+        $grid->column('created_at', __('Date'))
+            ->display(function ($value) {
+                return Carbon::parse($value)->format('Y-m-d');
+            });
+//        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableEdit();
             $actions->disableView();
