@@ -161,20 +161,41 @@ class BadgeController extends MainController
         $show->field('id', __('ID'));
         $show->field('name', __('Name'));
         $show->field('default_image', __('Default Image'))->as(function ($image) {
-            return "<img src='{$image}' style='max-width:150px;max-height:150px;'/>";
+            $defaultImage = asset("images/background_room.jpg");
+            $path = getImagePath($image);
+            if (!isImageExists(@$path)) {
+                $path = $defaultImage;
+            }
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+            return "<img src='{$correctUrl}' style='max-width:150px;max-height:150px;'/>";
         })->unescape();
 
         $show->field('priority', __('Priority'));
 
-        $show->field('localized_images', __('Localized Images'))->display(function ($images) {
-            if (!$images) return '-';
-            $output = '';
-            foreach ($images as $lang => $path) {
-                $url = admin_base_path($path);
-                $output .= "<strong>{$lang}:</strong> <img src='{$url}' style='max-height:40px;max-width:40px;' /> <br>";
+        $show->field('localized_images', __('Localized Images'))->as(function ($images) {
+            if (is_string($images)) {
+                $images = json_decode($images, true);
             }
-            return $output;
-        });
+            if (!is_array($images) || empty($images)) {
+                return '-';
+            }
+
+            $defaultImage = asset("images/background_room.jpg");
+            $output = '';
+            foreach ($images as $lang => $image) {
+                if (!is_string($image) || empty($image)) continue;
+                $path = getImagePath($image);
+                if (!isImageExists(@$path)) {
+                    $path = $defaultImage;
+                }
+                $parsedUrl = parse_url($path);
+                $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+                $safeLang = e($lang);
+                $output .= "<strong>{$safeLang}:</strong> <img src='{$correctUrl}' style='max-height:40px;max-width:40px;' /> <br>";
+            }
+            return $output ?: '-';
+        })->unescape();
 
         $show->field('created_at', 'Created At');
         $show->field('updated_at', 'Updated At');
