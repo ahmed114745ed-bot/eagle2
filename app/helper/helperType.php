@@ -100,6 +100,13 @@ const WARE_DEDICATE =
     22 => 'upload GIF image',
 ];
 
+const SELECTED_USED_WARE =
+[
+    4 => 'Avatar Frame',
+    5 => 'Bubble Frame',
+    6 => 'Entering Special Effects',
+];
+
 const  GET_TYPE_WARE =
 [
     4 => 'purchase',

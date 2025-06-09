@@ -91,7 +91,7 @@ class WareTabController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
              $filter->disableIdFilter();
-           
+
         });
 
         $grid->id(__('ID'));
@@ -173,7 +173,7 @@ class WareTabController extends MainController
         $content = new Row();
 
         // Define your type mapping
-        $typeMap = MORE_Used_WARE;
+        $typeMap = SELECTED_USED_WARE;
 
         $types =  collect($typeMap);
         $currentType = request()->get('type', $types->keys()->first());
