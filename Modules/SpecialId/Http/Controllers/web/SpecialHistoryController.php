@@ -75,7 +75,7 @@ class SpecialHistoryController extends MainController
             $filter->disableIdFilter();
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('user.uuid', __('UUID'));
+                $filter->equal('ware.value', __('UUID'));
             });
         });
 
