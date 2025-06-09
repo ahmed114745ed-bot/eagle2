@@ -74,12 +74,18 @@ class BadgeController extends MainController
                 return '-';
             }
 
+            $defaultImage = asset("images/background_room.jpg");
             $output = '';
-            foreach ($images as $lang => $path) {
-                if (!is_string($path) || empty($path)) continue;
-                $url = admin_base_path($path);
+            foreach ($images as $lang => $image) {
+                if (!is_string($image) || empty($image)) continue;
+                $path = getImagePath($image);
+                if (!isImageExists(@$path)) {
+                    $path = $defaultImage;
+                }
+                $parsedUrl = parse_url($path);
+                $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
                 $safeLang = e($lang);
-                $output .= "<strong>{$safeLang}:</strong> <img src='{$url}' style='max-height:40px;max-width:40px;' /> <br>";
+                $output .= "<strong>{$safeLang}:</strong> <img src='{$correctUrl}' style='max-height:40px;max-width:40px;' /> <br>";
             }
 
             return $output ?: '-';
