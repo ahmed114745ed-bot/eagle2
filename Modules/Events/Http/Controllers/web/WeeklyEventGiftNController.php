@@ -116,7 +116,7 @@ class WeeklyEventGiftNController extends MainController
                 );
         }
         
-        return parent::show($id, $content);
+        return  $content;
     }
     protected function grid1()
     {
