@@ -7,10 +7,11 @@ use App\Models\Config;
 use App\Models\Language;
 use App\Models\PaymentGateway;
 use Encore\Admin\Auth\Permission;
-
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\HtmlString;
+use Encore\Admin\Form;
+
 use Request;
 
 class MangerSettingController extends MainController
@@ -123,7 +124,7 @@ class MangerSettingController extends MainController
 
         $payment_gateways = PaymentGateway::all();
         return  $content
-            ->title(trans('Payment Gateways'))
+            ->title(title: trans('Payment Gateways'))
             ->view('mangerSetting', compact('config', 'configValue', 'languages', 'configAll', 'payment_gateways'));
     }
 
@@ -137,7 +138,24 @@ class MangerSettingController extends MainController
     {
         $gateway = PaymentGateway::findOrFail($id);
 
-        return $content->view('paymentGatewayEdit', compact('gateway'));
+        return parent::edit($id,$content
+        ->body($this->editForm()->edit($id)));
+        // view('paymentGatewayEdit', compact('gateway'));
+    }
+    
+    protected function editForm()
+    {
+        $form = new Form(new PaymentGateway);
+        // $form->setMethod('PUT');
+        $form->setAction(route('admin.update-payment-gateway', ['id' => request()->route('id')]));
+        
+        $form->display(__('ID'));
+        $form->text('title', __('title'));
+        $form->image('photo', trans('image'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
+    
+        return $form;
     }
 
     public function updatePaymentGateway($id)
@@ -160,7 +178,23 @@ class MangerSettingController extends MainController
     }
 
     public function createPaymentGateway(Content $content){
-        return $content->view('paymentGatewayCreate');
+        return $content
+        ->title(title: trans('Payment Gateways'))
+        ->body($this->form());
+        // ->view('paymentGatewayCreate');
+    }
+    protected function form()
+    {
+        $form = new Form(new PaymentGateway);
+        $form->setAction(route('admin.store-payment-gateway'));
+
+        $form->display(__('ID'));
+        $form->text('title', __('title'));
+        $form->image('photo', trans('image'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
+    
+        return $form;
     }
 
     public function storePaymentGateway(){
@@ -175,4 +209,6 @@ class MangerSettingController extends MainController
 
         return redirect('/admin/agency-setting-manger');
     }
+
+ 
 }

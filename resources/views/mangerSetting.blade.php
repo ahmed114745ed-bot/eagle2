@@ -4,8 +4,10 @@
         margin: 0;
         padding: 0;
         background-color: #121212;
-        color: white;
+        /* color: white; */
         display: flex;
+        color: var(--text-secondary-color);
+
     }
 
     /* القائمة الجانبية */
@@ -312,6 +314,8 @@
     .ltr .box-header .btn{
         right: 18px;
         position: absolute;
+        color: var(--text-secondary-color) !important;
+
 
     }
 
@@ -319,6 +323,12 @@
     .rtl .box-header .btn{
         left: 18px;
         position: absolute;
+        color: var(--text-secondary-color) !important;
+
+    }
+    .grid-table{
+        background: var(--secondary-color) !important;
+
     }
 
     /* Responsive adjustments */
@@ -338,7 +348,7 @@
     <div class="all-page" style="width: 100%;">
        
 
-        <div class="settings-content">
+        <div class="settings-content box grid-box"">
 
             <div id="PaymentGateways" class="settings-section active">
                 <!-- <h3>{{ __('Payment Gateways') }}</h3> -->
@@ -356,7 +366,7 @@
                     @endif 
 
                     </div>
-                    <table class="table  table-hover grid-table" style="background-color: var(--box-background-color) !important;">
+                    <table class="table  table-hover grid-table" >
                         <thead>
                             <tr>
                                 <th>#</th>
