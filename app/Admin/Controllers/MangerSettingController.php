@@ -123,6 +123,7 @@ class MangerSettingController extends MainController
 
         $payment_gateways = PaymentGateway::all();
         return  $content
+            ->title(trans('Payment Gateways'))
             ->view('mangerSetting', compact('config', 'configValue', 'languages', 'configAll', 'payment_gateways'));
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use DB;
 use Auth;
 use Exception;
 use App\Models\Gift;
@@ -11,49 +10,46 @@ use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Config;
-use App\Models\Target;
 use App\Enums\UserType;
+use App\Facades\UserHandling;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\UserSallary;
-use Illuminate\Http\Request;
-use App\Facades\UserHandling;
-use App\Services\UserService;
-use Illuminate\Validation\Rule;
-use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\AllUsersResource;
+use App\Http\Resources\Api\V1\DataUserResource;
+use App\Http\Resources\Api\V1\DeviceTokenResource;
+use App\Http\Resources\Api\V1\LevelUserResource;
+use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\MyStoreResource;
+use App\Http\Resources\Api\V1\OnlineResource;
+use App\Http\Resources\Api\V1\ShowUserResource;
+use App\Http\Resources\Api\V1\ShowUserSettingResource;
+use App\Http\Resources\Api\V1\UserLevelHistoryResource;
+use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\Api\V1\UserResourceSerche;
+use App\Http\Resources\Api\V1\UserTargetResource;
+use App\Http\Resources\Api\V1\UserTypeResource;
+use App\Http\Resources\CpUserResource;
+use App\Http\Resources\MyDataUtdResource;
+use App\Http\Resources\UserPackUtdResource;
+use App\Http\Resources\UserPackVipResource;
+use App\Http\Resources\UserVipUtdResource;
+use App\Http\Resources\UserVisitRoomResource;
+use App\Http\Services\ProfileRelationsService;
 use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\CpUserResource;
-use App\Http\Resources\MyDataUtdResource;
-use App\Http\Resources\UserIntroResource;
+use App\Models\UserSallary;
+use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\UserVipUtdResource;
-use App\Http\Resources\Api\V1\UserResource;
-use App\Http\Resources\UserPackUtdResource;
-use App\Http\Resources\UserPackVipResource;
-use App\Http\Resources\Api\V1\MyDataResource;
-use App\Http\Resources\Api\V1\OnlineResource;
-use App\Http\Resources\UserVisitRoomResource;
-use App\Http\Resources\Api\V1\MyStoreResource;
-use App\Http\Services\ProfileRelationsService;
-use App\Http\Resources\Api\V1\AllUsersResource;
-use App\Http\Resources\Api\V1\DataUserResource;
-use App\Http\Resources\Api\V1\ShowUserResource;
-use App\Http\Resources\Api\V1\UserTypeResource;
-use App\Http\Resources\Api\V1\LevelUserResource;
-use App\Http\Resources\Api\V1\UserResourceSerche;
-use App\Http\Resources\Api\V1\UserTargetResource;
-use App\Http\Resources\Api\V1\DeviceTokenResource;
-use Modules\WhatsappAuth\Services\WhatsappWebhook;
-use Modules\FixedTarget\Services\FixedTargetService;
-use Modules\SalaryTransaction\Entities\SalaryRequest;
-use App\Http\Resources\Api\V1\ShowUserSettingResource;
-use App\Http\Resources\Api\V1\ZegoCreditionalResource;
-use App\Http\Resources\Api\V1\UserLevelHistoryResource;
+use Illuminate\Validation\Rule;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use Modules\FixedTarget\Services\FixedTargetService;
+use Modules\SalaryTransaction\Entities\SalaryRequest;
+use Modules\WhatsappAuth\Services\WhatsappWebhook;
 
 class UserController extends Controller
 {
@@ -394,6 +390,17 @@ class UserController extends Controller
         return Common::apiResponse(true, '', new UserResource($user), 200);
     }
 
+    public function vTwoshow(Request $request, $id)
+    {
+        $isVisit = @$request->is_visit == 'true' ? true : false;
+        $auth   = $request->user();
+        try {
+            $user = $this->userService->vTwoshowUser($id, $auth, $request, $isVisit);
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+        return Common::apiResponse(true, '', new \App\Http\Resources\Api\V2\UserResource($user), 200);
+    }
 
     public function changePhoneWhatsapp(Request $request, WhatsappWebhook $whatsappWebhook)
     {

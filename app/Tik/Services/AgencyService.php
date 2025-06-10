@@ -495,7 +495,7 @@ class AgencyService
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
-        Common::createUserAdmin($agency->app_owner_id);
+      ///  Common::createUserAdmin($agency->app_owner_id);
         $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
         if (!$checkAgencyUser) {
             $joinAgencyData = [
@@ -640,6 +640,8 @@ class AgencyService
 
     public function dailyReport($user, $month, $year ,$agencyId = null)
     {
+
+      
         $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
         $joinedAgency = $member ??  $owner;
@@ -702,7 +704,9 @@ class AgencyService
         });
 
         $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
-        $userInfoArray = $user->getSallaryInfoByMonth();
+     
+        $saMonth = ltrim($month, '0');
+        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year);
 
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
@@ -1021,7 +1025,7 @@ class AgencyService
         ];
 
         $agency =  $this->agencyRepository->create($data);
-        Common::createUserAdmin($request->app_owner_id);
+        //Common::createUserAdmin($request->app_owner_id);
 
         if ($request->type == 1 ) {
 
@@ -1053,7 +1057,7 @@ class AgencyService
             $this->userRepository->update($data, $agency->app_owner_id);
             $user = User::find($agency->app_owner_id);
             Admin::where('username', $user->uuid)->delete();
-            Common::createUserAdmin($request->app_owner_id);
+            //Common::createUserAdmin($request->app_owner_id);
         }
 
         if ($request->type == 1 ) {

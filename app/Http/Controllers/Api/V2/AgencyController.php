@@ -44,6 +44,8 @@ class AgencyController extends Controller
         }
 
         $user   = $request->user();
+        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t join agency', null, 407);
+
         if (!$request->agency_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
 
         try {
@@ -248,7 +250,7 @@ class AgencyController extends Controller
         if (!$user->ownAgency)   return Common::apiResponse(0, 'لا يوجد وكاله!', []);
 
         //        try {
-       $mass=  $this->agencyService->userHandlingRequest($request->user_id, $agency->id ,$type);
+        $mass =  $this->agencyService->userHandlingRequest($request->user_id, $agency->id, $type);
         /*  } catch (ValidationException $exception){
             return Common::apiResponse(0, $exception->getMessage(), null, 422);
         } catch (\Exception $e) {
@@ -321,13 +323,13 @@ class AgencyController extends Controller
 
     public function gitOldAgencies(Request $request)
     {
-         $userId   = $request->user()->id;
+        $userId   = $request->user()->id;
         try {
             $agency = $this->agencyService->gitOldAgencies($userId);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return Common::apiResponse(1, '', JoinedAgencyResource::collection( $agency));
+        return Common::apiResponse(1, '', JoinedAgencyResource::collection($agency));
     }
 }

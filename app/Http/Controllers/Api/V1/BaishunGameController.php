@@ -44,7 +44,6 @@ class BaishunGameController extends Controller
         }
         $user = User::query()
             ->where('id', $id)
-            ->lockForUpdate()
             ->first();
 
         $userDi = $user->di;
@@ -63,7 +62,7 @@ class BaishunGameController extends Controller
             }
         }
 
-        DB::table('users')->where('id', $id)->update([
+        DB::table('users')->where('id', $id)->lockForUpdate()->update([
             'di' => DB::raw('di + ' . (int) $request->currency_diff)
         ]);
 

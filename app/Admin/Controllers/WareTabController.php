@@ -82,7 +82,7 @@ class WareTabController extends MainController
 
     protected function grid()
     {
-        $type = request()->get('type', 1);
+        $type = request()->get('type', 4);
         $grid = new Grid(new Ware());
       //  $types = [6, 4, 5];
         $grid->model()->where('type',  $type)->whereNot('get_type', 1);
@@ -91,7 +91,7 @@ class WareTabController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
              $filter->disableIdFilter();
-           
+
         });
 
         $grid->id(__('ID'));
@@ -173,7 +173,7 @@ class WareTabController extends MainController
         $content = new Row();
 
         // Define your type mapping
-        $typeMap = MORE_Used_WARE;
+        $typeMap = SELECTED_USED_WARE;
 
         $types =  collect($typeMap);
         $currentType = request()->get('type', $types->keys()->first());
