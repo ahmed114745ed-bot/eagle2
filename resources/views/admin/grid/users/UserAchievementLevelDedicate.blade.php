@@ -97,7 +97,7 @@
     
     .form-section.active {
         background: #e7f1ff;
-        border-left: 4px solid #0d6efd;
+        /* border-left: 4px solid #0d6efd; */
     }
     
     .file-upload-wrapper {
