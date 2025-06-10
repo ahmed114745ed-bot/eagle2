@@ -86,9 +86,9 @@ class EventReportController extends MainController
                 if ($this->reward->type == 'coins') {
                     $target = $this->reward->target;
                 } elseif ($this->reward->type == 'vip') {
-                    $target = $this->reward->vip->name;
+                    $target = $this->reward->vip?->name;
                 } elseif ($this->reward->type == 'ware') {
-                    $target = $this->reward->ware->name;
+                    $target = $this->reward->ware?->name;
                 }
                 return $target;
             }
