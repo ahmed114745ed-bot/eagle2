@@ -48,6 +48,21 @@ class PaymentGatewaysSeeder extends Seeder
             }
         }
 
+        $duplicates = Setting::select('key', 'item_id', 'type')
+            ->groupBy('key', 'item_id', 'type')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        foreach ($duplicates as $dup) {
+            $settings = Setting::where('key', $dup->key)
+                ->where('item_id', $dup->item_id)
+                ->where('type', $dup->type)
+                ->orderBy('id')
+                ->get();
+
+            $settings->skip(1)->each->delete();
+        }
+
         $fawry_id = PaymentCoin::updateOrCreate([
             'title' => 'fawry',
         ], [
@@ -86,7 +101,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_7' => [
                 "name" => "fawry_webhook_url",
                 "type" => "input",
-                "value" => 'https://www.google.com'
+                "value" => url('/api/fawry-callback')
             ],
         ];
 
@@ -188,7 +203,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_7' => [
                 "name" => "stripe_webhook_url",
                 "type" => "input",
-                "value" => 'webhook'
+                "value" => url('/api/stripe-callback')
             ],
         ];
 

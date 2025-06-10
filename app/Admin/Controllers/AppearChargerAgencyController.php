@@ -441,11 +441,11 @@ class AppearChargerAgencyController extends MainController
             $newOwnerId = $form->model()->app_owner_id;
 
             if (!$form->model()->exists) {
-                Common::createUserAdmin($appOwnerId);
+              //  Common::createUserAdmin($appOwnerId);
             }
 
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
-                Common::createUserAdmin($appOwnerId);
+              //  Common::createUserAdmin($appOwnerId);
 
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;

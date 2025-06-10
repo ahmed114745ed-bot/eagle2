@@ -39,6 +39,7 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
+use App\Models\UserSallary;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -805,18 +806,26 @@ class UserController extends MainController
         return $this->form()->update($id);
     }
 
-    public function show($id, Content $content)
+    public function show($id, Content $content,)
     {
+        $month = request('month'); // e.g., "5" for May
+        $year = request('year');
         $user = User::with('profile')->find($id);
         $packs = Pack::where('user_id', $id)->where('is_used', 1)->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
+        $salaries = UserSallary::where('user_id', $id)
+            ->with('agency')
+            ->when(isset($year), function ($query) use ($year) {
+                $query->where('year', $year);
+            })->when(isset($month), function ($query) use ($month) {
+                $query->where('month', $month);
+            })->orderByDesc('id')->paginate(10, ['*'], 'salary_page');
+        $data = compact('user', 'packs', 'userVips', 'salaries');
 
-        $data = compact('user', 'packs', 'userVips');
-
-        return $content->title(__('user profile'))
-            ->view('user_profile', $data);
+        return  parent::show($id, $content->title(__('user profile'))
+            ->view('user_profile', $data));
     }
 
     /**
@@ -1071,7 +1080,7 @@ class UserController extends MainController
     {
         $userVip = UserVip::find($id);
         // dd($userVip,$id );
-       // $wares = Ware::query()->where('get_type', 1)->where('level', $userVip->level)->pluck('id')->toArray();
+        // $wares = Ware::query()->where('get_type', 1)->where('level', $userVip->level)->pluck('id')->toArray();
         $userVip->packs()->delete();
         $user = User::query()->find($userVip->user_id);
         if ($user) {

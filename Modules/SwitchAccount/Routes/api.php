@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\SwitchAccount\Http\Controllers\SwitchAccountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,7 @@ use Illuminate\Http\Request;
 |
 */
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan'])->group(function () {
-    Route::post('add-account',[\Modules\SwitchAccount\Http\Controllers\SwitchAccountController::class,'add_account']);
-    Route::post('switch-account',[\Modules\SwitchAccount\Http\Controllers\SwitchAccountController::class,'switch_account']);
-    Route::get('my-accounts',[\Modules\SwitchAccount\Http\Controllers\SwitchAccountController::class,'myAccounts']);
+    Route::post('add-account',[SwitchAccountController::class,'add_account']);
+    Route::post('switch-account',[SwitchAccountController::class,'switch_account']);
+    Route::get('my-accounts',[SwitchAccountController::class,'myAccounts']);
 });

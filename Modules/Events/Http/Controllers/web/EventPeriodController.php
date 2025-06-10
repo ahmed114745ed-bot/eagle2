@@ -79,9 +79,9 @@ class EventPeriodController extends MainController
         $grid->column('created_at', __('Created at'));
         $grid->column( __ ('procedures'))->display(function () {
             // توليد الروابط
-            $url1 = url('admin/weekly-events-gift/1/'.$this->id);
-            $url2 = url('admin/weekly-events-gift/2/'.$this->id);
-            $url3 = url('admin/weekly-events-gift/3/'.$this->id);
+            $url1 = url('admin/weekly-events-gift/'.$this->id);
+            $url2 = url('admin/weekly-events-gift/'.$this->id);
+            $url3 = url('admin/weekly-events-gift/'.$this->id);
 
             // إنشاء أزرار HTML
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winner first gifts') . "</a>";

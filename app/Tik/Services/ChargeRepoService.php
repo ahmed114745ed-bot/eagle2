@@ -383,7 +383,7 @@ class ChargeRepoService
                     if (!$authAgency) throw new \Exception(__('api.notAgency'));
                     if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozenMassForYou'));
                     if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
-                    if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
+                    if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.yorSelf'));
                     if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));
                     $this->handleAgencyCharge($authAgency, $request);
                     break;

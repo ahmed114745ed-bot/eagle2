@@ -430,7 +430,7 @@ class AgencyController extends Controller
 
                 $actions->add(new DeleteAgencyAction());
             }
-            if (Admin::user()->can('change-users-agency-Switch-' . $permission) || Admin::user()->can('*')) {
+            if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new ChangeUsersAgencyAction($model->id));
             }

@@ -16,14 +16,14 @@ class OPayController extends Controller
 {
     public function make($data, $user) {
 
-        $verify_route_name = config('nafezly-payments.VERIFY_ROUTE_NAME');
+        $verify_route_name = config('nafezly-payments.OPAY_WEBHOOK_URL');
         $response = Http::withHeaders([
-            "MerchantId"=> env('OPAY_MERCHANT_ID'),
-            "authorization"=>"Bearer ".env('OPAY_PUBLIC_KEY'),
+            "MerchantId"=> config('nafezly-payments.OPAY_MERCHANT_ID'),
+            "authorization"=>"Bearer ".config('nafezly-payments.OPAY_PUBLIC_KEY'),
             "content-type"=>"application/json"
-        ])->post('https://sandboxapi.opaycheckout.com/api/v1/international/cashier/create',[
+        ])->post(config('nafezly-payments.OPAY_BASE_URL'),[
             "amount" => [
-                "currency" => env('OPAY_CURRENCY'),
+                "currency" => config('nafezly-payments.OPAY_CURRENCY'),
                 "total" => $data['amount']
             ],
             "callbackUrl" => $verify_route_name."?reference_id=".$data['trx'],

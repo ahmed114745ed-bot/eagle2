@@ -538,6 +538,37 @@ class UserService
         return $user;
     }
 
+    public function vTwoshowUser($userId, $auth, $request, $isVisit)
+    {
+        $user = $this->userRepository->findOrFail($userId, ['packs' /* => function ($q) {
+            $q->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5])->where('is_used', 1)->with('ware');
+        } */, 'profile','myroom', 'room.backgroundImage','room.background', 'family', 'UserVip.OVip', 'userVips', 'eligiblePacks.ware']);
+        if (!$user) throw new \Exception('not found');
+        if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
+        $request['user_id'] = $userId;
+
+        if ($auth->id != $user->id && $isVisit == true) {
+//            if (!Common::checkPackPrev($auth->id, 19)) {
+            if (Common::checkUserPacks($user['packs'], 19)->isEmpty()) {
+                $previousVisit = $this->ProfileVisitorRepository->checkVisit($auth->id, $user->id);
+                $user->profileVisits()->syncWithoutDetaching(
+                    [
+                        $auth->id => [
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]
+                    ]
+                );
+
+                if (!$previousVisit) {
+                    CustomNotification::visitProfile($user, $auth);
+                    (new UserCounterServices)->eventUser($user, 'visit-profile');
+                }
+            }
+        }
+        return $user;
+    }
+
     public function roomRanking($request)
     {
         $type     = $request->input('type', 2);

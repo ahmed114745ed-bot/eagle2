@@ -10,7 +10,8 @@ return [
         'send_ware'   => 'لقد قمت ببعت :wareName ل :toUserName',
         'got_gift'    => 'لقد وصلك :giftName كهدية',
     ],
-
+    'notCharge' => 'وكالتك غير مفعّلة، يرجى التواصل مع المسؤول.',
+    'yorSelf' => 'لا يمكنك الشحن إلى وكالتك الخاصة.',
     'user_send_gift_moment' => 'قام :name بارسال :gift علي اللحظة الخاصة بك.',
     'pack_not_allow_yet'   => 'هذه الباقة غير مسموح بها حاليًا',
     'has_color_name_title' => 'الاسم الملون',

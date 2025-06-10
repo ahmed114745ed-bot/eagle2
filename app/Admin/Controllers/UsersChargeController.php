@@ -189,13 +189,13 @@ class UsersChargeController extends MainController
 
             $filter->where(function ($query) {
                 $query->where('name', 'like', "%{$this->input}%");
-            }, __(' name'));
+            }, __('name'));
 
             $filter->where(function ($query) {
                
                     $query->where('uuid', 'like', "%{$this->input}%");
              
-            }, __(' uuid'));
+            }, __('uuid'));
         });
 
         $grid->model()
