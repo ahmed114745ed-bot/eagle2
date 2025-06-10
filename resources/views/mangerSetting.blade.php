@@ -6,6 +6,8 @@
         background-color: #121212;
         color: white;
         display: flex;
+        color: var(--text-secondary-color);
+
     }
 
     /* القائمة الجانبية */
@@ -312,6 +314,8 @@
     .ltr .box-header .btn{
         right: 18px;
         position: absolute;
+        color: var(--text-secondary-color);
+
 
     }
 
@@ -319,6 +323,8 @@
     .rtl .box-header .btn{
         left: 18px;
         position: absolute;
+        color: var(--text-secondary-color);
+
     }
     .grid-table{
         background: var(--secondary-color) !important;
