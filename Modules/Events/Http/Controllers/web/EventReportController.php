@@ -96,12 +96,12 @@ class EventReportController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->reward->type == 'ware') {
                 // $ware = Ware::find($this->reward->target);
-                $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
+                $path = $this->reward->ware?->img2 ?? $this->reward->ware?->show_img;
             } elseif ($this->reward->type == 'vip') {
                 //   $vips = OVip::find($this->reward->target);
-                $path = $this->reward->vip->img;
+                $path = $this->reward->vip?->img;
             } elseif ($this->reward->type == 'achievement') {
-                $path = $this->reward->target;
+                $path = $this->reward?->target;
             } else {
                 $path = 'coin.png';
             }
