@@ -239,8 +239,18 @@ class ShippingAgency extends Model
             if ($agency->app_owner_id) {
                 $user = User::find($agency->app_owner_id);
                 if ($user) {
-                    $user->type_user = 0;
-                    $user->save();
+                    $otherAgenciesCount = Agency::where('app_owner_id', $user->id)
+                                      ->count();
+                        if ($otherAgenciesCount > 0) {
+                            $user->type_user = 2; 
+                        } elseif ($user->agency_id) {
+
+                            $user->type_user = 1; 
+                        } else {
+                            $user->type_user = 0; 
+                        }
+                        $user->save();
+
                     $users = User::where('agency_id', $agency->id)->update([
                         'type_user' => 0
                     ]);
