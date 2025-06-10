@@ -96,9 +96,13 @@ class ChargeReportController extends MainController
 
     protected function result()
     {
-        $charger_type = "dash";
+        $charger_type = "";
         if (request("name") == "app") {
             $charger_type = "app";
+        }elseif (request("name") == "host") {
+            $charger_type = "host";
+        }else{
+            $charger_type = "dash";
         }
 
         $grid = new Grid(new Charge());
@@ -108,6 +112,7 @@ class ChargeReportController extends MainController
             // $grid->model()->where('charger_type', "dash")->where('agency_id', '!=', null);
             $grid->model()->where('charger_type', "dash");
         } elseif (request("name") == "host") {
+            
             $grid->model()->where('charger_type', 'host_agency');
         } else {
             $grid->model()->where('charger_type', 'agency');
