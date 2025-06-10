@@ -139,7 +139,7 @@
 </style>
 
 <div class="achievement-container">
-    <h3 class="text-center mb-4">{{ __('admin.assign_achievement') }}</h3>
+    <h3 class="text-center mb-4">{{ __('assign achievement') }}</h3>
     
     @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -167,9 +167,7 @@
                 <select name="user_id" id="user_id" class="form-control select2" required>
                     <option value="">{{ __('admin.selectUser') }}</option>
                 </select>
-                <div class="invalid-feedback">
-                    {{ __('admin.user_required') }}
-                </div>
+                
             </div>
         </div>
 
