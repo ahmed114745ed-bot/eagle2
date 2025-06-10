@@ -105,12 +105,12 @@ class ChargeReportController extends MainController
         $grid->model()->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
-            $grid->model()->where('charger_type', "dash")->where('agency_id', '!=', null);
+            // $grid->model()->where('charger_type', "dash")->where('agency_id', '!=', null);
             $grid->model()->where('charger_type', "dash");
         } elseif (request("name") == "host") {
-            $grid->model()->where('charger_type', '=', "dash")->where('charger_type', 'host_agency');
+            $grid->model()->where('charger_type', 'host_agency');
         } else {
-            $grid->model()->where('charger_type', '=', "dash")->where('charger_type', 'agency');
+            $grid->model()->where('charger_type', 'agency');
         }
 
         $grid->filter(function (Grid\Filter $filter) use ($charger_type) {
