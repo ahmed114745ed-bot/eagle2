@@ -80,13 +80,13 @@ class WeeklyEventGiftNController extends MainController
             ->body($this->form()->edit($id)));
     }
 
-    public function show($id, Content $content)
-    {
-        return parent::show($id,$content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
-            ->body($this->detail($id)));
-    }
+    // public function show($id, Content $content)
+    // {
+    //     return parent::show($id,$content
+    //         ->header(trans('admin.detail'))
+    //         ->description(trans('admin.description'))
+    //         ->body($this->detail($id)));
+    // }
     protected function grid1()
     {
         $type = 1;

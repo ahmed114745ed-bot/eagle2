@@ -3150,6 +3150,10 @@
     "Date": "التاريخ",
   "user wallet":"محفظه المستخدم",
   "user-charges":"شحن المستخدمين",
-  "you_have_charge_target" : "لقد حصلت عليه بالفعل "
+  "you_have_charge_target" : "لقد حصلت عليه بالفعل ",
+  "Pk Events": "فعاليات البك",
+  "Target Events": "فعاليات الهدف",
+  "Weekly Events": "الفعاليات الأسبوعية",
+  "Event Period": "فترة الفعالية"
 
 }
