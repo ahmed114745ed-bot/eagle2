@@ -134,16 +134,19 @@ class ChargeReportController extends MainController
 
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
-            if (request("name") == "dash") {
-                $name = @$this->admin_user->name ?? '';
-                $uuid = @$this->admin_user->id;
-                $path = @$this->admin_user->avatar;
-            } else {
-                $name = @$this->sender->name ?? '';
-                $uuid = @$this->sender->uuid;
-                $path = @$this->sender?->profile?->avatar;
-            }
-
+            // if (request("name") == "dash") {
+            //     $name = @$this->admin_user->name ?? '';
+            //     $uuid = @$this->admin_user->id;
+            //     $path = @$this->admin_user->avatar;
+            // } else {
+            //     $name = @$this->sender->name ?? '';
+            //     $uuid = @$this->sender->uuid;
+            //     $path = @$this->sender?->profile?->avatar;
+            // }
+           $sender= Common::getChargerInfo($this);
+           $name =$sender['name'];
+           $uuid =$sender['uuid'];
+           $path =$sender['image'];
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -164,9 +167,13 @@ class ChargeReportController extends MainController
             ";
         });
         $grid->column('user_id', __('recipient'))->display(function ($recever) {
-            $name =  $this->receiver->name ?? '';
-            $uid = @$this->receiver->uuid ?? 0;
-            $path = @$this->receiver?->profile?->avatar;
+            // $name =  $this->receiver->name ?? '';
+            // $uid = @$this->receiver->uuid ?? 0;
+            // $path = @$this->receiver?->profile?->avatar;
+            $sender= Common::getReceiverInfo($this);
+            $name =$sender['name'];
+            $uid =$sender['uuid'];
+            $path =$sender['image'];
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
