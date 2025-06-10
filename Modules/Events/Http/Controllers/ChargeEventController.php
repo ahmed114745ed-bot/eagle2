@@ -104,16 +104,16 @@ class ChargeEventController extends Controller
             return Common::apiResponse(0, 'لا يوجد تارجيت');
         }
         $total = $charges_sum_amount + $coin_logs_sum_obtained_coins;
-      //  dd($total ,$target->value);
+         //  dd($total ,$target->value);
         // $percentage = ((($charges_sum_amount + $coin_logs_sum_obtained_coins) * 100 ) /$target->value);
         $checkChargeEvent = UserChargeEvent::query()->where(["user_id" => $user->id, 'charge_event_id' => $request->target_id])->first();
           
         if ($checkChargeEvent) {
-            return Common::apiResponse(0, __('api_responses.dont_have_charge_target'));
+            return Common::apiResponse(0, __('you_have_charge_target'));
         }
 
         if ($total < $target->value) {
-            return Common::apiResponse(0, __('api_responses.dont_achieve_taregt'));
+              return Common::apiResponse(0, __('api_responses.dont_achieve_taregt'));
         }
 
         UserChargeEvent::create([

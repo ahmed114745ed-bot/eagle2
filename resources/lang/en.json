@@ -988,7 +988,9 @@
   "Delete payment gat way": "Delete payment methods for shipping agents",
   "Show payment gat way": "Show payment methods for shipping agents",
   "Salary switch users": " salary user",
-  "user-charges":"users charges"
+  "user-charges":"users charges",
+  "you_have_charge_target" : "you already got it  "
+
 
 
 
