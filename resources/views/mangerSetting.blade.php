@@ -320,6 +320,10 @@
         left: 18px;
         position: absolute;
     }
+    .grid-table{
+        background: var(--secondary-color) !important;
+
+    }
 
     /* Responsive adjustments */
     @media (max-width: 2000px) {
@@ -338,7 +342,7 @@
     <div class="all-page" style="width: 100%;">
        
 
-        <div class="settings-content">
+        <div class="settings-content box grid-box"">
 
             <div id="PaymentGateways" class="settings-section active">
                 <!-- <h3>{{ __('Payment Gateways') }}</h3> -->
@@ -356,7 +360,7 @@
                     @endif 
 
                     </div>
-                    <table class="table  table-hover grid-table" style="background-color: var(--box-background-color) !important;">
+                    <table class="table  table-hover grid-table" >
                         <thead>
                             <tr>
                                 <th>#</th>
