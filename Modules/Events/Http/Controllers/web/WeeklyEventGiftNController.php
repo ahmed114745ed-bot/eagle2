@@ -87,6 +87,37 @@ class WeeklyEventGiftNController extends MainController
     //         ->description(trans('admin.description'))
     //         ->body($this->detail($id)));
     // }
+
+     public function show($id, Content $content)
+    {   $type = request('id');
+    
+        $content = $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
+            ->breadcrumb(['text' => trans('admin.eventGift')]);
+        
+        // Add grids based on type
+        switch ($type) {
+            case 1:
+                $content = $content->body($this->grid1());
+                break;
+            case 2:
+                $content = $content->body($this->grid2());
+                break;
+            case 3:
+                $content = $content->body($this->grid3());
+                break;
+            default:
+                // Default case - show all grids or handle differently
+                $content = $content->body(
+                    $this->grid1()
+                        ->row($this->grid2())
+                        ->row($this->grid3())
+                );
+        }
+        
+        return parent::show($id, $content);
+    }
     protected function grid1()
     {
         $type = 1;
