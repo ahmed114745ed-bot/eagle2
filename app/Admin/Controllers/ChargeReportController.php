@@ -106,6 +106,7 @@ class ChargeReportController extends MainController
 
         if ($charger_type == "dash") {
             $grid->model()->where('charger_type', "dash")->where('agency_id', '!=', null);
+            $grid->model()->where('charger_type', "dash");
         } elseif (request("name") == "host") {
             $grid->model()->where('charger_type', '=', "dash")->where('charger_type', 'host_agency');
         } else {
