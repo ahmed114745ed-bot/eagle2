@@ -27,11 +27,11 @@ class UpdateChargesSeeder extends Seeder
             ]);
 
             DB::table('charges')
-            ->where('charger_type', 'host_agency')
+            ->where('charger_type', 'Host agent')
             ->update([
                 'charger_type' => 'host_agency',
                 'user_charger_type' => 'host_agency',
             ]);
-        $this->command->info('Charges table updated where charger_type = bd and user_id is null and agency_id is not null.');
+        $this->command->info('Charges table updated ................................................');
     }
 }
