@@ -314,7 +314,7 @@
     .ltr .box-header .btn{
         right: 18px;
         position: absolute;
-        color: var(--text-secondary-color);
+        color: var(--text-secondary-color) !important;
 
 
     }
@@ -323,7 +323,7 @@
     .rtl .box-header .btn{
         left: 18px;
         position: absolute;
-        color: var(--text-secondary-color);
+        color: var(--text-secondary-color) !important;
 
     }
     .grid-table{
