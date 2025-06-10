@@ -18,6 +18,12 @@
     .settings-content {
         flex-grow: 1;
         padding: 20px;
+        background: var(--secondary-color) !important;
+        filter: brightness(0.85);
+        color: var(--text-secondary-color) !important;
+        border-top: 3px solid var(--second-alpha) !important;
+        border-radius: 20px !important;
+        padding: 15px;
     }
 
     .settings-section {
@@ -303,6 +309,18 @@
         background: #ffab40;
     }
 
+    .ltr .box-header .btn{
+        right: 18px;
+        position: absolute;
+
+    }
+
+
+    .rtl .box-header .btn{
+        left: 18px;
+        position: absolute;
+    }
+
     /* Responsive adjustments */
     @media (max-width: 2000px) {
         .badge-upload-container {
@@ -315,9 +333,7 @@
 <body>
 
     <div class="settings-sidebar">
-        <div class="settings-menu">
-            <button onclick="showSection('PaymentGateways')">{{ __('Payment Gateways') }}</button>
-        </div>
+      
     </div>
     <div class="all-page" style="width: 100%;">
        
@@ -325,16 +341,22 @@
         <div class="settings-content">
 
             <div id="PaymentGateways" class="settings-section active">
-                <h3>{{ __('Payment Gateways') }}</h3>
+                <!-- <h3>{{ __('Payment Gateways') }}</h3> -->
 
                 <div class="table-responsive">
+                    <div class="box-header with-border" style="display: flex;">
+                    <div class="settings-menu">
+                        <button class="" onclick="showSection('PaymentGateways')">{{ __('Payment Gateways') }}</button>
+                    </div>
                   @if (Admin::user()->can('*') || Admin::user()->can('create-Payment-methods-for-shipping-agencies'))
 
                         <a  href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
                             {{ __('Add') }}
                         </a>
                     @endif 
-                    <table class="table" style="background-color: var(--box-background-color) !important;">
+
+                    </div>
+                    <table class="table  table-hover grid-table" style="background-color: var(--box-background-color) !important;">
                         <thead>
                             <tr>
                                 <th>#</th>
