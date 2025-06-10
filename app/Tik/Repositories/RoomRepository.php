@@ -90,7 +90,15 @@ class RoomRepository extends AbstractRepository
             'backgroundImage',
             'lastPk',
             'background',
-            'roomVisitorUsers' => fn($q) => $q->limit(5)
+            'roomVisitorUsers' => fn($q) => $q->limit(5),
+            'myClass',
+            'roomCategory',
+            'myType',
+            'roomVisitors.user.packs',
+            'owner.enabledMedals',
+            'owner.country',
+            'owner.eligiblePacks.ware',
+            'owner.medals.achievementLevel.achievement'
         ])
             ->orderByDesc('pin')
             ->withCount('roomVisitors')
@@ -145,12 +153,8 @@ class RoomRepository extends AbstractRepository
                     $query->where('type', 'party');
                 })->get();
                 break;
-            case 'festival':
-                $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
-                    ->orderByDesc('session')
-                ;
-                break;
             case 'recently':
+            case 'festival':
                 $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session')
                 ;

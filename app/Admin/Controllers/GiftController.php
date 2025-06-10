@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Forms\TabsFrom;
 use App\Models\Gift;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -65,6 +66,11 @@ class GiftController extends MainController
      */
     public function edit($id, Content $content)
     {
+
+        if (url()->previous() != url()) {
+            session(['return_url' => url()->previous()]);
+        }
+
         return parent::edit($id, $content
             ->title(trans('Gifts'))
             ->body($this->form()->edit($id)));
@@ -253,7 +259,7 @@ class GiftController extends MainController
      */
     protected function form()
     {
-        $form = new Form(new Gift);
+        $form = new TabsFrom(new Gift);
         $form->display(__('ID'));
         $form->text('name', __('name'));
 
@@ -288,25 +294,9 @@ class GiftController extends MainController
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
-        $form->file('img', __('img'));
-        $form->file('show_img', __('show_img'))->name(function ($file) {
-            return 'svga_' . \Str::random(6) . '.' . $file->getClientOriginalExtension();
-        })->required();
-        $form->select('image_type', __('image_type'))->options([
-            'svga' => __('svga'),
-            'alpha' => __('alpha'),
-            'mp4' => __('mp4'),
-            'vap' => __('vap'),
-        ])->required();
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_gift_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('💎');
-                $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
-            }
-        }
-        if ($form->isEditing()) {
-            if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'))->symbol('💎');
                 $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
             }

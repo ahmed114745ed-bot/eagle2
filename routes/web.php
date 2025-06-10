@@ -136,12 +136,12 @@ Route::get('/clear_clear', function () {
     return "Cleared!";
 });
 
-//Route::get('/seed', function () {
-//
-//    Artisan::call('db:seed');
-//
-//    return "Seeded!";
-//});
+Route::get('/seed', function () {
+
+    Artisan::call('db:seed');
+
+    return "Seeded!";
+});
 
 Route::get('/change_agencies_type_test', function () {
 
@@ -219,7 +219,7 @@ Route::group(
 
         Route::get('create-payment-gateways', [MangerSettingController::class, 'createPaymentGateway'])->name('create-payment-gateway');
         Route::post('store-payment-gateways', [MangerSettingController::class, 'storePaymentGateway'])->name('store-payment-gateway');
-        Route::post('update-payment-gateways/{id}', [MangerSettingController::class, 'UpdatePaymentGateway'])->name('update-payment-gateway');
+        Route::put('update-payment-gateways/{id}', [MangerSettingController::class, 'UpdatePaymentGateway'])->name('update-payment-gateway');
         Route::get('edit-payment-gateways/{id}', [MangerSettingController::class, 'editPaymentGateway'])->name('edit-payment-gateway');
         Route::get('delete-payment-gateways/{id}', [MangerSettingController::class, 'deletePaymentGateway'])->name('delete-payment-gateway');
 

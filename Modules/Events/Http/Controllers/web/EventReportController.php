@@ -86,9 +86,9 @@ class EventReportController extends MainController
                 if ($this->reward->type == 'coins') {
                     $target = $this->reward->target;
                 } elseif ($this->reward->type == 'vip') {
-                    $target = $this->reward->vip->name;
+                    $target = $this->reward->vip?->name;
                 } elseif ($this->reward->type == 'ware') {
-                    $target = $this->reward->ware->name;
+                    $target = $this->reward->ware?->name;
                 }
                 return $target;
             }
@@ -96,12 +96,12 @@ class EventReportController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->reward->type == 'ware') {
                 // $ware = Ware::find($this->reward->target);
-                $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
+                $path = $this->reward->ware?->img2 ?? $this->reward->ware?->show_img;
             } elseif ($this->reward->type == 'vip') {
                 //   $vips = OVip::find($this->reward->target);
-                $path = $this->reward->vip->img;
+                $path = $this->reward->vip?->img;
             } elseif ($this->reward->type == 'achievement') {
-                $path = $this->reward->target;
+                $path = $this->reward?->target;
             } else {
                 $path = 'coin.png';
             }
@@ -153,11 +153,11 @@ class EventReportController extends MainController
             if ($this->reward != null) {
                 $target = '';
                 if ($this->reward->type == 'coins') {
-                    $target = $this->reward->target;
+                    $target = $this->reward?->target;
                 } elseif ($this->reward->type == 'vip') {
-                    $target = $this->reward->vip->name;
+                    $target = $this->reward->vip?->name;
                 } elseif ($this->reward->type == 'ware') {
-                    $target = $this->reward->ware->name;
+                    $target = $this->reward->ware?->name;
                 }
                 return $target;
             }
@@ -165,12 +165,12 @@ class EventReportController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->reward->type == 'ware') {
                 //  $ware = Ware::find($this->reward->target);
-                $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
+                $path = $this->reward->ware?->img2 ?? $this->reward->ware?->show_img;
             } elseif ($this->reward->type == 'vip') {
                 //   $vips = OVip::find($this->reward->target);
-                $path = $this->reward->vip->img;
+                $path = $this->reward->vip?->img;
             } elseif ($this->reward->type == 'achievement') {
-                $path = $this->reward->target;
+                $path = $this->reward?->target;
             } else {
                 $path = 'coin.png';
             }
@@ -318,16 +318,16 @@ class EventReportController extends MainController
             foreach ($this->rewardCharges as $reward) {
                 if ($reward->type == "ware") {
                     $name = @$reward->ware->name;
-                    $img = getImagePath($reward->ware->img2 ?? $reward->ware->show_img);
+                    $img = getImagePath($reward->ware?->img2 ?? $reward->ware?->show_img);
                 } elseif ($reward->type == "vip") {
-                    $name = @$reward->vip->name;
-                    $img = getImagePath($reward->vip->img);
+                    $name = @$reward->vip?->name;
+                    $img = getImagePath($reward->vip?->img);
                 } elseif ($reward->type == "coins") {
-                    $name = @$reward->target;
+                    $name = @$reward?->target;
                     $img = asset('coin.png');
                 } elseif ($reward->type == "achievement") {
                     $name = "Achievement";
-                    $img = getDriverUrl() . '/' . $reward->target;
+                    $img = getDriverUrl() . '/' . $reward?->target;
                 } else {
                     $name = "-";
                     $img = asset('coin.png');

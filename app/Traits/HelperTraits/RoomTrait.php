@@ -469,7 +469,7 @@ trait RoomTrait
         self::addOfficialMessage('', $user_id, $content);
     }
 
-   protected static function addOfficialMessage($title = null , $user_id, $content =null) {
+   protected static function addOfficialMessage($title  , $user_id, $content =null) {
 
         $title = $title ?: 'system notification';
         $info['title'] = $title;

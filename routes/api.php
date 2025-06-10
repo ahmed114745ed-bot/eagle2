@@ -260,6 +260,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
+                Route::get('v2/{id}', [UserController::class, 'vTwoshow'])->where('id', '[0-9]+');
                 Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
@@ -514,7 +515,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
                 Route::get('old-agencies', [AgencyController::class, 'gitOldAgencies']);
 
-                
+
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);

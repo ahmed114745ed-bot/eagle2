@@ -442,6 +442,7 @@
     "joinSacses": "تم ارسال الطلب الي",
     "you_alredy_have_sent": "لقد قمت بالفعل بارسال طلب",
     "joinSacsesAg": "تم قبول الطلب",
+    "assign achievement": "تعيين الإنجاز",
     "joinfalse": "تم رفض الطلب",
     "Request not found": "الطلب غير موجود",
     "u_not_have_agncy": "انت لاتمتلك وكاله",
@@ -3085,7 +3086,7 @@
   "Gift switch gift from the store": " اهداء هدية من المتجر",
   "Gift switch gift VIP": "اهداء هدية vip",
   "Gift switch gift a medal": "اهداء هدية ميدالية",
-  "Add switch coin recharge": "إضافة تبديل إعادة شحن العملة",
+  "Add switch coin recharge": "إضافة إعادة شحن العملة",
   "Charge report switch coin recharge": "تقرير إعادة شحن العملة",
   "Delete user account switch deleted accounts": "حذف الحسابات المحذوفة",
   "Restore user account switch deleted accounts": "استعادة الحسابات المحذوفة",
@@ -3138,7 +3139,21 @@
 "History of unique identifiers": "تاريخ المعرفات الفريدة",
 "Vip Settings": "إعدادات  vip",
 "being kicked": "تم الطرد",
-  "anti ban": "مضاد الحظر"
-
+  "anti ban": "مضاد الحظر",
+  "net salary": "صافي الراتب",
+  "Salary switch users": "  الراتب المستخدم",
+    "Default Image": "الصورة الافتراضية",
+    "Priority": "الأولوية",
+    "Localized Images": "الصور المترجمة",
+    "Image for": "الصورة ل",
+    "Badge Name": "اسم الشارة",
+    "Date": "التاريخ",
+  "user wallet":"محفظه المستخدم",
+  "user-charges":"شحن المستخدمين",
+  "you_have_charge_target" : "لقد حصلت عليه بالفعل ",
+  "Pk Events": "فعاليات البك",
+  "Target Events": "فعاليات الهدف",
+  "Weekly Events": "الفعاليات الأسبوعية",
+  "Event Period": "فترة الفعالية"
 
 }
