@@ -108,7 +108,7 @@ class ChargeEventController extends Controller
         // $percentage = ((($charges_sum_amount + $coin_logs_sum_obtained_coins) * 100 ) /$target->value);
         $checkChargeEvent = UserChargeEvent::query()->where(["user_id" => $user->id, 'charge_event_id' => $request->target_id])->first();
           
-        if (!$checkChargeEvent) {
+        if ($checkChargeEvent) {
             return Common::apiResponse(0, __('api_responses.dont_have_charge_target'));
         }
 
