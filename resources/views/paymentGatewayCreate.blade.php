@@ -93,7 +93,7 @@
     }
 
     .settings-content {
-        width: 869px;
+        /* width: 869px; */
 
     }
 
@@ -277,6 +277,11 @@
     .upload-button:hover {
         background: #ffab40;
     }
+    .box-body{
+        width: 48%;
+        margin: auto;
+        padding: 8px;
+    }
 
     /* Responsive adjustments */
     @media (max-width: 2000px) {
@@ -288,8 +293,8 @@
 </head>
 
 <body>
-    <div class="all-page">
-        <div class="settings-sidebar">
+    <!-- <div class="all-page content"> -->
+        <!-- <div class="settings-sidebar">
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('PaymentGateways')"
@@ -297,8 +302,8 @@
                     {{ __('Payment Gateways') }}
                 </button>
             </div>
-        </div>
-        <div class="settings-content">
+        </div> -->
+        <div class="settings-content box box-info">
 
             <div id="PaymentGateways" class="settings-section active">
                 <a href="{{ URL::previous() }}" class="btn btn-primary">{{ __('back') }}</a>
@@ -306,10 +311,15 @@
                 <h3>{{ __('Payment Gateways') }}</h3>
 
                 <form action="{{ route('admin.store-payment-gateway') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+                 
+                @csrf
+                <div class="box-body">
                     <div class="form-group">
-                        <label for="">{{ __('title') }}</label>
+                      
+                        <label class="" for="">{{ __('title') }}</label>
+                       
                         <input type="text" name="title" class="form-control" required>
+                          
                     </div>
                     <div class="form-group">
                         <label for="">{{ __('Photo') }}</label>
@@ -319,8 +329,9 @@
                     <button class="btn btn-primary" type="submit">{{ __('Submit') }}</button>
                 </form>
 
+             </div>
             </div>
-        </div>
+        <!-- </div> -->
         <script>
             function previewImage(input, previewId) {
     const preview = document.getElementById(previewId);

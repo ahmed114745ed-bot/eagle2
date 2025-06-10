@@ -442,6 +442,7 @@
     "joinSacses": "تم ارسال الطلب الي",
     "you_alredy_have_sent": "لقد قمت بالفعل بارسال طلب",
     "joinSacsesAg": "تم قبول الطلب",
+    "assign achievement": "تعيين الإنجاز",
     "joinfalse": "تم رفض الطلب",
     "Request not found": "الطلب غير موجود",
     "u_not_have_agncy": "انت لاتمتلك وكاله",
@@ -3141,16 +3142,18 @@
   "anti ban": "مضاد الحظر",
   "net salary": "صافي الراتب",
   "Salary switch users": "  الراتب المستخدم",
-
     "Default Image": "الصورة الافتراضية",
     "Priority": "الأولوية",
     "Localized Images": "الصور المترجمة",
     "Image for": "الصورة ل",
     "Badge Name": "اسم الشارة",
-
     "Date": "التاريخ",
-
-  "user wallet":"محفظه المستخدم"
-
+  "user wallet":"محفظه المستخدم",
+  "user-charges":"شحن المستخدمين",
+  "you_have_charge_target" : "لقد حصلت عليه بالفعل ",
+  "Pk Events": "فعاليات البك",
+  "Target Events": "فعاليات الهدف",
+  "Weekly Events": "الفعاليات الأسبوعية",
+  "Event Period": "فترة الفعالية"
 
 }

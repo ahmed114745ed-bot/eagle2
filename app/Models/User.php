@@ -1464,6 +1464,7 @@ class User extends Authenticatable
     }
     public function lastSallary()
     {
-        return $this->hasOne(UserSallary::class, 'user_id')->latestOfMany();
+        return $this->hasOne(UserSallary::class, 'user_id')
+        ->where('user_agency_id', $this->agency_id)->latestOfMany();
     }
 }
