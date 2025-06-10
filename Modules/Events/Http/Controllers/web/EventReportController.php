@@ -318,16 +318,16 @@ class EventReportController extends MainController
             foreach ($this->rewardCharges as $reward) {
                 if ($reward->type == "ware") {
                     $name = @$reward->ware->name;
-                    $img = getImagePath($reward->ware->img2 ?? $reward->ware->show_img);
+                    $img = getImagePath($reward->ware?->img2 ?? $reward->ware?->show_img);
                 } elseif ($reward->type == "vip") {
-                    $name = @$reward->vip->name;
-                    $img = getImagePath($reward->vip->img);
+                    $name = @$reward->vip?->name;
+                    $img = getImagePath($reward->vip?->img);
                 } elseif ($reward->type == "coins") {
-                    $name = @$reward->target;
+                    $name = @$reward?->target;
                     $img = asset('coin.png');
                 } elseif ($reward->type == "achievement") {
                     $name = "Achievement";
-                    $img = getDriverUrl() . '/' . $reward->target;
+                    $img = getDriverUrl() . '/' . $reward?->target;
                 } else {
                     $name = "-";
                     $img = asset('coin.png');
