@@ -10,6 +10,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Modules\SpecialId\Entities\SpecialHistory;
+use Encore\Admin\Facades\Admin;
 
 class SpecialHistoryController extends MainController
 {
@@ -98,7 +99,15 @@ class SpecialHistoryController extends MainController
                 </div>
             ';
         });
-        $grid->column('ware.show_img', __('image'))->image('', 50);
+          $grid->column('ware.value', __('value'))->display(function ($coin) {
+            $icon = asset('images/coin.png'); // Ensure this path is correct
+            return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
+        });
+        $grid->column('ware.show_img', __('image'))->display(function ($path) {
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('status', __('status'))->display(function ($status) {
             // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
             return $status == 1 ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
@@ -118,7 +127,11 @@ class SpecialHistoryController extends MainController
         $grid->disableCreateButton();
         $this->extendGrid($grid);
 
-
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
