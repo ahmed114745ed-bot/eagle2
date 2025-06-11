@@ -225,7 +225,6 @@ return [
         App\Providers\ConfigServiceProvider::class,
 //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-
     ],
 
     /*

@@ -814,7 +814,7 @@ class Common
     }
 
 
-    public static function handelVip($vip, $user, $expire ,  $userVip)
+    public static function handelVip($vip, $user, $expire,  $userVip)
     {
         $type = $vip->privilegs()->pluck('type')->toArray();
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
@@ -859,6 +859,7 @@ class Common
                     ]
                 );
             }
+           if (in_array($ware->type, [4, 5, 6]))  self::userDress($ware, $user, $userVip->is_used);
         }
         $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
             $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
@@ -875,6 +876,24 @@ class Common
         Pack::where('user_id', $user->id)->whereNotIn('id', $exception_packs)->update(['is_used'=> 0]);
         Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
     }
+
+    public static function userDress($ware, $user, $isUsed)
+    {
+        switch ($ware->type) {
+            case 4:
+                $user->dress_1 = $isUsed ? ($ware->id) : null;
+                break;
+            case 5:
+                $user->dress_2 = $isUsed ? $ware->id : null;
+                break;
+            case 6:
+                $user->dress_3 = $isUsed ? ($ware->id) : null;
+                break;
+        }
+
+        $user->save();
+    }
+
 
 
     public static function setHourHot($uid)
@@ -1089,7 +1108,7 @@ class Common
     {
         return $packs->where('type', $type)
             ->where('is_used', 1)
-            ->filter(function ($item){
+            ->filter(function ($item) {
                 return $item->expire == 0 || $item->expire >= time();
             });
     }
@@ -1569,7 +1588,7 @@ class Common
                 return [
                     'id' => $resource->receiverUser->id ?? '',
                     'name' => $resource->receiverUser->name ?? '',
-                    'image' => $resource->receiverUser->profile->avatar ?? '',
+                    'image' => $resource->receiverUser->avatar ?? '',
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
                 ];
@@ -1593,9 +1612,9 @@ class Common
             'senderUser.profile',
             'senderAgency',
             'senderShippingAgency',
-            'receiverUser'  ,
+            'receiverUser',
             'receiverUser.profile',
-            'receiveragency'  ,
+            'receiveragency',
         ];
     }
 }
