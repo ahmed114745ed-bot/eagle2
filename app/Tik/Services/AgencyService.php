@@ -648,11 +648,8 @@ class AgencyService
         if (! $joinedAgency) {
             return [];
         }
-
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
-        ->where('agency_id', $agencyId)
-        ->whereMonth('join_date', $month)
-        ->whereYear('join_date', $year)
+        ->where('agency_id', $user->agency_id)
         ->latest('join_date')
         ->first();
 
