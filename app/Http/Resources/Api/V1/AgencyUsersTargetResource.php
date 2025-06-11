@@ -157,7 +157,7 @@ class AgencyUsersTargetResource extends JsonResource
             $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
         })
         ->value('agency_sallary');
-
+dd('xxx');
         return [
             'id' => $this->id ?? 0,
             'name' => $this->name ?? '',
