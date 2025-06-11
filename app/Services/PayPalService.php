@@ -91,22 +91,23 @@ class PayPalService
 
     public function callback(Request $request)
     {
-        info($request);
-        $orderId = $request->get('orderID');
-        $token = $this->getAccessToken();
+        info('Received webhook:', $request->all());
 
-        $response = Http::withToken($token)->post(config('paypal.base_url')."/v2/checkout/orders/{$orderId}/capture");
-        $result = $response->json();
+        $eventType = $request->get('event_type');
+        if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
+            return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);
+        }
 
-        info($result);
-        $coinLogId = $result['purchase_units'][0]['reference_id'] ?? null;
-        info($coinLogId);
+        $resource = $request->get('resource');
+        $orderId = $resource['id'];
+        $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
+
+        if (!$coinLogId) {
+            return response()->json(['status' => 'failed', 'reason' => 'Reference ID not found']);
+        }
 
         $coinLog = CoinLog::where("id", $coinLogId)->first();
-
-        info($coinLog);
-        $user = $coinLog->user;
-
+        info('CoinLog found:', $coinLog);
 
         if (!$coinLog || $coinLog->status == 1) {
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
@@ -115,6 +116,7 @@ class PayPalService
         $coinLog->status = 1;
         $coinLog->save();
 
+        $user = $coinLog->user;
         if ($user) {
             $user->di += $coinLog->obtained_coins;
             $user->save();
@@ -122,7 +124,7 @@ class PayPalService
             return response()->json(['status' => 'failed', 'reason' => 'User not found']);
         }
 
-        return response()->json(['status' => 'success', 'details' => $result]);
+        return response()->json(['status' => 'success', 'details' => $resource]);
     }
 
     public function cancel()
