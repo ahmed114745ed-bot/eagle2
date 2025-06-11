@@ -8,8 +8,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Facades\Admin;
+use Encore\Admin\Controllers\AdminController;
 use Modules\SpecialId\Entities\SpecialHistory;
+use Encore\Admin\Facades\Admin;
 
 class SpecialHistoryController extends MainController
 {
@@ -98,8 +99,8 @@ class SpecialHistoryController extends MainController
                 </div>
             ';
         });
-        $grid->column('ware.show_img', __('image'))->image('', 30);
-        $grid->column('img2', __('show_img'))->display(function ($path) {
+         $grid->column('ware.id', __('wareId'));
+        $grid->column('ware.show_img', __('image'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
@@ -124,10 +125,10 @@ class SpecialHistoryController extends MainController
         $this->extendGrid($grid);
 
         Admin::script("
-                if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-                    $('.table-responsive').removeClass('table-responsive');
-                    }
-                ");
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
