@@ -330,20 +330,6 @@ class OvipGiftTapController extends MainController
                     $ext = 'svga';
                 }
 
-                if (!in_array($ext, ['mp4', 'svg'])) {
-                    $response = Http::attach(
-                        'image',
-                        file_get_contents($form->img2->getPathname()),
-                        $form->img2->getClientOriginalName()
-                    )->post('https://utd-test.utdsoftware.com/api/analyze-media');
-
-                    $responseData = $response->json();
-
-                    if ($response->successful() && isset($responseData['data']['video_type'])) {
-                        $ext = strtolower($responseData['data']['video_type']);
-                    }
-                }
-
                 if ($ext === 'mp4') {
                     $urlVideo = $this->upload($form->img2);
 
