@@ -55,7 +55,7 @@ class PaymentGatewaysSeeder extends Seeder
 
         foreach ($duplicates as $dup) {
             $settings = Setting::where('key', $dup->key)
-                ->where('item_id', $dup->item_id)
+//                ->where('item_id', $dup->item_id)
                 ->where('type', $dup->type)
                 ->orderBy('id')
                 ->get();
