@@ -1588,7 +1588,7 @@ class Common
                 return [
                     'id' => $resource->receiverUser->id ?? '',
                     'name' => $resource->receiverUser->name ?? '',
-                    'image' => $resource->receiverUser->profile->avatar ?? '',
+                    'image' => $resource->receiverUser->avatar ?? '',
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
                 ];
