@@ -99,7 +99,10 @@ class SpecialHistoryController extends MainController
                 </div>
             ';
         });
-         $grid->column('ware.id', __('wareId'));
+          $grid->column('ware.value', __('value'))->display(function ($coin) {
+            $icon = asset('images/coin.png'); // Ensure this path is correct
+            return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
+        });
         $grid->column('ware.show_img', __('image'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
