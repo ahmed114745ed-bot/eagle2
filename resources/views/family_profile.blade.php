@@ -1007,10 +1007,10 @@
                                     <div class="box-body">
                                         <div class="fields-group">
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">نوع</label>
+                                                <label class="col-sm-2 control-label">{{__('type')}}</label>
                                                 <div class="col-sm-8">
                                                     <select class="form-control select2" name="type" style="width: 100%;">
-                                                        <option value="">{{ __('اختر') }}</option>
+                                                        <option value="">{{ __('select') }}</option>
                                                         <option value="0" {{ request('type') === '0' ? 'selected' : '' }}>{{ __('members') }}</option>
                                                         <option value="1" {{ request('type') === '1' ? 'selected' : '' }}>{{ __('admin') }}</option>
                                                     </select>
@@ -1025,7 +1025,7 @@
                                 <div class="row">
                                     <div class="col-md-6 offset-md-3">
                                         <div class="btn-group">
-                                            <button class="btn btn-info btn-sm"><i class="fa fa-search"></i> بحث</button>
+                                            <button class="btn btn-info btn-sm"><i class="fa fa-search"></i> {{__('Search')}}</button>
                                         </div>
                                         <div class="btn-group" style="margin-left: 10px;">
                                             <a href="{{ url('admin/families/' . $family->id . '?tab=members') }}" class="btn btn-default btn-sm">

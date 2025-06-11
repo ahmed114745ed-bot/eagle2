@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CoinLog;
 use App\Models\GameWallet;
 use App\Traits\User\PaymentTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -89,7 +90,7 @@ class PayPalService
         return json_decode($response->body());
     }
 
-    public function callback(Request $request)
+    public function callback(Request $request): JsonResponse
     {
         $eventType = $request->get('event_type');
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
@@ -97,31 +98,9 @@ class PayPalService
         }
 
         $resource = $request->get('resource');
-        $orderId = $resource['id'];
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
 
-        if (!$coinLogId) {
-            return response()->json(['status' => 'failed', 'reason' => 'Reference ID not found']);
-        }
-
-        $coinLog = CoinLog::where("id", $coinLogId)->first();
-
-        if (!$coinLog || $coinLog->status == 1) {
-            return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
-        }
-
-        $coinLog->status = 1;
-        $coinLog->save();
-
-        $user = $coinLog->user;
-        if ($user) {
-            $user->di += $coinLog->obtained_coins;
-            $user->save();
-        } else {
-            return response()->json(['status' => 'failed', 'reason' => 'User not found']);
-        }
-
-        return response()->json(['status' => 'success', 'details' => $resource]);
+        return $this->webhookPayment($coinLogId);
     }
 
     public function cancel()
