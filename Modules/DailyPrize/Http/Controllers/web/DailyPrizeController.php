@@ -22,13 +22,13 @@ class DailyPrizeController extends MainController
      *
      * @var string
      */
-    protected $title = 'DailyGift';
+    protected $title = 'daily login gift';
     public $permission_name = 'daily-gift';
 
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('daily prize'))
+            ->title(trans('daily login gift'))
             ->body($this->grid()));
     }
 
@@ -42,7 +42,7 @@ class DailyPrizeController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id,$content
-            ->title(trans('daily prize'))
+            ->title(trans('daily login gift'))
             ->body($this->detail($id)));
     }
 
@@ -61,14 +61,14 @@ class DailyPrizeController extends MainController
         $form = $this->form()->edit($id);
 
         return parent::edit($id,$content
-            ->title(trans('daily prize'))
+            ->title(trans('daily login gift'))
             ->body($form));
     }
 
     public function create(Content $content)
     {
         return parent::create($content
-            ->title(trans('daily prize'))
+            ->title(trans('daily login gift'))
             ->body($this->form()));
     }
 

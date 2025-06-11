@@ -8,6 +8,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
 use App\Helpers\Common;
+use App\Services\PayPalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -100,6 +101,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
     Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
+    Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback');
+    Route::post('paypal-cancel', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);

@@ -132,6 +132,11 @@ class AppServiceProvider extends ServiceProvider
                 'apple.apple_redirect_uri' => $settings['apple_redirect_uri'] ?? '',
                 'apple.apple_service_file' => $settings['apple_service_file'] ?? '',
 
+                'paypal.base_url' => $settings['paypal_base_url'] ?? '',
+                'paypal.client_id' => $settings['paypal_client_id'] ?? '',
+                'paypal.client_secret' => $settings['paypal_client_secret'] ?? '',
+                'paypal.currency' => $settings['paypal_currency'] ?? '',
+
                 'services.zinipay.api_key' => $settings[''] ?? '',
                 'services.zinipay.url' => $settings[''] ?? '',
 

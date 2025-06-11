@@ -6,6 +6,7 @@ use App\Helpers\UserCommon;
 use App\Models\Coin;
 use App\Models\CoinLog;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 
 
 trait PaymentTrait
@@ -47,4 +48,24 @@ trait PaymentTrait
         return $data;
     }
 
+    public function webhookPayment($coinLogId): JsonResponse
+    {
+        $coinLog = CoinLog::where("id", $coinLogId)->first();
+
+        if (!$coinLog || $coinLog->status == 1) {
+            return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
+        }
+
+        $coinLog->status = 1;
+        $coinLog->save();
+
+        $user = $coinLog->user;
+        if ($user) {
+            $user->di += $coinLog->obtained_coins;
+            $user->save();
+        } else {
+            return response()->json(['status' => 'failed', 'reason' => 'User not found']);
+        }
+        return response()->json(['status' => 'success', 'data' => []]);
+    }
 }

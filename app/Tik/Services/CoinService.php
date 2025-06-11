@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;
+use App\Services\PayPalService;
 use App\Services\ZiniPaymentService;
 use Exception;
 use App\Helpers\Common;
@@ -101,6 +102,9 @@ class CoinService
             } else if ($request->pay_method == 'zinipay') {
                 $ziniPayService = new ZiniPaymentService();
                 return $ziniPayService->makePayment($log->id, $coin->usd, $user);
+            } else if ($request->pay_method == 'paypal') {
+                $ziniPayService = new PayPalService();
+                return $ziniPayService->create($log->id, $coin->usd, $user);
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
