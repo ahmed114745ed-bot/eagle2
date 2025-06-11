@@ -27,7 +27,7 @@ class AllStatisticController extends MainController
     {
         
         $userId = \Encore\Admin\Facades\Admin::user()->id;
-        if ($userId == 1) {
+        // if ($userId == 1) {
             $coins                      = User::sum("di");
             $total_monthly_di_recieved  = User::sum("monthly_diamond_received");
             $user_sallaries   = UserSallary::query()->whereHas('user', function ($q) {
@@ -106,11 +106,11 @@ class AllStatisticController extends MainController
 
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), $this->formatNumber(@$app_earned_charge ?? 0)));
                 }));
-        } else {
-            dd(123);
-            return parent::index($content
-                ->title(trans('Dashboard')));
-        }
+        // } else {
+          
+        //     return parent::index($content
+        //         ->title(trans('Dashboard')));
+        // }
     }
 
     function formatNumber($number)
