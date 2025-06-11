@@ -125,7 +125,7 @@ class AgencyUsersTargetResource extends JsonResource
                     // 'year' => $item['year'],
                     'month_number' => $item['month'],
                     'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
-                    // 'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
+                    'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
                 ];
             }
            $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
