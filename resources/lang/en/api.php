@@ -127,6 +127,8 @@ return [
     'ShippingAgent' => 'Shipping Agent',
     'HostAndShippingAgent' => 'Host and Shipping Agent',
     'Admin' => 'Admin',
+    'add_admin_agency' => 'You have been added as an admin to the agency: :name',
+    'remove_admin_agency' => 'You have been removed as an admin from the agency: :name',
 
 
 ];
