@@ -97,6 +97,7 @@ class PayPalService
         $response = Http::withToken($token)->post(config('paypal.base_url')."/v2/checkout/orders/{$orderId}/capture");
         $result = $response->json();
 
+        info($result);
         $coinLogId = $result['purchase_units'][0]['reference_id'] ?? null;
         info($coinLogId);
 
