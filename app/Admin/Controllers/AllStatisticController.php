@@ -16,6 +16,7 @@ use App\Models\RequestTakeSalary;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Controllers\MainController;
 
 
 class AllStatisticController extends MainController
@@ -65,13 +66,13 @@ class AllStatisticController extends MainController
             $data = [$balance->used ?? 0, $availableBalance ?? 0];
             $user = Auth::user();
             $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
-            return $content
+            return parent::index($content
                 ->title(trans('Dashboard'))
-                ->row(function (\Encore\Admin\Layout\Row $row) use ($user, $data, $balanceDollar, $allBalance, $usePercentage) {
-                    if ($user->isRole('admin') || $user->isRole('developer')) {
-                        $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
-                    }
-                })
+                // ->row(function (\Encore\Admin\Layout\Row $row) use ($user, $data, $balanceDollar, $allBalance, $usePercentage) {
+                //     if ($user->isRole('admin') || $user->isRole('developer')) {
+                //         $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
+                //     }
+                // })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($onlineUsers, $allUsersCount) {
 
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Users') );
@@ -103,7 +104,7 @@ class AllStatisticController extends MainController
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('app earned') );
 
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), $this->formatNumber(@$app_earned_charge ?? 0)));
-                });
+                }));
         } else {
             return parent::index($content
                 ->title(trans('Dashboard')));
