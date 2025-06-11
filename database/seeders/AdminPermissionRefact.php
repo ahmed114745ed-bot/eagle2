@@ -342,7 +342,6 @@ class AdminPermissionRefact extends Seeder
                 'name' => 'Agency Manager',
                 'sort' => 17,
                 'permissions' => [
-                    ['key' => 'managers', 'except' => [], 'additional' => []],
                     [
                         'key' => 'BD',
                         'except' => [],
