@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
 //        CoreWalletsSeeder::class,
             PaymentGatewaysSeeder::class,
+
 //        AdminPermission::class,
 //        AdminNewPermission::class,
 //        AdminRoleBDSeeder::class,
