@@ -191,7 +191,7 @@
   array (
     'providers' => 
     array (
-      0 => 'niklasravnsborg\\LaravelPdf\\PdfServiceProvider',
+      // 0 => 'niklasravnsborg\\LaravelPdf\\PdfServiceProvider',
     ),
     'aliases' => 
     array (
