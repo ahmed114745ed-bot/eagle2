@@ -25,6 +25,7 @@ class AllStatisticController extends MainController
 
     public function index(Content $content)
     {
+        
         $userId = \Encore\Admin\Facades\Admin::user()->id;
         if ($userId == 1) {
             $coins                      = User::sum("di");
@@ -106,6 +107,7 @@ class AllStatisticController extends MainController
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), $this->formatNumber(@$app_earned_charge ?? 0)));
                 }));
         } else {
+            dd(123);
             return parent::index($content
                 ->title(trans('Dashboard')));
         }
