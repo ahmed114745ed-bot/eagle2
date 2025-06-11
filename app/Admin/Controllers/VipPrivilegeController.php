@@ -138,7 +138,6 @@ class VipPrivilegeController extends MainController
                 21 => trans('sound effect'),
                 22 => trans('upload GIF image'),
                 28 => trans('profile frame'),
-                29 => trans('being kicked'),
                 30 => trans('anti ban'),
             ]
         );

@@ -166,6 +166,36 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
+    public function agencyAddAdmin( $agencyId, User $user)
+    {
+        $agency =Agency::find($agencyId);
+        $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $body_ar = __('api.add_admin_agency', ['name' => $agency->name],  'ar');
+        $body_en = __('api.add_admin_agency', ['name' => $agency->name],  'en');
+        $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
+        $data['image'] = $agency->img;
+        $data['agency_id'] = $agency->id;
+        $icon = $agency->img;
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-add-admin');
+        Common::sendOfficialMessage($user->id, image: $agency->img, title: $body_en, content: $agency->name, titleAr: $body_ar);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    public function agencyRemoveAdmin( $agencyId, User $user)
+    {
+        $agency =Agency::find($agencyId);
+        $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $body_ar = __('api.remove_admin_agency', ['name' => $agency->name],  'ar');
+        $body_en = __('api.remove_admin_agency', ['name' => $agency->name],  'en');
+        $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
+        $data['image'] = $agency->img;
+        $data['agency_id'] = $agency->id;
+        $icon = $agency->img;
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-remove-admin');
+        Common::sendOfficialMessage($user->id, image: $agency->img, title: $body_en, content: $agency->name, titleAr: $body_ar);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
     public function visitProfile(User $user, User $visitor)
     {
         $tokens_notification = $user?->notification_id;
