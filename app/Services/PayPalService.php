@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\GameChargeHistory;
+use App\Models\CoinLog;
 use App\Models\GameWallet;
-use App\Models\PaymentMethodHistory;
+use App\Traits\User\PaymentTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class PayPalService
 {
+    use PaymentTrait;
    public static function redirectUrl()
    {
     return url("/admin/payment-with-method");
@@ -89,34 +90,31 @@ class PayPalService
         return json_decode($response->body());
     }
 
-
-
     public function callback(Request $request)
     {
-        \Log::info('im here');
-        info($request);
         $orderId = $request->get('token');
+        $coinLogId = $result['purchase_units'][0]['reference_id'] ?? null;
         $token = $this->getAccessToken();
 
         $response = Http::withToken($token)->post(config('paypal.base_url')."/v2/checkout/orders/{$orderId}/capture");
         $result = $response->json();
 
-        $merchantRefNumber = $result['purchase_units'][0]['payments']['captures'][0]['invoice_id'] ?? null;
-        $order = PaymentMethodHistory::where('utd_code', $merchantRefNumber)->first();
+        $coinLog = CoinLog::where("id", $coinLogId)->first();
 
-        if ($order) {
-            $order->status = 'paid';
-            $order->ref_code = $orderId;
+        $user = $coinLog->user;
 
-            if ($order->type === 'game_type') {
-                $this->updateDiForUser($order->amount);
-                GameChargeHistory::create([
-                    'value' => $order->amount,
-                    'admin_id' => 0,
-                ]);
-            }
+        if (!$coinLog || $coinLog->status == 1) {
+            return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
+        }
 
-            $order->save();
+        $coinLog->status = 1;
+        $coinLog->save();
+
+        if ($user) {
+            $user->di += $coinLog->obtained_coins;
+            $user->save();
+        } else {
+            return response()->json(['status' => 'failed', 'reason' => 'User not found']);
         }
 
         return response()->json(['status' => 'success', 'details' => $result]);
