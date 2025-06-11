@@ -83,7 +83,7 @@ class DailyPrizeTypeController extends MainController
                 return $weeks[$type] ?? $type; // عرض النص بدلاً من الرقم
             });
 
-        if (Admin::user()->can('browse-' . 'daily-gift-types') || Admin::user()->can('*')) {
+        if (Admin::user()->can('browse-' . 'daily-gift') || Admin::user()->can('*')) {
             $grid->column(__('procedures'))->display(function () {
                 $url1 = url('admin/daily-gifts/' . $this->type);
                 $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('create') . "</a>";

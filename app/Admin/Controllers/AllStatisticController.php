@@ -25,8 +25,9 @@ class AllStatisticController extends MainController
 
     public function index(Content $content)
     {
+        
         $userId = \Encore\Admin\Facades\Admin::user()->id;
-        if ($userId == 1) {
+        // if ($userId == 1) {
             $coins                      = User::sum("di");
             $total_monthly_di_recieved  = User::sum("monthly_diamond_received");
             $user_sallaries   = UserSallary::query()->whereHas('user', function ($q) {
@@ -68,11 +69,11 @@ class AllStatisticController extends MainController
             $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
             return parent::index($content
                 ->title(trans('Dashboard'))
-                // ->row(function (\Encore\Admin\Layout\Row $row) use ($user, $data, $balanceDollar, $allBalance, $usePercentage) {
-                //     if ($user->isRole('admin') || $user->isRole('developer')) {
-                //         $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
-                //     }
-                // })
+                ->row(function (\Encore\Admin\Layout\Row $row) use ($user, $data, $balanceDollar, $allBalance, $usePercentage) {
+                    if ($user->isRole('admin') || $user->isRole('developer')) {
+                        $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
+                    }
+                })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($onlineUsers, $allUsersCount) {
 
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Users') );
@@ -105,10 +106,11 @@ class AllStatisticController extends MainController
 
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), $this->formatNumber(@$app_earned_charge ?? 0)));
                 }));
-        } else {
-            return parent::index($content
-                ->title(trans('Dashboard')));
-        }
+        // } else {
+          
+        //     return parent::index($content
+        //         ->title(trans('Dashboard')));
+        // }
     }
 
     function formatNumber($number)
