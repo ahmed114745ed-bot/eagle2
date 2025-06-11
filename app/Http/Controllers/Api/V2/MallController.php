@@ -42,7 +42,15 @@ class MallController extends Controller
     public function wabbleAll()
     {
         $bubble = $this->mallService->getWabbles();
-        return Common::apiResponse(true, '', WareResourceAll::collection($bubble), 200);
+        $resource = WareResourceAll::collection($bubble);
+        $merged = $resource->toArray(request()); // مهم تمرر request() هنا
+        $merged[] = [
+            'id' => 0,
+            'image_type' => 'png',
+            'key' => '',
+            'image' => 'wappel.png',
+        ];
+        return Common::apiResponse(true, '', $merged, 200);
     }
 
     public function buyWare(Request $request)
