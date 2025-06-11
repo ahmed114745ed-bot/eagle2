@@ -91,8 +91,6 @@ class PayPalService
 
     public function callback(Request $request)
     {
-        info('Received webhook:', $request->all());
-
         $eventType = $request->get('event_type');
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
             return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);
@@ -107,7 +105,6 @@ class PayPalService
         }
 
         $coinLog = CoinLog::where("id", $coinLogId)->first();
-        info('CoinLog found:', $coinLog);
 
         if (!$coinLog || $coinLog->status == 1) {
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
