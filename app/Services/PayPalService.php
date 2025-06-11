@@ -60,7 +60,6 @@ class PayPalService
             ->withBody(json_encode($body))
             ->post(config('paypal.base_url'). '/v2/checkout/orders');
 
-        info($response->body());
         if (isset($response['id']) && $response['status'] == 'CREATED') {
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
@@ -93,12 +92,13 @@ class PayPalService
     public function callback(Request $request)
     {
         $orderId = $request->get('token');
-        $coinLogId = $result['purchase_units'][0]['reference_id'] ?? null;
         $token = $this->getAccessToken();
 
-        info($coinLogId);
         $response = Http::withToken($token)->post(config('paypal.base_url')."/v2/checkout/orders/{$orderId}/capture");
         $result = $response->json();
+
+        $coinLogId = $result['purchase_units'][0]['reference_id'] ?? null;
+        info($coinLogId);
 
         $coinLog = CoinLog::where("id", $coinLogId)->first();
 
