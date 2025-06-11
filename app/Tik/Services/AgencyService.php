@@ -226,8 +226,8 @@ class AgencyService
             $action->save();
             $this->userRepository->update(['agency_id' => $agency->id], $user->id);
             $this->userRepository->updateTypeUser($user);
-            $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
-            if (!$checkAgencyUser) {
+            // $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
+            // if (!$checkAgencyUser) {
                 $joinAgencyData = [
                     'user_id' =>  $user->id,
                     'agency_id' => $agency->id,
@@ -235,7 +235,7 @@ class AgencyService
                     'join_date' => now(),
                 ];
                 $this->usersJoinedAgencyRepository->create($joinAgencyData);
-            }
+            // }
             // add vip to user
             UserCommon::userVip($user);
             CustomNotification::acceptAgencyApp($agency, $user);
@@ -687,7 +687,6 @@ class AgencyService
 
         $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth)) ? $joinedDate : $startOfMonth;
         $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
-        
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
