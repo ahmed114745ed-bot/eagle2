@@ -60,7 +60,6 @@ class PayPalService
             ->withBody(json_encode($body))
             ->post(config('paypal.base_url'). '/v2/checkout/orders');
 
-        info($response->body());
         if (isset($response['id']) && $response['status'] == 'CREATED') {
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
@@ -92,16 +91,20 @@ class PayPalService
 
     public function callback(Request $request)
     {
-        $orderId = $request->get('token');
-        $coinLogId = $result['purchase_units'][0]['reference_id'] ?? null;
-        $token = $this->getAccessToken();
+        $eventType = $request->get('event_type');
+        if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
+            return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);
+        }
 
-        $response = Http::withToken($token)->post(config('paypal.base_url')."/v2/checkout/orders/{$orderId}/capture");
-        $result = $response->json();
+        $resource = $request->get('resource');
+        $orderId = $resource['id'];
+        $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
+
+        if (!$coinLogId) {
+            return response()->json(['status' => 'failed', 'reason' => 'Reference ID not found']);
+        }
 
         $coinLog = CoinLog::where("id", $coinLogId)->first();
-
-        $user = $coinLog->user;
 
         if (!$coinLog || $coinLog->status == 1) {
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
@@ -110,6 +113,7 @@ class PayPalService
         $coinLog->status = 1;
         $coinLog->save();
 
+        $user = $coinLog->user;
         if ($user) {
             $user->di += $coinLog->obtained_coins;
             $user->save();
@@ -117,7 +121,7 @@ class PayPalService
             return response()->json(['status' => 'failed', 'reason' => 'User not found']);
         }
 
-        return response()->json(['status' => 'success', 'details' => $result]);
+        return response()->json(['status' => 'success', 'details' => $resource]);
     }
 
     public function cancel()

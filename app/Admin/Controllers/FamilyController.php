@@ -45,12 +45,12 @@ class FamilyController extends MainController
             ->title(trans('families'))
             ->body($this->form()));
     }
-    public function show($id, Content $content)
-    {
-        return parent::show($id, $content
-            ->title(trans('families'))
-            ->body($this->detail($id)));
-    }
+    // public function show($id, Content $content)
+    // {
+    //     return parent::show($id, $content
+    //         ->title(trans('families'))
+    //         ->body($this->detail($id)));
+    // }
 
     /**
      * Make a grid builder.
@@ -81,7 +81,7 @@ class FamilyController extends MainController
             </div>
         ";
         });
-      
+
         $grid->column('owner.name', __('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $path = @$this->owner?->profile?->avatar;
@@ -105,8 +105,8 @@ class FamilyController extends MainController
         ";
         });
         $grid->column('num', __('number of people'));
-       
-       
+
+
         $this->extendGrid($grid);
         $grid->disableExport();
         return $grid;
@@ -118,27 +118,38 @@ class FamilyController extends MainController
      * @param mixed $id
      * @return Show
      */
-    protected function detail($id)
-    {
-        $show = new Show(Family::findOrFail($id));
+    // protected function detail($id)
+    // {
+    //     $show = new Show(Family::findOrFail($id));
 
-        $show->id(__('ID'));
-        //        $show->is_success('is_success');
-        $show->image(__('image'));
-        $show->name(__('name'));
-        $show->introduce(__('introduce'));
-        $show->notice(__('notice'));
-        $show->num(__('number of people'));
-        $show->user_id(__('user id'));
-        $show->speakswitch(__('speak switch'));
-        $show->status(__('status'));
-        //        $show->update_user_id('update_user_id');
-        //        $show->suctime('suctime');
-        //        $show->start_time('start_time');
-        //        $show->created_at(trans('admin.created_at'));
-        //        $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow($show);
-        return $show;
+    //     $show->id(__('ID'));
+    //     //        $show->is_success('is_success');
+    //     $show->image(__('image'));
+    //     $show->name(__('name'));
+    //     $show->introduce(__('introduce'));
+    //     $show->notice(__('notice'));
+    //     $show->num(__('number of people'));
+    //     $show->user_id(__('user id'));
+    //     $show->speakswitch(__('speak switch'));
+    //     $show->status(__('status'));
+    //     //        $show->update_user_id('update_user_id');
+    //     //        $show->suctime('suctime');
+    //     //        $show->start_time('start_time');
+    //     //        $show->created_at(trans('admin.created_at'));
+    //     //        $show->updated_at(trans('admin.updated_at'));
+    //     $this->extendShow($show);
+    //     return $show;
+    // }
+
+    public function show($id, Content $content,)
+    {
+        $type = request('type');
+        $family = Family::with('allMembers', 'owner')->find($id);
+        $familyMembers = $family->allMembers()->when(isset($type), function ($query) use ($type) {
+            $query->where('user_type', $type);
+        })->paginate(10, ['*'], 'member_page');
+        return  parent::show($id, $content->title(__('family profile'))
+            ->view('family_profile', compact('family', 'familyMembers')));
     }
 
     /**
