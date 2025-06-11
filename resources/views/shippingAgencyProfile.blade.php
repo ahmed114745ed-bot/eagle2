@@ -941,148 +941,149 @@
                     </div>
                 </div>
             </div>
-        @php
-            $activeTab = request('tab', 'charges');
-        @endphp
-        <!-- Navigation Tabs -->
-        <div class="agency-tabs">
-            <a href="?tab=charges" class="tab-btn {{ (!request('tab') || request('tab') != 'charges') ? 'active' : '' }}" data-target="charges-tab">{{ __('Charges') }}</a>
-            <a href="?tab=resived" class="tab-btn {{ request('tab') == 'resived' ? 'active' : '' }}" data-target="resived-tab">{{ __('receiver') }}</a>
-        </div>
-        <div id="tab-loading" style="
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            /* transform: translate(-50%, -50%); */
-            background: var(--primary-color);
-            color: var(--text-primary-color);
-            z-index: 9999;
-            padding: 30px 40px;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        ">
-            {{ __('Loading...') }}
-        </div>
-            <!-- Charges Section -->
-            @if($charges && $charges->count())
-            <div class="table-responsive">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>{{ __('receiver') }}</th>
-                <th>{{ __('Amount') }}</th>
-                <th>{{ __('Date') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($charges as $index => $charge)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
+@php
+    $activeTab = request('tab', 'charges');
+@endphp
 
-                    <td>
-                        @if($charge->resiver instanceof \App\Models\User)
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ getImagePath($charge->resiver->profile->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
-                                <div>
-                                    <strong>{{ $charge->resiver->name }}</strong><br>
-                                    <small>ID: {{ $charge->resiver->id }}</small>
-                                </div>
-                            </div>
-                        @elseif($charge->agency instanceof \App\Models\Agency)
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ getImagePath($charge->agency->logo_url) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
-                                <div>
-                                    <strong>{{ $charge->agency->name }}</strong><br>
-                                    <small>ID: {{ $charge->agency->id }}</small>
-                                </div>
-                            </div>
-                        @else
-                            -
-                        @endif
-                    </td>
-
-                    <td>{{ $charge->amount ?? '-' }}</td>
-                    <td>{{ $charge->created_at }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    {{ $charges->withQueryString()->links() }}
+<!-- Navigation Tabs -->
+<div class="agency-tabs">
+    <a href="?tab=charges" class="tab-btn {{ ($activeTab == 'charges') ? 'active' : '' }}" data-target="charges-tab">{{ __('Charges') }}</a>
+    <a href="?tab=resived" class="tab-btn {{ ($activeTab == 'resived') ? 'active' : '' }}" data-target="resived-tab">{{ __('receiver') }}</a>
 </div>
-        </div>
+
+<!-- Loading Indicator -->
+<div id="tab-loading" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background: var(--primary-color);
+    color: var(--text-primary-color);
+    z-index: 9999;
+    padding: 30px 40px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+">
+    {{ __('Loading...') }}
+</div>
+<!-- Charges Tab Content -->
+<div id="charges-tab" style="display: {{ ($activeTab == 'charges') ? 'block' : 'none' }}">
+    <div class="performers-card">
+    
+        @if($charges && $charges->count())
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('receiver') }}</th>
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('Date') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($charges as $index => $charge)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>
+                                    @if($charge->receiverUser instanceof \App\Models\User)
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <img src="{{ getImagePath($charge->receiverUser->profile?->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                            <div>
+                                                <strong>{{ $charge->receiverUser?->name }}</strong><br>
+                                                <small>ID: {{ $charge->receiverUser->id }}</small>
+                                            </div>
+                                        </div>
+                                    @elseif($charge->receiverAgency instanceof \App\Models\Agency)
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <img src="{{ getImagePath($charge->receiverAgency?->img) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
+                                            <div>
+                                                <strong>{{ $charge->receiverAgency?->name }}</strong><br>
+                                                <small>ID: {{ $charge->receiverAgency?->id }}</small>
+                                            </div>
+                                        </div>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>{{ $charge->amount ?? '-' }}</td>
+                                <td>{{ $charge->created_at }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                {{ $charges->withQueryString()->links() }}
+            </div>
+        @else
+            <div class="empty-state">
+                <i class="fas fa-user-slash"></i>
+                <p>{{ __('No  data available') }}</p>
+            </div>
+        @endif
     </div>
+</div>
 
-@else
-<!-- <p class="text-center text-muted">{{ __('No charges found.') }}</p> -->
-@endif
-
-    @if($resiveds && $resiveds->count())
-    <div class="table-responsive">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>{{ __('Sender') }}</th>
-                    <th>{{ __('Amount') }}</th>
-                    <th>{{ __('Date') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($resiveds as $index => $res)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>
-
-                        @if($res->sender instanceof \App\Models\User)
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ getImagePath($res->sender->profile->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
-                                <div>
-                                    <strong>{{ $res->sender->name }}</strong><br>
-                                    <small>ID: {{ $res->sender->id }}</small>
-                                </div>
-                            </div>
-                        @elseif($res->sender instanceof \App\Models\Agency)
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ getImagePath($res->sender->logo_url) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
-                                <div>
-                                    <strong>{{ $res->sender->name }}</strong><br>
-                                    <small>ID: {{ $res->sender->id }}</small>
-                                </div>
-                            </div>
-                        @else
-                            -
-                        @endif
-
-                    </td>
-                        <td>{{ $res->amount ?? '-' }}</td>
-                        <td>{{ $res->created_at }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-        {{ $resiveds->withQueryString()->links() }}
+<!-- Resived Tab Content -->
+<div id="resived-tab" style="display: {{ ($activeTab == 'resived') ? 'block' : 'none' }}">
+    <div class="performers-card">
+        @if($resiveds && $resiveds->count())
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('Sender') }}</th>
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('Date') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($resiveds as $index => $res)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>
+                                    @if($res->sender instanceof \App\Models\User)
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <img src="{{ getImagePath($res->sender->profile?->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                            <div>
+                                                <strong>{{ $res->sender->name }}</strong><br>
+                                                <small>ID: {{ $res->sender->id }}</small>
+                                            </div>
+                                        </div>
+                                    @elseif($res->sender instanceof \App\Models\Agency)
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <img src="{{ getImagePath($res->sender->logo_url) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
+                                            <div>
+                                                <strong>{{ $res->sender->name }}</strong><br>
+                                                <small>ID: {{ $res->sender->id }}</small>
+                                            </div>
+                                        </div>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>{{ $res->amount ?? '-' }}</td>
+                                <td>{{ $res->created_at }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                {{ $resiveds->withQueryString()->links() }}
+            </div>
+        @else
+            <p class="text-center text-muted">{{ __('No received charges found.') }}</p>
+        @endif
     </div>
-@else
-    <!-- <p class="text-center text-muted">{{ __('No received charges found.') }}</p> -->
-@endif
+</div>
 
-
-    </div>
-
-<!-- jQuery أولاً -->
+<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
-
-    <script>
-       document.addEventListener("DOMContentLoaded", function () {
+<script>
+document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
     const selectedTab = (urlParams.get('tab') || 'charges') + '-tab';
 
@@ -1095,8 +1096,6 @@
         const target = tab.getAttribute('data-target');
         const content = document.getElementById(target);
 
-        console.log(target)
-        console.log(selectedTab)
         if (target === selectedTab) {
             tab.classList.add('active');
             content.style.display = 'block';
@@ -1123,11 +1122,5 @@
         }, 400);
     }
 });
-
-
-
-
-
-
 </script>
 
