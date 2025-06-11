@@ -184,44 +184,51 @@ class AgencyUsersTargetResource extends JsonResource
     protected function latestOldTarget()
     {
         $currentDate = now();
-        $monthsWithYears = collect();
+    $monthsWithYears = collect();
 
-        for ($i = 2; $i >= 0; $i--) {
-            $date = $currentDate->copy()->subMonths($i);
-            $monthsWithYears->push([
-                'year' => $date->year,
-                'month' => $date->month,
-            ]);
-        }
+    for ($i = 2; $i >= 0; $i--) {
+        $date = $currentDate->copy()->subMonths($i)->startOfMonth();
+        $monthsWithYears->push($date);
+    }
 
-        $monthKeys = $monthsWithYears->map(function ($m) {
-            return $m['year'] . '-' . $m['month'];
-        })->toArray();
+    $joinRecord = $this->latestJoin; // تأكد أن العلاقة موجودة
+    if (!$joinRecord) {
+        return $monthsWithYears->map(fn($date) => [
+            'month_number' => $date->month,
+            'diamonds'     => 0,
+        ]);
+    }
 
-        $latestIds = $this->sallariesByMonth()
-            ->selectRaw('MAX(id) as id')
-            ->whereIn(DB::raw("CONCAT(year,'-',month)"), $monthKeys)
-            ->groupBy('year', 'month');
+    $joinedDate = Carbon::parse($joinRecord->join_date);
+    $leaveDate  = $joinRecord->leave_date
+        ? Carbon::parse($joinRecord->leave_date)
+        : now();
 
-        $userSallaries = $this->sallariesByMonth()
-            ->whereIn('id', $latestIds->pluck('id'))
-            ->select('year', 'month', 'target_diamonds')
-            ->get()
-            ->keyBy(function ($row) {
-                return $row->year . '-' . $row->month;
-            });
+    $result = [];
 
-        $result = [];
+    foreach ($monthsWithYears as $monthStart) {
+        $monthEnd = $monthStart->copy()->endOfMonth();
 
-        foreach ($monthsWithYears as $item) {
-            $key = $item['year'] . '-' . $item['month'];
-
+        if ($monthEnd->lt($joinedDate) || $monthStart->gt($leaveDate)) {
             $result[] = [
-                'month_number' => $item['month'],
-                'diamonds'     => $userSallaries[$key]->target_diamonds ?? 0,
+                'month_number' => $monthStart->month,
+                'diamonds'     => 0,
             ];
+            continue;
         }
 
-        return $result;
+        $latestSallary = $this->sallariesByMonth()
+            ->whereBetween('created_at', [$monthStart, $monthEnd])
+            ->whereBetween('created_at', [$joinedDate, $leaveDate])
+            ->latest('created_at')
+            ->first();
+
+        $result[] = [
+            'month_number' => $monthStart->month,
+            'diamonds'     => $latestSallary?->target_diamonds ?? 0,
+        ];
+    }
+
+    return $result;
     }
 }

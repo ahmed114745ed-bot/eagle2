@@ -1462,9 +1462,23 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\UserSallary::class, 'user_id')
                     ->where('user_agency_id', $this->agency_id);
     }
+
+    public function latestJoin()
+    {
+        return $this->hasOne(UsersJoinedAgency::class, 'user_id')
+            ->where('agency_id', $this->agency_id)
+            ->latestOfMany('join_date');
+    }
     public function lastSallary()
     {
+        $join = $this->latestJoin;
+        if (!$join) return null;
+        $start = $join->join_date;
+        $end = $join->leave_date ?? now();
+    
         return $this->hasOne(UserSallary::class, 'user_id')
-        ->where('user_agency_id', $this->agency_id)->latestOfMany();
+            ->where('user_agency_id', $this->agency_id)
+            ->whereBetween('created_at', [$start, $end])
+            ->latestOfMany();
     }
 }
