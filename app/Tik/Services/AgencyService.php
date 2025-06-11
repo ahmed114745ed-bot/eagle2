@@ -699,7 +699,7 @@ class AgencyService
             return $data;
         });
 
-        $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
+        $totalDays = $user->getTotalDaysJoinedAgency($startDate);
      
         $saMonth = ltrim($month, '0');
         $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year);
