@@ -48,15 +48,15 @@ class PaymentGatewaysSeeder extends Seeder
             }
         }
 
-        $duplicates = Setting::select('key', 'item_id', 'type')
-            ->groupBy('key', 'item_id', 'type')
+        $duplicates = Setting::select('key')//, 'item_id', 'type')
+            ->groupBy('key')//, 'item_id', 'type')
             ->havingRaw('COUNT(*) > 1')
             ->get();
 
         foreach ($duplicates as $dup) {
             $settings = Setting::where('key', $dup->key)
 //                ->where('item_id', $dup->item_id)
-                ->where('type', $dup->type)
+//                ->where('type', $dup->type)
                 ->orderBy('id')
                 ->get();
 
