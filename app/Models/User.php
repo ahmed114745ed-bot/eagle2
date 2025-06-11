@@ -1485,7 +1485,10 @@ class User extends Authenticatable
     //     })
     //     ->latestOfMany();
     // }
-
+    public function sallaries()
+    {
+        return $this->hasMany(UserSallary::class, 'user_id');
+    }
     public function getLastSallaryAttribute()
     {
         $join = $this->latestJoin()->first(); 
