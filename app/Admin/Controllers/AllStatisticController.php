@@ -16,6 +16,7 @@ use App\Models\RequestTakeSalary;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Controllers\MainController;
 
 
 class AllStatisticController extends MainController
@@ -24,8 +25,9 @@ class AllStatisticController extends MainController
 
     public function index(Content $content)
     {
+        
         $userId = \Encore\Admin\Facades\Admin::user()->id;
-        if ($userId == 1) {
+        // if ($userId == 1) {
             $coins                      = User::sum("di");
             $total_monthly_di_recieved  = User::sum("monthly_diamond_received");
             $user_sallaries   = UserSallary::query()->whereHas('user', function ($q) {
@@ -65,7 +67,7 @@ class AllStatisticController extends MainController
             $data = [$balance->used ?? 0, $availableBalance ?? 0];
             $user = Auth::user();
             $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
-            return $content
+            return parent::index($content
                 ->title(trans('Dashboard'))
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($user, $data, $balanceDollar, $allBalance, $usePercentage) {
                     if ($user->isRole('admin') || $user->isRole('developer')) {
@@ -103,11 +105,12 @@ class AllStatisticController extends MainController
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('app earned') );
 
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), $this->formatNumber(@$app_earned_charge ?? 0)));
-                });
-        } else {
-            return parent::index($content
-                ->title(trans('Dashboard')));
-        }
+                }));
+        // } else {
+          
+        //     return parent::index($content
+        //         ->title(trans('Dashboard')));
+        // }
     }
 
     function formatNumber($number)
