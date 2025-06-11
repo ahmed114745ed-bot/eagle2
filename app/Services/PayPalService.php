@@ -91,6 +91,7 @@ class PayPalService
 
     public function callback(Request $request)
     {
+        info($request);
         $orderId = $request->get('orderID');
         $token = $this->getAccessToken();
 
