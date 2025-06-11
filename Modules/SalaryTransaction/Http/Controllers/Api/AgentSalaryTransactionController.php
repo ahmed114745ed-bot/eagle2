@@ -73,61 +73,37 @@ class AgentSalaryTransactionController extends Controller
         $usrAuth = $request->user();
         $agency = $usrAuth->shippingAgency;
         $search = $request->search;
-        $type = $request->type;
+        $type = $request->type ?? null;
+        if (!$type) {
+            return Common::apiResponse(0, __("type not found"));
+        }
         if (!$agency) {
             return Common::apiResponse(0, __("api_responses.agency"));
         }
 
-        $data = Charge::where('is_used_transferred', false)
-                        ->where("charger_type", 'agency')
-                        ->where("charger_id", $agency->id);
-
-        // $data = $data->when($type == 'sent', function ($q) use ($search, $agency) {
-        //     $q->where("charger_id", $agency->id)->where('charger_type',  'agency');
-        //         // ->whereHas('receiver', function ($q2) use ($search) {
-        //         //     $q2->fitterByUuid($search);
-        //         // });
-        // })
-        // ->when($type == 'received', function ($q) use ($search, $agency) {
-        //     $q->where('agency_id', $agency->id);
-        //     //   ->whereHas('sender', function ($q2) use ($search) {
-        //     //       $q2->fitterByUuid($search);
-        //     //   });
-        // })->orderByDesc('id')->paginate();
-
+        $data = Charge::query();
+                        //  where('is_used_transferred', false)
+                        // ->where("charger_type", 'agency')
+                        // ->where("charger_id", $agency->id);
 
         $data = $data->when($type == 'sent', function ($q) use ($search, $agency) {
-            $q->where("charger_id", $agency->id)->where('charger_type',  'agency');
-        
-            if ($search) {
-                $q->whereHasMorph('receiver', [\App\Models\User::class, \App\Models\ShippingAgency::class], function ($query) use ($search) {
-                    $query->where('uuid', 'like', "%$search%");
-                });
-            }
+            $q->where("charger_id", $agency->id)
+              ->where('charger_type',  'agency')
+             
+              ->with('receiverUser','receiveragency');
+               
         })
         ->when($type == 'received', function ($q) use ($search, $agency) {
-            $q->where('agency_id', $agency->id);
-        
-            if ($search) {
-                $q->where(function ($query) use ($search) {
-                    $query->where(function ($subQuery) use ($search) {
-                        $subQuery->where('charger_type', 'agency')
-                            ->whereIn('charger_id', function ($subSubQuery) use ($search) {
-                                $subSubQuery->select('id')
-                                    ->from('shipping_agencies')
-                                    ->where('uuid', 'like', "%$search%");
-                            });
-                    })->orWhere(function ($subQuery) use ($search) {
-                        $subQuery->where('charger_type', 'user')
-                            ->whereIn('charger_id', function ($subSubQuery) use ($search) {
-                                $subSubQuery->select('id')
-                                    ->from('users')
-                                    ->where('uuid', 'like', "%$search%");
-                            });
-                    });
-                });
-            }
+            $q->where('user_id', $agency->id)->where('user_type','agency')
+            //   ->whereHas('sender', function ($q2) use ($search) {
+            //       $q2->fitterByUuid($search);
+            //   });
+            ->with('senderUser','senderShippingAgency','senderAgency','admin');
+
         })->orderByDesc('id')->paginate();
+
+
+     
 
       
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
