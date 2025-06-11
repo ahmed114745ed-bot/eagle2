@@ -514,8 +514,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
                 Route::get('old-agencies', [AgencyController::class, 'gitOldAgencies']);
-
-
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
