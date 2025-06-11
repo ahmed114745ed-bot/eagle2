@@ -473,7 +473,7 @@ class PaymentGatewaysSeeder extends Seeder
 //        }
 
 
-
+        info('seed');
         //paypal
         $paypal_id = PaymentCoin::updateOrCreate([
             'title' => 'paypal',
