@@ -816,6 +816,7 @@ class Common
 
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
+        dd($userVip->is_used);
         $type = $vip->privilegs()->pluck('type')->toArray();
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
         foreach ($wares as $ware) {
