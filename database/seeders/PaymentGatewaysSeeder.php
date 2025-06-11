@@ -24,7 +24,7 @@ class PaymentGatewaysSeeder extends Seeder
             'applepay.png',
 //            'mada.png',
 //            'liqpay.png',
-//            'paypal.png',
+            'paypal.png',
 //            'paytm.png',
             'paytabs.webp',
 //            'bkash.png',
@@ -475,48 +475,54 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         //paypal
-//        $paypal_id = PaymentCoin::updateOrCreate([
-//            'title' => 'paypal',
-//        ], [
-//            'photo' => 'images/paypal.png',
-//            'status' => 1,
-//            'type' => 'paypal',
-//        ]);
-//
-//        $paypal_fields = [
-//            'new_2' => [
-//                "name" => "paypal_client_id",
-//                "type" => "input",
-//                "value" => "apple team"
-//
-//            ],
-//            'new_3' => [
-//                "name" => "paypal_client_secret",
-//                "type" => "input",
-//                "value" => "Sit dignissimos aliq"
-//            ],
+        $paypal_id = PaymentCoin::updateOrCreate([
+            'title' => 'paypal',
+        ], [
+            'photo' => 'images/paypal.png',
+            'status' => 1,
+            'type' => 'paypal',
+        ]);
+
+        $paypal_fields = [
+            'new_1' => [
+                "name" => "paypal_base_url",
+                "type" => "input",
+                "value" => "paypal team"
+
+            ],
+            'new_2' => [
+                "name" => "paypal_client_id",
+                "type" => "input",
+                "value" => "paypal team"
+
+            ],
+            'new_3' => [
+                "name" => "paypal_client_secret",
+                "type" => "input",
+                "value" => "Sit dignissimos aliq"
+            ],
 //            'new_4' => [
 //                "name" => "paypal_payment_address",
 //                "type" => "input",
 //                "value" => 'asdasd'
 //            ],
-//            'new_5' => [
-//                "name" => "paypal_webhook_url",
-//                "type" => "input",
-//                "value" => 'asdasd'
-//            ],
-//        ];
-//
-//
-//        foreach ($paypal_fields as $key => $value) {
-//            Setting::updateOrCreate([
-//                'key' => $value['name'],
-//                'item_id' => $paypal_id->id,
-//                'type' => 'payment'
-//            ], [
-//                'value' => $value['value'],'input_type' => $value['type']
-//            ]);
-//        }
+            'new_4' => [
+                "name" => "paypal_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
+        ];
+
+
+        foreach ($paypal_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $paypal_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],'input_type' => $value['type']
+            ]);
+        }
 //
 //
 //
