@@ -15,8 +15,6 @@ class PaymentGatewaysSeeder extends Seeder
      */
     public function run(): void
     {
-        info('seed');
-
         $images = [
             'fawry.jpeg',
             'paysky.png',
