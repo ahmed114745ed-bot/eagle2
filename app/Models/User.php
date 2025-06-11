@@ -1469,20 +1469,38 @@ class User extends Authenticatable
             ->where('agency_id', $this->agency_id)
             ->latestOfMany('join_date');
     }
-    public function lastSallary()
+    // public function lastSallary()
+    // {
+    //     return $this->hasOne(UserSallary::class, 'user_id')
+    //     ->where(function ($query) {
+    //         $join = $this->latestJoin ?? now()->startOfMonth();
+    //         if ($join) {
+    //             $start = $join->join_date;
+    //             $end = $join->leave_date ?? now()->endOfMonth();
+    //             $query->where('user_agency_id', $this->agency_id)
+    //                   ->whereBetween('created_at', [$start, $end]);
+    //         } else {
+    //             $query->whereRaw('1 = 0');
+    //         }
+    //     })
+    //     ->latestOfMany();
+    // }
+    public function sallaries()
     {
-        return $this->hasOne(UserSallary::class, 'user_id')
-        ->where(function ($query) {
-            $join = $this->latestJoin ?? now()->startOfMonth();
-            if ($join) {
-                $start = $join->join_date;
-                $end = $join->leave_date ?? now()->endOfMonth();
-                $query->where('user_agency_id', $this->agency_id)
-                      ->whereBetween('created_at', [$start, $end]);
-            } else {
-                $query->whereRaw('1 = 0');
-            }
-        })
-        ->latestOfMany();
+        return $this->hasMany(UserSallary::class, 'user_id');
+    }
+    public function getLastSallaryAttribute()
+    {
+        $join = $this->latestJoin()->first(); 
+        if (!$join) return null;
+
+        $start = $join->join_date;
+        $end = $join->leave_date ?? now()->endOfMonth();
+
+        return $this->sallaries()
+            ->where('user_agency_id', $this->agency_id)
+            ->whereBetween('created_at', [$start, $end])
+            ->latest()
+            ->first();
     }
 }
