@@ -9,6 +9,8 @@ use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\VipPrivilege;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
@@ -19,6 +21,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Validation\ValidationException;
 use Modules\Public\Http\Services\UserCounterServices;
 use Encore\Admin\Widgets\Box;
+use Modules\Reals\Http\Services\FfmpegService;
 
 
 class OvipGiftTapController extends MainController
@@ -299,11 +302,27 @@ class OvipGiftTapController extends MainController
                 return back()->with(compact('error'));
             }
 
+            $allowedExtensions = [
+                'svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp',
+                'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',
+            ];
+
             if ($form->show_img instanceof UploadedFile) {
-                $form->image_type1 = $form->show_img->guessExtension();
+                $ext = strtolower($form->show_img->guessExtension());
+
+                if (!in_array($ext, $allowedExtensions)) {
+                    throw ValidationException::withMessages([
+                        'show_img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+                    ]);
+                }
+
+                $form->image_type1 = $ext;
             }
 
             if ($form->img2 instanceof UploadedFile) {
+
+                $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
+
                 $ext = strtolower($form->img2->guessExtension());
                 $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
@@ -311,9 +330,47 @@ class OvipGiftTapController extends MainController
                     $ext = 'svga';
                 }
 
-                if (!in_array($ext, ['svga', 'mp4'])) {
+                if (!in_array($ext, ['mp4', 'svg'])) {
+                    $response = Http::attach(
+                        'image',
+                        file_get_contents($form->img2->getPathname()),
+                        $form->img2->getClientOriginalName()
+                    )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+
+                    $responseData = $response->json();
+
+                    if ($response->successful() && isset($responseData['data']['video_type'])) {
+                        $ext = strtolower($responseData['data']['video_type']);
+                    }
+                }
+
+                if ($ext === 'mp4') {
+                    $urlVideo = $this->upload($form->img2);
+
+                    $videoPath = getDriverUrl() . '/' . $urlVideo;
+
+                    $wareId = $form->model()->id;
+
+                    (new FfmpegService())->extract($videoPath, $wareId);
+
+                    $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
+
+                    $response = Http::attach(
+                        'image',
+                        Storage::disk('gcs')->get($imagePath),
+                        $wareId . '.jpg'
+                    )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+
+                    $responseData = $response->json();
+
+                    if ($response->successful() && isset($responseData['data']['video_type'])) {
+                        $ext = strtolower($responseData['data']['video_type']);
+                    }
+                }
+
+                if (!in_array($ext, $allowedExtensions)) {
                     throw ValidationException::withMessages([
-                        'img2' => ['Only SVGA and MP4 files are allowed for img2.'], // field name => [errors array]
+                        'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                     ]);
                 } else {
                     $form->profile_frame_type = $ext;
@@ -402,6 +459,14 @@ class OvipGiftTapController extends MainController
         return $form;
     }
 
+
+    public  static function upload($file): ?string
+    {
+        $extension      = $file->getClientOriginalExtension();
+        $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
+        $file->storeAs('videos', $uniqueFileName, 'gcs');
+        return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
+    }
 
     private function tabsComponent($privileges, $level, $type)
     {
