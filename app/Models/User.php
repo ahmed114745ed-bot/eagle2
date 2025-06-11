@@ -1472,10 +1472,11 @@ class User extends Authenticatable
     public function lastSallary()
     {
         $join = $this->latestJoin;
+        
         if (!$join) return null;
         $start = $join->join_date;
-        $end = $join->leave_date ?? now();
-    
+        $end = $join->leave_date ?? now()->endOfMonth();
+      
         return $this->hasOne(UserSallary::class, 'user_id')
             ->where('user_agency_id', $this->agency_id)
             ->whereBetween('created_at', [$start, $end])
