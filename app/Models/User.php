@@ -1473,7 +1473,7 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserSallary::class, 'user_id')
         ->where(function ($query) {
-            $join = $this->latestJoin;
+            $join = $this->latestJoin ?? now()->startOfMonth();
             if ($join) {
                 $start = $join->join_date;
                 $end = $join->leave_date ?? now()->endOfMonth();
