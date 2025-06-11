@@ -166,11 +166,11 @@ class AgencyUsersTargetResource extends JsonResource
             'is_host' => $this->is_host,
             'salary' => (float) $agencySallary ?? 0,
             'target' => [
-                'id' => @$target->target_id ?? 0,
-                'user_diamonds' => (float) ($this->lastSallary?->achieved_diamond ?? 0),
-                'user_hours'    =>  $this->lastSallary?->achieved_hours ?? 0,
-                'user_days'     =>  $this->lastSallary?->achieved_days ?? 0,
-                'old_targets'  => $this->latestOldTarget(),
+                // 'id' => @$target->target_id ?? 0,
+                // 'user_diamonds' => (float) ($this->lastSallary?->achieved_diamond ?? 0),
+                // 'user_hours'    =>  $this->lastSallary?->achieved_hours ?? 0,
+                // 'user_days'     =>  $this->lastSallary?->achieved_days ?? 0,
+                // 'old_targets'  => $this->latestOldTarget(),
             ],
             // 'top_users' => SenderGiftLogResource::collection($giftLog),
            'top_users' => $giftLog->map(function ($log) {
