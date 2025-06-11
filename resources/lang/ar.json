@@ -563,7 +563,7 @@
     "Card Scroll": "بطاقة التمرير",
     "Avatar Frame": "إطار الصورة الشخصية",
     "Bubble Frame": "إطار الفقاعة",
-    "Entering Special Effects": "مؤثرات الدخول",
+    "Entering Special Effects": "مركبه ",
     "Microphone Aperture": "فتحة الميكروفون",
     "Badge": "شارة",
     "NoKick": "عدم الطرد",
@@ -3156,6 +3156,8 @@
   "Weekly Events": "الفعاليات الأسبوعية",
   "Event Period": "فترة الفعالية",
   "add a daily login gift":"اضافه هدايه تسجيل دخول اليومى",
-  "daily login gift": "هدية تسجيل الدخول اليومية"
+  "daily login gift": "هدية تسجيل الدخول اليومية",
+  "wapel":"مؤثر الدخول"
+
 
 }

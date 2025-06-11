@@ -998,7 +998,11 @@
   "Edit daily gift": "Edit daily login gift",
   "Delete daily gift": "Delete daily login gift",
   "Show daily gift": "Show daily login gift details",
-    "Browse daily gift": "Browse daily login gift"
+    "Browse daily gift": "Browse daily login gift",
+      "Entering Special Effects": "Compound",
+        "wapel": "entry effect"
+
+
 
 
 
