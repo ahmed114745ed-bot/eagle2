@@ -17,13 +17,7 @@ class DollarChargeLogResource extends JsonResource
     {
 
         $receiver=   Common::getReceiverInfo($this);
-        \Log::info('Receiver Info:', [
-            'type' => get_class($receiver),
-            'id'   => $receiver?->id,
-            'receiver'   => $receiver,
-            'name' => $receiver?->name ?? $receiver?->uuid ?? null,
-        ]);
-        
+      
         return [
             'id'        => $receiver['id'] ?? 0,
             'uuid'      => $receiver['uuid'] ?? '',
