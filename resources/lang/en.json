@@ -989,7 +989,17 @@
   "Pk Events": "Pk Events",
   "Target Events": "Target Events",
   "Weekly Events": "Weekly Events",
-  "Event Period": "Event Period"
+  "Event Period": "Event Period",
+  "Create daily gift": "Create daily login gift",
+  "Edit daily gift": "Edit daily login gift",
+  "Delete daily gift": "Delete daily login gift",
+  "Show daily gift": "Show daily login gift details",
+    "Browse daily gift": "Browse daily login gift",
+      "Entering Special Effects": "Compound",
+        "wapel": "entry effect"
+
+
+
 
 
 

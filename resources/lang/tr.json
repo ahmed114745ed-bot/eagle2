@@ -499,7 +499,7 @@
     "Card Scroll": "Kart Kaydırma",
     "Avatar Frame": "Avatar Çerçevesi",
     "Bubble Frame": "Baloncuk Çerçevesi",
-    "Entering Special Effects": "Giriş Özel Efektleri",
+    "Entering Special Effects": "bileşik",
     "Microphone Aperture": "Mikrofon Diyaframı",
     "Badge": "Rozet",
     "NoKick": "Atılamaz",
@@ -3005,7 +3005,13 @@
     "Pk Events": "Pk Etkinlikleri",
     "Target Events": "Hedef Etkinlikleri",
     "Weekly Events": "Haftalık Etkinlikler",
-    "Event Period": "Etkinlik Süresi"
+    "Event Period": "Etkinlik Süresi",
+      "add a daily login gift": "günlük giriş hediyesi ekle",
+        "daily login gift": "günlük giriş hediyesi",
+          "wapel": "giriş efekti"
+
+
+
 
 
 
