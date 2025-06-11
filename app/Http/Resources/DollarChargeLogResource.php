@@ -21,7 +21,7 @@ class DollarChargeLogResource extends JsonResource
         return [
             'id'        => $receiver['id'] ?? 0,
             'uuid'      => $receiver['uuid'] ?? '',
-            'image'     => $receiver['avatar'] ?? '',
+            'image'     => $receiver['image'] ?? '',
             'name'      => $receiver['name'] ?? '',
             'date'       => $this->created_at ?? '',
             'totalUsed'  => (int) ($this->usd ?? 0),

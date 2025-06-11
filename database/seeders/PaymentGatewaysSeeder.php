@@ -15,8 +15,6 @@ class PaymentGatewaysSeeder extends Seeder
      */
     public function run(): void
     {
-        info('seed');
-
         $images = [
             'fawry.jpeg',
             'paysky.png',
@@ -50,19 +48,19 @@ class PaymentGatewaysSeeder extends Seeder
             }
         }
 
-        $duplicates = Setting::select('key', 'item_id', 'type')
-            ->groupBy('key', 'item_id', 'type')
+        $duplicates = Setting::select('key')//, 'item_id', 'type')
+            ->groupBy('key')//, 'item_id', 'type')
             ->havingRaw('COUNT(*) > 1')
             ->get();
 
         foreach ($duplicates as $dup) {
             $settings = Setting::where('key', $dup->key)
-                ->where('item_id', $dup->item_id)
-                ->where('type', $dup->type)
+//                ->where('item_id', $dup->item_id)
+//                ->where('type', $dup->type)
                 ->orderBy('id')
                 ->get();
 
-            $settings->skip(1)->each->delete();
+            $settings->each->delete();
         }
 
         $fawry_id = PaymentCoin::updateOrCreate([
