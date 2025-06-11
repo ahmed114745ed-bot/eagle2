@@ -96,15 +96,16 @@ class PayPalService
         $coinLogId = $result['purchase_units'][0]['reference_id'] ?? null;
         $token = $this->getAccessToken();
 
+        info($coinLogId);
         $response = Http::withToken($token)->post(config('paypal.base_url')."/v2/checkout/orders/{$orderId}/capture");
         $result = $response->json();
 
         $coinLog = CoinLog::where("id", $coinLogId)->first();
 
+        info($coinLog);
         $user = $coinLog->user;
 
-        info($coinLogId);
-        info($coinLog);
+
         if (!$coinLog || $coinLog->status == 1) {
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
         }
