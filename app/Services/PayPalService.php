@@ -103,6 +103,8 @@ class PayPalService
 
         $user = $coinLog->user;
 
+        info($coinLogId);
+        info($coinLog);
         if (!$coinLog || $coinLog->status == 1) {
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
         }
