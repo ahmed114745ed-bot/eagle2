@@ -426,7 +426,7 @@ class ChargeRepoService
 
     private function handleUserCharge($authAgency, $auth, $request)
     {
-        $receiver = $this->userRepository->searchUserByUUId($request->id);
+        $receiver = $this->userRepository->searchUserById($request->id);
 
         if (!$receiver) throw new \Exception(__('api.notUser'));
         // if ($receiver->id == $auth->id) throw new \Exception(__('api.notYourself'));
