@@ -47,8 +47,9 @@ class MallController extends Controller
         $merged[] = [
             'id' => 0,
             'image_type' => 'png',
-            'key' => '',
+            'key_json' => null,
             'image' => 'wappel.png',
+            'img' => 'wappel.png',
         ];
         return Common::apiResponse(true, '', $merged, 200);
     }
