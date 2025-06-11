@@ -98,7 +98,7 @@ class PayPalService
         $orderId = $request->get('token');
         $token = $this->getAccessToken();
 
-        $response = Http::withToken($token)->post("{$this->baseUrl}/v2/checkout/orders/{$orderId}/capture");
+        $response = Http::withToken($token)->post(config('paypal.base_url')."/v2/checkout/orders/{$orderId}/capture");
         $result = $response->json();
 
         $merchantRefNumber = $result['purchase_units'][0]['payments']['captures'][0]['invoice_id'] ?? null;
