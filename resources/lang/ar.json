@@ -3159,7 +3159,6 @@
   "daily login gift": "هدية تسجيل الدخول اليومية",
   "wapel":"وابل",
 "family profile": "ملف العائلة",
-<<<<<<< HEAD
 "last login":"اخر نشاط للحالة",
 "active image": "الصورة المفعّلة",
 "inactive image": "الصورة غير المفعّلة",
@@ -3169,11 +3168,8 @@
   "user can send vip gift": "يمكن للمستخدم إرسال هدية كبار الشخصيات",
   "hide visitors to client pages": "إخفاء زوار صفحات العملاء",
   "hide room": "إخفاء الغرفة",
-  "user can not kick out from room": "لا يمكن طرد المستخدم من الغرفة"
-=======
-"last login":"اخير ظهور",
+  "user can not kick out from room": "لا يمكن طرد المستخدم من الغرفة",
 "This target has already been achieved by some users and cannot be updated.": "لقد قام بعض المستخدمين بتحقيق هذا التارجت بالفعل، ولا يمكن تعديله."
 
->>>>>>> b280e7e6fb1024f5615fa50480677caf2a31a571
 
 }
