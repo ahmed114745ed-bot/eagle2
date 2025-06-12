@@ -122,7 +122,7 @@ class VipService
 
         $isUsed = (bool)$request->type;
 
-        if ($isUsed) $this->userVipRepository->updateIsUsedForUser($user->id);
+        if (!$isUsed) $this->userVipRepository->updateIsUsedForUser($user->id);
 
         // update is used
         // $this->userVipRepository->updateIsUsedWithNum($user_vip, $isUsed);
