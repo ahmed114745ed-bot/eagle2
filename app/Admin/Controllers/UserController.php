@@ -900,18 +900,6 @@ class UserController extends MainController
             );
         }
 
-//        $form->multipleImage('images', 'Images');
-//
-//        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
-//            Admin::script(
-//                <<<JS
-//        $(document).ready(function() {
-//            $('input[name="images[]"]').closest('.form-group').find('.fileinput-remove').hide();
-//        });
-//        JS
-//            );
-//        }
-
         $state = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
