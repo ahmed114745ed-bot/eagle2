@@ -383,6 +383,7 @@ class WareTabController extends MainController
                     if ($ext === 'mp4') {
                         $urlVideo = upload($form->img2);
 
+
                         $videoPath = getDriverUrl() . '/' . $urlVideo;
 
                         $wareId = $form->model()->id;
