@@ -21,7 +21,6 @@ class HomeCarouselController extends Controller
             $notificationId = $request->header('x-notification-id');
             $user->notification_id = $notificationId;
             $user->save();
-            return response()->json(['success' => true, 'message' => 'Notification ID updated successfully']);
         }
 
         $items = HomeCarousel::query()
