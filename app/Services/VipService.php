@@ -399,6 +399,7 @@ class VipService
         //     return $oVip;
         // });
 
+        dd('ddddddddddddddddddd');
         $userVips = $this->userVipRepository->getAllByUserId($userId);
         $vipPrivileges = $this->vipPrivilegeRepository->all();
 
@@ -408,7 +409,6 @@ class VipService
             $oVips->pluck('level')->unique(),
             $vipPrivileges->pluck('type')->unique()
         );
-        dd($userVips,$oVips,$wares);
         $userVips->each(function ($userVip) use ($wares) {
             $oVip = $userVip->OVip;
             if ($oVip) {
