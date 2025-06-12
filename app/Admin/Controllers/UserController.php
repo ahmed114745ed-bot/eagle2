@@ -888,11 +888,17 @@ class UserController extends MainController
         });
 
         $form->image('profile.image_id', __('image Id'));
-        $profileImage = $form->image('profile.avatar', __('image profile'));
 
-        if (Admin::user()->can('delete-avatar')) {
-            $profileImage->removable();
+        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
+            Admin::script(
+                <<<JS
+                    $(document).ready(function() {
+                        $('input[name="photo"]').closest('.form-group').find('.fileinput-remove').hide();
+                    });
+                    JS
+            );
         }
+
         $state = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],

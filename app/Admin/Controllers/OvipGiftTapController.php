@@ -422,29 +422,62 @@ class OvipGiftTapController extends MainController
     }
 
 
+    // private function tabsComponent($privileges, $level, $type)
+    // {
+    //     $content = new Row();
+
+    //     // Fetch distinct privilege types and names
+    //     if (app()->getLocale() == 'en') {
+
+    //         $privilegeTypes = $privileges?->pluck('en_name', 'type')->sortKeys();
+    //     } else {
+    //         $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
+    //     }
+
+    //     $currentType = request()->get('type', $privilegeTypes?->keys()->first());
+    //     $alert = false;
+    //     if (!$type) {
+    //         $alert = true;
+    //     }
+    //     $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
+    //         'types' => $privilegeTypes,
+    //         'currentType' => $currentType,
+    //         'alert' => $alert,
+    //         'level' => $level
+    //     ]));
+
+    //     $content->column(12, $box);
+
+    //     return $content;
+    // }
+
     private function tabsComponent($privileges, $level, $type)
     {
         $content = new Row();
 
         // Fetch distinct privilege types and names
         if (app()->getLocale() == 'en') {
-
             $privilegeTypes = $privileges?->pluck('en_name', 'type')->sortKeys();
         } else {
             $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
+
+        $currentType = request()->get('type', $privilegeTypes?->keys()->first());
+
+        $alert = !$type;
+
+        // Inject JS to set type param on first load
         if (!request()->has('type') && $privilegeTypes->isNotEmpty()) {
             $firstType = $privilegeTypes->keys()->first();
+            \Encore\Admin\Admin::script(<<<SCRIPT
+            document.addEventListener("DOMContentLoaded", function () {
+                const url = new URL(window.location.href);
+                url.searchParams.set('type', '$firstType');
+                window.location.href = url.toString(); // Force reload with type
+            });
+        SCRIPT);
+        }
 
-            return redirect()->to(
-                request()->fullUrlWithQuery(['type' => $firstType])
-            );
-        }
-        $currentType = request()->get('type', $privilegeTypes?->keys()->first());
-        $alert = false;
-        if (!$type) {
-            $alert = true;
-        }
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
             'types' => $privilegeTypes,
             'currentType' => $currentType,
