@@ -122,7 +122,7 @@ class VipService
 
         $isUsed = (bool)$request->type;
 
-        if ($isUsed) $this->userVipRepository->updateIsUsedForUser($user->id);
+        if (!$isUsed) $this->userVipRepository->updateIsUsedForUser($user->id);
 
         // update is used
         // $this->userVipRepository->updateIsUsedWithNum($user_vip, $isUsed);
@@ -136,7 +136,8 @@ class VipService
             $data['expire'] = ($user_vip->days == 0) ? 0 : now()->addDays($user_vip->days * $user_vip->qty)->timestamp;
         }
         $this->userVipRepository->update($data, $user_vip->id);
-
+        if ($isUsed) $this->userVipRepository->updateTrueIsUsedForUser($user->id);
+        
         $user_vip = $this->userVipRepository->findByIdWithOVip($request->vip_id);
 
         $vip = $user_vip->OVip;
