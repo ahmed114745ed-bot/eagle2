@@ -55,18 +55,14 @@ class OvipGiftTapController extends MainController
                 $row->column(12, $this->tabsComponent($ovip?->privilegs, $ovip?->id, $ovip?->privilegs->first()?->type));
             })
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
+                $type = request('type');
+                if (in_array($type, [13, 17])) {
+                    $row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . __('comeback later') . '</div>');
+                } else {
+                    $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
+                }
             }));
 
-
-        // Dynamically add rows for each level
-        // foreach ($ovip->privilegs as $privileg) {
-        //     $content = $content
-        //         ->header(trans('admin.index'))
-
-        //         ->row($buttonHTML);
-        //     $content->row($this->gridDynamic($ovip->level, $privileg->type));
-        // }
 
         return $content;
     }
@@ -128,8 +124,10 @@ class OvipGiftTapController extends MainController
 
         $grid->title(__('title'));
         $grid->expire(__('expire'));
-        if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('delete-' . $this->permission_name)) {
-            $grid->column('actions', __('Actions'))->display(function () use ($type) {
+        if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('edit-' . $this->permission_name)) {
+            $permission = $this->permission_name;
+            $grid->column('actions', __('Actions'))->display(function () use ($type,$permission) {
+
                 $id = $this->id;
 
                 $editUrl = url("admin/ware-gifts/{$id}/edit");
@@ -144,7 +142,7 @@ class OvipGiftTapController extends MainController
                 $deleteBtn = '';
 
                 // Check permission for EDIT button
-                if (\Admin::user()->can('edit-' . $this->permission_name) || \Admin::user()->can('*')) {
+                if (\Admin::user()->can('edit-' . $permission) || \Admin::user()->can('*')) {
                     $editBtn = <<<HTML
             <a href="{$editUrl}" class="btn btn-xs btn-primary" style="margin-right: 5px">
                 <i class="fa fa-edit"></i> {$editText}
@@ -153,7 +151,7 @@ class OvipGiftTapController extends MainController
                 }
 
                 // Check permission for DELETE button
-                if (\Admin::user()->can('delete-' . $this->permission_name) || \Admin::user()->can('*')) {
+                if (\Admin::user()->can('delete-' . $permission) || \Admin::user()->can('*')) {
                     $deleteBtn = <<<HTML
             <form action="{$deleteUrl}" method="POST" style="display:inline-block;" onsubmit="return confirm('{$confirmText}')">
                 <input type="hidden" name="_token" value="{$csrf}">
@@ -178,7 +176,7 @@ class OvipGiftTapController extends MainController
         $grid->disableCreateButton();
         $this->extendGrid($grid);
         $grid->disableExport();
-        if ($firstType && (Admin::user()->can('create-' . $this->permission_name) || Admin::user()->can('*') )) {
+        if ($firstType && (Admin::user()->can('create-' . $this->permission_name) || Admin::user()->can('*'))) {
 
 
             $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
@@ -224,149 +222,47 @@ class OvipGiftTapController extends MainController
         $form->hidden('is_active_for_vip')->value(1);
         $form->hidden('get_type')->value(1);
         $form->hidden('enable')->value(1);
+        if (request('type') != 18) {
+            $form->display('ID');
+            $form->text('name', trans('name'));
+            $form->text('name_en', trans('Name en'));
+            $form->text('title', trans('title'));
+            $form->text('title_en', trans('Title en'));
 
-        $form->display('ID');
-        $form->text('name', trans('name'));
-        $form->text('name_en', trans('Name en'));
-        $form->text('title', trans('title'));
-        $form->text('title_en', trans('Title en'));
-        // if (!$form->isEditing()) {
-        //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-        //         $form->currency('price', __('price'));
-        //        // $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-        //     }
-        // }
-        // if ($form->isEditing()) {
-        //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-        //        // $form->currency('price', __('price'));
-        //      //   $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-        //     }
-        // }
 
-        //  $form->number('exp', __('exp'));
+            $form->image('show_img', trans('img'))->name(function ($file) {
+                return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            })->default('1.png');
+            $form->file('img2', trans('svg'))
+                ->name(function ($file) {
+                    return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+                });
 
-        $form->image('show_img', trans('img'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->default('1.png');
-        //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))
-            ->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            });
-        //        $form->select('image_type1', __('image_type'))->options(
-        //            [
-        //                'svga' => __('svga'),
-        //                'alpha' => __('alpha'),
-        //                'mp4' => __('mp4'),
-        //                'vap' => __('vap'),
-        //
-        //            ]
-        //        )->attribute(['id' => 'image_type1'])->required();
-        //
-        //        $form->select('profile_frame_type', __('image_type'))->options(
-        //            [
-        //                'svga' => __('svga'),
-        //                'png' => __('png'),
-        //
-        //            ]
-        //        )->attribute(['id' => 'profile_frame'])->required();
-        $form->keyValue('key_json', 'key_json');
-        if ($form->isEditing()) {
-            $form->select('image_type1', __('image_type'))->options(
-                [
-                    'svga' => __('svga'),
-                    'alpha' => __('alpha'),
-                    'mp4' => __('mp4'),
-                    'vap' => __('vap'),
+            $form->keyValue('key_json', 'key_json');
+            if ($form->isEditing()) {
+                $form->select('image_type1', __('image_type'))->options(
+                    [
+                        'svga' => __('svga'),
+                        'alpha' => __('alpha'),
+                        'mp4' => __('mp4'),
+                        'vap' => __('vap'),
 
-                ]
-            )->attribute(['id' => 'image_type1']);
+                    ]
+                )->attribute(['id' => 'image_type1']);
 
-            $form->select('profile_frame_type', __('image_type'))->options(
-                [
-                    'svga' => __('svga'),
-                    'png' => __('png'),
+                $form->select('profile_frame_type', __('image_type'))->options(
+                    [
+                        'svga' => __('svga'),
+                        'png' => __('png'),
 
-                ]
-            )->attribute(['id' => 'profile_frame']);
-        }
-
-        $form->saving(function (Form $form) {
-
-            if (!$form->show_img && !$form->img2) {
-                $error = new MessageBag([
-                    'title'   => 'Error',
-                    'message' => 'Please upload at least one image',
-                ]);
-
-                return back()->with(compact('error'));
+                    ]
+                )->attribute(['id' => 'profile_frame']);
             }
 
-            if ($form->show_img instanceof UploadedFile) {
-                $allowedExtensions = [
-                    'svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp',
-                    'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',
-                ];
 
-                $ext = strtolower($form->show_img->guessExtension());
+            $form->text('key', trans('key'));
 
-                if (!in_array($ext, $allowedExtensions)) {
-                    throw ValidationException::withMessages([
-                        'show_img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
-                    ]);
-                }
-
-                $form->image_type1 = $ext;
-            }
-
-            if ($form->img2 instanceof UploadedFile) {
-
-                $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
-
-                $ext = strtolower($form->img2->guessExtension());
-                $originalExt = strtolower($form->img2->getClientOriginalExtension());
-
-                if ($ext === 'zz' && $originalExt === 'svga') {
-                    $ext = 'svga';
-                }
-
-                if ($ext === 'mp4') {
-                    $urlVideo = $this->upload($form->img2);
-
-                    $videoPath = getDriverUrl() . '/' . $urlVideo;
-
-                    $wareId = $form->model()->id;
-
-                    (new FfmpegService())->extract($videoPath, $wareId);
-
-                    $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
-
-                    $response = Http::attach(
-                        'image',
-                        Storage::disk('gcs')->get($imagePath),
-                        $wareId . '.jpg'
-                    )->post('https://utd-test.utdsoftware.com/api/analyze-media');
-
-                    $responseData = $response->json();
-
-                    if ($response->successful() && isset($responseData['data']['video_type'])) {
-                        $ext = strtolower($responseData['data']['video_type']);
-                    }
-                }
-
-                if (!in_array($ext, $allowedExtensions)) {
-                    throw ValidationException::withMessages([
-                        'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
-                    ]);
-                } else {
-                    $form->profile_frame_type = $ext;
-                }
-            }
-        });
-
-        $form->text('key', trans('key'));
-
-        $script = <<<SCRIPT
+            $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
                      var type = $('#type').val();
@@ -386,22 +282,98 @@ class OvipGiftTapController extends MainController
                  });
              });
              SCRIPT;
-        Admin::script($script);
+            Admin::script($script);
+        }
 
-        // if (Session::has('show_alert')) {
-        //     $form->html('<script>
-        //      $(document).ready(function () {
-        //          alert("الرجاء اختيار نوع  الصوره");
-        //      });
-        //  </script>');
-        // }
-        //        $form->file('img3', trans('video'));
         if (request('type') == 18) $form->color('color', trans('color'));
-        // $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+        if (request('type') != 18) {
+            $form->saving(function (Form $form) {
 
-        //        $form->number('sort', 'sort');
-        // $form->number('num', __('num'));
+                if (!$form->show_img && !$form->img2) {
+                    $error = new MessageBag([
+                        'title'   => 'Error',
+                        'message' => 'Please upload at least one image',
+                    ]);
 
+                    return back()->with(compact('error'));
+                }
+
+                if ($form->show_img instanceof UploadedFile) {
+                    $allowedExtensions = [
+                        'svga',
+                        'mp4',
+                        'jpg',
+                        'jpeg',
+                        'png',
+                        'gif',
+                        'bmp',
+                        'tiff',
+                        'svg',
+                        'webp',
+                        'mov',
+                        'avi',
+                        'wmv',
+                        'flv',
+                        'mkv',
+                        'webm',
+                    ];
+
+                    $ext = strtolower($form->show_img->guessExtension());
+
+                    if (!in_array($ext, $allowedExtensions)) {
+                        throw ValidationException::withMessages([
+                            'show_img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+                        ]);
+                    }
+
+                    $form->image_type1 = $ext;
+                }
+
+                if ($form->img2 instanceof UploadedFile) {
+
+                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
+
+                    $ext = strtolower($form->img2->guessExtension());
+                    $originalExt = strtolower($form->img2->getClientOriginalExtension());
+
+                    if ($ext === 'zz' && $originalExt === 'svga') {
+                        $ext = 'svga';
+                    }
+
+                    if ($ext === 'mp4') {
+                        $urlVideo = upload($form->img2);
+
+                        $videoPath = getDriverUrl() . '/' . $urlVideo;
+
+                        $wareId = $form->model()->id;
+
+                        (new FfmpegService())->extract($videoPath, $wareId);
+
+                        $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
+
+                        $response = Http::attach(
+                            'image',
+                            Storage::disk('gcs')->get($imagePath),
+                            $wareId . '.jpg'
+                        )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+
+                        $responseData = $response->json();
+
+                        if ($response->successful() && isset($responseData['data']['video_type'])) {
+                            $ext = strtolower($responseData['data']['video_type']);
+                        }
+                    }
+
+                    if (!in_array($ext, $allowedExtensions)) {
+                        throw ValidationException::withMessages([
+                            'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+                        ]);
+                    } else {
+                        $form->profile_frame_type = $ext;
+                    }
+                }
+            });
+        }
         $form->saving(function (Form $form) {
 
             $id = $form->model()->id;
@@ -419,16 +391,17 @@ class OvipGiftTapController extends MainController
 
                 return back()->with(compact('error'));
             }
-            $imageType1 = $form->input('image_type1');
-            $profileFrameType = $form->input('profile_frame_type');
-            $form->model()->image_type = $imageType1 ?? $profileFrameType;
+            if (request('type') != 18) {
+                $imageType1 = $form->input('image_type1');
+                $profileFrameType = $form->input('profile_frame_type');
+                $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
-            if (is_null($imageType1) && is_null($profileFrameType)) {
+                if (is_null($imageType1) && is_null($profileFrameType)) {
 
-                session()->flash('show_alert', 'Your alert message');
-                return redirect()->back();
+                    session()->flash('show_alert', 'Your alert message');
+                    return redirect()->back();
+                }
             }
-
 
             (new UserCounterServices)->eventUsers('ware');
         });
@@ -445,14 +418,6 @@ class OvipGiftTapController extends MainController
         return $form;
     }
 
-
-    public  static function upload($file): ?string
-    {
-        $extension      = $file->getClientOriginalExtension();
-        $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
-        $file->storeAs('videos', $uniqueFileName, 'gcs');
-        return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
-    }
 
     private function tabsComponent($privileges, $level, $type)
     {
