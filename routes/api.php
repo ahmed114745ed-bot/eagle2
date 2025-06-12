@@ -242,6 +242,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
                 Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone']);
                 Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone']);
+                Route::post('kick_microphone', [MicrophoneController::class, 'kickMicrophone']);
                 Route::post('mute_microphone', [MicrophoneController::class, 'mute_microphone']);
                 Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone']);
                 Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);

@@ -97,6 +97,11 @@ class MicrophoneController extends Controller
         }
     }
 
+    public function kickMicrophone(Request $request)
+    {
+        return $this->microphoneService->kickMicrophone($request);
+    }
+
     //unmute mic place
     public function unmute_microphone(Request $request)
     {
