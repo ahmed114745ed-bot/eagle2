@@ -60,20 +60,4 @@
         display: inline-block;
     }
 </style>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
 
-        // Only append type if it's not already set
-        if (!urlParams.has('type')) {
-            const firstType = "{{ $types->keys()->first() }}"; // From your Blade variable
-            const newUrl = new URL(window.location.href);
-
-            newUrl.searchParams.set('type', firstType);
-            window.history.replaceState({}, '', newUrl); // Change URL without reload
-
-            // Optionally trigger a reload if needed
-            location.reload();
-        }
-    });
-</script>
