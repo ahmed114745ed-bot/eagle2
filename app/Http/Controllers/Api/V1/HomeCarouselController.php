@@ -17,8 +17,8 @@ class HomeCarouselController extends Controller
         logger('Headers:', $request->headers->all());
 
         logger('Request Data:', $request->all());
-        if ($request->hasHeader('notification_id')) {
-            $notificationId = $request->header('notification_id');
+        if ($request->input('notification_id')) {
+            $notificationId = $request->input('notification_id');
             $user->notification_id = $notificationId; 
             $user->save();  
             return response()->json(['success' => true, 'message' => 'Notification ID updated successfully']);
