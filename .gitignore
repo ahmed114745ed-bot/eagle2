@@ -30,3 +30,4 @@ php.ini
 gcp.json
 /config/theme.php
 /config/laravel-ffmpeg.php
+/config/filesystem.php
