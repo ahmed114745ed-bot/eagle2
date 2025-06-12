@@ -88,8 +88,7 @@ class UserRepository extends Repository
             })
             ->whereDoesntHave('shippingAgency') 
             ->where(function ($query) use ($key) {
-                $query->where('name', 'like', '%' . $key . '%')
-                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
@@ -109,8 +108,7 @@ class UserRepository extends Repository
                 $query->where('type', 1);
             })
             ->where(function ($query) use ($key) {
-                $query->where('name', 'like', '%' . $key . '%')
-                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
@@ -154,8 +152,7 @@ class UserRepository extends Repository
                     ->orWhereNull('family_id');
             })
             ->where(function ($query) use ($key) {
-                $query->where('name', 'like', '%' . $key . '%')
-                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
