@@ -888,7 +888,11 @@ class UserController extends MainController
         });
 
         $form->image('profile.image_id', __('image Id'));
-        $form->image('profile.avatar', __('image profile'));
+        $profileImage = $form->image('profile.avatar', __('image profile'));
+
+        if (Admin::user()->can('delete-avatar')) {
+            $profileImage->removable();
+        }
         $state = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
