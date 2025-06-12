@@ -23,9 +23,7 @@ Dockerfile
 /data
 php.ini
 /public/settings.json
-
 /public/images/app-logo.png
-gcp.json
 /config/theme.php
 /config/laravel-ffmpeg.php
 /config/filesystem.php

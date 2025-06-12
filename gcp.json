@@ -1,0 +1,14 @@
+{
+  "type": "service_account",
+  "project_id": "dragon-chat-390215",
+  "private_key_id": "21f533eae4735e9b64b6217581359f957940ef19",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCkttNpCM5iJm5+\n/aYjFOUCTHbv8kkbwV0KFuiPLvxeXfOkUSa/IIjvgzUmevnR5umIhg0kowjl5NND\nE9Mur90mpNxcj3SGlEZjn5Bd6fr4+K4u7w+iCNBvcqJ2KPziwXseD6NCXQenZL0E\nDlX252lSBPbPo9OPpwLssTmWIdXt1EkcgWLHwfqZKmcN35CL525JAEGMm6ph+WeO\nQrOlLXyY5i+ETcBimDauuzp55WH3R6tQw8e5A1spnNzRXh8WcHSWE6L2ZeTXsovJ\nW+Qv9S6wfgLr3PmHUUt6GDicLn1TJ3rhLGmwI3mCiLhWO4c7ugArTVPeuhVmLvGv\nXqdjfXbPAgMBAAECggEAHqJ2TXm60Nxu/qV0ad/v++52zIfWexgKkt7R4BeQDokQ\n0IXbW/7UGR/hGcgTgKue0aqE9URxWjil5jrgszU4P4C4D2sK9CDNuqeptR3YdMfj\ntYz27l8PTTsX5jwXVKFBocSsy6H703FUClYUPPirSPrtYI8KwRQB4j3QBRFD9ZiS\nBylhPC7OJ2jb1sAqUr65vdUY1K/6Dz8u61LLEmg19iesnVncV1Jkgy9YmHVcxf/K\nucV6jQKhU1NZdb46dOwcxFAZEKOeG9+zi7ZBEeeu+jSeTz7FvP/78EyIY5UY0278\n/MlLhFtYx58s8R2pI/6pGB1Y1nbxXSAv0vh2iZZ9GQKBgQDo4LK4FNiC/K6CqbJz\n4IhvI7mA75IhgXD9gaWDw7bWL/f02QrHNuwwiixsR1VA4claoiIWAvjinS1Ar5EM\nb1esxlMj+sZOYiGFRCC04c+m4xWwDEHmoT2Ex3Pye8xt5TEZ8Qqx/5cwHBmNa+ly\n5nUGOFb78qOj+0rDO/vgHUP5CwKBgQC1EYqm+Dgy3YywYE/JH4j91OyNtTG3xWR5\ntN8Vr7PX/Ty4c+OQszpcmR/6yj6HjDrcW7WTqsz9SRvQcoqYek6zWJt7Sr8ji0Qg\nWEo6KQTv309nZVPFQdJ7BQu3z5N4fn7NZl6+m1aZ8g9iWxzVJMdbuHtf4tnldIUa\nnvsphey7zQKBgHeRTxHG2je+5xb9bDuk0EhIDmnOF7iOTmZK16Gkrk6gyG31tlv8\nrh5qA08A/RvYEdswHdIxanpn+yEYQ6Af1uNF3NA/ZOw/5DgZd7WHr2dfdvYyBPAW\nX5C6G6UnvRm7sI9CPJyRv52a/9+lxXISM4mjCb5IoY6Daqp9NOCoBgtrAoGBAIzu\nD03wCsXEXNl2zQLMkbKHRGrzabQQZii4V54oeEEXcGhcgvXAGh+yawqm2U5lHfcf\nRk+d9Bj8CzMNw8P0BkdfIv0ua2C955OJRJTKEnalB8eBPVdd6PYpMjqpzK1PP2Cd\nWgbfHuOJXOH/6owXKTfBef1ispf+Pg8/SFvESkLNAoGBAKxpfk5Z8iBmL8+KjJqS\n2JBFWo5HVD2nqUr3RzxCRcS7Wn5Q6yJd2PVZKs53ES5vXnfyUaLJNkEDNHkny4ZD\nSq+lSjoW2/C5jbH0eKOAguRZAACZBJxbky2d7LmTGnsSdtMZOdfKmsXJZ8yn9MZK\n0QWGXKHjnHCX6OFiai4+7h6D\n-----END PRIVATE KEY-----\n",
+  "client_email": "storge-sa@dragon-chat-390215.iam.gserviceaccount.com",
+  "client_id": "104955385990512005607",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/storge-sa%40dragon-chat-390215.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
+
