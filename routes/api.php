@@ -137,7 +137,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     });
 
 
-    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'throttle:4,1'])
+    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'throttle:10,1'])
         ->group(function () {
             Route::post('open', [\App\Http\Controllers\Api\V1\HomeController::class, 'openTicket']);
         });
