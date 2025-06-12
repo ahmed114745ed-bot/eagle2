@@ -60,24 +60,29 @@ class RegularTarget implements TargetInterface
         $extras = $extra;
         // $per = 0.50;
         $per = common::getDiamondsPercentage();
+        logger('getDiamondsPercentage Achieved:', [$per]);
         if ($target->hours <= $hours) {
             $per += (settings()->get('hours') ?? 0) / 100;
         }
+        logger('hours Achieved:', [$per]);
 
 
         if ($target->days <= $days) {
             $per +=  (settings()->get('days') ?? 0) / 100;
         }
 
+        logger('days Achieved:', [$per]);
 
         if ((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1] ?? 0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments']) {
 
             $per += (settings()->get('moments') ?? 0) / 100;
         }
+        logger('targetMoment Achieved:', [$per]);
 
         if ((@$targetReel[0] ?? 0) <= $extras['reel']['upload'] && (@$targetReel[1] ?? 0) <= $extras['reel']['likes'] && (@$targetReel[2] ?? 0) <= $extras['reel']['comments']) {
             $per += (settings()->get('reels') ?? 0) / 100;
         }
+        logger('targetReel Achieved:', [$per]);
 
 
         return $per;
