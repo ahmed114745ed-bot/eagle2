@@ -344,7 +344,7 @@ class OvipGiftTapController extends MainController
                     }
 
                     if ($ext === 'mp4') {
-                        $urlVideo = $this->upload($form->img2);
+                        $urlVideo = upload($form->img2);
 
                         $videoPath = getDriverUrl() . '/' . $urlVideo;
 
@@ -421,14 +421,6 @@ class OvipGiftTapController extends MainController
         return $form;
     }
 
-
-    public  static function upload($file): ?string
-    {
-        $extension      = $file->getClientOriginalExtension();
-        $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
-        $file->storeAs('videos', $uniqueFileName, 'gcs');
-        return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
-    }
 
     private function tabsComponent($privileges, $level, $type)
     {

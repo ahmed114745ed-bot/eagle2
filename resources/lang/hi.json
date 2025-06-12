@@ -2593,6 +2593,7 @@
 "wapel": "प्रवेश प्रभाव",
 "family profile": "परिवार प्रोफ़ाइल",
 "last login": "आखिरी लॉगिन",
+<<<<<<< HEAD
 "active image": "सक्रिय छवि",
   "inactive image": "निष्क्रिय छवि",
   "no ban profile": "प्रोफ़ाइल प्रतिबंधित नहीं है",
@@ -2602,6 +2603,10 @@
   "hide visitors to client pages": "क्लाइंट पृष्ठों पर आगंतुकों को छुपाएं",
   "hide room": "कक्ष छुपाएं",
   "user can not kick out from room": "उपयोगकर्ता को कक्ष से बाहर नहीं निकाला जा सकता"
+=======
+"This target has already been achieved by some users and cannot be updated.": "इस लक्ष्य को कुछ उपयोगकर्ताओं द्वारा पहले ही प्राप्त किया जा चुका है और इसे अपडेट नहीं किया जा सकता।"
+
+>>>>>>> b280e7e6fb1024f5615fa50480677caf2a31a571
 
 
 

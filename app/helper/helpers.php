@@ -7,6 +7,7 @@ use App\Classes\AppSetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
+use Illuminate\Support\Str;
 use Yasser\AgoraToken\RtmTokenBuilder;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
 
@@ -165,6 +166,16 @@ if (!function_exists('checkStoredProcedureExists')) {
     {
         $data = sprintf("%s%s%d", $nonce, $appKey, $timestamp);
         return md5($data);
+    }
+}
+
+if (!function_exists('upload')) {
+    function upload($file): ?string
+    {
+        $extension      = $file->getClientOriginalExtension();
+        $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
+        $file->storeAs('videos', $uniqueFileName, 'gcs');
+        return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
     }
 }
 
