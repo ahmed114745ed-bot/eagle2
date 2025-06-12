@@ -158,13 +158,13 @@ class AgencyController extends MainController
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::with(['admins', 'owner:id,name,uuid'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->find($id);
         });
         if (!$agency) {
             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
                 return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
-                    ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+                    ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                     ->find($id);
             });
         }
@@ -350,7 +350,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
-        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'salary', 'coins', 'img')
+        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img')
             ->where(function ($query) {
                 $query->WhereDoesntHave('additionalInfo')
                     ->orWhereHas('additionalInfo', function ($query) {
@@ -838,7 +838,7 @@ class AgencyController extends MainController
         });
 
         $form->saved(function (Form $form) {
-           
+
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $form->model()->app_owner_id,
                 'agency_id' => $form->model()->id,

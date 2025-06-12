@@ -888,6 +888,7 @@ class UserController extends MainController
         });
 
         $form->image('profile.image_id', __('image Id'));
+        $form->image('profile.avatar', __('image profile'));
         $state = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
