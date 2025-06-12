@@ -5,8 +5,10 @@ namespace App\Tik\Services;
 use App\Exceptions\CValidationException;
 use App\Helpers\Common;
 use App\Facades\UserHandling;
+use App\Models\Profile;
 use DB;
 use Google_Client;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use App\Tik\Repositories\UserRepository;
@@ -123,10 +125,11 @@ class AuthService
         return [$user, $token];
     }
 
+    /**
+     * @throws \Exception
+     */
     public function loginWithGoogle($request)
     {
-
-
         $client = new Google_Client();
 
         $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
@@ -168,7 +171,6 @@ class AuthService
                     'country_id' => @$country->id ?: null,
                     'is_points_first' => 1,
                     'status' => true,
-
                 ];
                 //                $checkValidation = $this->verifyGoogleToken($request['id_token']);
                 //                if (!$checkValidation) {
@@ -176,6 +178,9 @@ class AuthService
                 //                }
                 $is_new = true;
                 $user = $this->userRepository->create($data);
+
+                $this->storeImage($request, $data, $user);
+
                 if (\request('tags') && is_array(\request('tags'))) {
                     $user->tags()->attach(\request('tags'));
                 }
@@ -191,6 +196,43 @@ class AuthService
         return [$user, $token, []];
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function storeImage($request, $data, $user)
+    {
+        if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
+            $img = $request['image'];
+            $imageType = $img->getClientOriginalExtension();
+            if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
+                throw new \Exception( __('api_responses.gifImage'));
+            }
+
+            $user->profile_count += 1;
+            $user->save();
+            $profile = $user->profile;
+            if($profile)
+            {
+                $profile->fill($data);
+                $profile->save();
+            }else{
+                $profile = Profile::create([
+                    'gender' => null,
+                    'birthday' => null,
+                    'province' => null,
+                    'city' => null,
+                    'country' => null,
+                    'user_id'=> @$user->id,
+                ]);
+            }
+
+            $newImagePass = Common::uploadProfileUser('profile', $img, $profile->id, $user->profile_count);
+            $profile->avatar = $newImagePass;
+            $profile->save();
+
+            return $profile;
+        }
+    }
 
     public function loginWithApple($request, $unique_id)
     {
