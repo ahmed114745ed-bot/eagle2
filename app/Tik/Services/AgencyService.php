@@ -221,6 +221,8 @@ class AgencyService
         if ($accept === 0 || $accept === false) {
             $action->status = 2;
             $action->save();
+            CustomNotification::rejectAgency($agency, $user);
+
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();

@@ -250,7 +250,7 @@ class OvipGiftTapController extends MainController
         $form->hidden('enable')->value(1);
         $id = request()->route('ware_gift');
         $ware = Ware::find($id);
-        if ((request('type') && (request('type') != 18)) || ($form->isEditing() && $ware && ($ware->type != 18))) {
+        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
             $form->display('ID');
             $form->text('name', trans('name'));
@@ -288,7 +288,7 @@ class OvipGiftTapController extends MainController
 
             if ($ware->type == 18)  $form->color('color', trans('color'));
         }
-        if ((request('type') && (request('type') != 18)) || ($form->isEditing() && $ware && ($ware->type != 18))) {
+        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
 
@@ -394,7 +394,7 @@ class OvipGiftTapController extends MainController
 
                 return back()->with(compact('error'));
             }
-            if (request('type') != 18) {
+            if (request('type') != 18 || request('type') != 21) {
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type');
                 $form->model()->image_type = $imageType1 ?? $profileFrameType;
@@ -422,23 +422,62 @@ class OvipGiftTapController extends MainController
     }
 
 
+    // private function tabsComponent($privileges, $level, $type)
+    // {
+    //     $content = new Row();
+
+    //     // Fetch distinct privilege types and names
+    //     if (app()->getLocale() == 'en') {
+
+    //         $privilegeTypes = $privileges?->pluck('en_name', 'type')->sortKeys();
+    //     } else {
+    //         $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
+    //     }
+
+    //     $currentType = request()->get('type', $privilegeTypes?->keys()->first());
+    //     $alert = false;
+    //     if (!$type) {
+    //         $alert = true;
+    //     }
+    //     $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
+    //         'types' => $privilegeTypes,
+    //         'currentType' => $currentType,
+    //         'alert' => $alert,
+    //         'level' => $level
+    //     ]));
+
+    //     $content->column(12, $box);
+
+    //     return $content;
+    // }
+
     private function tabsComponent($privileges, $level, $type)
     {
         $content = new Row();
 
         // Fetch distinct privilege types and names
         if (app()->getLocale() == 'en') {
-
             $privilegeTypes = $privileges?->pluck('en_name', 'type')->sortKeys();
         } else {
             $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
 
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
-        $alert = false;
-        if (!$type) {
-            $alert = true;
+
+        $alert = !$type;
+
+        // Inject JS to set type param on first load
+        if (!request()->has('type') && $privilegeTypes->isNotEmpty()) {
+            $firstType = $privilegeTypes->keys()->first();
+            \Encore\Admin\Admin::script(<<<SCRIPT
+            document.addEventListener("DOMContentLoaded", function () {
+                const url = new URL(window.location.href);
+                url.searchParams.set('type', '$firstType');
+                window.location.href = url.toString(); // Force reload with type
+            });
+        SCRIPT);
         }
+
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
             'types' => $privilegeTypes,
             'currentType' => $currentType,
