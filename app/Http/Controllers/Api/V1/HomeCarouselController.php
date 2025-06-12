@@ -14,11 +14,11 @@ class HomeCarouselController extends Controller
     public function index(Request $request)
     {
         $user =Auth::user();
-        logger('Headers:', $request->headers->all());
+        // logger('Headers:', $request->headers->all());
 
-        logger('Request Data:', $request->all());
-        if ($request->input('notification_id')) {
-            $notificationId = $request->input('notification_id');
+        // logger('Request Data:', $request->all());
+        if ($request->hasHeader('x-notification-id"')) {
+            $notificationId = $request->header('x-notification-id"');
             $user->notification_id = $notificationId; 
             $user->save();  
             return response()->json(['success' => true, 'message' => 'Notification ID updated successfully']);
