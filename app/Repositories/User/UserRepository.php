@@ -50,6 +50,7 @@ class UserRepository extends Repository
 
     public function searchUserAgency($key, $page, $perPage)
     {
+      
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
         ->where(function ($query) {
                 $query->where('agency_id', 0)
@@ -64,9 +65,12 @@ class UserRepository extends Repository
             })
             ->whereDoesntHave('shippingAgency') 
             ->where(function ($query) use ($key) {
-                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
-                    ->orWhere('id', 'like', '%' . $key . '%');
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%')
+                    ->orWhere('special_id', 'like', '%' . $key . '%');
             })
+           
             ->paginate($perPage, ['*'], 'page', $page);
 
     }
@@ -131,8 +135,11 @@ class UserRepository extends Repository
                 $query->where('type', 2)->where('deleted_at' , null);
             })
             ->where(function ($query) use ($key) {
-                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
-                    ->orWhere('id', 'like', '%' . $key . '%');
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%')
+                    ->orWhere('special_id', 'like', '%' . $key . '%');
+
             })
             ->paginate($perPage, ['*'], 'page', $page);
     }
