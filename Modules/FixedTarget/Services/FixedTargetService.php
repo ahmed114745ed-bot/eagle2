@@ -174,6 +174,9 @@ class FixedTargetService
         //     ['target_id' => $target->id],
         //     'get_target'
         // );
+        logger('agency_usd Achieved:', [$agency_usd]);
+        logger('percentageAchieved Achieved:', [$percentageAchieved]);
+        logger(' Achieved:', [$agency_usd * $percentageAchieved]);
 
         try {
             $values = [
@@ -290,6 +293,9 @@ class FixedTargetService
                 $appProfit        = $target->app_profit_percentage / 100;
                 $db               = $target->db_percentage / 100;
                 $user->target_usd = $t;
+                logger('t:', [$t]);
+                logger('Percentage Achieved:', [$percentageAchieved]);
+                logger('target_usd Achieved:', [$user->target_usd]);
 
                 $extras = [
                     "moment" => [
