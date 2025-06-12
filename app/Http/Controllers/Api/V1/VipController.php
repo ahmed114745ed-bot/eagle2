@@ -42,7 +42,6 @@ class VipController extends Controller
     }
     public function vipUserList(Request $request)
     {
-        dd("dddddddddddddddddddddd");
         $userId = $request->user()->id;
         $data = $this->vipService->vipUserList($userId);
 
