@@ -816,7 +816,9 @@ class Common
 
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
-      //  dd($userVip->is_used);
+        //  dd($userVip->is_used);
+        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('expire', '<', now()->timestamp)->where('expire', '!=', 0)->where('vip_user_id', "!=", $userVip->$userVip)->delete();
+
         $type = $vip->privilegs()->pluck('type')->toArray();
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
         foreach ($wares as $ware) {
@@ -860,7 +862,10 @@ class Common
                     ]
                 );
             }
-           if (in_array($ware->type, [4, 5, 6]))  self::userDress($ware, $user, $userVip->is_used);
+            if (in_array($ware->type, [4, 5, 6])) {
+                self::userDress($ware, $user, $userVip->is_used);
+                self::unUsePack($type, $user);
+            }
         }
         $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
             $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
@@ -878,21 +883,27 @@ class Common
         Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
     }
 
+    public static function  unUsePack($type, $user)
+    {
+        Pack::where('type', $type)
+            ->where('user_id', $user->id)
+            ->where('get_type', '!=', 1)
+            ->update(['is_used' => 0]);
+    }
+
     public static function userDress($ware, $user, $isUsed)
     {
-        switch ($ware->type) {
-            case 4:
-                $user->dress_1 = $isUsed ? ($ware->id) : null;
-                break;
-            case 5:
-                $user->dress_2 = $isUsed ? $ware->id : null;
-                break;
-            case 6:
-                $user->dress_3 = $isUsed ? ($ware->id) : null;
-                break;
-        }
+        $dressFieldMap = [
+            4 => 'dress_1',
+            5 => 'dress_2',
+            6 => 'dress_3',
+        ];
 
-        $user->save();
+        if (isset($dressFieldMap[$ware->type])) {
+            $field = $dressFieldMap[$ware->type];
+            $user->$field = $isUsed ? $ware->id : null;
+            $user->save();
+        }
     }
 
 

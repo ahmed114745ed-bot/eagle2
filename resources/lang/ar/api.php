@@ -122,6 +122,7 @@ return [
     'Admin' => 'اداري',
     'add_admin_agency' => 'تمت إضافتك كمسؤول إلى الوكالة: :name',
     'remove_admin_agency' => 'تمت إزالتك من إدارة الوكالة: :name',
+    'reject_agency' => 'تم رفض طلب الانضمام إلى الوكالة :name.',
 
 
 

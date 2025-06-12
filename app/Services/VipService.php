@@ -100,11 +100,12 @@ class VipService
             'user_id' => $user_id,
             'vip_id' => $vip->id,
             'level' => $vip->level,
-            'expire' => $ex,
+            'expire' => null,
             'qty' => $qty,
             'price' => $vip->price,
             'total' => $total,
-            'is_used' => 0
+            'is_used' => 0,
+            'days' => $vip->expire,
         ];
         $this->userVipRepository->create($data);
         $countWares = $this->wareRepository->countWareByLevel($vip->level);
@@ -124,14 +125,25 @@ class VipService
         if ($isUsed) $this->userVipRepository->updateIsUsedForUser($user->id);
 
         // update is used
-        $this->userVipRepository->updateIsUsedWithNum($user_vip, $isUsed);
+        // $this->userVipRepository->updateIsUsedWithNum($user_vip, $isUsed);
+         $user_vip->num_used += 1;
+        $data = [
+            'num_used' =>  $user_vip->num_used,
+            'is_used' => $isUsed,
+            'using'  => 1,
+        ];
+        if ($user_vip->using == 0) {
+            $data['expire'] = ($user_vip->days == 0) ? 0 : now()->addDays($user_vip->days * $user_vip->qty)->timestamp;
+        }
+        $this->userVipRepository->update($data, $user_vip->id);
+
         $user_vip = $this->userVipRepository->findByIdWithOVip($request->vip_id);
 
         $vip = $user_vip->OVip;
-       // if ($user_vip->num_used <= 1) {
-            // add vip data to user
-            Common::handelVip($vip, $user, null, $user_vip);
-       // }
+        // if ($user_vip->num_used <= 1) {
+        // add vip data to user
+        Common::handelVip($vip, $user, null, $user_vip);
+        // }
         return  $data['target_id'] = $user_vip->id;
     }
 
@@ -269,7 +281,7 @@ class VipService
 
                 $data = $this->userVipRepository->create($data);
             }
-            Common::handelVip($vip, $user,null, userVip: $userVip);
+            Common::handelVip($vip, $user, null, userVip: $userVip);
             DB::commit();
             $ex = Carbon::parse($ex)->diffInDays(now());
             CustomNotification::vips($user, $ex, $vip->img);
@@ -337,7 +349,7 @@ class VipService
 
             $data = $this->userVipRepository->create($data);
             // }
-            Common::handelVip($vip, $user ,null,$data);
+            Common::handelVip($vip, $user, null, $data);
             DB::commit();
             $ex = Carbon::parse($ex)->diffInDays(now());
             CustomNotification::vips($user, $ex, $vip->img);

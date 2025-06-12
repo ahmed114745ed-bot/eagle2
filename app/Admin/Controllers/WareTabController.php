@@ -6,6 +6,10 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
@@ -14,8 +18,9 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Validation\ValidationException;
 use Modules\Public\Http\Services\UserCounterServices;
-
+use Modules\Reals\Http\Services\FfmpegService;
 
 
 class WareTabController extends MainController
@@ -255,30 +260,37 @@ class WareTabController extends MainController
         $form->switch('is_active_for_vip', __("active vip"))->states($states);
         $form->number('exp', __('exp'));
 
+
+        //        $form->image('img1', trans('img'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-        //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        });
-        $form->select('image_type1', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'alpha' => __('alpha'),
-                'mp4' => __('mp4'),
-                'vap' => __('vap'),
+        $form->file('img2', trans('svg'))
+            ->name(function ($file) {
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            });
 
-            ]
-        )->attribute(['id' => 'image_type1'])->required();
 
-        $form->select('profile_frame_type', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'png' => __('png'),
+        if ($form->isEditing()) {
+            $form->select('image_type1', __('image_type'))->options(
+                [
+                    'svga' => __('svga'),
+                    'alpha' => __('alpha'),
+                    'mp4' => __('mp4'),
+                    'vap' => __('vap'),
 
-            ]
-        )->attribute(['id' => 'profile_frame'])->required();
+                ]
+            )->attribute(['id' => 'image_type1']);
+
+            $form->select('profile_frame_type', __('image_type'))->options(
+                [
+                    'svga' => __('svga'),
+                    'png' => __('png'),
+
+                ]
+            )->attribute(['id' => 'profile_frame']);
+        }
+
         $form->text('key', trans('key'));
         $script = <<<SCRIPT
              $(document).ready(function() {
@@ -316,6 +328,96 @@ class WareTabController extends MainController
         //        $form->number('sort', 'sort');
         $form->number('num', __('num'));
 
+        if (request('type') == 18) $form->color('color', trans('color'));
+        if (request('type') != 18) {
+            $form->saving(function (Form $form) {
+
+                if (!$form->show_img && !$form->img2) {
+                    $error = new MessageBag([
+                        'title'   => 'Error',
+                        'message' => 'Please upload at least one image',
+                    ]);
+
+                    return back()->with(compact('error'));
+                }
+
+                if ($form->show_img instanceof UploadedFile) {
+                    $allowedExtensions = [
+                        'svga',
+                        'mp4',
+                        'jpg',
+                        'jpeg',
+                        'png',
+                        'gif',
+                        'bmp',
+                        'tiff',
+                        'svg',
+                        'webp',
+                        'mov',
+                        'avi',
+                        'wmv',
+                        'flv',
+                        'mkv',
+                        'webm',
+                    ];
+
+                    $ext = strtolower($form->show_img->guessExtension());
+
+                    if (!in_array($ext, $allowedExtensions)) {
+                        throw ValidationException::withMessages([
+                            'show_img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+                        ]);
+                    }
+
+                    $form->image_type1 = $ext;
+                }
+
+                if ($form->img2 instanceof UploadedFile) {
+
+                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
+
+                    $ext = strtolower($form->img2->guessExtension());
+                    $originalExt = strtolower($form->img2->getClientOriginalExtension());
+
+                    if ($ext === 'zz' && $originalExt === 'svga') {
+                        $ext = 'svga';
+                    }
+
+                    if ($ext === 'mp4') {
+                        $urlVideo = upload($form->img2);
+
+
+                        $videoPath = getDriverUrl() . '/' . $urlVideo;
+
+                        $wareId = $form->model()->id;
+
+                        (new FfmpegService())->extract($videoPath, $wareId);
+
+                        $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
+
+                        $response = Http::attach(
+                            'image',
+                            Storage::disk('gcs')->get($imagePath),
+                            $wareId . '.jpg'
+                        )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+
+                        $responseData = $response->json();
+
+                        if ($response->successful() && isset($responseData['data']['video_type'])) {
+                            $ext = strtolower($responseData['data']['video_type']);
+                        }
+                    }
+
+                    if (!in_array($ext, $allowedExtensions)) {
+                        throw ValidationException::withMessages([
+                            'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+                        ]);
+                    } else {
+                        $form->profile_frame_type = $ext;
+                    }
+                }
+            });
+        }
         $form->saving(function (Form $form) {
             $imageType1 = $form->input('image_type1');
             $profileFrameType = $form->input('profile_frame_type');

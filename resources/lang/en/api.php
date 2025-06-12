@@ -129,6 +129,7 @@ return [
     'Admin' => 'Admin',
     'add_admin_agency' => 'You have been added as an admin to the agency: :name',
     'remove_admin_agency' => 'You have been removed as an admin from the agency: :name',
+    'reject_agency' => 'Your request to join the agency :name has been rejected.',
 
 
 ];
