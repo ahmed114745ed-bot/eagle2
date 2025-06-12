@@ -399,7 +399,6 @@ class VipService
         //     return $oVip;
         // });
 
-        dd('ddddddddddddddddddd');
         $userVips = $this->userVipRepository->getAllByUserId($userId);
         $vipPrivileges = $this->vipPrivilegeRepository->all();
 
