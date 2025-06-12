@@ -72,6 +72,15 @@ class UserVipRepository extends AbstractRepository
         }  
     
     }
+    public function updateTrueIsUsedForUser($userId)
+    {
+        $vips = $this->model->where('user_id', $userId)->get();
+   
+        foreach ($vips as $vip) {
+            $vip->packs()->update(['is_used' => 1]);
+        }  
+    
+    }
     public function updateIsUsed($userVip, $isUsed)
     {
         $userVip->is_used = $isUsed;
