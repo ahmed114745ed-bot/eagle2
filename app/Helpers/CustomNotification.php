@@ -190,7 +190,10 @@ class CustomNotification
         $data['image'] = $agency->img;
         $data['agency_id'] = $agency->id;
         $icon = $agency->img;
-        logger()->info('Firebase tokens_notification : ', ['tokens_notification' => $tokens_notification]);
+        logger()->info('Firebase tokens_notification : ', [
+            'tokens_notification' => $tokens_notification,
+            'user' => $user
+        ]);
        
         $result =  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-add-admin');
         logger()->info('Firebase Send Result: ', ['result' => $result]);
@@ -209,8 +212,10 @@ class CustomNotification
         $data['image'] = $agency->img;
         $data['agency_id'] = $agency->id;
         $icon = $agency->img;
-        logger()->info('Firebase tokens_notification : ', ['tokens_notification' => $tokens_notification]);
-
+        logger()->info('Firebase tokens_notification : ', [
+            'tokens_notification' => $tokens_notification,
+            'user' => $user
+        ]);
         $result=  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-remove-admin');
         logger()->info('Firebase Send Result: ', ['result' => $result]);
         Common::sendOfficialMessage($user->id, image: $agency->img, title: $body_en, content: $agency->name, titleAr: $body_ar);
