@@ -28,7 +28,7 @@ class UserVipRepository extends AbstractRepository
 
     public function getAllByUserId($userId)
     {
-        return $this->model->where('user_id', $userId)->with('OVip')->where('expire', '>', Carbon::now()->timestamp)->orderBy('expire', 'DESC')->get();
+        return $this->model->where('user_id', $userId)->with('OVip')->where('expire', null)->orderBy('id')->get();
     }
 
     public function getAllByUserIdWithAll($userId)
