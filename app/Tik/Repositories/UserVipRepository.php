@@ -28,18 +28,21 @@ class UserVipRepository extends AbstractRepository
 
     public function getAllByUserId($userId)
     {
-        return $this->model->where('user_id', $userId)->with('OVip')->where('expire', null)->orderBy('id')->get();
+        return $this->model->where('user_id', $userId)->with('OVip')->where(function ($query) {
+
+            $query->where('expire', '>', Carbon::now()->timestamp)->where('expire', null);
+        })->orderBy('id')->get();
     }
 
     public function getAllByUserIdWithAll($userId)
-{
-    return $this->model
-        ->where('user_id', $userId)
-        ->with(['OVip.privilegs']) 
-        ->where('expire', '>', Carbon::now()->timestamp)
-        ->orderBy('expire', 'DESC')
-        ->get();
-}
+    {
+        return $this->model
+            ->where('user_id', $userId)
+            ->with(['OVip.privilegs'])
+            ->where('expire', '>', Carbon::now()->timestamp)
+            ->orderBy('expire', 'DESC')
+            ->get();
+    }
 
     public function deleteExpireUserVip()
     {
@@ -58,7 +61,7 @@ class UserVipRepository extends AbstractRepository
     }
 
     public function findByIdWithOVip($id)
-    {  
+    {
         return $this->model->with("OVip")->has("OVip")->find($id);
     }
 
@@ -66,20 +69,18 @@ class UserVipRepository extends AbstractRepository
     {
         $this->model->where('user_id', $userId)->update(['is_used' => 0]);
         $vips = $this->model->where('user_id', $userId)->get();
-   
+
         foreach ($vips as $vip) {
             $vip->packs()->update(['is_used' => 0]);
-        }  
-    
+        }
     }
     public function updateTrueIsUsedForUser($userId)
     {
         $vips = $this->model->where('user_id', $userId)->get();
-   
+
         foreach ($vips as $vip) {
             $vip->packs()->update(['is_used' => 1]);
-        }  
-    
+        }
     }
     public function updateIsUsed($userVip, $isUsed)
     {
