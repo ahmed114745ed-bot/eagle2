@@ -271,8 +271,8 @@ class MyDataResource extends JsonResource
             'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
             'wallet' => $this->wallet?->value ?? 0,
             'user_types' => $this->user_types,
-            'wabble' => $this->getUserPack(12),
-            'wabble_id' => $this->getUserPackId(12),
+            'wabble' => $this->getUesdUserPack(12),
+            'wabble_id' => $this->getUesdUserPackId(12),
             "shipping-agency" => $this->shippingAgency ? [
                 "id" => $this->shippingAgency->id,
                 "name" => $this->shippingAgency->name ?? '',
@@ -328,6 +328,23 @@ class MyDataResource extends JsonResource
         ];
     }
 
+    public function getUesdUserPack($type)
+    {
+        $pack = $this->packs->where('type', $type)->where('is_used', 1)->first();
+        
+
+        return $pack ?  new GeneralUserPackResource($pack) : [
+            'id'   =>  0,
+            'image_type' => 'png',
+            'key' => '',
+            'image' => 'wappel.png',
+        ];
+    }
+    public function getUesdUserPackId($type)
+    {
+        $pack = $this->packs->where('type', $type)->where('is_used', 1)->first();
+        return $pack ? @$pack?->ware->id : 0;
+    }
     public function getUserPackId($type)
     {
         $pack = $this->packs->where('type', $type)->first();

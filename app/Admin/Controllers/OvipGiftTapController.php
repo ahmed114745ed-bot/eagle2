@@ -250,7 +250,7 @@ class OvipGiftTapController extends MainController
         $form->hidden('enable')->value(1);
         $id = request()->route('ware_gift');
         $ware = Ware::find($id);
-        if ((request('type') && (request('type') != 18)) || ($form->isEditing() && $ware && ($ware->type != 18))) {
+        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
             $form->display('ID');
             $form->text('name', trans('name'));
@@ -288,7 +288,7 @@ class OvipGiftTapController extends MainController
 
             if ($ware->type == 18)  $form->color('color', trans('color'));
         }
-        if ((request('type') && (request('type') != 18)) || ($form->isEditing() && $ware && ($ware->type != 18))) {
+        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
 
@@ -394,7 +394,7 @@ class OvipGiftTapController extends MainController
 
                 return back()->with(compact('error'));
             }
-            if (request('type') != 18) {
+            if (request('type') != 18 || request('type') != 21) {
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type');
                 $form->model()->image_type = $imageType1 ?? $profileFrameType;
@@ -433,7 +433,7 @@ class OvipGiftTapController extends MainController
         } else {
             $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
-
+        
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
         $alert = false;
         if (!$type) {
