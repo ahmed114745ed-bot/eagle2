@@ -408,7 +408,6 @@ class VipService
             $oVips->pluck('level')->unique(),
             $vipPrivileges->pluck('type')->unique()
         );
-
         $userVips->each(function ($userVip) use ($wares) {
             $oVip = $userVip->OVip;
             if ($oVip) {
