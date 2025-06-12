@@ -127,7 +127,7 @@ class OvipGiftTapController extends MainController
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('edit-' . $this->permission_name)) {
             $permission = $this->permission_name;
             $grid->column('actions', __('Actions'))->display(function () use ($type,$permission) {
-                 
+
                 $id = $this->id;
 
                 $editUrl = url("admin/ware-gifts/{$id}/edit");
@@ -341,7 +341,7 @@ class OvipGiftTapController extends MainController
                     }
 
                     if ($ext === 'mp4') {
-                        $urlVideo = $this->upload($form->img2);
+                        $urlVideo = upload($form->img2);
 
                         $videoPath = getDriverUrl() . '/' . $urlVideo;
 
@@ -418,14 +418,6 @@ class OvipGiftTapController extends MainController
         return $form;
     }
 
-
-    public  static function upload($file): ?string
-    {
-        $extension      = $file->getClientOriginalExtension();
-        $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
-        $file->storeAs('videos', $uniqueFileName, 'gcs');
-        return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
-    }
 
     private function tabsComponent($privileges, $level, $type)
     {
