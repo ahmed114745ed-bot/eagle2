@@ -270,6 +270,7 @@ class WareTabController extends MainController
                 return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
             });
 
+
         if ($form->isEditing()) {
             $form->select('image_type1', __('image_type'))->options(
                 [
