@@ -575,7 +575,7 @@
     "hidden room": "الغرفة المخفية",
     "anonymous man": "رجل مجهول",
     "colored name": "اسم ملوّن",
-    "profile visitors hide in": "إخفاء زوارصفحات العملالعملات في",
+    "profile visitors hide in": "إخفاء زوار صفحات العملاء",
     "hide last active": "إخفاء آخر نشاط",
     "owner_room_id": "معرف صاحب الغرفة",
     "text": "نص",
@@ -3157,8 +3157,17 @@
   "Event Period": "فترة الفعالية",
   "add a daily login gift":"اضافه هدايه تسجيل دخول اليومى",
   "daily login gift": "هدية تسجيل الدخول اليومية",
-  "wapel":"مؤثر الدخول",
+  "wapel":"وابل",
 "family profile": "ملف العائلة",
-"last login":"اخير ظهور"
+"last login":"اخر نشاط للحالة",
+"active image": "الصورة المفعّلة",
+"inactive image": "الصورة غير المفعّلة",
+"no ban profile": "الملف الشخصي غير محظور",
+ "hide user country": "إخفاء دولة المستخدم",
+  "user ender room anonymous": "دخول المستخدم الغرفة بشكل مجهول",
+  "user can send vip gift": "يمكن للمستخدم إرسال هدية كبار الشخصيات",
+  "hide visitors to client pages": "إخفاء زوار صفحات العملاء",
+  "hide room": "إخفاء الغرفة",
+  "user can not kick out from room": "لا يمكن طرد المستخدم من الغرفة"
 
 }

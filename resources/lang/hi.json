@@ -2592,7 +2592,16 @@
 "daily login gift": "दैनिक लॉगिन उपहार",
 "wapel": "प्रवेश प्रभाव",
 "family profile": "परिवार प्रोफ़ाइल",
-"last login": "आखिरी लॉगिन"
+"last login": "आखिरी लॉगिन",
+"active image": "सक्रिय छवि",
+  "inactive image": "निष्क्रिय छवि",
+  "no ban profile": "प्रोफ़ाइल प्रतिबंधित नहीं है",
+  "hide user country": "उपयोगकर्ता का देश छुपाएं",
+  "user ender room anonymous": "उपयोगकर्ता गुमनाम रूप से कक्ष में प्रवेश करे",
+  "user can send vip gift": "उपयोगकर्ता VIP उपहार भेज सकता है",
+  "hide visitors to client pages": "क्लाइंट पृष्ठों पर आगंतुकों को छुपाएं",
+  "hide room": "कक्ष छुपाएं",
+  "user can not kick out from room": "उपयोगकर्ता को कक्ष से बाहर नहीं निकाला जा सकता"
 
 
 

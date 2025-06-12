@@ -3010,7 +3010,16 @@
         "daily login gift": "günlük giriş hediyesi",
           "wapel": "giriş efekti",
           "family profile": "aile profili",
-   "last login": "son giriş"
+   "last login": "son giriş",
+   "active image": "aktif resim",
+  "inactive image": "pasif resim",
+  "no ban profile": "Profil yasaklı değil",
+  "hide user country": "Kullanıcının ülkesini gizle",
+  "user ender room anonymous": "Kullanıcı odaya anonim olarak girsin",
+  "user can send vip gift": "Kullanıcı VIP hediye gönderebilir",
+  "hide visitors to client pages": "Müşteri sayfalarındaki ziyaretçileri gizle",
+  "hide room": "Odayı gizle",
+  "user can not kick out from room": "Kullanıcı odadan atılamaz"
 
 
 
