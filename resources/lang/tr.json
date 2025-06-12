@@ -3023,6 +3023,7 @@
   "hide room": "Odayı gizle",
   "user can not kick out from room": "Kullanıcı odadan atılamaz",
    "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
+,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
 
 
 

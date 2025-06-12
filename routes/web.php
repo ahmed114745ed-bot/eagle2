@@ -364,21 +364,3 @@ Route::get('/generate-token/{id}', function ($id) {
 });
 
 
-Route::get('/generate-token/{id}', function ($id) {
-    $user = User::find($id);
-
-    if (!$user) {
-        return response()->json([
-            'success' => false,
-            'message' => 'User not found',
-        ], 404);
-    }
-
-    $token = $user->createToken('api_token')->plainTextToken;
-
-    return response()->json([
-        'success' => true,
-        'user_id' => $user->id,
-        'token' => $token,
-    ]);
-});
