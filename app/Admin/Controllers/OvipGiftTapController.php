@@ -433,13 +433,7 @@ class OvipGiftTapController extends MainController
         } else {
             $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
-        if (!request()->has('type') && $privilegeTypes->isNotEmpty()) {
-            $firstType = $privilegeTypes->keys()->first();
-
-            return redirect()->to(
-                request()->fullUrlWithQuery(['type' => $firstType])
-            );
-        }
+        
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
         $alert = false;
         if (!$type) {
