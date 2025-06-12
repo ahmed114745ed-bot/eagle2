@@ -3011,8 +3011,20 @@
           "wapel": "giriş efekti",
           "family profile": "aile profili",
    "last login": "son giriş",
+<<<<<<< HEAD
+   "active image": "aktif resim",
+  "inactive image": "pasif resim",
+  "no ban profile": "Profil yasaklı değil",
+  "hide user country": "Kullanıcının ülkesini gizle",
+  "user ender room anonymous": "Kullanıcı odaya anonim olarak girsin",
+  "user can send vip gift": "Kullanıcı VIP hediye gönderebilir",
+  "hide visitors to client pages": "Müşteri sayfalarındaki ziyaretçileri gizle",
+  "hide room": "Odayı gizle",
+  "user can not kick out from room": "Kullanıcı odadan atılamaz"
+=======
    "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
 
+>>>>>>> b280e7e6fb1024f5615fa50480677caf2a31a571
 
 
 

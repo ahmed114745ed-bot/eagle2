@@ -56,8 +56,33 @@ class OvipGiftTapController extends MainController
             })
             ->row(function (Row $row) use ($ovip) {
                 $type = request('type');
-                if (in_array($type, [13, 17])) {
-                    $row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . __('comeback later') . '</div>');
+                if (in_array($type, [13, 17, 14, 19, 16, 20, 9])) {
+                    switch ($type) {
+                        case 13:
+                            $text = __('hide user country');
+                            break;
+                        case 17:
+                            $text = __('user ender room anonymous');
+                            break;
+                        case 14:
+                            $text = __('user can send  vip gift');
+                            break;
+                        case 19:
+                            $text = __('hide visitors to client pages');
+                            break;
+                        case 16:
+                            $text = __('hide room');
+                            break;
+                        case 20:
+                            $text = __('last login');
+                            break;
+                        case 9:
+                            $text = __('user can not kick out from room');
+                            break;
+                        default:
+                            $text = null;
+                    }
+                    $row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . $text . '</div>');
                 } else {
                     $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
                 }
@@ -126,7 +151,7 @@ class OvipGiftTapController extends MainController
         $grid->expire(__('expire'));
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('edit-' . $this->permission_name)) {
             $permission = $this->permission_name;
-            $grid->column('actions', __('Actions'))->display(function () use ($type,$permission) {
+            $grid->column('actions', __('Actions'))->display(function () use ($type, $permission) {
 
                 $id = $this->id;
 
@@ -217,12 +242,16 @@ class OvipGiftTapController extends MainController
     protected function form()
     {
         $form = new Form(new Ware());
+
         $form->hidden('level')->value(request('level'));
         $form->hidden('type')->value(request('type'));
         $form->hidden('is_active_for_vip')->value(1);
         $form->hidden('get_type')->value(1);
         $form->hidden('enable')->value(1);
-        if (request('type') != 18) {
+        $id = request()->route('ware_gift');
+        $ware = Ware::find($id);
+        if ((request('type') && (request('type') != 18)) || ($form->isEditing() && $ware && ($ware->type != 18))) {
+
             $form->display('ID');
             $form->text('name', trans('name'));
             $form->text('name_en', trans('Name en'));
@@ -239,54 +268,28 @@ class OvipGiftTapController extends MainController
                 });
 
             $form->keyValue('key_json', 'key_json');
-            if ($form->isEditing()) {
-                $form->select('image_type1', __('image_type'))->options(
-                    [
-                        'svga' => __('svga'),
-                        'alpha' => __('alpha'),
-                        'mp4' => __('mp4'),
-                        'vap' => __('vap'),
 
-                    ]
-                )->attribute(['id' => 'image_type1']);
+            $form->select('image_type1', __('image_type'))->options(
+                [
+                    'svga' => __('svga'),
+                    'alpha' => __('alpha'),
+                    'mp4' => __('mp4'),
+                    'vap' => __('vap'),
+                    'png' => __('png'),
 
-                $form->select('profile_frame_type', __('image_type'))->options(
-                    [
-                        'svga' => __('svga'),
-                        'png' => __('png'),
-
-                    ]
-                )->attribute(['id' => 'profile_frame']);
-            }
-
+                ]
+            )->attribute(['id' => 'image_type1']);
 
             $form->text('key', trans('key'));
-
-            $script = <<<SCRIPT
-             $(document).ready(function() {
-                 function toggleWinProbability() {
-                     var type = $('#type').val();
-                     if(type == '28') {
-                         $('#profile_frame').closest('.form-group').show();
-                          $('#image_type1').closest('.form-group').hide();
-                     } else {
-                         $('#profile_frame').closest('.form-group').hide();
-                         $('#image_type1').closest('.form-group').show();
-
-                     }
-                 }
-                 toggleWinProbability();
-
-                 $('#type').change(function() {
-                     toggleWinProbability();
-                 });
-             });
-             SCRIPT;
-            Admin::script($script);
         }
 
         if (request('type') == 18) $form->color('color', trans('color'));
-        if (request('type') != 18) {
+        if (($form->isEditing() && $ware && ($ware->type == 18))) {
+
+            if ($ware->type == 18)  $form->color('color', trans('color'));
+        }
+        if ((request('type') && (request('type') != 18)) || ($form->isEditing() && $ware && ($ware->type != 18))) {
+
             $form->saving(function (Form $form) {
 
                 if (!$form->show_img && !$form->img2) {
