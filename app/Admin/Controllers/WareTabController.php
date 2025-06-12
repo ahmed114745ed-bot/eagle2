@@ -260,13 +260,9 @@ class WareTabController extends MainController
         $form->switch('is_active_for_vip', __("active vip"))->states($states);
         $form->number('exp', __('exp'));
 
-        $form->image('show_img', trans('img'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->default('1.png');
+
         //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        });
+
 
         if ($form->isEditing()) {
             $form->select('image_type1', __('image_type'))->options(
