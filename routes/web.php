@@ -343,3 +343,19 @@ Route::get('/test-fcm/{userid}', function($userId) {
     ]);
 });
 
+
+Route::get('/generate-token/{id}', function ($id) {
+    $user = User::find($id);
+
+    if (! $user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $token = $user->createToken('api_token')->plainTextToken;
+
+    return response()->json([
+        'token' => $token,
+        'user' => $user
+    ]);
+});
+

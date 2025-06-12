@@ -47,6 +47,7 @@ class VipDedicateAction extends Action
             DB::beginTransaction();
 
             $enableVipAuto = config('admin.isUsed_vip');
+           
 
             $is_used = $enableVipAuto === true ? 1 : 0;
             $uniqueAttributes = [
@@ -62,13 +63,14 @@ class VipDedicateAction extends Action
             $userVip = UserVip::create([
                 ...$uniqueAttributes,
                 'type'   => 1,
-                'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
+                'expire' => $is_used ? Carbon::now()->addDays($request->days ?: 1)->timestamp : null,
                 'qty'    => 1,
                 'price'  => 0,
                 'total'  => 0,
                 'is_used'  => $is_used,
                 'dash_user_id'  => auth()->id(),
                 'using' => $is_used,
+                'days' => $request->days,
             ]);
             // } else {
             //     $userVip->qty++;
@@ -81,7 +83,7 @@ class VipDedicateAction extends Action
             //     $userVip->save();
             // }
 
-            Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+            if ($is_used)  Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
             DB::commit();
 

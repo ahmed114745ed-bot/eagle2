@@ -888,6 +888,50 @@ class UserController extends MainController
         });
 
         $form->image('profile.image_id', __('image Id'));
+
+        Admin::script(<<<'JS'
+                $(function() {
+                    // For every file/image input (fileinput plugin)
+                    $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
+                    $('.fileinput-upload').hide(); // Hide upload buttons if present
+                    $('input[type="file"]').prop('disabled', true); // Prevent any file selection
+                });
+            JS
+        );
+
+        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
+            Admin::script(
+                <<<JS
+                    $(document).ready(function() {
+                        $('input[name="photo"]').closest('.form-group').find('.fileinput-remove').hide();
+                    });
+                    JS
+            );
+        }
+
+
+        $form->hasMany('images', __('Profile Images'), function ($form) {
+            $form->image('img', __('Image'));
+        })->useTable()->disableCreate()->disableDelete();;
+
+        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
+            Admin::script(
+                <<<JS
+        $(document).ready(function() {
+            // Hide 'remove' button on main image
+            $('input[name="photo"]').closest('.form-group').find('.fileinput-remove').hide();
+
+            // Hide 'remove' (×/close) button in hasMany images block, try these selectors:
+            $('.has-many-images .has-many-remove').hide();
+            $('.has-many-images .remove').hide();
+            $('.has-many-images .close').hide();
+            // Try direct selector as fallback for any <a> close button in hasMany block
+            $('.has-many-images a.close').hide();
+        });
+        JS
+            );
+        }
+
         $state = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],

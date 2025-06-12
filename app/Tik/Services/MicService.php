@@ -303,7 +303,25 @@ class MicService
     }
 
 
+    public function kickMicrophone($data)
+    {
+        $room = $this->roomRepository->findRoom($data['room_id']);
 
+        if (! $room){
+            return Common::apiResponse(0, __('api_responses.room_not_found'), null, 408);
+        }
+        info($room);
+
+
+        $admins = $room->room_admin;
+        $admins = explode(',', $admins);
+
+        if ($data->user()->id != $room->uid && !in_array($data->user()->id, $admins)) {
+            return Common::apiResponse(0, __('api_responses.you_dont_have_permission'), null, 408);
+        }
+
+        return Common::apiResponse(true, __('success'), []);
+    }
 
 
     public function micType(string $type, $microphone, $position)
