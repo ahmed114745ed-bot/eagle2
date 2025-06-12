@@ -17,15 +17,13 @@ yarn-error.log
 /.vscode
 .htaccess.swp
 /.htaccess
-/config/broadcasting.php
-/config/websockets.php
 docker-compose.yml
 Dockerfile
 /nginx
 /data
 php.ini
 /public/settings.json
-/config/filesystems.php
+
 /public/images/app-logo.png
 gcp.json
 /config/theme.php
