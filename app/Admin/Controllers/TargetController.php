@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Helpers\Common;
 use App\Models\Target;
+use App\Models\User;
 use Encore\Admin\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -446,6 +447,17 @@ class TargetController extends MainController
         });
 
         $form->saving(function (Form $form) {
+            if ($form->isEditing()) {
+                $original = $form->model();
+                $users = User::where('monthly_diamond_received', '>=', $original->diamonds)->count();
+                if ($users > 0) {
+                    $error = new MessageBag([
+                        'title' => __('Update Not Allowed'),
+                        'message' => __('This target has already been achieved by some users and cannot be updated.'),
+                    ]);
+                    return back()->with(compact('error'));
+                }
+            }
             $fields = [
                 'usd' => request()->usd,
                 'agency_share' => request()->agency_share,
