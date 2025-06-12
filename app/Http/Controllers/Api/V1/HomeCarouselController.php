@@ -14,9 +14,10 @@ class HomeCarouselController extends Controller
     public function index(Request $request)
     {
         $user =Auth::user();
-        if ($request->has('notification_id')) {  // تحقق من وجود notification_id في الطلب
-            $user->notification_id = $request->notification_id; // تعيين الـ notification_id للمستخدم
-            $user->save();  // حفظ التغييرات
+        if ($request->hasHeader('notification_id')) {
+            $notificationId = $request->header('notification_id');
+            $user->notification_id = $notificationId; 
+            $user->save();  
             return response()->json(['success' => true, 'message' => 'Notification ID updated successfully']);
         }
 
