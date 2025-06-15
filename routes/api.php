@@ -101,7 +101,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
     Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
-    Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback');
+    Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
     Route::post('paypal-cancel', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
     Route::prefix('config')->group(function () {
@@ -376,6 +376,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('my_pack', [PackController::class, 'my_pack']);
                 Route::post('use_pack_item', [PackController::class, 'usePackItem']);
                 Route::post('takeOff', [PackController::class, 'takeOff']);
+                Route::post('takeOffV2', [PackController::class, 'takeOffV2']);
                 //                Route::get('my_store', [UserController::class, 'my_store']);
                 //                Route::get('my_income', [UserController::class, 'my_income']);
                 Route::post('getTimes', [HomeController::class, 'getTimes']);

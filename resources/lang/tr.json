@@ -3022,6 +3022,9 @@
   "hide visitors to client pages": "Müşteri sayfalarındaki ziyaretçileri gizle",
   "hide room": "Odayı gizle",
   "user can not kick out from room": "Kullanıcı odadan atılamaz",
+  "Receiver Level": "Alıcının Seviyesi",
+  "cancel": "İptal et",
+  "Delete gift a medal": "Bir madalya hediyesini sil",
    "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
 ,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
 

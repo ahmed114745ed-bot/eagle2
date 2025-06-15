@@ -55,9 +55,11 @@ class UserVipRepository extends AbstractRepository
         return $this->model->find($id);
     }
 
-    public function getByUserId($userId): Collection
+    public function getByUserId($userId,array $additionalRelations = []): Collection
     {
-        return $this->model->where("user_id", $userId)->get();
+        $userQuery = $this->model->where("user_id", $userId);
+        $userQuery = $additionalRelations ? $userQuery->with($additionalRelations) : $userQuery;
+        return $userQuery->get();
     }
 
     public function findByIdWithOVip($id)

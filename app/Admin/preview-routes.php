@@ -3,7 +3,6 @@
 use App\Models\Room;
 use App\Models\User;
 use App\Models\Background;
-use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BoxController;
@@ -11,8 +10,6 @@ use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
-use KevinSoft\MultiLanguage\MultiLanguage;
-use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\MomentController;
@@ -47,7 +44,6 @@ use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\MomentSettingsController;
-
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
@@ -62,62 +58,58 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-use Modules\Achievement\Http\Controllers\web\GiftAchievemntController;
-use Modules\Achievement\Http\Controllers\web\UserAchievementLevelController;
-use Modules\Achievement\Http\Controllers\web\AchievementLevelsModuleController;
 
 
 Admin::routes();
-Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => ['web', 'admin','prevent-delete', 'adminIp', //            'adminGeneralBan',
-        'multiLanguage',], 'as' => config('admin.route.prefix') . '.',], function (Router $router) {
-        $router->post('_handle_form_', 'HandleController@handleForm')->name('admin.handle-form');
-        $router->post('_handle_action_', 'HandleController@handleAction')->name('admin.handle-action');
-        $router->get('_handle_selectable_', 'HandleController@handleSelectable')->name('admin.handle-selectable');
-        $router->get('_handle_renderable_', 'HandleController@handleRenderable')->name('admin.handle-renderable');
-
+Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => [
+    'web',
+    'admin',
+    'prevent-delete',
+    'adminIp',
+    'multiLanguage',
+], 'as' => config('admin.route.prefix') . '.',], function () {
+    // Route::post('_handle_form_', 'HandleController@handleForm')->name('admin.handle-form');
+    // Route::post('_handle_action_', 'HandleController@handleAction')->name('admin.handle-action');
+    // Route::get('_handle_selectable_', 'HandleController@handleSelectable')->name('admin.handle-selectable');
+    // Route::get('_handle_renderable_', 'HandleController@handleRenderable')->name('admin.handle-renderable');
 });
 
 
 Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => '', 'middleware' => [
     'web',
     'admin',
-//            'adminGeneralBan',
-        'multiLanguage',], 'as' => config('admin.route.prefix') . '.',], function (Router $router) {
+    'multiLanguage',
+], 'as' => config('admin.route.prefix') . '.',], function () {
     Route::post('login', App\Admin\Controllers\Preview\AuthController::class . '@postLogin');
     Route::get('login', [App\Admin\Controllers\Preview\AuthController::class, 'getLogin']);
-
-
 });
 
 
-Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => ['web', 'admin','prevent-delete', 'adminIp', //            'adminGeneralBan',
-        'multiLanguage',], 'as' => config('admin.route.prefix') . '.',], function (Router $router) {
+Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => [
+    'web',
+    'admin',
+    'prevent-delete',
+    'adminIp',
+    'multiLanguage',
+], 'as' => config('admin.route.prefix') . '.',], function () {
     Route::post('/locale', MultiLanguageController::class . '@locale');
-//    if (MultiLanguage::config("show-login-page", true)) {
-////        Route::get('login', MultiLanguageController::class . '@getLogin');
-//        Route::get('login', [App\Admin\Controllers\Preview\AuthController::class, 'getLogin']);
-//
-//    }
 
+    Route::resource('questions', QuestionController::class);
+    Route::resource('user-online-history', UserOnlineHistoryController::class);
 
-
-
-    $router->resource('questions', QuestionController::class);
-    $router->resource('user-online-history', UserOnlineHistoryController::class);
-
-    $router->get('btats', function(){
-        return response()->json(Admin::menu()) ;
+    Route::get('btats', function () {
+        return response()->json(Admin::menu());
     });
-    $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
-    $router->get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
-    $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
-    $router->post('agency-user-job/{agency_id}', 'AgencyUserJobController@store');
-    $router->get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
-    $router->get('agency-statistic', 'AgencyStatisticController@index');
-    $router->get('agency-settings', 'AgencySettingController@index');
-    $router->resource('test-test', 'TestTestController');
+    Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
+    Route::get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
+    Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
+    Route::post('agency-user-job/{agency_id}', 'AgencyUserJobController@store');
+    Route::get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
+    Route::get('agency-statistic', 'AgencyStatisticController@index');
+    Route::get('agency-settings', 'AgencySettingController@index');
+    Route::resource('test-test', 'TestTestController');
 
-    $router->resource('auth/users', 'AdminUserController')->names([
+    Route::resource('auth/users', 'AdminUserController')->names([
         'index' => 'auth.users.index',
         'create' => 'auth.users.create',
         'store' => 'auth.users.store',
@@ -126,121 +118,123 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
         'update' => 'auth.users.update',
         'destroy' => 'auth.users.destroy',
     ]);
-    $router->resource('/agencies/managers', AdminAgencyMangerController::class);
-    $router->resource('auth/roles', 'RoleController');
-    $router->resource('colors', ColorController::class);
-    $router->resource('agency-settings', AgencySettingsController::class);
-    $router->get('agency-settings', 'AgencySettingController@index');
-    $router->get('chat-settings', [GroupChatController::class, 'chat_settings']);
-    $router->get('ovip-settings', [OVipController::class, 'vip_settings']);
-    $router->get('lucy-box-settings', [BoxController::class, 'box_settings']);
-    $router->resource('moment-settings', MomentSettingsController::class);
-    $router->resource('reel-settings', ReelSettingsController::class);
-    $router->resource('custom-settings', CustomController::class);
-    $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
-    $router->get('/setting-family', [FamilyConfigSettingController::class, 'index']);
-    $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
-    $router->resource('settings', SettingController::class);
-    $router->resource('room-settings', RoomSettingsController::class);
-    $router->resource('charges-settings', ChargesSettingController::class);
-    $router->resource('app-features', AppFeatureController::class);
+    Route::resource('/agencies/managers', AdminAgencyMangerController::class);
+    Route::resource('auth/roles', 'RoleController');
+    Route::resource('colors', ColorController::class);
+    Route::resource('agency-settings', AgencySettingsController::class);
+    Route::get('agency-settings', 'AgencySettingController@index');
+    Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
+    Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
+    Route::get('lucy-box-settings', [BoxController::class, 'box_settings']);
+    Route::resource('moment-settings', MomentSettingsController::class);
+    Route::resource('reel-settings', ReelSettingsController::class);
+    Route::resource('custom-settings', CustomController::class);
+    Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
+    Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
+    Route::get('/agency-setting-manger', [MangerSettingController::class, 'index']);
+    Route::resource('settings', SettingController::class);
+    Route::resource('room-settings', RoomSettingsController::class);
+    Route::resource('charges-settings', ChargesSettingController::class);
+    Route::resource('app-features', AppFeatureController::class);
     //resources
-    $router->resource('users', 'UserController', ['names' => ['index' => 'users', 'show' => 'users.show']]);
-    $router->post('send-request-invite-code', 'UserController@request_invite_code');
-    $router->resource('user-statistics', 'UserStatisticsController');
-    $router->get('profile', [AdminAuthController::class, 'index']);
-    $router->resource('profiles', 'ProfileController');
-    $router->resource('vips', 'VipController');
-    $router->resource('rooms', 'RoomController', ['names' => ['index' => 'rooms']]);
-    $router->resource('all-games', AllGameController::class);
-    $router->resource('blacks', 'BlackListController');
+    Route::resource('users', 'UserController', ['names' => ['index' => 'users', 'show' => 'users.show']]);
+    Route::post('send-request-invite-code', 'UserController@request_invite_code');
+    Route::resource('user-statistics', 'UserStatisticsController');
+    Route::get('profile', [AdminAuthController::class, 'index']);
+    Route::resource('profiles', 'ProfileController');
+    Route::resource('vips', 'VipController');
+    Route::resource('rooms', 'RoomController', ['names' => ['index' => 'rooms']]);
+    Route::resource('all-games', AllGameController::class);
+    Route::resource('blacks', 'BlackListController');
     Route::prefix('black-lists')->group(function () {
         Route::get('/', [BlackListUsersController::class, 'index']);
     });
-    $router->resource('codes', 'CodeController');
-    $router->resource('gifts', 'GiftController', ['names' => ['index' => 'gifts']]);
-    $router->resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
-    $router->resource('test-pusher', TestPusherController::class);
-    $router->resource('report_user', ReportUserController::class);
-    $router->resource('coupons', 'CouponController');
-    $router->resource('configs', 'ConfigController');
-    $router->resource('categories', 'RoomCategoryController');
-    $router->resource('countries', 'CountryController');
-    $router->resource('backgrounds', 'BackgroundController');
-    $router->resource('official_msgs', 'OfficialMessageController');
-    $router->resource('emojis', 'EmojiController');
-    $router->resource('home_carousels', 'HomeCarouselController');
-    $router->resource('vip_prev', 'VipAuthController');
-    $router->resource('agencies', 'AgencyController');
-    $router->resource('families', 'FamilyController');
-    $router->resource('targets', 'TargetController');
-    $router->resource('polices', PoliceController::class);
-    $router->resource('offers', OfferController::class);
-    $router->resource('payment-gateways', PaymentGetWayController::class);
-    $router->resource('charges', 'ChargeController', [
+    Route::resource('codes', 'CodeController');
+    Route::resource('gifts', 'GiftController', ['names' => ['index' => 'gifts']]);
+    Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
+    Route::resource('test-pusher', TestPusherController::class);
+    Route::resource('report_user', ReportUserController::class);
+    // Route::resource('coupons', 'CouponController');
+    Route::resource('configs', 'ConfigController');
+    Route::resource('categories', 'RoomCategoryController');
+    Route::resource('countries', 'CountryController');
+    Route::resource('backgrounds', 'BackgroundController');
+    Route::resource('official_msgs', 'OfficialMessageController');
+    Route::resource('emojis', 'EmojiController');
+    Route::resource('home_carousels', 'HomeCarouselController');
+    Route::resource('vip_prev', 'VipAuthController');
+    Route::resource('agencies', 'AgencyController');
+    Route::resource('families', 'FamilyController');
+    Route::resource('targets', 'TargetController');
+    Route::resource('polices', PoliceController::class);
+    Route::resource('offers', OfferController::class);
+    Route::resource('payment-gateways', PaymentGetWayController::class);
+    Route::resource('charges', 'ChargeController', [
 
-        'names' => ['index' => 'charges', 'show' => 'charges.show']]);
-    $router->resource('charges-details', 'ChargesDetailsController', [
+        'names' => ['index' => 'charges', 'show' => 'charges.show']
+    ]);
+    Route::resource('charges-details', 'ChargesDetailsController', [
 
         'names' => [
             'index' => 'charges-details',
             'show' => 'charges-details.show'
         ]
     ]);
-    $router->resource('commissions', 'CommissionController', [
+    Route::resource('commissions', 'CommissionController', [
 
-        'names' => ['index' => 'commissions', 'show' => 'commission.show']]);
-    $router->resource('charge_values', 'ChargeValueController');
-    $router->resource('userTarget', 'UserTargetController', ['names' => ['index' => 'user_targets']]);
-    // $router->get('/', 'HomeController@infoBox')->name('home');
-    $router->get('/', 'AllStatisticController@index')->name('home');
-    $router->get('app-earned', 'AppEarnedController@index')->name('app-earned');
-    $router->get('/custom-export-users', [ExportController::class, 'usersSallaryTargets'])->name('custom-export-users');
-    $router->get('/agency-export-report', [ExportController::class, 'usersAgencyTargets'])->name('agency-export-report');
-    $router->get('/dev', 'HomeController@devindex')->name('dev-home');
-    $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
-    $router->resource('wares-vips', WareVipController::class);
+        'names' => ['index' => 'commissions', 'show' => 'commission.show']
+    ]);
+    Route::resource('charge_values', 'ChargeValueController');
+    Route::resource('userTarget', 'UserTargetController', ['names' => ['index' => 'user_targets']]);
+    // Route::get('/', 'HomeController@infoBox')->name('home');
+    Route::get('/', 'AllStatisticController@index')->name('home');
+    Route::get('app-earned', 'AppEarnedController@index')->name('app-earned');
+    Route::get('/custom-export-users', [ExportController::class, 'usersSallaryTargets'])->name('custom-export-users');
+    Route::get('/agency-export-report', [ExportController::class, 'usersAgencyTargets'])->name('agency-export-report');
+    Route::get('/dev', 'HomeController@devindex')->name('dev-home');
+    Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
+    Route::resource('wares-vips', WareVipController::class);
     // servers
-    $router->resource('server-country', ServerCountryController::class);
-    $router->resource('room-gift-targets', RoomGiftTargetController::class);
+    Route::resource('server-country', ServerCountryController::class);
+    Route::resource('room-gift-targets', RoomGiftTargetController::class);
 
     //--------------------
-    // $router->get('/', 'HomeController@infoBox')->name('home');
-    $router->get('/dev', 'HomeController@devindex')->name('dev-home');
-    $router->resource('manger-types', 'MangerTypeController');
-    $router->resource('chat-letters', ChatLetterController::class);
-    $router->resource('userscharg', chargUsersSleemController::class);
-    $router->resource('image-colors', ImageColorController::class);
-    $router->resource('agency_join_requests', 'AgencyJoinRequestController');
-    $router->resource('requests-for-get-salary', 'GetSalaryRequestController');
-    $router->resource('requests-for-get-salary-history', 'GetSalaryRequestFilterationController');
-    $router->resource('special-id-requests', 'SpecialIdRequestController');
-    $router->resource('family_levels', 'FamilyLevelController');
-    $router->resource('silver', 'SilverController');
-    $router->resource('coins', 'CoinController');
-    $router->resource('ovip', 'OVipController');
-    $router->resource('vip_privilege', 'VipPrivilegeController');
-    $router->resource('tickets', 'TicketController');
-    $router->resource('pages', 'PageController');
-    $router->resource('exchanges', 'ExchangeController');
-    $router->resource('boxes', 'BoxController');
-    $router->resource('thrown_boxes', 'BoxUseController');
-    $router->resource('reports', 'ReportController');
-    $router->resource('charges-reports', 'ChargeReportController');
-    $router->resource('sallaries', 'SallariesController')->name('index', 'sallaries');
-    $router->resource('total-statistics', 'AllStatisticController');
-    $router->resource('coin-reports', 'CoinReportController');
-    $router->resource('ban-types', BanTypeController::class);
-    $router->resource('sallaries_history', 'SallariesHistoryController');
-    // $router->resource ('export-excel','ImportExcelReportController');
-    $router->resource('agencies-tareget-manger', AgencyMangerTaregetController::class);
-    $router->resource('report_users', ReportFromUsersController::class);
-    $router->post('cashing', 'ReportController@cashing')->name('cashing');
-    $router->resource('trxs', 'CoinLogController');
-    $router->resource('images', 'ImageController');
-    $router->resource('moments', MomentController::class);
-    $router->resource('reels', ReelController::class);
-    $router->resource('levels/users', UserLevelController::class)->names([
+    // Route::get('/', 'HomeController@infoBox')->name('home');
+    Route::get('/dev', 'HomeController@devindex')->name('dev-home');
+    Route::resource('manger-types', 'MangerTypeController');
+    // Route::resource('chat-letters', ChatLetterController::class);
+    Route::resource('userscharg', chargUsersSleemController::class);
+    Route::resource('image-colors', ImageColorController::class);
+    Route::resource('agency_join_requests', 'AgencyJoinRequestController');
+    Route::resource('requests-for-get-salary', 'GetSalaryRequestController');
+    Route::resource('requests-for-get-salary-history', 'GetSalaryRequestFilterationController');
+    Route::resource('special-id-requests', 'SpecialIdRequestController');
+    Route::resource('family_levels', 'FamilyLevelController');
+    Route::resource('silver', 'SilverController');
+    Route::resource('coins', 'CoinController');
+    Route::resource('ovip', 'OVipController');
+    Route::resource('vip_privilege', 'VipPrivilegeController');
+    Route::resource('tickets', 'TicketController');
+    Route::resource('pages', 'PageController');
+    Route::resource('exchanges', 'ExchangeController');
+    Route::resource('boxes', 'BoxController');
+    Route::resource('thrown_boxes', 'BoxUseController');
+    Route::resource('reports', 'ReportController');
+    Route::resource('charges-reports', 'ChargeReportController');
+    Route::resource('sallaries', 'SallariesController')->name('index', 'sallaries');
+    Route::resource('total-statistics', 'AllStatisticController');
+    Route::resource('coin-reports', 'CoinReportController');
+    Route::resource('ban-types', BanTypeController::class);
+    Route::resource('sallaries_history', 'SallariesHistoryController');
+    // Route::resource ('export-excel','ImportExcelReportController');
+    Route::resource('agencies-tareget-manger', AgencyMangerTaregetController::class);
+    Route::resource('report_users', ReportFromUsersController::class);
+    Route::post('cashing', 'ReportController@cashing')->name('cashing');
+    Route::resource('trxs', 'CoinLogController');
+    Route::resource('images', 'ImageController');
+    Route::resource('moments', MomentController::class);
+    Route::resource('reels', ReelController::class);
+    Route::resource('levels/users', UserLevelController::class)->names([
         'index' => 'levels.users.index',
         'create' => 'levels.users.create',
         'store' => 'levels.users.store',
@@ -249,54 +243,54 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
         'update' => 'levels.users.update',
         'destroy' => 'levels.users.destroy',
     ]);
-    $router->resource('trashed-users', TrashedUserAccountController::class);
-    $router->resource('withdraw-types', WithdrawController::class);
-    $router->resource('room-vips', RoomVipController::class);
-    $router->resource('room-target', RoomTargetController::class);
+    Route::resource('trashed-users', TrashedUserAccountController::class);
+    Route::resource('withdraw-types', WithdrawController::class);
+    Route::resource('room-vips', RoomVipController::class);
+    Route::resource('room-target', RoomTargetController::class);
 
-    // $router->resource('agencyMangLink', AgencyMangerLinkController::class);
+    // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
 
-    Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
-        $router->get('/', 'HomeController@infoBox')->name('home');
-        $router->get('/users', 'UserController@index')->name('users');
-        $router->get('/userTarget', 'UserTargetController@index')->name('userTarget');
-        $router->get('/target', 'AgencyTargetController@index')->name('targets');
-        $router->get('/charges', 'ChargeController@index')->name('charges');
-        $router->resource('/ag-req', 'AgencyJoinRequestController');
+    Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function () {
+        Route::get('/', 'HomeController@infoBox')->name('home');
+        Route::get('/users', 'UserController@index')->name('users');
+        Route::get('/userTarget', 'UserTargetController@index')->name('userTarget');
+        Route::get('/target', 'AgencyTargetController@index')->name('targets');
+        Route::get('/charges', 'ChargeController@index')->name('charges');
+        Route::resource('/ag-req', 'AgencyJoinRequestController');
     });
 
-    Route::prefix('ch')->name('charger.')->namespace('ChargerControllers')->group(function (Router $router) {
-        $router->get('/', 'HomeController@infoBox')->name('home');
-        $router->get('/charges', 'ChargeController@index')->name('charges');
+    Route::prefix('ch')->name('charger.')->namespace('ChargerControllers')->group(function () {
+        Route::get('/', 'HomeController@infoBox')->name('home');
+        Route::get('/charges', 'ChargeController@index')->name('charges');
     });
 
-    $router->resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
-    $router->get('/vips_dedicate', 'DedicateVipController@index');
-    $router->resource('/bans', 'BanController');
-    $router->resource('/request-background-image', 'RequestBackgroundImageController');
-    $router->resource('/group-chat', 'GroupChatController');
-    $router->resource('interests', \App\Admin\Controllers\InterestsController::class);
-    $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-    $router->resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
-    $router->resource('agency-manger-users', AgencyMangerUsers::class);
-    $router->resource('core-wallets', CoreWalletsController::class);
-    $router->resource('change_agencies_manger', ChangeAgencyMangerController::class);
-    $router->resource('appear-charger-agency', AppearChargerAgencyController::class);
+    Route::resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
+    Route::get('/vips_dedicate', 'DedicateVipController@index');
+    Route::resource('/bans', 'BanController');
+    Route::resource('/request-background-image', 'RequestBackgroundImageController');
+    Route::resource('/group-chat', 'GroupChatController');
+    Route::resource('interests', \App\Admin\Controllers\InterestsController::class);
+    Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
+    Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
+    Route::resource('agency-manger-users', AgencyMangerUsers::class);
+    Route::resource('core-wallets', CoreWalletsController::class);
+    Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
+    Route::resource('appear-charger-agency', AppearChargerAgencyController::class);
 
     //    dd( Admin::menu(function ($menu) {
     //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
     //             ->icon('fa-file');
     //     }));
 
-    $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-    $router->resource('report-reals', \App\Admin\Controllers\ReportRealsController::class);
-    $router->resource('report-moments', ReportMomentController::class);
-    $router->resource('admin-users', AdminUsersController::class);
-    $router->resource('parent-users', ParentUsersController::class);
-    $router->resource('custom-zego-messages', CustomZegoMessageController::class);
-    $router->get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
-    $router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
-    $router->get('convert-is_gold', function () {
+    Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
+    Route::resource('report-reals', \App\Admin\Controllers\ReportRealsController::class);
+    Route::resource('report-moments', ReportMomentController::class);
+    Route::resource('admin-users', AdminUsersController::class);
+    Route::resource('parent-users', ParentUsersController::class);
+    Route::resource('custom-zego-messages', CustomZegoMessageController::class);
+    Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
+    Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
+    Route::get('convert-is_gold', function () {
         $users = User::where("is_gold_id", 1)->get();
         foreach ($users as $user) {
             $user->image_color_id = 1;
@@ -304,7 +298,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
         }
         dD("goold");
     });
-    $router->get('background-count', function () {
+    Route::get('background-count', function () {
         $backgrounds = Background::get();
         if ($backgrounds) {
             foreach ($backgrounds as $background) {
@@ -318,40 +312,21 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     });
 
 
-    $router->resource('banners', BannerController::class);
+    Route::resource('banners', BannerController::class);
 
     // module achievement
 
-  /*  $router->resource('achievements', AchievementsController::class);
-    $router->post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
-    $router->get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class,'getAchievementLevels'])->name('get-achievement-levels');
-    $router->get('/get-view-page', [AchievementLevelsModuleController::class,'viewPage'])->name('get-view-page');
-   $router->resource('user-achievement-levels', UserAchievementLevelController::class);
-  // $router->post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
-   $router->get('achievement-levels/create/{id}', 'AchievementsLevelsController@create')->name('achievement-levels.create');
-    $router->resource('gift-achievements','UserGiftAchController');
-    $router->resource('gift-achievment', 'GiftAchiementController');
-    $router->post('postAddGiftAchievement', [GiftAchievemntController::class,'postAddGiftAchievemnt'])->name('postAddGiftAchievement');
-    $router->post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
-    $router->post('posteditGiftAchievementLevel', [GiftAchievemntController::class,'posteditGiftAchievementLevel'])->name('posteditGiftAchievementLevel');
-    $router->resource('achievement-levels', AchievementsLevelsController::class,['name'=>['create'=>'create2']]);*/
-
+    /*  Route::resource('achievements', AchievementsController::class);
+    Route::post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
+    Route::get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class,'getAchievementLevels'])->name('get-achievement-levels');
+    Route::get('/get-view-page', [AchievementLevelsModuleController::class,'viewPage'])->name('get-view-page');
+   Route::resource('user-achievement-levels', UserAchievementLevelController::class);
+  // Route::post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
+   Route::get('achievement-levels/create/{id}', 'AchievementsLevelsController@create')->name('achievement-levels.create');
+    Route::resource('gift-achievements','UserGiftAchController');
+    Route::resource('gift-achievment', 'GiftAchiementController');
+    Route::post('postAddGiftAchievement', [GiftAchievemntController::class,'postAddGiftAchievemnt'])->name('postAddGiftAchievement');
+    Route::post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
+    Route::post('posteditGiftAchievementLevel', [GiftAchievemntController::class,'posteditGiftAchievementLevel'])->name('posteditGiftAchievementLevel');
+    Route::resource('achievement-levels', AchievementsLevelsController::class,['name'=>['create'=>'create2']]);*/
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

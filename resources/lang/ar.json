@@ -2092,6 +2092,7 @@
     "Vip": "VIP",
     "Sub sender level": "مستوى المرسل الفرعي",
     "Sub receiver level": "مستوى المستلم الفرعي",
+    "Receiver Level": "مستوى المستلم",
     "Sub sender num": "عدد المرسلين الفرعيين",
     "Sub receiver num": "عدد المستلمين الفرعيين",
     "Salary": "الراتب",
@@ -3173,7 +3174,9 @@
   "user can not kick out from room": "لا يمكن طرد المستخدم من الغرفة",
 "This target has already been achieved by some users and cannot be updated.": "لقد قام بعض المستخدمين بتحقيق هذا التارجت بالفعل، ولا يمكن تعديله."
 ,
-"target_change_warning": "عند رفع قيمة التارجت، ستزداد قيمة الدولار التي يحصل عليها المضيفون، بينما عند خفض قيمة التارجت، ستنخفض قيمة الدولار لديهم"
+"target_change_warning": "عند رفع قيمة التارجت، ستزداد قيمة الدولار التي يحصل عليها المضيفون، بينما عند خفض قيمة التارجت، ستنخفض قيمة الدولار لديهم",
+"cansel":"إلغاء",
+"Delete gift a medal":"حذف هدية ميدالية"
 
 
 }

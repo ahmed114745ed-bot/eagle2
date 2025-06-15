@@ -12,10 +12,7 @@ use App\Jobs\SendCustomOfficialMessageToUser;
 class UserSallaryObserver
 {
 
-    public function created(UserSallary $userSalary)
-    {
-
-    }
+    public function created(UserSallary $userSalary) {}
 
 
     public function updated(UserSallary $userSalary)
@@ -26,10 +23,7 @@ class UserSallaryObserver
     }
 
 
-    public function deleted(UserSallary $userSalary)
-    {
-
-    }
+    public function deleted(UserSallary $userSalary) {}
 
 
     public function restored(UserSallary $userSalary)
@@ -46,33 +40,28 @@ class UserSallaryObserver
     {
         $this->updateOrCreateAgencySallary($userSalary, false);
         $this->updateOrCreateBDSallary($userSalary);
-
     }
 
     public function creating(UserSallary $userSalary)
     {
 
-        if(!$userSalary->extras) $userSalary->extras = '';
+        if (!$userSalary->extras) $userSalary->extras = '';
         $this->updateOrCreateAgencySallary($userSalary, true);
         $this->updateOrCreateBDSallary($userSalary);
-
     }
 
 
     public function updating(UserSallary $userSalary)
     {
-        if(!$userSalary->extras) $userSalary->extras = '';
+        if (!$userSalary->extras) $userSalary->extras = '';
 
-        if ($userSalary->isDirty('sallary') && $userSalary->sallary > 0){
+        if ($userSalary->isDirty('sallary') && $userSalary->sallary > 0) {
             dispatch(new SendCustomOfficialMessageToUser($userSalary->user_id, NotificationType::TARGET))->onQueue('notification');
         }
     }
 
 
-    public function saving(UserSallary $userSalary)
-    {
-
-    }
+    public function saving(UserSallary $userSalary) {}
 
     /**
      * @param UserSallary $userSalary
@@ -81,7 +70,7 @@ class UserSallaryObserver
     public function updateOrCreateAgencySallary(UserSallary $userSalary, bool $isCreate = false): void
     {
         $app_feature = \Cache::get('host_agency');
-        if ($app_feature){
+        if ($app_feature) {
             $agency = Agency::find($userSalary->user_agency_id);
             if ($userSalary->user_agency_id != 0 /*&& ($userSalary->isDirty('agency_sallary') || $isCreate)*/ && $agency && $agency->status == 1) {
                 $agency_id    = $userSalary->user_agency_id;
@@ -90,7 +79,7 @@ class UserSallaryObserver
                 $agencySalary =
                     AgencySallary::query()->where('month', $month)->where('year', $year)->where('agency_id', $agency_id)->first();
 
-//            $diff = (double)$userSalary->agency_sallary - ((double)$userSalary->getOriginal('agency_sallary') ?? 0);
+                //            $diff = (double)$userSalary->agency_sallary - ((double)$userSalary->getOriginal('agency_sallary') ?? 0);
 
                 $salary = UserSallary::where('user_agency_id', $agency_id)->where('month', now()->month)->where('year', now()->year)->sum('agency_sallary');
                 /*if( $diff < 0 ){
@@ -103,19 +92,20 @@ class UserSallaryObserver
                     ]);
                 } else {
                     AgencySallary::query()->create([
-                        'sallary' => $salary, 'agency_id' => $agency_id, 'month' => $month,
+                        'sallary' => $salary,
+                        'agency_id' => $agency_id,
+                        'month' => $month,
                         'year'    => $year
                     ]);
                 }
             }
-
         }
     }
 
     public function updateOrCreateBDSallary(UserSallary $userSalary, bool $isCreate = false): void
     {
         $agency = Agency::find($userSalary->user_agency_id);
-    
+
         if ($userSalary->user_agency_id != 0 && $agency && $agency->bd_id && $agency->status == 1) {
             $bdId    = $agency->bd_id;
             $month   = now()->month;
@@ -123,29 +113,29 @@ class UserSallaryObserver
             $agencyId = $agency->id;
 
             $totals = UserSallary::where('user_agency_id', $agency->id)
-            ->where('month', now()->month)
-            ->where('year', now()->year)
-            ->selectRaw('
+                ->where('month', now()->month)
+                ->where('year', now()->year)
+                ->selectRaw('
                 SUM(agency_sallary) as total_agency_sallary,
                 SUM(sallary) as total_users_sallary,
                 SUM(diamond) as total_diamond
             ')
-            ->first();
-        
+                ->first();
+
 
 
             $totalBdSallary = UserSallary::where('user_agency_id', $agencyId)
                 ->where('month', $month)
                 ->where('year', $year)
                 ->sum('dB');
-    
+
             $bdSalary = BDSallary::query()->where([
                 'bd_id'     => $bdId,
                 'agency_id' => $agencyId,
                 'month'     => $month,
                 'year'      => $year,
             ])->lock()->first();
-    
+
             if ($bdSalary) {
                 $bdSalary->update([
                     'sallary' => $totalBdSallary,
@@ -169,5 +159,4 @@ class UserSallaryObserver
             }
         }
     }
-
 }

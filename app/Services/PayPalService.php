@@ -17,7 +17,7 @@ class PayPalService
     return url("/admin/payment-with-method");
    }
 
-    private function getAccessToken(): string
+    protected function getAccessToken(): string
     {
         $headers = [
             'Content-Type'  => 'application/x-www-form-urlencoded',

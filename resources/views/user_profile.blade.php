@@ -554,6 +554,31 @@
     text-overflow: ellipsis;
 }
 
+.nav-scroll-container {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-pills {
+        display: inline-flex;
+        padding: 10px 0;
+    }
+
+    .nav-pills li {
+        display: inline-block;
+    }
+
+
+
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus {
+    border-top-color: var(--primary-color);
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+    color: #fff;
+    background-color: var(--primary-color);
+}
+
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -961,17 +986,21 @@
                 <div class="agency-stats">
                     <div class="agency-meta">
                         <div class="meta-item">
-                                <span class="meta-label">{{ __('Balance') }}:</span>
+                                <span class="meta-label">{{ __('wallet balance') }}:</span>
                                 <span class="meta-value">{{ @$user->salary }}</span>
 
                         </div>
                         <div class="meta-item">
-                            <span class="meta-label">{{__('Level')}}:</span>
-                            <span class="meta-value">{{\App\Helpers\Common::level_center($user)['sender_level'] }}</span>
+                            <span class="meta-label">{{__('Sender Level')}}:</span>
+                            <span class="meta-value">
+                                    <img src="{{ getImagePath(\App\Helpers\Common::level_center($user)['sender_img']) }}"  style="height: 24px;">
+                                </span>
                         </div>
                         <div class="meta-item">
-                            <span class="meta-label">{{__('worth')}}:</span>
-                            <span class="meta-value">{{\App\Helpers\Common::level_center($user)['receiver_level'] }}</span>
+                            <span class="meta-label">{{__('Receiver Level')}}:</span>
+                            <span class="meta-value">
+                                <img src="{{ getImagePath(\App\Helpers\Common::level_center($user)['receiver_img']) }}"  style="height: 24px;">
+                            </span>
                         </div>
 
                     </div>
@@ -1002,12 +1031,15 @@
 
 
        @php
-                    $activeTab = request('tab', 'tab=salary'); 
+                    $activeTab = request('tab', 'tab=salary');
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
             <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
             <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
+             @if (\Encore\Admin\Facades\Admin::user()->can('edit' . 'edit-level') || \Encore\Admin\Facades\Admin::user()->can('*'))
+              <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
+            @endif
             @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
                 <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}" data-target="salary-tab">{{ __('user wallet') }}</a>
             @endif
@@ -1043,6 +1075,24 @@
                     <div class="card-header">
                         <h4 class="card-title" style="text-align: left;">{{ __('pack') }}</h4>
                     </div>
+                    <div class="box-body no-padding">
+                        <div class="nav-scroll-container">
+                            <ul class="nav nav-pills">
+                                @foreach($types as $id => $name)
+                                    @php
+                                        $selectedType = request()->get('type', 4); // Default to 1
+                                    @endphp
+                                    <li class="{{ $selectedType == $id ? 'active' : '' }}">
+                                        <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">
+                                            {{ __($name) }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+
+
 
                             <div class="table-responsive">
                                 <div class="box-body ">
@@ -1055,6 +1105,7 @@
                                                 <th>{{ __('img') }}</th>
                                                 <th>{{ __('expire') }}</th>
                                                 <th>{{ __('action') }}</th>
+
                                             </tr>
                                         </thead>
                                         @if($packs && $packs->count())
@@ -1073,7 +1124,7 @@
                                                         <img src="{{ getImagePath(@$path) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
                                                     </td>
-                                                    <td>{{\Carbon\Carbon::createFromTimestamp($pack->expire)->format('Y-m-d H:i:s') }}</td>
+                                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                                     <td>
                                                         <div class="d-flex">
                                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn" data-id="{{ $pack->id }}">
@@ -1131,12 +1182,12 @@
                                                     <tr>
                                                         <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
                                                         <td>{{ $userVip->level }}</td>
-                                                        <td>{{\Carbon\Carbon::createFromTimestamp($userVip->expire)->format('Y-m-d H:i:s')}}</td>
+                                                        <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                                         <td>{{ @$userVip->qty ?? 0 }}</td>
                                                         <td>{{ @$userVip->total ?? 0 }}</td>
                                                          <td>
                                                         <div class="d-flex">
-                                                            
+
                                                             <button class="btn btn-danger delete-vip-btn" data-id="{{ $userVip->id }}">
                                                                 {{ __('dashboard.delete') }}
                                                             </button>
@@ -1170,56 +1221,6 @@
                     <div class="card-header">
                         <h4 class="card-title" style="text-align: left;">{{ __('user wallet') }}</h4>
                     </div>
-                
-                    {{-- <div class="card-body">
-                        <div class="filter-container">
-                            <form method="GET" action="{{ url('admin/users/' . $user->id ) }}" class="filter-form">
-                                <input type="hidden" name="tab" value="salary">
-                                
-                                <div class="filter-content">
-                                    <!-- Month Selector -->
-                                    <div class="filter-group">
-                                        <div class="form-floating">
-                                            <select name="month" id="month" class="form-select">
-                                                <option value="">All Months</option>
-                                                @for($m = 1; $m <= 12; $m++)
-                                                    <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
-                                                        {{ \Carbon\Carbon::create()->month($m)->format('F') }}
-                                                    </option>
-                                                @endfor
-                                            </select>
-                                            <label for="month" class="form-label">{{ __('Month') }}</label>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Year Selector -->
-                                    <div class="filter-group">
-                                        <div class="form-floating">
-                                            <select name="year" id="year" class="form-select">
-                                                <option value="">All Years</option>
-                                                @for($y = now()->year; $y >= 2020; $y--)
-                                                    <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
-                                                        {{ $y }}
-                                                    </option>
-                                                @endfor
-                                            </select>
-                                            <label for="year" class="form-label">{{ __('Year') }}</label>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Action Buttons -->
-                                    <div class="filter-actions">
-                                        <button type="submit" class="btn btn-filter">
-                                            <i class="fas fa-filter"></i>
-                                            <span>{{ __('Apply') }}</span>
-                                        </button>
-                                        
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-                    </div>      --}}
 
                    <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" pjax-container="">
                       <input type="hidden" name="tab" value="salary">
@@ -1330,7 +1331,7 @@
                                                                     </div>
                                                                 </a>
                                                             </td>
-                                                   
+
 
                                                         <td>{{$salary->sallary}}</td>
                                                         <td>{{ $salary->cut_amount}}</td>
@@ -1358,6 +1359,38 @@
                             </div>
                 </div>
             </div>
+
+            <div class="tab-content" id="level-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title text-left">{{ __('level') }}</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <form action="{{ url('/admin/edit-level') }}" id="user_level_update_form" method="POST" enctype="multipart/form-data">
+                           @csrf
+                                <div class="row" style="justify-content:space-evenly">
+                                    <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
+                                    <div class=" col-lg-6 form-Roles mb-3">
+                                        <label class="form-label"> {{ __('Sender Level') }}</label>
+                                        <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control " id="total_sender_level" name="total_sender_level"  required>
+                                    </div>
+
+                                    <div class=" col-lg-6 form-Roles mb-3">
+                                        <label class="form-label"> {{ __('Received Level') }}</label>
+                                        <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control " id="total_received_level" name="total_received_level" required >
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" type="button"
+                                    data-bs-dismiss="modal">{{ __('cancel') }} </button>
+                                <button class="btn btn-primary " type="submit">{{ __('save') }} </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
 
 
 

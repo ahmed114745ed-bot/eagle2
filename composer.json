@@ -45,6 +45,7 @@
         "stripe/stripe-php": "^9.9"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.15.4",
         "barryvdh/laravel-ide-helper": "^3.0",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",

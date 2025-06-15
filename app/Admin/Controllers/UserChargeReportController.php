@@ -479,28 +479,3 @@ class UserChargeReportController extends MainController
         return $grid;
     }
 }
-
-class TemporaryModel extends Model
-{
-    // Prevent Laravel from trying to map the model to a database table
-    protected $table = null;
-
-    // Disable timestamps
-    public $timestamps = false;
-
-    // Disable incrementing IDs and primary key
-    protected $primaryKey = null;
-    public $incrementing = false;
-
-    // Disable auto connection to the database
-    protected $connection = null;
-
-    // Optionally, define fillable attributes if you want to use it like a regular model
-    protected $fillable = ['name', 'age', 'email'];
-
-
-    public function getTestAttribute(): string
-    {
-        return 'this is test attribute';
-    }
-}
