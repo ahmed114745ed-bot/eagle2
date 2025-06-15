@@ -132,6 +132,7 @@ return [
     'Remove_Ban' => 'Remove Ban',
     'Actions' => 'Actions',
     'agency_id' => 'Agency ID',
+    'agency' => 'Agency',
     'status' => 'Status',
     'pending' => 'Pending',
     'accepted' => 'Accepted',

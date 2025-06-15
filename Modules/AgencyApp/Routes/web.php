@@ -15,21 +15,19 @@ use Modules\AgencyApp\Http\Controllers\web\RequestAgencyFilterationController;
 |
 */
 
-Route::group(
-    [
-        'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
-        'middleware' => [
-            'web',
-            'admin',
-            'adminIp',
-            //            'adminGeneralBan',
-            'multiLanguage',
-        ],
-        'as'         => config('admin.route.prefix') . '.',
+Route::group([
+    'prefix'     => config('admin.route.prefix'),
+    'namespace'  => 'web',
+    'middleware' => [
+        'web',
+        'admin',
+        'adminIp',
+        // 'adminGeneralBan',
+        'multiLanguage',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('request-agencies', RequestAgencyController::class);
-        $router->resource('request-agencies-filteration', RequestAgencyFilterationController::class);
-        $router->resource('recommendation-agencies', RecommendationAgencyController::class);
-    });
+    'as' => config('admin.route.prefix') . '.',
+], function () {
+    Route::resource('request-agencies', RequestAgencyController::class);
+    Route::resource('request-agencies-filteration', RequestAgencyFilterationController::class);
+    Route::resource('recommendation-agencies', RecommendationAgencyController::class);
+});

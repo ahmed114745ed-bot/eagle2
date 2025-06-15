@@ -16,12 +16,12 @@ class AgencyReportResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => @$this->name ?: '',
+            'name' => $this?->name ?? '',
             'target' => $this->target,
             'expenses' => $this->expenses,
-            'salary'   => $this->salary,
-            'agent' => @$this->owner->name ?: @$this->dashOwner->name,
-            'users' => $this->users()->count(),
+            'salary' => $this->salary,
+            'agent' => $this->owner?->name ?? $this->dashOwner?->name,
+            'users' => $this->users_count,
         ];
     }
 }

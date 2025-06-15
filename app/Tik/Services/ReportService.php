@@ -31,14 +31,12 @@ class ReportService
             return UserReportResource::collection($data);
         } elseif ($request->type == 'agencies') {
             $data = $this->agencyRepository->report($request->id, $request->month, $request->year, $request->per_page, $request->page);
-
             return AgencyReportResource::collection($data);
         } elseif ($request->type == 'agencies_manger') {
             $data = $this->adminUsersRepository->report($request->id, $request->per_page, $request->page);
             return AdminUserReportResource::Collection($data);
         }
     }
-
 
     public function eventReports($request)
     {

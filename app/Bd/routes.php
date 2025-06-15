@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Bd\Controllers\HomeController;
@@ -16,7 +17,7 @@ use App\Bd\Controllers\RequestAgencyController;
 
 
 Route::prefix('bd')->name('bd.')->group(function () {
-     Route::post('logout', [\App\Bd\Controllers\AuthController::class, 'logout'])->name('logout');
+    Route::post('logout', [\App\Bd\Controllers\AuthController::class, 'logout'])->name('logout');
 
     // Route::middleware(['auth:bd'])->group(function () {
     //     Route::get('/', [\App\Bd\Controllers\DashboardController::class, 'index'])->name('dashboard');
@@ -41,7 +42,6 @@ Route::group(
         }
         Route::post('login', [\App\Bd\Controllers\AuthController::class, 'postLogin']);
         Route::get('logout', [\App\Bd\Controllers\AuthController::class, 'logout']);
-
     }
 
 );
@@ -52,10 +52,11 @@ Route::group(
         'namespace' => 'App\\Bd\\Controllers',
         'middleware' => [
             'web',
-'admin.auth',
+            'admin.auth',
             'admin.pjax',
             'admin.log',
-            'admin.bootstrap',            'adminIp',
+            'admin.bootstrap',
+            'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
         ],
@@ -63,15 +64,15 @@ Route::group(
     ],
     function (Router $router) {
 
-                $router->get('/', [HomeController::class,'index'])->name('home');
-                $router->get('/charges', [ChargeController::class, 'index'])->name('charges');
-                $router->resource('/agencies', AgencyController::class);
-                $router->resource('/salaries', BdSalariesController::class);
-                $router->resource('/charges', ChargeController::class);
-                // $router->resource('/wallet', 'WalletController');
-                Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
-                Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+        $router->get('/', [HomeController::class, 'index'])->name('home');
+        $router->get('/charges', [ChargeController::class, 'index'])->name('charges');
+        $router->resource('/agencies', Agency::class);
+        $router->resource('/salaries', BdSalariesController::class);
+        $router->resource('/charges', ChargeController::class);
+        // $router->resource('/wallet', 'WalletController');
+        Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+        Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
 
-                $router->resource('/request-agencies', RequestAgencyController::class);
-
-    });
+        $router->resource('/request-agencies', RequestAgency::class);
+    }
+);
