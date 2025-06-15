@@ -821,7 +821,6 @@ class Common
 
         $type = $vip->privilegs()->pluck('type')->toArray();
 
-    
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
         ->where('level', $vip->level)
         ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
@@ -894,6 +893,7 @@ class Common
         if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->delete();
 
         $type = $vip->privilegs()->pluck('type')->toArray();
+        \Log::info('type',['all'=>$type]);
 
         if (!empty($type)) {
             foreach ($type as $wareType) {
@@ -955,6 +955,8 @@ class Common
                         'using' => 1,
                     ]
                 );
+                \Log::info('missingTypes',['all'=>$missingTypes]);
+
                 foreach ($missingTypes ?? [] as $wareType) {
                     Pack::query()->create([
                         'user_id' => $user->id,
