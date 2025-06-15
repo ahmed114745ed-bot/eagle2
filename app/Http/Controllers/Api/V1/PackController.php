@@ -8,6 +8,7 @@ use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V2\MyPacksResource;
 use App\Models\User;
 use App\Helpers\Common;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Tik\Services\PackService;
 use App\Http\Controllers\Controller;
@@ -83,7 +84,7 @@ class PackController extends Controller
         return Common::apiResponse(1, '', MyPacksResource::collection($data));
     }
 
-   
+
 
 
     public function usePackItem(Request $request)
@@ -115,5 +116,18 @@ class PackController extends Controller
         return Common::apiResponse(1, 'success', new UserResource($user));
     }
 
+    public function takeOffV2(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $user->load(['packs', 'profile', 'myroom', 'room.backgroundImage', 'room.background',  'family']);
+        $type = $request->type;
+        $item = $request->item_id;
+        if (!$type && !$item) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!in_array($type, [1, 2, 3, 4])) return Common::apiResponse(0, 'type invalid', null, 403);
+
+        $this->packService->updateDress($user, $type,$item);
+
+        return Common::apiResponse(1, 'success', new \App\Http\Resources\Api\V2\UserResource($user));
+    }
 
 }

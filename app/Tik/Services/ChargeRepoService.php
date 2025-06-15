@@ -329,7 +329,7 @@ class ChargeRepoService
 
 
 
-    public function chargeAgency(User $sender,Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function chargeAgency( $sender,Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
 
 

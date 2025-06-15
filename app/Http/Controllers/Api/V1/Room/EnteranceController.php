@@ -251,8 +251,23 @@ class EnteranceController extends Controller
     {
 
         $room_pass = $request['room_pass'];
-        $owner_id = $request['owner_id'];
+        // $owner_id = $request['owner_id'];
         $user = $request->user();
+        $room_id = $request->input('room_id');
+        $owner_id = $request->input('owner_id');
+    
+        if (!$room_id && !$owner_id) {
+            return Common::apiResponse(0, __('Please provide either owner_id or room_id.'));
+        }
+        if ($room_id) {
+            $room = Room::find($room_id);
+            if (!$room) {
+                return Common::apiResponse(0, __('This room was not found.'));
+            }
+            $owner_id = $room->uid; 
+        }
+    
+
         $ban = Common::ifRoomHasband($owner_id);
         if ($ban) {
             return Common::apiResponse(0, __('this room has been banned.'), ['ban' => true]);

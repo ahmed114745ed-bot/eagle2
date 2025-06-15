@@ -182,6 +182,8 @@
     "Enable Transfer Salary": "تفعيل تحويل الراتب",
     "Disable Transfer Salary": "تعطيل تحويل الراتب",
 
+    "Delete profile switch users": "حذف بروفايل اليوزر",
+    "Profile Images": "صور الملف الشخصي",
     "your recharge success": "تم الشحن بنجاح",
     "your exchange done": "تم الشحن بنجاح",
     "recharge process": "عملية شحن",
@@ -575,7 +577,7 @@
     "hidden room": "الغرفة المخفية",
     "anonymous man": "رجل مجهول",
     "colored name": "اسم ملوّن",
-    "profile visitors hide in": "إخفاء زوارصفحات العملالعملات في",
+    "profile visitors hide in": "إخفاء زوار صفحات العملاء",
     "hide last active": "إخفاء آخر نشاط",
     "owner_room_id": "معرف صاحب الغرفة",
     "text": "نص",
@@ -2090,6 +2092,7 @@
     "Vip": "VIP",
     "Sub sender level": "مستوى المرسل الفرعي",
     "Sub receiver level": "مستوى المستلم الفرعي",
+    "Receiver Level": "مستوى المستلم",
     "Sub sender num": "عدد المرسلين الفرعيين",
     "Sub receiver num": "عدد المستلمين الفرعيين",
     "Salary": "الراتب",
@@ -3157,7 +3160,23 @@
   "Event Period": "فترة الفعالية",
   "add a daily login gift":"اضافه هدايه تسجيل دخول اليومى",
   "daily login gift": "هدية تسجيل الدخول اليومية",
-  "wapel":"مؤثر الدخول"
+  "wapel":"وابل",
+"family profile": "ملف العائلة",
+"last login":"اخر نشاط للحالة",
+"active image": "الصورة المفعّلة",
+"inactive image": "الصورة غير المفعّلة",
+"no ban profile": "الملف الشخصي غير محظور",
+ "hide user country": "إخفاء دولة المستخدم",
+  "user ender room anonymous": "دخول المستخدم الغرفة بشكل مجهول",
+  "user can send vip gift": "يمكن للمستخدم إرسال هدية كبار الشخصيات",
+  "hide visitors to client pages": "إخفاء زوار صفحات العملاء",
+  "hide room": "إخفاء الغرفة",
+  "user can not kick out from room": "لا يمكن طرد المستخدم من الغرفة",
+"This target has already been achieved by some users and cannot be updated.": "لقد قام بعض المستخدمين بتحقيق هذا التارجت بالفعل، ولا يمكن تعديله."
+,
+"target_change_warning": "عند رفع قيمة التارجت، ستزداد قيمة الدولار التي يحصل عليها المضيفون، بينما عند خفض قيمة التارجت، ستنخفض قيمة الدولار لديهم",
+"cansel":"إلغاء",
+"Delete gift a medal":"حذف هدية ميدالية"
 
 
 }

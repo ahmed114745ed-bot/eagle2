@@ -147,7 +147,7 @@ class WareController extends MainController
                 HTML;
             });
 
-                Admin::style("
+            Admin::style("
                     .switch {
                         position: relative;
                         display: inline-block;
@@ -194,7 +194,7 @@ class WareController extends MainController
                     }
                 ");
 
-                Admin::script("
+            Admin::script("
                     $(document).off('change', '.toggle-enable').on('change', '.toggle-enable', function () {
                         var id = $(this).data('id');
                         var enable = $(this).is(':checked') ? 1 : 0;
@@ -220,9 +220,6 @@ class WareController extends MainController
                         });
                     });
                 ");
-
-
-
         } else {
             $grid->column('price', __('price'));
         }
@@ -380,46 +377,17 @@ class WareController extends MainController
         });
         $form->text('key', trans('key'));
         $form->keyValue('key_json', 'key_json');
-        $form->select('image_type1', __('image_type'))->options(
-            [
+        $form->select('image_type1', __('image_type'))
+            ->options([
                 'svga' => __('svga'),
                 'alpha' => __('alpha'),
                 'mp4' => __('mp4'),
                 'vap' => __('vap'),
-
-            ]
-        )->attribute(['id' => 'image_type1']);
-
-        $form->select('profile_frame_type', __('profile_frame_type'))->options(
-            [
-                'svga' => __('svga'),
                 'png' => __('png'),
+            ])
+            ->attribute(['id' => 'image_type1']);
+           
 
-            ]
-        )->attribute(['id' => 'profile_frame']);
-
-
-
-        $script = <<<SCRIPT
-             $(document).ready(function() {
-                 function toggleWinProbability() {
-                     var type = $('#type').val();
-                     if (type == '28') {
-                        $('tr:has(#profile_frame)').show();
-                        $('tr:has(#image_type1)').hide();
-                    } else {
-                        $('tr:has(#image_type1)').show();
-                        $('tr:has(#profile_frame)').hide();
-                    }
-                 }
-                 toggleWinProbability();
-
-                 $('#type').change(function() {
-                     toggleWinProbability();
-                 });
-             });
-             SCRIPT;
-        Admin::script($script);
 
         if (Session::has('show_alert')) {
             $form->html('<script>

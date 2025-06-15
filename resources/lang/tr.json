@@ -59,7 +59,9 @@
   "Official Messages": "Resmi Mesajlar",
   "home carousels": "Ana Sayfa Karuselleri",
   "vip privileges": "VIP Ayrıcalıkları",
-  "Room Categories": "Oda Kategorileri",
+    "Delete profile switch users": "Kullanıcı profil değiştirmeyi sil",
+    "Profile Images": "Profil Resimleri",
+    "Room Categories": "Oda Kategorileri",
   "countries": "Ülkeler",
   "backgrounds": "Arka Planlar",
   "Emojis": "Emojiler",
@@ -3008,7 +3010,32 @@
     "Event Period": "Etkinlik Süresi",
       "add a daily login gift": "günlük giriş hediyesi ekle",
         "daily login gift": "günlük giriş hediyesi",
-          "wapel": "giriş efekti"
+          "wapel": "giriş efekti",
+          "family profile": "aile profili",
+   "last login": "son giriş",
+   "active image": "aktif resim",
+  "inactive image": "pasif resim",
+  "no ban profile": "Profil yasaklı değil",
+  "hide user country": "Kullanıcının ülkesini gizle",
+  "user ender room anonymous": "Kullanıcı odaya anonim olarak girsin",
+  "user can send vip gift": "Kullanıcı VIP hediye gönderebilir",
+  "hide visitors to client pages": "Müşteri sayfalarındaki ziyaretçileri gizle",
+  "hide room": "Odayı gizle",
+  "user can not kick out from room": "Kullanıcı odadan atılamaz",
+  "Receiver Level": "Alıcının Seviyesi",
+  "cancel": "İptal et",
+  "Delete gift a medal": "Bir madalya hediyesini sil",
+   "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
+,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
+
+
+
+
+
+
+
+
+
 
 
 

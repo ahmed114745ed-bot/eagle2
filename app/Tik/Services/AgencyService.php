@@ -221,6 +221,8 @@ class AgencyService
         if ($accept === 0 || $accept === false) {
             $action->status = 2;
             $action->save();
+            CustomNotification::rejectAgency($agency, $user);
+
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
@@ -358,7 +360,9 @@ class AgencyService
     public function userHandlingRequest($userId, $agencyId ,$type =null)
     {
         $operator = $this->userRepository->findById($userId);
-
+        if (!$operator) {
+            throw new CValidationException(__('User not found'));
+        }
         // if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
 
         if (!empty($type) && $type == 'remove'){
@@ -367,8 +371,8 @@ class AgencyService
                $title = $operator->name;
                $body = 'تم ازالتك من مشرفين الوكالة';
                $type = $message->type ?? 'text';
-                Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
-                return 'تم ازالة  المستخدم بنجاح';
+               CustomNotification::agencyRemoveAdmin($agencyId, $operator);
+               return 'تم ازالة  المستخدم بنجاح';
            }
 
         if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
@@ -381,6 +385,8 @@ class AgencyService
             'type' => "requestManger",
         ];
         $this->agencyUserJobRepository->create($data);
+        CustomNotification::agencyAddAdmin($agencyId, $operator);
+
         return 'تم اضافه المستخدم بنجاح';
     }
 
@@ -699,7 +705,7 @@ class AgencyService
             return $data;
         });
 
-        $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
+        $totalDays = $user->getTotalDaysJoinedAgency($startDate);
      
         $saMonth = ltrim($month, '0');
         $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year);

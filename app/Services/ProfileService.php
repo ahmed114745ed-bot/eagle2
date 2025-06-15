@@ -31,7 +31,8 @@ class ProfileService
         $data = $request->only(['name', 'email', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id']);
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
-        $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country']);
+        $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country','image']);
+        
         if ($profileData) $profile = $this->profileRepo->updateProfile($user->profile, $profileData, $user->id);
 
         if ($request->hasFile('image')) {

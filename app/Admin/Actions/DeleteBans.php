@@ -51,7 +51,7 @@ class DeleteBans extends Action
     {
         $this->hidden('uid', __('id'))->default($this->id);
         $this->hidden('type', __('id'))->default($this->type);
-        // $this->hidden('ban_type_id', __('id'))->default($this->ban_type_id);
+         $this->hidden('ban_type_id', __('id'))->default($this->ban_type_id);
 
         $this->confirm(__('messages.confirm_delete'), __('messages.are_you_sure'), [
             'icon' => 'warning',

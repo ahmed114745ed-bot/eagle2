@@ -423,6 +423,7 @@ return [
     'google_pay'    => 'جوجل باي',
     'huawei_pay' => 'هواوي باي',
     "webhook_url" => "عنوان ويب هوك",
+    "webhook_id" => "معرف ويب هوك",
 
     "target_no" => 'رقم الهدف',
     "diamonds" => 'هدف الألماس',

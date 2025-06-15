@@ -11,17 +11,29 @@ class MyPacksResource extends JsonResource
 {
     public function toArray($request)
     {
-        $user_id = $request->user_id ?:  $request->user()->id;
+//        $user_id = $request->user_id ?:  $request->user()->id;
         $type = $request->type;
         if (in_array($type, [4, 5, 6, 7])) {
-            $user_dress_after_i_changed = [
-                4 => 1,
-                5 => 2,
-                6 => 3,
-                7 => 4
+//            $user_dress_after_i_changed = [
+//                4 => 1,
+//                5 => 2,
+//                6 => 3,
+//                7 => 4
+//            ];
+//            $dress_id = User::where(['id' => $user_id])->value("dress_" . $user_dress_after_i_changed[$type]);
+
+            $user_dress_map = [
+                4 => 'dress_1',
+                5 => 'dress_2',
+                6 => 'dress_3',
+                7 => 'dress_4',
             ];
-            $dress_id  =
-                User::where(['id' => $user_id])->value("dress_" . $user_dress_after_i_changed[$type]);
+
+            $dress_id = null;
+            if (in_array($type, [4, 5, 6, 7]) && isset($user_dress_map[$type])) {
+                $dress_column = $user_dress_map[$type];
+                $dress_id = $this->user?->$dress_column;
+            }
         }
         if (in_array($type, [4, 5, 6, 7])) {
             $title    = empty($this->expire) ? "permanent" : date('Y-m-d H:i:s', $this->expire) . " expire";
@@ -67,11 +79,11 @@ class MyPacksResource extends JsonResource
             'sender_id' => $this->sender_id,
             'is_used' => $this->is_used == 1 ? true : false,
             'use_num' => $this->use_num,
-            'name' => $this->name,
-            'show_img' => $this->show_img,
-            'svg'       =>  $this->img2 ?? '',
+            'name' => $this->ware?->name,
+            'show_img' => $this->ware?->show_img ?? '',
+            'svg'       =>  $this->ware?->img2 ?? '',
             'price' => @$this->price ?? '',
-            'price_item' => @$this->ware->price ?? '',
+            'price_item' => @$this->price ?? '',
             'image_type' => $this->ware->image_type ?? "",
             'is_dress' => $is_dress ?? 0,
             'title' => $title,

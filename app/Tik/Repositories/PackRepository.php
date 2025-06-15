@@ -4,7 +4,7 @@ namespace App\Tik\Repositories;
 
 use App\Models\Pack;
 use Carbon\Carbon;
-
+use Illuminate\Database\Eloquent\Collection;
 
 
 /**
@@ -96,19 +96,37 @@ class PackRepository extends AbstractRepository
         return true;
     }
 
-    public function packsJoinWithGift($userId, $type): \Illuminate\Support\Collection
+//    public function packsJoinWithGift($userId, $type): \Illuminate\Support\Collection
+//    {
+//        return $this->model->join('gifts as b', 'packs.target_id', '=', 'b.id')
+//            ->where(['packs.user_id' => $userId, 'packs.type' => $type])
+//            ->selectRaw("packs.*,b.name,b.show_img,b.price")
+//            ->get();
+//    }
+
+    public function packsJoinWithGift($userId, $type,array $additionalRelations = []): Collection|array
     {
-        return $this->model->join('gifts as b', 'packs.target_id', '=', 'b.id')
-            ->where(['packs.user_id' => $userId, 'packs.type' => $type])
-            ->selectRaw("packs.*,b.name,b.show_img,b.price")
+        return $this->model
+            ->with(array_merge(['gift:id,name,show_img,price'], $additionalRelations))
+            ->where('user_id', $userId)
+            ->where('type', $type)
             ->get();
     }
 
-    public function packsJoinWithWare($userId, $type): \Illuminate\Support\Collection
+//    public function packsJoinWithWare($userId, $type): \Illuminate\Support\Collection
+//    {
+//        return $this->model->join('wares as b', 'packs.target_id', '=', 'b.id')
+//            ->where(['packs.user_id' => $userId, 'packs.type' => $type])
+//            ->selectRaw("packs.*,b.name,b.show_img,b.title,b.color, b.img2 as img2")
+//            ->get();
+//    }
+
+    public function packsJoinWithWare($userId, $type,array $additionalRelations = []): Collection|array
     {
-        return $this->model->join('wares as b', 'packs.target_id', '=', 'b.id')
-            ->where(['packs.user_id' => $userId, 'packs.type' => $type])
-            ->selectRaw("packs.*,b.name,b.show_img,b.title,b.color, b.img2 as img2")
+        return $this->model
+            ->with(array_merge(['ware:id,id,name,show_img,title,color,img2'], $additionalRelations))
+            ->where('user_id', $userId)
+            ->where('type', $type)
             ->get();
     }
 

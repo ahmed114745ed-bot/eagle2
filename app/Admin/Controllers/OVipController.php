@@ -229,15 +229,14 @@ class OVipController extends MainController
         $form->file('img', trans('img'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
-        $form->number('exp', __('exp'));
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_vip_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('💎');
+                $form->currency('price', __('price'))->symbol('🪙');
             }
         }
         if ($form->isEditing()) {
             if (Admin::user()->can('edit_vip_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('💎');
+                $form->currency('price', __('price'))->symbol('🪙');
             }
         }
         if (Admin::user()->can('*')) {

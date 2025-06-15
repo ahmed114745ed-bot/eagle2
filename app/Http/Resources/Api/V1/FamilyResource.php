@@ -43,7 +43,10 @@ class FamilyResource extends JsonResource
         }
 
         $mems = FamilyUser::query()->with("user")->where('family_id', @$this->id)->where('status', 1)->where("user_type",'!=',2)->get();
-
+        $requested = FamilyUser::where('user_id', $request->user()->id)
+        ->where('family_id', $this->id)
+        ->where('status', 0)
+        ->exists();
 
         return [
 
@@ -61,6 +64,7 @@ class FamilyResource extends JsonResource
             'num_of_requests' => FamilyUser::query()->where('family_id', $this->id)->where('status', 0)->count(),
             'num_of_members' => ($this->members_count + 1),
             'level' => @$this->level ?: '',
+            'requested' => @$requested,
         ];
     }
 }

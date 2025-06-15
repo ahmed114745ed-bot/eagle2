@@ -1464,9 +1464,39 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\UserSallary::class, 'user_id')
                     ->where('user_agency_id', $this->agency_id);
     }
+
+    public function latestJoin()
+    {
+        return $this->hasOne(UsersJoinedAgency::class, 'user_id')
+            ->where('agency_id', $this->agency_id)
+            ->latestOfMany('join_date');
+    }
     public function lastSallary()
     {
+        $join = $this->latestJoin()->first();    
         return $this->hasOne(UserSallary::class, 'user_id')
-        ->where('user_agency_id', $this->agency_id)->latestOfMany();
+            ->where(function ($query) use ($join) {
+                if ($join) {
+                    $start = $join->join_date;
+                    $end = $join->leave_date ?? now()->endOfMonth();
+                    $query->where('user_agency_id', $this->agency_id)
+                          ->whereBetween('created_at', [$start, $end]);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            })
+            ->latestOfMany();
+    }
+
+
+    public function type16Packs()
+    {
+        return $this->hasMany(Pack::class, 'user_id')
+                    ->where('type', 16)
+                    ->where('is_used', 1)
+                    ->where(function ($q) {
+                        $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                    });
     }
 }
