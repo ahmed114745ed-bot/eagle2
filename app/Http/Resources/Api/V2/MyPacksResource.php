@@ -80,7 +80,7 @@ class MyPacksResource extends JsonResource
             'is_used' => $this->is_used == 1 ? true : false,
             'use_num' => $this->use_num,
             'name' => $this->name,
-            'show_img' => $this->show_img,
+            'show_img' => $this->show_img ?? '',
             'svg'       =>  $this->img2 ?? '',
             'price' => @$this->price ?? '',
             'price_item' => @$this->ware->price ?? '',
