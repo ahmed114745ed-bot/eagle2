@@ -81,7 +81,6 @@ class PackController extends Controller
         }
         if ($request->type == 22) return Common::apiResponse(1, '', MyPacksVipResource::collection($data));
 
-        \Log::info('show_img',['data'=>$data]);
         return Common::apiResponse(1, '', MyPacksResource::collection($data));
     }
 
