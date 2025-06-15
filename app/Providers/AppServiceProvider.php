@@ -136,6 +136,7 @@ class AppServiceProvider extends ServiceProvider
                 'paypal.client_id' => $settings['paypal_client_id'] ?? '',
                 'paypal.client_secret' => $settings['paypal_client_secret'] ?? '',
                 'paypal.currency' => $settings['paypal_currency'] ?? '',
+                'paypal.webhook_id' => $settings['paypal_webhook_id'] ?? '',
 
                 'services.zinipay.api_key' => $settings[''] ?? '',
                 'services.zinipay.url' => $settings[''] ?? '',

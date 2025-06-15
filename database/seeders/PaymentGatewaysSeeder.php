@@ -509,6 +509,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => 'asdasd'
             ],
+            'new_5' => [
+                "name" => "paypal_webhook_id",
+                "type" => "input",
+                "value" => '123'
+            ],
         ];
 
 
