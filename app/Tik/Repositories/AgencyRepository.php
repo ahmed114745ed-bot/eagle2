@@ -48,10 +48,11 @@ class AgencyRepository extends AbstractRepository
     {
         return $this->model->whereRaw('CAST(id AS CHAR) LIKE ?', [$id . '%'])->with('owner', 'AgencypaymentGateways')->get();
     }
+
     public function findById($id)
     {
-
-        return $this->model->with(['additionalInfo', 'mempers', 'admins','userSalaries'])
+        return $this->model
+            ->with(['additionalInfo', 'mempers', 'admins', 'userSalaries'])
             ->withCount('mempers')
             ->where('id', $id)->first();
     }
@@ -59,13 +60,13 @@ class AgencyRepository extends AbstractRepository
     public function gitOldAgencies($id)
     {
         return UsersJoinedAgency::where('user_id', $id)
-        ->whereHas('agency')
-        ->with(['agency:id,img'])  
-        ->select('join_date', 'leave_date', 'agency_id')    
-        ->get();
+            ->whereHas('agency')
+            ->with(['agency:id,img'])
+            ->select('join_date', 'leave_date', 'agency_id')
+            ->get();
     }
 
-    
+
     public function findByStatus($id)
     {
         return $this->model->with('additionalInfo')->where('id', $id)->where('status', 1)->first();
@@ -259,17 +260,22 @@ class AgencyRepository extends AbstractRepository
 
     public function report($id, $month = null, $year = null, $perPage, $page)
     {
-        return  $this->model->when(isset($id), function ($query) use ($id) {
-            $query->where('id', $id);
-        })->whereHas('agencySalaries', function ($q) use ($month, $year) {
-            $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {
-                $query->where('month', $month)->where('year', $year);
-            });
-        })->with(['agencySalaries' => function ($query) use ($month, $year) {
-            $query->when(isset($month) && isset($year), function ($query) use ($month, $year) {
-                $query->where('month', $month)->where('year', $year);
-            });
-        }], 'owner', 'dashOwner', 'users')->paginate($perPage, ['*'], 'page', $page)
+        return $this->model
+            ->when(isset($id), function ($query) use ($id) {
+                $query->where('id', $id);
+            })
+            ->whereHas('agencySalaries', function ($q) use ($month, $year) {
+                $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {
+                    $query->where('month', $month)->where('year', $year);
+                });
+            })
+            ->withCount('users')
+            ->with(['owner', 'dashOwner', 'agencySalaries' => function ($query) use ($month, $year) {
+                $query->when(isset($month) && isset($year), function ($query) use ($month, $year) {
+                    $query->where('month', $month)->where('year', $year);
+                });
+            }])
+            ->paginate($perPage, ['*'], 'page', $page)
             ->through(function ($agency) use ($month, $year) {
                 $agency->target = $agency->getTotalSallaryAgency($month, $year);
                 $agency->expenses = $agency->getTotalCutAmountAgency($month, $year);
@@ -280,7 +286,7 @@ class AgencyRepository extends AbstractRepository
 
     public function getChargeAgency($id)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class)->whereHas('chargeAgency')->when(isset($id), function ($query) use ($id) {
+        return $this->model->withoutGlobalScope(HostAgencyScope::class)->whereHas('chargeAgency')->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->get();
     }

@@ -134,6 +134,7 @@ return [
     'Remove_Ban' => 'ازاله الحظر',
     'Actions' => 'أجراءات',
     'agency_id' => 'معرف الوكاله',
+    'agency' => 'الوكاله',
     'status' => 'الحاله',
     'pending' => 'معلقه',
     'accepted' => 'مقبوله',
