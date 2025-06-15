@@ -414,6 +414,7 @@ return [
     'google_pay'    => 'google_pay',
     'huawei_pay' => 'Huawei Pay',
     "webhook_url" => "Webhook URL'si",
+    'webhook_id' => 'Webhook Kimliği',
 
     "target_no" => 'Hedef Numarası',
     "diamonds" => 'Elmas Hedefi',

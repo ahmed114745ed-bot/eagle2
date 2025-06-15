@@ -210,6 +210,7 @@ class AuthService
 
             $user->profile_count += 1;
             $user->save();
+            $user->load('profile');
             $profile = $user->profile;
             if($profile)
             {

@@ -411,6 +411,7 @@ return [
     'google_pay'    => 'गूगल पे',
     'huawei_pay' => 'हुआवेई पे',
     "webhook_url" => "वेबहुक URL",
+    'webhook_id' => 'वेबहुक आईडी',
 
     "target_no" => 'लक्ष्य संख्या',
     "diamonds" => 'हीरे का लक्ष्य',
