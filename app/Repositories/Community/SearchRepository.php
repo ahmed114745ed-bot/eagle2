@@ -4,6 +4,7 @@ namespace App\Repositories\Community;
 use App\Helpers\Common;
 use App\Http\Resources\Api\V1\CommunityResource;
 use App\Models\OfficialMessage;
+use App\Models\Pack;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -34,11 +35,20 @@ class SearchRepository implements SearchRepositoryInterface
         }
 
         $keywords = $user->id;
-
+        
+        $excludedUsers = Pack::query()
+        ->where('type', 16)
+        ->where('is_used', 1)
+        ->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        })
+        ->pluck('user_id')
+        ->toArray();
         $rooms = DB::table('rooms')
             ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
             ->where('users.status', 1)
+            ->whereNotIn('rooms.uid', $excludedUsers)
             ->select([
                 'rooms.*',
                 'rooms.id as room_id',
