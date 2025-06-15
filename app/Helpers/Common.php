@@ -822,8 +822,8 @@ class Common
         $type = $vip->privilegs()->pluck('type')->toArray();
 
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
-        ->where('level', $vip->level)
-        ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
+            ->where('level', $vip->level)
+            ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
         foreach ($wares as $ware) {
             Pack::query()->where('user_id', $user->id)
                 ->where('expire', '<', now()->timestamp)
@@ -890,10 +890,10 @@ class Common
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
         //  dd($userVip->is_used);
-        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->delete();
+        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->update(['is_used' => 0]);
 
         $type = $vip->privilegs()->pluck('type')->toArray();
-        \Log::info('type',['all'=>$type]);
+        \Log::info('type', ['all' => $type]);
         $missingTypes = [];
         if (!empty($type)) {
             foreach ($type as $wareType) {
@@ -902,23 +902,23 @@ class Common
                     ->where('level', $vip->level)
                     ->where('type', $wareType)
                     ->first();
-        
-                    if (!$isSetWare) {
-                        $missingTypes[] = $wareType;
-                    } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
-                        $isSetWare->update([
-                            'is_active_for_vip' => 1,
-                            'enable' => 1,
-                        ]);
-                        $availableWares[] = $isSetWare;
-                    } else {
-                        $availableWares[] = $isSetWare;
-                    }
+
+                if (!$isSetWare) {
+                    $missingTypes[] = $wareType;
+                } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
+                    $isSetWare->update([
+                        'is_active_for_vip' => 1,
+                        'enable' => 1,
+                    ]);
+                    $availableWares[] = $isSetWare;
+                } else {
+                    $availableWares[] = $isSetWare;
+                }
             }
         }
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
-        ->where('level', $vip->level)
-        ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
+            ->where('level', $vip->level)
+            ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
         foreach ($wares as $ware) {
             Pack::query()->where('user_id', $user->id)
                 ->where('expire', '<', now()->timestamp)
@@ -936,10 +936,9 @@ class Common
                 $expire = $vip->expire;
             }
             if ($pack) {
-             
+
                 $pack->is_used = $userVip->is_used;
                 $pack->save();
-                
             } else {
                 Pack::query()->create(
                     [
@@ -955,14 +954,14 @@ class Common
                         'using' => 1,
                     ]
                 );
-                \Log::info('missingTypes',['all'=>$missingTypes]);
+                \Log::info('missingTypes', ['all' => $missingTypes]);
 
                 foreach ($missingTypes ?? [] as $wareType) {
                     Pack::query()->create([
                         'user_id' => $user->id,
                         'get_type' => 1,
                         'type' => $wareType,
-                        'target_id' => 0,   
+                        'target_id' => 0,
                         'num' => 1,
                         'expire' => $vip->expire ? now()->addDays($expire)->timestamp : 0,
                         'use_num' => 0,
@@ -977,15 +976,13 @@ class Common
                 self::unUsePack($type, $user);
             }
         }
-     
+
         $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
             $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->orderBy('level', 'desc')->first();
         if ($uvip) {
             $user->update(['vip' => $uvip->id]);
         }
-
-    
     }
     public static function  unUsePack($type, $user)
     {
