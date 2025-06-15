@@ -821,12 +821,10 @@ class Common
 
         $type = $vip->privilegs()->pluck('type')->toArray();
 
-        $vipWares =$userVip->privilegs;
         if (!empty($type)) {
             foreach ($type as $wareType) {
                 $isSetWare = Ware::query()
                     ->where('get_type', 1)
-                    ->where('enable', 1)
                     ->where('level', $vip->level)
                     ->where('type', $wareType)
                     ->first();
@@ -875,10 +873,17 @@ class Common
                         'updated_at' => now(),
                         'is_active_for_vip' => 1
                     ]);
+                } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
+                    $isSetWare->update([
+                        'is_active_for_vip' => 1,
+                        'enable' => 1,
+                    ]);
                 }
             }
         }
-        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
+        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
+        ->where('level', $vip->level)
+        ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
         foreach ($wares as $ware) {
             Pack::query()->where('user_id', $user->id)
                 ->where('expire', '<', now()->timestamp)
