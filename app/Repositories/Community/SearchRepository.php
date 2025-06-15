@@ -28,27 +28,29 @@ class SearchRepository implements SearchRepositoryInterface
 
     public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|array
     {
-        $user = User::searchByUuid($keywords)->first();
+        // $user = User::searchByUuid($keywords)->first();
 
-        if (!$user) {
+        $user = User::searchByUuid($keywords)
+            ->with(['packs' => function ($q) {
+                $q->where('type', 16)
+                    ->where('is_used', 1)
+                    ->where(function ($q) {
+                        $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                    });
+            }])->first();
+
+        if (!$user || $user->packs->isNotEmpty()) {
             return [];
         }
 
         $keywords = $user->id;
-        
-        $excludedUsers = Pack::query()
-        ->where('type', 16)
-        ->where('is_used', 1)
-        ->where(function ($q) {
-            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
-        })
-        ->pluck('user_id')
-        ->toArray();
+
+
         $rooms = DB::table('rooms')
             ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
             ->where('users.status', 1)
-            ->whereNotIn('rooms.uid', $excludedUsers)
             ->select([
                 'rooms.*',
                 'rooms.id as room_id',

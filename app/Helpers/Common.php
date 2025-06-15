@@ -894,7 +894,7 @@ class Common
 
         $type = $vip->privilegs()->pluck('type')->toArray();
         \Log::info('type',['all'=>$type]);
-
+        $missingTypes = [];
         if (!empty($type)) {
             foreach ($type as $wareType) {
                 $isSetWare = Ware::query()
