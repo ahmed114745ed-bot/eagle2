@@ -569,7 +569,7 @@
         display: inline-block;
     }
 
-    
+
 
 .nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus {
     border-top-color: var(--primary-color);
@@ -1031,7 +1031,7 @@
 
 
        @php
-                    $activeTab = request('tab', 'tab=salary'); 
+                    $activeTab = request('tab', 'tab=salary');
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
@@ -1043,7 +1043,7 @@
             @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
                 <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}" data-target="salary-tab">{{ __('user wallet') }}</a>
             @endif
-            
+
 
         </div>
         <div id="tab-loading" style="
@@ -1105,7 +1105,7 @@
                                                 <th>{{ __('img') }}</th>
                                                 <th>{{ __('expire') }}</th>
                                                 <th>{{ __('action') }}</th>
-                                                
+
                                             </tr>
                                         </thead>
                                         @if($packs && $packs->count())
@@ -1124,7 +1124,7 @@
                                                         <img src="{{ getImagePath(@$path) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
                                                     </td>
-                                                    <td>{{\Carbon\Carbon::createFromTimestamp($pack->expire)->format('Y-m-d H:i:s') }}</td>
+                                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                                     <td>
                                                         <div class="d-flex">
                                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn" data-id="{{ $pack->id }}">
@@ -1182,12 +1182,12 @@
                                                     <tr>
                                                         <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
                                                         <td>{{ $userVip->level }}</td>
-                                                        <td>{{\Carbon\Carbon::createFromTimestamp($userVip->expire)->format('Y-m-d H:i:s')}}</td>
+                                                        <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                                         <td>{{ @$userVip->qty ?? 0 }}</td>
                                                         <td>{{ @$userVip->total ?? 0 }}</td>
                                                          <td>
                                                         <div class="d-flex">
-                                                            
+
                                                             <button class="btn btn-danger delete-vip-btn" data-id="{{ $userVip->id }}">
                                                                 {{ __('dashboard.delete') }}
                                                             </button>
@@ -1331,7 +1331,7 @@
                                                                     </div>
                                                                 </a>
                                                             </td>
-                                                   
+
 
                                                         <td>{{$salary->sallary}}</td>
                                                         <td>{{ $salary->cut_amount}}</td>
