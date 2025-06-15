@@ -17,8 +17,8 @@ class VerifyPayPalWebhook extends PayPalService
      */
     public function handle(Request $request, Closure $next): Response
     {
-        info($request);
-        $headers = $request->headers();
+        $headers = $request->headers;
+        info($headers);
 
         $verificationData = [
             'auth_algo'         => $headers->get('paypal-auth-algo'),
