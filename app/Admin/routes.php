@@ -9,7 +9,6 @@ use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AgencySettingsController;
-use App\Admin\Controllers\AgoraZegoSettingController;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AppFeatureController;
@@ -18,8 +17,6 @@ use App\Admin\Controllers\BadgeController;
 use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\BanTypeController;
 use App\Admin\Controllers\BdController;
-use App\Admin\Controllers\BDControllers\RequestAgencyController;
-use App\Admin\Controllers\BDControllers\WalletController;
 use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\BoxController;
@@ -223,7 +220,8 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
-
+        
+        $router->post('/edit-level', [UsersAppController::class, 'editLevelUser']);
         $router->post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);
         $router->post('/delete-user-vip/{id}', [UsersAppController::class, 'deleteUserVip']);
         $router->post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
