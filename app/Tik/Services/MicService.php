@@ -234,38 +234,84 @@ class MicService
     }
 
     //Down the wheat - execute the operation
-    public  function goMicrophoneHand($user, $room)
-    {
-        $microphone = $room->microphone;
-        $mainMicrophone = $room->main_microphone;
+    // public  function goMicrophoneHand($user, $room)
+    // {
+    //     $microphone = $room->microphone;
+    //     $mainMicrophone = $room->main_microphone;
 
-        $baseMic = $room->getOriginal('microphone');
-        $microphone = explode(',', $microphone);
-        $mainMicrophone = explode(',', $mainMicrophone);
-        $baseMic = explode(',', $baseMic);
+    //     $baseMic = $room->getOriginal('microphone');
+    //     $microphone = explode(',', $microphone);
+    //     $mainMicrophone = explode(',', $mainMicrophone);
+    //     $baseMic = explode(',', $baseMic);
+    //     if (!$microphone || !in_array($user->id, $microphone)) {
+    //         return 0;
+    //     }
+    //     $position = 0;
+    //     for ($i = 0; $i < count($microphone); $i++) {
+    //         if ($microphone[$i] == $user->id) {
+    //             $position = $i;
+    //             break;
+    //         }
+    //     }
+    //     if ($microphone[$position] > 0) {
+    //         $baseMic[$position] = $mainMicrophone[$position];
+    //     }
+
+    //     $microphone = implode(',', $baseMic);
+    //     $this->updateMicAndPK($room, $microphone);
+    //     //clear timer
+    //     $this->timeLogRepository->deleteAth($room->uid, $user->id);
+
+    //     $this->handleLeaveCp($user, $room);
+
+    //     return true;
+    // }
+
+    public function goMicrophoneHand($user, $room)
+    {
+        $microphone = explode(',', $room->microphone);
+        $mainMicrophone = explode(',', $room->main_microphone);
+        $original = explode(',', $room->getOriginal('microphone'));
+
         if (!$microphone || !in_array($user->id, $microphone)) {
             return 0;
         }
-        $position = 0;
+
+        $position = array_search($user->id, $microphone);
+        if ($position === false) return 0;
+
+        // Remove user
+        $microphone[$position] = "0";
+
+        $final = [];
+
         for ($i = 0; $i < count($microphone); $i++) {
-            if ($microphone[$i] == $user->id) {
-                $position = $i;
-                break;
+            $mic = $microphone[$i] ?? '0';
+            $main = $mainMicrophone[$i] ?? '0';
+
+            if ($mic != '0' && $main != '0' && $mic != $main) {
+                $final[] = $mic . '#' . $main;
+            } elseif ($mic != '0') {
+                $final[] = $mic;
+            } elseif ($main != '0') {
+                $final[] = $main;
+            } else {
+                $final[] = '0';
             }
         }
-        if ($microphone[$position] > 0) {
-            $baseMic[$position] = $mainMicrophone[$position];
-        }
 
-        $microphone = implode(',', $baseMic);
-        $this->updateMicAndPK($room, $microphone);
-        //clear timer
+        // Save to DB
+        $result = implode(',', $final);
+        $this->updateMicAndPK($room, $result);
+
+        // Clear mic timer and leave CP
         $this->timeLogRepository->deleteAth($room->uid, $user->id);
-
         $this->handleLeaveCp($user, $room);
 
         return true;
     }
+
+
 
     public function handleLeaveCp($user, $room)
     {
@@ -307,7 +353,7 @@ class MicService
     {
         $room = $this->roomRepository->findRoom($data['room_id']);
 
-        if (! $room){
+        if (! $room) {
             return Common::apiResponse(0, __('api_responses.room_not_found'), null, 408);
         }
         info($room);
