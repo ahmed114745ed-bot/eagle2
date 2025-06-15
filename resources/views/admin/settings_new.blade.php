@@ -1978,7 +1978,7 @@ use App\Models\Vip;
                                                             <div class="copy-container">
                                                                 <input type="text" id="paypal_webhook_id" name="paypal_webhook_id"
                                                                        placeholder="paypal_webhook_id"
-                                                                       value="{{ url('/api/paypal-callback') }}"
+                                                                       value="{{ $settings['paypal_webhook_id'] ?? '' }}"
                                                                        class="form-control">
                                                             </div>
                                                         </div>
