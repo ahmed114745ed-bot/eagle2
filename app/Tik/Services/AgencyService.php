@@ -221,13 +221,15 @@ class AgencyService
         if ($accept === 0 || $accept === false) {
             $action->status = 2;
             $action->save();
+            CustomNotification::rejectAgency($agency, $user);
+
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
             $this->userRepository->update(['agency_id' => $agency->id], $user->id);
             $this->userRepository->updateTypeUser($user);
-            $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
-            if (!$checkAgencyUser) {
+            // $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
+            // if (!$checkAgencyUser) {
                 $joinAgencyData = [
                     'user_id' =>  $user->id,
                     'agency_id' => $agency->id,
@@ -235,7 +237,7 @@ class AgencyService
                     'join_date' => now(),
                 ];
                 $this->usersJoinedAgencyRepository->create($joinAgencyData);
-            }
+            // }
             // add vip to user
             UserCommon::userVip($user);
             CustomNotification::acceptAgencyApp($agency, $user);
@@ -358,7 +360,9 @@ class AgencyService
     public function userHandlingRequest($userId, $agencyId ,$type =null)
     {
         $operator = $this->userRepository->findById($userId);
-
+        if (!$operator) {
+            throw new CValidationException(__('User not found'));
+        }
         // if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
 
         if (!empty($type) && $type == 'remove'){
@@ -367,8 +371,8 @@ class AgencyService
                $title = $operator->name;
                $body = 'تم ازالتك من مشرفين الوكالة';
                $type = $message->type ?? 'text';
-                Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
-                return 'تم ازالة  المستخدم بنجاح';
+               CustomNotification::agencyRemoveAdmin($agencyId, $operator);
+               return 'تم ازالة  المستخدم بنجاح';
            }
 
         if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
@@ -381,6 +385,8 @@ class AgencyService
             'type' => "requestManger",
         ];
         $this->agencyUserJobRepository->create($data);
+        CustomNotification::agencyAddAdmin($agencyId, $operator);
+
         return 'تم اضافه المستخدم بنجاح';
     }
 
@@ -495,7 +501,7 @@ class AgencyService
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
-        Common::createUserAdmin($agency->app_owner_id);
+      ///  Common::createUserAdmin($agency->app_owner_id);
         $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
         if (!$checkAgencyUser) {
             $joinAgencyData = [
@@ -648,11 +654,8 @@ class AgencyService
         if (! $joinedAgency) {
             return [];
         }
-
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
-        ->where('agency_id', $agencyId)
-        ->whereMonth('join_date', $month)
-        ->whereYear('join_date', $year)
+        ->where('agency_id', $user->agency_id)
         ->latest('join_date')
         ->first();
 
@@ -665,10 +668,10 @@ class AgencyService
 
 
         if ($joinRecord) {
-            $joinedDate = Carbon::parse($joinRecord->join_date)->startOfDay();
+            $joinedDate = Carbon::parse($joinRecord->join_date);
 
             $leaveDate = $joinRecord->leave_date
-                ? Carbon::parse($joinRecord->leave_date)->endOfDay()
+                ? Carbon::parse($joinRecord->leave_date)
                 : $endOfMonth;
         } else {
             $joinedDate = null;
@@ -690,7 +693,6 @@ class AgencyService
 
         $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth)) ? $joinedDate : $startOfMonth;
         $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
-
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
@@ -703,7 +705,7 @@ class AgencyService
             return $data;
         });
 
-        $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
+        $totalDays = $user->getTotalDaysJoinedAgency($startDate);
      
         $saMonth = ltrim($month, '0');
         $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year);
@@ -1025,7 +1027,7 @@ class AgencyService
         ];
 
         $agency =  $this->agencyRepository->create($data);
-        Common::createUserAdmin($request->app_owner_id);
+        //Common::createUserAdmin($request->app_owner_id);
 
         if ($request->type == 1 ) {
 
@@ -1057,7 +1059,7 @@ class AgencyService
             $this->userRepository->update($data, $agency->app_owner_id);
             $user = User::find($agency->app_owner_id);
             Admin::where('username', $user->uuid)->delete();
-            Common::createUserAdmin($request->app_owner_id);
+            //Common::createUserAdmin($request->app_owner_id);
         }
 
         if ($request->type == 1 ) {

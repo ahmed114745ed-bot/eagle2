@@ -12,5 +12,5 @@
 */
 
 Route::prefix('karisma')->middleware('appFeatureEnable:charizma')->group(function() {
-    Route::get('/', 'KarismaController@index');
+    // Route::get('/', 'KarismaController@index');
 });

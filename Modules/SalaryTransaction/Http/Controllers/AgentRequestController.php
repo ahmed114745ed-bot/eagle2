@@ -147,13 +147,14 @@ class AgentRequestController extends MainController
         // $grid->column('payment_gateway.title',__("payment title"));
         // $grid->column('country.name',__("country"));
         $grid->disableCreateButton();
-        $grid->actions(function ($actions) {
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions)use($permission) {
             $actions->disableEdit();
             $actions->disableDelete();
-            if (Admin::user()->can('accept-request-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('accept-request-switch-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new AcceptAgentRequestAction());
             }
-            if (Admin::user()->can('rejected-request-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('rejected-request-switch-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new RejectedAgentRequestAction());
             }
         });

@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Helpers\Common;
 use App\Models\Target;
+use App\Models\User;
 use Encore\Admin\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -395,6 +396,7 @@ class TargetController extends MainController
 
                 calculateUsdAmount();
             });
+            
         </script>');
         $form->html('<h1>' . __('days and hours') . '</h1>');
 
@@ -444,8 +446,46 @@ class TargetController extends MainController
 
             return @explode(',', $moment)[2] ?? 0;
         });
+      
+        $form->editing(function (Form $form) {
+            
+            $target = Target::find($form->model()->id);
+        
+            if ($target) {
+                $users = User::where('monthly_diamond_received', '>=', $target->diamonds)->count();
+                if ($users > 0) {
+                    admin_warning('تحذير', __('target_change_warning'));
+                }
+            }
+        });
 
+        $form->html(<<<HTML
+                <script>
+                    Dcat.ready(function () {
+                        let hasWarning = $('div.alert-warning:contains("بعض المستخدمين")').length > 0;
+
+                        if (hasWarning) {
+                            $('form').on('submit', function (e) {
+                                e.preventDefault();
+                                Dcat.confirm('تحذير', 'بعض المستخدمين وصلوا إلى هذا الهدف. هل تريد حفظ التعديلات؟', function () {
+                                    $('form').off('submit').submit(); // إعادة الإرسال بعد التأكيد
+                                });
+                            });
+                        }
+                    });
+                </script>
+                HTML);
+
+        
         $form->saving(function (Form $form) {
+            // if ($form->isEditing()) {
+            //     $original = $form->model();
+            //     $users = User::where('monthly_diamond_received', '>=', $original->diamonds)->count();
+            //     if ($users > 0) {
+            //         admin_error('تحذير', 'بعض المستخدمين وصلوا إلى هذا الهدف بالفعل. هل أنت متأكد من التعديل؟');
+            //     }
+            // }
+
             $fields = [
                 'usd' => request()->usd,
                 'agency_share' => request()->agency_share,

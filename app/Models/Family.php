@@ -14,23 +14,23 @@ class Family extends Model
 
     protected $appends = ['rank'];
     private $cachedLevelMax = null;
-    
+
 
     public function getCreatedAtAttribute($value)
     {
         $cacheKey = 'timezone';
 
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
+        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
 
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
+        // Get the timezone from the request header or use the cached setting
+        $timeZone = request()->header('tz') ?? $timezone;
 
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        // Parse the date and set the timezone
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
 
     // Convert updated_at to the user's local time zone
@@ -38,17 +38,17 @@ class Family extends Model
     {
         $cacheKey = 'timezone';
 
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
+        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
 
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
+        // Get the timezone from the request header or use the cached setting
+        $timeZone = request()->header('tz') ?? $timezone;
 
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        // Parse the date and set the timezone
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
     public function users()
     {
@@ -68,6 +68,11 @@ class Family extends Model
     public function members()
     {
         return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', 0);
+    }
+
+    public function allMembers()
+    {
+        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', '!=', 2);
     }
 
     public function currentLevel()

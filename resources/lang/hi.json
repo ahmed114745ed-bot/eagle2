@@ -15,6 +15,8 @@
     "Charge Reports": "चार्ज रिपोर्ट",
     "Agency name": "एजेंसी का नाम",
     "charge-reports": "चार्ज रिपोर्ट",
+    "Delete profile switch users": "प्रोफ़ाइल स्विच उपयोगकर्ताओं को हटाएं",
+    "Profile Images": "प्रोफ़ाइल छवियाँ",
     "Charged by dash": "सिस्टम से चार्ज",
     "Top Gift": "शीर्ष उपहार",
     "Badges": "बैज",
@@ -510,7 +512,7 @@
     "Card Scroll": "कार्ड स्क्रॉल",
     "Avatar Frame": "अवतार फ्रेम",
     "Bubble Frame": "बबल फ्रेम",
-    "Entering Special Effects": "विशेष प्रभाव प्रवेश",
+    "Entering Special Effects": " यौगिक",
     "Microphone Aperture": "माइक्रोफोन एपर्चर",
     "Badge": "बैज",
     "NoKick": "कोई चुस्ती नहीं",
@@ -2572,9 +2574,48 @@
   "History of unique identifiers": "अद्वितीय पहचानकर्ताओं का इतिहास",
     "Vip Settings": "वीआईपी सेटिंग्स",
     "being kicked": "निकाल दिया गया",
-  "anti ban": "प्रतिबंध विरोधी"
+  "anti ban": "प्रतिबंध विरोधी",
+  "net salary": "शुद्ध वेतन",
+    "Salary switch users": "प्रयुक्त वेतन",
 
-  
+    "Default Image": "डिफ़ॉल्ट छवि",
+    "Priority": "प्राथमिकता",
+    "Localized Images": "स्थानीयकृत छवियाँ",
+    "Image for": "लिए छवि",
+    "Badge Name": "बैज का नाम",
+
+    "user wallet": "उपयोगकर्ता वॉलेट",
+    "assign achievement": "उपलब्धि सौंपें",
+    "Pk Events": "पीके कार्यक्रम",
+    "Target Events": "लक्ष्य कार्यक्रम",
+    "Weekly Events": "साप्ताहिक कार्यक्रम",
+    "Event Period": "कार्यक्रम अवधि",
+      "add a daily login gift": "दैनिक लॉगिन उपहार जोड़ें",
+"daily login gift": "दैनिक लॉगिन उपहार",
+"wapel": "प्रवेश प्रभाव",
+"family profile": "परिवार प्रोफ़ाइल",
+"last login": "आखिरी लॉगिन",
+"active image": "सक्रिय छवि",
+  "inactive image": "निष्क्रिय छवि",
+  "no ban profile": "प्रोफ़ाइल प्रतिबंधित नहीं है",
+  "hide user country": "उपयोगकर्ता का देश छुपाएं",
+  "user ender room anonymous": "उपयोगकर्ता गुमनाम रूप से कक्ष में प्रवेश करे",
+  "user can send vip gift": "उपयोगकर्ता VIP उपहार भेज सकता है",
+ "hide visitors to client pages": "क्लाइंट पृष्ठों पर आगंतुकों को छुपाएं",
+"hide room": "कक्ष छुपाएं",
+ "user can not kick out from room": "उपयोगकर्ता को कक्ष से बाहर नहीं निकाला जा सकता",
+"Receiver Level": "प्राप्तकर्ता स्तर",
+"cancel": "रद्द करें",
+"Delete gift a medal": "मेडल उपहार हटाएं",
+"This target has already been achieved by some users and cannot be updated.": "इस लक्ष्य को कुछ उपयोगकर्ताओं द्वारा पहले ही प्राप्त किया जा चुका है और इसे अपडेट नहीं किया जा सकता।"
+,    "target_change_warning": "टारगेट मूल्य बढ़ाने पर होस्ट को मिलने वाली डॉलर राशि बढ़ेगी, जबकि इसे घटाने पर डॉलर राशि कम हो जाएगी।"
+
+
+
+
+
+
+
 
 
 }

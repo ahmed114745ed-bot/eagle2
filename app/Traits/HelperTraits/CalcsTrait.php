@@ -13,6 +13,7 @@ use App\Models\UserLevelLog;
 use App\Models\UserVip;
 use App\Models\Vip;
 use App\Models\Ware;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -439,14 +440,14 @@ trait CalcsTrait
         }
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
         // $user            = User::find($user_id);
-        $diamondReceived = $user->total_received_diamonds;
+        $diamondReceived = @$user->total_received_diamonds;
         $receivedNum        =  floor($diamondReceived  * $expPercentages['exp_received_percentage']);
-        $diamondSend             = $user->total_sender_diamonds;
+        $diamondSend             = @$user->total_sender_diamonds;
 
         $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
         //$senderNum        = floor(2000000000000000000000  * $expPercentages[0]);
 
-        $star_level      = $user->total_received_level;
+        $star_level      = @$user->total_received_level;
 
         $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
 
@@ -461,7 +462,7 @@ trait CalcsTrait
         $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
 
 
-        $gold_level             = $user->total_sender_level;
+        $gold_level             = @$user->total_sender_level;
 
         $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
         $gold_level_img = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
@@ -532,6 +533,121 @@ trait CalcsTrait
         return $data;
     }
 
+
+    public static function searchVipByLevelAndType($vips, $level, $type)
+    {
+        foreach ($vips as $vip){
+            if ($vip->level == $level && $vip->type == $type){
+                return $vip;
+            }
+        }
+    }
+
+    public static function level_center_v2($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+        $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
+        // $user            = User::find($user_id);
+        $diamondReceived = $user->total_received_diamonds;
+        $receivedNum        =  floor($diamondReceived  * $expPercentages['exp_received_percentage']);
+        $diamondSend             = $user->total_sender_diamonds;
+
+        $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
+        //$senderNum        = floor(2000000000000000000000  * $expPercentages[0]);
+
+        $star_level      = $user->total_received_level;
+
+
+        // $current_star_num       = self::getCurrentLevel(1, $star_level, 'exp');
+        $vipsData = DB::table('vips')->get();
+
+        $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
+//        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
+
+        $star_level_img = !is_null($firstVip_type1) ? $firstVip_type1->img : '';
+
+
+        $gold_level             = $user->total_sender_level;
+
+        $firstVip_type2 = self::searchVipByLevelAndType($vipsData, $gold_level, 2);
+//        $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
+
+
+        $vipsData = $vipsData->groupBy('type');
+//        Vip::where('level', $level)->where('type', $type)->first();
+
+        // تعريف المتغيرات المطلوبة من المصفوفة المجمعة
+        $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
+
+
+        $gold_level_img = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
+
+        // $current_gold_num   = self::getCurrentLevel(2, $gold_level, 'exp');
+        // $next_gold_num   = self::getNextLevel(2, $gold_level, 'exp');
+        // $next_gold_level = self::getNextLevel(2, $gold_level, 'level');
+        $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+
+        // استخدام الدالة للحصول على المستوى التالي من المصفوفة
+        $nextStarData = self::getNextLevelDataFromCache(1, $star_level, $vipsData);
+        $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
+
+        $next_star_num = $nextStarData['next_exp'];
+        $next_star_level = $nextStarData['next_level'];
+        $next_gold_num = $nextGoldData['next_exp'];
+        $next_gold_level = $nextGoldData['next_level'];
+
+        $data['receiver_num']        = (int)$receivedNum;
+        $data['receiver_img']        = $star_level_img;
+        $data['sender_num']          = (int)$senderNum;
+        $data['sender_rem']          = (($next_gold_num - $senderNum) < 0 ? 0 : floor((int)($next_gold_num - $senderNum)));
+        $data['receiver_rem']        = (($next_star_num - $receivedNum) < 0 ? 0 : floor((int)($next_star_num - $receivedNum)));
+        $data['sender_img']          = $gold_level_img;
+
+        $data['receiver_level']      = (int)$star_level;
+        $data['next_receiver_num']   = (int)$next_star_num ?: 0;
+        $data['next_receiver_level'] = (int)$next_star_level ?: 0;
+
+        $data['sender_level']      = (int)$gold_level;
+        $data['next_sender_num']   = (int)($next_gold_num);
+        $data['next_sender_level'] = (int)$next_gold_level ?: 0;
+
+        $data['prev_receiver_num'] = (int)$current_star_num ?: 0;
+        $data['prev_sender_num'] = (int)($current_gold_num);
+        $data['current_receiver_num'] = $current_star_num;
+        $data['current_sender_num'] = $current_gold_num;
+        $data['exp-sender'] = $expPercentages['exp_sender_percentage'] ?? 1;
+        $data['exp-receiver'] = $expPercentages['exp_received_percentage'] ?? 1;
+
+        $rt = (int)$next_star_num - (int)$current_star_num;
+        $st = (int)$next_gold_num - (int)($current_gold_num);
+        $rc = (int)$receivedNum - ((int)$current_star_num);
+        $sc = (int)$senderNum - (int)($current_gold_num);
+
+        $data['rt'] = $rt < 0 ? 0 : $rt;
+        $data['st'] = $st < 0 ? 0 : $st;
+        $data['rc'] = $rc < 0 ? 0 : $rc;
+        $data['sc'] = $sc < 0 ? 0 : $sc;
+
+
+        if ($rt > 0 && ($rc / $rt) < 1 && ($rc / $rt) > 0) {
+            $data['receiver_per'] = (float)($rc / $rt);
+        } else {
+            $data['receiver_per'] = (float)0.00;
+        }
+
+        if ($st > 0 && ($sc / $st) < 1 && ($sc / $st) > 0) {
+            $data['sender_per'] = (float)($sc / $st);
+        } else {
+            $data['sender_per'] = (float)0.00;
+        }
+
+        return $data;
+    }
 
     public static function level_center_ranking($user_id)
     {
@@ -727,6 +843,37 @@ trait CalcsTrait
         ];
     }
 
+    public static function ovip_center_v2($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+
+        $vip = $user->UserVip->OVip;
+        if (!$vip) return new \stdClass();
+
+        $cacheKey = "ware_{$vip->level}_{10}";
+        $vipIcon = Common::getCachedWares($cacheKey, $vip, 10);
+//        $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
+        $hasColor = Common::hasInPackV2($user->packs, 18, true);
+        return [
+            'id'        => 1,
+            'level'     => $vip->level ?? 0,
+            'name'      => $vip->name ?? '',
+            'price'     => $vip->price ?? 0,
+            'img_old'     => $vip->img ?? '',
+            'img'     => $vipIcon->show_img ?? '',
+            'image'     => $vip->image ?? '',
+            'image_from_wares'     => $vipIcon->show_img ?? '',
+            'expire'    => $vip->expire ?? 0,
+            'ware_id' => $vipIcon?->id ?? 0,
+            'color' => '',
+            'colored_name' => $hasColor ? common::wareUserVipV2($user_id, 18, 'color') ?? '' : '',
+        ];
+    }
 
     public static function ovip_center_rank($user_id)
     {
@@ -801,10 +948,6 @@ trait CalcsTrait
 
     public static function wareUserVip($user_id, $type, $item, $isLatest = false)
     {
-
-
-
-
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
             if (!$user) return new \stdClass();
@@ -819,6 +962,29 @@ trait CalcsTrait
 
         if (!$vip) return  '';
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
+        $value = optional($ware)->{$item};
+        return ($value === 'NULL' || $value === null) ? '' : $value;
+    }
+
+    public static function wareUserVipV2($user_id, $type, $item, $isLatest = false)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+        if (!isset($user->UserVip)) return '';
+        $uvip = $user?->UserVip;
+        if (!$uvip) return '';
+
+        $vip = $user->UserVip->OVip;
+
+        if (!$vip) return  '';
+        $cacheKey = "ware_{$vip->level}_{$type}";
+
+        $ware = Common::getCachedWares($cacheKey, $vip, $type);
+
         $value = optional($ware)->{$item};
         return ($value === 'NULL' || $value === null) ? '' : $value;
     }

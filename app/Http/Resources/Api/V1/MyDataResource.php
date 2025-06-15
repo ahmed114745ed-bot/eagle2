@@ -248,6 +248,7 @@ class MyDataResource extends JsonResource
             'user_jobs' => $this->jobs,
             ///  'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
             'has_color_name'       => Common::hasInPack($this->id, 18, true),
+            'has_anti_ban'       => Common::hasInPack($this->id, 15, true),
             'anonymous' => $this->packs->where('type', 17)->count() >= 1,
             'country' => $this->country ?? null,
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
@@ -271,8 +272,8 @@ class MyDataResource extends JsonResource
             'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
             'wallet' => $this->wallet?->value ?? 0,
             'user_types' => $this->user_types,
-            'wabble' => $this->getUserPack(12),
-            'wabble_id' => $this->getUserPackId(12),
+            'wabble' => $this->getUesdUserPack(12),
+            'wabble_id' => $this->getUesdUserPackId(12),
             "shipping-agency" => $this->shippingAgency ? [
                 "id" => $this->shippingAgency->id,
                 "name" => $this->shippingAgency->name ?? '',
@@ -328,6 +329,23 @@ class MyDataResource extends JsonResource
         ];
     }
 
+    public function getUesdUserPack($type)
+    {
+        $pack = $this->packs->where('type', $type)->where('is_used', 1)->first();
+        
+
+        return $pack ?  new GeneralUserPackResource($pack) : [
+            'id'   =>  0,
+            'image_type' => 'png',
+            'key' => '',
+            'image' => 'wappel.png',
+        ];
+    }
+    public function getUesdUserPackId($type)
+    {
+        $pack = $this->packs->where('type', $type)->where('is_used', 1)->first();
+        return $pack ? @$pack?->ware->id : 0;
+    }
     public function getUserPackId($type)
     {
         $pack = $this->packs->where('type', $type)->first();

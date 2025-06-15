@@ -100,6 +100,35 @@ const WARE_DEDICATE =
     22 => 'upload GIF image',
 ];
 
+const SELECTED_USED_WARE =
+[
+    4 => 'Avatar Frame',
+    5 => 'Bubble Frame',
+    6 => 'Entering Special Effects',
+];
+
+const PACK_USER =
+[
+    4 => 'Avatar Frame',
+    5 => 'Bubble Frame',
+    6 => 'Entering Special Effects',
+    9 => 'NoKick',
+    10 => 'Icon',
+    12 => 'wapel',
+    13 => 'hide country',
+    14 => 'vip gifts',
+    15 => 'no pan',
+    16 => 'hidden room',
+    17 => 'anonymous man',
+    18 => 'colored name',
+    19 => 'profile visitors hide in',
+    20 => 'hide last active',
+    21 => 'sound effect',
+    22 => 'upload GIF image',
+    25 => 'special uuid',
+    28 => 'profile frame',
+];
+
 const  GET_TYPE_WARE =
 [
     4 => 'purchase',

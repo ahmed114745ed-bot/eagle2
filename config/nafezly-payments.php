@@ -60,6 +60,7 @@ return [
     'OPAY_MERCHANT_ID'=>env('OPAY_MERCHANT_ID'),
     'OPAY_COUNTRY_CODE'=>env('OPAY_COUNTRY_CODE',"EG"),
     'OPAY_BASE_URL'=>env('OPAY_BASE_URL',"https://sandboxapi.opaycheckout.com"),//https://api.opaycheckout.com for production
+    'OPAY_WEBHOOK_URL'=>env('OPAY_WEBHOOK_URL',"https://sandboxapi.opaycheckout.com"),
 
 
     #PAYMOB_WALLET (vodaphone-cash,orange-money,etisalat-cash,we-cash,meza-wallet) - test phone 01010101010 ,PIN & OTP IS 123456

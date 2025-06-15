@@ -441,11 +441,11 @@ class AppearChargerAgencyController extends MainController
             $newOwnerId = $form->model()->app_owner_id;
 
             if (!$form->model()->exists) {
-                Common::createUserAdmin($appOwnerId);
+              //  Common::createUserAdmin($appOwnerId);
             }
 
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
-                Common::createUserAdmin($appOwnerId);
+              //  Common::createUserAdmin($appOwnerId);
 
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
@@ -481,7 +481,7 @@ class AppearChargerAgencyController extends MainController
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        $tab = request('tab') ?? 'members';
+        $tab = request('tab') ?? 'charges';
         $filter_by = request('filter_by') ?? null;
 
 
@@ -508,44 +508,47 @@ class AppearChargerAgencyController extends MainController
         $filterId = $request->filter_id  ?? null;
         $charges = $resiveds = null;
         switch ($tab) {
-            case 'charge':
-                $charges = Charge::where('user_charger_type', 'agency')
-                    ->where('charger_id', $agencyId);
-                $relations = [];
-                $charges->when($filter_by === 'user', function ($query) use (&$relations) {
-                    $query->whereNotNull('user_id')
-                        ->whereNull('agency_id');
-                    $relations[] = 'resiver';
-                });
-                $charges->when($filter_by === 'agency', function ($query) use (&$relations) {
-                    $query->whereNull('user_id')
-                        ->whereNotNull('agency_id');
-                    $relations[] = 'agency';
-                });
-                if (!empty($relations)) {
-                    $charges->with($relations);
-                }
-                $charges = $charges->latest()
-                    ->paginate(10, ['*'], 'charges_page');
+            case 'charges':
+                        $charges = Charge::where('charger_type', 'agency')
+                        ->where('charger_id', $agencyId);
+            
+                    $relations = [];
+            
+                    $charges->when($filter_by === 'user', function ($query) use (&$relations) {
+                        $query->where('user_type', 'user');
+                        $relations[] = 'receiverUser';
+                    });
+            
+                    $charges->when($filter_by === 'agency', function ($query) use (&$relations) {
+                        $query->where('user_type', 'agency');
+                        $relations[] = 'receiverAgency';
+                    });
+            
+                    if (!empty($relations)) {
+                        $charges->with($relations);
+                    }
+            
+                    $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
                 break;
 
             case 'resived':
                 $resiveds = Charge::with(['sender'])
-                    ->where('agency_id', $agencyId)
+                    ->where('user_id', $agencyId)
+                    ->where('user_type', 'agency')
                     ->latest()
                     ->paginate(10, ['*'], 'resived_page');
                 break;
         }
 
         // dd($charges);
-        $data = compact(
-            'agency',
-            'resiveds',
-            'charges',
-            'tab'
-        );
+      
 
         return $content->title(__('agency profile'))
-            ->view('shippingAgencyProfile', $data);
+            ->view('shippingAgencyProfile', compact(
+                'agency',
+                'resiveds',
+                'charges',
+                'tab'
+            ));
     }
 }

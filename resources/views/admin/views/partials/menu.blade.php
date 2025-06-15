@@ -75,14 +75,14 @@
             @if(url()->isValidUrl($item['uri']))
                 <a href="{{ $item['uri'] }}" target="_blank">
                     @else
-               
 
-                    
+
+
                     @if (Admin::user()->type != 'bd')
                     <a href="{{ admin_url($item['uri']) }}">
 
                     @endif
-                       
+
                             @endif
                             <i class="fa {{$item['icon']}}"></i>
                             @if (Lang::has($titleTranslation = 'admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($item['title'])))))
@@ -107,12 +107,12 @@
                 @else
                     <span>{{ admin_trans($item['title']) }}</span>
                 @endif
-                @if ($item['title'] == 'المحفظة')
-                    <i class="pull-left" style="margin-right: 2px;">{{ __('soon') }}</i>
-                @endif
-                @if ($item['title'] == 'Wallet')
-                    <i class="pull-right" style="margin-right: 2px;">{{ __('soon') }}</i>
-                @endif
+{{--                @if ($item['title'] == 'المحفظة')--}}
+{{--                    <i class="pull-left" style="margin-right: 2px;">{{ __('soon') }}</i>--}}
+{{--                @endif--}}
+{{--                @if ($item['title'] == 'Wallet')--}}
+{{--                    <i class="pull-right" style="margin-right: 2px;">{{ __('soon') }}</i>--}}
+{{--                @endif--}}
 
                 <i class="fa fa-angle-left pull-right"></i>
             </a>

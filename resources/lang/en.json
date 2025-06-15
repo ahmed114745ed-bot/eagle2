@@ -986,7 +986,29 @@
   "Create payment gat way": "Create payment methods for shipping agents",
   "Edit payment gat way": "Edit payment methods for shipping agents",
   "Delete payment gat way": "Delete payment methods for shipping agents",
-  "Show payment gat way": "Show payment methods for shipping agents"
+  "Show payment gat way": "Show payment methods for shipping agents",
+  "Salary switch users": " salary user",
+  "user-charges":"users charges",
+  "you_have_charge_target" : "you already got it  ",
+  "Pk Events": "Pk Events",
+  "Target Events": "Target Events",
+  "Weekly Events": "Weekly Events",
+  "Event Period": "Event Period",
+  "Create daily gift": "Create daily login gift",
+  "Edit daily gift": "Edit daily login gift",
+  "Delete daily gift": "Delete daily login gift",
+  "Show daily gift": "Show daily login gift details",
+  "Browse daily gift": "Browse daily login gift",
+  "Entering Special Effects": "Compound",
+  "wapel": "entry effect",
+  "This target has already been achieved by some users and cannot be updated.": "This target has already been achieved by some users and cannot be updated."
+,    "target_change_warning": "Increasing the target value will increase the dollar amount received by the hosts, while decreasing it will reduce their dollar value."
+
+
+
+
+
+
 
 
 

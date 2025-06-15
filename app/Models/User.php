@@ -1171,6 +1171,24 @@ class User extends Authenticatable
         return $this->loadedPacks;
     }
 
+    public function eligiblePacks(): HasMany
+    {
+        return $this->hasMany(Pack::class)
+            ->where('is_used', 1)
+            ->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+            })
+            ->with('ware');
+    }
+
+    public function getUuidV2Attribute()
+    {
+        $pack = $this->eligiblePacks
+            ->where('ware.value', $this->special_id)
+            ->first();
+
+        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
+    }
 
     /**
      * Custom accessor for UUID with special pack conditions.
@@ -1223,6 +1241,11 @@ class User extends Authenticatable
         $packs = $this->getLoadedPacks();
         /** @var \Illuminate\Database\Eloquent\Collection $packs */
         return $packs->where('type', $type)->isNotEmpty();
+    }
+
+    public function getPackWithTypeV2($type)
+    {
+        return $this->eligiblePacks->where('type', $type)->isNotEmpty();
     }
 
     public function nowGame()
@@ -1423,7 +1446,7 @@ class User extends Authenticatable
         if ($this->is_bd){
             return  [4];
         }
-        
+
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
         }
@@ -1439,8 +1462,39 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\UserSallary::class, 'user_id')
                     ->where('user_agency_id', $this->agency_id);
     }
+
+    public function latestJoin()
+    {
+        return $this->hasOne(UsersJoinedAgency::class, 'user_id')
+            ->where('agency_id', $this->agency_id)
+            ->latestOfMany('join_date');
+    }
     public function lastSallary()
     {
-        return $this->hasOne(UserSallary::class, 'user_id')->latestOfMany();
+        $join = $this->latestJoin()->first();    
+        return $this->hasOne(UserSallary::class, 'user_id')
+            ->where(function ($query) use ($join) {
+                if ($join) {
+                    $start = $join->join_date;
+                    $end = $join->leave_date ?? now()->endOfMonth();
+                    $query->where('user_agency_id', $this->agency_id)
+                          ->whereBetween('created_at', [$start, $end]);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            })
+            ->latestOfMany();
+    }
+
+
+    public function type16Packs()
+    {
+        return $this->hasMany(Pack::class, 'user_id')
+                    ->where('type', 16)
+                    ->where('is_used', 1)
+                    ->where(function ($q) {
+                        $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                    });
     }
 }

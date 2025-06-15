@@ -87,6 +87,39 @@ class WeeklyEventGiftNController extends MainController
     //         ->description(trans('admin.description'))
     //         ->body($this->detail($id)));
     // }
+
+    public function show( $id, Content $content)
+    {
+        $type = $id; // Using the second parameter as type
+        
+        $content = $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
+            ->breadcrumb(['text' => trans('admin.eventGift')]);
+        
+        // Create a row to hold our grid
+        $row = new \Encore\Admin\Layout\Row();
+        
+        switch ($type) {
+            case 1:
+                $row->column(12, $this->grid1());
+                break;
+            case 2:
+                $row->column(12, $this->grid2());
+                break;
+            case 3:
+                $row->column(12, $this->grid3());
+                break;
+            default:
+                // Show all grids stacked vertically
+                $row->column(12, $this->grid1());
+                $row->column(12, $this->grid2());
+                $row->column(12, $this->grid3());
+        }
+        
+        return $content->body($row);
+    }
+    
     protected function grid1()
     {
         $type = 1;

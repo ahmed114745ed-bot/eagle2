@@ -13,6 +13,9 @@ return [
 
 
     ],
+
+    'notCharge' => ' your agency not active please call administrator',
+    'yorSelf' => ' you can\'t charge to your agency',
     'off_msg' => '',
     'user_send_gift_moment' => ':name send you a :gift in your moment',
     'pack_not_allow_yet'   => 'This package not allowed yet',
@@ -124,6 +127,9 @@ return [
     'ShippingAgent' => 'Shipping Agent',
     'HostAndShippingAgent' => 'Host and Shipping Agent',
     'Admin' => 'Admin',
+    'add_admin_agency' => 'You have been added as an admin to the agency: :name',
+    'remove_admin_agency' => 'You have been removed as an admin from the agency: :name',
+    'reject_agency' => 'Your request to join the agency :name has been rejected.',
 
 
 ];

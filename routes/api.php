@@ -8,6 +8,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
 use App\Helpers\Common;
+use App\Services\PayPalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -100,6 +101,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
     Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
+    Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
+    Route::post('paypal-cancel', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
@@ -134,7 +137,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     });
 
 
-    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'throttle:4,1'])
+    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'throttle:10,1'])
         ->group(function () {
             Route::post('open', [\App\Http\Controllers\Api\V1\HomeController::class, 'openTicket']);
         });
@@ -239,6 +242,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
                 Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone']);
                 Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone']);
+                Route::post('kick_microphone', [MicrophoneController::class, 'kickMicrophone']);
                 Route::post('mute_microphone', [MicrophoneController::class, 'mute_microphone']);
                 Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone']);
                 Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
@@ -258,6 +262,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
+                Route::get('v2/{id}', [UserController::class, 'vTwoshow'])->where('id', '[0-9]+');
                 Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
@@ -371,6 +376,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('my_pack', [PackController::class, 'my_pack']);
                 Route::post('use_pack_item', [PackController::class, 'usePackItem']);
                 Route::post('takeOff', [PackController::class, 'takeOff']);
+                Route::post('takeOffV2', [PackController::class, 'takeOffV2']);
                 //                Route::get('my_store', [UserController::class, 'my_store']);
                 //                Route::get('my_income', [UserController::class, 'my_income']);
                 Route::post('getTimes', [HomeController::class, 'getTimes']);
@@ -512,7 +518,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
                 Route::get('old-agencies', [AgencyController::class, 'gitOldAgencies']);
 
-                
+
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);

@@ -2,6 +2,7 @@
 
 namespace Modules\SpecialId\Http\Controllers\web;
 
+use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -9,6 +10,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Modules\SpecialId\Entities\SpecialHistory;
+use Encore\Admin\Facades\Admin;
 
 class SpecialHistoryController extends MainController
 {
@@ -70,6 +72,14 @@ class SpecialHistoryController extends MainController
     {
         $grid = new Grid(new SpecialHistory());
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('ware.value', __('UUID'));
+            });
+        });
+
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))->display(function () {
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -83,13 +93,21 @@ class SpecialHistoryController extends MainController
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <img src="' . $url . '" alt="User Image" style="width: 40px; height: 40px;">
                     <div>
-                        <a href="/admin/users/' . $this->user_id . '" style="text-decoration: none; color:rgb(253, 253, 253); font-weight: bold;">' . $name . '</a>
-                        <div style="font-size: 12px; color: #fff;">' . 'Uuid: ' . $this->user?->uuid . '</div>
+                        <a href="/admin/users/' . $this->user_id . '" style="text-decoration: none; font-weight: bold;">' . $name . '</a>
+                        <div style="font-size: 12px;">' . 'Uuid: ' . $this->user?->uuid . '</div>
                     </div>
                 </div>
             ';
         });
-        $grid->column('ware.show_img', __('image'))->image('', 50);
+          $grid->column('ware.value', __('value'))->display(function ($coin) {
+            $icon = asset('images/coin.png'); // Ensure this path is correct
+            return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
+        });
+        $grid->column('ware.show_img', __('image'))->display(function ($path) {
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('status', __('status'))->display(function ($status) {
             // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
             return $status == 1 ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
@@ -97,7 +115,11 @@ class SpecialHistoryController extends MainController
                 "></span>";
         });
 
-        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
+        $grid->column('created_at', __('Date'))
+            ->display(function ($value) {
+                return Carbon::parse($value)->format('Y-m-d');
+            });
+//        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableEdit();
             $actions->disableView();
@@ -105,7 +127,11 @@ class SpecialHistoryController extends MainController
         $grid->disableCreateButton();
         $this->extendGrid($grid);
 
-
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 

@@ -30,6 +30,127 @@
         --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
         --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
     }
+
+    .filter-container {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .filter-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 12px;
+        margin-left: auto;
+    }
+
+    .form-floating {
+        position: relative;
+    }
+
+    .form-select {
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        padding: 12px 16px;
+        font-size: 14px;
+        background-color: #f9f9f9;
+    }
+
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+        background-color: #ffffff;
+    }
+
+    .form-label {
+        color: #000000;
+        transition: all 0.3s ease;
+    }
+
+    .btn-filter {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        height: 48px;
+    }
+
+    .btn-filter:hover {
+        background-color: var(--primary-hover-color);
+        transform: translateY(-1px);
+    }
+
+    .btn-reset {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        height: 48px;
+    }
+
+    .btn-reset:hover {
+        background-color: #f1f3f5;
+        color: var(--danger-color);
+        border-color: var(--danger-light-color);
+    }
+
+    @media (max-width: 768px) {
+        .filter-content {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .filter-group {
+            width: 100%;
+        }
+
+        .filter-actions {
+            width: 100%;
+            justify-content: flex-end;
+            margin-left: 0;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .filter-actions {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-filter, .btn-reset {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 .stat-icon {
     width: 50px;
     height: 50px;
@@ -54,7 +175,6 @@
 .stat-info {
     flex: 1;
 }
-
 .stat-value {
     font-size: 20px;
     font-weight: 700;
@@ -432,6 +552,31 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.nav-scroll-container {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-pills {
+        display: inline-flex;
+        padding: 10px 0;
+    }
+
+    .nav-pills li {
+        display: inline-block;
+    }
+
+
+
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus {
+    border-top-color: var(--primary-color);
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+    color: #fff;
+    background-color: var(--primary-color);
 }
 
 .empty-state {
@@ -816,20 +961,20 @@
         <!-- Header Section -->
         <div class="agency-header">
             <div class="agency-avatar">
-                <img src="{{getImagePath( $user->profile->avatar) }}" alt="Agency Logo" class="logo-img">
+                <img src="{{getImagePath( @$user->profile->avatar ) }}" alt="Agency Logo" class="logo-img">
             </div>
             <div class="agency-info">
                 <h1 class="agency-name">{{ @$user?->name ?? ''}}</h1>
                 <div class="agency-meta">
                     <div class="meta-item">
-                        @if ($user->uuid == $user->original_uuid)
+                        @if (@$user->uuid == @$user->original_uuid)
                             <span class="meta-label">{{ __("uuid") }}:</span>
-                            <span class="meta-value">{{ $user->uuid }}</span>
+                            <span class="meta-value">{{ @$user->uuid }}</span>
                         @else
                             <span class="meta-label">{{ __("uuid") }}:</span>
-                            <span class="meta-value">{{ $user->uuid }}</span><br>
+                            <span class="meta-value">{{ @$user->uuid }}</span><br>
                             <span class="meta-label">{{ __("special uuid") }}:</span>
-                            <span class="meta-value">{{ $user->original_uuid }}</span>
+                            <span class="meta-value">{{ @$user->original_uuid }}</span>
                         @endif
                     </div>
                     <div class="meta-item">
@@ -841,17 +986,21 @@
                 <div class="agency-stats">
                     <div class="agency-meta">
                         <div class="meta-item">
-                                <span class="meta-label">{{ __('Balance') }}:</span>
-                                <span class="meta-value">{{ $user->salary }}</span>
+                                <span class="meta-label">{{ __('wallet balance') }}:</span>
+                                <span class="meta-value">{{ @$user->salary }}</span>
 
                         </div>
                         <div class="meta-item">
-                            <span class="meta-label">{{__('Level')}}:</span>
-                            <span class="meta-value">{{\App\Helpers\Common::level_center($user)['sender_level'] }}</span>
+                            <span class="meta-label">{{__('Sender Level')}}:</span>
+                            <span class="meta-value">
+                                    <img src="{{ getImagePath(\App\Helpers\Common::level_center($user)['sender_img']) }}"  style="height: 24px;">
+                                </span>
                         </div>
                         <div class="meta-item">
-                            <span class="meta-label">{{__('worth')}}:</span>
-                            <span class="meta-value">{{\App\Helpers\Common::level_center($user)['receiver_level'] }}</span>
+                            <span class="meta-label">{{__('Receiver Level')}}:</span>
+                            <span class="meta-value">
+                                <img src="{{ getImagePath(\App\Helpers\Common::level_center($user)['receiver_img']) }}"  style="height: 24px;">
+                            </span>
                         </div>
 
                     </div>
@@ -859,16 +1008,16 @@
                     <div class="agency-meta">
                         <div class="meta-item">
                                 <span class="meta-label">{{ __('diamonds') }}:</span>
-                                <span class="meta-value">{{ $user->getTotalDiamond() }}</span>
+                                <span class="meta-value">{{ @$user->getTotalDiamond() }}</span>
 
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">{{__('coins')}}:</span>
-                            <span class="meta-value">{{$user->di }}</span>
+                            <span class="meta-value">{{@$user->di }}</span>
                         </div>
                         <div class="meta-item">
                             <span class="meta-label">{{__('type')}}:</span>
-                            <span class="meta-value">{{$user->userType() }}</span>
+                            <span class="meta-value">{{@$user->userType() }}</span>
                         </div>
 
                     </div>
@@ -881,12 +1030,19 @@
 
 
 
-
+       @php
+                    $activeTab = request('tab', 'tab=salary');
+        @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
             <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
-             <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
-
+            <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
+             @if (\Encore\Admin\Facades\Admin::user()->can('edit' . 'edit-level') || \Encore\Admin\Facades\Admin::user()->can('*'))
+              <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
+            @endif
+            @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}" data-target="salary-tab">{{ __('user wallet') }}</a>
+            @endif
 
 
         </div>
@@ -919,6 +1075,24 @@
                     <div class="card-header">
                         <h4 class="card-title" style="text-align: left;">{{ __('pack') }}</h4>
                     </div>
+                    <div class="box-body no-padding">
+                        <div class="nav-scroll-container">
+                            <ul class="nav nav-pills">
+                                @foreach($types as $id => $name)
+                                    @php
+                                        $selectedType = request()->get('type', 4); // Default to 1
+                                    @endphp
+                                    <li class="{{ $selectedType == $id ? 'active' : '' }}">
+                                        <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">
+                                            {{ __($name) }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+
+
 
                             <div class="table-responsive">
                                 <div class="box-body ">
@@ -931,6 +1105,7 @@
                                                 <th>{{ __('img') }}</th>
                                                 <th>{{ __('expire') }}</th>
                                                 <th>{{ __('action') }}</th>
+
                                             </tr>
                                         </thead>
                                         @if($packs && $packs->count())
@@ -949,7 +1124,7 @@
                                                         <img src="{{ getImagePath(@$path) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
                                                     </td>
-                                                    <td>{{\Carbon\Carbon::createFromTimestamp($pack->expire)->format('Y-m-d H:i:s') }}</td>
+                                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                                     <td>
                                                         <div class="d-flex">
                                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn" data-id="{{ $pack->id }}">
@@ -972,6 +1147,7 @@
                             <div class="pagination-wrapper">
                                 {{ $packs?->appends([
                                     'vip_page' => $userVips?->currentPage(),
+                                    'salary_page' => $salaries?->currentPage(),
                                 ])->links('vendor.pagination.default') }}
                             </div>
 
@@ -1006,12 +1182,12 @@
                                                     <tr>
                                                         <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
                                                         <td>{{ $userVip->level }}</td>
-                                                        <td>{{\Carbon\Carbon::createFromTimestamp($userVip->expire)->format('Y-m-d H:i:s')}}</td>
+                                                        <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                                         <td>{{ @$userVip->qty ?? 0 }}</td>
                                                         <td>{{ @$userVip->total ?? 0 }}</td>
                                                          <td>
                                                         <div class="d-flex">
-                                                            
+
                                                             <button class="btn btn-danger delete-vip-btn" data-id="{{ $userVip->id }}">
                                                                 {{ __('dashboard.delete') }}
                                                             </button>
@@ -1028,7 +1204,7 @@
                                             <div class="pagination-container">
                                                 {{ $userVips->appends([
                                                     'pack_page' => $packs?->currentPage(),
-
+                                                    'salary_page' => $salaries?->currentPage(),
                                                 ])->links('vendor.pagination.bootstrap-4') }}
                                             </div>
                                         @endif
@@ -1039,6 +1215,182 @@
 
                 </div>
             </div>
+
+            <div class="tab-content" id="salary-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title" style="text-align: left;">{{ __('user wallet') }}</h4>
+                    </div>
+
+                   <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" pjax-container="">
+                      <input type="hidden" name="tab" value="salary">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="box-body">
+                                    <div class="fields-group">
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">السنة</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control year" placeholder="السنة" name="year" value="{{ request('year') }}" style="text-align: right;">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">الشهر</label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </div>
+                                                    <input type="text" class="form-control month" placeholder="الشهر" name="month" value="{{ request('month') }}" style="text-align: right;">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                            <!-- /.box-body -->
+                            <div class="box-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-8">
+                                            <div class="btn-group pull-left">
+                                                <button class="btn btn-info submit btn-sm">
+                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;بحث
+                                                </button>
+                                            </div>
+                                            <div class="btn-group pull-left" style="margin-left: 10px;">
+                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}" class="btn btn-default btn-sm">
+                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;تفريغ
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                     </form>
+
+                            <div class="table-responsive">
+                                <div class="box-body ">
+                                    <table class="data-table" id="vip">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>{{ __('agency') }}</th>
+                                                <th>{{ __('salary') }}</th>
+                                                <th>{{ __('expenses') }}</th>
+                                                <th>{{ __('net salary') }}</th>
+                                                <th>{{ __('days') }}</th>
+                                                <th>{{ __('hours') }}</th>
+                                                <th>{{ __('diamonds') }}</th>
+                                                <th>{{ __('date') }}</th>
+
+                                            </tr>
+                                        </thead>
+                                        @if($salaries && $salaries->count())
+                                            <tbody style="color: rgb(208, 115, 43);">
+                                                @foreach($salaries as $index => $salary)
+
+                                                        @php
+                                                            $agency = $salary->agency;
+                                                            $name = $agency->name ?? '';
+
+                                                            $path = @$agency->img;
+                                                            $defaultImage = asset("images/icon-agency.jpg");
+                                                            $url = getImagePath($path) ?? $defaultImage;
+
+                                                            if (!isImageExists($url)) {
+                                                                $url = $defaultImage;
+                                                            }
+
+                                                            $image = handleShowImageWithTypes($user->id, $url, 40, 40);
+                                                            $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+                                                        @endphp
+
+                                                        <tr>
+                                                            <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
+                                                            <td>
+                                                                <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
+                                                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                                                        {!! $image !!}
+                                                                        <div style="display: flex; flex-direction: column;">
+                                                                            <span style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
+                                                                            <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </td>
+
+
+                                                        <td>{{$salary->sallary}}</td>
+                                                        <td>{{ $salary->cut_amount}}</td>
+                                                        <td>{{ $salary->sallary - $salary->cut_amount }}</td>
+                                                        <td>{{ $salary->achieved_days }}</td>
+                                                        <td>{{ $salary->achieved_hours }}</td>
+                                                        <td>{{ $salary->achieved_diamond }}</td>
+                                                        <td>{{ $salary->month .'/'. $salary->year }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        @endif
+                                    </table>
+
+                                    @if($salaries)
+                                            <div class="pagination-container">
+                                                {{ $salaries->appends([
+                                                    'pack_page' => $packs?->currentPage(),
+                                                    'vip_page' => $userVips?->currentPage(),
+
+                                                ])->links('vendor.pagination.bootstrap-4') }}
+                                            </div>
+                                        @endif
+                                </div>
+                            </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="level-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title text-left">{{ __('level') }}</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <form action="{{ url('/admin/edit-level') }}" id="user_level_update_form" method="POST" enctype="multipart/form-data">
+                           @csrf
+                                <div class="row" style="justify-content:space-evenly">
+                                    <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
+                                    <div class=" col-lg-6 form-Roles mb-3">
+                                        <label class="form-label"> {{ __('Sender Level') }}</label>
+                                        <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control " id="total_sender_level" name="total_sender_level"  required>
+                                    </div>
+
+                                    <div class=" col-lg-6 form-Roles mb-3">
+                                        <label class="form-label"> {{ __('Received Level') }}</label>
+                                        <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control " id="total_received_level" name="total_received_level" required >
+                                    </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" type="button"
+                                    data-bs-dismiss="modal">{{ __('cancel') }} </button>
+                                <button class="btn btn-primary " type="submit">{{ __('save') }} </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
 
 
 

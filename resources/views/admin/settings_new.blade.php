@@ -1503,8 +1503,8 @@ use App\Models\Vip;
                                                         <div class="copy-container">
                                                             <input type="text" id="fawry_webhook_url" name="fawry_webhook_url"
                                                                    placeholder="fawry_webhook_url"
-                                                                   value="{{ $settings['fawry_webhook_url'] ?? '' }}"
-                                                                   class="form-control">
+                                                                   value="{{ url('/api/fawry-callback') }}"
+                                                                   class="form-control" readonly>
                                                             <button type="button" class="copy-button" data-copy-target="fawry_webhook_url" title="Copy">📋</button>
                                                         </div>
                                                     </div>
@@ -1568,8 +1568,8 @@ use App\Models\Vip;
                                                             <div class="copy-container">
                                                                 <input type="text" id="stripe_webhook_url" name="stripe_webhook_url"
                                                                        placeholder="stripe_webhook_url"
-                                                                       value="{{ $settings['stripe_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
+                                                                       value="{{ url('/api/stripe-callback') }}"
+                                                                       class="form-control" readonly>
                                                                 <button type="button" class="copy-button" data-copy-target="stripe_webhook_url" title="Copy">📋</button>
                                                             </div>
                                                         </div>
@@ -1624,7 +1624,7 @@ use App\Models\Vip;
                                                                 <input type="text" id="opay_webhook_url" name="opay_webhook_url"
                                                                        placeholder="opay_webhook_url"
                                                                        value="{{ $settings['opay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
+                                                                       class="form-control" readonly>
                                                                 <button type="button" class="copy-button" data-copy-target="opay_webhook_url" title="Copy">📋</button>
                                                             </div>
                                                         </div>
@@ -1692,7 +1692,7 @@ use App\Models\Vip;
                                                                 <input type="text" id="apple_webhook_url" name="apple_webhook_url"
                                                                        placeholder="apple_webhook_url"
                                                                        value="{{ $settings['apple_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
+                                                                       class="form-control" readonly>
                                                                 <button type="button" class="copy-button" data-copy-target="apple_webhook_url" title="Copy">📋</button>
                                                             </div>
                                                         </div>
@@ -1726,7 +1726,7 @@ use App\Models\Vip;
                                                                 <input type="text" id="google_pay_webhook_url" name="google_pay_webhook_url"
                                                                        placeholder="google_pay_webhook_url"
                                                                        value="{{ $settings['google_pay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
+                                                                       class="form-control" readonly>
                                                                 <button type="button" class="copy-button" data-copy-target="google_pay_webhook_url" title="Copy">📋</button>
                                                             </div>
                                                         </div>
@@ -1780,7 +1780,7 @@ use App\Models\Vip;
                                                                 <input type="text" id="paysky_webhook_url" name="paysky_webhook_url"
                                                                        placeholder="paysky_webhook_url"
                                                                        value="{{ $settings['paysky_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
+                                                                       class="form-control" readonly>
                                                                 <button type="button" class="copy-button" data-copy-target="paysky_webhook_url" title="Copy">📋</button>
                                                             </div>
                                                         </div>
@@ -1854,7 +1854,7 @@ use App\Models\Vip;
                                                                 <input type="text" id="opay_webhook_url" name="opay_webhook_url"
                                                                        placeholder="opay_webhook_url"
                                                                        value="{{ $settings['opay_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
+                                                                       class="form-control" readonly>
                                                                 <button type="button" class="copy-button" data-copy-target="opay_webhook_url" title="Copy">📋</button>
                                                             </div>
                                                         </div>
@@ -1911,13 +1911,79 @@ use App\Models\Vip;
                                                                 <input type="text" id="paytabs_webhook_url" name="paytabs_webhook_url"
                                                                        placeholder="paytabs_webhook_url"
                                                                        value="{{ $settings['paytabs_webhook_url'] ?? '' }}"
-                                                                       class="form-control" required>
+                                                                       class="form-control" readonly>
                                                                 <button type="button" class="copy-button" data-copy-target="paytabs_webhook_url" title="Copy">📋</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @endif
-
+                                                @if ($coin->type == 'paypal')
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="paypal_base_url">{{ __('admin.base_url') }}:</label>
+                                                            <input type="text" id="paypal_base_url"
+                                                                   name="paypal_base_url" placeholder="paypal_base_url"
+                                                                   value="{{ $settings['paypal_base_url'] ?? '' }}"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="paypal_client_id">{{ __('admin.client_id') }}:</label>
+                                                            <input type="text" id="paypal_client_id"
+                                                                   name="paypal_client_id" placeholder="paypal_client_id"
+                                                                   value="{{ $settings['paypal_client_id'] ?? '' }}"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="paypal_client_secret">{{ __('admin.client_secret') }}:</label>
+                                                            <input type="text" id="paypal_client_secret"
+                                                                   name="paypal_client_secret"
+                                                                   placeholder="paypal_client_secret"
+                                                                   value="{{ $settings['paypal_client_secret'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="paypal_currency">{{ __('admin.currency') }}:</label>
+                                                            <input type="text" id="paypal_currency"
+                                                                   name="paypal_currency"
+                                                                   placeholder="paypal_currency"
+                                                                   value="{{ $settings['paypal_currency'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="paypal_webhook_id">{{ __('admin.webhook_id') }}:</label>
+                                                            <div class="copy-container">
+                                                                <input type="text" id="paypal_webhook_id" name="paypal_webhook_id"
+                                                                       placeholder="paypal_webhook_id"
+                                                                       value="{{ $settings['paypal_webhook_id'] ?? '' }}"
+                                                                       class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="paypal_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <div class="copy-container">
+                                                                <input type="text" id="paypal_webhook_url" name="paypal_webhook_url"
+                                                                       placeholder="paypal_webhook_url"
+                                                                       value="{{ url('/api/paypal-callback') }}"
+                                                                       class="form-control" required>
+                                                                <button type="button" class="copy-button" data-copy-target="paypal_webhook_url" title="Copy">📋</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
 
 {{--                                            @if ($coin->type == 'huawei_pay')--}}
 {{--                                                    <div class="col-md-6">--}}
@@ -2030,53 +2096,6 @@ use App\Models\Vip;
 {{--                                                                       value="{{ $settings['liqpay_webhook_url'] ?? '' }}"--}}
 {{--                                                                       class="form-control" required>--}}
 {{--                                                                <button type="button" class="copy-button" data-copy-target="liqpay_webhook_url" title="Copy">📋</button>--}}
-{{--                                                            </div>--}}
-{{--                                                        </div>--}}
-{{--                                                    </div>--}}
-{{--                                                @endif--}}
-{{--                                            @if ($coin->type == 'paypal')--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paypal__client_id">{{ __('admin.client_id') }}:</label>--}}
-{{--                                                        <input type="text" id="paypal_client_id"--}}
-{{--                                                            name="paypal_client_id" placeholder="paypal_client_id"--}}
-{{--                                                            value="{{ $settings['paypal_client_id'] ?? '' }}"--}}
-{{--                                                            class="form-control">--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="paypal_client_secret">{{ __('admin.client_secret') }}:</label>--}}
-{{--                                                        <input type="text" id="paypal_client_secret"--}}
-{{--                                                            name="paypal_client_secret"--}}
-{{--                                                            placeholder="paypal_client_secret"--}}
-{{--                                                            value="{{ $settings['paypal_client_secret'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-
-{{--                                                <div class="col-md-6">--}}
-{{--                                                    <div class="form-group">--}}
-{{--                                                        <label--}}
-{{--                                                            for="payment_address">{{ __('admin.payment_address') }}:</label>--}}
-{{--                                                        <input type="text" id="paypal_payment_address"--}}
-{{--                                                            name="paypal_payment_address"--}}
-{{--                                                            placeholder="paypal_payment_address"--}}
-{{--                                                            value="{{ $settings['paypal_payment_address'] ?? '' }}"--}}
-{{--                                                            class="form-control" required>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                                                    <div class="col-md-6">--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <label for="paypal_webhook_url">{{ __('admin.webhook_url') }}:</label>--}}
-{{--                                                            <div class="copy-container">--}}
-{{--                                                                <input type="text" id="paypal_webhook_url" name="paypal_webhook_url"--}}
-{{--                                                                       placeholder="paypal_webhook_url"--}}
-{{--                                                                       value="{{ $settings['paypal_webhook_url'] ?? '' }}"--}}
-{{--                                                                       class="form-control" required>--}}
-{{--                                                                <button type="button" class="copy-button" data-copy-target="paypal_webhook_url" title="Copy">📋</button>--}}
 {{--                                                            </div>--}}
 {{--                                                        </div>--}}
 {{--                                                    </div>--}}

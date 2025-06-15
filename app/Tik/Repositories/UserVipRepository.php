@@ -28,18 +28,21 @@ class UserVipRepository extends AbstractRepository
 
     public function getAllByUserId($userId)
     {
-        return $this->model->where('user_id', $userId)->with('OVip')->where('expire', '>', Carbon::now()->timestamp)->orderBy('expire', 'DESC')->get();
+        return $this->model->where('user_id', $userId)->with('OVip')->where(function ($query) {
+
+            $query->where('expire', '>', Carbon::now()->timestamp)->orWhere('expire', null);
+        })->orderBy('id')->get();
     }
 
     public function getAllByUserIdWithAll($userId)
-{
-    return $this->model
-        ->where('user_id', $userId)
-        ->with(['OVip.privilegs']) 
-        ->where('expire', '>', Carbon::now()->timestamp)
-        ->orderBy('expire', 'DESC')
-        ->get();
-}
+    {
+        return $this->model
+            ->where('user_id', $userId)
+            ->with(['OVip.privilegs'])
+            ->where('expire', '>', Carbon::now()->timestamp)
+            ->orderBy('expire', 'DESC')
+            ->get();
+    }
 
     public function deleteExpireUserVip()
     {
@@ -52,9 +55,11 @@ class UserVipRepository extends AbstractRepository
         return $this->model->find($id);
     }
 
-    public function getByUserId($userId): Collection
+    public function getByUserId($userId,array $additionalRelations = []): Collection
     {
-        return $this->model->where("user_id", $userId)->get();
+        $userQuery = $this->model->where("user_id", $userId);
+        $userQuery = $additionalRelations ? $userQuery->with($additionalRelations) : $userQuery;
+        return $userQuery->get();
     }
 
     public function findByIdWithOVip($id)
@@ -64,7 +69,20 @@ class UserVipRepository extends AbstractRepository
 
     public function updateIsUsedForUser($userId)
     {
-        return $this->model->where('user_id', $userId)->update(['is_used' => 0]);
+        $this->model->where('user_id', $userId)->update(['is_used' => 0]);
+        $vips = $this->model->where('user_id', $userId)->get();
+
+        foreach ($vips as $vip) {
+            $vip->packs()->update(['is_used' => 0]);
+        }
+    }
+    public function updateTrueIsUsedForUser($userId)
+    {
+        $vips = $this->model->where('user_id', $userId)->get();
+
+        foreach ($vips as $vip) {
+            $vip->packs()->update(['is_used' => 1]);
+        }
     }
     public function updateIsUsed($userVip, $isUsed)
     {

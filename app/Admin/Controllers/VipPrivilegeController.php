@@ -122,14 +122,14 @@ class VipPrivilegeController extends MainController
                 5 => trans('Bubble Frame'),
                 6 => trans('Entering Special Effects'),
                 // 7=>trans ('Microphone Aperture'),============
-                8 => trans('Badge'),
+               // 8 => trans('Badge'), // ask
                 9 => trans('NoKick'),
                 10 => trans('Icon'),
                 // 11=>trans ('intro animation'),======
                 12 => trans('wapel'),
                 13 => trans('hide country'),
                 14 => trans('vip gifts'),
-                15 => trans('no pan'),
+                15 => trans('no ban profile'), //ask
                 16 => trans('hidden room'),
                 17 => trans('anonymous man'),
                 18 => trans('colored name'),
@@ -138,12 +138,11 @@ class VipPrivilegeController extends MainController
                 21 => trans('sound effect'),
                 22 => trans('upload GIF image'),
                 28 => trans('profile frame'),
-                29 => trans('being kicked'),
-                30 => trans('anti ban'),
+    
             ]
         );
-        $form->file('img1', __('admin.img'));
-        $form->file('img2', __('admin.img2'));
+        $form->file('img1', __('active image'));
+        $form->file('img2', __('inactive image'));
         //        $form->display(trans('admin.created_at'));
         //        $form->display(trans('admin.updated_at'));
 

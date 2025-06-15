@@ -59,7 +59,9 @@
   "Official Messages": "Resmi Mesajlar",
   "home carousels": "Ana Sayfa Karuselleri",
   "vip privileges": "VIP Ayrıcalıkları",
-  "Room Categories": "Oda Kategorileri",
+    "Delete profile switch users": "Kullanıcı profil değiştirmeyi sil",
+    "Profile Images": "Profil Resimleri",
+    "Room Categories": "Oda Kategorileri",
   "countries": "Ülkeler",
   "backgrounds": "Arka Planlar",
   "Emojis": "Emojiler",
@@ -499,7 +501,7 @@
     "Card Scroll": "Kart Kaydırma",
     "Avatar Frame": "Avatar Çerçevesi",
     "Bubble Frame": "Baloncuk Çerçevesi",
-    "Entering Special Effects": "Giriş Özel Efektleri",
+    "Entering Special Effects": "bileşik",
     "Microphone Aperture": "Mikrofon Diyaframı",
     "Badge": "Rozet",
     "NoKick": "Atılamaz",
@@ -2533,7 +2535,7 @@
 
 
 
-    
+
   "All permission": "Tüm izinler",
   "Create games": "Oyun oluştur",
   "Delete games": "Oyunu sil",
@@ -2990,7 +2992,54 @@
   "History of unique identifiers": "Benzersiz tanımlayıcıların geçmişi",
   "Vip Settings": "VIP Ayarları",
   "being kicked": "atıldı",
-  "anti ban": "yasak koruması"
+  "anti ban": "yasak koruması",
+   "net salary": "net maaş",
+    "Salary switch users": "kullanılmış maaş",
+
+    "Default Image": "Varsayılan Resim",
+    "Priority": "Öncelik",
+    "Localized Images": "Yerelleştirilmiş Resimler",
+    "Image for": "için resim",
+    "Badge Name": "Rozet Adı",
+
+    "user wallet": "kullanıcı cüzdanı",
+    "assign achievement": "başarı atayın",
+    "Pk Events": "Pk Etkinlikleri",
+    "Target Events": "Hedef Etkinlikleri",
+    "Weekly Events": "Haftalık Etkinlikler",
+    "Event Period": "Etkinlik Süresi",
+      "add a daily login gift": "günlük giriş hediyesi ekle",
+        "daily login gift": "günlük giriş hediyesi",
+          "wapel": "giriş efekti",
+          "family profile": "aile profili",
+   "last login": "son giriş",
+   "active image": "aktif resim",
+  "inactive image": "pasif resim",
+  "no ban profile": "Profil yasaklı değil",
+  "hide user country": "Kullanıcının ülkesini gizle",
+  "user ender room anonymous": "Kullanıcı odaya anonim olarak girsin",
+  "user can send vip gift": "Kullanıcı VIP hediye gönderebilir",
+  "hide visitors to client pages": "Müşteri sayfalarındaki ziyaretçileri gizle",
+  "hide room": "Odayı gizle",
+  "user can not kick out from room": "Kullanıcı odadan atılamaz",
+  "Receiver Level": "Alıcının Seviyesi",
+  "cancel": "İptal et",
+  "Delete gift a medal": "Bir madalya hediyesini sil",
+   "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
+,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

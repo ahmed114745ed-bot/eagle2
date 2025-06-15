@@ -426,6 +426,7 @@ return [
     'google_pay'    => 'Google Pay',
     'huawei_pay'    => 'Huawei Pay',
     "webhook_url" => "Webhook Url",
+    "webhook_id" => "Webhook Id",
 
     "target_no" => 'Target Number',
     "diamonds" => 'Diamond Target',
