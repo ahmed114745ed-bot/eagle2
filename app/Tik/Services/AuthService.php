@@ -212,7 +212,6 @@ class AuthService
             $user->save();
             $user->load('profile');
             $profile = $user->profile;
-            info($profile);
             if($profile)
             {
                 $profile->fill($data);
