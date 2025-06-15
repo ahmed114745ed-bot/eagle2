@@ -817,9 +817,67 @@ class Common
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
         //  dd($userVip->is_used);
-        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('expire', '<', now()->timestamp)->where('expire', '!=', 0)->where('vip_user_id', "!=", $userVip->$userVip)->delete();
+        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->delete();
 
         $type = $vip->privilegs()->pluck('type')->toArray();
+
+        $vipWares =$userVip->privilegs;
+        if (!empty($type)) {
+            foreach ($type as $wareType) {
+                $isSetWare = Ware::query()
+                    ->where('get_type', 1)
+                    ->where('enable', 1)
+                    ->where('level', $vip->level)
+                    ->where('type', $wareType)
+                    ->first();
+        
+                if (!$isSetWare) {
+                    $typesArr = [
+                        1 => 'Gemstone',
+                        3 => 'Card Scroll',
+                        4 => 'Avatar Frame',
+                        5 => 'Bubble Frame',
+                        6 => 'Entering Special Effects',
+                        7 => 'Microphone Aperture',
+                        8 => 'Badge',
+                        9 => 'NoKick',
+                        10 => 'Icon',
+                        11 => 'intro animation',
+                        12 => 'maple',
+                        13 => 'hide country',
+                        14 => 'vip gifts',
+                        15 => 'no pan',
+                        19 => 'profile visitors hide in',
+                        20 => 'hide last active',
+                        28 => 'profile frame',
+                        29 => 'being kicked',
+                        30 => 'anti ban',
+                    ];
+                
+                    $typeName = $typesArr[$wareType] ?? 'Unknown Type';
+                    Ware::create([
+                        'get_type' => 1,
+                        'type' => $wareType, 
+                        'name' => $typeName  ?? 'VIP Ware',
+                        'name_en' => $typeName ?? 'VIP Ware',
+                        'title' => $typeName ?? '',
+                        'title_en' => $typeName ?? '',
+                        'level' => $vip->level,
+                        'price' =>  0,
+                        'enable' => 1,
+                        'expire' => $expire,
+                        'show_img' =>  '1.png',
+                        'img2' =>  '',
+                        'key' =>  '',
+                        'key_json' => '',
+                        'image_type' => 'png',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                        'is_active_for_vip' => 1
+                    ]);
+                }
+            }
+        }
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
         foreach ($wares as $ware) {
             Pack::query()->where('user_id', $user->id)

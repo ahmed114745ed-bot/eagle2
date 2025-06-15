@@ -29,6 +29,13 @@ trait SpecialId
         });
     }
 
+    public function scopeFitterByUuidUser(Builder $builder, $toId): Builder
+    {
+        return $builder->where(function ($query) use ($toId) {
+            $query->where('uuid', 'like', '%' . $toId . '%')->orWhere(fn($q) => $q->where('special_id', 'like', '%' . $toId . '%')->whereHas('specialId'));
+        });
+    }
+
     public function soundEffect()
     {
         return $this->belongsTo(Pack::class, 'id', 'user_id')->where(function ($query) {

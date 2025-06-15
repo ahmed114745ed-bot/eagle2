@@ -440,14 +440,14 @@ trait CalcsTrait
         }
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
         // $user            = User::find($user_id);
-        $diamondReceived = $user->total_received_diamonds;
+        $diamondReceived = @$user->total_received_diamonds;
         $receivedNum        =  floor($diamondReceived  * $expPercentages['exp_received_percentage']);
-        $diamondSend             = $user->total_sender_diamonds;
+        $diamondSend             = @$user->total_sender_diamonds;
 
         $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
         //$senderNum        = floor(2000000000000000000000  * $expPercentages[0]);
 
-        $star_level      = $user->total_received_level;
+        $star_level      = @$user->total_received_level;
 
         $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
 
@@ -462,7 +462,7 @@ trait CalcsTrait
         $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
 
 
-        $gold_level             = $user->total_sender_level;
+        $gold_level             = @$user->total_sender_level;
 
         $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
         $gold_level_img = !is_null($firstVip_type2) ? $firstVip_type2->img : '';

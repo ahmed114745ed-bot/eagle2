@@ -30,7 +30,7 @@ class UserVipRepository extends AbstractRepository
     {
         return $this->model->where('user_id', $userId)->with('OVip')->where(function ($query) {
 
-            $query->where('expire', '>', Carbon::now()->timestamp)->where('expire', null);
+            $query->where('expire', '>', Carbon::now()->timestamp)->orWhere('expire', null);
         })->orderBy('id')->get();
     }
 

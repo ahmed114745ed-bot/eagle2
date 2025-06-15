@@ -169,13 +169,12 @@ class AchievementDedicateController extends MainController
         }
         $grid->column('created_at', trans('admin.created_at'));
 
-        $grid->disableActions();
+
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableView();
             $actions->disableEdit();
-            $actions->disableDelete();
-            // $actions->add(new AchievementDedicateAction());
         });
+        $this->extendGrid($grid);
 
 
         return $grid;
