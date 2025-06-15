@@ -310,8 +310,6 @@ class MicService
         if (! $room){
             return Common::apiResponse(0, __('api_responses.room_not_found'), null, 408);
         }
-        info($room);
-
 
         $admins = $room->room_admin;
         $admins = explode(',', $admins);
