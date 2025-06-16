@@ -2,9 +2,6 @@
 namespace App\Classes\PaymentGateways;
 use App\Helpers\Common;
 use App\Models\CoinLog;
-use App\Models\Setting;
-use Illuminate\Http\Request;
-use Stripe\Stripe as StripeStripe;
 
 class Stripe
 {
@@ -35,7 +32,7 @@ class Stripe
                 'line_items' => [
                     [
                         'price_data' => [
-                            'currency'=>$data['stripe_currency']?->value,
+                            'currency'=> $data['stripe_currency']?->value,
                             'product_data'=>[
                                 'name'=>$data['name']
                             ],
