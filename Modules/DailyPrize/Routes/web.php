@@ -29,9 +29,9 @@ Route::group(
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-       // $router->resource('daily-gifts', DailyPrizeController::class);
-        $router->resource('daily-gift-types', DailyPrizeTypeController::class);
+    function () {
+        // Route::resource('daily-gifts', DailyPrizeController::class);
+        Route::resource('daily-gift-types', DailyPrizeTypeController::class);
         Route::prefix('daily-gifts/{type}')->group(function () {
             Route::get('/', [DailyPrizeController::class, 'index'])->name('daily-gifts.index');
             Route::get('/create', [DailyPrizeController::class, 'create']);
@@ -41,4 +41,5 @@ Route::group(
             Route::put('/{id}', [DailyPrizeController::class, 'update']);
             Route::delete('/{id}', [DailyPrizeController::class, 'destroy'])->where('id', '[0-9]+');
         });
-    });
+    }
+);
