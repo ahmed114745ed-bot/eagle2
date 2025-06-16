@@ -88,7 +88,7 @@ class StripeController extends Controller
 //        try {
             // Verify the webhook signature to ensure it's coming from Stripe
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
-            info($event->data->object);
+            info($event);
             info($event->type);
 
             // Handle the event types
