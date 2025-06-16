@@ -2611,7 +2611,17 @@
 "Delete gift a medal": "मेडल उपहार हटाएं",
 "This target has already been achieved by some users and cannot be updated.": "इस लक्ष्य को कुछ उपयोगकर्ताओं द्वारा पहले ही प्राप्त किया जा चुका है और इसे अपडेट नहीं किया जा सकता।"
 ,    "target_change_warning": "टारगेट मूल्य बढ़ाने पर होस्ट को मिलने वाली डॉलर राशि बढ़ेगी, जबकि इसे घटाने पर डॉलर राशि कम हो जाएगी।"
-
+, "Moments": "पलों",
+"Reels": "रील्स",
+"Uploads:": "अपलोड:",
+"Likes:": "पसंद:",
+"Comments:": "टिप्पणियाँ:",
+"Moment Upload": "पलों की अपलोड",
+"Moment Likes": "पलों की पसंद",
+"Moment Comments": "पलों की टिप्पणियाँ",
+"Reel Upload": "रील्स अपलोड",
+"Reel Likes": "रील्स पसंद",
+"Reel Comments": "रील्स टिप्पणियाँ"
 
 
 

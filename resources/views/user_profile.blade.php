@@ -1031,7 +1031,7 @@
 
 
        @php
-                    $activeTab = request('tab', 'tab=salary');
+                    $activeTab = @$tab ;
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
@@ -1041,8 +1041,10 @@
               <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
             @endif
             @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}" data-target="salary-tab">{{ __('user wallet') }}</a>
+                <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}" data-target="salary-tab">{{ __('prof_reports') }}</a>
             @endif
+            <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}" data-target="charge-tab">{{ __('Charge Reports') }}</a>
+
 
 
         </div>
@@ -1289,10 +1291,12 @@
                                                 <th>#</th>
                                                 <th>{{ __('agency') }}</th>
                                                 <th>{{ __('salary') }}</th>
-                                                <th>{{ __('expenses') }}</th>
+                                                <th>{{ __('Withdraw') }}</th>
                                                 <th>{{ __('net salary') }}</th>
                                                 <th>{{ __('days') }}</th>
                                                 <th>{{ __('hours') }}</th>
+                                                <th>{{ __('Moments') }}</th>
+                                                <th>{{ __('Reels') }}</th>
                                                 <th>{{ __('diamonds') }}</th>
                                                 <th>{{ __('date') }}</th>
 
@@ -1316,6 +1320,20 @@
 
                                                             $image = handleShowImageWithTypes($user->id, $url, 40, 40);
                                                             $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+                                                           
+                                                            $extras = json_decode($salary->extras, true);
+                                                            $moment = $extras['moment'] ?? [];
+                                                            $reel = $extras['reel'] ?? [];
+
+                                                            $momentUpload = $moment['upload'] ?? '0/0';
+                                                            $momentLikes = $moment['likes'] ?? '0/0';
+                                                            $momentComments = $moment['comments'] ?? '0/0';
+
+                                                            $reelUpload = $reel['upload'] ?? '0/0';
+                                                            $reelLikes = $reel['likes'] ?? '0/0';
+                                                            $reelComments = $reel['comments'] ?? '0/0';
+
+                                                      
                                                         @endphp
 
                                                         <tr>
@@ -1338,6 +1356,24 @@
                                                         <td>{{ $salary->sallary - $salary->cut_amount }}</td>
                                                         <td>{{ $salary->achieved_days }}</td>
                                                         <td>{{ $salary->achieved_hours }}</td>
+                                                        <td>
+                                                            <div style="line-height: 1.6;">
+                                                                <ul style="margin-left: 8px;">
+                                                                    <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
+                                                                    <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
+                                                                    <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div style="line-height: 1.6;">
+                                                                <ul style="margin-left: 8px;">
+                                                                    <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
+                                                                    <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
+                                                                    <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
                                                         <td>{{ $salary->achieved_diamond }}</td>
                                                         <td>{{ $salary->month .'/'. $salary->year }}</td>
                                                     </tr>
@@ -1390,17 +1426,63 @@
                     </div>
                 </div>
             </div>
-
-
-
-
-
-
-
-
-
     </div>
 
+    @if($activeTab == 'charge')
+    <div class="tab-content active" id="charge-tab">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">{{ __('Charge Reports') }}</h4>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table" id="charge-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('receiver') }}</th>
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('USD') }}</th>
+                            <th>{{ __('Created at') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($charges as $index => $charge)
+                            @php
+                                $receiver = \App\Helpers\Common::getReceiverInfo($charge);
+                                $name = $receiver['name'] ?? '-';
+                                $uid = $receiver['uuid'] ?? '-';
+                                $image = $receiver['image'] ?? asset('default-user.png');
+                            @endphp
+                            <tr>
+                                <td>{{ $charge->id }}</td>
+                                <td>
+                                    <img src="{{ $image }}" width="30" height="30"
+                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                    {{ $name }} ({{ $uid }})
+                                </td>
+                                <td>{{ $charge->amount }} </td>
+                                <td>{{ $charge->usd }}</td>
+                                <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination --}}
+            @if($charges instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                <div class="pagination-container mt-3">
+                    {{ $charges->appends([
+                        'tab' => 'charge',
+                        'pack_page' => $packs?->currentPage(),
+                        'vip_page' => $userVips?->currentPage(),
+                        'salary_page' => $salaries?->currentPage(),
+                    ])->links('vendor.pagination.bootstrap-4') }}
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
 
     <div class="modal fade" id="Add_model" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg mt-6" role="document">
