@@ -10,8 +10,6 @@ class UserSallary extends Model
 {
     use TimestampsWithTimezone;
 
-    public bool $allowSaving = true;
-
     protected $table = 'user_sallaries';
 
     protected $guarded = ['id'];
