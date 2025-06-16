@@ -143,7 +143,7 @@ class AppServiceProvider extends ServiceProvider
 
                 'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
                 'is_paysky_active' => $settings['is_paysky_active'] ?? 0,
-                'is_stripe_active' => $settings['is_stripe_active'] ?? 0,
+                'is_stripe_active' => $settings['is_strip_active'] ?? 0,
                 'is_opay_active' => $settings['is_opay_active'] ?? 0,
                 'is_applepay_active' => $settings['is_applepay_active'] ?? 0,
             ]);

@@ -2,9 +2,6 @@
 namespace App\Classes\PaymentGateways;
 use App\Helpers\Common;
 use App\Models\CoinLog;
-use App\Models\Setting;
-use Illuminate\Http\Request;
-use Stripe\Stripe as StripeStripe;
 
 class Stripe
 {
@@ -29,13 +26,13 @@ class Stripe
 
 
     public function make($data){
-        \Stripe\Stripe::setApiKey($data['stripe_test_secret_key']?->value);
+        \Stripe\Stripe::setApiKey($data['stripe_test_secret_key']);
         $checkout_session = \Stripe\Checkout\Session::create(
             [
                 'line_items' => [
                     [
                         'price_data' => [
-                            'currency'=>$data['stripe_currency']?->value,
+                            'currency'=> $data['stripe_currency'],
                             'product_data'=>[
                                 'name'=>$data['name']
                             ],
@@ -49,12 +46,12 @@ class Stripe
                     'order_id' => $data['order_id'] ?? '',
                     'user_id' => $data['user_id'] ?? '',
                 ],
-                'success_url' => self::redirect_if_payment_success ($data),
-                'cancel_url' => self::redirect_if_payment_faild ($data),
+                'success_url' => url('/payment/success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => url('/payment/cancel'),
             ]
         );
 
-        $c = CoinLog::query ()->where ('trx',$data['trx'])->where ('method','strip')->where ('status',0)->first ();
+        $c = CoinLog::query ()->where ('trx',$data['trx'])->where ('method','strip')->where ('status',0)->first();
         if($c){
             $c->pid = $checkout_session->id;
             $c->save ();

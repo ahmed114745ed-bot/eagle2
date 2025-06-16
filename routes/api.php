@@ -144,6 +144,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
     Route::post('/stripe-callback', [StripeController::class, 'handleWebhook']);
+    Route::get('/payment/success', [StripeController::class, 'success']);
+    Route::get('/payment/cancel', [StripeController::class, 'cancel']);
+
 
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(

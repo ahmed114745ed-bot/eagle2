@@ -14,6 +14,7 @@
 use Modules\Achievement\Http\Controllers\web\GiftAchievemntController;
 use Modules\Achievement\Http\Controllers\web\UserAchievementLevelController;
 use Modules\Achievement\Http\Controllers\web\AchievementLevelsModuleController;
+use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
@@ -28,29 +29,21 @@ Route::group(
             'prevent-delete',
             'appFeatureEnable:achievement',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->get('/test-calculat', function (){
-            $gift=\App\Models\Gift::first();
-            $user_owner=\App\Models\User::find(1260);
-            \Modules\Achievement\Jobs\CalculateAchievement::dispatch($gift,5, $user_owner);
-            dd("dsdsdsds");
-        });
-        Route::prefix('')->name('')->group(function (\Illuminate\Routing\Router $router) {
-
-            $router->resource('achievements', AchievementsController::class);
-            $router->post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
-            $router->get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class,'getAchievementLevels'])->name('get-achievement-levels');
-            $router->get('/get-view-page', [AchievementLevelsModuleController::class,'viewPage'])->name('get-view-page');
-            $router->resource('user-achievement-levels', UserAchievementLevelController::class);
-            // $router->post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
-            $router->get('achievement-levels/create/{id}', 'AchievementsLevelsController@create')->where('id', '[0-9]+')->name('achievement-levels.create');
-            $router->resource('gift-achievements','UserGiftAchController');
-            $router->resource('gift-achievment', 'GiftAchiementController');
-            $router->post('postAddGiftAchievement', [GiftAchievemntController::class,'postAddGiftAchievemnt'])->name('postAddGiftAchievement');
-            $router->post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
-            $router->post('posteditGiftAchievementLevel', [GiftAchievemntController::class,'posteditGiftAchievementLevel'])->name('posteditGiftAchievementLevel');
-            $router->resource('achievement-levels', AchievementsLevelsController::class,['names'=>['create'=>'achievement-levels.create2']]);
-        });
-    });
+    function () {
+        Route::resource('achievements', AchievementsController::class);
+        Route::post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
+        Route::get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class, 'getAchievementLevels'])->name('get-achievement-levels');
+        Route::get('/get-view-page', [AchievementLevelsModuleController::class, 'viewPage'])->name('get-view-page');
+        Route::resource('user-achievement-levels', UserAchievementLevelController::class);
+        // Route::post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
+        Route::get('achievement-levels/create/{id}', 'AchievementsLevelsController@create')->where('id', '[0-9]+')->name('achievement-levels.create');
+        Route::resource('gift-achievements', 'UserGiftAchController');
+        Route::resource('gift-achievment', 'GiftAchiementController');
+        Route::post('postAddGiftAchievement', [GiftAchievemntController::class, 'postAddGiftAchievemnt'])->name('postAddGiftAchievement');
+        Route::post('postAddGiftAchievementLevel', [GiftAchievemntController::class, 'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
+        Route::post('posteditGiftAchievementLevel', [GiftAchievemntController::class, 'posteditGiftAchievementLevel'])->name('posteditGiftAchievementLevel');
+        Route::resource('achievement-levels', AchievementsLevelsController::class, ['names' => ['create' => 'achievement-levels.create2']]);
+    }
+);

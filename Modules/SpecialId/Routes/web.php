@@ -3,6 +3,7 @@
 use Modules\SpecialId\Http\Controllers\web\SpecialWareController;
 use Modules\SpecialId\Http\Controllers\web\SpecialIdFramController;
 use Modules\SpecialId\Http\Controllers\web\SpecialHistoryController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,9 +29,9 @@ Route::group(
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('special-wares', SpecialWareController::class);
-        $router->resource('special-histories', SpecialHistoryController::class);
-        $router->resource('special-id-fram', SpecialIdFramController::class);
-
-    });
+    function () {
+        Route::resource('special-wares', SpecialWareController::class);
+        Route::resource('special-histories', SpecialHistoryController::class);
+        Route::resource('special-id-fram', SpecialIdFramController::class);
+    }
+);

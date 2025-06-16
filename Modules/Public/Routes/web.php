@@ -2,8 +2,7 @@
 
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Public\Http\Controllers\web\RewardLevelIntervalController;
-
-
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,15 +21,15 @@ Route::group(
         'namespace'  => 'web',
         'middleware' => [
             'web',
-           'admin',
+            'admin',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('level-intervals', LevelIntervalController::class);
+    function () {
+        Route::resource('level-intervals', LevelIntervalController::class);
 
         Route::prefix('reward_level_interval/{level_interval_id}')->group(function () {
             Route::get('/', [RewardLevelIntervalController::class, 'index']);
@@ -41,4 +40,5 @@ Route::group(
             Route::put('/{id}', [RewardLevelIntervalController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [RewardLevelIntervalController::class, 'destroy'])->where('id', '[0-9]+');
         });
-    });
+    }
+);
