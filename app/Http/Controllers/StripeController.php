@@ -150,6 +150,8 @@ class StripeController extends Controller
 
         $item  = CoinLog::where("id", $orderId)->first();
 
+        info($item);
+
         if($item->status == 1){
             return false;
         }
