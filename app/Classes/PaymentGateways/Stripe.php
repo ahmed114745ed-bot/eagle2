@@ -49,12 +49,12 @@ class Stripe
                     'order_id' => $data['order_id'] ?? '',
                     'user_id' => $data['user_id'] ?? '',
                 ],
-                'success_url' => self::redirect_if_payment_success ($data),
-                'cancel_url' => self::redirect_if_payment_faild ($data),
+                'success_url' => url('/payment/success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => url('/payment/cancel'),
             ]
         );
 
-        $c = CoinLog::query ()->where ('trx',$data['trx'])->where ('method','strip')->where ('status',0)->first ();
+        $c = CoinLog::query ()->where ('trx',$data['trx'])->where ('method','strip')->where ('status',0)->first();
         if($c){
             $c->pid = $checkout_session->id;
             $c->save ();

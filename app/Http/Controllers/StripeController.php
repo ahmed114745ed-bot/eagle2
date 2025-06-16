@@ -21,8 +21,6 @@ class StripeController extends Controller
     public function __construct(public StripeService $stripeService) {}
     public function pay(Request $request)
     {
-
-
         $request->validate([
             'product_name' => 'required|string|max:255',
             'amount' => 'required|numeric',
@@ -30,7 +28,6 @@ class StripeController extends Controller
             'coin_id' => 'required|numeric'
         ]);
         try {
-
             $apiKey = config('stripe.test_secret_key');
 
             $request->user_id = auth()->id();
@@ -79,7 +76,7 @@ class StripeController extends Controller
 
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
-        $endpointSecret = $stripe_webhook_secret?->value; // Set this in your .env file
+        $endpointSecret = $stripe_webhook_secret?->value;
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
 
@@ -130,4 +127,29 @@ class StripeController extends Controller
 
         $user->save();
     }
+
+    public function success(Request $request)
+    {
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $sessionId = $request->get('session_id');
+
+        if (!$sessionId) {
+            return response('Missing session ID', 400);
+        }
+
+        try {
+            Session::retrieve($sessionId);
+
+            return response('Payment successful.', 200);
+        } catch (\Exception $e) {
+            return response('Payment verification failed.', 500);
+        }
+    }
+
+    public function cancel()
+    {
+        return response('Payment was cancelled.', 200);
+    }
+
 }
