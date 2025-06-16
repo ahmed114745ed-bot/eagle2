@@ -71,6 +71,7 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
+        info('welcome to webhook');
         $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
         $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
 
