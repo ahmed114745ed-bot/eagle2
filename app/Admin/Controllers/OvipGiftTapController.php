@@ -56,7 +56,7 @@ class OvipGiftTapController extends MainController
             })
             ->row(function (Row $row) use ($ovip) {
                 $type = request('type');
-                if (in_array($type, [13, 17, 14, 19, 16, 20, 9, 22])) {
+                if (in_array($type, [13, 17, 14, 19, 16, 20, 9, 22, 15])) {
                     switch ($type) {
                         case 13:
                             $text = __('hide user country');
@@ -81,6 +81,9 @@ class OvipGiftTapController extends MainController
                             break;
                         case 22:
                             $text = __('user can upload Gif image');
+                            break;
+                        case 15:
+                            $text = __('can not ban this user');
                             break;
                         default:
                             $text = null;
@@ -253,7 +256,7 @@ class OvipGiftTapController extends MainController
         $form->hidden('enable')->value(1);
         $id = request()->route('ware_gift');
         $ware = Ware::find($id);
-        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
+        if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
 
             $form->display('ID');
             $form->text('name', trans('name'));
@@ -291,7 +294,7 @@ class OvipGiftTapController extends MainController
 
             if ($ware->type == 18 || $ware->type == 21)  $form->color('color', trans('color'));
         }
-        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
+        if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
 
@@ -397,7 +400,7 @@ class OvipGiftTapController extends MainController
 
                 return back()->with(compact('error'));
             }
-            if (request('type') != 18 || request('type') != 21) {
+            if (request('type') != 18 && request('type') != 21) {
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type');
                 $form->model()->image_type = $imageType1 ?? $profileFrameType;
