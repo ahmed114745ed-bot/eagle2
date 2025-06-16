@@ -71,6 +71,7 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
+        info('welcome to webhook');
         $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
         $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
 
@@ -84,7 +85,7 @@ class StripeController extends Controller
         // Your Stripe webhook secret, which you get from the Stripe dashboard
         $endpointSecret = $stripe_webhook_secret?->value; // Set this in your .env file
         Log::info('strip callback called '. $apiKey . ' '. $stripe_webhook_secret);
-        try {
+//        try {
             // Verify the webhook signature to ensure it's coming from Stripe
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
 
@@ -127,15 +128,15 @@ class StripeController extends Controller
 
             // Return a 200 response to Stripe to acknowledge the webhook
             return response('Webhook Handled', 200);
-        } catch (SignatureVerificationException $e) {
-            // Invalid signature from Stripe
-            \Log::error("Invalid webhook signature: {$e->getMessage()}");
-            return response('Invalid Signature', 400);
-        } catch (\Exception $e) {
-            // General error handling
-            \Log::error("Webhook error: {$e->getMessage()}");
-            return response('Webhook Error: ' . $e->getMessage(), 500);
-        }
+//        } catch (SignatureVerificationException $e) {
+//            // Invalid signature from Stripe
+//            \Log::error("Invalid webhook signature: {$e->getMessage()}");
+//            return response('Invalid Signature', 400);
+//        } catch (\Exception $e) {
+//            // General error handling
+//            \Log::error("Webhook error: {$e->getMessage()}");
+//            return response('Webhook Error: ' . $e->getMessage(), 500);
+//        }
     }
 
     public function makePayment($orderId, int|string|null $userId)
