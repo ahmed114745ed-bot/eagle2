@@ -45,6 +45,10 @@ class Stripe
                     ]
                 ],
                 'mode' => 'payment',
+                'metadata' => [
+                    'order_id' => $data['order_id'] ?? '',
+                    'user_id' => $data['user_id'] ?? '',
+                ],
                 'success_url' => self::redirect_if_payment_success ($data),
                 'cancel_url' => self::redirect_if_payment_faild ($data),
             ]

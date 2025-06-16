@@ -34,14 +34,12 @@ use App\Models\Scopes\HostAgencyScope;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
-use App\Traits\AdminTraits\AdminUserTrait;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
-
 class AgencyController extends MainController
 {
-    use HasResourceActions, AdminUserTrait;
+    use HasResourceActions;
 
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
@@ -154,16 +152,19 @@ class AgencyController extends MainController
 
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        $tab = request('tab') ?? 'members';
+        $tab = request('tab', 'members');
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return Agency::with(['admins', 'owner:id,name,uuid'])
+            return Agency::query()
+                ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->find($id);
         });
+
         if (!$agency) {
             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-                return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
+                return ShippingAgency::query()
+                    ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                     ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                     ->find($id);
             });
@@ -202,7 +203,8 @@ class AgencyController extends MainController
 
             case 'salary':
                 $salaries = Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
-                    return AgencySallary::where('agency_id', $id)
+                    return AgencySallary::query()
+                        ->where('agency_id', $id)
                         ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
                         ->orderByDesc('id')
                         ->paginate(10, ['*'], 'salary_page');
@@ -211,7 +213,8 @@ class AgencyController extends MainController
 
             case 'requests':
                 $agencyJoinRequests = Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
-                    return AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
+                    return AgencyJoinRequest::query()
+                        ->where(['agency_id' => $id, 'status' => 0])
                         ->with('user')
                         ->whereHas('user')
                         ->orderByDesc('id')
@@ -221,16 +224,32 @@ class AgencyController extends MainController
 
             case 'targets':
                 $memberTargets = Cache::remember("agency_{$id}_targets_{$month}_{$year}_page_" . request('target_page', 1), 600, function () use ($agency, $agencyId, $month, $year) {
-                    return $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
-                        $query->where('agency_id', $agencyId)
-                            ->whereMonth('created_at', $month)
-                            ->whereYear('created_at', $year);
-                    }])->paginate(10, ['*'], 'target_page');
+                    return $agency
+                        ->mempers()
+                        ->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+                            $query
+                                ->where('agency_id', $agencyId)
+                                ->whereMonth('created_at', $month)
+                                ->whereYear('created_at', $year);
+                        }])
+                        ->paginate(10, ['*'], 'target_page');
                 });
 
-                [$agencyTarget, $rate] = Cache::remember("agency_{$id}_rate_{$month}_{$year}", 600, fn() => $this->rateAgency($agencyId, $month, $year));
-                $stars = Cache::remember("agency_{$id}_stars_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'));
-                $heroes = Cache::remember("agency_{$id}_heroes_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'));
+                [$agencyTarget, $rate] = Cache::remember(
+                    "agency_{$id}_rate_{$month}_{$year}",
+                    600,
+                    fn() => $this->rateAgency($agencyId, $month, $year),
+                );
+                $stars = Cache::remember(
+                    "agency_{$id}_stars_{$month}_{$year}",
+                    600,
+                    fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'),
+                );
+                $heroes = Cache::remember(
+                    "agency_{$id}_heroes_{$month}_{$year}",
+                    600,
+                    fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'),
+                );
 
                 break;
         }
@@ -245,36 +264,37 @@ class AgencyController extends MainController
                 ->get();
         });
 
-        $data = compact(
-            'agency',
-            'members',
-            'charges',
-            'salaries',
-            'agencyJoinRequests',
-            'giftLog',
-            'memberTargets',
-            'agencyTarget',
-            'rate',
-            'stars',
-            'heroes',
-            'tab'
-        );
-
-        return $content->title(__('agency profile'))
-            ->view('agency_profile', $data);
+        return $content
+            ->title(__('agency profile'))
+            ->view('agency_profile', compact(
+                'agency',
+                'members',
+                'charges',
+                'salaries',
+                'agencyJoinRequests',
+                'giftLog',
+                'memberTargets',
+                'agencyTarget',
+                'rate',
+                'stars',
+                'heroes',
+                'tab'
+            ));
     }
-
-
-
 
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
     {
-        return  GiftLog::where('agency_id', $agencyId)->whereHas($rel)->with($rel)->whereYear('created_at', $year)->whereMonth('created_at', $month)
-            ->selectRaw("sum(giftPrice) as exp, $keywords")
-            ->groupBy($keywords)->orderByRaw("exp desc")
-            ->get()->reject(function ($q) {
-                return $q->exp == 0;
-            });
+        return GiftLog::query()
+            ->whereHas($rel)
+            ->with($rel)
+            ->where('agency_id', $agencyId)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->selectRaw("SUM(giftPrice) as exp, $keywords")
+            ->groupBy($keywords)
+            ->havingRaw("exp > 0")
+            ->orderByRaw("exp DESC")
+            ->get();
     }
 
     public function rateAgency($agencyId, $month, $year)
@@ -593,20 +613,6 @@ class AgencyController extends MainController
     protected function form()
     {
         $form = new Form(new Agency());
-        $ops = [];
-        foreach ($this->getAgencies() as $user) {
-            $ops[$user->id] = $user->name;
-        }
-
-        $opsAgencyManger = [];
-        foreach (User::where('is_manger', 1)->get() as $user) {
-            $opsAgencyManger[$user->id] = $user->uuid . '_' . $user->name;
-        }
-
-        $opsAgencyMangerDash = [];
-        foreach (DB::table('admin_users')->get() as $user) {
-            $opsAgencyMangerDash[$user->id] = $user->name;
-        }
         $form->hidden('type', __('type'))->default(1);
         $form->display('ID');
         if (!$form->isEditing()) {
@@ -673,8 +679,6 @@ class AgencyController extends MainController
             });
         }
 
-
-
         if (Session::has('show_alert')) {
             $form->html('<script>
              $(document).ready(function () {
@@ -682,8 +686,6 @@ class AgencyController extends MainController
              });
          </script>');
         }
-
-
 
         Admin::script(<<<'JS'
         function initPhoneInput() {
@@ -851,8 +853,6 @@ class AgencyController extends MainController
         return $form;
     }
 
-
-
     public function usersGrid($id)
     {
         $grid = new Grid(new User());
@@ -873,7 +873,6 @@ class AgencyController extends MainController
 
         $grid->column('name', __('Name'));
 
-
         $grid->column('salary', __('salary'));
 
         $grid->column('coins', __('diamonds'));
@@ -881,26 +880,21 @@ class AgencyController extends MainController
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
-                $target = $target->only(
-                    [
-                        'id',
-                        'add_month',
-                        'add_year',
-                        'target_usd',
-                        'target_hours',
-                        'target_days',
-                        'target_agency_share',
-                        'user_diamonds',
-                        'user_hours',
-                        'user_days',
-                        'user_obtain',
-                        'agency_obtain',
-                        'updated_at'
-                    ]
-                );
-
-
-                return $target;
+                return $target->only([
+                    'id',
+                    'add_month',
+                    'add_year',
+                    'target_usd',
+                    'target_hours',
+                    'target_days',
+                    'target_agency_share',
+                    'user_diamonds',
+                    'user_hours',
+                    'user_days',
+                    'user_obtain',
+                    'agency_obtain',
+                    'updated_at'
+                ]);
             });
 
             return new Table(
@@ -924,10 +918,8 @@ class AgencyController extends MainController
             );
         });
 
-
         $grid->disableActions();
         $grid->disableCreateButton();
-
 
         return $grid;
     }
@@ -956,8 +948,6 @@ class AgencyController extends MainController
         $grid->column('tot', __('agency obtain'));
         $grid->disableActions();
         $grid->disableCreateButton();
-
-
 
         return $grid;
     }
