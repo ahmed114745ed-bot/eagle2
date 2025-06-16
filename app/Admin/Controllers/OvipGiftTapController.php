@@ -248,11 +248,9 @@ class OvipGiftTapController extends MainController
         $form->hidden('is_active_for_vip')->value(1);
         $form->hidden('get_type')->value(1);
         $form->hidden('enable')->value(1);
-
         $id = request()->route('ware_gift');
         $ware = Ware::find($id);
-
-        if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
+        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
             $form->display('ID');
             $form->text('name', trans('name'));
@@ -260,60 +258,76 @@ class OvipGiftTapController extends MainController
             $form->text('title', trans('title'));
             $form->text('title_en', trans('Title en'));
 
+
             $form->image('show_img', trans('img'))->name(function ($file) {
                 return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
             })->default('1.png');
-
-            $form->file('img2', trans('svg'))->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            });
+            $form->file('img2', trans('svg'))
+                ->name(function ($file) {
+                    return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+                });
 
             $form->keyValue('key_json', 'key_json');
 
-            $form->select('image_type1', __('image_type'))->options([
-                'svga' => __('svga'),
-                'alpha' => __('alpha'),
-                'mp4' => __('mp4'),
-                'vap' => __('vap'),
-                'png' => __('png'),
-            ])->attribute(['id' => 'image_type1']);
+            $form->select('image_type1', __('image_type'))->options(
+                [
+                    'svga' => __('svga'),
+                    'alpha' => __('alpha'),
+                    'mp4' => __('mp4'),
+                    'vap' => __('vap'),
+                    'png' => __('png'),
+
+                ]
+            )->attribute(['id' => 'image_type1']);
 
             $form->text('key', trans('key'));
         }
 
-        if (request('type') == 18 || ($form->isEditing() && $ware && $ware->type == 18)) {
-            $form->color('color', trans('color'));
-        }
+        if (request('type') == 18) $form->color('color', trans('color'));
+        if (($form->isEditing() && $ware && ($ware->type == 18))) {
 
-        if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
+            if ($ware->type == 18)  $form->color('color', trans('color'));
+        }
+        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
-                $model = $form->model();
+                info($form->show_img);
+                info($form->img2);
 
-                if (empty($form->show_img) && !$form->show_img instanceof UploadedFile) {
-                    $model->show_img = null;
-                }
-
-                if (empty($form->img2) && !$form->img2 instanceof UploadedFile) {
-                    $model->img2 = null;
-                }
-
-                $hasShowImg = $form->show_img || $model->getOriginal('show_img');
-                $hasImg2 = $form->img2 || $model->getOriginal('img2');
-
-                if (!$hasShowImg && !$hasImg2) {
-                    throw ValidationException::withMessages([
-                        'img2' => ['Please upload at least one image'],
+                if (!$form->show_img && !$form->img2) {
+                    $error = new MessageBag([
+                        'title'   => 'Error',
+                        'message' => 'Please upload at least one image',
                     ]);
+
+                    return back()->with(compact('error'));
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+                    $allowedExtensions = [
+                        'svga',
+                        'mp4',
+                        'jpg',
+                        'jpeg',
+                        'png',
+                        'gif',
+                        'bmp',
+                        'tiff',
+                        'svg',
+                        'webp',
+                        'mov',
+                        'avi',
+                        'wmv',
+                        'flv',
+                        'mkv',
+                        'webm',
+                    ];
+
                     $ext = strtolower($form->show_img->guessExtension());
 
                     if (!in_array($ext, $allowedExtensions)) {
                         throw ValidationException::withMessages([
-                            'show_img' => ['Invalid file type. Allowed extensions: ' . implode(', ', $allowedExtensions)],
+                            'show_img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                         ]);
                     }
 
@@ -321,6 +335,7 @@ class OvipGiftTapController extends MainController
                 }
 
                 if ($form->img2 instanceof UploadedFile) {
+
                     $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
 
                     $ext = strtolower($form->img2->guessExtension());
@@ -332,7 +347,9 @@ class OvipGiftTapController extends MainController
 
                     if ($ext === 'mp4') {
                         $urlVideo = upload($form->img2);
+
                         $videoPath = getDriverUrl() . '/' . $urlVideo;
+
                         $wareId = $form->model()->id;
 
                         (new FfmpegService())->extract($videoPath, $wareId);
@@ -354,7 +371,7 @@ class OvipGiftTapController extends MainController
 
                     if (!in_array($ext, $allowedExtensions)) {
                         throw ValidationException::withMessages([
-                            'img2' => ['Invalid file type. Allowed extensions: ' . implode(', ', $allowedExtensions)],
+                            'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                         ]);
                     } else {
                         $form->profile_frame_type = $ext;
@@ -362,45 +379,46 @@ class OvipGiftTapController extends MainController
                 }
             });
         }
-
         $form->saving(function (Form $form) {
-            $model = $form->model();
-            $id = $model->id;
+
+            $id = $form->model()->id;
 
             $exists = Ware::where('level', $form->level)
-                ->where('type', $form->type)
-                ->where('get_type', 1)
-                ->when($id, fn($q) => $q->where('id', '!=', $id))
-                ->exists();
+                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
+                    $query->where('id', "!=", $id);
+                })->exists();
 
             if ($exists) {
-                throw ValidationException::withMessages([
-                    'level' => __('This level and type combination already exists'),
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => __('This level and type combination already exists'),
                 ]);
+
+                return back()->with(compact('error'));
             }
+            if (request('type') != 18 || request('type') != 21) {
+                $imageType1 = $form->input('image_type1');
+                $profileFrameType = $form->input('profile_frame_type');
+                $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
-            $imageType1 = $form->input('image_type1');
-            $profileFrameType = $form->input('profile_frame_type');
-            $existingImageType = $model->getOriginal('image_type');
+                if (is_null($imageType1) && is_null($profileFrameType)) {
 
-            if ((request('type') != 18 && request('type') != 21) &&
-                is_null($imageType1) && is_null($profileFrameType) && is_null($existingImageType)) {
-                throw ValidationException::withMessages([
-                    'img2' => ['Please upload or keep at least one valid image type'],
-                ]);
+                    session()->flash('show_alert', 'Your alert message');
+                    return redirect()->back();
+                }
             }
-
-            $model->image_type = $imageType1 ?? $profileFrameType ?? $existingImageType;
 
             (new UserCounterServices)->eventUsers('ware');
         });
 
         $form->saved(function (Form $form) {
             $level = $form->model()->level;
-            $type = $form->model()->type;
+            $type = $form->model()->type; // Get the saved model's ID
             $ovip = Ovip::where('level', $level)->first();
             $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
+            return redirect()->to($url);
         });
+
 
         return $form;
     }
