@@ -60,7 +60,7 @@ class CoinService
             ];
             if ($request->pay_method == 'strip') {
                 $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
-                $is_stripe_active = Setting::where('key', 'is_stripe_active')->first();
+                $is_stripe_active = Setting::where('key', 'is_strip_active')->first();
                 $stripe_success_url = Setting::where('key', 'stripe_success_url')->first();
                 $stripe_cancel_url = Setting::where('key', 'stripe_cancel_url')->first();
                 $stripe_currency = Setting::where('key', 'stripe_currency')->first();
