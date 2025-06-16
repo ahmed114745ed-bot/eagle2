@@ -283,10 +283,10 @@ class OvipGiftTapController extends MainController
             $form->text('key', trans('key'));
         }
 
-        if (request('type') == 18) $form->color('color', trans('color'));
-        if (($form->isEditing() && $ware && ($ware->type == 18))) {
+        if (request('type') == 18 || request('type') == 21) $form->color('color', trans('color'));
+        if (($form->isEditing() && $ware && ($ware->type == 18 || $ware->type == 21))) {
 
-            if ($ware->type == 18)  $form->color('color', trans('color'));
+            if ($ware->type == 18 || $ware->type == 21)  $form->color('color', trans('color'));
         }
         if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
