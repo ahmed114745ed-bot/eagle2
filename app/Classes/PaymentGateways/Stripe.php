@@ -26,7 +26,6 @@ class Stripe
 
 
     public function make($data){
-         info($data);
         \Stripe\Stripe::setApiKey($data['stripe_test_secret_key']);
         $checkout_session = \Stripe\Checkout\Session::create(
             [
