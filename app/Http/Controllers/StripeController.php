@@ -138,8 +138,6 @@ class StripeController extends Controller
             return response('Missing session ID', 400);
         }
 
-        info($sessionId);
-        info(Session::retrieve($sessionId));
         try {
             Session::retrieve($sessionId);
 
