@@ -332,10 +332,10 @@ class WareTabController extends MainController
         if (request('type') == 18) $form->color('color', trans('color'));
         if (request('type') == 5) {
             $form->html('<h1>' . __('padding') . '</h1>');
-            $form->number('top', __('top'));
-            $form->number('left', __('left'));
-            $form->number('right', __('right'));
-            $form->number('bottom', __('bottom'));
+            $form->decimal('top', __('top'))->default(0);
+            $form->decimal('left', __('left'))->default(0);
+            $form->decimal('right', __('right'))->default(0);
+            $form->decimal('bottom', __('bottom'))->default(0);
         }
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
