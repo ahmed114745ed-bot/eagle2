@@ -1962,6 +1962,17 @@ use App\Models\Vip;
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
+                                                            <label for="paypal_webhook_id">{{ __('admin.webhook_id') }}:</label>
+                                                            <div class="copy-container">
+                                                                <input type="text" id="paypal_webhook_id" name="paypal_webhook_id"
+                                                                       placeholder="paypal_webhook_id"
+                                                                       value="{{ $settings['paypal_webhook_id'] ?? '' }}"
+                                                                       class="form-control">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
                                                             <label for="paypal_webhook_url">{{ __('admin.webhook_url') }}:</label>
                                                             <div class="copy-container">
                                                                 <input type="text" id="paypal_webhook_url" name="paypal_webhook_url"

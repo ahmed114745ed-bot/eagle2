@@ -112,7 +112,10 @@ class Pack extends Model
         case 20: return trans('hide last active');
         case 21: return trans('sound effect');
         case 22: return trans('upload GIF image');
+        case 25: return trans('special uuid');
+        case 28: return trans('profile frame');
         default: return '-';
+ 
     }
     }
 }

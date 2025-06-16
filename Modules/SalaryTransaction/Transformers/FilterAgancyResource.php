@@ -54,6 +54,7 @@ class FilterAgancyResource extends JsonResource
             ],
             'admins' => AdminsAgencyResource::collection($this->admins),
             'star' => ReceiverGiftLogResource::collection($giftLog),
+            'bio'               => $this->contents,
         ];
     }
 }

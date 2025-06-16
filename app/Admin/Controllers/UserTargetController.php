@@ -73,7 +73,18 @@ class UserTargetController extends MainController
     {
 
         $grid = new Grid(new UserSallary);
+        
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
 
+            $filter->disableIdFilter();
+
+            $filter->where(function ($query) {
+                $query->whereHas('user', function ($subQuery) {
+                    $subQuery->where('uuid', 'like', "%{$this->input}%");
+                });
+            }, __('UUID'));
+        });
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name =@$this->user->name ?? '';
             $uid = @$this->user->uuid;

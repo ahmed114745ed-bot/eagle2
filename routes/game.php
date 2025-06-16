@@ -4,8 +4,8 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'userBan', 'ip', 'general
     ->group(function () {
 
         Route::prefix('game')->group(function () {
-            Route::get('getUserInfo', [\App\Http\Controllers\Api\V1\JoyPlayController::class, 'getUserInfo']);
-            Route::post('submitFlow', [\App\Http\Controllers\Api\V1\JoyPlayController::class, 'submitFlow']);
+            // Route::get('getUserInfo', [\App\Http\Controllers\Api\V1\JoyPlayController::class, 'getUserInfo']);
+            // Route::post('submitFlow', [\App\Http\Controllers\Api\V1\JoyPlayController::class, 'submitFlow']);
         });
     });
 

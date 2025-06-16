@@ -3,6 +3,7 @@
 namespace Modules\Events\Console;
 
 use Carbon\Carbon;
+use App\Helpers\Common;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\Reward;
@@ -17,39 +18,43 @@ class WeeklyStarUpdate extends Command
     public function handle()
     {
         $weeklyEvent = WeeklyStar::weeklyStar()
-                                 ->endToday()
-                                 ->with('gifts')
-                                 ->first();
-
+            // ->endToday()
+            ->with('gifts')
+            ->latest()
+            ->first();
         if (!$weeklyEvent) {
             return '';
         }
+        $timezone = Common::timeZone();
+        if (Carbon::parse($weeklyEvent->end_date, $timezone)->endOfDay() == now($timezone) || $weeklyEvent->end_date == Carbon::yesterday($timezone)->toDateString()) {
 
-        $lastEndDate  = WeeklyStar::weeklyStar()->max('end_date');
-        $newStartDate = Carbon::parse($lastEndDate)->toDateString();
-        $newEndDate   = Carbon::parse($lastEndDate)->addWeek()->toDateString();
 
-        $newWeeklyStar = new WeeklyStar([
-                                            'admin_id'   => $weeklyEvent->admin_id,
-                                            'start_date' => $newStartDate,
-                                            'end_date'   => $newEndDate,
-                                            'editor_id'  => $weeklyEvent->editor_id,
-                                            'type'       => $weeklyEvent->type,
-                                        ]);
-        $newWeeklyStar->save();
+            $lastEndDate  = WeeklyStar::weeklyStar()->max('end_date');
+            $newStartDate = Carbon::parse($lastEndDate)->toDateString();
+            $newEndDate   = Carbon::parse($lastEndDate)->addWeek()->toDateString();
 
-        $gifts = $weeklyEvent->gifts->map(function ($gift) use ($newWeeklyStar) {
-            return [
-                'weekly_star_id' => $newWeeklyStar->id,
-                'gift_id'        => $gift->id,
-            ];
-        })->toArray();
+            $newWeeklyStar =  WeeklyStar::create([
+                'admin_id'   => $weeklyEvent->admin_id,
+                'start_date' => $newStartDate,
+                'end_date'   => $newEndDate,
+                'editor_id'  => $weeklyEvent->editor_id,
+                'type'       => $weeklyEvent->type,
+            ]);
 
-        if (!empty($gifts)) {
-            DB::table('weekly_star_gifts')->insert($gifts);
+
+            $gifts = $weeklyEvent->gifts->map(function ($gift) use ($newWeeklyStar) {
+                return [
+                    'weekly_star_id' => $newWeeklyStar->id,
+                    'gift_id'        => $gift->id,
+                ];
+            })->toArray();
+
+            if (!empty($gifts)) {
+                DB::table('weekly_star_gifts')->insert($gifts);
+            }
+            $this->repeatRewards($weeklyEvent, $newWeeklyStar->id);
+            $this->info(now()->toDateTimeString() . ' ' . $this->signature . ' Run successful...');
         }
-        $this->repeatRewards($weeklyEvent, $newWeeklyStar->id);
-
     }
 
     public function repeatRewards(WeeklyStar $weeklyStar, int $weeklyStarNewId)
@@ -78,8 +83,6 @@ class WeeklyStarUpdate extends Command
         }
 
         Reward::query()->insert($previousRewards);
-
-        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
-
+        $this->info($this->signature . ' Run successfully');
     }
 }

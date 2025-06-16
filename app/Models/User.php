@@ -1352,7 +1352,7 @@ class User extends Authenticatable
                 $userType = __("User");
                 break;
             case 1:
-                $userType = __("Host");
+                $userType = __("host");
                 break;
             case 2:
                 $userType = __("Host Agent");
@@ -1485,5 +1485,16 @@ class User extends Authenticatable
             })
             ->latestOfMany();
     }
-  
+
+
+    public function type16Packs()
+    {
+        return $this->hasMany(Pack::class, 'user_id')
+                    ->where('type', 16)
+                    ->where('is_used', 1)
+                    ->where(function ($q) {
+                        $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                    });
+    }
 }

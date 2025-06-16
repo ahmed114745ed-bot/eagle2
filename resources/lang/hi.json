@@ -2601,9 +2601,14 @@
   "hide user country": "उपयोगकर्ता का देश छुपाएं",
   "user ender room anonymous": "उपयोगकर्ता गुमनाम रूप से कक्ष में प्रवेश करे",
   "user can send vip gift": "उपयोगकर्ता VIP उपहार भेज सकता है",
-  "hide visitors to client pages": "क्लाइंट पृष्ठों पर आगंतुकों को छुपाएं",
-  "hide room": "कक्ष छुपाएं",
-  "user can not kick out from room": "उपयोगकर्ता को कक्ष से बाहर नहीं निकाला जा सकता",
+ "hide visitors to client pages": "क्लाइंट पृष्ठों पर आगंतुकों को छुपाएं",
+"hide room": "कक्ष छुपाएं",
+ "user can not kick out from room": "उपयोगकर्ता को कक्ष से बाहर नहीं निकाला जा सकता",
+"Receiver Level": "प्राप्तकर्ता स्तर",
+"cancel": "रद्द करें",
+"Level switch users":"प्रयुक्त स्तर ",
+
+"Delete gift a medal": "मेडल उपहार हटाएं",
 "This target has already been achieved by some users and cannot be updated.": "इस लक्ष्य को कुछ उपयोगकर्ताओं द्वारा पहले ही प्राप्त किया जा चुका है और इसे अपडेट नहीं किया जा सकता।"
 ,    "target_change_warning": "टारगेट मूल्य बढ़ाने पर होस्ट को मिलने वाली डॉलर राशि बढ़ेगी, जबकि इसे घटाने पर डॉलर राशि कम हो जाएगी।"
 

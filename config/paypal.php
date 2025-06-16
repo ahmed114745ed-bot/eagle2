@@ -6,4 +6,5 @@ return [
     'client_id'     => env('PAYPAL_CLIENT_ID'),
     'client_secret' => env('PAYPAL_CLIENT_SECRET'),
     'currency'      => env('PAYPAL_CURRENCY', 'GBP'),
+    'webhook_id'      => env('PAYPAL_WEBHOOK_ID', '123'),
     ];

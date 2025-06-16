@@ -5,7 +5,6 @@ namespace App\Admin\Controllers;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
-use App\Models\Ware;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -13,6 +12,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\UserVip;
+use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use Encore\Admin\Widgets\Box;
@@ -24,6 +24,7 @@ use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
+use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use App\Admin\Selectable\ImageColors;
@@ -39,9 +40,7 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
-use App\Models\UserSallary;
-use Modules\SwitchAccount\Entities\UserAccount;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Illuminate\Support\Facades\Auth;
 
 
 class UserController extends MainController
@@ -811,7 +810,8 @@ class UserController extends MainController
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
         $user = User::with('profile')->find($id);
-        $packs = Pack::where('user_id', $id)->where('is_used', 1)->with(['ware' => function ($q) {
+        $type = request('type') ?? 4;
+        $packs = Pack::where('user_id', $id)->where('is_used', 1)->where('type', $type)->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
@@ -822,8 +822,12 @@ class UserController extends MainController
             })->when(isset($month), function ($query) use ($month) {
                 $query->where('month', $month);
             })->orderByDesc('id')->paginate(10, ['*'], 'salary_page');
-        $data = compact('user', 'packs', 'userVips', 'salaries');
 
+        $typeMap = PACK_USER;
+
+        $types =  collect($typeMap);
+        $currentType = request()->get('type', $types->keys()->first());
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
@@ -889,7 +893,8 @@ class UserController extends MainController
 
         $form->image('profile.image_id', __('image Id'));
 
-        Admin::script(<<<'JS'
+        Admin::script(
+            <<<'JS'
                 $(function() {
                     // For every file/image input (fileinput plugin)
                     $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
@@ -931,6 +936,17 @@ class UserController extends MainController
         JS
             );
         }
+        //        $form->multipleImage('images', 'Images');
+        //
+        //        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
+        //            Admin::script(
+        //                <<<JS
+        //        $(document).ready(function() {
+        //            $('input[name="images[]"]').closest('.form-group').find('.fileinput-remove').hide();
+        //        });
+        //        JS
+        //            );
+        //        }
 
         $state = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
@@ -1002,7 +1018,6 @@ class UserController extends MainController
 
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
-            //  dd($form->model()->profile->avatar);
             $model     = $form->model();
             $user_id   = $model->id;
             // $user = User::find($user_id);
@@ -1123,8 +1138,6 @@ class UserController extends MainController
     public function deleteUserVip($id)
     {
         $userVip = UserVip::find($id);
-        // dd($userVip,$id );
-        // $wares = Ware::query()->where('get_type', 1)->where('level', $userVip->level)->pluck('id')->toArray();
         $userVip->packs()->delete();
         $user = User::query()->find($userVip->user_id);
         if ($user) {
@@ -1137,6 +1150,27 @@ class UserController extends MainController
             }
         }
         $userVip->delete();
+        return Redirect::back();
+    }
+
+
+    public function editLevelUser(Request $request)
+    {
+        $user = User::find($request->id);
+
+        ChangeLevelHistory::create([
+            'user_id' => $user->id,
+            'admin_id' => Auth::id(),
+            'old_total_sender_level' => $user->total_sender_level,
+            'new_total_sender_level' => $request->total_sender_level,
+            'old_total_received_level' => $user->total_received_level,
+            'new_total_received_level' => $request->total_received_level,
+
+        ]);
+
+        $user->total_sender_level = $request->total_sender_level;
+        $user->total_received_level = $request->total_received_level;
+        $user->save();
         return Redirect::back();
     }
 }
