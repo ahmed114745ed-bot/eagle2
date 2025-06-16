@@ -39,7 +39,7 @@ Route::get('applications/{id}', [SettingsController::class, 'downloadApp']);
 Route::get('/now-payment', [NowPaymentsController::class, 'rechargeForm']);
 Route::post('/create-payment', [NowPaymentsController::class, 'createPayment'])->name('now_payment_create');
 // Route::get('get-avaialble-currencies', [NowPaymentsController::class, 'getCurrencies']);
-Route::get('payment-status/{payment}',[NowPaymentsController::class, 'paymentStatus']);
+Route::get('payment-status/{payment}', [NowPaymentsController::class, 'paymentStatus']);
 Route::get('/payment-success', function () {
     return 'Payment was successful!';
 })->name('payment.success');
@@ -47,7 +47,7 @@ Route::get('/payment-success', function () {
 Route::get('/payment-cancel', function () {
     return 'Payment was cancelled.';
 })->name('payment.cancel');
-Route::get('update-need',function(){
+Route::get('update-need', function () {
 
     $two = VipPrivilege::find(2);
     $two->en_name = 'Special frame';
@@ -191,15 +191,9 @@ Route::get('delete-account', function () {
     return view('deleteAccount', compact("data"));
 });
 
-
-
-
 Route::get('/', function () {
     return response()->json();
 });
-
-
-
 
 Route::group(
     [
@@ -214,9 +208,7 @@ Route::group(
         ],
         'as' => config('admin.route.prefix') . '.',
     ],
-    function (Router $router) {
-
-
+    function () {
         Route::get('create-payment-gateways', [MangerSettingController::class, 'createPaymentGateway'])->name('create-payment-gateway');
         Route::post('store-payment-gateways', [MangerSettingController::class, 'storePaymentGateway'])->name('store-payment-gateway');
         Route::put('update-payment-gateways/{id}', [MangerSettingController::class, 'UpdatePaymentGateway'])->name('update-payment-gateway');
@@ -244,42 +236,33 @@ Route::group(
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
-
-
     }
 );
 
-Route::group(
-    [
-        'prefix' => '',
-        'namespace' => '',
-        'middleware' => [
-            'web',
-            'admin',
-            'adminIp',
-            //            'adminGeneralBan',
-            'multiLanguage',
-        ],
-        'as' => '',
+Route::group([
+    'prefix' => '',
+    'namespace' => '',
+    'middleware' => [
+        'web',
+        'admin',
+        'adminIp',
+        //            'adminGeneralBan',
+        'multiLanguage',
     ],
-    function (Router $router) {
-        $router->get('admin/auth', function () {
-            return view('checkLogin');
-        })->name('admin/auth');
-        $router->post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+    'as' => '',
+], function () {
+    Route::get('admin/auth', function () {
+        return view('checkLogin');
+    })->name('admin/auth');
+    Route::post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+});
 
-
-    }
-
-
-);
-Route::get('/update-rooms', function(){
-    RoomVisitor::whereDate('created_at','<',date("Y-m-d"))->delete();
+Route::get('/update-rooms', function () {
+    RoomVisitor::whereDate('created_at', '<', date("Y-m-d"))->delete();
     return "done";
 });
 
-
-Route::get('/update-rooms-microphone', function(){
+Route::get('/update-rooms-microphone', function () {
 
     Room::withoutVisitorsAndActiveMic()->update([
         'microphone' => '0,0,0,0,0,0,0,0,0,0'
@@ -296,11 +279,11 @@ Route::get('/clear-admin-error', function () {
     return 'Session cleared!';
 });
 
-Route::get('/delete_reward_target', function(){
+Route::get('/delete_reward_target', function () {
     \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
 });
 
-Route::get('/test-fcm/{userid}', function($userId) {
+Route::get('/test-fcm/{userid}', function ($userId) {
     $testToken = 'fTFfWXoaQUqjCqFRqMqqGG:APA91bGw6rmXbrGm8XwPwwZ6sJOlcxeXrGNffGbpfXWBzIBK463WyoDFArkJJnYDRzvjDOP23Q2xqh6_c95vsdk08ww7v_R4GJeTOSxSDuWGTXVOLxpxzxE';
 
     $language = 'ar'; // أو 'en'
@@ -342,12 +325,6 @@ Route::get('/test-fcm/{userid}', function($userId) {
     ]);
 });
 
-
-
-use App\Http\Resources\MyStoreResource;
-
-
-
 Route::get('/generate-token/{id}', function ($id) {
     $user = User::find($id);
 
@@ -362,4 +339,3 @@ Route::get('/generate-token/{id}', function ($id) {
         'user' => $user
     ]);
 });
-

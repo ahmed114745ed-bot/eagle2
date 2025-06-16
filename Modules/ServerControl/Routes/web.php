@@ -12,6 +12,7 @@
 */
 
 use Modules\ServerControl\Http\Controllers\web\ConfigAppController;
+use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
@@ -19,7 +20,7 @@ Route::group(
         'namespace'  => 'web',
         'middleware' => [
             'web',
-           'admin',
+            'admin',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
@@ -27,7 +28,7 @@ Route::group(
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('config-apps', ConfigAppController::class);
-
-});
+    function () {
+        Route::resource('config-apps', ConfigAppController::class);
+    }
+);

@@ -3,9 +3,7 @@
 
 use App\Classes\Facades\Agency;
 use Encore\Admin\Facades\Admin;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
-
 
 agency::routes();
 
@@ -20,54 +18,54 @@ Route::group(
         ],
         'as'            => config('agency.route.prefix') . '.',
     ],
-    function (Router $router) {
-        $router->resource ('auth/users','AdminUserController');
-        $router->resource ('auth/roles','RoleController');
+    function () {
+        Route::resource ('auth/users','AdminUserController');
+        Route::resource ('auth/roles','RoleController');
         //resources
-        $router->resource('users', 'UserController',[
+        Route::resource('users', 'UserController',[
             'names'=>[
                 'index'=>'users',
                 'show'=>'users.show'
             ]
         ]);
-        $router->resource('profiles', 'ProfileController');
-        $router->resource('vips', 'VipController');
-        $router->resource('rooms', 'RoomController',[
+        Route::resource('profiles', 'ProfileController');
+        Route::resource('vips', 'VipController');
+        Route::resource('rooms', 'RoomController',[
             'names'=>[
                 'index'=>'rooms'
             ]
         ]);
-        $router->resource('blacks', 'BlackListController');
-        $router->resource('codes', 'CodeController');
-        $router->resource ('gifts','GiftController',[
+        Route::resource('blacks', 'BlackListController');
+        Route::resource('codes', 'CodeController');
+        Route::resource ('gifts','GiftController',[
             'names'=>[
                 'index'=>'gifts'
             ]
         ]);
-        $router->resource ('wares','WareController',[
+        Route::resource ('wares','WareController',[
             'names'=>[
                 'index'=>'wares'
             ]
         ]);
-        $router->resource ('coupons','CouponController');
-        $router->resource ('configs','ConfigController');
-        $router->resource ('categories','RoomCategoryController');
-        $router->resource ('countries','CountryController');
-        $router->resource ('backgrounds','BackgroundController');
-        $router->resource ('official_msgs','OfficialMessageController');
-        $router->resource ('emojis','EmojiController');
-        $router->resource ('home_carousels','HomeCarouselController');
-        $router->resource ('vip_prev','VipAuthController');
-        $router->resource ('agencies','AgencyController');
-        $router->resource ('families','FamilyController');
-        $router->resource ('targets','TargetController');
-        $router->resource ('charges','ChargeController',[
+        Route::resource ('coupons','CouponController');
+        Route::resource ('configs','ConfigController');
+        Route::resource ('categories','RoomCategoryController');
+        Route::resource ('countries','CountryController');
+        Route::resource ('backgrounds','BackgroundController');
+        Route::resource ('official_msgs','OfficialMessageController');
+        Route::resource ('emojis','EmojiController');
+        Route::resource ('home_carousels','HomeCarouselController');
+        Route::resource ('vip_prev','VipAuthController');
+        Route::resource ('agencies','AgencyController');
+        Route::resource ('families','FamilyController');
+        Route::resource ('targets','TargetController');
+        Route::resource ('charges','ChargeController',[
             'names'=>[
                 'store'=>'charges.new'
             ]
         ]);
-        $router->resource ('charge_values','ChargeValueController');
-        $router->resource ('userTarget','UserTargetController',[
+        Route::resource ('charge_values','ChargeValueController');
+        Route::resource ('userTarget','UserTargetController',[
             'names'=>[
                 'index'=>'user_targets'
             ]
@@ -75,38 +73,25 @@ Route::group(
 
 
         //--------------------
-        $router->get('/', 'HomeController@infoBox')->name('home');
-        $router->get('/dev', 'HomeController@devindex')->name('dev-home');
-        $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
+        Route::get('/', 'HomeController@infoBox')->name('home');
+        Route::get('/dev', 'HomeController@devindex')->name('dev-home');
+        Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
 
-        $router->resource ('agency_join_requests','AgencyJoinRequestController');
-        $router->resource ('family_levels','FamilyLevelController');
-        $router->resource ('silver','SilverController');
-        $router->resource ('coins','CoinController');
-        $router->resource ('ovip','OVipController');
-        $router->resource ('vip_privilege','VipPrivilegeController');
-        $router->resource ('tickets','TicketController');
-        $router->resource ('pages','PageController');
-        $router->resource ('exchanges','ExchangeController');
-        $router->resource ('boxes','BoxController');
-        $router->resource ('thrown_boxes','BoxUseController');
-        $router->resource ('reports','ReportController');
-        $router->post ('cashing','ReportController@cashing')->name ('cashing');
-        $router->resource ('trxs','CoinLogController');
+        Route::resource ('agency_join_requests','AgencyJoinRequestController');
+        Route::resource ('family_levels','FamilyLevelController');
+        Route::resource ('silver','SilverController');
+        Route::resource ('coins','CoinController');
+        Route::resource ('ovip','OVipController');
+        Route::resource ('vip_privilege','VipPrivilegeController');
+        Route::resource ('tickets','TicketController');
+        Route::resource ('pages','PageController');
+        Route::resource ('exchanges','ExchangeController');
+        Route::resource ('boxes','BoxController');
+        Route::resource ('thrown_boxes','BoxUseController');
+        Route::resource ('reports','ReportController');
+        Route::post ('cashing','ReportController@cashing')->name ('cashing');
+        Route::resource ('trxs','CoinLogController');
     }
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 */

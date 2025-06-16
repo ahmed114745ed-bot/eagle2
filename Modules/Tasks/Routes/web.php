@@ -10,7 +10,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-use Illuminate\Routing\Router;
+
+use Illuminate\Support\Facades\Route;
 use Modules\Tasks\Http\Controllers\DayController;
 //use Modules\Tasks\Http\Controllers\DayController;
 use Modules\Tasks\Http\Controllers\DailyTaskController;
@@ -35,8 +36,8 @@ Route::group(
         ],
         'as' => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('days', DayController::class);
+    function () {
+        Route::resource('days', DayController::class);
         Route::prefix('{day_id}/day-tasks')->group(function () {
             Route::get('/', [DailyTaskController::class, 'index'])->name('day-tasks.index');
             Route::get('/create', [DailyTaskController::class, 'create'])->name('day-tasks.create');
@@ -56,5 +57,5 @@ Route::group(
             Route::put('/{id}', [TaskRewardController::class, 'update'])->name('day-rewards.update');
             Route::delete('/{id}', [TaskRewardController::class, 'destroy'])->name('day-rewards.destroy');
         });
-
-    });
+    }
+);

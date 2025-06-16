@@ -3,6 +3,7 @@
 use Modules\SpecialId\Http\Controllers\web\SpecialWareController;
 use Modules\SpecialId\Http\Controllers\web\SpecialHistoryController;
 use Modules\SwitchAccount\Http\Controllers\web\UsersDevicesHistoriesController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,13 +22,14 @@ Route::group(
         'namespace'  => 'web',
         'middleware' => [
             'web',
-           'admin',
+            'admin',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('user-devices-histories', UsersDevicesHistoriesController::class);
-    });
+    function () {
+        Route::resource('user-devices-histories', UsersDevicesHistoriesController::class);
+    }
+);
