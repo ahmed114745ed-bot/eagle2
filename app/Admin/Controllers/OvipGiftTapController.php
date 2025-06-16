@@ -469,13 +469,12 @@ class OvipGiftTapController extends MainController
         // Inject JS to set type param on first load
         if (!request()->has('type') && $privilegeTypes->isNotEmpty()) {
             $firstType = $privilegeTypes->keys()->first();
+
             \Encore\Admin\Admin::script(<<<SCRIPT
-            document.addEventListener("DOMContentLoaded", function () {
                 const url = new URL(window.location.href);
                 url.searchParams.set('type', '$firstType');
                 window.location.href = url.toString(); // Force reload with type
-            });
-        SCRIPT);
+            SCRIPT);
         }
 
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
