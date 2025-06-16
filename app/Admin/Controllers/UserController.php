@@ -27,7 +27,6 @@ use Encore\Admin\Auth\Permission;
 use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use App\Admin\Selectable\ImageColors;
 use Illuminate\Support\Facades\Cache;
 use App\Admin\Actions\DeletePackAction;
