@@ -2,7 +2,10 @@
     "name": "laravel/laravel",
     "type": "project",
     "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
     "license": "MIT",
     "require": {
         "php": "^8.1",
@@ -91,7 +94,8 @@
         "helper": [
             "@php artisan clear-compiled",
             "@php artisan ide-helper:generate",
-            "@php artisan ide-helper:model --dir=\"App/Models\" --dir=\"Modules/*/Entities\""        ]
+            "@php artisan ide-helper:model --dir=\"App/Models\" --dir=\"Modules/*/Entities\""
+        ]
     },
     "extra": {
         "laravel": {
