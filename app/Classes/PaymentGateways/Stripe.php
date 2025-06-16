@@ -46,8 +46,8 @@ class Stripe
                     'order_id' => $data['order_id'] ?? '',
                     'user_id' => $data['user_id'] ?? '',
                 ],
-                'success_url' => url('/payment/success') . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => url('/payment/cancel'),
+                'success_url' => url('/api/payment/success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => url('/api/payment/cancel'),
             ]
         );
 
