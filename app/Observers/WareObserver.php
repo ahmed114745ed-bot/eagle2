@@ -9,56 +9,47 @@ class WareObserver
 {
     /**
      * Handle the Ware "created" event.
-     *
-     * @param  \App\Models\Ware  $ware
-     * @return void
      */
-    public function created(Ware $ware)
+    public function created(Ware $ware): void
     {
-       
-        
-        if ($ware->enable){
-            if ($ware->type == 6 ){
+        if ($ware->enable) {
+            if ($ware->type == 6) {
                 settings()->set('intro_updated_at', time());
-            }elseif ($ware->type == 4){
+            } elseif ($ware->type == 4) {
                 settings()->set('frame_updated_at', time());
-            }elseif ($ware->type == 1){
+            } elseif ($ware->type == 1) {
                 settings()->set('extra_updated_at', time());
-            }elseif ($ware->type == 5){
+            } elseif ($ware->type == 5) {
                 settings()->set('bubble_frame_updated_at', time());
             }
         }
-
     }
 
     /**
      * Handle the Ware "updated" event.
-     *
-     * @param  \App\Models\Ware  $ware
-     * @return void
      */
-    public function updated(Ware $ware)
+    public function updated(Ware $ware): void
     {
         $isEnableOld = $ware->getOriginal('enable');
         $svgOld = $ware->getOriginal('img2');
 
-        if ((!$isEnableOld && $ware->enable) ||($isEnableOld && !$ware->enable) || $svgOld != $ware->img2){
-            if ($ware->type == 6 ){
+        if ((!$isEnableOld && $ware->enable) || ($isEnableOld && !$ware->enable) || $svgOld != $ware->img2) {
+            if ($ware->type == 6) {
                 settings()->set('intro_updated_at', time());
-            }elseif ($ware->type == 4){
+            } elseif ($ware->type == 4) {
                 settings()->set('frame_updated_at', time());
-            }elseif ($ware->type == 1){
+            } elseif ($ware->type == 1) {
                 settings()->set('extra_updated_at', time());
-            }elseif ($ware->type == 28){
+            } elseif ($ware->type == 28) {
                 settings()->set('profile_frame_updated', time());
-            }elseif ($ware->type == 5){
+            } elseif ($ware->type == 5) {
                 settings()->set('bubble_frame_updated_at', time());
             }
         }
 
 
         $originalSpecialValue = $ware->getOriginal('value');
-        if($ware->type == 25 && $originalSpecialValue != $ware->value ){
+        if ($ware->type == 25 && $originalSpecialValue != $ware->value) {
             User::where('special_id', $originalSpecialValue)
                 ->update(['special_id' => $ware->value]);
         }
@@ -66,45 +57,19 @@ class WareObserver
 
     /**
      * Handle the Ware "deleted" event.
-     *
-     * @param  \App\Models\Ware  $ware
-     * @return void
      */
-    public function deleted(Ware $ware)
+    public function deleted(Ware $ware): void
     {
-        if ($ware->enable){
-            if ($ware->type == 6 ){
+        if ($ware->enable) {
+            if ($ware->type == 6) {
                 settings()->set('intro_updated_at', time());
-            }elseif ($ware->type == 4){
+            } elseif ($ware->type == 4) {
                 settings()->set('frame_updated_at', time());
-            }elseif ($ware->type == 1){
+            } elseif ($ware->type == 1) {
                 settings()->set('extra_updated_at', time());
-            }elseif ($ware->type == 5){
+            } elseif ($ware->type == 5) {
                 settings()->set('bubble_frame_updated_at', time());
             }
-
         }
-    }
-
-    /**
-     * Handle the Ware "restored" event.
-     *
-     * @param  \App\Models\Ware  $ware
-     * @return void
-     */
-    public function restored(Ware $ware)
-    {
-        //
-    }
-
-    /**
-     * Handle the Ware "force deleted" event.
-     *
-     * @param  \App\Models\Ware  $ware
-     * @return void
-     */
-    public function forceDeleted(Ware $ware)
-    {
-        //
     }
 }

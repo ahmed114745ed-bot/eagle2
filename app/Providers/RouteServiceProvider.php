@@ -21,44 +21,33 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/home';
 
     /**
-     * The controller namespace for the application.
-     *
-     * When present, controller route declarations will automatically be prefixed with this namespace.
-     *
-     * @var string|null
-     */
-    // protected $namespace = 'App\\Http\\Controllers';
-
-    /**
      * Define your route model bindings, pattern filters, etc.
      *
      * @return void
      */
     public function boot()
     {
-
         $this->configureRateLimiting();
 
         $this->routes(function () {
             Route::prefix('api')
-            ->middleware(['api', 'localization'/*, 'throttle:500,1'*/])
+                ->middleware(['api', 'localization'])
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
 
             Route::prefix('api/utd')
-            ->middleware(['api', 'localization',])
+                ->middleware(['api', 'localization',])
                 ->namespace($this->namespace)
                 ->group(base_path('routes/utd.php'));
 
-            if (AppFeatureService::isEnable('login')){
+            if (AppFeatureService::isEnable('login')) {
                 Route::prefix('api')
                     ->middleware('api')
-                    ->middleware ('localization')
-                    //                ->middleware ('throttle:500,1')
+                    ->middleware('localization')
                     ->namespace($this->namespace)
                     ->group(base_path('routes/game.php'));
 
-                 Route::middleware([ 'throttle'])
+                Route::middleware(['throttle'])
                     ->prefix('preview')
                     ->name('.preview.')
                     ->namespace($this->namespace)
@@ -67,15 +56,7 @@ class RouteServiceProvider extends ServiceProvider
                 Route::middleware(['web', 'throttle:40,1'])
                     ->namespace($this->namespace)
                     ->group(base_path('routes/web.php'));
-
-
-                /*Route::middleware(['web', 'throttle'])
-                    ->namespace($this->namespace)
-                    ->group(base_path('app/Agency/routes.php'));*/
-
-
             }
-
         });
     }
 
