@@ -289,10 +289,10 @@ class OvipGiftTapController extends MainController
             $form->text('key', trans('key'));
             if (request('type') == 5 || ($form->isEditing() && $ware && ($ware->type == 5))) {
                 $form->html('<h1>' . __('padding') . '</h1>');
-                $form->number('top', __('top'));
-                $form->number('left', __('left'));
-                $form->number('right', __('right'));
-                $form->number('bottom', __('bottom'));
+                $form->decimal('top', __('top'))->default(0);
+                $form->decimal('left', __('left'))->default(0);
+                $form->decimal('right', __('right'))->default(0);
+                $form->decimal('bottom', __('bottom'))->default(0);
             }
         }
 
