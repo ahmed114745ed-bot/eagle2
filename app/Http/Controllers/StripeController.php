@@ -130,7 +130,7 @@ class StripeController extends Controller
 
     public function success(Request $request)
     {
-        Stripe::setApiKey(config('services.stripe.secret'));
+        Stripe::setApiKey(config('stripe.test_secret_key'));
 
         $sessionId = $request->get('session_id');
 
