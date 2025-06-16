@@ -26,15 +26,18 @@ class AdminUser extends Administrator
     }
 
 
-    public function managerAgenciesAll(): HasManyThrough
+    public function managerAgenciesWithoutScope(): HasManyThrough
     {
-        return $this->hasManyThrough(
-            Agency::withoutGlobalScopes()->getModel(),
-            User::class,
-            'id',
-            'agency_manger_id',
-            'app_id',
-            'id'
+        $related = (new Agency)->newQueryWithoutScopes()->getModel();
+        $through = (new User)->newQuery()->getModel();
+    
+        return new HasManyThrough(
+            $related,     // موديل Agency بدون سكوبات
+            $through,     // موديل User
+            'app_id',     // المفتاح الأجنبي على جدول users الذي يشير إلى admin_users (AdminUser->app_id = users.id)
+            'agency_manger_id', // المفتاح الأجنبي على جدول agencies الذي يشير إلى users
+            'app_id',     // المفتاح المحلي في admin_users
+            'id'          // المفتاح المحلي في users
         );
     }
 }
