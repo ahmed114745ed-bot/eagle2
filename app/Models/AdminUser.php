@@ -20,14 +20,7 @@ class AdminUser extends Administrator
 
     public function managerAgencies(): HasManyThrough
     {
-        // return $this->hasManyThrough(Agency::class, User::class, 'id', 'agency_manger_id', 'app_id', 'id');
-        return $this->hasManyThrough(
-            Agency::class,
-            User::class,
-            'id',
-            'agency_manger_id',
-            'app_id',
-            'id'
-        )->where('agencies.type', 1);
+        return $this->hasManyThrough(Agency::class, User::class, 'id', 'agency_manger_id', 'app_id', 'id');
+       
     }
 }

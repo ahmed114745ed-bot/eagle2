@@ -13,7 +13,6 @@ class ManagerHelper
     {
         if ($agencies->isEmpty()) return 0;
         $totalSalary = $agencies->toQuery()
-        ->select('agencies.*')
         ->withSum('agencySalaries as total_salaries', 'sallary')->get()->sum('total_salaries');
         $config = Config::query()->where('name','agency_manager_percentage')->first();
         $percentage = intval($config->value ?? 100) / 100;
