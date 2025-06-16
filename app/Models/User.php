@@ -1149,8 +1149,8 @@ class User extends Authenticatable
                 ->sum(DB::raw('sallary - cut_amount'));
 
 
-            return floor($userSallary ?? 0);
-        } else {
+                return round($userSallary, 2) ?? 0;
+                    } else {
             return 0;
         }
     }

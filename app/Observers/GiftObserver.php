@@ -8,67 +8,34 @@ class GiftObserver
 {
     /**
      * Handle the Gift "created" event.
-     *
-     * @param  \App\Models\Gift  $gift
-     * @return void
      */
-    public function created(Gift $gift)
+    public function created(Gift $gift): void
     {
-        if ($gift->enable){
+        if ($gift->enable) {
             settings()->set('gifts_update_at', time());
-
         }
     }
 
     /**
      * Handle the Gift "updated" event.
-     *
-     * @param  \App\Models\Gift  $gift
-     * @return void
      */
-    public function updated(Gift $gift)
+    public function updated(Gift $gift): void
     {
         $isEnableOld = $gift->getOriginal('enable');
         $svgOld = $gift->getOriginal('show_img');
 
-        if ((!$isEnableOld && $gift->enable)|| ($isEnableOld && !$gift->enable) || $gift->show_img != $svgOld){
+        if ((!$isEnableOld && $gift->enable) || ($isEnableOld && !$gift->enable) || $gift->show_img != $svgOld) {
             settings()->set('gifts_update_at', time());
         }
     }
 
     /**
      * Handle the Gift "deleted" event.
-     *
-     * @param  \App\Models\Gift  $gift
-     * @return void
      */
-    public function deleted(Gift $gift)
+    public function deleted(Gift $gift): void
     {
-        if ($gift->enable){
+        if ($gift->enable) {
             settings()->set('gifts_update_at', time());
-
         }
-    }
-
-    /**
-     * Handle the Gift "restored" event.
-     *
-     * @param  \App\Models\Gift  $gift
-     * @return void
-     */
-    public function restored(Gift $gift)
-    {
-        //
-    }
-
-    /**
-     * Handle the Gift "force deleted" event.
-     *
-     * @param  \App\Models\Gift  $gift
-     * @return void
-     */
-    public function forceDeleted(Gift $gift)
-    {
-        //
     }
 }

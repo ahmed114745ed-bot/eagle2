@@ -1003,7 +1003,23 @@
   "wapel": "entry effect",
   "This target has already been achieved by some users and cannot be updated.": "This target has already been achieved by some users and cannot be updated."
 ,    "target_change_warning": "Increasing the target value will increase the dollar amount received by the hosts, while decreasing it will reduce their dollar value."
-,"host":"Host"
+,"host":"Host",
+"Host reports":"Host Reports",
+"Moments": "Moments",
+    "Reels": "Reels",
+    "Uploads:": "Uploads:",
+    "Likes:": "Likes:",
+    "Comments:": "Comments:",
+    "Moment Upload": "Moment Upload",
+    "Moment Likes": "Moment Likes",
+    "Moment Comments": "Moment Comments",
+    "Reel Upload": "Reel Upload",
+    "Reel Likes": "Reel Likes",
+    "Reel Comments": "Reel Comments",
+    "Withdraw": "Withdraw",
+    "prof_reports": "Proftes Reports"
+
+
 
 
 

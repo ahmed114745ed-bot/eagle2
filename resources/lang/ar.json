@@ -3177,7 +3177,23 @@
 "target_change_warning": "عند رفع قيمة التارجت، ستزداد قيمة الدولار التي يحصل عليها المضيفون، بينما عند خفض قيمة التارجت، ستنخفض قيمة الدولار لديهم",
 "cansel":"إلغاء",
 "Delete gift a medal":"حذف هدية ميدالية",
-"Level switch users":"  المستوى المستخدم"
+"Level switch users":"  المستوى المستخدم",
+"Host reports":"تقارير المضيف",
+"Moments": "اللحظات",
+"Reels": "المقاطع",
+"Uploads:": "الرفع:",
+"Likes:": "الإعجابات:",
+"Comments:": "التعليقات:",
+"Moment Upload": "رفع اللحظات",
+"Moment Likes": "إعجابات اللحظات",
+"Moment Comments": "تعليقات اللحظات",
+"Reel Upload": "رفع المقاطع",
+"Reel Likes": "إعجابات المقاطع",
+"Reel Comments": "تعليقات المقاطع",
+"Withdraw": "سحب",
+"prof_reports": "تقارير الارباح"
+
+
 
 
 }
