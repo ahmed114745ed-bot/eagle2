@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ChargeWinner extends Model
 {
+    use HasFactory, TimestampsWithTimezone;
+
     protected $guarded = ['id'];
-    use HasFactory;
 
-
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class, 'user_id');
     }
 }

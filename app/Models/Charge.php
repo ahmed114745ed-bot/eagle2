@@ -2,74 +2,43 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Models\Scopes\HostAgencyScope;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Scopes\HostAgencyScope;
+
 class Charge extends Model
 {
-    use HasFactory;
+    use HasFactory, TimestampsWithTimezone;
+
     protected $guarded = ['id'];
+
     protected $casts = [
         'created_at' => 'datetime',
     ];
-    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred','usd','user_charger_type','action_user_id'];
 
-    public function getCreatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
+    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred', 'usd', 'user_charger_type', 'action_user_id'];
 
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
     public function sender()
-    {  
-        if ($this->charger_type == 'agency') {
+    {
+        if ($this->charger_type === 'agency') {
             return $this->hasOne(ShippingAgency::class, 'id', 'charger_id');
         }
+
         return $this->hasOne(User::class, 'id', 'charger_id');
     }
-
-    
 
     public function getSenderAllAttribute()
     {
         if ($this->charger_type === 'agency') {
             return ShippingAgency::find($this->charger_id);
         }
-    
+
         return User::find($this->charger_id);
     }
 
@@ -83,12 +52,12 @@ class Charge extends Model
     }
 
     public function receiver()
-    { 
-        if ($this->user_type == 'agency') {
+    {
+        if ($this->user_type === 'agency') {
             return $this->belongsTo(ShippingAgency::class, 'agency_id', 'id');
         }
+
         return $this->belongsTo(User::class, 'user_id', 'id');
-    
     }
 
     // public function admin()
@@ -104,63 +73,37 @@ class Charge extends Model
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'agency_id')
-        ->withoutGlobalScope(HostAgencyScope::class); 
+            ->withoutGlobalScope(HostAgencyScope::class);
     }
+
     public function shippingAgency()
     {
-        return $this->belongsTo(ShippingAgency ::class, 'agency_id');
+        return $this->belongsTo(ShippingAgency::class, 'agency_id');
     }
-    protected static function booted()
-    {
-        static::saved(function ($model) {
-            if ($model->agency_id) {
-                clearAgencyCache($model->agency_id);
-            }
-        });
-
-        static::deleted(function ($model) {
-            if ($model->agency_id) {
-                clearAgencyCache($model->agency_id);
-            }
-        });
-    }
-
-
 
     public function receiverage()
     {
         return $this->belongsTo(Agency::class, 'agency_id')
-        ->withoutGlobalScope(HostAgencyScope::class);   
-    
+            ->withoutGlobalScope(HostAgencyScope::class);
     }
 
-
-    /**           
-     * 
-     * receiver ############################ 
-     * 
+    /**
+     * receiver ############################
      */
     public function receiverUser()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
- 
 
     public function receiveragency()
     {
         return $this->belongsTo(Agency::class, 'user_id')
-        ->withoutGlobalScope(HostAgencyScope::class);  
+            ->withoutGlobalScope(HostAgencyScope::class);
     }
 
- 
-
-
-    /**           
-     * 
-     * sender ############################ 
-     * 
+    /**
+     * sender ############################
      */
-
     public function senderUser()
     {
         return $this->belongsTo(User::class, 'charger_id');
@@ -168,12 +111,12 @@ class Charge extends Model
 
     public function senderAgency()
     {
-        return $this->belongsTo(Agency::class, 'charger_id');  
+        return $this->belongsTo(Agency::class, 'charger_id');
     }
 
     public function senderShippingAgency()
     {
-        return $this->belongsTo(ShippingAgency::class, 'charger_id');  
+        return $this->belongsTo(ShippingAgency::class, 'charger_id');
     }
 
     public function admin()
@@ -181,6 +124,18 @@ class Charge extends Model
         return $this->belongsTo(Admin::class, 'charger_id');
     }
 
+    protected static function booted()
+    {
+        self::saved(function ($model) {
+            if ($model->agency_id) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
 
-
+        self::deleted(function ($model) {
+            if ($model->agency_id) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+    }
 }

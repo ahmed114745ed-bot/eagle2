@@ -2,64 +2,23 @@
 
 namespace Modules\Achievement\Entities;
 
-use App\Models\Setting;
-use App\Models\User;
-use Cache;
-use Carbon\Carbon;
 use App\Models\Admin;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Builder;
-use Modules\Achievement\Entities\Achievement;
-use Modules\Achievement\Enums\AchievementType;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Achievement\Http\Services\AchievementLevelsService;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Achievement\Enums\AchievementType;
 
 class UserAchievementLevel extends Model
 {
-    use HasFactory;
+    use HasFactory, TimestampsWithTimezone;
 
-    protected $fillable = ["id","achievement_level_id","user_id","gift_achievement_id","unique_value","end_at","is_enable","achievement_id","custom_image","picked","file",'admin_id'];
+    protected $fillable = ['id', 'achievement_level_id', 'user_id', 'gift_achievement_id', 'unique_value', 'end_at', 'is_enable', 'achievement_id', 'custom_image', 'picked', 'file', 'admin_id'];
 
     protected $guarded = [];
 
-
-    public function getCreatedAtAttribute($value)
-    {
-           // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = Cache::rememberForever($cacheKey, function () {
-        $setting = Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-            // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = Cache::rememberForever($cacheKey, function () {
-        $setting = Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
     public function achievementLevel(): BelongsTo
     {
         return $this->belongsTo(AchievementLevel::class, 'achievement_level_id');
@@ -69,6 +28,7 @@ class UserAchievementLevel extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'admin_id');
@@ -95,13 +55,12 @@ class UserAchievementLevel extends Model
             'achievementLevel' => function ($query) {
                 $query->select(['id', 'valid_image', 'target']);
             },
-            'Achievement'
+            'Achievement',
         ]);
     }
 
-
     public function scopeUserPickProfile(Builder $builder): Builder
     {
-        return $builder->where("picked",1)->whereDoesntHave('achievement', fn($q) => $q->where('type' , AchievementType::ROOM_TARGET->getValue()));
+        return $builder->where('picked', 1)->whereDoesntHave('achievement', fn ($q) => $q->where('type', AchievementType::ROOM_TARGET->getValue()));
     }
 }

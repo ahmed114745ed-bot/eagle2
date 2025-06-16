@@ -2,69 +2,32 @@
 
 namespace Modules\Moment\Entities;
 
-use Carbon\Carbon;
 use App\Models\Gift;
-use App\Models\User;
 use App\Models\MomentGallery;
-use App\Models\Setting;
-use Cache;
-use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
 class Moment extends Model
 {
-    protected $fillable = ['user_id','description','img'];
+    use TimestampsWithTimezone;
+
+    protected $fillable = ['user_id', 'description', 'img'];
+
     protected $table = 'moment';
+
     protected $guarded = ['id'];
-
-
-
-    public function getCreatedAtAttribute($value)
-    {
-            // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = Cache::rememberForever($cacheKey, function () {
-        $setting = Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-            // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = Cache::rememberForever($cacheKey, function () {
-        $setting = Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
 
     public function comments()
     {
-        return $this->hasMany( MomentCommint::class, 'moment_id', 'id');
+        return $this->hasMany(MomentCommint::class, 'moment_id', 'id');
     }
 
     public function likes()
     {
-        return $this->hasMany( MomentLikes::class, 'moment_id', 'id');
+        return $this->hasMany(MomentLikes::class, 'moment_id', 'id');
     }
+
     public function gifts()
     {
         return $this->belongsToMany(Gift::class, 'moment_user_gifts');
@@ -75,11 +38,9 @@ class Moment extends Model
         return $this->hasMany(MomentGallery::class);
     }
 
-
-
     public function user()
     {
-        return $this->belongsTo(User::class,);
+        return $this->belongsTo(User::class);
     }
 
     // public function users()
@@ -89,11 +50,8 @@ class Moment extends Model
 
     public function scopeLikeExists($query, $userId)
     {
-        return $query->withExists(['likes' => function($query) use($userId){
+        return $query->withExists(['likes' => function ($query) use ($userId) {
             $query->where('user_id', $userId);
-        } ]);
+        }]);
     }
-
-
-
 }

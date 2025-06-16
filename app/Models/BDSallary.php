@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BDSallary extends Model
 {
-    use HasFactory;
+    use HasFactory, TimestampsWithTimezone;
+
     protected $table = 'bd_sallaries';
 
     protected $fillable = [
@@ -20,7 +22,7 @@ class BDSallary extends Model
         'is_paid',
         'total_agency_sallary',
         'total_users_sallary',
-        'total_diamond'
+        'total_diamond',
     ];
 
     public function agency()
