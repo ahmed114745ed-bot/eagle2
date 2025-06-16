@@ -191,7 +191,7 @@ class ReportController extends MainController
             }, __('Month'), 'month')->integer();
         });
 
-        $grid->column('name', __('name'))->display(function ($name) {
+        $grid->column('agency', __('dashboard.agency'))->display(function () {
             $defaultImage = asset('images/icon-agency.jpg');
             $url = getImagePath($this->img) ?? $defaultImage;
 
@@ -207,7 +207,7 @@ class ReportController extends MainController
                         <div style='display: flex; align-items: center; gap: 10px;'>
                             {$image}
                             <div style='display: flex; flex-direction: column;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$this->name}</span>
                                 <span style='font-size: smaller;'>ID: {$this->id}</span>
                             </div>
                         </div>
@@ -240,13 +240,13 @@ class ReportController extends MainController
                 $url = $defaultImage;
             }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
+
             return "<div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
+                    <img src='$url' style='height: 40px !important; width: 40px !important; object-fit: cover;' />
                     <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>$name</span>
                         </a>
                         <span style='font-size: smaller;'>UUID: $uid</span>
                     </div>
