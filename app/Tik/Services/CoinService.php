@@ -56,7 +56,9 @@ class CoinService
             $data = [
                 'name' => $coin->coin . '_coins',
                 'amount' => $coin->usd,
-                'trx' => $log->trx
+                'trx' => $log->trx,
+                'order_id' => $log->id,
+                'user_id' => $user->id
             ];
             if ($request->pay_method == 'strip') {
                 $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
