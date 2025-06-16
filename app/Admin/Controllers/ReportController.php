@@ -199,13 +199,11 @@ class ReportController extends MainController
                 $url = $defaultImage;
             }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
             return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                         <div style='display: flex; align-items: center; gap: 10px;'>
-                            {$image}
+                            <img src='$url' style='height: 40px !important; width: 40px !important; object-fit: cover;' />
                             <div style='display: flex; flex-direction: column;'>
                                 <span style='text-decoration: underline; cursor: pointer;'>{$this->name}</span>
                                 <span style='font-size: smaller;'>ID: {$this->id}</span>
@@ -242,8 +240,10 @@ class ReportController extends MainController
 
             $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
 
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
             return "<div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='$url' style='height: 40px !important; width: 40px !important; object-fit: cover;' />
+                    {$image}
                     <div>
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
