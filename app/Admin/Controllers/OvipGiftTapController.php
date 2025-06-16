@@ -248,64 +248,52 @@ class OvipGiftTapController extends MainController
         $form->hidden('is_active_for_vip')->value(1);
         $form->hidden('get_type')->value(1);
         $form->hidden('enable')->value(1);
-
-        $id   = request()->route('ware_gift');
+        $id = request()->route('ware_gift');
         $ware = Ware::find($id);
-
-        if ((request('type') && request('type') != 18 && request('type') != 21) ||
-            ($form->isEditing() && $ware && $ware->type != 18 && $ware->type != 21)) {
+        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
             $form->display('ID');
-            $form->text('name',     trans('name'));
-            $form->text('name_en',  trans('Name en'));
-            $form->text('title',    trans('title'));
+            $form->text('name', trans('name'));
+            $form->text('name_en', trans('Name en'));
+            $form->text('title', trans('title'));
             $form->text('title_en', trans('Title en'));
 
-            $form->image('show_img', trans('img'))
-                ->removable()
-                ->name(fn ($file) => now()->timestamp . rand(0, 999) . '.' . $file->guessExtension())
-                ->default('1.png');
 
+            $form->image('show_img', trans('img'))->name(function ($file) {
+                return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            })->default('1.png');
             $form->file('img2', trans('svg'))
-                ->removable()
-                ->name(fn ($file) => 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension());
+                ->name(function ($file) {
+                    return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+                });
 
             $form->keyValue('key_json', 'key_json');
 
-            $form->select('image_type1', __('image_type'))->options([
-                'svga'  => __('svga'),
-                'alpha' => __('alpha'),
-                'mp4'   => __('mp4'),
-                'vap'   => __('vap'),
-                'png'   => __('png'),
-            ])->attribute(['id' => 'image_type1']);
+            $form->select('image_type1', __('image_type'))->options(
+                [
+                    'svga' => __('svga'),
+                    'alpha' => __('alpha'),
+                    'mp4' => __('mp4'),
+                    'vap' => __('vap'),
+                    'png' => __('png'),
+
+                ]
+            )->attribute(['id' => 'image_type1']);
 
             $form->text('key', trans('key'));
         }
 
-        if (request('type') == 18 || ($form->isEditing() && $ware && $ware->type == 18)) {
-            $form->color('color', trans('color'));
-        }
+        if (request('type') == 18) $form->color('color', trans('color'));
+        if (($form->isEditing() && $ware && ($ware->type == 18))) {
 
-        if ((request('type') && request('type') != 18 && request('type') != 21) ||
-            ($form->isEditing() && $ware && $ware->type != 18 && $ware->type != 21)) {
+            if ($ware->type == 18)  $form->color('color', trans('color'));
+        }
+        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
 
-                if (request()->input('show_img_remove') == 1) {
-                    $form->model()->show_img = null;
-                    $form->show_img          = null;
-                }
-                if (request()->input('img2_remove') == 1) {
-                    $form->model()->img2 = null;
-                    $form->img2          = null;
-                }
-
-                if (!$form->show_img && !$form->img2 &&
-                    empty($form->model()->show_img) &&
-                    empty($form->model()->img2)) {
-
-                    $error = new \Illuminate\Support\MessageBag([
+                if (!$form->show_img && !$form->img2) {
+                    $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
                     ]);
@@ -314,11 +302,23 @@ class OvipGiftTapController extends MainController
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-
                     $allowedExtensions = [
-                        'svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp',
-                        'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv',
-                        'mkv', 'webm',
+                        'svga',
+                        'mp4',
+                        'jpg',
+                        'jpeg',
+                        'png',
+                        'gif',
+                        'bmp',
+                        'tiff',
+                        'svg',
+                        'webp',
+                        'mov',
+                        'avi',
+                        'wmv',
+                        'flv',
+                        'mkv',
+                        'webm',
                     ];
 
                     $ext = strtolower($form->show_img->guessExtension());
@@ -336,7 +336,7 @@ class OvipGiftTapController extends MainController
 
                     $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
 
-                    $ext         = strtolower($form->img2->guessExtension());
+                    $ext = strtolower($form->img2->guessExtension());
                     $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
                     if ($ext === 'zz' && $originalExt === 'svga') {
@@ -344,9 +344,11 @@ class OvipGiftTapController extends MainController
                     }
 
                     if ($ext === 'mp4') {
-                        $urlVideo  = upload($form->img2);
+                        $urlVideo = upload($form->img2);
+
                         $videoPath = getDriverUrl() . '/' . $urlVideo;
-                        $wareId    = $form->model()->id;
+
+                        $wareId = $form->model()->id;
 
                         (new FfmpegService())->extract($videoPath, $wareId);
 
@@ -369,40 +371,36 @@ class OvipGiftTapController extends MainController
                         throw ValidationException::withMessages([
                             'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                         ]);
+                    } else {
+                        $form->profile_frame_type = $ext;
                     }
-
-                    $form->profile_frame_type = $ext;
                 }
             });
         }
-
         $form->saving(function (Form $form) {
 
             $id = $form->model()->id;
 
             $exists = Ware::where('level', $form->level)
-                ->where('type', $form->type)
-                ->where('get_type', 1)
-                ->when(isset($id), function ($query) use ($id) {
-                    $query->where('id', '!=', $id);
-                })
-                ->exists();
+                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
+                    $query->where('id', "!=", $id);
+                })->exists();
 
             if ($exists) {
                 $error = new \Illuminate\Support\MessageBag([
-                    'title'   => 'Error',
+                    'title' => 'Error',
                     'message' => __('This level and type combination already exists'),
                 ]);
 
                 return back()->with(compact('error'));
             }
-
-            if ($form->type != 18 && $form->type != 21) {
-                $imageType1       = $form->input('image_type1');
+            if (request('type') != 18 || request('type') != 21) {
+                $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type');
                 $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
                 if (is_null($imageType1) && is_null($profileFrameType)) {
+
                     session()->flash('show_alert', 'Your alert message');
                     return redirect()->back();
                 }
@@ -413,14 +411,16 @@ class OvipGiftTapController extends MainController
 
         $form->saved(function (Form $form) {
             $level = $form->model()->level;
-            $type  = $form->model()->type;
-            $ovip  = Ovip::where('level', $level)->first();
-            $url   = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
+            $type = $form->model()->type; // Get the saved model's ID
+            $ovip = Ovip::where('level', $level)->first();
+            $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
             return redirect()->to($url);
         });
 
+
         return $form;
     }
+
 
     // private function tabsComponent($privileges, $level, $type)
     // {
