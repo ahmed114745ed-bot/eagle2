@@ -290,9 +290,14 @@ class OvipGiftTapController extends MainController
         }
         if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
-            $form->saving(function (Form $form) {
+            $form->saving(function (Form $form){
+                $model = $form->model();
 
-                if (!$form->show_img && !$form->img2) {
+                info($model->getOriginal('show_img'));
+                $hasShowImg = $form->show_img || $model->getOriginal('show_img');
+                $hasImg2 = $form->img2 || $model->getOriginal('img2');
+
+                if (!$hasShowImg && !$hasImg2) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -377,7 +382,8 @@ class OvipGiftTapController extends MainController
                 }
             });
         }
-        $form->saving(function (Form $form) {
+        $form->saving(function (Form $form){
+            $model = $form->model();
 
             $id = $form->model()->id;
 
@@ -397,14 +403,16 @@ class OvipGiftTapController extends MainController
             if (request('type') != 18 || request('type') != 21) {
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type');
-                $form->model()->image_type = $imageType1 ?? $profileFrameType;
+                $existingImageType = $model->getOriginal('image_type');
 
-                if (is_null($imageType1) && is_null($profileFrameType)) {
-
-                    session()->flash('show_alert', 'Your alert message');
-                    return redirect()->back();
+                if (is_null($imageType1) && is_null($profileFrameType) && is_null($existingImageType)) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'img2' => ['Please upload or keep at least one valid image type'],
+                    ]);
                 }
             }
+
+            $form->model()->image_type = $imageType1 ?? $profileFrameType ?? $existingImageType;
 
             (new UserCounterServices)->eventUsers('ware');
         });
