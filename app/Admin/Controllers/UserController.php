@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Charge;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
@@ -809,6 +810,7 @@ class UserController extends MainController
     {
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
+        $tab = request('tab') ?? 'salary';
         $user = User::with('profile')->find($id);
         $type = request('type') ?? 4;
         $packs = Pack::where('user_id', $id)->where('is_used', 1)->where('type', $type)->whereHas('ware')->with(['ware' => function ($q) {
@@ -827,7 +829,14 @@ class UserController extends MainController
 
         $types =  collect($typeMap);
         $currentType = request()->get('type', $types->keys()->first());
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType');
+        
+        $charges = Charge::where('charger_id', $id)
+        ->where('charger_type', 'user')
+        ->with(Common::chargerRelationsQuery()) 
+        ->orderByDesc('id')
+        ->paginate(10, ['*'], 'charges_page');
+        
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType','charges' ,'tab');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }

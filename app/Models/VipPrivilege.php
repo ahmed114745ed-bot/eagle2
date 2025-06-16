@@ -2,55 +2,24 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
 class VipPrivilege extends Model
 {
+    use TimestampsWithTimezone;
+
     protected $table = 'vip_privileges';
 
-    public function getCreatedAtAttribute($value)
+    public function getItem($vip)
     {
-               // Cache key for the timezone setting
-    $cacheKey = 'timezone';
+        $i = Ware::query()->where('get_type', 1)->where('type', $this->type)->where('level', $vip)->first();
 
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-               // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-    public function getItem($vip){
-        $i = Ware::query ()->where ('get_type',1)->where ('type',$this->type)->where('level',$vip)->first ();
         return $i;
     }
 
-    public function vip(){
-        return $this->belongsToMany (VipPrivilege::class,'vip_prev','o_vip_privilege_id', 'o_vip_id','id','id');
+    public function vip()
+    {
+        return $this->belongsToMany(self::class, 'vip_prev', 'o_vip_privilege_id', 'o_vip_id', 'id', 'id');
     }
 }

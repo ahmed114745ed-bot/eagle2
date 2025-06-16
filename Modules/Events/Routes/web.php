@@ -5,8 +5,7 @@ use Modules\Events\Http\Controllers\web\PkEventGiftController;
 use Modules\Events\Http\Controllers\web\TargetEventController;
 use Modules\Events\Http\Controllers\web\RewardTargetController;
 use Modules\Events\Http\Controllers\web\WeeklyEventGiftNController;
-
-
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,11 +32,11 @@ Route::group(
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource ('event-period','EventPeriodController');
-        $router->resource ('weekly-events-new','WeeklyEventNController');
-        $router->resource('target-events', TargetEventController::class);
-        $router->resource('pk-events', PkEventController::class);
+    function () {
+        Route::resource('event-period', 'EventPeriodController');
+        Route::resource('weekly-events-new', 'WeeklyEventNController');
+        Route::resource('target-events', TargetEventController::class);
+        Route::resource('pk-events', PkEventController::class);
         Route::prefix('weekly-events-gift/{weekly_event_id}')->group(function () {
             Route::get('/', [WeeklyEventGiftNController::class, 'index']);
             Route::get('/{level}/create', [WeeklyEventGiftNController::class, 'create']);
@@ -69,12 +68,12 @@ Route::group(
             Route::delete('/{id}', [RewardTargetController::class, 'destroy'])->where('id', '[0-9]+');
         });
 
-        $router->resource ('general-rols','GeneralRoleController');
-        $router->resource ('event-reports','EventReportController');
-        Route::get("update-weekly-star",function (){
+        Route::resource('general-rols', 'GeneralRoleController');
+        Route::resource('event-reports', 'EventReportController');
+        Route::get("update-weekly-star", function () {
             \Modules\Events\Entities\WeeklyStar::whereNull('type')->update([
-                'type'=>"weekly_star"
+                'type' => "weekly_star"
             ]);
         });
-    });
-
+    }
+);

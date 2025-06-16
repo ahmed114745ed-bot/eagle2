@@ -8,6 +8,7 @@ use App\Models\CoinLog;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\StripeService;
+use App\Traits\User\PaymentTrait;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,11 +19,10 @@ use Stripe\Webhook;
 
 class StripeController extends Controller
 {
+    use PaymentTrait;
     public function __construct(public StripeService $stripeService) {}
     public function pay(Request $request)
     {
-
-
         $request->validate([
             'product_name' => 'required|string|max:255',
             'amount' => 'required|numeric',
@@ -30,7 +30,6 @@ class StripeController extends Controller
             'coin_id' => 'required|numeric'
         ]);
         try {
-
             $apiKey = config('stripe.test_secret_key');
 
             $request->user_id = auth()->id();
@@ -60,7 +59,6 @@ class StripeController extends Controller
                 'link' => $link
             ]);
         } catch (\Exception $e) {
-            // Handle any other errors (e.g., API issues, server errors)
             return response()->json([
                 'message' => 'Error generating payment link: ' . $e->getMessage(),
                 'error' => $e->getMessage()
@@ -71,7 +69,6 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
-        info('welcome to webhook');
         $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
         $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
 
@@ -79,98 +76,60 @@ class StripeController extends Controller
 
         Stripe::setApiKey($apiKey);
 
-        // Retrieve the request's body and Stripe signature header
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
-        // Your Stripe webhook secret, which you get from the Stripe dashboard
-        $endpointSecret = $stripe_webhook_secret?->value; // Set this in your .env file
-        Log::info('strip callback called '. $apiKey . ' '. $stripe_webhook_secret);
-//        try {
-            // Verify the webhook signature to ensure it's coming from Stripe
-        Log::info('Headers', $request->headers->all());
-        info('payload'.$payload);
-        info('sigHeader'.$sigHeader);
-        info('endpointSecret'.$endpointSecret);
+        $endpointSecret = $stripe_webhook_secret?->value;
+        try {
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
-            info($event);
-            info($event->type);
 
-            // Handle the event types
             switch ($event->type) {
-                case 'checkout.session.completed':
-                    // Payment successful
-                    $session = $event->data->object; // Contains session details
-
-                    $userId = $session->metadata->user_id;
-                    $orderId = $session->metadata->order_id;
-                    info('orderId'.$orderId);
-
-                    $this->makePayment($orderId, $userId);
-                    info('completed');
-                    // Handle successful payment here (e.g., update database)
-                    // You can access $session->id, $session->payment_status, etc.
-                    break;
-
                 case 'payment_intent.succeeded':
+                case 'checkout.session.completed':
+                    $session = $event->data->object;
 
-                    $session = $event->data->object; // Contains session details
-
-                    $userId = $session->metadata->user_id;
                     $orderId = $session->metadata->order_id;
-                    info('orderId'.$orderId);
 
-                    $this->makePayment($orderId, $userId);
-                    info('succeeded');
-                    // Handle successful payment here (e.g., update database)
-                    // You can access $session->id, $session->payment_status, etc.
-
+                    $this->webhookPayment($orderId);
                     break;
+
                 case 'payment_intent.failed':
-                    // Payment failed
-                    info('failed');
-                    $paymentIntent = $event->data->object; // Contains payment intent details
-                    // Handle failed payment here (e.g., notify user)
+                    $paymentIntent = $event->data->object;
                     break;
 
                 default:
-                    // Handle other events if needed
                     break;
             }
 
-            info('Webhook Handled 200');
-            // Return a 200 response to Stripe to acknowledge the webhook
             return response('Webhook Handled', 200);
-//        } catch (SignatureVerificationException $e) {
-//            // Invalid signature from Stripe
-//            \Log::error("Invalid webhook signature: {$e->getMessage()}");
-//            return response('Invalid Signature', 400);
-//        } catch (\Exception $e) {
-//            // General error handling
-//            \Log::error("Webhook error: {$e->getMessage()}");
-//            return response('Webhook Error: ' . $e->getMessage(), 500);
-//        }
+        } catch (SignatureVerificationException $e) {
+            return response('Invalid Signature', 400);
+        } catch (\Exception $e) {
+            return response('Webhook Error: ' . $e->getMessage(), 500);
+        }
     }
 
-    public function makePayment($orderId, int|string|null $userId)
+    public function success(Request $request)
     {
-        if ($userId === null) return false;
+        Stripe::setApiKey(config('stripe.test_secret_key'));
 
-        $item  = CoinLog::where("id", $orderId)->first();
+        $sessionId = $request->get('session_id');
 
-        info($item);
-
-        if($item->status == 1){
-            return false;
+        if (!$sessionId) {
+            return response('Missing session ID', 400);
         }
 
-        $item->status = 1;
+        try {
+            Session::retrieve($sessionId);
 
-        $item->save();
-
-        $user = User::find($userId);
-
-        $user->di += $item->obtained_coins;
-
-        $user->save();
+            return response('Payment successful.', 200);
+        } catch (\Exception $e) {
+            return response('Payment verification failed.', 500);
+        }
     }
+
+    public function cancel()
+    {
+        return response('Payment was cancelled.', 200);
+    }
+
 }

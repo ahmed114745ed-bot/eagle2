@@ -469,9 +469,8 @@ class Common
 
     public static function timeZone()
     {
-        $cacheKey = 'timezone';
-        return \Cache::rememberForever($cacheKey, function () {
-            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+        return Cache::rememberForever('timezone', function () {
+            $setting = Setting::where('key', 'timezone')->first();
             return $setting?->value ?? 'UTC';
         });
     }

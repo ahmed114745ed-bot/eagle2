@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +27,8 @@ Route::group(
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('fixed-targets', FixedTargetController::class);
-        $router->resource('special-users', SpecialUserController::class);
-    });
+    function () {
+        Route::resource('fixed-targets', FixedTargetController::class);
+        Route::resource('special-users', SpecialUserController::class);
+    }
+);

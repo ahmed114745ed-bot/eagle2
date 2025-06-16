@@ -2,79 +2,71 @@
 
 namespace Modules\DailyPrize\Entities;
 
+use App\Helpers\Common;
 use App\Models\OVip;
 use App\Models\Ware;
-use App\Helpers\Common;
-use App\Models\Setting;
-use App\Services\RedisService;
-use Cache;
-use Carbon\Carbon;
-use Exception;
-use Illuminate\Database\Eloquent\Model;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class DailyGift extends Model
 {
-    use HasFactory;
+    use HasFactory, TimestampsWithTimezone;
 
     /**
      * The attributes that are mass assignable.
      */
     protected $guarded = ['id'];
-    protected $appends = ['target1', 'target2', 'target3','target4'];
 
-    public function getCreatedAtAttribute($value)
+    protected $appends = ['target1', 'target2', 'target3', 'target4'];
+
+    public function ware()
     {
-            // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = Cache::rememberForever($cacheKey, function () {
-        $setting = Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        return $this->hasOne(Ware::class, 'id', 'target');
     }
 
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
+    public function vip()
     {
-            // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = Cache::rememberForever($cacheKey, function () {
-        $setting = Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        return $this->hasOne(OVip::class, 'id', 'target');
     }
-    protected static function boot() {
+
+    public function getTarget1Attribute()
+    {
+        return $this->gift_type === 'ware' ? $this->target : null;
+    }
+
+    public function getTarget2Attribute()
+    {
+        return $this->gift_type === 'vip' ? $this->target : null;
+    }
+
+    public function getTarget3Attribute()
+    {
+        return $this->gift_type === 'coins' ? $this->target : null;
+    }
+
+    public function getTarget4Attribute()
+    {
+        return $this->gift_type === 'achievement' ? $this->target : null;
+    }
+
+    protected static function boot()
+    {
         parent::boot();
-        static::creating(function ($model) {
-            if ($model->gift_type == "ware"){
+        self::creating(function ($model) {
+            if ($model->gift_type === 'ware') {
                 $model->target = request('target1', $model->target);
-            }elseif ($model->gift_type == "vip"){
+            } elseif ($model->gift_type === 'vip') {
                 $model->target = request('target2', $model->target);
-            }elseif ($model->gift_type == "coins"){
+            } elseif ($model->gift_type === 'coins') {
                 $model->target = request('target3', $model->target);
-            }elseif ($model->gift_type == "achievement"){
+            } elseif ($model->gift_type === 'achievement') {
 
-                $file       = request('target4', $model->target);
+                $file = request('target4', $model->target);
 
-                if ($file instanceof  UploadedFile){
+                if ($file instanceof UploadedFile) {
                     $url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
                 }
                 $model->target = $url ?? '';
@@ -83,26 +75,24 @@ class DailyGift extends Model
             unset($model->target2);
             unset($model->target3);
             unset($model->target4);
-
-
         });
 
-        static::updating(function ($model) {
-            if ($model->gift_type == "ware"){
+        self::updating(function ($model) {
+            if ($model->gift_type === 'ware') {
                 $model->target = request('target1', $model->target);
-            }elseif ($model->gift_type == "vip"){
+            } elseif ($model->gift_type === 'vip') {
                 $model->target = request('target2', $model->target);
-            }elseif ($model->gift_type == "coins"){
+            } elseif ($model->gift_type === 'coins') {
                 $model->target = request('target3', $model->target);
-            }elseif ($model->gift_type == "achievement"){
-                $file       = request('target4', $model->target);
-                if ($file instanceof  UploadedFile){
-                    $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
+            } elseif ($model->gift_type === 'achievement') {
+                $file = request('target4', $model->target);
+                if ($file instanceof UploadedFile) {
+                    $url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
                     $file = str_replace('\\', '/', $model->target);
                     Storage::delete($file);
                 }
                 $model->target = $url ?? '';
-//                $model->target = request('target4', $model->target);
+                //                $model->target = request('target4', $model->target);
 
             }
             unset($model->target1);
@@ -111,41 +101,11 @@ class DailyGift extends Model
             unset($model->target4);
         });
 
-        static::deleted(function ($model) {
+        self::deleted(function ($model) {
             \App\Facades\RedisService::update('daily-gift-count', DailyGift::count());
         });
-        static::created(function ($model) {
+        self::created(function ($model) {
             \App\Facades\RedisService::update('daily-gift-count', DailyGift::count());
         });
     }
-
-    public function ware()
-    {
-        return $this->hasOne(Ware::class,'id','target');
-    }
-
-    public function vip()
-    {
-        return $this->hasOne(OVip::class,'id','target');
-    }
-
-    public function getTarget1Attribute()
-    {
-        return $this->gift_type == 'ware' ? $this->target : null;
-    }
-    public function getTarget2Attribute()
-    {
-        return $this->gift_type == 'vip' ? $this->target : null;
-    }
-    public function getTarget3Attribute()
-    {
-        return $this->gift_type == 'coins' ? $this->target : null;
-    }
-    public function getTarget4Attribute()
-    {
-        return $this->gift_type == 'achievement' ? $this->target : null;
-    }
-
-
-
 }

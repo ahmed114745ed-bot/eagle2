@@ -8,17 +8,14 @@ use App\Models\Target;
 use App\Models\User;
 use App\Models\UserSallary;
 use App\Models\UserTarget;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class TargetService
 {
 
 
-    public function __construct(private User $user)
-    {
-
-    }
+    public function __construct(private User $user) {}
 
 
     public function calculateTarget()
@@ -65,23 +62,23 @@ class TargetService
                 $ap               = $target->agency_share / 100;
                 $user->target_usd = $t;
 
-                $this->updateSalaries( $user, $t, $ap, $hours, $target, $days, $month_received);
-            }else{
+                $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received);
+            } else {
 
-        $values = [
+                $values = [
 
-            'diamond'  => $month_received . ' / ' . 0 ,
-            'sallary' =>  0
+                    'diamond'  => $month_received . ' / ' . 0,
+                    'sallary' =>  0
 
-        ];
+                ];
 
 
-        UserSallary::query()->updateOrCreate([
-                                                 'user_id' => $user->id,
-                                                 'month' => Carbon::now()->month,
-                                                 'year' => Carbon::now()->year,
-                                                 'user_agency_id' => $user->agency_id,
-                                             ], $values);
+                UserSallary::query()->updateOrCreate([
+                    'user_id' => $user->id,
+                    'month' => Carbon::now()->month,
+                    'year' => Carbon::now()->year,
+                    'user_agency_id' => $user->agency_id,
+                ], $values);
             }
         }
         return $user;
@@ -105,7 +102,7 @@ class TargetService
     public function calculateUsdFromTarget(Model $target, float $hours, int $days): float
     {
         // $per = 0.50;
-        $per =common::getDiamondsPercentage();
+        $per = common::getDiamondsPercentage();
 
         if ($target->hours <= $hours) {
             $per += 0.20;
@@ -118,7 +115,7 @@ class TargetService
                 $per = 0;
             }
         }
-         $usd = Common::getTargetUsd($target->diamonds,$target->agency_share);
+        $usd = Common::getTargetUsd($target->diamonds, $target->agency_share);
         return $usd * $per;
     }
 
@@ -126,10 +123,13 @@ class TargetService
     {
         try {
             $values = [
-                'user_id'             => $user->id, 'add_month' => Carbon::now()->month,
+                'user_id'             => $user->id,
+                'add_month' => Carbon::now()->month,
                 'add_year'            => Carbon::now()->year,
-                'agency_id'           => $user->agency_id, 'target_id' => @$target->id,
-                'target_diamonds'     => @$target->diamonds ?? 0, 'target_usd' => @$target->usd ?? 0,
+                'agency_id'           => $user->agency_id,
+                'target_id' => @$target->id,
+                'target_diamonds'     => @$target->diamonds ?? 0,
+                'target_usd' => @$target->usd ?? 0,
                 'target_hours'        => @$target->hours ?? 0,
                 'target_days'         => @$target->days ?? 0,
                 'target_agency_share' => @$target->agency_share ?? 0,
@@ -142,9 +142,10 @@ class TargetService
                 $values['agency_obtain'] = $t * $ap;
             }
             UserTarget::query()->updateOrCreate([
-                                                    'user_id' => $user->id, 'add_month' => Carbon::now()->month,
-                                                                                                                                                                                                    'add_year' => Carbon::now()->year,
-                                                ], $values);
+                'user_id' => $user->id,
+                'add_month' => Carbon::now()->month,
+                'add_year' => Carbon::now()->year,
+            ], $values);
         } catch (\Exception $e) {
         }
 
@@ -159,32 +160,29 @@ class TargetService
         if (0 < $t) $values['sallary'] = $t;
 
         $userSalary = UserSallary::query()->where([
-                                                      'user_id' => $user->id,
-                                                      'month' => Carbon::now()->month,
-                                                      'year' => Carbon::now()->year,
-                                                      'user_agency_id' => $user->agency_id,
-                                                  ])->orderByDesc('id')->lock()->first();
-        if ($userSalary){
+            'user_id' => $user->id,
+            'month' => Carbon::now()->month,
+            'year' => Carbon::now()->year,
+            'user_agency_id' => $user->agency_id,
+        ])->orderByDesc('id')->lock()->first();
+        if ($userSalary) {
             $userSalary->update($values);
-        }else{
-             UserSallary::query()->create([
+        } else {
+            UserSallary::query()->create([
                 'user_id' => $user->id,
                 'month' => Carbon::now()->month,
                 'year' => Carbon::now()->year,
                 'user_agency_id' => $user->agency_id,
                 ...$values
             ])->lock();
-//            UserSallary::query()->where([
-//                                            'user_id' => $user->id,
-//                                            'month' => Carbon::now()->month,
-//                                            'year' => Carbon::now()->year,
-//                                            'user_agency_id' => $user->agency_id,
-//
-//                                        ])->where('id','!=', $userSalary->id)->delete();
+            //            UserSallary::query()->where([
+            //                                            'user_id' => $user->id,
+            //                                            'month' => Carbon::now()->month,
+            //                                            'year' => Carbon::now()->year,
+            //                                            'user_agency_id' => $user->agency_id,
+            //
+            //                                        ])->where('id','!=', $userSalary->id)->delete();
 
         }
-
-
-
     }
 }

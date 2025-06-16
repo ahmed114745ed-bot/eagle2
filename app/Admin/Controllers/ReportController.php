@@ -10,6 +10,7 @@ use App\Models\AdminUser;
 use App\Facades\ManagerHelper;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Carbon\Carbon;
 
 class ReportController extends MainController
 {
@@ -20,7 +21,7 @@ class ReportController extends MainController
         checkAgencyFeature();
 
         return parent::index($content
-            ->title(trans('reports'))
+            ->title(trans('Host reports'))
             ->description(__(request('desc', 'users')))
             ->row(function ($row) {
                 $row->column(2, view('admin.grid.common.actions'));
@@ -129,14 +130,84 @@ class ReportController extends MainController
                     <img src='{$image}' alt='USD' width='20' height='20'>
                 </div>";
         });
-
+        $grid->column('sallary_year', __('Year'))->display(function () {
+            $year = request('year') ?? now()->year;
+            $month = request('month') ?? now()->month;
+        
+            $sallary = $this->userSallary()
+                ->where('month', $month)
+                ->where('year', $year)
+                ->latest()
+                ->first();
+        
+            return $sallary?->year ?? '-';
+        });
+        
+        $grid->column('sallary_month', __('Month'))->display(function () {
+            $month = request('month') ?? now()->month;
+            $monthName = Carbon::create()->month($month)->translatedFormat('F'); // اسم الشهر حسب اللغة
+        
+            $sallary = $this->userSallary()
+                ->where('month', $month)
+                ->where('year', request('year', now()->year))
+                ->first();
+        
+            return $sallary ? $monthName : '-';
+        });
+        
+        $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
+            $month = request('month') ?? now()->month;
+            $year = request('year') ?? now()->year;
+        
+            $sallary = $this->userSallary()
+                ->where('month', $month)
+                ->where('year', $year)
+                ->first();
+        
+            if (!$sallary || !$sallary->extras) {
+                return '<span style="color: #aaa;">No Data</span>';
+            }
+        
+            $extras = json_decode($sallary->extras, true);
+        
+            $momentUpload = $extras['moment']['upload'] ?? '-';
+            $momentLikes = $extras['moment']['likes'] ?? '-';
+            $momentComments = $extras['moment']['comments'] ?? '-';
+        
+            $reelUpload = $extras['reel']['upload'] ?? '-';
+            $reelLikes = $extras['reel']['likes'] ?? '-';
+            $reelComments = $extras['reel']['comments'] ?? '-';
+            
+            $labelMoments = __('Moments');
+            $labelReels = __('Reels');
+            $labelUploads = __('Uploads:');
+            $labelLikes = __('Likes:');
+            $labelComments = __('Comments:');
+        
+            return <<<HTML
+                <div style="line-height: 1.6;">
+                    <div><b>{$labelMoments}</b></div>
+                    <ul style="margin-left: 8px;width: 149px;">
+                        <li><b>{$labelUploads}</b> {$momentUpload}</li>
+                        <li><b>{$labelLikes}</b> {$momentLikes}</li>
+                        <li><b>{$labelComments}</b> {$momentComments}</li>
+                    </ul>
+                    <div><b>{$labelReels}</b></div>
+                    <ul style="margin-left: 8px;width: 149px;">
+                        <li><b>{$labelUploads}</b> {$reelUpload}</li>
+                        <li><b>{$labelLikes}</b> {$reelLikes}</li>
+                        <li><b>{$labelComments}</b> {$reelComments}</li>
+                    </ul>
+                </div>
+            HTML;
+        });
         $grid->column('agency', __('agency'))->display(function () {
             $name = @$this->agency->name ?? '';
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
+            $showUrl = $this ? url("admin/agencies/profile/{$this->id}") : 0;
 
-            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
@@ -144,8 +215,10 @@ class ReportController extends MainController
 
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <span>$name</span>
+                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <span>$name</span>
+                </a>
             </div>
         ";
         });

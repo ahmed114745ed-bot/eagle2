@@ -2,58 +2,27 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use http\Env\Request;
 use App\Traits\Families\ResourceTrait;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+
+use function request;
 
 class Family extends Model
 {
-    use ResourceTrait;
+    use ResourceTrait, TimestampsWithTimezone;
+
     protected $guarded = ['id'];
 
     protected $appends = ['rank'];
+
     private $cachedLevelMax = null;
 
-
-    public function getCreatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-        $timezone = \Cache::rememberForever($cacheKey, function () {
-            $setting = \App\Models\Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
-
-        // Get the timezone from the request header or use the cached setting
-        $timeZone = request()->header('tz') ?? $timezone;
-
-        // Parse the date and set the timezone
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-        $timezone = \Cache::rememberForever($cacheKey, function () {
-            $setting = \App\Models\Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
-
-        // Get the timezone from the request header or use the cached setting
-        $timeZone = request()->header('tz') ?? $timezone;
-
-        // Parse the date and set the timezone
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
     public function users()
     {
-        return $this->hasManyThrough(User::class, FamilyUser::class, 'family_id',  'family_id');
+        return $this->hasManyThrough(User::class, FamilyUser::class, 'family_id', 'family_id');
     }
+
     public function owner()
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -61,7 +30,8 @@ class Family extends Model
 
     public function getMembersNumAttribute()
     {
-        $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/*->where ('user_type',0)*/->count();
+        $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/* ->where ('user_type',0) */ ->count();
+
         return $fu;
     }
 
@@ -83,38 +53,39 @@ class Family extends Model
     public function getMembersCountAttribute()
     {
         $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)->count();
+
         return $fu - 1;
     }
-
 
     public function getAdminsNumAttribute()
     {
         $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)->where('user_type', 1)->count();
+
         return $fu;
     }
 
     public function getLevelAttribute()
     {
-        $giftLogs   = $this->total_diamond;
-        $cur_level  = $this->getLevelMax();
-        $next      = FamilyLevel::query()->where('exp', '>', $giftLogs)->orderBy('exp')->first();
+        $giftLogs = $this->total_diamond;
+        $cur_level = $this->getLevelMax();
+        $next = FamilyLevel::query()->where('exp', '>', $giftLogs)->orderBy('exp')->first();
         $next_level = $next ?? $cur_level;
-        $min_exp    = @$cur_level->exp ?: 0;
-        $over       = $giftLogs - $min_exp;
-        $diff       = @$next_level->exp - @$cur_level->exp;
+        $min_exp = @$cur_level->exp ?: 0;
+        $over = $giftLogs - $min_exp;
+        $diff = @$next_level->exp - @$cur_level->exp;
 
         $lev = [
-            'level_exp' => @(int)$cur_level->exp ?: 0,
+            'level_exp' => @(int) $cur_level->exp ?: 0,
             'level_name' => @$cur_level->name ?: '',
             'level_img' => @$cur_level->img ?: '',
-            'family_exp' => (int)$giftLogs,
-            'over_current_level_exp' => (int)$over,
-            'next_exp' => @(int)$next_level->exp,
+            'family_exp' => (int) $giftLogs,
+            'over_current_level_exp' => (int) $over,
+            'next_exp' => @(int) $next_level->exp,
             'next_name' => @$next_level->name,
             'next_img' => @$next_level->img,
-            'per' => $diff <= 0 ? 0 : (($over > $diff) ? 1 : (float)($over / $diff)),
-            'rem' => ($over > $diff) ? 0 : (int)($diff - $over),
-            'is_last_level' => (bool)($next == null)
+            'per' => $diff <= 0 ? 0 : (($over > $diff) ? 1 : (float) ($over / $diff)),
+            'rem' => ($over > $diff) ? 0 : (int) ($diff - $over),
+            'is_last_level' => (bool) ($next === null),
         ];
 
         return $lev;
@@ -134,6 +105,7 @@ class Family extends Model
                 ->orderByDesc('exp')
                 ->first();
         }
+
         return $this->cachedLevelMax;
     }
 
@@ -144,6 +116,7 @@ class Family extends Model
         if ($level) {
             return $level->members;
         }
+
         return null;
     }
 
@@ -153,6 +126,7 @@ class Family extends Model
         if ($level) {
             return $level->admins;
         }
+
         return null;
     }
 
@@ -161,6 +135,7 @@ class Family extends Model
         if ($this->level_max_members_num) {
             return $this->level_max_members_num;
         }
+
         return $this->attributes['num'];
     }
 
@@ -169,6 +144,7 @@ class Family extends Model
         if ($this->level_max_admins_num) {
             return $this->level_max_admins_num;
         }
+
         return 2;
     }
 
@@ -181,45 +157,45 @@ class Family extends Model
 
     public function getRankAttribute()
     {
-        $time = \request('time');
+        $time = request('time');
 
-
-        if ($time == 'today') {
+        if ($time === 'today') {
             // dd($this->today_rank);
 
             //            $gl = GiftLog::query ()->whereRaw('CAST(created_at AS DATE) = CAST(NOW() AS DATE)')->where (function ($q) use ($time){
             //                $q->where('sender_family_id',$this->id)->orWhere('receiver_family_id',$this->id);
             //            })->sum('giftPrice');
             $gl = $this->today_rank;
-        } elseif ($time == 'week') {
+        } elseif ($time === 'week') {
             //            $gl = GiftLog::query ()->whereRaw('WEEK(CAST(created_at AS DATE)) = WEEK(CAST(NOW() AS DATE))')->where (function ($q) use ($time){
             //                $q->where('sender_family_id',$this->id)->orWhere('receiver_family_id',$this->id);
             //            })->sum('giftPrice');
             $gl = $this->week_rank;
-        } elseif ($time == 'month') {
+        } elseif ($time === 'month') {
             //            $gl = GiftLog::query ()->whereRaw('MONTH(CAST(created_at AS DATE)) = MONTH(CAST(NOW() AS DATE))')->where (function ($q) use ($time){
             //                $q->where('sender_family_id',$this->id)->orWhere('receiver_family_id',$this->id);
             //            })->sum('giftPrice');
             $gl = $this->month_rank;
         } else {
 
-            $gl = GiftLog::query()->where(function ($q) use ($time) {
+            $gl = GiftLog::query()->where(function ($q) {
                 $q->where('sender_family_id', $this->id)->orWhere('receiver_family_id', $this->id);
             })->sum('giftPrice');
         }
+
         return $gl;
     }
-
 
     public function getTodayRankAttribute($val)
     {
         $gl = GiftLog::query()->whereRaw('CAST(created_at AS DATE) = CAST(NOW() AS DATE)')->where(function ($q) {
             $q->where('sender_family_id', $this->id)->orWhere('receiver_family_id', $this->id);
         })->sum('giftPrice');
-        if ($val != $gl) {
+        if ($val !== $gl) {
             $this->attributes['today_rank'] = $gl;
             $this->save();
         }
+
         return $gl;
     }
 
@@ -228,10 +204,11 @@ class Family extends Model
         $gl = GiftLog::query()->whereRaw('WEEK(CAST(created_at AS DATE)) = WEEK(CAST(NOW() AS DATE))')->where(function ($q) {
             $q->where('sender_family_id', $this->id)->orWhere('receiver_family_id', $this->id);
         })->sum('giftPrice');
-        if ($val != $gl) {
+        if ($val !== $gl) {
             $this->attributes['week_rank'] = $gl;
             $this->save();
         }
+
         return $gl;
     }
 
@@ -240,13 +217,13 @@ class Family extends Model
         $gl = GiftLog::query()->whereRaw('MONTH(CAST(created_at AS DATE)) = MONTH(CAST(NOW() AS DATE))')->where(function ($q) {
             $q->where('sender_family_id', $this->id)->orWhere('receiver_family_id', $this->id);
         })->sum('giftPrice');
-        if ($val != $gl) {
+        if ($val !== $gl) {
             $this->attributes['month_rank'] = $gl;
             $this->save();
         }
+
         return $gl;
     }
-
 
     public function setTodayRankAttribute()
     {

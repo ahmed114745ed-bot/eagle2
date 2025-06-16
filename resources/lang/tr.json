@@ -3025,10 +3025,25 @@
   "Receiver Level": "Alıcının Seviyesi",
   "Level switch users":"Kullanılan seviye ",
   "cancel": "İptal et",
+  "top": "üst",
+  "padding": "iç boşluk",
+  "user can upload Gif image": "Kullanıcı GIF görüntüsü yükleyebilir",
+  "bottom": "alt",
+  "can not ban this user": "Bu kullanıcı yasaklanamaz",
   "Delete gift a medal": "Bir madalya hediyesini sil",
    "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
 ,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
-
+,"Moments": "Anlar",
+    "Reels": "Videolar",
+    "Uploads:": "Yüklemeler:",
+    "Likes:": "Beğeniler:",
+    "Comments:": "Yorumlar:",
+    "Moment Upload": "An Yüklemesi",
+    "Moment Likes": "An Beğenileri",
+    "Moment Comments": "An Yorumları",
+    "Reel Upload": "Video Yüklemesi",
+    "Reel Likes": "Video Beğenileri",
+    "Reel Comments": "Video Yorumları"
 
 
 

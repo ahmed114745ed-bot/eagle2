@@ -2,53 +2,23 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RequestTakeSalary extends Model
 {
-    use HasFactory;
-    protected $guarded=['id'];
+    use HasFactory, TimestampsWithTimezone;
 
-    public function getCreatedAtAttribute($value)
+    protected $guarded = ['id'];
+
+    public function paymentWithDraw()
     {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        return $this->belongsTo(PaymentWithdrawType::class, 'payment_withdraw_type_id');
     }
 
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
+    public function user()
     {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-    public function paymentWithDraw(){
-        return $this->belongsTo(PaymentWithdrawType::class,'payment_withdraw_type_id');
-    }
-    public function user(){
         return $this->belongsTo(User::class);
     }
 }
