@@ -3025,6 +3025,9 @@
   "Receiver Level": "Alıcının Seviyesi",
   "Level switch users":"Kullanılan seviye ",
   "cancel": "İptal et",
+  "top": "üst",
+  "padding": "iç boşluk",
+  "bottom": "alt",
   "Delete gift a medal": "Bir madalya hediyesini sil",
    "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
 ,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
