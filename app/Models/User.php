@@ -1352,7 +1352,7 @@ class User extends Authenticatable
                 $userType = __("User");
                 break;
             case 1:
-                $userType = __("Host");
+                $userType = __("host");
                 break;
             case 2:
                 $userType = __("Host Agent");
