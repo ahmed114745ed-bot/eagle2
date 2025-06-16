@@ -349,46 +349,42 @@ class AgencyController extends MainController
     {
         $grid = new Grid(new Agency);
 
-        $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
-        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img')
+        $grid->model()
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img')
+            ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
             ->where(function ($query) {
-                $query->WhereDoesntHave('additionalInfo')
-                    ->orWhereHas('additionalInfo', function ($query) {
-                        $query->where('status', 1);
-                    });
+                $query
+                    ->whereDoesntHave('additionalInfo')
+                    ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
             })
-
-            ->with(['owner' => function ($query) {
-                $query->select('id', 'name', 'uuid');
-            }])
             ->orderByDesc('id');
 
-        if (request("active") == true) {
-            $grid->model()->whereHas("agencySalaries", function ($q) {
-                $q->where('month', now()->month)
-                    ->where('year', now()->year);
-            });
+        if (request()->has('active')) {
+            $grid->model()
+                ->whereHas('agencySalaries', function ($q) {
+                    $q
+                        ->where('month', now()->month)
+                        ->where('year', now()->year);
+                });
         }
 
-        $grid->column('name', __('Agency'))
-            ->display(function ($name) {
-                $cacheKey = "agency_image_{$this->id}";
-                $image = Cache::remember($cacheKey, 3600, function () {
-                    $path = @$this->img;
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
+        $grid->column('name', __('Agency'))->display(function ($name) {
+            $cacheKey = "agency_image_{$this->id}";
+            $image = Cache::remember($cacheKey, 3600, function () {
+                $path = @$this->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-                    return handleShowImageWithTypes($this->id, $url, 40, 40);
-                });
+                return handleShowImageWithTypes($this->id, $url, 40, 40);
+            });
 
-                $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
+            $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
-                return "
-                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+            return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                         <div style='display: flex; align-items: center; gap: 10px;'>
                             {$image}
                             <div style='display: flex; flex-direction: column;'>
@@ -396,15 +392,13 @@ class AgencyController extends MainController
                                 <span style='font-size: smaller;'>ID: {$this->id}</span>
                             </div>
                         </div>
-                    </a>
-                ";
-            });
-
+                    </a>";
+        });
 
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
@@ -443,26 +437,21 @@ class AgencyController extends MainController
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $coin = $this->salary;
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
+                </div>";
         });
         $permission = $this->permission_name;
 
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
-            // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
             if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
-
                 $actions->add(new DeleteAgencyAction());
             }
-            if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
 
+            if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new ChangeUsersAgencyAction($model->id));
             }
         });
@@ -761,10 +750,10 @@ class AgencyController extends MainController
             $newOwnerId = $form->model()->app_owner_id;
             // Create admin dashboard for agency when accept it
             $modelExists = $form->model()->exists;
-           // if (!$modelExists)  Common::createUserAdmin($appOwnerId);
+            // if (!$modelExists)  Common::createUserAdmin($appOwnerId);
 
             if ($modelExists && $newOwnerId != $originalOwnerId) {
-             //   Common::createUserAdmin($appOwnerId);
+                //   Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
