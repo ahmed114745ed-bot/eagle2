@@ -131,8 +131,10 @@ class OVipController extends MainController
 
         if (Admin::user()->can('browse-' . 'vip-gift') || Admin::user()->can('*')) {
             $grid->column(__('file'))->display(function () {
+                $privilegeTypes =   $this->privilegs->pluck('en_name', 'type')->sortKeys();
+                $type = $privilegeTypes?->keys()->first();
                 // توليد الروابط
-                $url1 = url('admin/ovip-gift/' . $this->id);
+                $url1 = url('admin/ovip-gift/' . $this->id . '?type=' . $type);
 
                 $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";
                 return $button1;
