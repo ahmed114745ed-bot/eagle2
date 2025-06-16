@@ -986,12 +986,12 @@
                 <div class="agency-stats">
                     <div class="agency-meta">
                         <div class="meta-item">
-                                <span class="meta-label">{{ __('wallet balance') }}:</span>
+                                <span class="meta-label">{{ __('Balance') }}:</span>
                                 <span class="meta-value">{{ @$user->salary }}</span>
 
                         </div>
                         <div class="meta-item">
-                            <span class="meta-label">{{__('Sender Level')}}:</span>
+                            <span class="meta-label">{{__('level')}}:</span>
                             <span class="meta-value">
                                     <img src="{{ getImagePath(\App\Helpers\Common::level_center($user)['sender_img']) }}"  style="height: 24px;">
                                 </span>

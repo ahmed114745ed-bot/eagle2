@@ -1003,6 +1003,7 @@
   "wapel": "entry effect",
   "This target has already been achieved by some users and cannot be updated.": "This target has already been achieved by some users and cannot be updated."
 ,    "target_change_warning": "Increasing the target value will increase the dollar amount received by the hosts, while decreasing it will reduce their dollar value."
+,"host":"Host"
 
 
 
