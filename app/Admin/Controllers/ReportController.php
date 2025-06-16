@@ -295,14 +295,14 @@ class ReportController extends MainController
                 </div>";
         });;
 
-        // $grid->column('due', __('due'))->display(function ($_) {
-        //     $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
-        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
-        //     return "<div style='display: flex; align-items: center; '>
-        //             <span>{$salary}</span>
-        //             <img src='{$image}' alt='USD' width='20' height='20'>
-        //         </div>";
-        // });
+        $grid->column('due', __('due'))->display(function ($_) {
+            $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope, $this->app_id);
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                    <span>{$salary}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20'>
+                </div>";
+        });
 
         $grid->export(function ($export) {
             $export->filename('report');

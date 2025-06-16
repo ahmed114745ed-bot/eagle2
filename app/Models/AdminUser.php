@@ -6,6 +6,7 @@ use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Builder;
 
 class AdminUser extends Administrator
 {
@@ -22,5 +23,18 @@ class AdminUser extends Administrator
     {
         return $this->hasManyThrough(Agency::class, User::class, 'id', 'agency_manger_id', 'app_id', 'id');
        
+    }
+
+
+    public function managerAgenciesAll(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Agency::withoutGlobalScopes()->getModel(),
+            User::class,
+            'id',
+            'agency_manger_id',
+            'app_id',
+            'id'
+        );
     }
 }
