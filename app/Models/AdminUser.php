@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\HostAgencyScope;
 use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,18 +27,9 @@ class AdminUser extends Administrator
     }
 
 
-    public function managerAgenciesWithoutScope(): HasManyThrough
+
+    public function managerAgenciesWithoutScope()
     {
-        $related = (new Agency)->newQueryWithoutScopes()->getModel();
-        $through = (new User)->newQuery()->getModel();
-    
-        return new HasManyThrough(
-            $related,     // موديل Agency بدون سكوبات
-            $through,     // موديل User
-            'app_id',     // المفتاح الأجنبي على جدول users الذي يشير إلى admin_users (AdminUser->app_id = users.id)
-            'agency_manger_id', // المفتاح الأجنبي على جدول agencies الذي يشير إلى users
-            'app_id',     // المفتاح المحلي في admin_users
-            'id'          // المفتاح المحلي في users
-        );
+        return $this->managerAgencies()->withoutGlobalScope(HostAgencyScope::class);
     }
 }

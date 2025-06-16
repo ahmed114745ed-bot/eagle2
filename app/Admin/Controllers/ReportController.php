@@ -296,7 +296,7 @@ class ReportController extends MainController
         });;
 
         $grid->column('due', __('due'))->display(function ($_) {
-            $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope, $this->app_id);
+            $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope()->get(), $this->app_id);
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
                     <span>{$salary}</span>
