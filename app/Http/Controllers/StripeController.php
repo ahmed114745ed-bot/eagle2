@@ -87,6 +87,9 @@ class StripeController extends Controller
         Log::info('strip callback called '. $apiKey . ' '. $stripe_webhook_secret);
 //        try {
             // Verify the webhook signature to ensure it's coming from Stripe
+        info('payload'.$payload);
+        info('sigHeader'.$sigHeader);
+        info('endpointSecret'.$endpointSecret);
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
             info($event);
             info($event->type);
