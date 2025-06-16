@@ -283,10 +283,10 @@ class OvipGiftTapController extends MainController
             $form->text('key', trans('key'));
         }
 
-        if (request('type') == 18) $form->color('color', trans('color'));
-        if (($form->isEditing() && $ware && ($ware->type == 18))) {
+        if (request('type') == 18 || request('type') == 21) $form->color('color', trans('color'));
+        if (($form->isEditing() && $ware && ($ware->type == 18 || $ware->type == 21))) {
 
-            if ($ware->type == 18)  $form->color('color', trans('color'));
+            if ($ware->type == 18 || $ware->type == 21)  $form->color('color', trans('color'));
         }
         if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
 
@@ -469,13 +469,12 @@ class OvipGiftTapController extends MainController
         // Inject JS to set type param on first load
         if (!request()->has('type') && $privilegeTypes->isNotEmpty()) {
             $firstType = $privilegeTypes->keys()->first();
+
             \Encore\Admin\Admin::script(<<<SCRIPT
-            document.addEventListener("DOMContentLoaded", function () {
                 const url = new URL(window.location.href);
                 url.searchParams.set('type', '$firstType');
                 window.location.href = url.toString(); // Force reload with type
-            });
-        SCRIPT);
+            SCRIPT);
         }
 
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
