@@ -8,6 +8,7 @@ use App\Models\CoinLog;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\StripeService;
+use App\Traits\User\PaymentTrait;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,7 @@ use Stripe\Webhook;
 
 class StripeController extends Controller
 {
+    use PaymentTrait;
     public function __construct(public StripeService $stripeService) {}
     public function pay(Request $request)
     {
@@ -85,10 +87,9 @@ class StripeController extends Controller
                 case 'checkout.session.completed':
                     $session = $event->data->object;
 
-                    $userId = $session->metadata->user_id;
                     $orderId = $session->metadata->order_id;
 
-                    $this->makePayment($orderId, $userId);
+                    $this->webhookPayment($orderId);
                     break;
 
                 case 'payment_intent.failed':
@@ -107,30 +108,9 @@ class StripeController extends Controller
         }
     }
 
-    public function makePayment($orderId, int|string|null $userId)
-    {
-        if ($userId === null) return false;
-
-        $item  = CoinLog::where("id", $orderId)->first();
-
-        if($item->status == 1){
-            return false;
-        }
-
-        $item->status = 1;
-
-        $item->save();
-
-        $user = User::find($userId);
-
-        $user->di += $item->obtained_coins;
-
-        $user->save();
-    }
-
     public function success(Request $request)
     {
-        Stripe::setApiKey(config('services.stripe.secret'));
+        Stripe::setApiKey(config('stripe.test_secret_key'));
 
         $sessionId = $request->get('session_id');
 
