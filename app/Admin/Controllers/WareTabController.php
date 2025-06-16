@@ -89,14 +89,13 @@ class WareTabController extends MainController
     {
         $type = request()->get('type', 4);
         $grid = new Grid(new Ware());
-      //  $types = [6, 4, 5];
+        //  $types = [6, 4, 5];
         $grid->model()->where('type',  $type)->whereNot('get_type', 1);
 
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-             $filter->disableIdFilter();
-
+            $filter->disableIdFilter();
         });
 
         $grid->id(__('ID'));
@@ -291,6 +290,8 @@ class WareTabController extends MainController
             )->attribute(['id' => 'profile_frame']);
         }
 
+
+
         $form->text('key', trans('key'));
         $script = <<<SCRIPT
              $(document).ready(function() {
@@ -329,6 +330,13 @@ class WareTabController extends MainController
         $form->number('num', __('num'));
 
         if (request('type') == 18) $form->color('color', trans('color'));
+        if (request('type') == 5) {
+            $form->html('<h1>' . __('padding') . '</h1>');
+            $form->number('top', __('top'));
+            $form->number('left', __('left'));
+            $form->number('right', __('right'));
+            $form->number('bottom', __('bottom'));
+        }
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
 

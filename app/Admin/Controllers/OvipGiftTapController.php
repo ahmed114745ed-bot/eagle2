@@ -56,7 +56,7 @@ class OvipGiftTapController extends MainController
             })
             ->row(function (Row $row) use ($ovip) {
                 $type = request('type');
-                if (in_array($type, [13, 17, 14, 19, 16, 20, 9])) {
+                if (in_array($type, [13, 17, 14, 19, 16, 20, 9, 22])) {
                     switch ($type) {
                         case 13:
                             $text = __('hide user country');
@@ -78,6 +78,9 @@ class OvipGiftTapController extends MainController
                             break;
                         case 9:
                             $text = __('user can not kick out from room');
+                            break;
+                        case 22:
+                            $text = __('user can upload Gif image');
                             break;
                         default:
                             $text = null;

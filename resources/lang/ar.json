@@ -3179,6 +3179,8 @@
 "Delete gift a medal":"حذف هدية ميدالية",
 "Level switch users":"  المستوى المستخدم",
 "Host reports":"تقارير المضيف",
+"top": "أعلى",
+  "bottom": "أسفل",
 "Moments": "اللحظات",
 "Reels": "المقاطع",
 "Uploads:": "الرفع:",
@@ -3191,7 +3193,10 @@
 "Reel Likes": "إعجابات المقاطع",
 "Reel Comments": "تعليقات المقاطع",
 "Withdraw": "سحب",
-"prof_reports": "تقارير الارباح"
+"prof_reports": "تقارير الارباح",
+"padding":"مسافة داخلية",
+  "user can upload Gif image": "يمكن للمستخدم رفع صورة بصيغة GIF"
+
 
 
 
