@@ -252,8 +252,8 @@ class OvipGiftTapController extends MainController
         $id   = request()->route('ware_gift');
         $ware = Ware::find($id);
 
-        if ( (request('type') && request('type') != 18 && request('type') != 21) ||
-            ($form->isEditing() && $ware && $ware->type != 18 && $ware->type != 21) ) {
+        if ((request('type') && request('type') != 18 && request('type') != 21) ||
+            ($form->isEditing() && $ware && $ware->type != 18 && $ware->type != 21)) {
 
             $form->display('ID');
             $form->text('name',     trans('name'));
@@ -287,16 +287,18 @@ class OvipGiftTapController extends MainController
             $form->color('color', trans('color'));
         }
 
-        if ( (request('type') && request('type') != 18 && request('type') != 21) ||
-            ($form->isEditing() && $ware && $ware->type != 18 && $ware->type != 21) ) {
+        if ((request('type') && request('type') != 18 && request('type') != 21) ||
+            ($form->isEditing() && $ware && $ware->type != 18 && $ware->type != 21)) {
 
             $form->saving(function (Form $form) {
 
-                if (request()->boolean('show_img__remove')) {
+                if (request()->input('show_img_remove') == 1) {
                     $form->model()->show_img = null;
+                    $form->show_img          = null;
                 }
-                if (request()->boolean('img2__remove')) {
+                if (request()->input('img2_remove') == 1) {
                     $form->model()->img2 = null;
+                    $form->img2          = null;
                 }
 
                 if (!$form->show_img && !$form->img2 &&
@@ -334,8 +336,8 @@ class OvipGiftTapController extends MainController
 
                     $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
 
-                    $ext          = strtolower($form->img2->guessExtension());
-                    $originalExt  = strtolower($form->img2->getClientOriginalExtension());
+                    $ext         = strtolower($form->img2->guessExtension());
+                    $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
                     if ($ext === 'zz' && $originalExt === 'svga') {
                         $ext = 'svga';
@@ -396,8 +398,8 @@ class OvipGiftTapController extends MainController
             }
 
             if ($form->type != 18 && $form->type != 21) {
-                $imageType1        = $form->input('image_type1');
-                $profileFrameType  = $form->input('profile_frame_type');
+                $imageType1       = $form->input('image_type1');
+                $profileFrameType = $form->input('profile_frame_type');
                 $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
                 if (is_null($imageType1) && is_null($profileFrameType)) {
