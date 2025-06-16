@@ -26,13 +26,14 @@ class Stripe
 
 
     public function make($data){
-        \Stripe\Stripe::setApiKey($data['stripe_test_secret_key']?->value);
+         info($data);
+        \Stripe\Stripe::setApiKey($data['stripe_test_secret_key']);
         $checkout_session = \Stripe\Checkout\Session::create(
             [
                 'line_items' => [
                     [
                         'price_data' => [
-                            'currency'=> $data['stripe_currency']?->value,
+                            'currency'=> $data['stripe_currency'],
                             'product_data'=>[
                                 'name'=>$data['name']
                             ],
