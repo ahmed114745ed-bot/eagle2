@@ -98,7 +98,7 @@ class StripeController extends Controller
 
                     $userId = $session->metadata->user_id;
                     $orderId = $session->metadata->order_id;
-                    info($orderId);
+                    info('orderId'.$orderId);
 
                     $this->makePayment($orderId, $userId);
                     info('completed');
@@ -112,6 +112,7 @@ class StripeController extends Controller
 
                     $userId = $session->metadata->user_id;
                     $orderId = $session->metadata->order_id;
+                    info('orderId'.$orderId);
 
                     $this->makePayment($orderId, $userId);
                     info('succeeded');
