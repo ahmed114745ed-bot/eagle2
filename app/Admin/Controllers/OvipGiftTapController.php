@@ -287,6 +287,13 @@ class OvipGiftTapController extends MainController
             )->attribute(['id' => 'image_type1']);
 
             $form->text('key', trans('key'));
+            if (request('type') == 5 || ($form->isEditing() && $ware && ($ware->type == 5))) {
+                $form->html('<h1>' . __('padding') . '</h1>');
+                $form->number('top', __('top'));
+                $form->number('left', __('left'));
+                $form->number('right', __('right'));
+                $form->number('bottom', __('bottom'));
+            }
         }
 
         if (request('type') == 18 || request('type') == 21) $form->color('color', trans('color'));
