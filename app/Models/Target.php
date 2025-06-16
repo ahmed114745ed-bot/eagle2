@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
 class Target extends Model
 {
+    use TimestampsWithTimezone;
 
     protected $fillable = [
         'id',
@@ -23,58 +24,20 @@ class Target extends Model
         'coin',
         'img',
         'app_profit_percentage',
-        'db_percentage'
+        'db_percentage',
     ];
 
     protected static function boot()
     {
         parent::boot();
 
-        static::saving(function ($model) {
-           
-            if (isset($model->usd) && isset($model->agency_share) &&  isset($model->db_percentage)) {
-                $model->app_profit_percentage = 100 - (double) $model->usd - (double) $model->agency_share - (double) $model->db_percentage;
+        self::saving(function ($model) {
+
+            if (isset($model->usd) && isset($model->agency_share) && isset($model->db_percentage)) {
+                $model->app_profit_percentage = 100 - (float) $model->usd - (float) $model->agency_share - (float) $model->db_percentage;
             }
-
-
         });
     }
-
-    public function getCreatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
 
     //     public function setReelAttribute($values)
     // {

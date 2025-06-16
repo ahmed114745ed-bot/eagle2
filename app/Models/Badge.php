@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Badge extends Model
 {
-    use HasFactory;
+    use HasFactory, TimestampsWithTimezone;
 
     protected $fillable = ['name', 'default_image', 'localized_images', 'priority'];
 

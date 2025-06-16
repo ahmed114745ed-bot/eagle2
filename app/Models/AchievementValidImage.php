@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AchievementValidImage extends Model
 {
-    use HasFactory;
-    protected $guarded=['id'];
+    use HasFactory, TimestampsWithTimezone;
+
+    protected $guarded = ['id'];
 }

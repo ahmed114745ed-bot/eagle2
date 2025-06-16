@@ -2,9 +2,6 @@
 
 namespace Modules\WhatsappAuth\Entities;
 
-use App\Models\Setting;
-use Cache;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,14 +11,9 @@ class WhatsappWebhookValidate extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $guarded = ['id'];
-
     public $timestamps = false;
-//whatsapp_webhook_validates
-    public function getCreatedAtColumn()
-    {
-        return 'id';
-    }
+
+    protected $guarded = ['id'];
 
     protected $fillable = [
         'uuid',
@@ -34,37 +26,6 @@ class WhatsappWebhookValidate extends Model
         'expires_at',
     ];
 
-
-    public function getCreatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-        $setting = Cache::rememberForever($cacheKey, function () {
-            $setting = Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
-
-        $timeZone = request()->header('tz') ?? $setting;
-        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-        $setting = Cache::rememberForever($cacheKey, function () {
-            $setting = Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
-
-        $timeZone = request()->header('tz') ?? $setting;
-        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
     public function scopeValidated(Builder $query)
     {
         return $query->where('status', 'validated')->where('expires_at', '>=', now());
@@ -74,9 +35,7 @@ class WhatsappWebhookValidate extends Model
     {
         return [
             'phone' => $this->phone_number ?? '',
-            'name' => $this->profile_name
+            'name' => $this->profile_name,
         ];
     }
-
-
 }

@@ -2,78 +2,23 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class Ware extends Model
 {
+    use TimestampsWithTimezone;
+
     protected $table = 'wares';
+
     protected $guarded = ['id'];
+
     protected $appends = ['image_type1', 'profile_frame_type'];
+
     protected $casts = [
-    'key_json' => 'array',
-];
-
-    public function getCreatedAtAttribute($value)
-    {
-               // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-               // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-    protected static function boot()
-    {
-        parent::boot();
-        static::saving(function ($model) {
-            if ($model->status) {
-                unset($model->status);
-            }
-            unset($model->image_type1);
-            unset($model->profile_frame_type);
-        });
-
-        static::updating(function ($model) {
-
-            unset($model->image_type1);
-            unset($model->profile_frame_type);
-        });
-        // Listen for the 'deleting' event of the Agency model
-        static::deleting(function ($id) {
-
-            $pack = Pack::where('target_id', $id->id)->delete();
-        });
-    }
+        'key_json' => 'array',
+    ];
 
     public function packs()
     {
@@ -82,20 +27,18 @@ class Ware extends Model
 
     public function scopeIsNotUsedInPacks(Builder $query)
     {
-        return $query->whereDoesntHave("packs", function ($q) {
-            $q->where(fn($q) => $q->where('packs.expire', 0)->orWhere('packs.expire', '>=', time()));
+        return $query->whereDoesntHave('packs', function ($q) {
+            $q->where(fn ($q) => $q->where('packs.expire', 0)->orWhere('packs.expire', '>=', time()));
         });
     }
 
     public function scopeShowUserCustom(Builder $query, int $userId)
     {
         return $query->where(
-            fn($q) =>
-            $q->whereDoesntHave('ware_users')
-                ->orWhereHas('ware_users', fn($q) => $q->where('user_id', $userId))
+            fn ($q) => $q->whereDoesntHave('ware_users')
+                ->orWhereHas('ware_users', fn ($q) => $q->where('user_id', $userId))
         );
     }
-
 
     public function ware_users()
     {
@@ -104,11 +47,34 @@ class Ware extends Model
 
     public function getImageType1Attribute()
     {
-        return  $this->image_type;
+        return $this->image_type;
     }
 
     public function getProfileFrameTypeAttribute()
     {
-        return  $this->image_type;
+        return $this->image_type;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        self::saving(function ($model) {
+            if ($model->status) {
+                unset($model->status);
+            }
+            unset($model->image_type1);
+            unset($model->profile_frame_type);
+        });
+
+        self::updating(function ($model) {
+
+            unset($model->image_type1);
+            unset($model->profile_frame_type);
+        });
+        // Listen for the 'deleting' event of the Agency model
+        self::deleting(function ($id) {
+
+            $pack = Pack::where('target_id', $id->id)->delete();
+        });
     }
 }

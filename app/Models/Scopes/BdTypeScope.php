@@ -14,6 +14,5 @@ class BdTypeScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         $builder->where('type', 'bd');
-
     }
 }
