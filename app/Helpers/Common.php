@@ -825,7 +825,7 @@ class Common
                     ->where('level', $vip->level)
                     ->where('type', $wareType)
                     ->first();
-        
+
                 if (!$isSetWare) {
                     $typesArr = [
                         1 => 'Gemstone',
@@ -848,11 +848,11 @@ class Common
                         29 => 'being kicked',
                         30 => 'anti ban',
                     ];
-                
+
                     $typeName = $typesArr[$wareType] ?? 'Unknown Type';
                     Ware::create([
                         'get_type' => 1,
-                        'type' => $wareType, 
+                        'type' => $wareType,
                         'name' => $typeName  ?? 'VIP Ware',
                         'name_en' => $typeName ?? 'VIP Ware',
                         'title' => $typeName ?? '',
@@ -1743,7 +1743,6 @@ class Common
 
                 ];
             case 'user':
-            case 'bd':
                 return [
                     'name' => $resource->senderUser->name ?? '',
                     'image' => $resource->senderUser->profile->avatar ?? '',
@@ -1751,6 +1750,15 @@ class Common
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
                     'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
+                ];
+            case 'bd':
+                return [
+                    'name' => $resource->senderUser->name ?? '',
+                    'image' => $resource->senderUser->profile->avatar ?? '',
+                    'uuid' => $resource->senderUser->uuid ?? '',
+                    'id' => $resource->senderUser->id ?? '',
+                    'type' => 'user',
+                    'url' => $resource->senderUser ? url("admin/usersBd/{$resource->senderUser->id}") : '#',
                 ];
             default:
                 return [
@@ -1767,7 +1775,6 @@ class Common
 
     public static function getReceiverInfo($resource)
     {
-        
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
@@ -1776,14 +1783,16 @@ class Common
                     'uuid' => $resource->receiveragency->id ?? '',
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
+                    'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                 ];
             case 'user':
                 return [
-                    'id' => $resource->receiverUser->id ?? '',
+                    'id' => $resource->receivnerUser->id ?? '',
                     'name' => $resource->receiverUser->name ?? '',
                     'image' => $resource->receiverUser->profile->avatar ?? '',
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
+                    'url' => $resource->receivnerUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
                 ];
             default:
                 return [
@@ -1830,6 +1839,6 @@ class Common
             return null;
         }
 
-        return $extras[$type]; 
+        return $extras[$type];
     }
 }
