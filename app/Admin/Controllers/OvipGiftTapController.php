@@ -129,31 +129,38 @@ class OvipGiftTapController extends MainController
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
 
         $grid->id(__('ID'));
-        $grid->column('name', __('name'));
+        if ($this->type == 18 || $this->type == 21) {
+            $grid->column('color', __('Color'))->display(function ($color) {
+                return "<div style='width: 30px; height: 30px; background-color: {$color}; border: 1px solid #ccc; border-radius: 4px;'></div>";
+            });
+        } else {
+            $grid->column('name', __('name'));
 
-        $grid->column('price', __('price'));
+            $grid->column('price', __('price'));
 
-        $grid->column('show_img', __('show_img'))->display(function ($path) {
-            /** @var Ware $this */
-            $defaultImage = asset("images/image.png");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 101, 50);
-        });
-        $grid->column('img2', __('show_img'))->display(function ($path) {
-            /** @var Ware $this */
-            $defaultImage = asset("images/image.png");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 101, 50);
-        });
+            $grid->column('show_img', __('show_img'))->display(function ($path) {
+                /** @var Ware $this */
+                $defaultImage = asset("images/image.png");
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($this->id, $url, 101, 50);
+            });
+            $grid->column('img2', __('show_img'))->display(function ($path) {
+                /** @var Ware $this */
+                $defaultImage = asset("images/image.png");
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($this->id, $url, 101, 50);
+            });
 
 
-        $grid->title(__('title'));
+            $grid->title(__('title'));
+        }
+
         $grid->expire(__('expire'));
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('edit-' . $this->permission_name)) {
             $permission = $this->permission_name;
@@ -304,7 +311,7 @@ class OvipGiftTapController extends MainController
         if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
-                 //dd($form->isEditing(),$form->model()->show_img,$form->model()->img2,request('show_img'),request('img2'));
+                //dd($form->isEditing(),$form->model()->show_img,$form->model()->img2,request('show_img'),request('img2'));
                 if (($form->isEditing() && (!($form->model()->show_img) && ! ($form->model()->img2))) && (!request('show_img') && !request('img2'))) {
                     $error = new MessageBag([
                         'title'   => 'Error',
