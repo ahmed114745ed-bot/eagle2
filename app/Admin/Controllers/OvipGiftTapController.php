@@ -304,7 +304,7 @@ class OvipGiftTapController extends MainController
         if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
-               // dd($form->model()->show_img, request('img2'), $form->model()->img2, request()->hasFile('img2'));
+                 dd($form->isEditing(),$form->model()->show_img,$form->model()->img2,request('show_img'),request('img2'));
                 if ((($form->isEditing() && !($form->model()->show_img) && ! ($form->model()->img2))) || (!request('show_img') && !request('img2'))) {
                     $error = new MessageBag([
                         'title'   => 'Error',
