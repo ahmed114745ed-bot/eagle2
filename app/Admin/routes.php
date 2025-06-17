@@ -224,7 +224,7 @@ Route::group(
         Route::post('/delete-user-vip/{id}', [UsersAppController::class, 'deleteUserVip']);
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
-        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
+//        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         Route::resource('free-users', 'FreeUserController');
 
