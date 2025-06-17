@@ -211,6 +211,7 @@ class OVipController extends MainController
 
             $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
         }
+        
         if (Admin::user()->can('*')) {
             $form->number('expire', __('expire'))->rules('required|numeric|gt:0');
         } else {
