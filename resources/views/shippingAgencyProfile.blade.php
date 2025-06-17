@@ -857,7 +857,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             margin-left: 10px;
         ">
-            <img src="{{ getImagePath($agency->display_image) }}" alt="Agency Logo" class="logo-img" style="
+            <img src="{{ getImagePath($agency->img) }}" alt="Agency Logo" class="logo-img" style="
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
@@ -885,7 +885,7 @@
                             background: #f0f0f0;
                             border: 2px solid rgba(255,255,255,0.3);
                         ">
-                            <img src="{{ getImagePath(@$agency?->owner?->profile->avatar) ?? 'path/to/default-avatar.png' }}" 
+                            <img src="{{ getImagePath(@$agency?->owner?->profile->avatar) }}" 
                                 alt="Owner" 
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
