@@ -67,7 +67,7 @@ class OvipGiftTapController extends MainController
                             $text = __('user ender room anonymous');
                             break;
                         case 14:
-                            $text = __('user can send  vip gift');
+                            $text = __('user can send vip gift');
                             break;
                         case 19:
                             $text = __('hide visitors to client pages');
