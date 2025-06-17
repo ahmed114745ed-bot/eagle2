@@ -274,6 +274,9 @@ class HomeController extends Controller
             'visit'          => 19,
             'room'           => 16,
             // 'spechEfeect'    => 22
+            'sound_effect'   => 21,
+            'being_kicked'   => 29,
+            'anti_ban'       => 30,
         ];
         $type         = $request->type;
         $this->homeService->changePackMode($type, $privilegeArr, $user, false);
