@@ -129,7 +129,7 @@ class OvipGiftTapController extends MainController
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
 
         $grid->id(__('ID'));
-        if ($this->type == 18 || $this->type == 21) {
+        if ( $type == 18 ||  $type == 21) {
             $grid->column('color', __('Color'))->display(function ($color) {
                 return "<div style='width: 30px; height: 30px; background-color: {$color}; border: 1px solid #ccc; border-radius: 4px;'></div>";
             });
