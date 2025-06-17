@@ -305,7 +305,7 @@ class OvipGiftTapController extends MainController
 
             $form->saving(function (Form $form) {
                  //dd($form->isEditing(),$form->model()->show_img,$form->model()->img2,request('show_img'),request('img2'));
-                if (($form->isEditing() && (!($form->model()->show_img) && ! ($form->model()->img2))) || (!request('show_img') && !request('img2'))) {
+                if (($form->isEditing() && (!($form->model()->show_img) && ! ($form->model()->img2))) && (!request('show_img') && !request('img2'))) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
