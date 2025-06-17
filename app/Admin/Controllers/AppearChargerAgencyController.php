@@ -5,40 +5,26 @@ namespace App\Admin\Controllers;
 use App\Models\Charge;
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Grid\Filter\Where;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\AgencySallary;
 use App\Models\ShippingAgency;
-use App\Admin\Selectable\Users;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
-use App\Traits\AdminTraits\AdminUserTrait;
 use App\Admin\Actions\DeleteShippingAgencyAction;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController
 {
-    /**
-     *
-     * Title for current resource.
-     *
-     * @var string
-     */
-    use AdminUserTrait;
-
     public $permission_name = 'appear-charger-agency';
 
     public function index(Content $content)
@@ -298,7 +284,7 @@ class AppearChargerAgencyController extends MainController
             ->switch(Common::getSwitchStates());
         $permission = $this->permission_name;
 
-        $grid->actions(function ($actions) use($permission){
+        $grid->actions(function ($actions) use ($permission) {
             $actions->disableView();
             if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
 
@@ -337,11 +323,6 @@ class AppearChargerAgencyController extends MainController
     protected function form()
     {
         $form = new Form(new ShippingAgency());
-
-        $ops = [];
-        foreach ($this->getAgencies() as $user) {
-            $ops[$user->id] = $user->name;
-        }
 
         // --- الحقول المشتركة ---
         $form->display('ID');
@@ -441,11 +422,11 @@ class AppearChargerAgencyController extends MainController
             $newOwnerId = $form->model()->app_owner_id;
 
             if (!$form->model()->exists) {
-              //  Common::createUserAdmin($appOwnerId);
+                //  Common::createUserAdmin($appOwnerId);
             }
 
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
-              //  Common::createUserAdmin($appOwnerId);
+                //  Common::createUserAdmin($appOwnerId);
 
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
@@ -509,26 +490,26 @@ class AppearChargerAgencyController extends MainController
         $charges = $resiveds = null;
         switch ($tab) {
             case 'charges':
-                        $charges = Charge::where('charger_type', 'agency')
-                        ->where('charger_id', $agencyId);
-            
-                    $relations = [];
-            
-                    $charges->when($filter_by === 'user', function ($query) use (&$relations) {
-                        $query->where('user_type', 'user');
-                        $relations[] = 'receiverUser';
-                    });
-            
-                    $charges->when($filter_by === 'agency', function ($query) use (&$relations) {
-                        $query->where('user_type', 'agency');
-                        $relations[] = 'receiverAgency';
-                    });
-            
-                    if (!empty($relations)) {
-                        $charges->with($relations);
-                    }
-            
-                    $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
+                $charges = Charge::where('charger_type', 'agency')
+                    ->where('charger_id', $agencyId);
+
+                $relations = [];
+
+                $charges->when($filter_by === 'user', function ($query) use (&$relations) {
+                    $query->where('user_type', 'user');
+                    $relations[] = 'receiverUser';
+                });
+
+                $charges->when($filter_by === 'agency', function ($query) use (&$relations) {
+                    $query->where('user_type', 'agency');
+                    $relations[] = 'receiverAgency';
+                });
+
+                if (!empty($relations)) {
+                    $charges->with($relations);
+                }
+
+                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
                 break;
 
             case 'resived':
@@ -539,16 +520,17 @@ class AppearChargerAgencyController extends MainController
                     ->paginate(10, ['*'], 'resived_page');
                 break;
         }
-
-        // dd($charges);
-      
-
+        $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
+        $totalSend = Charge::where('charger_type', 'agency')
+            ->where('charger_id', $agencyId)->sum('amount');
         return $content->title(__('agency profile'))
             ->view('shippingAgencyProfile', compact(
                 'agency',
                 'resiveds',
                 'charges',
-                'tab'
+                'tab',
+                'totalReceive',
+                'totalSend'
             ));
     }
 }

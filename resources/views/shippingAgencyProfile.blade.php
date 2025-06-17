@@ -845,9 +845,25 @@
     <div class="agency-profile-container">
         <!-- Header Section -->
         <div class="agency-header">
-            <div class="agency-avatar">
-                <img src="{{ getImagePath($agency->display_image) }}" alt="Agency Logo" class="logo-img">
-            </div>
+                    <div class="agency-avatar" style="
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-left: 10px;
+        ">
+            <img src="{{ getImagePath($agency->display_image) }}" alt="Agency Logo" class="logo-img" style="
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                padding: 5px;
+            ">
+        </div>
             <div class="agency-info">
                 <h1 class="agency-name">{{ @$agency?->name ?? ''}}</h1>
                 <div class="agency-meta">
@@ -861,6 +877,19 @@
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{__("Owner")}}:</span>
+                        <div style="
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 50%;
+                            overflow: hidden;
+                            background: #f0f0f0;
+                            border: 2px solid rgba(255,255,255,0.3);
+                        ">
+                            <img src="{{ getImagePath(@$agency?->owner?->profile->avatar) ?? 'path/to/default-avatar.png' }}" 
+                                alt="Owner" 
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+
                         <span class="meta-value">{{ @$agency?->owner?->name ?? 'N/A' }}</span>
                         <span class="meta-uuid">({{ @$agency?->owner?->uuid ?? 'N/A' }})</span>
                     </div>
@@ -876,8 +905,8 @@
                     </div> -->
                 </div>
             </div>
-            <button class="btn-back" onclick="window.history.back()">
-                {{__("Go Back")}} <i class="fas fa-arrow-left"></i>
+           <button class="btn-back" onclick="window.location.href='{{ url('admin/charge-agencies') }}'">
+                {{ __('Go Back') }} <i class="fas fa-arrow-left"></i>
             </button>
         </div>
 
@@ -896,50 +925,397 @@
         </div>
         @endif
 
-                <div style="display: flex; gap: 20px;">
-                    <!-- Stars Section -->
-                    <div class="performers-card" style="flex: 1;">
-                        <div class="section-header">
-                            <h2 class="section-title">
-                                <i class="fas fa-star"></i>
-                                {{ __('Agency Coins') }}
-                            </h2>
-                        </div>
-                        <div class="avatar-grid">
-                            {{ @$agency->coins }}
-                        </div>
-                    </div>
+                
 
-                    <!-- Filter Section -->
-                    <div class="card-target-filter-phone">
-                        <form method="GET" action="{{ url('admin/shipping-agencies/profile/' . $agency->id ) }}" class="filter-form">
-                            <div class="row">
-                                <input type="hidden" name="tab" value="charge">
-                                <div class="col-sm-12 col-md-8">
-                                    <div class="form-group mb-0">
-                                        <select name="filter_by" id="filter_by" class="form-control">
-                                            <option value="">{{ __('Select type') }}</option>
-                                            <option value="user" {{ request('filter_by') == 'user' ? 'selected' : '' }}>{{ __('User') }}</option>
-                                            <option value="agency" {{ request('filter_by') == 'agency' ? 'selected' : '' }}>{{ __('Agency') }}</option>
-                                        </select>
+                <div style="display: flex; gap: 15px; padding: 10px; flex-wrap: wrap;">
+                   <!-- Card 1: Balance -->
+                        <div class="performers-card" style="flex: 1; min-width: 300px; font-family: Arial, sans-serif;">
+                            <div class="card-content" style="
+                                padding: 20px;
+                                display: flex;
+                                justify-content: space-between;
+                                background: linear-gradient(135deg, #3a4f6a 0%, #265329 100%);
+                                border-radius: 12px;
+                                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                                color: white;
+                                position: relative;
+                                overflow: hidden;
+                                min-height: 180px;
+                                height: 100%;
+                            ">
+                                <!-- Decorative elements -->
+                                <div style="
+                                    position: absolute;
+                                    top: -50px;
+                                    right: -50px;
+                                    width: 150px;
+                                    height: 150px;
+                                    background: rgba(255,255,255,0.1);
+                                    border-radius: 50%;
+                                "></div>
+                                <div style="
+                                    position: absolute;
+                                    bottom: -30px;
+                                    left: -30px;
+                                    width: 100px;
+                                    height: 100px;
+                                    background: rgba(255,255,255,0.05);
+                                    border-radius: 50%;
+                                "></div>
+                                
+                                <!-- Left Content -->
+                                <div class="left-section" style="
+                                    text-align: left;
+                                    z-index: 2;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+                                    width: 50%;
+                                ">
+                                    <div>
+                                        <div style="
+                                            color: rgba(255,255,255,0.7);
+                                            margin-bottom: 5px;
+                                            font-size: 12px;
+                                            text-transform: uppercase;
+                                            letter-spacing: 1px;
+                                        ">
+                                            {{ __('coin shipping agency wallet') }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="
+                                            color: rgba(255,255,255,0.7);
+                                            font-size: 12px;
+                                            text-transform: uppercase;
+                                            letter-spacing: 1px;
+                                        ">
+                                            {{ __('Balance') }}
+                                        </div>
+                                        <div style="
+                                            font-size: 28px;
+                                            font-weight: bold;
+                                            letter-spacing: 1px;
+                                            font-family: 'Courier New', monospace;
+                                            margin-top: 5px;
+                                        ">
+                                            {{ number_format(@$agency->coins) }}
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="d-flex">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-filter"></i> {{ __('Apply') }}
-                                        </button>
-                                        @if(request()->has('month') || request()->has('year'))
-                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
-                                                <i class="fas fa-times"></i>
-                                            </a>
-                                        @endif
+                                
+                                <!-- Right Content -->
+                                <div class="right-section" style="
+                                    text-align: right;
+                                    z-index: 2;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+                                    width: 45%;
+                                ">
+                                    <div>
+                                        <div style="
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                            margin-bottom: 15px;
+                                            letter-spacing: 1px;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: flex-end;
+                                        ">
+                                            {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
+                                            <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="
+                                                width: 30px;
+                                                height: 30px;
+                                                margin-left: 10px;
+                                            ">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="
+                                            font-weight: bold;
+                                            margin-bottom: 5px;
+                                            letter-spacing: 1px;
+                                            font-size: 14px;
+                                            color: white;
+                                        ">{{ __('id') }} {{ @$agency->owner->uuid }}</div>
+                                        <div style="
+                                            color: white;
+                                            font-size: 14px;
+                                            text-transform: uppercase;
+                                        "> {{ __('agency') }} {{ @$agency->owner->name }}</div>
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        </div>
+
+                        <!-- Card 2: Sent Balance -->
+                        <div class="performers-card" style="flex: 1; min-width: 300px; font-family: Arial, sans-serif;">
+                            <div class="card-content" style="
+                                padding: 20px;
+                                display: flex;
+                                justify-content: space-between;
+                                background: linear-gradient(135deg, #3a4f6a 0%, #53264d 100%);
+                                border-radius: 12px;
+                                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                                color: white;
+                                position: relative;
+                                overflow: hidden;
+                                min-height: 180px;
+                                height: 100%;
+                            ">
+                                <!-- Decorative elements -->
+                                <div style="
+                                    position: absolute;
+                                    top: -50px;
+                                    right: -50px;
+                                    width: 150px;
+                                    height: 150px;
+                                    background: rgba(255,255,255,0.1);
+                                    border-radius: 50%;
+                                "></div>
+                                <div style="
+                                    position: absolute;
+                                    bottom: -30px;
+                                    left: -30px;
+                                    width: 100px;
+                                    height: 100px;
+                                    background: rgba(255,255,255,0.05);
+                                    border-radius: 50%;
+                                "></div>
+                                
+                                <!-- Left Content -->
+                                <div class="left-section" style="
+                                    text-align: left;
+                                    z-index: 2;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+                                    width: 50%;
+                                ">
+                                    <div>
+                                        <div style="
+                                            color: rgba(255,255,255,0.7);
+                                            margin-bottom: 5px;
+                                            font-size: 12px;
+                                            text-transform: uppercase;
+                                            letter-spacing: 1px;
+                                        ">
+                                            {{ __('coin shipping agency wallet') }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="
+                                            color: rgba(255,255,255,0.7);
+                                            font-size: 12px;
+                                            text-transform: uppercase;
+                                            letter-spacing: 1px;
+                                        ">
+                                            {{ __('Sent Balance') }}
+                                        </div>
+                                        <div style="
+                                            font-size: 28px;
+                                            font-weight: bold;
+                                            letter-spacing: 1px;
+                                            font-family: 'Courier New', monospace;
+                                            margin-top: 5px;
+                                        ">
+                                            {{ number_format(@$totalSend) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right Content -->
+                                <div class="right-section" style="
+                                    text-align: right;
+                                    z-index: 2;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+                                    width: 45%;
+                                ">
+                                    <div>
+                                        <div style="
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                            margin-bottom: 15px;
+                                            letter-spacing: 1px;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: flex-end;
+                                        ">
+                                            {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
+                                            <img src="{{ asset('images/dollar.jpg') }}" alt="Coin" style="
+                                                width: 30px;
+                                                height: 30px;
+                                                margin-left: 10px;
+                                            ">
+                                        </div>
+                                    </div>
+                                    <div style="
+                                            display: flex;
+                                            flex-direction: column;
+                                            gap: 5px;
+                                            margin-top: 10px;
+                                        ">
+                                            <div style="
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 5px;
+                                            ">
+                                                <span style="
+                                                    font-weight: bold;
+                                                    letter-spacing: 1px;
+                                                    font-size: 14px;
+                                                    color: white;
+                                                ">{{ __('id') }}</span>
+                                                <span style="
+                                                    font-size: 14px;
+                                                    color: white;
+                                                ">{{ @$agency->owner->uuid }}</span>
+                                            </div>
+                                            <div style="
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 5px;
+                                            ">
+                                                <span style="
+                                                    font-size: 14px;
+                                                    color: white;
+                                                    text-transform: uppercase;
+                                                ">{{ __('agency') }}</span>
+                                                <span style="
+                                                    font-size: 14px;
+                                                    color: white;
+                                                    text-transform: uppercase;
+                                                ">{{ @$agency->owner->name }}</span>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Received Balance -->
+                        <div class="performers-card" style="flex: 1; min-width: 300px; font-family: Arial, sans-serif;">
+                            <div class="card-content" style="
+                                padding: 20px;
+                                display: flex;
+                                justify-content: space-between;
+                                background: linear-gradient(135deg, #3a4f6a 0%, #532626 100%);
+                                border-radius: 12px;
+                                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                                color: white;
+                                position: relative;
+                                overflow: hidden;
+                                min-height: 180px;
+                                height: 100%;
+                            ">
+                                <!-- Decorative elements -->
+                                <div style="
+                                    position: absolute;
+                                    top: -50px;
+                                    right: -50px;
+                                    width: 150px;
+                                    height: 150px;
+                                    background: rgba(255,255,255,0.1);
+                                    border-radius: 50%;
+                                "></div>
+                                <div style="
+                                    position: absolute;
+                                    bottom: -30px;
+                                    left: -30px;
+                                    width: 100px;
+                                    height: 100px;
+                                    background: rgba(255,255,255,0.05);
+                                    border-radius: 50%;
+                                "></div>
+                                
+                                <!-- Left Content -->
+                                <div class="left-section" style="
+                                    text-align: left;
+                                    z-index: 2;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+                                    width: 50%;
+                                ">
+                                    <div>
+                                        <div style="
+                                            color: rgba(255,255,255,0.7);
+                                            margin-bottom: 5px;
+                                            font-size: 12px;
+                                            text-transform: uppercase;
+                                            letter-spacing: 1px;
+                                        ">
+                                            {{ __('coin shipping agency wallet') }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="
+                                            color: rgba(255,255,255,0.7);
+                                            font-size: 12px;
+                                            text-transform: uppercase;
+                                            letter-spacing: 1px;
+                                        ">
+                                            {{ __('Received Balance') }}
+                                        </div>
+                                        <div style="
+                                            font-size: 28px;
+                                            font-weight: bold;
+                                            letter-spacing: 1px;
+                                            font-family: 'Courier New', monospace;
+                                            margin-top: 5px;
+                                        ">
+                                            {{ number_format(@$totalReceive) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right Content -->
+                                <div class="right-section" style="
+                                    text-align: right;
+                                    z-index: 2;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+                                    width: 45%;
+                                ">
+                                    <div>
+                                        <div style="
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                            margin-bottom: 15px;
+                                            letter-spacing: 1px;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: flex-end;
+                                        ">
+                                            {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
+                                            <img src="{{ asset('images/dollar.jpg') }}" alt="Coin" style="
+                                                width: 30px;
+                                                height: 30px;
+                                                margin-left: 10px;
+                                            ">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="
+                                            font-weight: bold;
+                                            margin-bottom: 5px;
+                                            letter-spacing: 1px;
+                                            font-size: 14px;
+                                            color: white;
+                                        ">{{ __('id') }} {{ @$agency->owner->uuid }}</div>
+                                        <div style="
+                                            color: white;
+                                            font-size: 14px;
+                                            text-transform: uppercase;
+                                        "> {{ __('agency') }} {{ @$agency->owner->name }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
             </div>
 @php
     $activeTab = request('tab', 'charges');

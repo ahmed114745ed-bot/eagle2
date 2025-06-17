@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Modules\SalaryTransaction\Http\Controllers\AgentRequestController;
 use Modules\SalaryTransaction\Http\Controllers\ChargeCountryController;
@@ -16,18 +15,18 @@ Route::group(
             'web',
             'admin',
             'adminIp',
-//            'adminGeneralBan',
+            // 'adminGeneralBan',
             'multiLanguage',
             'agencyFeature'
         ],
-        'as'            => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix') . '.',
     ],
-    function (Router $router) {
-        $router->resource ('transaction-request-problem',RequestProblemController::class);
-        $router->resource ('agent-salary-requests',AgentRequestController::class);
-        $router->resource ('charge-country',ChargeCountryController::class);
-        $router->resource ('agency-country',ChargeAgencyController::class);
-        $router->resource('salary-requests', SalaryRequestController::class);
-        $router->resource ('agent-requests-history', AgentRequestHistoryController::class);
-
-});
+    function () {
+        Route::resource('transaction-request-problem', RequestProblemController::class);
+        Route::resource('agent-salary-requests', AgentRequestController::class);
+        Route::resource('charge-country', ChargeCountryController::class);
+        Route::resource('agency-country', ChargeAgencyController::class);
+        Route::resource('salary-requests', SalaryRequestController::class);
+        Route::resource('agent-requests-history', AgentRequestHistoryController::class);
+    }
+);

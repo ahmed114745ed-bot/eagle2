@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,11 +23,5 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-
-//        Auth::provider('custom', function ($app, array $config) {
-//
-//            // Return an instance of Illuminate\Contracts\Auth\UserProvider...
-//            return new CustomUserProvider();
-//        });
     }
 }

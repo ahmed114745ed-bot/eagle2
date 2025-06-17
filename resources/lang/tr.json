@@ -595,7 +595,7 @@
     "percentage-target": "Hedeflenen yüzde",
     "charges reports": "Yükleme raporları",
     "dash_repo": "Dashboard yüklemesi",
-    "app_repo": "Uygulama üzerinden yükleme",
+    "app_repo": "Şarj Ajansı Etkinliği",
     "payment gateway": "Ödeme geçitleri",
     "sendTo": "Gönderilen kişi",
     "parent-users": " Ana kullanıcılar",
@@ -606,6 +606,10 @@
     "reals_uploads": "Reels yükleme",
     "real_likes": "Reels beğenileri",
     "real_comments": "Reels yorumları",
+    "Total recharge from recharge agencies": "Şarj ajanslarından toplam şarj",
+  "Total recharge to recharge agencies": "Şarj ajanslarına toplam şarj",
+  "Sender UUID or shipping Agency ID": "Gönderici UUID veya kargo acentesi kimliği",
+  "receiver UUID or shipping Agency ID": "Alıcı UUID veya kargo acentesi kimliği",
     "uploads": "Yüklemeler",
     "like": "Beğeni",
     "comment": "Yorum",
@@ -3023,11 +3027,27 @@
   "hide room": "Odayı gizle",
   "user can not kick out from room": "Kullanıcı odadan atılamaz",
   "Receiver Level": "Alıcının Seviyesi",
+  "Level switch users":"Kullanılan seviye ",
   "cancel": "İptal et",
+  "top": "üst",
+  "padding": "iç boşluk",
+  "user can upload Gif image": "Kullanıcı GIF görüntüsü yükleyebilir",
+  "bottom": "alt",
+  "can not ban this user": "Bu kullanıcı yasaklanamaz",
   "Delete gift a medal": "Bir madalya hediyesini sil",
    "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
 ,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
-
+,"Moments": "Anlar",
+    "Reels": "Videolar",
+    "Uploads:": "Yüklemeler:",
+    "Likes:": "Beğeniler:",
+    "Comments:": "Yorumlar:",
+    "Moment Upload": "An Yüklemesi",
+    "Moment Likes": "An Beğenileri",
+    "Moment Comments": "An Yorumları",
+    "Reel Upload": "Video Yüklemesi",
+    "Reel Likes": "Video Beğenileri",
+    "Reel Comments": "Video Yorumları"
 
 
 

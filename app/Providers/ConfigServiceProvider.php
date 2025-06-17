@@ -24,27 +24,26 @@ class ConfigServiceProvider extends ServiceProvider
     {
         Config::set('exp_percentages', $this->getReceivedAndSanderPercentage());
 
-         $config = getPusherConfig();
+        $config = getPusherConfig();
 
-         if ($config) {
-             Config::set('broadcasting.connections.pusher.key', @$config['app_key']);
-             Config::set('broadcasting.connections.pusher.secret', @$config['app_secret']);
-             Config::set('broadcasting.connections.pusher.app_id', @$config['app_id']);
-             Config::set('broadcasting.connections.pusher.options.cluster', @$config['app_cluster']);
-         }
+        if ($config) {
+            Config::set('broadcasting.connections.pusher.key', @$config['app_key']);
+            Config::set('broadcasting.connections.pusher.secret', @$config['app_secret']);
+            Config::set('broadcasting.connections.pusher.app_id', @$config['app_id']);
+            Config::set('broadcasting.connections.pusher.options.cluster', @$config['app_cluster']);
+        }
         $requestPath = \Request::path();
 
-         if (\Str::startsWith($requestPath, 'preview')){//admin.route.prefix,admin.auth.controller
-             Config::set('session.cookie', 'laravel_preview');
-             Config::set('admin.route.prefix', 'preview/admin');
+        if (\Str::startsWith($requestPath, 'preview')) { //admin.route.prefix,admin.auth.controller
+            Config::set('session.cookie', 'laravel_preview');
+            Config::set('admin.route.prefix', 'preview/admin');
             $get = Config::get('admin.route.middleware');
-            $get[]="prevent-delete";
-            Config::set('admin.route.middleware',$get);
-             Config::set('admin.auth.controller', \App\Admin\Controllers\Preview\AuthController::class);
-         }
+            $get[] = "prevent-delete";
+            Config::set('admin.route.middleware', $get);
+            Config::set('admin.auth.controller', \App\Admin\Controllers\Preview\AuthController::class);
+        }
 
-
-         // Timezone value
+        // Timezone value
         Config::set('app.owner_timezone', getTimezone());
     }
 
@@ -60,7 +59,6 @@ class ConfigServiceProvider extends ServiceProvider
             ];
 
             $collection = Common::getConfFromKey($keys);
-            // \Log::info($collection);
             $values = [];
 
             foreach ($keys as $key) {
@@ -71,16 +69,4 @@ class ConfigServiceProvider extends ServiceProvider
             return $values;
         });
     }
-    // public function getReceivedAndSanderPercentage(): array
-    // {
-    //     $keys       = [ 'exp_sender_percentage', 'exp_received_percentage', 'exp_cp_percentage'];
-    //     $collection = Common::getConfFromKey($keys);
-    //     $values = [];
-    //     foreach ($keys as $key) {
-    //         $config    = $collection->where('name', $key)->first();
-    //         $values[] = $config? $config->value / 100 : 1;
-    //     }
-    //     unset($collection);
-    //     return $values;
-    // }
 }

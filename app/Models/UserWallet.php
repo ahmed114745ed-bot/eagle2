@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class UserWallet extends Model
-{    
-    use HasFactory;
+{
+    use HasFactory, TimestampsWithTimezone;
+
     protected $fillable = ['user_id', 'value', 'cut_amount', 'pending_value'];
 
     public function user(): BelongsTo
@@ -23,8 +26,6 @@ class UserWallet extends Model
 
     public function getCurrentBalanceAttribute()
     {
-        return $this->value - $this->cut_amount ;
+        return $this->value - $this->cut_amount;
     }
-    
-
 }

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,16 +10,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WhatsappWebhookValidate extends Model
 {
-    use HasFactory, SoftDeletes;
-
-    protected $guarded = ['id'];
+    use HasFactory, SoftDeletes, TimestampsWithTimezone;
 
     public $timestamps = false;
-//whatsapp_webhook_validates
-    public function getCreatedAtColumn()
-    {
-        return 'id';
-    }
+
+    protected $guarded = ['id'];
 
     protected $fillable = [
         'uuid',
@@ -32,42 +27,6 @@ class WhatsappWebhookValidate extends Model
         'expires_at',
     ];
 
-    public function getCreatedAtAttribute($value)
-    {
-               // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-               // Cache key for the timezone setting
-    $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
     public function scopeValidated(Builder $query)
     {
         return $query->where('status', 'validated')->where('expires_at', '>=', now());
@@ -77,9 +36,7 @@ class WhatsappWebhookValidate extends Model
     {
         return [
             'phone' => $this->phone_number ?? '',
-            'name' => $this->profile_name
+            'name' => $this->profile_name,
         ];
     }
-
-
 }

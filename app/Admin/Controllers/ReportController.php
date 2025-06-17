@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Grid;
@@ -10,7 +11,7 @@ use App\Models\AdminUser;
 use App\Facades\ManagerHelper;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ReportController extends MainController
 {
@@ -21,7 +22,7 @@ class ReportController extends MainController
         checkAgencyFeature();
 
         return parent::index($content
-            ->title(trans('reports'))
+            ->title(trans('Host reports'))
             ->description(__(request('desc', 'users')))
             ->row(function ($row) {
                 $row->column(2, view('admin.grid.common.actions'));
@@ -62,10 +63,8 @@ class ReportController extends MainController
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
-                // $filter->equal('salaries.year', __('Year'));
-                // $filter->equal('salaries.month', __('Month'));
                 $filter->where(function ($query) {
-                    $year = Request::input('year');
+                    $year = request('year');
                     if (!empty($year)) {
                         $query->whereHas('userSallary', function ($q) use ($year) {
                             $q->where('year', $year);
@@ -74,11 +73,9 @@ class ReportController extends MainController
                 }, __('Year'), 'year')->integer();
             });
 
-
             $filter->where(function ($query) {
-                $month = Request::input('month');
+                $month = request('month');
                 if (!empty($month)) {
-
                     $query->whereHas('userSallary', function ($q) use ($month) {
                         $q->where('month', $month);
                     });
@@ -100,9 +97,8 @@ class ReportController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this) ? url("admin/users/{$this->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
+            $showUrl = $this ? url("admin/users/{$this->id}") : 0;
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
@@ -110,42 +106,109 @@ class ReportController extends MainController
                         </a>
                         <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
                     </div>
-                </div>
-            ";
+                </div>";
         });
         $grid->column('monthly_diamond_received', __('diamond'))->display(function () {
-            $diamond = @$this->getTotalDiamond(request()->month, request()->year) ?? 0;
+            $diamond = @$this->getTotalDiamond(request('month'), request('year')) ?? 0;
             $image = asset('images/diamond.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-
-                       <span>{$diamond}</span>
-                         <img src='{$image}' alt='USD' width='20' height='20'>
-                   </div>";
+                    <span>{$diamond}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20'>
+                </div>";
         });
         $grid->column('target', __('target'))->display(function () {
-            return @$this->getTotalSallary(request()->month, request()->year) ?? 0;
+            return @$this->getTotalSallary(request('month'), request('year')) ?? 0;
         });
         $grid->column('expenses', __('expenses'))->display(function () {
-            return @$this->getTotalCutAmount(request()->month, request()->year) ?? 0;
+            return @$this->getTotalCutAmount(request('month'), request('year')) ?? 0;
         });
 
         $grid->column('total', __('salary'))->display(function () {
-            $salary = $this->getSalary(request()->month, request()->year) ?? 0;
+            $salary = $this->getSalary(request('month'), request('year')) ?? 0;
             $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
-
-                        <span>{$salary}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
+            return "<div style='display: flex; align-items: center;'>
+                    <span>{$salary}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20'>
+                </div>";
         });
+        $grid->column('sallary_year', __('Year'))->display(function () {
+            $year = request('year') ?? now()->year;
+            $month = request('month') ?? now()->month;
+        
+            $sallary = $this->userSallary()
+                ->where('month', $month)
+                ->where('year', $year)
+                ->latest()
+                ->first();
+        
+            return $sallary?->year ?? '-';
+        });
+        
+        $grid->column('sallary_month', __('Month'))->display(function () {
+            $month = request('month') ?? now()->month;
+            $monthName = Carbon::create()->month($month)->translatedFormat('F'); // اسم الشهر حسب اللغة
+        
+            $sallary = $this->userSallary()
+                ->where('month', $month)
+                ->where('year', request('year', now()->year))
+                ->first();
+        
+            return $sallary ? $monthName : '-';
+        });
+        
+        $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
+            $month = request('month') ?? now()->month;
+            $year = request('year') ?? now()->year;
+        
+            $sallary = $this->userSallary()
+                ->where('month', $month)
+                ->where('year', $year)
+                ->first();
+        
+            if (!$sallary || !$sallary->extras) {
+                return '<span style="color: #aaa;">No Data</span>';
+            }
+        
+            $extras = json_decode($sallary->extras, true);
+        
+            $momentUpload = $extras['moment']['upload'] ?? '-';
+            $momentLikes = $extras['moment']['likes'] ?? '-';
+            $momentComments = $extras['moment']['comments'] ?? '-';
+        
+            $reelUpload = $extras['reel']['upload'] ?? '-';
+            $reelLikes = $extras['reel']['likes'] ?? '-';
+            $reelComments = $extras['reel']['comments'] ?? '-';
 
+            $labelMoments = __('Moments');
+            $labelReels = __('Reels');
+            $labelUploads = __('Uploads:');
+            $labelLikes = __('Likes:');
+            $labelComments = __('Comments:');
+        
+            return <<<HTML
+                <div style="line-height: 1.6;">
+                    <div><b>{$labelMoments}</b></div>
+                    <ul style="margin-left: 8px;width: 149px;">
+                        <li><b>{$labelUploads}</b> {$momentUpload}</li>
+                        <li><b>{$labelLikes}</b> {$momentLikes}</li>
+                        <li><b>{$labelComments}</b> {$momentComments}</li>
+                    </ul>
+                    <div><b>{$labelReels}</b></div>
+                    <ul style="margin-left: 8px;width: 149px;">
+                        <li><b>{$labelUploads}</b> {$reelUpload}</li>
+                        <li><b>{$labelLikes}</b> {$reelLikes}</li>
+                        <li><b>{$labelComments}</b> {$reelComments}</li>
+                    </ul>
+                </div>
+            HTML;
+        });
         $grid->column('agency', __('agency'))->display(function () {
             $name = @$this->agency->name ?? '';
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
+            $showUrl = $this ? url("admin/agencies/profile/{$this->id}") : 0;
 
-            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
@@ -153,14 +216,16 @@ class ReportController extends MainController
 
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <span>$name</span>
+                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <span>$name</span>
+                </a>
             </div>
         ";
         });
 
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('custom-export-users', ['month' => request()->month, 'year' => request()->year, 'agency_id' => request('agency_id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . route('custom-export-users', ['month' => request('month'), 'year' => request()->year, 'agency_id' => request('agency_id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
         });
 
         return $grid;
@@ -170,18 +235,22 @@ class ReportController extends MainController
     {
         $grid = new Grid(new Agency());
 
+        $grid->model()
+            ->withCount(['users'])
+            ->with(['owner.profile']);
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
             $filter->disableIdFilter();
 
-            $filter->equal('id', __('dashboard.agency'))->select()->ajax(route('admin.filter-agencies'));
+            $filter->equal('id', __('dashboard.agency'))
+                ->select()
+                ->ajax(route('admin.filter-agencies'));
 
             $filter->column(1 / 2, function ($filter) {
-                // $filter->equal('salaries.year', __('Year'));
-                // $filter->equal('salaries.month', __('Month'));
                 $filter->where(function ($query) {
-                    $year = Request::input('year');
+                    $year = request('year');
                     if (!empty($year)) {
                         $query->whereHas('agencySalaries', fn($q) => $q->where('year', $year));
                     }
@@ -189,86 +258,81 @@ class ReportController extends MainController
             });
 
             $filter->where(function ($query) {
-                $month = Request::input('month');
+                $month = request('month');
                 if (!empty($month)) {
                     $query->whereHas('agencySalaries', fn($q) => $q->where('month', $month));
                 }
             }, __('Month'), 'month')->integer();
         });
+        $grid->column('id', __('ID'));
 
-        $grid->column('id', __('Id'));
-        $grid->column('name', __('name'))
-            ->display(function () {
-                $name = @$this->name ?? '';
-                $path = @$this->img;
-                $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+        $grid->column('agency', __('dashboard.agency'))->display(function () {
+            $defaultImage = asset('images/icon-agency.jpg');
+            $url = getImagePath($this->img) ?? $defaultImage;
 
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-                return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <span>$name</span>
-            </div>
-        ";
-            });
-        $grid->column('target', __('target'))->display(function () {
-            return @$this->getTotalSallaryAgency(request()->month, request()->year) ?? 0;
-        });
-        $grid->column('expenses', __('expenses'))->display(function () {
-            return @$this->getTotalCutAmountAgency(request()->month, request()->year) ?? 0;
-        });
-
-        $grid->column('total', __('salary'))->display(function () {
-            $salary = $this->getSalaryAgency(request()->month, request()->year) ?? 0;
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center;'>
-
-                        <span>{$salary}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        });
-        $grid->column('agent', __('agent'))->display(function () {
-            return;
-            $name = @$this->owner->name ?: @$this->dashOwner->name;
-            $uid = @$this->owner->uuid;
-            $path = @$this->owner->profile?->avatar ?? @$this->dashOwner->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            $id = @$this->owner->id ?: @$this->dashOwner->id ?? 0;
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =   url("admin/users/{$id}");
-            return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        $image
-                        <div>
-                           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                            </a>
-                            <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+
+            $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
+
+            return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            <img src='$url' style='height: 40px !important; width: 40px !important; object-fit: cover;' />
+                            <div style='display: flex; flex-direction: column;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$this->name}</span>
+                                <span style='font-size: smaller;'>ID: {$this->id}</span>
+                            </div>
                         </div>
-                    </div>
-                ";
+                    </a>";
         });
-        $grid->column('users', __('users'))->display(function () {
-            return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users()->count() . '</a>';
+
+        $grid->column('target', __('target'))->display(function () {
+            return @$this->getTotalTargetAgency(request('month'), request('year')) ?? 0;
         });
-        // $grid->column('cashing', __('cashing'))->display(function () {
-        //     return (new \App\Admin\Actions\SalaryAction($this->id, 'agency'))->render();
+        // $grid->column('expenses', __('expenses'))->display(function () {
+        //     return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
         // });
 
+        $grid->column('total', __('salary'))->display(function () {
+            $salary = $this->getSalaryAgency(request('month'), request('year')) ?? 0;
+            $image = asset('images/dollar.jpg');
+            return "<div style='display: flex; align-items: center;'>
+                    <span>{$salary}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20'>
+                </div>";
+        });
+        // $grid->column('owner.name', __('owner'))->display(function ($name) {
+        //     $uid = $this->owner?->uuid;
+        //     $path = $this->owner?->profile?->avatar;
+        //     $defaultImage = asset('images/businessman-icon.jpg');
+        //     $url = getImagePath($path) ?? $defaultImage;
+
+        //     // Check if the image exists
+        //     if (!isImageExists($url)) {
+        //         $url = $defaultImage;
+        //     }
+
+        //     $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
+
+        //     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+        //     return "<div style='display: flex; align-items: center; gap: 10px;'>
+        //             {$image}
+        //             <div>
+        //                 <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+        //                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+        //                 </a>
+        //                 <span style='font-size: smaller;'>UUID: $uid</span>
+        //             </div>
+        //         </div>";
+        // });
+        $grid->column('hosts', __('dashboard.hosts'))->display(function () {
+            return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
+        });
+
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('agency-export-report', ['month' => request()->month, 'year' => request()->year, 'agency_id' => request()->id]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . route('agency-export-report', ['month' => request('month'), 'year' => request()->year, 'agency_id' => request()->id]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
 
         return $grid;
@@ -283,7 +347,6 @@ class ReportController extends MainController
         $grid->column('user.id', __('Id'));
 
         $grid->column('user.name', __('name'))->display(function ($name) {
-
             $uid = @$this->user->uuid;
             $path = @$this?->user->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -295,9 +358,8 @@ class ReportController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->user) ? url("admin/users/{$this->user->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
+            $showUrl = $this->user ? url("admin/users/{$this->user->id}") : 0;
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
@@ -305,18 +367,16 @@ class ReportController extends MainController
                         </a>
                         <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
                     </div>
-                </div>
-            ";
+                </div>";
         });;
 
         $grid->column('due', __('due'))->display(function ($_) {
-            $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
+            $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope()->get(), $this->app_id);
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-
-                        <span>{$salary}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
+                    <span>{$salary}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20'>
+                </div>";
         });
 
         $grid->export(function ($export) {

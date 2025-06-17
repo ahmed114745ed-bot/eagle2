@@ -18,14 +18,14 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
 use App\Models\Ware;
-use App\Observers\Api\V1\AgencyJoinRequestObserver;
-use App\Observers\Api\V1\AgencyObserver;
-use App\Observers\Api\V1\FamilyObserver;
-use App\Observers\Api\V1\FamilyUserObserver;
-use App\Observers\Api\V1\PKObserver;
-use App\Observers\Api\V1\RoomObserver;
-use App\Observers\Api\V1\UserObserver;
-use App\Observers\Api\V1\UserSallaryObserver;
+use App\Observers\AgencyJoinRequestObserver;
+use App\Observers\AgencyObserver;
+use App\Observers\FamilyObserver;
+use App\Observers\FamilyUserObserver;
+use App\Observers\PKObserver;
+use App\Observers\RoomObserver;
+use App\Observers\UserObserver;
+use App\Observers\UserSallaryObserver;
 use App\Observers\EmojiObserver;
 use App\Observers\GiftObserver;
 use App\Observers\WareObserver;
@@ -143,7 +143,7 @@ class AppServiceProvider extends ServiceProvider
 
                 'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
                 'is_paysky_active' => $settings['is_paysky_active'] ?? 0,
-                'is_stripe_active' => $settings['is_stripe_active'] ?? 0,
+                'is_stripe_active' => $settings['is_strip_active'] ?? 0,
                 'is_opay_active' => $settings['is_opay_active'] ?? 0,
                 'is_applepay_active' => $settings['is_applepay_active'] ?? 0,
             ]);
@@ -166,7 +166,6 @@ class AppServiceProvider extends ServiceProvider
 
         Config::set('admin.logo', Cache::get('app_title', 'Default Title'));
 
-        // تسجيل الـ Observers
         User::observe(UserObserver::class);
         Gift::observe(GiftObserver::class);
         Emoji::observe(EmojiObserver::class);

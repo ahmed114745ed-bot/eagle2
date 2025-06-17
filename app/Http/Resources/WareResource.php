@@ -33,6 +33,13 @@ class WareResource extends JsonResource
             'image_type' => $this->image_type ?? "",
             'type'       => $this->type,
             'key_json'  => $this->key_json,
+            'padding' => $this->when($this->type == 5, [
+                'top'    => $this->top  ?? 0,
+                'left'   => $this->left ?? 0,
+                'right'  => $this->right?? 0,
+                'bottom' => $this->bottom ?? 0,
+            ]),
+
         ];
     }
 }

@@ -278,6 +278,7 @@ Route::group(
         Route::post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         Route::post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
+        Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
         Route::resource('targets', 'TargetController');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');

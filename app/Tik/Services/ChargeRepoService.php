@@ -261,17 +261,18 @@ class ChargeRepoService
     public function charge( $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
 
-        WalletService::storeTransaction(
-            $sender->id,
-            'cut',
-            $usd,
-            'user_transaction',
-            'transfer_to_user',
-            ['receiver_id' => $receiver->id],
-            'charge_to_user'
+        if ($chargeType == 'user'){
+            WalletService::storeTransaction(
+                $sender->id,
+                'cut',
+                $usd,
+                'user_transaction',
+                'transfer_to_user',
+                ['receiver_id' => $receiver->id],
+                'charge_to_user'
 
-         );
-
+            );
+        }
         // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
