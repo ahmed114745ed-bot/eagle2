@@ -91,14 +91,13 @@ class OvipGiftTapController extends MainController
                             $text = null;
                     }
                     //$row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . $text . '</div>');
-                    $row->column(12, function () use ($image, $text) {
-                        return '
-                                    <div style="text-align: center;">
-                                        <img src="' . $image . '" alt="Image" style="max-height: 120px; margin-bottom: 10px;">
-                                        <div style="font-size: 48px; font-weight: bold;">' . $text . '</div>
-                                    </div>
-                                ';
-                    });
+                    $row->column(12, '
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                                                <img src="' . $image . '" alt="VIP Image" style="max-height: 60px;">
+                                                <div style="font-size: 48px; font-weight: bold;">' . $text . '</div>
+                                            </div>
+                                        ');
+                    
                 } else {
                     $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
                 }
