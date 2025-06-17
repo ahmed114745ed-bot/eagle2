@@ -1018,7 +1018,7 @@
                                     justify-content: space-between;
                                     width: 45%;
                                 ">
-                                    <div>
+                                    {{-- <div> --}}
                                         <div style="
                                             font-size: 18px;
                                             font-weight: bold;
@@ -1035,7 +1035,7 @@
                                                 margin-left: 10px;
                                             ">
                                         </div>
-                                    </div>
+                                    {{-- </div> --}}
                                     <div>
                                         <div style="
                                             font-weight: bold;
