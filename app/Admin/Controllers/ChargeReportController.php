@@ -123,9 +123,8 @@ class ChargeReportController extends MainController
 
                 $filter->where(function () {}, __('Type'), 'filter_type')
                     ->select([
-                        ''         => 'All',
-                        'user'     => 'User',
                         'shipping' => 'Shipping Agency',
+                        'user'     => 'User',
                     ])->default('shipping');
 
                 $filter->where(function ($query) {
