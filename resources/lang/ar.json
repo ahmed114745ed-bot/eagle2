@@ -3205,7 +3205,12 @@
   "Received Balance": "الرصيد المستلم",
   "Sent Balance": "الرصيد المرسل",
   "total wallet": "إجمالي المحفظة",
-  "export/import": "صادر / وارد"
+  "export/import": "صادر / وارد",
+
+"remove_admin": "إزالة من المشرفين",
+"kick": "طرد",
+"are_you_sure_remove_member": "هل أنت متأكد من إزالة هذا العضو؟",
+"are_you_sure_remove_admin": "هل أنت متأكد من إزالة هذا المسؤول؟"
   
 
 

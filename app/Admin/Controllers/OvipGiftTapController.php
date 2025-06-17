@@ -267,11 +267,11 @@ class OvipGiftTapController extends MainController
 
             $form->image('show_img', trans('img'))->name(function ($file) {
                 return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-            })->default('1.png');
+            })->default('1.png')->removable();
             $form->file('img2', trans('svg'))
                 ->name(function ($file) {
                     return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-                });
+                })->removable();
 
             $form->keyValue('key_json', 'key_json');
 
@@ -305,7 +305,7 @@ class OvipGiftTapController extends MainController
 
             $form->saving(function (Form $form) {
 
-                if (!$form->show_img && !$form->img2) {
+                if ($form->show_img instanceof UploadedFile && $form->img2 instanceof UploadedFile) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -315,24 +315,7 @@ class OvipGiftTapController extends MainController
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = [
-                        'svga',
-                        'mp4',
-                        'jpg',
-                        'jpeg',
-                        'png',
-                        'gif',
-                        'bmp',
-                        'tiff',
-                        'svg',
-                        'webp',
-                        'mov',
-                        'avi',
-                        'wmv',
-                        'flv',
-                        'mkv',
-                        'webm',
-                    ];
+                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
 
@@ -408,15 +391,17 @@ class OvipGiftTapController extends MainController
                 return back()->with(compact('error'));
             }
             if (request('type') != 18 && request('type') != 21) {
-                $imageType1 = $form->input('image_type1');
-                $profileFrameType = $form->input('profile_frame_type');
-                $form->model()->image_type = $imageType1 ?? $profileFrameType;
+                $imageType1        = $form->input('image_type1')        ?? $form->model()->image_type;
+                $profileFrameType  = $form->input('profile_frame_type') ?? $form->model()->image_type;
 
-                if (is_null($imageType1) && is_null($profileFrameType)) {
-
-                    session()->flash('show_alert', 'Your alert message');
-                    return redirect()->back();
+                if ($form->isCreating()) {
+                    if (is_null($imageType1) && is_null($profileFrameType)) {
+                        session()->flash('show_alert', 'Please choose an image type');
+                        return back();
+                    }
                 }
+
+                $form->model()->image_type = $imageType1 ?? $profileFrameType;
             }
 
             (new UserCounterServices)->eventUsers('ware');

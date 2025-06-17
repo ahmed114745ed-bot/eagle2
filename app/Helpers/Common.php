@@ -1693,6 +1693,7 @@ class Common
 
     public static function getReceiverInfo($resource)
     {
+        
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
@@ -1734,5 +1735,27 @@ class Common
             'receiverUser.profile',
             'receiveragency',
         ];
+    }
+
+
+    public static function getUserMediaStats($userId, $type)
+    {
+        if (!in_array($type, ['moment', 'reel'])) {
+            return null;
+        }
+
+        $record = UserSallary::where('user_id', $userId)->latest()->first();
+
+        if (! $record || empty($record->extras)) {
+            return null;
+        }
+
+        $extras = json_decode($record->extras, true);
+
+        if (! isset($extras[$type])) {
+            return null;
+        }
+
+        return $extras[$type]; 
     }
 }

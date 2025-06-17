@@ -31,7 +31,7 @@ class Agency extends Model
 
     public function charges()
     {
-        return $this->hasMany(Charge::class, 'agency_id')->whereNotNull('agency_id');
+        return $this->hasMany(Charge::class, 'user_id','id')->where('charger_type','host_agency');
     }
 
     public function Countries()
@@ -227,6 +227,19 @@ class Agency extends Model
             ->sum(DB::raw('sallary'));
 
         return floor($agencySalary ?? 0);
+    }
+    public function getTotalTargetAgency($month = null, $year = null)
+    {
+        $month ??= now()->month;
+        $year ??= now()->year;
+        $sumTargets = 
+             UserSallary::where('user_agency_id', $this->id)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->sum('target_diamonds');
+        
+
+        return floor($sumTargets ?? 0);
     }
 
     public function getTotalCutAmountAgency($month = null, $year = null)
