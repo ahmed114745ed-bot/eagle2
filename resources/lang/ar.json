@@ -3201,6 +3201,11 @@
   "Total recharge to recharge agencies":"مجموع الشحن إلى وكلات الشحن" ,
   "Sender UUID or shipping Agency ID": "معرّف المرسل (UUID) أو معرّف وكالة الشحن",
 "receiver UUID or shipping Agency ID": "معرّف المستلم (UUID) أو معرّف وكالة الشحن",
+"Balance": "الرصيد",
+  "Received Balance": "الرصيد المستلم",
+  "Sent Balance": "الرصيد المرسل",
+  "total wallet": "إجمالي المحفظة",
+  "export/import": "صادر / وارد",
 
 "remove_admin": "إزالة من المشرفين",
 "kick": "طرد",
