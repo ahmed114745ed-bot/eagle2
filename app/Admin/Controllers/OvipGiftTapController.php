@@ -261,11 +261,11 @@ class OvipGiftTapController extends MainController
 
             $form->image('show_img', trans('img'))->name(function ($file) {
                 return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-            })->default('1.png')->removable();
+            })->default('1.png');
             $form->file('img2', trans('svg'))
                 ->name(function ($file) {
                     return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-                })->removable();
+                });
 
             $form->keyValue('key_json', 'key_json');
 
@@ -299,6 +299,14 @@ class OvipGiftTapController extends MainController
                     ]);
 
                     return back()->with(compact('error'));
+                }
+
+                if ($form->input('show_img_file_del_') === '1' || !$form->input('show_img')) {
+                    $form->model()->show_img = null;
+                }
+
+                if ($form->input('img2_file_del_') === '1' || !$form->input('img2')) {
+                    $form->model()->img2 = null;
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
