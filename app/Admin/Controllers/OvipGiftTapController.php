@@ -6,22 +6,21 @@ use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Helpers\Common;
-use App\Models\VipPrivilege;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use App\Models\VipPrivilege;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
-use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Modules\Public\Http\Services\UserCounterServices;
-use Encore\Admin\Widgets\Box;
 use Modules\Reals\Http\Services\FfmpegService;
+use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Public\Http\Services\UserCounterServices;
 
 
 class OvipGiftTapController extends MainController
@@ -56,7 +55,10 @@ class OvipGiftTapController extends MainController
             })
             ->row(function (Row $row) use ($ovip) {
                 $type = request('type');
+
                 if (in_array($type, [13, 17, 14, 19, 16, 20, 9, 22, 15])) {
+                    $vipPrivilege = VipPrivilege::where('type', $type)->first();
+                    $image = getImagePath($vipPrivilege->img1);
                     switch ($type) {
                         case 13:
                             $text = __('hide user country');
@@ -65,7 +67,7 @@ class OvipGiftTapController extends MainController
                             $text = __('user ender room anonymous');
                             break;
                         case 14:
-                            $text = __('user can send  vip gift');
+                            $text = __('user can send vip gift');
                             break;
                         case 19:
                             $text = __('hide visitors to client pages');
@@ -88,7 +90,14 @@ class OvipGiftTapController extends MainController
                         default:
                             $text = null;
                     }
-                    $row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . $text . '</div>');
+                    //$row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . $text . '</div>');
+                    $row->column(12, '
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                                                <img src="' . $image . '" alt="VIP Image" style="max-height: 60px;">
+                                                <div style="font-size: 48px; font-weight: bold;">' . $text . '</div>
+                                            </div>
+                                        ');
+                    
                 } else {
                     $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
                 }
@@ -129,12 +138,15 @@ class OvipGiftTapController extends MainController
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
 
         $grid->id(__('ID'));
-        if ( $type == 18 ||  $type == 21) {
+        if ($type == 18 ||  $type == 21) {
             $grid->column('color', __('Color'))->display(function ($color) {
                 return "<div style='width: 30px; height: 30px; background-color: {$color}; border: 1px solid #ccc; border-radius: 4px;'></div>";
             });
         } else {
-            $grid->column('name', __('name'));
+            $grid->column('name', __('name'))->display(function ($name) {
+
+                return app()->getLocale() == 'ar' ? $name : $this->name_en;
+            });
 
             $grid->column('price', __('price'));
 
@@ -158,7 +170,10 @@ class OvipGiftTapController extends MainController
             });
 
 
-            $grid->title(__('title'));
+            $grid->title(__('title'))->display(function ($name) {
+
+                return app()->getLocale() == 'ar' ? $name : $this->title_en;
+            });;
         }
 
         $grid->expire(__('expire'));
