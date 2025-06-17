@@ -59,6 +59,7 @@ class UserResource extends JsonResource
             'receiver_img'       => $receiver_img, // both
             'sender_img'         => $sender_img, // both
             'vip'                => $vip_level, // both
+            'new_vip'                => $vip, // both
             'has_color_name'     => Common::hasInPack($this->id, 18), // both
             'frame_id'           => $frame != '' ? @$this->dress_1 : 0,
             'frame'              => $frame,
@@ -79,7 +80,7 @@ class UserResource extends JsonResource
             'image_color'          => @$this->color_image ?? '',
             'special_color'    => @$this->color_id ?? '',
             'color_name'   => common::wareUserVipColor($this->id, 18) ?? '',
-
+            'user_types' => $this->user_types,
         ];
     }
 }

@@ -813,13 +813,71 @@ class Common
     }
 
 
-    public static function handelVip0($vip, $user, $expire,  $userVip)
+    public static function handelVip($vip, $user, $expire,  $userVip)
     {
-        //  dd($userVip->is_used);
         if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->delete();
 
         $type = $vip->privilegs()->pluck('type')->toArray();
-
+        if (!empty($type)) {
+            foreach ($type as $wareType) {
+                $isSetWare = Ware::query()
+                    ->where('get_type', 1)
+                    ->where('level', $vip->level)
+                    ->where('type', $wareType)
+                    ->first();
+        
+                if (!$isSetWare) {
+                    $typesArr = [
+                        1 => 'Gemstone',
+                        3 => 'Card Scroll',
+                        4 => 'Avatar Frame',
+                        5 => 'Bubble Frame',
+                        6 => 'Entering Special Effects',
+                        7 => 'Microphone Aperture',
+                        8 => 'Badge',
+                        9 => 'NoKick',
+                        10 => 'Icon',
+                        11 => 'intro animation',
+                        12 => 'maple',
+                        13 => 'hide country',
+                        14 => 'vip gifts',
+                        15 => 'no pan',
+                        19 => 'profile visitors hide in',
+                        20 => 'hide last active',
+                        28 => 'profile frame',
+                        29 => 'being kicked',
+                        30 => 'anti ban',
+                    ];
+                
+                    $typeName = $typesArr[$wareType] ?? 'Unknown Type';
+                    Ware::create([
+                        'get_type' => 1,
+                        'type' => $wareType, 
+                        'name' => $typeName  ?? 'VIP Ware',
+                        'name_en' => $typeName ?? 'VIP Ware',
+                        'title' => $typeName ?? '',
+                        'title_en' => $typeName ?? '',
+                        'level' => $vip->level,
+                        'price' =>  0,
+                        'enable' => 1,
+                        'expire' => $expire,
+                        'show_img' =>  '1.png',
+                        'img2' =>  '',
+                        'key' =>  '',
+                        'key_json' => '',
+                        'image_type' => 'png',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                        'is_active_for_vip' => 1
+                    ]);
+                } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
+                    $isSetWare->update([
+                        'is_active_for_vip' => 1,
+                        'enable' => 1,
+                    ]);
+                }
+            }
+        }
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
             ->where('level', $vip->level)
             ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
@@ -886,13 +944,12 @@ class Common
     }
 
 
-    public static function handelVip($vip, $user, $expire,  $userVip)
+    public static function handelVip0($vip, $user, $expire,  $userVip)
     {
         //  dd($userVip->is_used);
         if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->update(['is_used' => 0]);
 
         $type = $vip->privilegs()->pluck('type')->toArray();
-        \Log::info('type', ['all' => $type]);
         $missingTypes = [];
         if (!empty($type)) {
             foreach ($type as $wareType) {
@@ -1186,7 +1243,24 @@ class Common
 
         return $ch->exists();
     }
+    public static function hasColorInPack($user_id, $type, $use_status = false)
+    {
+        $query = Pack::query()
+        ->with('ware')
+        ->where('user_id', $user_id)
+        ->where('type', $type)
+        ->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        });
 
+        if ($use_status) {
+            $query->where('is_used', 1);
+        }
+
+        $pack = $query->first();
+
+       return $pack?->ware?->color ?? '';
+    }
     public static function hasInPackV2($userPacks, $type, $use_status = false)
     {
         $ch =  self::checkPackV2($userPacks, $type);
