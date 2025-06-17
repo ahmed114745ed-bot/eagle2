@@ -212,9 +212,9 @@ class OVipController extends MainController
             $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
         }
         if (Admin::user()->can('*')) {
-            $form->number('expire', __('expire'))->required();
+            $form->number('expire', __('expire'))->rules('required|numeric|gt:0');
         } else {
-            $form->number('expire', __('expire'))->max(30)->required();
+            $form->number('expire', __('expire'))->max(30)->rules('required|numeric|gt:0');
         }
         $form->belongsToMany('privilegs', Privileges::class, __('privileges'))->rules('required|array|min:1');
 
