@@ -174,9 +174,21 @@
                         $value = 0;
 
                         if ($name === 'receiver') {
-                            $value = $calculateReceiverValue($user, request());
+                            if($isApp)
+                            {
+                              $value = \App\Models\Charge::where('user_type', 'agency')->sum('amount');
+                            }else {
+                                 $value = $calculateReceiverValue($user, request());
+                            }
+                           
                         } elseif ($name === 'sender') {
-                            $value = \App\Models\Charge::where('charger_id', $user?->id)->sum('amount');
+                            if($isApp)
+                            {
+                              $value = \App\Models\Charge::where('charger_type', 'agency')->sum('amount');
+                            }else {
+                                $value = \App\Models\Charge::where('charger_id', $user?->id)->sum('amount');
+                            }
+                            
                         } elseif ($name === 'gameCoins') {
                             $coinResult = \App\Models\CoinGameUser::select(
                                 \DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as sum_type_1"),
