@@ -972,7 +972,7 @@
                             
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
-                                <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">
+                                <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
                                     {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
                                 </div>
                                 <div style="display: flex; justify-content: flex-end;">
@@ -1030,7 +1030,7 @@
                             
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
-                                <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">
+                                <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
                                     {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
                                 </div>
                                 <div style="display: flex; justify-content: flex-end;">
@@ -1088,7 +1088,7 @@
                             
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
-                                <div style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">
+                                <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
                                     {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
                                 </div>
                                 <div style="display: flex; justify-content: flex-end;">
