@@ -304,8 +304,8 @@ class OvipGiftTapController extends MainController
         if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
-             dd($form->model()->show_img,$form->model()->img2);
-                if (!($form->model()->show_img instanceof UploadedFile )&&! ($form->model()->img2 instanceof UploadedFile)) {
+                 dd($form->isEditing(),$form->model()->show_img,$form->model()->img2,request('show_img'),request('img2'));
+                if ((($form->isEditing() && !($form->model()->show_img) && ! ($form->model()->img2))) || (!request('show_img') && !request('img2'))) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -314,7 +314,8 @@ class OvipGiftTapController extends MainController
                     return back()->with(compact('error'));
                 }
 
-                if ($form->model()->show_img instanceof UploadedFile) {
+                if (($form->model()->show_img != null && $form->model()->show_img instanceof UploadedFile) || request('show_img')) {
+
                     $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
@@ -328,7 +329,7 @@ class OvipGiftTapController extends MainController
                     $form->image_type1 = $ext;
                 }
 
-                if ($form->model()->img2 instanceof UploadedFile) {
+                if ($form->model()->img2 instanceof UploadedFile || request('img2')) {
 
                     $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
 
