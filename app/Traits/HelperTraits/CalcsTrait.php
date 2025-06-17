@@ -827,6 +827,8 @@ trait CalcsTrait
         if (!$vip) return new \stdClass();
         $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
         $hasColor = Common::hasInPack($user->id, 18, true);
+        $color    = Common::hasColorInPack($user->id, 21, true);
+
         return [
             'id'        => 1,
             'level'     => $vip->level ?? 0,
@@ -838,7 +840,7 @@ trait CalcsTrait
             'image_from_wares'     => $vipIcon->show_img ?? '',
             'expire'    => $vip->expire ?? 0,
             'ware_id' => $vipIcon?->id ?? 0,
-            'color' => '',
+            'color' =>  $color ?? '',
             'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
         ];
     }
