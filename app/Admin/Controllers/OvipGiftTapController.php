@@ -292,7 +292,7 @@ class OvipGiftTapController extends MainController
 
             $form->saving(function (Form $form) {
 
-                if (!$form->show_img && !$form->img2) {
+                if ($form->show_img instanceof UploadedFile && $form->img2 instanceof UploadedFile) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -302,24 +302,7 @@ class OvipGiftTapController extends MainController
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = [
-                        'svga',
-                        'mp4',
-                        'jpg',
-                        'jpeg',
-                        'png',
-                        'gif',
-                        'bmp',
-                        'tiff',
-                        'svg',
-                        'webp',
-                        'mov',
-                        'avi',
-                        'wmv',
-                        'flv',
-                        'mkv',
-                        'webm',
-                    ];
+                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
 
@@ -387,7 +370,7 @@ class OvipGiftTapController extends MainController
                 })->exists();
 
             if ($exists) {
-                $error = new \Illuminate\Support\MessageBag([
+                $error = new MessageBag([
                     'title' => 'Error',
                     'message' => __('This level and type combination already exists'),
                 ]);
@@ -395,15 +378,17 @@ class OvipGiftTapController extends MainController
                 return back()->with(compact('error'));
             }
             if (request('type') != 18 || request('type') != 21) {
-                $imageType1 = $form->input('image_type1');
-                $profileFrameType = $form->input('profile_frame_type');
-                $form->model()->image_type = $imageType1 ?? $profileFrameType;
+                $imageType1        = $form->input('image_type1')        ?? $form->model()->image_type;
+                $profileFrameType  = $form->input('profile_frame_type') ?? $form->model()->image_type;
 
-                if (is_null($imageType1) && is_null($profileFrameType)) {
-
-                    session()->flash('show_alert', 'Your alert message');
-                    return redirect()->back();
+                if ($form->isCreating()) {
+                    if (is_null($imageType1) && is_null($profileFrameType)) {
+                        session()->flash('show_alert', 'Please choose an image type');
+                        return back();
+                    }
                 }
+
+                $form->model()->image_type = $imageType1 ?? $profileFrameType;
             }
 
             (new UserCounterServices)->eventUsers('ware');
@@ -411,7 +396,7 @@ class OvipGiftTapController extends MainController
 
         $form->saved(function (Form $form) {
             $level = $form->model()->level;
-            $type = $form->model()->type; // Get the saved model's ID
+            $type = $form->model()->type;
             $ovip = Ovip::where('level', $level)->first();
             $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
             return redirect()->to($url);
