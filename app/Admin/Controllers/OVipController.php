@@ -205,18 +205,18 @@ class OVipController extends MainController
         });
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_vip_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('🪙');
+                $form->currency('price', __('price'))->symbol('🪙')->required();
             }
         }
         if ($form->isEditing()) {
             if (Admin::user()->can('edit_vip_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('🪙');
+                $form->currency('price', __('price'))->symbol('🪙')->required();
             }
         }
         if (Admin::user()->can('*')) {
-            $form->number('expire', __('expire'));
+            $form->number('expire', __('expire'))->required();
         } else {
-            $form->number('expire', __('expire'))->max(30);
+            $form->number('expire', __('expire'))->max(30)->required();
         }
         $form->belongsToMany('privilegs', Privileges::class, __('privileges'))->rules('required|array|min:1');
 

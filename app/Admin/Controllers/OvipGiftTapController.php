@@ -305,7 +305,7 @@ class OvipGiftTapController extends MainController
 
             $form->saving(function (Form $form) {
 
-                if ($form->show_img instanceof UploadedFile && $form->img2 instanceof UploadedFile) {
+                if (!($form->show_img instanceof UploadedFile )&&! ($form->img2 instanceof UploadedFile)) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
