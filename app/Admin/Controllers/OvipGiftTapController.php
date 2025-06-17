@@ -305,7 +305,7 @@ class OvipGiftTapController extends MainController
 
             $form->saving(function (Form $form) {
 
-                if (!(request('show_img') instanceof UploadedFile) && ! (request('img2') instanceof UploadedFile)) {
+                if (!($form->model()->show_img instanceof UploadedFile )&&! ($form->model()->img2 instanceof UploadedFile)) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -314,7 +314,7 @@ class OvipGiftTapController extends MainController
                     return back()->with(compact('error'));
                 }
 
-                if ($form->show_img instanceof UploadedFile) {
+                if ($form->model()->show_img instanceof UploadedFile) {
                     $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
@@ -328,7 +328,7 @@ class OvipGiftTapController extends MainController
                     $form->image_type1 = $ext;
                 }
 
-                if ($form->img2 instanceof UploadedFile) {
+                if ($form->model()->img2 instanceof UploadedFile) {
 
                     $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
 
@@ -377,7 +377,7 @@ class OvipGiftTapController extends MainController
 
             $id = $form->model()->id;
 
-            $exists = Ware::where('level', $form->level)
+            $exists = Ware::where('level', $form->model()->level)
                 ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
                     $query->where('id', "!=", $id);
                 })->exists();
