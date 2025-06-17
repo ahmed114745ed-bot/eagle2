@@ -863,7 +863,7 @@
     <div class="agency-profile-container">
         <!-- Header Section -->
         <div class="agency-header">
-            <div class="agency-avatar">
+            <div class="agency-avatar" style="width: 183px !important;">
                 <img src="{{ $agency->display_image }}" alt="Agency Logo" class="logo-img">
             </div>
             <div class="agency-info">
@@ -887,6 +887,7 @@
                         <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
                     </div>
+                  
                 </div>
             </div>
             <a class="btn-back" href="{{ route('admin.agencies.index') }}">
@@ -895,22 +896,35 @@
         </div>
 
         <div class="agency-header">
+       
+
             <div class="agency-avatar" style="border-radius: 50%;">
+                @php
+                $url =  url("admin/users/{$agency?->owner?->id}");
+                @endphp
+            <a href="{{ $url }}">
                 <img src="{{ getImagePath($agency?->owner?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}" class="logo-img">
+             </a>
             </div>
             <div class="agency-info">
+            <a href="{{ $url }}">
                 <h1 class="agency-name">{{ $agency?->owner?->name ?? 'N/A'}}</h1>
                 <div class="agency-meta">
                     <div class="meta-item">
                         <span class="meta-label">{{__('UUID')}}:</span>
+                        
                         <span class="meta-value">{{ @$agency?->owner?->uuid ?? 'N/A' }}</span>
+                    
                     </div>
-                    <div class="meta-item">
+                    <!-- <div class="meta-item">
                         <span class="meta-label">{{__('dashboard.id')}}:</span>
                         <span class="meta-value">{{ @$agency?->owner?->id ?? 'N/A' }}</span>
-                    </div>
+                    </div> -->
                 </div>
+                </a>
             </div>
+            
+
         </div>
 
         <!-- Notice Section -->
@@ -942,13 +956,13 @@
                     <div class="avatar-grid">
                         @foreach($giftLog as $log)
                             @php
-        $user = $log->receiver;
-        $path = $user->profile?->avatar ?? null;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
-        $username = htmlspecialchars($user->name ?? 'Unknown');
-        $userUrl = route('admin.users.show', $user->id);
-        $exp = number_format($log->exp);
+                                    $user = $log->receiver;
+                                    $path = $user->profile?->avatar ?? null;
+                                    $defaultImage = asset("images/businessman-icon.jpg");
+                                    $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                    $username = htmlspecialchars($user->name ?? 'Unknown');
+                                    $userUrl = route('admin.users.show', $user->id);
+                                    $exp = number_format($log->exp);
                             @endphp
 
                             <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }} ({{ $exp }} EXP)">
@@ -982,12 +996,12 @@
                     <div class="avatar-grid">
                         @foreach($agency->admins as $admin)
                             @php
-        $user = $admin->user;
-        $path = $user->profile?->avatar ?? null;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
-        $username = htmlspecialchars($user->name ?? 'Unknown');
-        $userUrl = route('admin.users.show', $user->id);
+                                    $user = $admin->user;
+                                    $path = $user->profile?->avatar ?? null;
+                                    $defaultImage = asset("images/businessman-icon.jpg");
+                                    $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                    $username = htmlspecialchars($user->name ?? 'Unknown');
+                                    $userUrl = route('admin.users.show', $user->id);
                             @endphp
 
                             <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }}">
@@ -1008,7 +1022,7 @@
             </div>
         </div>
         @php
-$activeTab = request('tab', 'tab=targets'); 
+                $activeTab = request('tab', 'tab=targets'); 
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
@@ -1060,13 +1074,13 @@ $activeTab = request('tab', 'tab=targets');
                             <tbody>
                                 @foreach($members as $index => $member)
                                     @php
-        $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
-            ->where('agency_id', $member->agency_id)
-            ->where('type', 'requestManger')
-            ->exists();
-        $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
-            ->where('id', $member->agency_id)
-            ->exists();
+                                        $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
+                                            ->where('agency_id', $member->agency_id)
+                                            ->where('type', 'requestManger')
+                                            ->exists();
+                                        $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
+                                            ->where('id', $member->agency_id)
+                                            ->exists();
                                     @endphp
 
                                     <tr>
@@ -1089,10 +1103,20 @@ $activeTab = request('tab', 'tab=targets');
                                             @if($isOwner)
                                                 <span class="role-badge owner">{{ __('Owner') }}</span>
                                             @elseif($isAdmin)
-                                                <span class="role-badge admin">{{ __('Admin') }}</span>
+                                                <!-- <span class="role-badge admin">{{ __('Admin') }}</span> -->
+                                                <button class="btn-action remove-admin-btn btn-danger" style="background-color: red;" data-id="{{ $member->id }}">
+                                                    {{ __('remove_admin') }}
+                                                </button> 
+
+                                                 <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
+                                                    {{ __('kick') }}
+                                                </button>
                                             @else
                                                 <button class="btn-action make-admin-btn" data-id="{{ $member->id }}">
                                                     {{ __('Make Admin') }}
+                                                </button>
+                                                <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
+                                                    {{ __('kick') }}
                                                 </button>
                                             @endif
                                         </td>
@@ -1103,11 +1127,11 @@ $activeTab = request('tab', 'tab=targets');
                     </div>
                     <div class="pagination-wrapper">
                         {{ $members?->appends([
-        'charges_page' => $charges?->currentPage(),
-        'salaries_page' => $salaries?->currentPage(),
-        'join_page' => $agencyJoinRequests?->currentPage(),
-        'target_page' => $memberTargets?->currentPage(),
-    ])->links('vendor.pagination.default') }}
+                                    'charges_page' => $charges?->currentPage(),
+                                    'salaries_page' => $salaries?->currentPage(),
+                                    'join_page' => $agencyJoinRequests?->currentPage(),
+                                    'target_page' => $memberTargets?->currentPage(),
+                                ])->links('vendor.pagination.default') }}
                        </div>
                 @else
                     <div class="empty-table">
@@ -1117,7 +1141,7 @@ $activeTab = request('tab', 'tab=targets');
                 @endif
             </div>
         </div>
-
+   
         <!-- Charges Section -->
         <div class="tab-content" id="charges-tab">
             <div class="card">
@@ -1130,38 +1154,37 @@ $activeTab = request('tab', 'tab=targets');
                         <table class="data-table" id="charge">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>{{ __('Name') }}</th>
-                                    <th>{{ __('coin') }}</th>
-                                    <th>{{ __('created') }}</th>
+                                <th>#</th>
+                                <th>{{ __('receiver') }}</th>
+                                <th>{{ __('coins') }}</th>
+                                <th>{{ __('USD') }}</th>
+                                <th>{{ __('Created at') }}</th>
                                 </tr>
                             </thead>
+    
+
                             @if($charges && $charges->count())
-                                @if($agency->type == 1)
                                     <tbody style="color: rgb(208, 115, 43);">
-                                        @foreach($charges as $index => $charge)
-                                            @php
-            if ($charge->charger_type == 'dash' && $charge->user_type == 'dash') {
-                $user = $charge->admin;
-                $image = $user->avatar;
-            } else {
-                $user = $charge->sender;
-                $image = $user->profile->avatar ?? null;
-            }
-                                            @endphp
-                                            <tr>
-                                                <td>{{ $charges->firstItem() + $index }}</td>
-                                                <td>
-                                                    <img src="{{ getImagePath($image) }}" width="30" height="30"
-                                                        style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                    {{ $user->name ?? '' }}
-                                                </td>
-                                                <td>{{ number_format($charge->amount ?? 0) }}</td>
-                                                <td>{{ $charge->created_at ?? '' }}</td>
-                                            </tr>
-                                        @endforeach
+                                    @foreach($charges as $index => $charge)
+                                                @php
+                                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge);
+                                                    $name = $receiver['name'] ?? '-';
+                                                    $uid = $receiver['uuid'] ?? '-';
+                                                    $image = $receiver['image'] ?? asset('default-user.png');
+                                                @endphp
+                                                <tr>
+                                                    <td>{{ $charge->id }}</td>
+                                                    <td>
+                                                        <img src="{{ $image }}" width="30" height="30"
+                                                            style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                        {{ $name }} ({{ $uid }})
+                                                    </td>
+                                                    <td>{{ $charge->amount }} </td>
+                                                    <td>{{ $charge->usd }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
+                                                </tr>
+                                            @endforeach
                                     </tbody>
-                                @endif
                             @endif
                         </table>
                     </div>
@@ -1169,11 +1192,11 @@ $activeTab = request('tab', 'tab=targets');
 
                 <div class="pagination-wrapper">
                     {{ $members?->appends([
-    'charges_page' => $charges?->currentPage(),
-    'salaries_page' => $salaries?->currentPage(),
-    'join_page' => $agencyJoinRequests?->currentPage(),
-    'target_page' => $memberTargets?->currentPage(),
-])->links('vendor.pagination.default') }}
+                                'charges_page' => $charges?->currentPage(),
+                                'salaries_page' => $salaries?->currentPage(),
+                                'join_page' => $agencyJoinRequests?->currentPage(),
+                                'target_page' => $memberTargets?->currentPage(),
+                            ])->links('vendor.pagination.default') }}
                 </div>
 
 
@@ -1183,10 +1206,26 @@ $activeTab = request('tab', 'tab=targets');
 
         <!-- salary Section -->
         <div class="tab-content" id="salary-tab">
+        <div class="target-card-stat">
+                            <div class="stats-row">
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-blue">
+                                        <i class="fas fa-bullseye"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <div class="stat-value">{{ $sumTargets }}</div>
+                                        <div class="stat-label">{{ __('Target') }}</div>
+                                    </div>
+                                </div>
+
+                              
+                            </div>
+                        </div>
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
                 </div>
+              
                 <div class="table-responsive">
                     <div class="box-body ">
                         <table class="data-table" id="salary">
@@ -1219,11 +1258,11 @@ $activeTab = request('tab', 'tab=targets');
                         @if($salaries)
                                                 <div class="pagination-container">
                                                     {{ $salaries->appends([
-        'charges_page' => $charges?->currentPage(),
-        'join_page' => $agencyJoinRequests?->currentPage(),
-        'members_page' => $members?->currentPage(),
-        'target_page' => $memberTargets?->currentPage(),
-    ])->links('vendor.pagination.bootstrap-4') }}
+                                                            'charges_page' => $charges?->currentPage(),
+                                                            'join_page' => $agencyJoinRequests?->currentPage(),
+                                                            'members_page' => $members?->currentPage(),
+                                                            'target_page' => $memberTargets?->currentPage(),
+                                                        ])->links('vendor.pagination.bootstrap-4') }}
                                                 </div>
                         @endif
                     </div>
@@ -1256,21 +1295,21 @@ $activeTab = request('tab', 'tab=targets');
                                 <tbody style="color: rgb(208, 115, 43);">
                                     @foreach($agencyJoinRequests as $index => $agencyJoinRequest)
                                         @php
-        $user = $agencyJoinRequest->user;
-        $name = $user->name ?? '-';
-        $uid = $user->uuid ?? '-';
-        $avatarPath = $user->profile?->avatar;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
-        if (!isImageExists($avatarUrl)) {
-            $avatarUrl = $defaultImage;
-        }
-        $image = handleShowImageWithTypes($user->id, $avatarUrl, 40, 40);
+                                                    $user = $agencyJoinRequest->user;
+                                                    $name = $user->name ?? '-';
+                                                    $uid = $user->uuid ?? '-';
+                                                    $avatarPath = $user->profile?->avatar;
+                                                    $defaultImage = asset("images/businessman-icon.jpg");
+                                                    $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
+                                                    if (!isImageExists($avatarUrl)) {
+                                                        $avatarUrl = $defaultImage;
+                                                    }
+                                                    $image = handleShowImageWithTypes($user->id, $avatarUrl, 40, 40);
 
-        $iconUrl = asset('images/whatsapp.png');
-        $country = $user->country;
-        $countryName = app()->getLocale() == 'ar' ? $country?->name : $country?->e_name;
-        $countryFlag = getImagePath($country?->flag ?? '');
+                                                    $iconUrl = asset('images/whatsapp.png');
+                                                    $country = $user->country;
+                                                    $countryName = app()->getLocale() == 'ar' ? $country?->name : $country?->e_name;
+                                                    $countryFlag = getImagePath($country?->flag ?? '');
                                         @endphp
 
                                         <tr>
@@ -1326,11 +1365,11 @@ $activeTab = request('tab', 'tab=targets');
                 <div class="pagination-container mt-3">
                     @if($agencyJoinRequests)
                                         {{ $agencyJoinRequests->appends([
-        'members_page' => $members ? $members->currentPage() : 1,
-        'salaries_page' => $salaries ? $salaries->currentPage() : 1,
-        'charges_page' => $charges ? $charges->currentPage() : 1,
-        'target_page' => $memberTargets ? $memberTargets->currentPage() : 1,
-    ])->links('vendor.pagination.bootstrap-4') }}
+                                                'members_page' => $members ? $members->currentPage() : 1,
+                                                'salaries_page' => $salaries ? $salaries->currentPage() : 1,
+                                                'charges_page' => $charges ? $charges->currentPage() : 1,
+                                                'target_page' => $memberTargets ? $memberTargets->currentPage() : 1,
+                                            ])->links('vendor.pagination.bootstrap-4') }}
                     @endif
                 </div>
 
@@ -1494,13 +1533,13 @@ $activeTab = request('tab', 'tab=targets');
                             <div class="avatar-grid">
                                 @foreach($stars as $log)
                                     @php
-        $user = $log->receiver;
-        $path = $user->profile?->avatar ?? null;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
-        $username = htmlspecialchars($user->name ?? 'Unknown');
-        $userUrl = route('admin.users.show', $user->id);
-        $exp = number_format($log->exp);
+                                            $user = $log->receiver;
+                                            $path = $user->profile?->avatar ?? null;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                                            $userUrl = route('admin.users.show', $user->id);
+                                            $exp = number_format($log->exp);
                                     @endphp
 
                                     <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }} ({{ $exp }} EXP)">
@@ -1533,13 +1572,13 @@ $activeTab = request('tab', 'tab=targets');
                             <div class="avatar-grid">
                                 @foreach($heroes as $log)
                                     @php
-        $user = $log->sender;
-        $path = $user->profile?->avatar ?? null;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
-        $username = htmlspecialchars($user->name ?? 'Unknown');
-        $userUrl = route('admin.users.show', $user->id);
-        $exp = number_format($log->exp);
+                                            $user = $log->sender;
+                                            $path = $user->profile?->avatar ?? null;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                                            $userUrl = route('admin.users.show', $user->id);
+                                            $exp = number_format($log->exp);
                                     @endphp
 
                                     <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }} ({{ $exp }} EXP)">
@@ -1574,6 +1613,8 @@ $activeTab = request('tab', 'tab=targets');
                                             <th width="18%">{{ __('Remaining') }}</th>
                                             <th width="12%">{{ __('Days') }}</th>
                                             <th width="12%">{{ __('Hours') }}</th>
+                                            <th>{{ __('Moments') }}</th>
+                                            <th>{{ __('Reels') }}</th>
                                             <th width="16%">{{ __('Supporters') }}</th>
                                         </tr>
                                     </thead>
@@ -1582,32 +1623,45 @@ $activeTab = request('tab', 'tab=targets');
                                         <tbody>
                                             @foreach($memberTargets as $index => $memberTarget)
                                                 @php
-        $name = $memberTarget->name ?? '-';
-        $uid = $memberTarget->uuid ?? '-';
-        $avatarPath = $memberTarget->profile?->avatar;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
-        if (!isImageExists($avatarUrl)) {
-            $avatarUrl = $defaultImage;
-        }
-        $month = request('month') ?? now()->month;
-        $year = request('year') ?? now()->year;
+                                                        $name = $memberTarget->name ?? '-';
+                                                        $uid = $memberTarget->uuid ?? '-';
+                                                        $avatarPath = $memberTarget->profile?->avatar;
+                                                        $defaultImage = asset("images/businessman-icon.jpg");
+                                                        $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
+                                                        if (!isImageExists($avatarUrl)) {
+                                                            $avatarUrl = $defaultImage;
+                                                        }
+                                                        $month = request('month') ?? now()->month;
+                                                        $year = request('year') ?? now()->year;
 
-        $giftLogs = \App\Models\GiftLog::where('agency_id', $memberTarget->agency_id)
-            ->where('receiver_id', $memberTarget->id)
-            ->whereHas('sender')
-            ->with('sender.profile') // assuming sender has a 'profile' with 'avatar'
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->selectRaw("sum(giftPrice) as exp, sender_id")
-            ->groupBy('sender_id')
-            ->orderByRaw("exp desc")
-            ->limit(3)
-            ->get()
-            ->reject(fn($q) => $q->exp == 0);
+                                                        $giftLogs = \App\Models\GiftLog::where('agency_id', $memberTarget->agency_id)
+                                                            ->where('receiver_id', $memberTarget->id)
+                                                            ->whereHas('sender')
+                                                            ->with('sender.profile') // assuming sender has a 'profile' with 'avatar'
+                                                            ->whereYear('created_at', $year)
+                                                            ->whereMonth('created_at', $month)
+                                                            ->selectRaw("sum(giftPrice) as exp, sender_id")
+                                                            ->groupBy('sender_id')
+                                                            ->orderByRaw("exp desc")
+                                                            ->limit(3)
+                                                            ->get()
+                                                            ->reject(fn($q) => $q->exp == 0);
 
-        $memberTarget->topSupporters = $giftLogs;
-                                                @endphp
+                                                        $memberTarget->topSupporters = $giftLogs;
+
+                                                        $moment = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'moment') ?? [];
+                                                        $reel = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'reel') ?? [];
+
+                                                        $momentUpload = $moment['upload'] ?? '0/0';
+                                                        $momentLikes = $moment['likes'] ?? '0/0';
+                                                        $momentComments = $moment['comments'] ?? '0/0';
+
+                                                        $reelUpload = $reel['upload'] ?? '0/0';
+                                                        $reelLikes = $reel['likes'] ?? '0/0';
+                                                        $reelComments = $reel['comments'] ?? '0/0';
+
+                                                      
+                                                 @endphp
 
                                                 <tr>
                                                     <td>{{ $memberTargets->firstItem() + $index }}</td>
@@ -1633,15 +1687,33 @@ $activeTab = request('tab', 'tab=targets');
                                                     <td>{{ $memberTarget->targets->first()->user_hours ?? 0 }}</td>
                                                     <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
                                                     <td>
+                                                            <div style="line-height: 1.6;">
+                                                                <ul style="margin-left: 8px; width: 141px;">
+                                                                    <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
+                                                                    <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
+                                                                    <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div style="line-height: 1.6;">
+                                                                <ul style="margin-left: 8px; width: 141px;">
+                                                                    <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
+                                                                    <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
+                                                                    <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    <td>
                                                         <div class="supporters-avatars">
                                                             @foreach($memberTarget->topSupporters ?? [] as $supporter)
                                                                 @php
-            $sender = $supporter->sender;
-            $supporterAvatar = $sender->profile->avatar ?? null;
-            $supporterUrl = getImagePath($supporterAvatar) ?? $defaultImage;
-            if (!isImageExists($supporterUrl)) {
-                $supporterUrl = $defaultImage;
-            }
+                                                                        $sender = $supporter->sender;
+                                                                        $supporterAvatar = $sender->profile->avatar ?? null;
+                                                                        $supporterUrl = getImagePath($supporterAvatar) ?? $defaultImage;
+                                                                        if (!isImageExists($supporterUrl)) {
+                                                                            $supporterUrl = $defaultImage;
+                                                                        }
                                                                 @endphp
                                                                 <img src="{{ $supporterUrl }}" class="supporter-avatar"
                                                                     title="{{ $sender->name ?? '' }}" alt="Supporter">
@@ -1664,16 +1736,16 @@ $activeTab = request('tab', 'tab=targets');
                             @endif
 
                             @if($memberTargets)
-                                                        <div class="pagination-wrapper">
-                                                            {{ $memberTargets->appends([
-        'members_page' => $members?->currentPage() ?? 1,
-        'salaries_page' => $salaries?->currentPage() ?? 1,
-        'charges_page' => $charges?->currentPage() ?? 1,
-        'join_page' => $agencyJoinRequests?->currentPage() ?? 1,
-        'month' => request('month'),
-        'year' => request('year'),
-    ])->links('vendor.pagination.bootstrap-4') }}
-                                                        </div>
+                                <div class="pagination-wrapper">
+                                    {{ $memberTargets->appends([
+                                            'members_page' => $members?->currentPage() ?? 1,
+                                            'salaries_page' => $salaries?->currentPage() ?? 1,
+                                            'charges_page' => $charges?->currentPage() ?? 1,
+                                            'join_page' => $agencyJoinRequests?->currentPage() ?? 1,
+                                            'month' => request('month'),
+                                            'year' => request('year'),
+                                        ])->links('vendor.pagination.bootstrap-4') }}
+                                </div>
                             @endif
 
                         </div>
@@ -1878,6 +1950,58 @@ $activeTab = request('tab', 'tab=targets');
                         confirmAction('{{ __("are_you_sure_make_admin") }}', () => {
                             showLoader();
                             $.post(`/admin/agencies/admin/${id}`, {
+                                _token: '{{ csrf_token() }}'
+                            }, function (response) {
+                                Swal.close();
+                                console.log("Make admin response:", response);
+                                if (response.status) {
+                                    showSuccess(response.message, () => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    showError(response.message);
+                                }
+                            }).fail(function (xhr) {
+                                Swal.close();
+                                console.error("Make admin failed", xhr);
+                                const res = xhr.responseJSON;
+                                showError(res?.message ?? '{{ __("failed_make_admin") }}');
+                            });
+                        });
+                    });
+
+                    $('.remove-admin-btn').click(function () {
+                        const id = $(this).data('id');
+                        console.log("Make admin clicked, ID:", id);
+                        confirmAction('{{ __("are_you_sure_remove_admin") }}', () => {
+                            showLoader();
+                            $.post(`/admin/agencies/admin/${id}`, {
+                                _token: '{{ csrf_token() }}'
+                            }, function (response) {
+                                Swal.close();
+                                console.log("Make admin response:", response);
+                                if (response.status) {
+                                    showSuccess(response.message, () => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    showError(response.message);
+                                }
+                            }).fail(function (xhr) {
+                                Swal.close();
+                                console.error("Make admin failed", xhr);
+                                const res = xhr.responseJSON;
+                                showError(res?.message ?? '{{ __("failed_make_admin") }}');
+                            });
+                        });
+                    });
+
+                    $('.kick-member-btn').click(function () {
+                        const id = $(this).data('id');
+                        console.log("Make admin clicked, ID:", id);
+                        confirmAction('{{ __("are_you_sure_remove_member") }}', () => {
+                            showLoader();
+                            $.post(`/admin/agencies/kick/${id}`, {
                                 _token: '{{ csrf_token() }}'
                             }, function (response) {
                                 Swal.close();

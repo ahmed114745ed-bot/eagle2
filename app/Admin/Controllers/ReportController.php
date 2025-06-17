@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Grid;
@@ -177,7 +178,7 @@ class ReportController extends MainController
             $reelUpload = $extras['reel']['upload'] ?? '-';
             $reelLikes = $extras['reel']['likes'] ?? '-';
             $reelComments = $extras['reel']['comments'] ?? '-';
-            
+
             $labelMoments = __('Moments');
             $labelReels = __('Reels');
             $labelUploads = __('Uploads:');
@@ -263,6 +264,7 @@ class ReportController extends MainController
                 }
             }, __('Month'), 'month')->integer();
         });
+        $grid->column('id', __('ID'));
 
         $grid->column('agency', __('dashboard.agency'))->display(function () {
             $defaultImage = asset('images/icon-agency.jpg');
@@ -286,11 +288,11 @@ class ReportController extends MainController
         });
 
         $grid->column('target', __('target'))->display(function () {
-            return @$this->getTotalSallaryAgency(request('month'), request('year')) ?? 0;
+            return @$this->getTotalTargetAgency(request('month'), request('year')) ?? 0;
         });
-        $grid->column('expenses', __('expenses'))->display(function () {
-            return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
-        });
+        // $grid->column('expenses', __('expenses'))->display(function () {
+        //     return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
+        // });
 
         $grid->column('total', __('salary'))->display(function () {
             $salary = $this->getSalaryAgency(request('month'), request('year')) ?? 0;
@@ -300,31 +302,31 @@ class ReportController extends MainController
                     <img src='{$image}' alt='USD' width='20' height='20'>
                 </div>";
         });
-        $grid->column('owner.name', __('owner'))->display(function ($name) {
-            $uid = $this->owner?->uuid;
-            $path = $this->owner?->profile?->avatar;
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($path) ?? $defaultImage;
+        // $grid->column('owner.name', __('owner'))->display(function ($name) {
+        //     $uid = $this->owner?->uuid;
+        //     $path = $this->owner?->profile?->avatar;
+        //     $defaultImage = asset('images/businessman-icon.jpg');
+        //     $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+        //     // Check if the image exists
+        //     if (!isImageExists($url)) {
+        //         $url = $defaultImage;
+        //     }
 
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
+        //     $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+        //     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                    {$image}
-                    <div>
-                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                            <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>";
-        });
+        //     return "<div style='display: flex; align-items: center; gap: 10px;'>
+        //             {$image}
+        //             <div>
+        //                 <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+        //                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+        //                 </a>
+        //                 <span style='font-size: smaller;'>UUID: $uid</span>
+        //             </div>
+        //         </div>";
+        // });
         $grid->column('hosts', __('dashboard.hosts'))->display(function () {
             return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
         });

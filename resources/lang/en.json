@@ -456,7 +456,7 @@
     "user_earn": " user earns",
     "parent_earn": " parent earns",
     "dash_repo": "Dash",
-    "app_repo": "App",
+    "app_repo": "Recharge Agency Activity",
     "coins_repo": "Coins",
     "sendTo": "sendTo",
     "use count": "use count",
@@ -1017,7 +1017,12 @@
     "Reel Likes": "Reel Likes",
     "Reel Comments": "Reel Comments",
     "Withdraw": "Withdraw",
-    "prof_reports": "Proftes Reports"
+    "prof_reports": "Proftes Reports",
+    "remove_admin": "Remove Admin",
+"kick": "Kick",
+"make_admin": "Make Admin",
+"are_you_sure_remove_member": "Are you sure you want to remove this member?",
+"are_you_sure_remove_admin": "Are you sure you want to remove this admin?"
 
 
 

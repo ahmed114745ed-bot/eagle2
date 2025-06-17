@@ -3,11 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Helpers\UserCommon;
-use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\CoinLog;
 use App\Enums\PaymentType;
@@ -15,17 +13,10 @@ use App\Models\ExchangeLog;
 use App\Models\PaymentCoin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use App\Admin\Forms\CustomForm;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Admin\Actions\SalariesAction;
-use App\Admin\Extensions\UserExporter;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Request;
-use App\Admin\Extensions\AgencyExporter;
+use Encore\Admin\Admin;
+
 
 class ChargeReportController extends MainController
 {
@@ -99,9 +90,9 @@ class ChargeReportController extends MainController
         $charger_type = "";
         if (request("name") == "app") {
             $charger_type = "app";
-        }elseif (request("name") == "host") {
+        } elseif (request("name") == "host") {
             $charger_type = "host";
-        }else{
+        } else {
             $charger_type = "dash";
         }
 
@@ -112,7 +103,7 @@ class ChargeReportController extends MainController
             // $grid->model()->where('charger_type', "dash")->where('agency_id', '!=', null);
             $grid->model()->where('charger_type', "dash");
         } elseif (request("name") == "host") {
-            
+
             $grid->model()->where('charger_type', 'host_agency');
         } else {
             $grid->model()->where('charger_type', 'agency');
@@ -127,32 +118,124 @@ class ChargeReportController extends MainController
                     $filter->equal('receiver.uuid', __("receiver"));
                 });
             } else {
+                // $filter->column(1 / 2, function ($filter) {
+                //     $filter->equal('sender.uuid', __('Sender'));
+                // });
+
                 $filter->column(1 / 2, function ($filter) {
-                    $filter->equal('sender.uuid', __('Sender'));
+                    // $filter->equal('receiver.uuid', __('receiver'));
+                    $filter->between('created_at', __('Created At'))->date();
+                });
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        $value = trim($this->input);
+
+                        $query->where(function ($q) use ($value) {
+                            $q->whereHas('senderUser', function ($userQuery) use ($value) {
+                                $userQuery->where('uuid', $value);
+                            })->orWhereHas('senderShippingAgency', function ($agencyQuery) use ($value) {
+                                $agencyQuery->where('id', $value);
+                            });
+                        });
+                    }, __('Sender UUID or shipping Agency ID'));
                 });
 
                 $filter->column(1 / 2, function ($filter) {
-                    $filter->equal('receiver.uuid', __('receiver'));
+                    $filter->where(function ($query) {
+                        $value = trim($this->input);
+
+                        $query->where(function ($q) use ($value) {
+                            $q->whereHas('receiverUser', function ($userQuery) use ($value) {
+                                $userQuery->where('uuid', $value);
+                            })->orWhereHas('shippingAgency', function ($agencyQuery) use ($value) {
+                                $agencyQuery->where('id', $value);
+                            });
+                        });
+                    }, __('receiver UUID or shipping Agency ID'));
                 });
-            }
+
+            //    $filter->column(1 / 2, function ($filter) {
+            //         // Select entity type
+            //         $filter->equal('filter_type', __('Type'))->select([
+            //             'user' => 'User',
+            //             'shipping' => 'Shipping Agency',
+            //         ])->default('shipping');
+
+            //         // Select direction: sender or receiver
+            //         $filter->equal('filter_target', __('Target'))->select([
+            //             'sender' => 'Sender',
+            //             'receiver' => 'Receiver',
+            //         ])->default('sender');
+
+            //         // UUID or ID inputs (text fields)
+            //         $filter->equal('user_uuid', __('User UUID'));
+            //         $filter->equal('agency_id', __('Shipping Agency ID'));
+            //     });
+
+            //     // Main filter logic
+            //     $filter->where(function ($query) {
+            //         $type = request('filter_type');
+            //         $target = request('filter_target');
+            //         $userUuid = request('user_uuid');
+            //         $agencyId = request('agency_id');
+
+            //         if ($type === 'user' && $userUuid) {
+            //             if ($target === 'sender') {
+            //                 $query->whereHas('senderUser', function ($q) use ($userUuid) {
+            //                     $q->where('uuid', $userUuid);
+            //                 });
+            //             } elseif ($target === 'receiver') {
+            //                 $query->whereHas('receiverUser', function ($q) use ($userUuid) {
+            //                     $q->where('uuid', $userUuid);
+            //                 });
+            //             }
+            //         } elseif ($type === 'shipping' && $agencyId) {
+            //             if ($target === 'sender') {
+            //                 $query->whereHas('senderShippingAgency', function ($q) use ($agencyId) {
+            //                     $q->where('id', $agencyId);
+            //                 });
+            //             } elseif ($target === 'receiver') {
+            //                 $query->whereHas('shippingAgency', function ($q) use ($agencyId) {
+            //                     $q->where('id', $agencyId);
+            //                 });
+            //             }
+            //         }
+            //     }, __('Dynamic Sender/Receiver Filter'));
+             }
         });
+            Admin::script(<<<JS
+                function setFilterIdsAndToggle() {
+                    // Set IDs once
+                    $('select[name="filter[filter_type]"]').attr('id', 'filter-type');
+                    $('select[name="filter[filter_target]"]').attr('id', 'filter-target');
+                    $('input[name="filter[user_uuid]"]').attr('id', 'filter-user-uuid');
+                    $('input[name="filter[agency_id]"]').attr('id', 'filter-agency-id');
 
+                    // Show/hide inputs
+                    let type = $('#filter-type').val();
+                    if (type === 'user') {
+                        $('#filter-user-uuid').closest('.form-group').show();
+                        $('#filter-agency-id').closest('.form-group').hide();
+                    } else {
+                        $('#filter-user-uuid').closest('.form-group').hide();
+                        $('#filter-agency-id').closest('.form-group').show();
+                    }
+                }
+
+                $(document).ready(function () {
+                    setFilterIdsAndToggle();
+                    $('#filter-type').on('change', setFilterIdsAndToggle);
+                });
+            JS);
 
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
-            // if (request("name") == "dash") {
-            //     $name = @$this->admin_user->name ?? '';
-            //     $uuid = @$this->admin_user->id;
-            //     $path = @$this->admin_user->avatar;
-            // } else {
-            //     $name = @$this->sender->name ?? '';
-            //     $uuid = @$this->sender->uuid;
-            //     $path = @$this->sender?->profile?->avatar;
-            // }
-           $sender= Common::getChargerInfo($this);
-           $name =$sender['name'];
-           $uuid =$sender['uuid'];
-           $path =$sender['image'];
+
+            $sender = Common::getChargerInfo($this);
+            $name = $sender['name'];
+            $uuid = $sender['uuid'];
+            $path = $sender['image'];
+            $showUrl = $sender['url'];
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -162,12 +245,16 @@ class ChargeReportController extends MainController
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
+
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
-                        <strong>$name</strong><br>
-                        <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
                     </div>
                 </div>
             ";
@@ -176,10 +263,10 @@ class ChargeReportController extends MainController
             // $name =  $this->receiver->name ?? '';
             // $uid = @$this->receiver->uuid ?? 0;
             // $path = @$this->receiver?->profile?->avatar;
-            $sender= Common::getReceiverInfo($this);
-            $name =$sender['name'];
-            $uid =$sender['uuid'];
-            $path =$sender['image'];
+            $sender = Common::getReceiverInfo($this);
+            $name = $sender['name'];
+            $uid = $sender['uuid'];
+            $path = $sender['image'];
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -709,9 +796,9 @@ class ChargeReportController extends MainController
 
         $grid->column('amount', __('Amount'));
         $grid->column('amount', __('Amount'));
-        if ($scope === 'not_dash' ) {
-           // dd(123);
-            $grid->column('amount_type', __('status'))->display(function () use($agency_id){
+        if ($scope === 'not_dash') {
+            // dd(123);
+            $grid->column('amount_type', __('status'))->display(function () use ($agency_id) {
                 return $this->user_id == $agency_id  ?  __('increment') : __('decrement');
             });
         } else {

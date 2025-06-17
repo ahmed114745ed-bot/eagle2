@@ -1647,6 +1647,7 @@ class Common
                     'uuid' => $resource->admin->uuid ?? '',
                     'id' => $resource->admin->id ?? '',
                     'type' => 'dash',
+                    'url' => $resource->admin ? url("admin/auth/users/{$resource->admin->id}") : '#',
                 ];
             case 'agency':
                 return [
@@ -1655,6 +1656,7 @@ class Common
                     'uuid' => $resource->senderShippingAgency->id ?? '',
                     'id' => $resource->senderShippingAgency->id ?? '',
                     'type' => 'agency',
+                    'url' => $resource->senderShippingAgency ? url("admin/shipping-agencies/profile/{$resource->senderShippingAgency->id}") : '#',
                 ];
             case 'host_agency':
                 return [
@@ -1663,6 +1665,8 @@ class Common
                     'uuid' => $resource->senderAgency->id ?? '',
                     'id' => $resource->senderAgency->id ?? '',
                     'type' => 'host_agency',
+                    'url' => $resource->senderAgency ? url("admin/agencies/profile/{$resource->senderAgency->id}") : '#',
+
                 ];
             case 'user':
             case 'bd':
@@ -1672,6 +1676,7 @@ class Common
                     'uuid' => $resource->senderUser->uuid ?? '',
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
+                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
                 ];
             default:
                 return [
@@ -1681,12 +1686,14 @@ class Common
                     'id' => '',
                     'type' => '',
                     'type_name' => '',
+                    'url' => '#',
                 ];
         }
     }
 
     public static function getReceiverInfo($resource)
     {
+        
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
@@ -1728,5 +1735,27 @@ class Common
             'receiverUser.profile',
             'receiveragency',
         ];
+    }
+
+
+    public static function getUserMediaStats($userId, $type)
+    {
+        if (!in_array($type, ['moment', 'reel'])) {
+            return null;
+        }
+
+        $record = UserSallary::where('user_id', $userId)->latest()->first();
+
+        if (! $record || empty($record->extras)) {
+            return null;
+        }
+
+        $extras = json_decode($record->extras, true);
+
+        if (! isset($extras[$type])) {
+            return null;
+        }
+
+        return $extras[$type]; 
     }
 }

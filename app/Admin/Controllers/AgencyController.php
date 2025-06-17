@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Facades\UserHandling;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -184,7 +185,8 @@ class AgencyController extends MainController
 
         switch ($tab) {
             case 'members':
-                $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
+                $members = 
+                Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
                     return $agency->mempers()
                         ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
                         ->with('country', 'agencyUserJob')
@@ -195,7 +197,8 @@ class AgencyController extends MainController
             case 'charges':
                 $charges = Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
                     return $agency->charges()
-                        ->select('id', 'amount', 'created_at')
+                        ->with(Common::chargerRelationsQuery()) 
+                        // ->select('id', 'amount', 'created_at')
                         ->latest()
                         ->paginate(10, ['*'], 'charges_page');
                 });
@@ -264,6 +267,15 @@ class AgencyController extends MainController
                 ->get();
         });
 
+        $sumTargets = 
+        Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
+            return
+             UserSallary::where('user_agency_id', $agencyId)
+                ->where('month', now()->month)
+                ->where('year', now()->year)
+                ->sum('target_diamonds');
+        });
+
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
@@ -278,7 +290,8 @@ class AgencyController extends MainController
                 'rate',
                 'stars',
                 'heroes',
-                'tab'
+                'tab',
+                'sumTargets'
             ));
     }
 
@@ -1114,11 +1127,15 @@ class AgencyController extends MainController
     public function adminAgency($id)
     {
         $user = User::Find($id);
-        $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->exists();
-        if ($admin) return response()->json([
-            'status' => false,
-            'message' => __('this user admin in  this agency')
-        ], 404);
+        $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->first();
+        if ($admin) {
+            $admin->delete();
+    
+            return response()->json([
+                'status' => true,
+                'message' => __('Admin role removed from this agency')
+            ]);
+        }
         $data = [
             'agency_id' => $user->agency_id,
             'user_id' => $user->id,
@@ -1131,6 +1148,34 @@ class AgencyController extends MainController
             'message' => __('done')
         ]);
     }
+
+    public function kickFromAgency($id)
+    {
+        $user = User::findOrFail($id);
+        clearAgencyCache($user->agency_id);
+
+        $isOwner = Agency::where('id', $user->agency_id)
+            ->where('app_owner_id', $user->id)
+            ->exists();
+    
+        if ($isOwner) {
+            return response()->json([
+                'status' => false,
+                'message' => __('Cannot remove the owner of the agency'),
+            ], 403);
+        }
+
+        $user->agency_id = 0 ;
+        $user->save();
+        UserHandling::kickUserFromAgency($user);
+
+        return response()->json([
+            'status' => true,
+            'message' => __('done')
+        ]);
+    }
+
+    
 
     public function rejectJoin($id)
     {

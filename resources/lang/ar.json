@@ -661,7 +661,7 @@
     "percentage-target": "النسبة المستهدفة",
     "charges reports": "تقارير الشحن",
     "dash_repo": "شحن النظام",
-    "app_repo": "شحن وكالات الشحن",
+    "app_repo": "نشاط وكلات الشحن",
     "payment gateway": "بوابات دفع",
     "sendTo": "المرسل اليه",
     "parent-users": "دعوات الانضمام",
@@ -3196,8 +3196,17 @@
 "prof_reports": "تقارير الارباح",
 "padding":"مسافة داخلية",
   "user can upload Gif image": "يمكن للمستخدم رفع صورة بصيغة GIF",
-  "can not ban this user": "لا يمكن حظر هذا المستخدم"
+  "can not ban this user": "لا يمكن حظر هذا المستخدم",
+  "Total recharge from recharge agencies":"مجموع الشحن من وكلات الشحن",
+  "Total recharge to recharge agencies":"مجموع الشحن إلى وكلات الشحن" ,
+  "Sender UUID or shipping Agency ID": "معرّف المرسل (UUID) أو معرّف وكالة الشحن",
+"receiver UUID or shipping Agency ID": "معرّف المستلم (UUID) أو معرّف وكالة الشحن",
 
+"remove_admin": "إزالة من المشرفين",
+"kick": "طرد",
+"are_you_sure_remove_member": "هل أنت متأكد من إزالة هذا العضو؟",
+"are_you_sure_remove_admin": "هل أنت متأكد من إزالة هذا المسؤول؟"
+  
 
 
 
