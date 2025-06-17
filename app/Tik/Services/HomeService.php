@@ -127,11 +127,9 @@ class HomeService
 
     public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
     {
-        \Log::info('privilegeArr',['type' => $type]);
 
         if (key_exists($type, $privilegeArr)) {
 
-            \Log::info('privilegeArr',['privilegeArr' => $privilegeArr]);
 
             $privilegeId = $privilegeArr[$type];
 
