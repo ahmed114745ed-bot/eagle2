@@ -395,7 +395,7 @@ Route::group(
             Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
         });
-        Route::resource('g', 'VipPrivilegeController');
+        Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');
