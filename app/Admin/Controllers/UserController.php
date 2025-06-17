@@ -829,13 +829,13 @@ class UserController extends MainController
 
         $types =  collect($typeMap);
         $currentType = request()->get('type', $types->keys()->first());
-        
+
         $charges = Charge::where('charger_id', $id)
         ->where('charger_type', 'user')
-        ->with(Common::chargerRelationsQuery()) 
+        ->with(Common::chargerRelationsQuery())
         ->orderByDesc('id')
         ->paginate(10, ['*'], 'charges_page');
-        
+
         $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType','charges' ,'tab');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
