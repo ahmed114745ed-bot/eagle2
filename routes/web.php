@@ -1,26 +1,27 @@
 <?php
 
-use App\Helpers\Common;
-use App\Http\Controllers\PaytabsController;
-use App\Models\DeleteAccount;
 use App\Models\Room;
-use Encore\Admin\Controllers\AdminController;
-use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Route;
-use App\Admin\Controllers\CoinController;
-use App\Admin\Controllers\ConfigController as ControllersConfigController;
-use App\Admin\Controllers\MangerSettingController;
-use App\Admin\Controllers\UserController;
-use App\Facades\CustomNotification;
-use App\Http\Controllers\addTOjesonController;
-use App\Http\Controllers\Api\V2\MallController;
-use App\Http\Controllers\Api\V1\ConfigController;
 use App\Models\User;
-use App\Http\Controllers\RoomSettings;
-use App\Http\Controllers\SettingsController;
+use App\Helpers\Common;
 use App\Models\RoomVisitor;
 use App\Models\VipPrivilege;
+use App\Exports\AgencyCharge;
+use App\Models\DeleteAccount;
+use Illuminate\Routing\Router;
+use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoomSettings;
+use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\UserController;
+use App\Http\Controllers\PaytabsController;
+use App\Http\Controllers\SettingsController;
+use Encore\Admin\Controllers\AdminController;
+use App\Http\Controllers\addTOjesonController;
+use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\Api\V1\ConfigController;
+use App\Admin\Controllers\MangerSettingController;
+use App\Admin\Controllers\ConfigController as ControllersConfigController;
 
 
 /*
@@ -125,6 +126,10 @@ Route::get('/clear', function () {
 
     return "Cleared!";
 });
+Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
+    return Excel::download(new AgencyCharge($agencyId), 'shipping_agency.xlsx');
+});
+
 
 Route::get('/clear_clear', function () {
 

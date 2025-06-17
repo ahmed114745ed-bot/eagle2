@@ -154,79 +154,44 @@ class ChargeReportController extends MainController
                     }, __('receiver UUID or shipping Agency ID'));
                 });
 
-            //    $filter->column(1 / 2, function ($filter) {
-            //         // Select entity type
-            //         $filter->equal('filter_type', __('Type'))->select([
-            //             'user' => 'User',
-            //             'shipping' => 'Shipping Agency',
-            //         ])->default('shipping');
+                $filter->column(1 / 2, function ($filter) {
+                    // Select entity type
+                    $filter->custom('filter_type', 'Filter Type')->select([
+                        'user' => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ]);
 
-            //         // Select direction: sender or receiver
-            //         $filter->equal('filter_target', __('Target'))->select([
-            //             'sender' => 'Sender',
-            //             'receiver' => 'Receiver',
-            //         ])->default('sender');
-
-            //         // UUID or ID inputs (text fields)
-            //         $filter->equal('user_uuid', __('User UUID'));
-            //         $filter->equal('agency_id', __('Shipping Agency ID'));
-            //     });
-
-            //     // Main filter logic
-            //     $filter->where(function ($query) {
-            //         $type = request('filter_type');
-            //         $target = request('filter_target');
-            //         $userUuid = request('user_uuid');
-            //         $agencyId = request('agency_id');
-
-            //         if ($type === 'user' && $userUuid) {
-            //             if ($target === 'sender') {
-            //                 $query->whereHas('senderUser', function ($q) use ($userUuid) {
-            //                     $q->where('uuid', $userUuid);
-            //                 });
-            //             } elseif ($target === 'receiver') {
-            //                 $query->whereHas('receiverUser', function ($q) use ($userUuid) {
-            //                     $q->where('uuid', $userUuid);
-            //                 });
-            //             }
-            //         } elseif ($type === 'shipping' && $agencyId) {
-            //             if ($target === 'sender') {
-            //                 $query->whereHas('senderShippingAgency', function ($q) use ($agencyId) {
-            //                     $q->where('id', $agencyId);
-            //                 });
-            //             } elseif ($target === 'receiver') {
-            //                 $query->whereHas('shippingAgency', function ($q) use ($agencyId) {
-            //                     $q->where('id', $agencyId);
-            //                 });
-            //             }
-            //         }
-            //     }, __('Dynamic Sender/Receiver Filter'));
-             }
-        });
-            Admin::script(<<<JS
-                function setFilterIdsAndToggle() {
-                    // Set IDs once
-                    $('select[name="filter[filter_type]"]').attr('id', 'filter-type');
-                    $('select[name="filter[filter_target]"]').attr('id', 'filter-target');
-                    $('input[name="filter[user_uuid]"]').attr('id', 'filter-user-uuid');
-                    $('input[name="filter[agency_id]"]').attr('id', 'filter-agency-id');
-
-                    // Show/hide inputs
-                    let type = $('#filter-type').val();
-                    if (type === 'user') {
-                        $('#filter-user-uuid').closest('.form-group').show();
-                        $('#filter-agency-id').closest('.form-group').hide();
-                    } else {
-                        $('#filter-user-uuid').closest('.form-group').hide();
-                        $('#filter-agency-id').closest('.form-group').show();
-                    }
-                }
-
-                $(document).ready(function () {
-                    setFilterIdsAndToggle();
-                    $('#filter-type').on('change', setFilterIdsAndToggle);
+                    $filter->where(function ($query) {
+                    }, __('type'), 'type')->radio([
+                        '' => 'All',
+                        'user' => 'user',
+                        'shipping' => 'Shipping Agency',
+                    ]);
                 });
-            JS);
+
+                // Main filter logic
+                $filter->where(function ($query) {
+                    $type = request('type');
+                    $value = trim($this->input);
+                    if ($type === 'user') {
+
+                        $query->whereHas('senderUser', function ($q) use ($value) {
+                            $q->where('uuid', $value);
+                        })->orWhereHas('receiverUser', function ($q) use ($value) {
+                            $q->where('uuid', $value);
+                        });
+                    } elseif ($type === 'shipping') {
+
+                        $query->whereHas('senderShippingAgency', function ($q) use ($value) {
+                            $q->where('id', $value);
+                        })->orWhereHas('shippingAgency', function ($q) use ($value) {
+                            $q->where('id', $value);
+                        });
+                    }
+                }, __('Dynamic Sender/Receiver Filter'));
+            }
+        });
+
 
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
