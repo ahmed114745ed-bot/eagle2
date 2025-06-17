@@ -6,22 +6,21 @@ use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Helpers\Common;
-use App\Models\VipPrivilege;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use App\Models\VipPrivilege;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
-use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Modules\Public\Http\Services\UserCounterServices;
-use Encore\Admin\Widgets\Box;
 use Modules\Reals\Http\Services\FfmpegService;
+use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Public\Http\Services\UserCounterServices;
 
 
 class OvipGiftTapController extends MainController
@@ -56,7 +55,10 @@ class OvipGiftTapController extends MainController
             })
             ->row(function (Row $row) use ($ovip) {
                 $type = request('type');
+
                 if (in_array($type, [13, 17, 14, 19, 16, 20, 9, 22, 15])) {
+                    $vipPrivilege = VipPrivilege::where('type', $type)->first();
+                    $image = getImagePath($vipPrivilege->img1);
                     switch ($type) {
                         case 13:
                             $text = __('hide user country');
@@ -88,7 +90,15 @@ class OvipGiftTapController extends MainController
                         default:
                             $text = null;
                     }
-                    $row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . $text . '</div>');
+                    //$row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . $text . '</div>');
+                    $row->column(12, function () use ($image, $text) {
+                        return '
+                                    <div style="text-align: center;">
+                                        <img src="' . $image . '" alt="Image" style="max-height: 120px; margin-bottom: 10px;">
+                                        <div style="font-size: 48px; font-weight: bold;">' . $text . '</div>
+                                    </div>
+                                ';
+                    });
                 } else {
                     $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
                 }
