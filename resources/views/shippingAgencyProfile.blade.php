@@ -905,9 +905,14 @@
                     </div> -->
                 </div>
             </div>
+             <a class="btn btn-success btn-back" href="{{ url('download-charge-agency/' . $agency->id) }}">
+            {{ __('Export to Excel') }}
+        </a>
            <button class="btn-back" onclick="window.location.href='{{ url('admin/charge-agencies') }}'">
                 {{ __('Go Back') }} <i class="fas fa-arrow-left"></i>
             </button>
+
+           
         </div>
 
         <div class="card">
