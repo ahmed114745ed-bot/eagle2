@@ -1120,9 +1120,8 @@
                         <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{ __('Sent Balance') }}</div>
                         
-                        <div style="margin-top: 10px; font-size: 16px;">
+                        <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$totalSend)}}
                             <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
-                            {{numToString(@$totalSend)}} 
                         </div>
                         </div>
                         
@@ -1130,10 +1129,8 @@
                         <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{__("Received Balance")}}</div>
                         
-                        <div style="margin-top: 10px; font-size: 16px;">
-                         <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
-                        {{ numToString(@$totalReceive) }}
-                           
+                        <div style="margin-top: 10px; font-size: 16px;">{{ numToString(@$totalReceive) }}
+                            <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
                         </div>
                         </div>
                     </div>
