@@ -97,7 +97,7 @@ class PayPalService
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
         ];
 
-        $response = Http::withHeaders($headers)->post($url);
+        $response = Http::withHeaders($headers)->post($url, null);
 
         info($response);
 
