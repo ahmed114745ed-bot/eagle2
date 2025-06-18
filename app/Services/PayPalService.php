@@ -82,9 +82,10 @@ class PayPalService
      */
     public function success(Request $request)
     {
-        info($request);
+        sleep(60);
         $orderId = $request->query('token');
-        info($orderId);
+        info('token'.$this->getAccessToken());
+        info('orderId'.$orderId);
         if (! $orderId) {
             return response()->json([
                 'status'  => 'error',
@@ -99,8 +100,6 @@ class PayPalService
         ];
 
         $response = Http::withHeaders($headers)->post($url, null);
-
-        info($response);
 
         if ($response->failed()) {
             return response()->json([
