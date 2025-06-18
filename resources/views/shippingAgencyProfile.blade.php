@@ -890,8 +890,16 @@
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
 
-                        <span class="meta-value">{{ @$agency?->owner?->name ?? 'N/A' }}</span>
-                        <span class="meta-uuid">({{ @$agency?->owner?->uuid ?? 'N/A' }})</span>
+                        <span class="meta-value">
+                            @if($agency?->owner)
+                                <a href="{{ url('admin/users/' . $agency->owner->id) }}">
+                                    {{ $agency->owner->name }}
+                                </a>
+                            @else
+                                N/A
+                            @endif
+                        </span>
+                        <span class="meta-uuid">( UUid:{{ @$agency?->owner?->uuid ?? 'N/A' }})</span>
                     </div>
                 </div>
                 <div class="agency-stats">
@@ -930,8 +938,6 @@
         </div>
         @endif
 
-                
-
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 15px;">
                     <!-- Card 1: Balance -->
@@ -965,7 +971,7 @@
                                         {{ __('Balance') }}
                                     </div>
                                     <div style="font-size: 28px; font-weight: bold; letter-spacing: 1px; font-family: 'Courier New', monospace; margin-top: 5px;">
-                                        {{ number_format(@$agency->coins) }}
+                                        {{ numToString(@$agency->coins) }}
                                     </div>
                                 </div>
                             </div>
@@ -993,7 +999,7 @@
                     </div>
 
                     <!-- Card 2: Sent Balance -->
-                    <div class="performers-card" style="font-family: Arial, sans-serif;">
+                    {{-- <div class="performers-card" style="font-family: Arial, sans-serif;">
                         <div class="card-content" style="
                             padding: 20px;
                             display: flex;
@@ -1023,7 +1029,7 @@
                                         {{ __('Sent Balance') }}
                                     </div>
                                     <div style="font-size: 28px; font-weight: bold; letter-spacing: 1px; font-family: 'Courier New', monospace; margin-top: 5px;">
-                                        {{ number_format(@$totalSend) }}
+                                        {{ numToString(@$totalSend) }}
                                     </div>
                                 </div>
                             </div>
@@ -1081,7 +1087,7 @@
                                         {{ __('Received Balance') }}
                                     </div>
                                     <div style="font-size: 28px; font-weight: bold; letter-spacing: 1px; font-family: 'Courier New', monospace; margin-top: 5px;">
-                                        {{ number_format(@$totalReceive) }}
+                                        {{ numToString(@$totalReceive) }}
                                     </div>
                                 </div>
                             </div>
@@ -1106,17 +1112,35 @@
                                 </div>
                             </div>
                         </div>
+                    </div> --}}
+                </div>
+                 <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 15px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; max-width: 800px;">
+                        <!-- Card 1 -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{ __('Sent Balance') }}</div>
+                        
+                        <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$totalSend)}}</div>
+                        </div>
+                        
+                        <!-- Card 2 -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{__("Received Balance")}}</div>
+                        
+                        <div style="margin-top: 10px; font-size: 16px;">{{ numToString(@$totalReceive) }}</div>
+                        </div>
+                    </div>
                     </div>
                 </div>
-            </div>
+                               
 @php
     $activeTab = request('tab', 'charges');
 @endphp
 
 <!-- Navigation Tabs -->
 <div class="agency-tabs">
-    <a href="?tab=charges" class="tab-btn {{ ($activeTab == 'charges') ? 'active' : '' }}" data-target="charges-tab">{{ __('Charges') }}</a>
-    <a href="?tab=resived" class="tab-btn {{ ($activeTab == 'resived') ? 'active' : '' }}" data-target="resived-tab">{{ __('receiver') }}</a>
+    <a href="?tab=charges" class="tab-btn {{ ($activeTab == 'charges') ? 'active' : '' }}" data-target="charges-tab">{{ __('Sent Transactions') }}</a>
+    <a href="?tab=resived" class="tab-btn {{ ($activeTab == 'resived') ? 'active' : '' }}" data-target="resived-tab">{{ __('Received Transactions') }}</a>
 </div>
 
 <!-- Loading Indicator -->
@@ -1153,6 +1177,9 @@
                     </thead>
                     <tbody>
                         @foreach($charges as $index => $charge)
+                                {{-- @php
+                                    $receiver = Common::getReceiverInfo($charge);
+                                @endphp --}}
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
