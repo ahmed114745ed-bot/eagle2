@@ -426,7 +426,7 @@ class VipController extends MainController
         //        $form->number('co', __('Coins'));
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        }) ->removable();
+        }) ->removable()->required();
 
 
         
