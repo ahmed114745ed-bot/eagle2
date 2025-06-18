@@ -82,10 +82,10 @@ class PayPalService
      */
     public function success(Request $request)
     {
-        sleep(60);
+        sleep(29);
         $orderId = $request->query('token');
-        info('token'.$this->getAccessToken());
-        info('orderId'.$orderId);
+        info('token-'.$this->getAccessToken());
+        info('orderId-'.$orderId);
         if (! $orderId) {
             return response()->json([
                 'status'  => 'error',
@@ -131,8 +131,8 @@ class PayPalService
 
     public function callback(Request $request): JsonResponse
     {
+        info('webhook-'.$request);
         $eventType = $request->get('event_type');
-        info($eventType);
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
             return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);
         }
