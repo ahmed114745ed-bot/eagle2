@@ -82,7 +82,7 @@ class SearchRepository implements SearchRepositoryInterface
 
         $whereOr = ['uuid' => $keywords];
         $blockedUserIds = BlackList::where('user_id', $userId)->pluck('from_uid')->toArray();
-
+\Log::info('blockedUserIds',['blockedUserIds'=>$blockedUserIds]);
         $users = User::query()
             ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])
             ->where(function ($query) use ($keywords) {
