@@ -16,7 +16,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form\Field\Table as FieldTable;
 use Encore\Admin\Widgets\Table as WidgetsTable;
 
-class FfReelController extends MainController
+class ReelController extends MainController
 {
     /**
      * Title for current resource.
