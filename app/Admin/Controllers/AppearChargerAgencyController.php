@@ -521,8 +521,7 @@ class AppearChargerAgencyController extends MainController
                 break;
         }
         $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
-        $totalSend = Charge::where('charger_type', 'agency')
-            ->where('charger_id', $agencyId)->sum('amount');
+        $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');
         return $content->title(__('agency profile'))
             ->view('shippingAgencyProfile', compact(
                 'agency',

@@ -3044,6 +3044,8 @@
   "bottom": "alt",
   "can not ban this user": "Bu kullanıcı yasaklanamaz",
   "Delete gift a medal": "Bir madalya hediyesini sil",
+  "Sent Transactions": "Gönderilen İşlemler",
+  "Received Transactions": "Alınan İşlemler",
    "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
 ,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
 ,"Moments": "Anlar",

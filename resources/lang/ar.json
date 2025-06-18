@@ -3208,6 +3208,8 @@
   "Sent Balance": "الرصيد المرسل",
   "total wallet": "إجمالي المحفظة",
   "export/import": "صادر / وارد",
+  "Sent Transactions":"المعاملات المرسلة",
+  "Received Transactions":"المعاملات المستلمة",
 
 "remove_admin": "إزالة من المشرفين",
 "kick": "طرد",
