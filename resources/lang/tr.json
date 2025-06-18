@@ -27,6 +27,10 @@
     "Shipping": "Nakliye",
     "Hosting" : "Ev sahibi",
     "Agency_owner" : "Acente sahibi",
+    "receiver type": "Alıcı Türü",
+  "sender type": "Gönderici Türü",
+  "Sender UUID or Shipping Agency ID": "Gönderici UUID veya Kargo Ajansı Kimliği",
+  "Receiver UUID or Shipping Agency ID": "Alıcı UUID veya Kargo Ajansı Kimliği"
 
     "Charged by dash": "Sistemden şarj",
     "Enter amount in dollars": "Tutarı dolar olarak girin",
@@ -3040,6 +3044,8 @@
   "cancel": "İptal et",
   "top": "üst",
   "padding": "iç boşluk",
+  "To Date": "Bitiş Tarihi",
+  "From Date": "Başlangıç Tarihi",
   "user can upload Gif image": "Kullanıcı GIF görüntüsü yükleyebilir",
   "bottom": "alt",
   "can not ban this user": "Bu kullanıcı yasaklanamaz",
