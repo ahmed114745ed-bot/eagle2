@@ -30,9 +30,14 @@ class ShippingAgency extends Model
         return $this->hasMany(ChargeAgency::class, 'agency_id');
     }
 
+ 
     public function charges()
     {
-        return $this->hasMany(Charge::class, 'agency_id')->whereNotNull('agency_id');
+        return $this->hasMany(Charge::class, 'user_id','id')->where('charger_type','agency');
+    }
+    public function senderCharges()
+    {
+        return $this->hasMany(Charge::class, 'charger_id','id')->where('charger_type','agency');
     }
 
     public function Countries()
@@ -270,7 +275,8 @@ class ShippingAgency extends Model
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
 
-        return floor($agencySallary ?? 0);
+        return      round($agencySallary, 2);
+
     }
 
     public function getSalary($month = null, $year = null)

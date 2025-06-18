@@ -150,8 +150,8 @@ class VipPrivilegeController extends MainController
 
             ]
         )->rules('required');
-        $form->file('img1', __('active image'))->rules('required');
-        $form->file('img2', __('inactive image'))->rules('required');
+        $form->file('img1', __('active image'))->removable()->rules('required');
+        $form->file('img2', __('inactive image'))->removable()->rules('required');
         //        $form->display(trans('admin.created_at'));
         //        $form->display(trans('admin.updated_at'));
 

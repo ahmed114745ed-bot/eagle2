@@ -562,10 +562,12 @@
     "Received Level": "Alınan Seviye",
     "Sender Level": "Gönderen Seviye",
     "receiver": "alıcı",
+    "Receiver": "alıcı",
     "amount_type": "Miktar türü",
     "balance_before": "Önceki bakiye",
     "balance_after": "Sonraki bakiye",
     "charger": "Şarj cihazı",
+    "Charger": "Şarj cihazı",
     "when submit this user will lose his monthly diamond?": "Bu kullanıcıyı eklediğinizde aylık elmasını kaybedecek mi?",
     "diamond": "Elmas",
     "pin": "Sabit",
@@ -3042,6 +3044,8 @@
   "bottom": "alt",
   "can not ban this user": "Bu kullanıcı yasaklanamaz",
   "Delete gift a medal": "Bir madalya hediyesini sil",
+  "Sent Transactions": "Gönderilen İşlemler",
+  "Received Transactions": "Alınan İşlemler",
    "This target has already been achieved by some users and cannot be updated.": "Bu hedef bazı kullanıcılar tarafından zaten gerçekleştirildi ve güncellenemez."
 ,    "target_change_warning": "Hedef değeri artırıldığında, sunucuların aldığı dolar miktarı artar; azaltıldığında ise dolar değerleri azalır."
 ,"Moments": "Anlar",

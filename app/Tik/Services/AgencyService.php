@@ -738,7 +738,8 @@ class AgencyService
             'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
-
+        $hours_days = \Cache::get('hours_days') ?? 2;
+        
         for ($startDay = $reportStart; $startDay <= $endDay; $startDay++) {
             
             $dailyHours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
@@ -762,7 +763,7 @@ class AgencyService
                 'live_minutes' => (int)$dailyMinutes,
                 'live_minutes_formatted' => (string)$dailyFormatted,
                 'diamonds' => numToString((int)$diamonds),
-                'is_active_day' => $dailyHours >= 2, 
+                'is_active_day' => $dailyHours >= $hours_days, 
 
             ];
         }
