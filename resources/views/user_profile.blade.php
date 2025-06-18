@@ -1,4 +1,4 @@
-@php use App\Helpers\Common; @endphp
+@php use App\Helpers\Common;use Carbon\Carbon; @endphp
     <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +18,7 @@
             --text-secondary-color: {{ config('themes.textSecondaryColor') }};
             --box-background-color: {{ config('themes.boxBackgroundColor') }};
             --table-background-color: {{ config('themes.tableBackGroundColor')}}
-            --background-image:{{ config('themes.backgroundImage') }};
+             --background-image:{{ config('themes.backgroundImage') }};
             --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
             --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
             --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
@@ -1515,7 +1515,8 @@
                         <tr>
                             <td>{{ $charge->id }}</td>
                             <td>
-                                <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank" style="display: inline-flex; align-items: center; text-decoration: none;">
+                                <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
+                                   style="display: inline-flex; align-items: center; text-decoration: none;">
                                     <img src="{{ $image }}" width="30" height="30"
                                          style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <span>{{ $name }} ({{ $uid }})</span>
