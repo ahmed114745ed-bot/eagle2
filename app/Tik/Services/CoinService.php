@@ -99,8 +99,9 @@ class CoinService
                 $ziniPayService = new ZiniPaymentService();
                 return $ziniPayService->makePayment($log->id, $coin->usd, $user);
             } else if ($request->pay_method == 'paypal') {
-                $ziniPayService = new PayPalService();
-                return $ziniPayService->create($log->id, $coin->usd, $user);
+                $paypalService = new PayPalService();
+                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
+                return response()->json($paymentLink);
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
