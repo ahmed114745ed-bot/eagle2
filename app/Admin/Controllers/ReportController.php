@@ -117,7 +117,9 @@ class ReportController extends MainController
                 </div>";
         });
         $grid->column('target', __('target'))->display(function () {
-            return @$this->getTotalSallary(request('month'), request('year')) ?? 0;
+            // return @$this->getTotalSallary(request('month'), request('year')) ?? 0;
+            $lastTargetFromRelation = optional($this->targets()->orderByDesc('id')->first())->target_id ?? 0;
+            return $lastTargetFromRelation;
         });
         $grid->column('expenses', __('expenses'))->display(function () {
             return @$this->getTotalCutAmount(request('month'), request('year')) ?? 0;

@@ -33,9 +33,9 @@
                         <td>{{ $charge->created_at }}</td>
                         <td> 
                              @if ($charge->user_type == 'agency')
-                               <i class="fas fa-arrow-up text-success"></i>
+                                🟢↑
                             @elseif ($charge->charger_type == 'agency')
-                                <i class="fas fa-arrow-down text-danger"></i>
+                                🔴↓
                             @endif
                     </td>
                         <td>{{ $charge->balance_before }}</td>

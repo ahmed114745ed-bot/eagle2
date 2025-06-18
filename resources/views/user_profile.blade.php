@@ -1374,8 +1374,8 @@
                                     <td>{{$salary->sallary}}</td>
                                     <td>{{ $salary->cut_amount}}</td>
                                     <td>{{ $salary->sallary - $salary->cut_amount }}</td>
-                                    <td>{{ $salary->achieved_days }}</td>
-                                    <td>{{ $salary->achieved_hours }}</td>
+                                    <td>{{ $salary->days }}</td>
+                                    <td>{{ $salary->hours }}</td>
                                     <td>
                                         <div style="line-height: 1.6;">
                                             <ul style="margin-left: 8px;">

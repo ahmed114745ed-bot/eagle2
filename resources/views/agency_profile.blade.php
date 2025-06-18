@@ -1207,7 +1207,7 @@
         <!-- salary Section -->
         <div class="tab-content" id="salary-tab">
         <div class="target-card-stat">
-                            <div class="stats-row">
+                            <!-- <div class="stats-row">
                                 <div class="stat-card">
                                     <div class="stat-icon bg-blue">
                                         <i class="fas fa-bullseye"></i>
@@ -1219,7 +1219,7 @@
                                 </div>
 
                               
-                            </div>
+                            </div> -->
                         </div>
             <div class="card">
                 <div class="card-header">
@@ -1233,6 +1233,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>{{ __('salary') }}</th>
+                                    <th>{{ __('Target') }}</th>
                                     <th>{{ __('month') }}</th>
                                     <th>{{ __('year') }}</th>
 
@@ -1245,9 +1246,10 @@
                                         <tr>
                                             <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
                                             <td>{{ @$salary->sallary - $salary->cut_amount }}</td>
+                                            <td>{{ @$sumTargets }}</td>
                                             <td>{{ @$salary->month ?? '' }}</td>
                                             <td>{{ @$salary->year ?? '' }}</td>
-
+                                            
 
                                         </tr>
                                     @endforeach
@@ -1660,7 +1662,8 @@
                                                         $reelLikes = $reel['likes'] ?? '0/0';
                                                         $reelComments = $reel['comments'] ?? '0/0';
 
-                                                      
+                                                        
+                                                            $target = $memberTarget->targets->first();
                                                  @endphp
 
                                                 <tr>
@@ -1676,16 +1679,16 @@
                                                     </td>
                                                     <td>
                                                         <span class="number-badge">
-                                                            {{ $memberTarget->targets->first()->user_diamonds ?? 0 }}
+                                                            {{ $target->user_diamonds ?? 0 }}
                                                         </span>
                                                     </td>
                                                     <td>
                                                         <span class="number-badge warning">
-                                                            {{ $memberTarget->targets->first()->next_diamond ?? 0 }}
+                                                            {{ $target->next_diamond ?? 0 }}
                                                         </span>
                                                     </td>
-                                                    <td>{{ $memberTarget->targets->first()->user_hours ?? 0 }}</td>
-                                                    <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
+                                                    <td>{{ $target->user_hours ?? 0 }}</td>
+                                                    <td>{{ $target->user_days ?? 0 }}</td>
                                                     <td>
                                                             <div style="line-height: 1.6;">
                                                                 <ul style="margin-left: 8px; width: 141px;">

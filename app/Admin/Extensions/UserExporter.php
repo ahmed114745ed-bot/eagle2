@@ -66,9 +66,10 @@ class UserExporter implements FromCollection, WithHeadings
                 ->select(
                     DB::raw('SUM(sallary) AS target'),
                     DB::raw('SUM(cut_amount) AS expenses'),
+                    DB::raw('SUM(achieved_diamond) AS achieved_diamond'),
                     DB::raw('SUM(sallary) - SUM(cut_amount) AS salary'),
-                    DB::raw('MAX(achieved_days) AS achieved_days'),
-                    DB::raw('MAX(achieved_hours) AS achieved_hours'),
+                    DB::raw('MAX(days) AS achieved_days'),
+                    DB::raw('MAX(hours) AS achieved_hours'),
                     DB::raw('MAX(extras) AS extras'),
                     DB::raw('MAX(user_agency_id) AS user_agency_id')
                 )
@@ -91,9 +92,19 @@ class UserExporter implements FromCollection, WithHeadings
             $arr[] = [
                 'uuid'             => $user->uuid,
                 'name'             => $user->name,
-                'diamonds'         => $diamonds->diamond ?? "0",
-                'days'             => $userSalarys->achieved_days ?? "0",
-                'hours'            => $userSalarys->achieved_hours ?? "0",
+                'diamonds'         => $userSalarys->achieved_diamond ?? "0",
+                'days'             => $userSalarys->achieved_days ?? "0/0",
+                'hours'            => $userSalarys->achieved_hours ?? "0/0",
+                'moment' => [
+                        'upload'   => $moment['upload'] ?? '0/0',
+                        'likes'    => $moment['likes'] ?? '0/0',
+                        'comments' => $moment['comments'] ?? '0/0',
+                ],
+                'reel' => [
+                        'upload'   => $reel['upload'] ?? '0/0',
+                        'likes'    => $reel['likes'] ?? '0/0',
+                        'comments' => $reel['comments'] ?? '0/0',
+                ],
                 'salary'           => $userSalarys->target ?? "0",
                 'withdrawn'        => $userSalarys->expenses ?? "0",
                 'remaining'        => $userSalarys->salary ?? "0",
@@ -101,12 +112,7 @@ class UserExporter implements FromCollection, WithHeadings
                 'agency_id'        => $userSalarys->user_agency_id ?? '-',
                 'month'            => $month,
                 'year'             => $year,
-                'moment_upload'    => $moment['upload'] ?? '0/0',
-                'moment_likes'     => $moment['likes'] ?? '0/0',
-                'moment_comments'  => $moment['comments'] ?? '0/0',
-                'reel_upload'      => $reel['upload'] ?? '0/0',
-                'reel_likes'       => $reel['likes'] ?? '0/0',
-                'reel_comments'    => $reel['comments'] ?? '0/0',
+             
             ];
         }
     
@@ -122,6 +128,8 @@ class UserExporter implements FromCollection, WithHeadings
             __('diamonds', [], 'ar'),
             __('days', [], 'ar'),
             __('hours', [], 'ar'),
+            __('moment', [], 'ar'),
+            __('reel', [], 'ar'),
             __('salary', [], 'ar'),
             __('withdrawn', [], 'ar'),
             __('remaining', [], 'ar'),
@@ -129,12 +137,7 @@ class UserExporter implements FromCollection, WithHeadings
             __('agency_id', [], 'ar'),
             __('month', [], 'ar'),
             __('year', [], 'ar'),
-            __('Moment Upload', [], 'ar'),
-            __('Moment Likes', [], 'ar'),
-            __('Moment Comments', [], 'ar'),
-            __('Reel Upload', [], 'ar'),
-            __('Reel Likes', [], 'ar'),
-            __('Reel Comments', [], 'ar'),
+        
         ];
     
     }

@@ -278,6 +278,7 @@ class WareTabController extends MainController
                     'alpha' => __('alpha'),
                     'mp4' => __('mp4'),
                     'vap' => __('vap'),
+                    'png' => __('png'),
 
                 ]
             )->attribute(['id' => 'image_type1']);
