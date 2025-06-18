@@ -2,20 +2,21 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\UserCommon;
+use Carbon\Carbon;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\CoinLog;
+use Encore\Admin\Admin;
 use App\Enums\PaymentType;
+use App\Helpers\UserCommon;
 use App\Models\ExchangeLog;
 use App\Models\PaymentCoin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Admin;
 
 
 class ChargeReportController extends MainController
@@ -114,47 +115,92 @@ class ChargeReportController extends MainController
             if (!request()->has('filter_type')) {
                 request()->merge(['filter_type' => 'shipping']);
             }
-
+            $filter->disableIdFilter();
             $filter->expand();
 
-            $filter->column(1 / 2, function ($filter) {
-
-                $filter->between('created_at', __('Created At'))->date();
-
+            $filter->column(1 / 4, function ($filter) {
                 $filter->where(function () {}, __('Type'), 'filter_type')
                     ->select([
                         'user'     => 'User',
                         'shipping' => 'Shipping Agency',
                     ])->default('shipping');
+            });
 
+            $filter->column(3 / 4, function ($filter) {
                 $filter->where(function ($query) {
                     $type  = request('filter_type');
                     $value = trim($this->input);
 
                     if ($type === 'user') {
-                        $query->whereHas('senderUser', fn ($q) => $q->where('uuid', $value))
-                            ->orWhereHas('receiverUser', fn ($q) => $q->where('uuid', $value));
+                        $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value))
+                            ->orWhereHas('receiverUser', fn($q) => $q->where('uuid', $value));
                     } elseif ($type === 'shipping') {
-                        $query->whereHas('senderShippingAgency', fn ($q) => $q->where('id', $value))
-                            ->orWhereHas('shippingAgency', fn ($q) => $q->where('id', $value));
+                        $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value))
+                            ->orWhereHas('shippingAgency', fn($q) => $q->where('id', $value));
                     }
                 }, __('Dynamic Sender/Receiver Filter'));
             });
 
-            $filter->column(1 / 2, function ($filter) {
-
-                $filter->where(function ($query) {
-                    $value = trim($this->input);
-                    $query->whereHas('senderUser', fn ($q) => $q->where('uuid', $value))
-                        ->orWhereHas('senderShippingAgency', fn ($q) => $q->where('id', $value));
-                }, __('Sender UUID or shipping Agency ID'));
-
-                $filter->where(function ($query) {
-                    $value = trim($this->input);
-                    $query->whereHas('receiverUser', fn ($q) => $q->where('uuid', $value))
-                        ->orWhereHas('shippingAgency', fn ($q) => $q->where('id', $value));
-                }, __('receiver UUID or shipping Agency ID'));
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function () {}, __('sender type'), 'sender_type')
+                    ->select([
+                        'user'     => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ])->default('shipping');
             });
+
+            $filter->column(3 / 4, function ($filter) {
+                $filter->where(function ($query) {
+                    $type  = request('sender_type');
+                    $value = trim($this->input);
+
+                    if ($type === 'user') {
+                        $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value));
+                    } elseif ($type === 'shipping') {
+                        $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value));
+                    }
+                }, __('Sender UUID or Shipping Agency ID'));
+            });
+
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function () {}, __('receiver type'), 'receiver_type')
+                    ->select([
+                        'user'     => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ])->default('shipping');
+            });
+
+            $filter->column(3 / 4, function ($filter) {
+                $filter->where(function ($query) {
+                    $type  = request('receiver_type');
+                    $value = trim($this->input);
+
+                    if ($type === 'user') {
+                        $query->whereHas('receiverUser', fn($q) => $q->where('uuid', $value));
+                    } elseif ($type === 'shipping') {
+                        $query->whereHas('shippingAgency', fn($q) => $q->where('id', $value));
+                    }
+                }, __('Receiver UUID or Shipping Agency ID'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $from = request('from_date');
+                }, __('From Date'), 'from_date')->date();
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $to = request('to_date');
+                }, __('To Date'), 'to_date')->date();
+            });
+        });
+
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+
+            $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+            $query->whereBetween('created_at', [$start, $end]);
         });
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
