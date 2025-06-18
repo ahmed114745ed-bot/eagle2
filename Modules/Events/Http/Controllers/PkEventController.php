@@ -85,8 +85,8 @@ class PkEventController extends Controller
     public function topDetails()
     {
         $nowDate = Carbon::now();
-        $pkEvent = PkEvent::currentEvent()->with(['rewards'])
-            ->first();
+        $pkEvent = PkEvent::currentEvent()->with(['rewards']) ->first();
+            dd( $pkEvent);
         if (!$pkEvent) {
             return Common::apiResponse(0, __('there is no event now'), null, 422);
         }
