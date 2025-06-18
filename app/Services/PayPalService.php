@@ -83,27 +83,50 @@ class PayPalService
     public function success(Request $request)
     {
         $orderId = $request->query('token');
+        info($orderId);
         if (! $orderId) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Missing Pay-Pal order id',
+                'message' => 'Missing PayPal order id',
             ], 422);
         }
 
-        $url = config('paypal.base_url') . '/v2/checkout/orders/' . $orderId . '/capture';
-
+        $url = config('paypal.base_url') . "/v2/checkout/orders/{$orderId}/capture";
         $headers = [
             'Content-Type'  => 'application/json',
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
         ];
 
-        $response = Http::withHeaders($headers)
-            ->post($url, null);
+        $response = Http::withHeaders($headers)->post($url);
 
         info($response);
-        return response('Payment successful.', 200);
 
-        return json_decode($response->body());
+        if ($response->failed()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => data_get($response->json(), 'message', 'Payment capture failed'),
+                'details' => $response->json(),
+            ], $response->status());
+        }
+
+        $data = $response->json();
+
+        if (data_get($data, 'status') !== 'COMPLETED') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Payment not completed',
+                'details' => $data,
+            ], 409);
+        }
+
+        $referenceId = data_get($data, 'purchase_units.0.reference_id');
+        $amount      = (float) data_get($data, 'purchase_units.0.payments.captures.0.amount.value');
+
+        return response()->json([
+            'status'  => 'success',
+            'order'   => $orderId,
+            'amount'  => $amount,
+        ], 200);
     }
 
     public function callback(Request $request): JsonResponse
