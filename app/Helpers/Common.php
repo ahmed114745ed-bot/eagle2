@@ -927,6 +927,9 @@ class Common
                 self::unUsePack($type, $user);
             }
         }
+        $userVip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->where('id', '!=', $userVip->id)->update(['is_used' => 0]);
         $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
             $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->orderBy('level', 'desc')->first();
@@ -1246,12 +1249,12 @@ class Common
     public static function hasColorInPack($user_id, $type, $use_status = false)
     {
         $query = Pack::query()
-        ->with('ware')
-        ->where('user_id', $user_id)
-        ->where('type', $type)
-        ->where(function ($q) {
-            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
-        });
+            ->with('ware')
+            ->where('user_id', $user_id)
+            ->where('type', $type)
+            ->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+            });
 
         if ($use_status) {
             $query->where('is_used', 1);
@@ -1259,7 +1262,7 @@ class Common
 
         $pack = $query->first();
 
-       return $pack?->ware?->color ?? '';
+        return $pack?->ware?->color ?? '';
     }
     public static function hasInPackV2($userPacks, $type, $use_status = false)
     {
