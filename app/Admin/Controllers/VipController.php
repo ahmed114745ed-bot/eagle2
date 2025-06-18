@@ -9,6 +9,7 @@ use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
+use App\Admin\Fields\Image;
 
 use App\Services\AppFeatureService;
 use App\Admin\Controllers\MainController;
@@ -425,8 +426,10 @@ class VipController extends MainController
         //        $form->number('co', __('Coins'));
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        });
+        }) ->removable();
 
+
+        
         $form->footer(function ($footer) {
             $footer->disableReset();        // Disables the "Reset" button
             $footer->disableViewCheck();    // Disables the "View" checkbox
