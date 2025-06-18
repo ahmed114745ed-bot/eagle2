@@ -978,7 +978,7 @@
     <!-- Header Section -->
     <div class="agency-header">
         <div class="agency-avatar">
-            <img src="{{getImagePath( @$user->profile->avatar ) }}" alt="Agency Logo" class="logo-img">
+            <img src="{{getImagePath( @$user->profile->avatar ) ?? asset("images/businessman-icon.jpg") }}" alt="Agency Logo" class="logo-img">
         </div>
         <div class="agency-info">
             <h1 class="agency-name">{{ @$user?->name ?? ''}}</h1>
