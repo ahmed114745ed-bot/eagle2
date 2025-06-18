@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Box;
 use App\Models\Room;
 use App\Models\User;
+use App\Enums\TypeBox;
 use App\Models\BoxUse;
 use App\Models\Config;
 use App\Helpers\Common;
@@ -149,7 +150,7 @@ class BoxController extends Controller
         $keyBoxUse  = 'BoxUse_' . $request->bid;
         $box_use = RedisService::getUnSerialize($keyBoxUse);
 
-        if (!$box_use || $box_use['not_used_num'] == 0 || $box_use['unused_coins'] == 0) {
+        if (!$box_use && $box_use['not_used_num'] == 0 && $box_use['unused_coins'] == 0) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
 
@@ -164,7 +165,7 @@ class BoxController extends Controller
         {
             return $this->normalBox($box_use, $keyBoxUse, $user, $request);
         } else {  // super
-            return  $this->superBox($box_use, $user, $keyBoxUse,$request->bid);
+            return  $this->superBox($box_use, $user, $keyBoxUse, $request->bid);
         }
     }
 
@@ -221,7 +222,6 @@ class BoxController extends Controller
     public function superBox($box_use, $user, $keyBoxUse, $bosUserId)
     {
 
-
         if (PickBoxList::where('box_user_id', $bosUserId)->where('user_id', $user->id)->exists()) {
             return Common::apiResponse(0, 'used it before', null, 403);
         }
@@ -233,6 +233,6 @@ class BoxController extends Controller
         $box_use['used_num'] += 1;
         //update box use in redis
         RedisService::updateUnSerialize($keyBoxUse, $box_use);
-        return Common::apiResponse(1, ' you are in waiting list', [], 200);
+        return Common::apiResponse(1, ' you are in waiting list', ["type" => strtolower(TypeBox::from($box_use['type'])->name),], 200);
     }
 }
