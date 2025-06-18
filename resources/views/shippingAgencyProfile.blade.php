@@ -1240,23 +1240,19 @@
                     </thead>
                     <tbody>
                         @foreach($resiveds as $index => $res)
+                                @php
+                                    $sender = \App\Helpers\Common::getChargerInfo($charge);
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge);
+                                @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
-                                    @if($res->sender instanceof \App\Models\User)
+                                    @if($sender)
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($res->sender->profile?->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                            <img src="{{ getImagePath($sender['image']) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
                                             <div>
-                                                <strong>{{ $res->sender->name }}</strong><br>
-                                                <small>ID: {{ $res->sender->id }}</small>
-                                            </div>
-                                        </div>
-                                    @elseif($res->sender instanceof \App\Models\Agency)
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($res->sender->logo_url) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
-                                            <div>
-                                                <strong>{{ $res->sender->name }}</strong><br>
-                                                <small>ID: {{ $res->sender->id }}</small>
+                                                <strong>{{ $sender['name'] }}</strong><br>
+                                                <small>ID: {{$sender['uuid'] }}</small>
                                             </div>
                                         </div>
                                     @else
