@@ -1517,7 +1517,7 @@
                             <td>
                                 <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
                                    style="display: inline-flex; align-items: center; text-decoration: none;">
-                                    <img src="{{ $image }}" width="30" height="30"
+                                    <img src="{{ getImagePath( $image) }}" width="30" height="30"
                                          style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <span>{{ $name }} ({{ $uid }})</span>
                                 </a>
