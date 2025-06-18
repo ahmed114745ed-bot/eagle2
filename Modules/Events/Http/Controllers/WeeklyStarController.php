@@ -118,7 +118,6 @@ class WeeklyStarController extends Controller
         $nowDate = Carbon::now();
         $weeklyEvent = WeeklyStar::currentEvent()->weeklyStar()->with(['rewards'])
                                  ->first();
-                                 dd($weeklyEvent);
 
         if (!$weeklyEvent) {
             return Common::apiResponse(0, __('there is no weekly star now'), null, 422);
