@@ -815,7 +815,7 @@ class Common
 
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
-        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->delete();
+        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->update(['is_used' => 0]);
 
         $type = $vip->privilegs()->pluck('type')->toArray();
         if (!empty($type)) {
