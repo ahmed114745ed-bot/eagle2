@@ -82,21 +82,39 @@ class SearchRepository implements SearchRepositoryInterface
 
         $whereOr = ['uuid' => $keywords];
         $blockedUserIds = BlackList::where('user_id', $userId)->pluck('from_uid')->toArray();
-\Log::info('blockedUserIds',['blockedUserIds'=>$blockedUserIds]);
+        \Log::info('blockedUserIds',['blockedUserIds'=>$blockedUserIds]);
+        // $users = User::query()
+        //     ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])
+        //     ->where(function ($query) use ($keywords) {
+        //         $query->where('uuid', 'like', '%' . $keywords . '%')
+        //               ->orWhere('special_id', 'like', '%' . $keywords . '%');
+        //     })
+        //     ->whereNotIn('id', $blockedUserIds)
+        //     ->where('status', 1)
+        //     ->with(['followedByAuthUser' , 'country']  )
+        //     ->orWhere(function ($query) use ($whereOr) {
+        //         $query->where($whereOr);
+        //     })
+        //     ->orderBy('matching_percentage', 'desc')
+        //     ->paginate();
         $users = User::query()
-            ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])
-            ->where(function ($query) use ($keywords) {
-                $query->where('uuid', 'like', '%' . $keywords . '%')
-                      ->orWhere('special_id', 'like', '%' . $keywords . '%');
+        ->select([
+            '*',
+            DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")
+        ])
+        ->where(function ($query) use ($keywords, $whereOr) {
+            $query->where(function ($subQuery) use ($keywords) {
+                $subQuery->where('uuid', 'like', '%' . $keywords . '%')
+                         ->orWhere('special_id', 'like', '%' . $keywords . '%');
             })
-            ->whereNotIn('id', $blockedUserIds)
-            ->where('status', 1)
-            ->with(['followedByAuthUser' , 'country']  )
-            ->orWhere(function ($query) use ($whereOr) {
-                $query->where($whereOr);
-            })
-            ->orderBy('matching_percentage', 'desc')
-            ->paginate();
+            ->orWhere($whereOr);
+        })
+        ->whereNotIn('id', $blockedUserIds)
+        ->where('status', 1)
+        ->with(['followedByAuthUser', 'country'])
+        ->orderBy('matching_percentage', 'desc')
+        ->paginate(10, ['*'], 'page', $page);
+
 
 
 
