@@ -29,7 +29,10 @@
     .ltr label {
         margin: 0 70px 0 0 !important;
     }
+    .fileinput-remove{
+        display: none;
 
+    }
     .rtl .pull-right{
         float: left !important;
     }
