@@ -16,7 +16,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form\Field\Table as FieldTable;
 use Encore\Admin\Widgets\Table as WidgetsTable;
 
-class ReelController extends MainController
+class FfReelController extends MainController
 {
     /**
      * Title for current resource.
@@ -157,11 +157,12 @@ class ReelController extends MainController
         $permission_name = $this->permission_name;
         $grid->actions(function ($actions) use ($permission_name) {
             $actions->disableEdit();
-            if (! Admin::user()->can('delete-' . $permission_name) || !Admin::user()->can('*')) {
-                $actions->disableDelete();
-            }
+            // if (! Admin::user()->can('delete-' . $permission_name) || !Admin::user()->can('*')) {
+            //     $actions->disableDelete();
+            // }
         });
         $grid->disableExport();
+         $this->extendGrid($grid);
 
         return $grid;
     }
