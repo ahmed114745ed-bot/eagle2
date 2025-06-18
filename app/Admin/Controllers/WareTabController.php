@@ -283,13 +283,13 @@ class WareTabController extends MainController
                 ]
             )->attribute(['id' => 'image_type1']);
 
-            $form->select('profile_frame_type', __('image_type'))->options(
-                [
-                    'svga' => __('svga'),
-                    'png' => __('png'),
+            // $form->select('profile_frame_type', __('image_type'))->options(
+            //     [
+            //         'svga' => __('svga'),
+            //         'png' => __('png'),
 
-                ]
-            )->attribute(['id' => 'profile_frame']);
+            //     ]
+            // )->attribute(['id' => 'profile_frame']);
         }
 
 
@@ -430,7 +430,8 @@ class WareTabController extends MainController
         }
         $form->saving(function (Form $form) {
             $imageType1 = $form->input('image_type1');
-            $profileFrameType = $form->input('profile_frame_type');
+            // $profileFrameType = $form->input('profile_frame_type');
+            $profileFrameType = request('image_type1') ?? $form->input('image_type1');
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
             if (is_null($imageType1) && is_null($profileFrameType)) {

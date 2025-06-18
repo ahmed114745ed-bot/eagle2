@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Transformers;
 
+use App\Models\Target;
 use Carbon\Carbon;
 use App\Helpers\Common;
 
@@ -38,14 +39,17 @@ class UserChargeResource extends JsonResource
         if ($TotalAmount < 0 ){
             $TotalAmount = 0 ;
         }
-        return [
+        $next_target = Target::where('diamonds', '>', $this->monthly_diamond_received)->orderBy('diamonds')->first();
 
+        return [
             'user' => [
                 'user_id'   => $this->id,
                 'uuid'      => $this->uuid ?? 0,
                 'name'      => $this->name ?? '',
                 'avatar'    => $this->profile->avatar ?? '',
                 'amount'    => $TotalAmount ?? 0,
+                'next_target' => $next_target->diamonds ?? $this->monthly_diamond_received ,
+                'remaining' => $this->monthly_diamond_received
             ],
 
             'role'      => $rule != null ? app()->getLocale() == 'ar' ? $rule->desc_ar : $rule->desc_en : "",
