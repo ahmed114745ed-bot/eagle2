@@ -3,6 +3,7 @@
 namespace Modules\Events\Traits;
 
 use Carbon\Carbon;
+use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Builder;
 
 trait EventModel
