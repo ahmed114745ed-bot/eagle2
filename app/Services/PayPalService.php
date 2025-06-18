@@ -46,9 +46,9 @@ class PayPalService
 
         $body = [
             "intent"         => "CAPTURE",
-            'application_context' => [
-                'return_url'  => route('paypal.success'),
-                'cancel_url'  => route('paypal.cancel'),
+            'experience_context' => [
+                'return_url'  => url('/api/paypal-success'),
+                'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
             ],
             "purchase_units" => [
@@ -82,8 +82,10 @@ class PayPalService
      */
     public function success(Request $request)
     {
+        sleep(29);
         $orderId = $request->query('token');
-        info($orderId);
+        info('token-'.$this->getAccessToken());
+        info('orderId-'.$orderId);
         if (! $orderId) {
             return response()->json([
                 'status'  => 'error',
@@ -100,7 +102,6 @@ class PayPalService
         $response = Http::withHeaders($headers)->post($url, null);
 
         info($response);
-
         if ($response->failed()) {
             return response()->json([
                 'status'  => 'error',
@@ -131,6 +132,7 @@ class PayPalService
 
     public function callback(Request $request): JsonResponse
     {
+        info('webhook-'.$request);
         $eventType = $request->get('event_type');
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
             return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);

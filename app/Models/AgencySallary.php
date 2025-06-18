@@ -32,4 +32,16 @@ class AgencySallary extends Model
             }
         });
     }
+    public function totalTargetDiamonds($month = null, $year = null)
+{
+    $month = $month ?? now()->month;
+    $year = $year ?? now()->year;
+
+    return $this->hasMany(UserSallary::class, 'user_agency_id', 'agency_id')
+        ->where('month', $month)
+        ->where('year', $year)
+        ->selectRaw('user_agency_id, SUM(target_diamonds) as total_target_diamonds')
+        ->groupBy('user_agency_id');
+}
+
 }

@@ -240,10 +240,11 @@ class User extends Authenticatable
         if ($from_date) {
             $query->where('created_at', '>=', $from_date);
         }
+        $hours_days = \Cache::get('hours_days') ?? 2;
 
         $days = $query
             ->groupBy('date')
-            ->having('total_hours', '>', 1)
+            ->having('total_hours', '>=', $hours_days)
             ->get();
 
         return $days->count();
