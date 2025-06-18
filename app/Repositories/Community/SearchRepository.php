@@ -3,6 +3,7 @@ namespace App\Repositories\Community;
 
 use App\Helpers\Common;
 use App\Http\Resources\Api\V1\CommunityResource;
+use App\Models\BlackList;
 use App\Models\OfficialMessage;
 use App\Models\Pack;
 use App\Models\User;
@@ -80,9 +81,11 @@ class SearchRepository implements SearchRepositoryInterface
         }
 
         $whereOr = ['uuid' => $keywords];
+        $blockedUserIds = BlackList::where('user_id', $userId)->pluck('from_uid')->toArray();
 
         $users = User::query()
             ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])
+            ->whereNotIn('id', $blockedUserIds)
             ->where(function ($query) use ($keywords) {
                 $query->where('uuid', 'like', '%' . $keywords . '%')
                       ->orWhere('special_id', 'like', '%' . $keywords . '%');
