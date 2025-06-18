@@ -3041,6 +3041,8 @@
   "user can not kick out from room": "Kullanıcı odadan atılamaz",
   "Receiver Level": "Alıcının Seviyesi",
   "Level switch users":"Kullanılan seviye ",
+  "sender id": "Gönderen Kimliği",
+  "receiver id": "Alıcı Kimliği",
   "cancel": "İptal et",
   "top": "üst",
   "padding": "iç boşluk",

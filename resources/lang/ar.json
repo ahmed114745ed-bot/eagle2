@@ -3210,7 +3210,8 @@
   "export/import": "صادر / وارد",
   "Sent Transactions":"المعاملات المرسلة",
   "Received Transactions":"المعاملات المستلمة",
-
+"sender id": "معرّف المرسل",
+  "receiver id": "معرّف المستلم",
 "remove_admin": "إزالة من المشرفين",
 "kick": "طرد",
 "are_you_sure_remove_member": "هل أنت متأكد من إزالة هذا العضو؟",
