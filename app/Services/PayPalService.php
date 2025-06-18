@@ -46,6 +46,11 @@ class PayPalService
 
         $body = [
             "intent"         => "CAPTURE",
+            'application_context' => [
+                'return_url'  => route('paypal.success'),
+                'cancel_url'  => route('paypal.cancel'),
+                'user_action' => 'PAY_NOW',
+            ],
             "purchase_units" => [
                 [
                     "reference_id" => $referenceId,
@@ -75,19 +80,53 @@ class PayPalService
     /**
      * @return mixed
      */
-    public function complete($orderID)
+    public function success(Request $request)
     {
-        $url = config('paypal.base_url') . '/v2/checkout/orders/' . $orderID . '/capture';
+        $orderId = $request->query('token');
+        info($orderId);
+        if (! $orderId) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Missing PayPal order id',
+            ], 422);
+        }
 
+        $url = config('paypal.base_url') . "/v2/checkout/orders/{$orderId}/capture";
         $headers = [
             'Content-Type'  => 'application/json',
             'Authorization' => 'Bearer ' . $this->getAccessToken(),
         ];
 
-        $response = Http::withHeaders($headers)
-            ->post($url, null);
+        $response = Http::withHeaders($headers)->post($url, null);
 
-        return json_decode($response->body());
+        info($response);
+
+        if ($response->failed()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => data_get($response->json(), 'message', 'Payment capture failed'),
+                'details' => $response->json(),
+            ], $response->status());
+        }
+
+        $data = $response->json();
+
+        if (data_get($data, 'status') !== 'COMPLETED') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Payment not completed',
+                'details' => $data,
+            ], 409);
+        }
+
+        $referenceId = data_get($data, 'purchase_units.0.reference_id');
+        $amount      = (float) data_get($data, 'purchase_units.0.payments.captures.0.amount.value');
+
+        return response()->json([
+            'status'  => 'success',
+            'order'   => $orderId,
+            'amount'  => $amount,
+        ], 200);
     }
 
     public function callback(Request $request): JsonResponse
@@ -101,11 +140,6 @@ class PayPalService
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
 
         return $this->webhookPayment($coinLogId);
-    }
-
-    public function cancel()
-    {
-        return response()->json(['status' => 'cancelled']);
     }
 
     private function updateDiForUser($amount)

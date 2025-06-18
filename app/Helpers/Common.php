@@ -1795,7 +1795,7 @@ class Common
                     'image' => $resource->receiverUser->profile->avatar ?? '',
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
-                    'url' => $resource->receivnerUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
+                    'url' => $resource->receiverUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
                 ];
             default:
                 return [
