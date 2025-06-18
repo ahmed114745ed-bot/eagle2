@@ -46,6 +46,11 @@ class PayPalService
 
         $body = [
             "intent"         => "CAPTURE",
+            'application_context' => [
+                'return_url'  => route('paypal.success'),
+                'cancel_url'  => route('paypal.cancel'),
+                'user_action' => 'PAY_NOW',
+            ],
             "purchase_units" => [
                 [
                     "reference_id" => $referenceId,
@@ -75,9 +80,17 @@ class PayPalService
     /**
      * @return mixed
      */
-    public function complete($orderID)
+    public function success(Request $request)
     {
-        $url = config('paypal.base_url') . '/v2/checkout/orders/' . $orderID . '/capture';
+        $orderId = $request->query('token');
+        if (! $orderId) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Missing Pay-Pal order id',
+            ], 422);
+        }
+
+        $url = config('paypal.base_url') . '/v2/checkout/orders/' . $orderId . '/capture';
 
         $headers = [
             'Content-Type'  => 'application/json',
@@ -86,6 +99,9 @@ class PayPalService
 
         $response = Http::withHeaders($headers)
             ->post($url, null);
+
+        info($response);
+        return response('Payment successful.', 200);
 
         return json_decode($response->body());
     }
@@ -101,11 +117,6 @@ class PayPalService
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
 
         return $this->webhookPayment($coinLogId);
-    }
-
-    public function cancel()
-    {
-        return response()->json(['status' => 'cancelled']);
     }
 
     private function updateDiForUser($amount)
