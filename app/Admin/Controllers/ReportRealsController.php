@@ -140,6 +140,9 @@ class ReportRealsController extends MainController
             if (! Admin::user()->can('delete-' . $permission_name) && !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
+            if (!Admin::user()->can('show-' . $permission_name) && !Admin::user()->can('*')) {
+                $actions->disableView();
+            }
         });
 
         return $grid;
