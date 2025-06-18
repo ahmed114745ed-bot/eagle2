@@ -82,6 +82,7 @@ class PayPalService
      */
     public function success(Request $request)
     {
+        info($request);
         $orderId = $request->query('token');
         info($orderId);
         if (! $orderId) {
