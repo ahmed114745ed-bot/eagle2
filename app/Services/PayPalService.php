@@ -132,7 +132,7 @@ class PayPalService
 
     public function success($orderId): mixed
     {
-        sleep(10);
+        sleep(20);
         $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
 
         if ($coinLog->status){
