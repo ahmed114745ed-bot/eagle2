@@ -47,8 +47,8 @@ class PayPalService
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
-                'return_url'  => route('paypal.success'),
-                'cancel_url'  => route('paypal.cancel'),
+                'return_url'  => url('/api/paypal-success'),
+                'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
             ],
             "purchase_units" => [
