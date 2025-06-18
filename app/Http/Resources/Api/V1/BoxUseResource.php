@@ -18,13 +18,13 @@ class BoxUseResource extends JsonResource
      */
     public function toArray($request)
     {
-        $startTime = Carbon::createFromTimestamp($this->start_at);
-        $currentTime = Carbon::now();
-        if ($startTime >= $currentTime) {
-            $rem_time = $startTime->diffInSeconds($currentTime);
-        } else {
-            $rem_time = 0;
-        }
+        // $startTime = Carbon::createFromTimestamp($this->start_at);
+        // $currentTime = Carbon::now();
+        // if ($startTime >= $currentTime) {
+        //     $rem_time = $startTime->diffInSeconds($currentTime);
+        // } else {
+        //     $rem_time = 0;
+        // }
 
 
         // $rem_time = Carbon::createFromTimestamp($this->start_at)->diffInSeconds(now());
@@ -50,7 +50,8 @@ class BoxUseResource extends JsonResource
             //            'label'=>$this->label,
             //            'image'=>$this->image,
             //            'rem_time'=>$this->type == 1 ? $rem_time : 0
-            'rem_time' => $rem_time
+            // 'rem_time' => $rem_time,
+            "end_time" => Carbon::createFromTimestamp($this->end_at)->toDateTimeString(),
         ];
     }
 }

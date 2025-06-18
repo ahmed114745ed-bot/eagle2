@@ -42,6 +42,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use App\Models\Language;
+use Encore\Admin\Form;
+use App\Admin\Fields\Image;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -52,6 +54,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        Form::extend('image', Image::class);
+
         if ($this->app->isLocal()) {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
