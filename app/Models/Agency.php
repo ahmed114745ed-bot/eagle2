@@ -33,7 +33,12 @@ class Agency extends Model
     {
         return $this->hasMany(Charge::class, 'user_id','id')->where('charger_type','host_agency');
     }
+    public function senderCharges()
+    {
+        return $this->hasMany(Charge::class, 'charger_id','id')->where('charger_type','host_agency');
+    }
 
+    
     public function Countries()
     {
         return $this->belongsToMany(Country::class, 'agency_countries', 'agency_id', 'country_id')->withTimestamps();
@@ -283,7 +288,7 @@ class Agency extends Model
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
 
-        return floor($agencySalary ?? 0);
+            return round($agencySalary, 2);
     }
 
     public function getSalary($month = null, $year = null)
