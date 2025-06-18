@@ -130,10 +130,16 @@ class PayPalService
 //        ], 200);
 //    }
 
-    public function success($orderId)
+    public function success($orderId): mixed
     {
-        info(auth()->id());
-        $coinLog = CoinLog::whereId($orderId)->whereUserId(auth()->id())->whereMethod('paypal')->firstOrFail();
+        sleep(2);
+        $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
+
+        if ($coinLog->status){
+            return response('Payment successful.', 200);
+        }
+
+        return response('Payment failed.', 500);
     }
 
     public function callback(Request $request): JsonResponse
