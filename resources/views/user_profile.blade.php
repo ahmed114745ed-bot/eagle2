@@ -1495,7 +1495,7 @@
                         </th>
                         <th>{{ __('Type') }}</th>
                         <th>{{ __('Amount') }}</th>
-                        <th>{{ __('USD') }}</th>
+                        <th>{{ __('usd') }}</th>
                         <th>{{ __('Created at') }}</th>
                     </tr>
                     </thead>
@@ -1510,7 +1510,7 @@
                               $name = $userCharges['name'] ?? '-';
                               $uid = $userCharges['uuid'] ?? '-';
                               $type = $userCharges['type'] ?? '-';
-                              $image = $userCharges['image'] ?? asset('default-user.png');
+                              $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
                         @endphp
                         <tr>
                             <td>{{ $charge->id }}</td>
