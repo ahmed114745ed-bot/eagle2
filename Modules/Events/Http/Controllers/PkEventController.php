@@ -86,7 +86,6 @@ class PkEventController extends Controller
     {
         $nowDate = Carbon::now();
         $pkEvent = PkEvent::currentEvent()->with(['rewards']) ->first();
-            dd( $pkEvent);
         if (!$pkEvent) {
             return Common::apiResponse(0, __('there is no event now'), null, 422);
         }
