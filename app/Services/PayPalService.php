@@ -100,6 +100,7 @@ class PayPalService
 
         $response = Http::withHeaders($headers)->post($url, null);
 
+        info($response);
         if ($response->failed()) {
             return response()->json([
                 'status'  => 'error',
