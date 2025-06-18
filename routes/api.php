@@ -102,8 +102,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
     Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
-    Route::post('paypal-success', [PayPalService::class, 'success'])->name('paypal.success');
-    Route::post('paypal-cancel', [PayPalService::class, 'cancel'])->name('paypal.cancel');
+    Route::get('paypal-success', [PayPalService::class, 'success'])->name('paypal.success');
+    Route::get('paypal-cancel', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
