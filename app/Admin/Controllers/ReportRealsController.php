@@ -137,7 +137,7 @@ class ReportRealsController extends MainController
 
         $grid->actions(function ($actions)  use ($permission_name) {
             $actions->disableEdit();
-            if (! Admin::user()->can('delete-' . $permission_name) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('delete-' . $permission_name) && !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
         });
