@@ -50,9 +50,9 @@ class BoxController extends Controller
 
         if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
         $room = Room::query()->where('uid', $request->room_uid)->first();
-        if (!$room)  return Common::apiResponse(0, 'not found', null, 404);
+        if (!$room)  return Common::apiResponse(0, 'room not found', null, 404);
         $box = Box::query()->find($request->box_id);
-        if (!$box) return Common::apiResponse(0, 'not found', null, 404);
+        if (!$box) return Common::apiResponse(0, ' box not found', null, 404);
         if (($box->type == 0) && !$request->users_num) return Common::apiResponse(0, 'missing number of users', null, 422);
         if ($user->di < $box->coins)  return Common::apiResponse(0, 'low balance', null, 407);
 
