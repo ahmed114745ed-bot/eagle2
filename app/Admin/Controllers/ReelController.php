@@ -157,12 +157,11 @@ class FfReelController extends MainController
         $permission_name = $this->permission_name;
         $grid->actions(function ($actions) use ($permission_name) {
             $actions->disableEdit();
-            // if (! Admin::user()->can('delete-' . $permission_name) || !Admin::user()->can('*')) {
-            //     $actions->disableDelete();
-            // }
+            if (!Admin::user()->can('delete-' . $permission_name) && !Admin::user()->can('*')) {
+                $actions->disableDelete();
+            }
         });
         $grid->disableExport();
-         $this->extendGrid($grid);
 
         return $grid;
     }
