@@ -3,6 +3,7 @@
 namespace Modules\Events\Traits;
 
 use Carbon\Carbon;
+use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Builder;
 
 trait EventModel
@@ -19,7 +20,8 @@ trait EventModel
 
     public function scopePreviousNewEvent(Builder $query)
     {
-        $timezone = config('app.owner_timezone');
+        // $timezone = config('app.owner_timezone');
+        $timezone = Common::timeZone();
 
         // Define start and end of the week
         $nowDate = Carbon::now($timezone)->toDateTimeString();
@@ -64,33 +66,37 @@ trait EventModel
             return 'english';
         }
 
-        return 'unknown'; 
+        return 'unknown';
     }
 
 
     public function scopeCurrentEvent(Builder $query)
     {
-        $timezone = config('app.owner_timezone') ?? '-03:00';
+        // $timezone = config('app.owner_timezone') ?? '-03:00';
+        $timezone = Common::timeZone();
         $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
-        return $query->whereRaw("start_date <= ?", [date($nowDate)]) // 27
-            ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) >= ?", [$timezone, $nowDate]); // 27
+        return $query->whereRaw("start_date <= ?", [$nowDate])->whereDate('end_date', '>=', $nowDate); // 27
+        // ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) >= ?", [$timezone, $nowDate]); // 27
     }
 
 
     public function scopePreviousEvent(Builder $query)
     {
-        $timezone = config('app.owner_timezone') ?? '-03:00';
+        // $timezone = config('app.owner_timezone') ?? '-03:00';
+        $timezone = Common::timeZone();
         $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
 
-        return $query->whereRaw("start_date < ?", [date($nowDate)]) // 27
-            ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) < ?", [$timezone, $nowDate]); // 27
+        return $query->whereRaw("start_date < ?", [date($nowDate)])->whereDate('end_date', '<', $nowDate); // 27
+           // ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) < ?", [$timezone, $nowDate]); // 27
     }
 
 
     public function scopeEndToday(Builder $query)
     {
-        $timezone = config('app.owner_timezone');
+        //$timezone = config('app.owner_timezone');
+        $timezone = Common::timeZone();
         $nowDate     = Carbon::now()->copy()->toDateString();
-        return $query->whereRaw("date(CONVERT_TZ(end_date, '+00:00', ?)) = ?", [$timezone, $nowDate]);
+        return $query->whereDate('end_date', $nowDate);
+       // whereRaw("date(CONVERT_TZ(end_date, '+00:00', ?)) = ?", [$timezone, $nowDate]);
     }
 }
