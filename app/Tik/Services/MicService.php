@@ -269,6 +269,12 @@ class MicService
 
     public function goMicrophoneHand($user, $room)
     {
+        \Log::info('shami test goMicrophoneHand: START', [
+            'user_id' => $user->id,
+            'room_id' => $room->id,
+            'microphone' => $room->microphone,
+            'main_microphone' => $room->main_microphone,
+        ]);
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
@@ -303,6 +309,7 @@ class MicService
         // Save to DB
         $result = implode(',', $final);
         $this->updateMicAndPK($room, $result);
+        \Log::info('goMicrophoneHand: FINAL MIC RESULT', ['result' => $result]);
 
         // Clear mic timer and leave CP
         $this->timeLogRepository->deleteAth($room->uid, $user->id);
@@ -342,6 +349,7 @@ class MicService
         }
 
         $microphone = $room->microphone;
+        \Log::info('microphone: database ', ['$room->microphone' => $room->microphone]);
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);
@@ -370,21 +378,61 @@ class MicService
 
     public function micType(string $type, $microphone, $position)
     {
+
         $microphone = explode(',', $microphone);
-        if ($type == 'mute') {
-            if (@$microphone[$position] != -1) {
-                $microphone[$position] = -2;
-            }
-        } elseif ($type == 'unmute' || $type == 'open') {
-            if (@$microphone[$position]) {
-                $microphone[$position] = 0;
-            }
-        } elseif ($type == 'shut') {
-            if (@$microphone[$position] == false) {
-                $microphone[$position] = -1;
-            }
+        \Log::info('micType: 1111 ', ['micType' => $microphone]);
+
+        $current = $microphone[$position] ?? '0';
+    
+        $user = '0';
+        $status = '0';
+    
+        // ✅ فك التركيب الحالي
+        if (str_contains($current, '#')) {
+            [$user, $status] = explode('#', $current);
+        } elseif (is_numeric($current) && (int)$current > 0) {
+            $user = $current;
+            $status = '-1'; // نفترض أنه مقفل إن لم يكن مذكور
+        } else {
+            $user = '0';
+            $status = $current;
         }
-        return $microphone = implode(',', $microphone);
+    
+        // ✅ تعديل حسب نوع العملية
+        if ($type === 'mute') {
+            $status = '-2';
+        } elseif ($type === 'unmute' || $type === 'open') {
+            $status = '0';
+        } elseif ($type === 'shut') {
+            $status = '-1';
+        }
+    
+        // ✅ إعادة تركيب القيمة
+        if ($user !== '0') {
+            $microphone[$position] = $user . '#' . $status;
+        } else {
+            $microphone[$position] = $status;
+        }
+    
+        // ✅ تسجيل النتيجة
+        \Log::info('micType: FINAL MIC micType', ['micType' => $microphone]);
+    
+        return implode(',', $microphone);
+        // $microphone = explode(',', $microphone);
+        // if ($type == 'mute') {
+        //     if (@$microphone[$position] != -1) {
+        //         $microphone[$position] = -2;
+        //     }
+        // } elseif ($type == 'unmute' || $type == 'open') {
+        //     if (@$microphone[$position]) {
+        //         $microphone[$position] = 0;
+        //     }
+        // } elseif ($type == 'shut') {
+        //     if (@$microphone[$position] == false) {
+        //         $microphone[$position] = -1;
+        //     }
+        // }
+        // return $microphone = implode(',', $microphone);
     }
 
 

@@ -125,7 +125,7 @@ class RankingService
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
 
-        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
+        $data = $this->rankingRepo->getGiftLogsV2($class, $rel, $type, $limit, $keywords);
         $this->transformDataV2($data, $class, $keywords, $rel);
 
         return $this->prepareResponseV2($data, $user, $type, $keywords, $user->id, $class, $limit);
