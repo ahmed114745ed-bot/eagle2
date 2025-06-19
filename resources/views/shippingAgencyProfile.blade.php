@@ -1181,26 +1181,19 @@
                     </thead>
                     <tbody>
                         @foreach($charges as $index => $charge)
-                                {{-- @php
-                                    $receiver = Common::getReceiverInfo($charge);
-                                @endphp --}}
+                                 @php
+                                    $sender = \App\Helpers\Common::getChargerInfo($res);
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($res);
+                                @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
                                     @if($charge->receiverUser instanceof \App\Models\User)
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($charge->receiverUser->profile?->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                            <img src="{{ getImagePath($receiver['image']) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
                                             <div>
-                                                <strong>{{ $charge->receiverUser?->name }}</strong><br>
-                                                <small>ID: {{ $charge->receiverUser->id }}</small>
-                                            </div>
-                                        </div>
-                                    @elseif($charge->receiverAgency instanceof \App\Models\Agency)
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($charge->receiverAgency?->img) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
-                                            <div>
-                                                <strong>{{ $charge->receiverAgency?->name }}</strong><br>
-                                                <small>ID: {{ $charge->receiverAgency?->id }}</small>
+                                                <strong>{{ $receiver['name'] }}</strong><br>
+                                                <small>ID: {{ $receiver['uuid'] }}</small>
                                             </div>
                                         </div>
                                     @else
