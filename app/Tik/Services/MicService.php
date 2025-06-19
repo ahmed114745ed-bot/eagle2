@@ -381,44 +381,40 @@ class MicService
         $microphone = explode(',', $microphone);
 
         $current = $microphone[$position] ?? '0';
-
+    
         $user = '0';
         $status = '0';
-
+    
+        // ✅ فك التركيب الحالي
         if (str_contains($current, '#')) {
             [$user, $status] = explode('#', $current);
         } elseif (is_numeric($current) && (int)$current > 0) {
             $user = $current;
-            $status = '0'; // مستخدم موجود لكن المايك مفتوح
+            $status = '-1'; // نفترض أنه مقفل إن لم يكن مذكور
         } else {
             $user = '0';
             $status = $current;
         }
-
-        // تعديل حسب النوع
-        if ($type == 'mute') {
-            if ($status != -1) {
-                $status = -2;
-            }
-        } elseif ($type == 'unmute' || $type == 'open') {
-            $status = 0;
-        } elseif ($type == 'shut') {
-            if ($status == 0 || $status === '0') {
-                $status = -1;
-            }
+    
+        // ✅ تعديل حسب نوع العملية
+        if ($type === 'mute') {
+            $status = '-2';
+        } elseif ($type === 'unmute' || $type === 'open') {
+            $status = '0';
+        } elseif ($type === 'shut') {
+            $status = '-1';
         }
-
-        // تجميع القيمة النهائية
-        if ($user != '0' && $status !== null && $status !== '') {
+    
+        // ✅ إعادة تركيب القيمة
+        if ($user !== '0') {
             $microphone[$position] = $user . '#' . $status;
-        } elseif ($user != '0') {
-            $microphone[$position] = $user . '#0'; // تأكيد وجود status
         } else {
-            $microphone[$position] = (string)$status;
+            $microphone[$position] = $status;
         }
-
+    
+        // ✅ تسجيل النتيجة
         \Log::info('micType: FINAL MIC micType', ['micType' => $microphone]);
-
+    
         return implode(',', $microphone);
         // $microphone = explode(',', $microphone);
         // if ($type == 'mute') {
