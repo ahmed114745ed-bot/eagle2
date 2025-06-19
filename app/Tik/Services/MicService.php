@@ -379,6 +379,7 @@ class MicService
     {
 
         $microphone = explode(',', $microphone);
+        \Log::info('micType: 1111 ', ['micType' => $microphone]);
 
         $current = $microphone[$position] ?? '0';
     
