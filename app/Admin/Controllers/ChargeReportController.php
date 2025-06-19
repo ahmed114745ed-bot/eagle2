@@ -231,6 +231,9 @@ class ChargeReportController extends MainController
                 .filter-box .col-md-9 {
                     width: 66% !important;
                 }
+                .ltr label {
+                margin: 0 25px 0 0 !important;
+                }
             }
         ");
 
