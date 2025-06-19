@@ -1026,11 +1026,22 @@
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
-            <a href="?tab=members" class="tab-btn" data-target="members-tab">{{ __('Members') }}</a>
-            <a href="?tab=charges" class="tab-btn" data-target="charges-tab">{{ __('Charge History') }}</a>
-            <a href="?tab=salary" class="tab-btn" data-target="salary-tab">{{ __('Salary') }}</a>
-            <a href="?tab=requests" class="tab-btn" data-target="requests-tab">{{ __('Join Requests') }}</a>
-            <a href="?tab=targets" class="tab-btn" data-target="targets-tab">{{ __('Targets') }}</a>
+           @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+               <a href="?tab=members" class="tab-btn" data-target="members-tab">{{ __('Members') }}</a>
+            @endif
+           @if (\Encore\Admin\Facades\Admin::user()->can('charge-history-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+             <a href="?tab=charges" class="tab-btn" data-target="charges-tab">{{ __('Charge History') }}</a>
+            @endif
+            @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+
+             <a href="?tab=salary" class="tab-btn" data-target="salary-tab">{{ __('Salary') }}</a>
+            @endif
+            @if (\Encore\Admin\Facades\Admin::user()->can('join-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+             <a href="?tab=requests" class="tab-btn" data-target="requests-tab">{{ __('Join Requests') }}</a>
+            @endif
+            @if (\Encore\Admin\Facades\Admin::user()->can('target-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+             <a href="?tab=targets" class="tab-btn" data-target="targets-tab">{{ __('Targets') }}</a>
+            @endif
         </div>
         <div id="tab-loading" style="
             display: none;
@@ -1049,99 +1060,107 @@
         ">
             {{ __('Loading...') }}
         </div>
+        @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+            
+            <div class="tab-content active" id="members-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>{{ __('Agency Members') }}</h3>
+                        <span class="badge count-badge">{{ optional($members)->total() ?? 0 }}</span>
+                    </div>
 
-        <div class="tab-content active" id="members-tab">
-            <div class="card">
-                <div class="card-header">
-                    <h3>{{ __('Agency Members') }}</h3>
-                    <span class="badge count-badge">{{ optional($members)->total() ?? 0 }}</span>
-                </div>
-
-                @if($members && $members->count())
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>{{ __('Member') }}</th>
-                                    <th>{{ __('Reals') }}</th>
-                                    <th>{{ __('Live Hours') }}</th>
-                                    <th>{{ __('Monthly DI') }}</th>
-                                    <th>{{ __('Salary') }}</th>
-                                    <th>{{ __('Role') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($members as $index => $member)
-                                    @php
-                                        $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
-                                            ->where('agency_id', $member->agency_id)
-                                            ->where('type', 'requestManger')
-                                            ->exists();
-                                        $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
-                                            ->where('id', $member->agency_id)
-                                            ->exists();
-                                    @endphp
-
+                    @if($members && $members->count())
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
                                     <tr>
-                                        <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
-                                        <td class="user-cell">
-                                            <div class="user-avatar">
-                                                <img src="{{ getImagePath(@$member->profile->avatar) }}"
-                                                    alt="{{ $member->name }}">
-                                            </div>
-                                            <div class="user-info">
-                                                <strong>{{ @$member->name ?? '' }}</strong>
-                                                <small>UID: {{ @$member->uuid ?? '' }}</small>
-                                            </div>
-                                        </td>
-                                        <td>{{ count($member->reals) ?? 0 }}</td>
-                                        <td>{{ $member->liveTime->sum("hours") }}</td>
-                                        <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                        <td>{{ $member->salary ?? 0 }}</td>
-                                        <td>
-                                            @if($isOwner)
-                                                <span class="role-badge owner">{{ __('Owner') }}</span>
-                                            @elseif($isAdmin)
-                                                <!-- <span class="role-badge admin">{{ __('Admin') }}</span> -->
-                                                <button class="btn-action remove-admin-btn btn-danger" style="background-color: red;" data-id="{{ $member->id }}">
-                                                    {{ __('remove_admin') }}
-                                                </button> 
-
-                                                 <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
-                                                    {{ __('kick') }}
-                                                </button>
-                                            @else
-                                                <button class="btn-action make-admin-btn" data-id="{{ $member->id }}">
-                                                    {{ __('Make Admin') }}
-                                                </button>
-                                                <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
-                                                    {{ __('kick') }}
-                                                </button>
-                                            @endif
-                                        </td>
+                                        <th>#</th>
+                                        <th>{{ __('Member') }}</th>
+                                        <th>{{ __('Reals') }}</th>
+                                        <th>{{ __('Live Hours') }}</th>
+                                        <th>{{ __('Monthly DI') }}</th>
+                                        <th>{{ __('Salary') }}</th>
+                                        <th>{{ __('Role') }}</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-wrapper">
-                        {{ $members?->appends([
-                                    'charges_page' => $charges?->currentPage(),
-                                    'salaries_page' => $salaries?->currentPage(),
-                                    'join_page' => $agencyJoinRequests?->currentPage(),
-                                    'target_page' => $memberTargets?->currentPage(),
-                                ])->links('vendor.pagination.default') }}
-                       </div>
-                @else
-                    <div class="empty-table">
-                        <i class="fas fa-users-slash"></i>
-                        <p>{{ __('No members found') }}</p>
-                    </div>
-                @endif
+                                </thead>
+                                <tbody>
+                                    @foreach($members as $index => $member)
+                                        @php
+                                            $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
+                                                ->where('agency_id', $member->agency_id)
+                                                ->where('type', 'requestManger')
+                                                ->exists();
+                                            $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
+                                                ->where('id', $member->agency_id)
+                                                ->exists();
+                                        @endphp
+
+                                        <tr>
+                                            <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
+                                            <td class="user-cell">
+                                                <div class="user-avatar">
+                                                    <img src="{{ getImagePath(@$member->profile->avatar) }}"
+                                                        alt="{{ $member->name }}">
+                                                </div>
+                                                <div class="user-info">
+                                                    <strong>{{ @$member->name ?? '' }}</strong>
+                                                    <small>UID: {{ @$member->uuid ?? '' }}</small>
+                                                </div>
+                                            </td>
+                                            <td>{{ count($member->reals) ?? 0 }}</td>
+                                            <td>{{ $member->liveTime->sum("hours") }}</td>
+                                            <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
+                                            <td>{{ $member->salary ?? 0 }}</td>
+                                            <td>
+                                                @if($isOwner)
+                                                    <span class="role-badge owner">{{ __('Owner') }}</span>
+                                                @elseif($isAdmin)
+                                                    <!-- <span class="role-badge admin">{{ __('Admin') }}</span> -->
+                                                    @if (\Encore\Admin\Facades\Admin::user()->can('remove-admin-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                        <button class="btn-action remove-admin-btn btn-danger" style="background-color: red;" data-id="{{ $member->id }}">
+                                                            {{ __('remove_admin') }}
+                                                        </button> 
+                                                    @endif
+                                                    @if (\Encore\Admin\Facades\Admin::user()->can('kick-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                        <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
+                                                            {{ __('kick') }}
+                                                        </button>
+                                                    @endif
+                                                @else
+                                                        @if (\Encore\Admin\Facades\Admin::user()->can('make-admin-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                                <button class="btn-action make-admin-btn" data-id="{{ $member->id }}">
+                                                                    {{ __('Make Admin') }}
+                                                                </button>
+                                                            @endif
+                                                @if (\Encore\Admin\Facades\Admin::user()->can('kick-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                    <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
+                                                        {{ __('kick') }}
+                                                    </button>
+                                                @endif
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination-wrapper">
+                            {{ $members?->appends([
+                                        'charges_page' => $charges?->currentPage(),
+                                        'salaries_page' => $salaries?->currentPage(),
+                                        'join_page' => $agencyJoinRequests?->currentPage(),
+                                        'target_page' => $memberTargets?->currentPage(),
+                                    ])->links('vendor.pagination.default') }}
+                        </div>
+                    @else
+                        <div class="empty-table">
+                            <i class="fas fa-users-slash"></i>
+                            <p>{{ __('No members found') }}</p>
+                        </div>
+                    @endif
+                </div>
             </div>
-        </div>
-   
+         @endif 
         <!-- Charges Section -->
         <div class="tab-content" id="charges-tab">
             <div class="card">

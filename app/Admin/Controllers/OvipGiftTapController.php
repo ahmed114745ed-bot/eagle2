@@ -176,7 +176,6 @@ class OvipGiftTapController extends MainController
             });;
         }
 
-        $grid->expire(__('expire'));
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('edit-' . $this->permission_name)) {
             $permission = $this->permission_name;
             $grid->column('actions', __('Actions'))->display(function () use ($type, $permission) {

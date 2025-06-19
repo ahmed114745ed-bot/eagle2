@@ -429,7 +429,7 @@ class AgencyController extends Controller
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
-            // $actions->disableView(); // Disable the "View" action
+             $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
             if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
 
