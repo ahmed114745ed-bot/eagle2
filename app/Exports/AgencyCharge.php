@@ -22,7 +22,7 @@ class AgencyCharge implements FromView
         $agencyId = $this->agency_id;
         $agency = Agency::find($agencyId);
         $charges = Charge::where(function ($query) use ($agencyId) {
-            $query->where('agency_id', $agencyId)->where('user_type', 'agency');
+            $query->where('user_id', $agencyId)->where('user_type', 'agency');
         })->orWhere(function ($query) use ($agencyId) {
             $query->where('charger_id', $agencyId)->where('charger_type', 'agency');
         })->orderByDesc('id')->get();

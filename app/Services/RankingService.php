@@ -125,7 +125,7 @@ class RankingService
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
 
-        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
+        $data = $this->rankingRepo->getGiftLogsV2($class, $rel, $type, $limit, $keywords);
         $this->transformDataV2($data, $class, $keywords, $rel);
 
         return $this->prepareResponseV2($data, $user, $type, $keywords, $user->id, $class, $limit);
@@ -206,7 +206,7 @@ class RankingService
             $v->color_name = $color_name;
 
             $value = $v->exp;
-            $v->exp = numToString(ceil($v->exp));
+            $v->exp = numToString(ceil((float)$v->exp));
             $v->exp_int = ceil($value);
 
             $value2 = $v->exp_diff;
