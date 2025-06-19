@@ -105,9 +105,9 @@ class UserVipRepository extends AbstractRepository
     {
         $vips = $this->model->where('user_id', $userId)->get();
 
-        // foreach ($vips as $vip) {
-        //     $vip->packs()->update(['is_used' => 0]);
-        // }
+        foreach ($vips as $vip) {
+            $vip->packs()->update(['is_used' => 1]);
+        }
     }
     public function updateIsUsed($userVip, $isUsed)
     {
