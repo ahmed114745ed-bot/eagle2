@@ -377,21 +377,48 @@ class MicService
 
     public function micType(string $type, $microphone, $position)
     {
+
         $microphone = explode(',', $microphone);
+        $current = $microphone[$position] ?? '0';
+        $parts = explode('#', $current);
+        $user = $parts[0] ?? '0';
+        $status = $parts[1] ?? '0';
+
         if ($type == 'mute') {
-            if (@$microphone[$position] != -1) {
-                $microphone[$position] = -2;
+            if ($status != -1) {
+                $status = -2;
             }
         } elseif ($type == 'unmute' || $type == 'open') {
-            if (@$microphone[$position]) {
-                $microphone[$position] = 0;
+            if ($status != 0) {
+                $status = 0;
             }
         } elseif ($type == 'shut') {
-            if (@$microphone[$position] == false) {
-                $microphone[$position] = -1;
+            if ($status == 0 || $status == '0') {
+                $status = -1;
             }
         }
-        return $microphone = implode(',', $microphone);
+        if ($user != '0') {
+            $microphone[$position] = $user . '#' . $status;
+        } else {
+            $microphone[$position] = $status;
+        }
+
+        return implode(',', $microphone);
+        // $microphone = explode(',', $microphone);
+        // if ($type == 'mute') {
+        //     if (@$microphone[$position] != -1) {
+        //         $microphone[$position] = -2;
+        //     }
+        // } elseif ($type == 'unmute' || $type == 'open') {
+        //     if (@$microphone[$position]) {
+        //         $microphone[$position] = 0;
+        //     }
+        // } elseif ($type == 'shut') {
+        //     if (@$microphone[$position] == false) {
+        //         $microphone[$position] = -1;
+        //     }
+        // }
+        // return $microphone = implode(',', $microphone);
     }
 
 
