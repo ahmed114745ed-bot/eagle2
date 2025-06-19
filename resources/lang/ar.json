@@ -3232,7 +3232,13 @@
   "Salary switch agencies":" مرتب الوكاله",
   "Join switch agencies":" طلب الانضمام للوكاله",
   "Target switch agencies":" هدف الوكاله",
-  "pack_not_found": "العنصر غير موجود بالحقيبة  "
+  "pack_not_found": "العنصر غير موجود بالحقيبة  ",
+  "input": "إدخال",
+  "from date": "من التاريخ",
+  "to date": "إلى التاريخ",
+  "submit": "إرسال",
+  "search": "بحث",
+  "expiry": "تاريخ الانتهاء"
 
 
 

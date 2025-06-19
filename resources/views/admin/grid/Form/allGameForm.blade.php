@@ -89,7 +89,7 @@
                                     <input type="date" name="to_date"  value="{{request("to_date")}}">
                                 </div>
                                 <label for=""></label><br>
-                                <button class="btn btn-primary">submit</button>
+                                <button class="btn btn-primary">{{_('submit')}}</button>
                             </div>
                         </form>
 

@@ -348,7 +348,8 @@ class MicService
             return Common::apiResponse(0, __('api_responses.you_dont_have_permission'), null, 408);
         }
 
-        $microphone = $room->microphone;
+        $microphone = $room->getOriginal('microphone');
+        \Log::info('microphone: database ', ['$room->microphone' => $room->getOriginal('microphone')]);
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);
@@ -379,6 +380,7 @@ class MicService
     {
 
         $microphone = explode(',', $microphone);
+        \Log::info('micType: 1111 ', ['micType' => $microphone]);
 
         $current = $microphone[$position] ?? '0';
     
