@@ -226,6 +226,17 @@ class ChargeReportController extends MainController
             });
         });
 
+        Admin::style("
+            @media (min-width: 992px) {
+                .ltr label {
+                    margin: 0 20px 0 0 !important;
+                }
+                .col-md-8 {
+                    width: auto !important;
+                }
+            }
+        ");
+
         $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();

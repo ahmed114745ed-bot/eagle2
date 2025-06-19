@@ -1182,8 +1182,8 @@
                     <tbody>
                         @foreach($charges as $index => $charge)
                                  @php
-                                    $sender = \App\Helpers\Common::getChargerInfo($res);
-                                    $receiver = \App\Helpers\Common::getReceiverInfo($res);
+                                    $sender = \App\Helpers\Common::getChargerInfo($charge);
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge);
                                 @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>

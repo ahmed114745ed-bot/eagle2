@@ -80,11 +80,12 @@ class TargetController extends MainController
         $coins = Common::getMaxCoins();
         // $grid->id(__('ID'));
 
-        $grid->column(__('target no'))->display(function () {
-            $TargetCount = Target::where('diamonds', '<', $this->diamonds)->count();
+        // $grid->column(__('target no'))->display(function () {
+        //     $TargetCount = Target::where('diamonds', '<', $this->diamonds)->count();
 
-            return  $TargetCount + 1;
-        });
+        //     return  $TargetCount + 1;
+        // });
+         $grid->column(('level'), __('target no'));
 
         $grid->diamonds(__('diamonds'))
             ->display(function ($value) use ($coins) {
