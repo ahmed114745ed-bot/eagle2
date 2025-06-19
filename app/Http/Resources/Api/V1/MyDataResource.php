@@ -250,7 +250,16 @@ class MyDataResource extends JsonResource
             'has_color_name'       => Common::hasInPack($this->id, 18, true),
             'has_anti_ban'       => Common::hasInPack($this->id, 15, true),
             'anonymous' => $this->packs->where('type', 17)->count() >= 1,
-            'country' => $this->country ?? null,
+//            'country' => $this->country ?? null,
+            'country' => $this->country ? [
+                'id' => $this->country->id,
+                'name' => $this->country->name,
+                'flag' => $this->country->flag,
+                'language' => $this->country->language,
+                'e_name' => $this->country->e_name,
+                'phone_code' => $this->country->phone_code,
+                'iso' => substr($this->country->iso, 0, 2),
+            ] : null,
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
             'country_hidden' => $isHideCountry,
             'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
@@ -332,7 +341,7 @@ class MyDataResource extends JsonResource
     public function getUesdUserPack($type)
     {
         $pack = $this->packs->where('type', $type)->where('is_used', 1)->first();
-        
+
 
         return $pack ?  new GeneralUserPackResource($pack) : [
             'id'   =>  0,
