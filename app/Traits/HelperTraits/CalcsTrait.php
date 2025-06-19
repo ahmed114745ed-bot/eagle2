@@ -907,10 +907,28 @@ trait CalcsTrait
 
     }
 
+    public static function ovip_center_rank_v2($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+        if (!isset($user->UserVip)) return 0;
+        $uvip = $user?->UserVip;
+        if (!$uvip) return new \stdClass();
+
+        $vip = $uvip->OVip;
+
+        if (!$vip) return new \stdClass();
+
+        return $vip->level;
+    }
+
+
     public static function ovip_center_rank_img($user_id)
     {
-
-
         if (is_object($user_id)) {
             if (isset($user_id->userId)) {
                 $user_id = $user_id->userId;
@@ -948,6 +966,34 @@ trait CalcsTrait
 
     }
 
+    public static function ovip_center_rank_img_v2($user_id)
+    {
+        if (is_object($user_id)) {
+            if (isset($user_id->userId)) {
+                $user_id = $user_id->userId;
+            } else {
+                return '';
+            }
+        }
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return '';
+        } else {
+            $user = $user_id;
+        }
+        if (!isset($user->UserVip)) return '';
+        $uvip = $user?->UserVip;
+        if (!$uvip) return '';
+
+        $vip = $uvip->OVip;
+
+        if (!$vip) return '';
+        $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
+
+        return @$vipIcon->show_img ?? '';
+    }
+
+
     public static function wareUserVip($user_id, $type, $item, $isLatest = false)
     {
         if (gettype($user_id) == 'integer') {
@@ -980,7 +1026,7 @@ trait CalcsTrait
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
-        $vip = $user->UserVip->OVip;
+        $vip = $uvip->OVip;
 
         if (!$vip) return  '';
         $cacheKey = "ware_{$vip->level}_{$type}";
