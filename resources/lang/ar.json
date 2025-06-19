@@ -3224,6 +3224,14 @@
   "From Date": "من التاريخ",
   "Sender UUID or Shipping Agency ID": "معرّف المرسل (UUID) أو معرّف وكالة الشحن",
   "Receiver UUID or Shipping Agency ID": "معرّف المستلم (UUID) أو معرّف وكالة الشحن",
+  "Kick switch agencies":" طرد",
+  "Make admin switch agencies":" اجعله مسئول",
+  "Remove admin switch agencies":"حذف المسؤول ",
+  "Member switch agencies":"  الاعضاء الوكاله",
+  "Charge history switch agencies":" سجل شحن الوكاله ",
+  "Salary switch agencies":" مرتب الوكاله",
+  "Join switch agencies":" طلب الانضمام للوكاله",
+  "Target switch agencies":" هدف الوكاله",
   "pack_not_found": "العنصر غير موجود بالحقيبة  "
 
 

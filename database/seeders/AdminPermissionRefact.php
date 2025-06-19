@@ -15,7 +15,7 @@ class AdminPermissionRefact extends Seeder
      */
     public function run(): void
     {
-        
+
         $methods = [
             'browse',
             'create',
@@ -128,7 +128,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 6,
                 'permissions' => [
                     ['key' => 'deleted-accounts', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['delete-user-account-switch', 'restore-user-account-switch']],
-                    ['key' => 'users', 'except' => [], 'additional' => ['actions-switch', 'level-switch','chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch','salary-switch', 'delete-profile-switch']],
+                    ['key' => 'users', 'except' => [], 'additional' => ['actions-switch', 'level-switch', 'chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch', 'salary-switch', 'delete-profile-switch']],
                     ['key' => 'complaints', 'except' => [], 'additional' => []],
 
                 ],
@@ -199,7 +199,7 @@ class AdminPermissionRefact extends Seeder
                 'permissions' => [
                     ['key' => 'reports', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'achieved-Target', 'except' => [], 'additional' => []],
-                    ['key' => 'agencies', 'except' => ['delete'], 'additional' => ['delete-switch', 'change-users-agency-switch']],
+                    ['key' => 'agencies', 'except' => ['delete'], 'additional' => ['delete-switch', 'change-users-agency-switch', 'kick-switch', 'make-admin-switch', 'remove-admin-switch', 'member-switch', 'charge-history-switch', 'salary-switch', 'join-switch', 'target-switch']],
                     ['key' => 'host-agencies-report', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'users-Wallet', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'hosts-target', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],

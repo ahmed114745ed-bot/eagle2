@@ -101,7 +101,8 @@ class CoinService
             } else if ($request->pay_method == 'paypal') {
                 $paypalService = new PayPalService();
                 $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
-                return response()->json($paymentLink);
+                return Common::apiResponse(1, 'ok', $paymentLink, 200);
+
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
