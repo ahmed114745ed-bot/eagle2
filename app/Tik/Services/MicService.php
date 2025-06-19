@@ -382,38 +382,37 @@ class MicService
 
         $current = $microphone[$position] ?? '0';
 
-        // تأكد: لو فيها #
+        $user = '0';
+        $status = '0';
+
         if (str_contains($current, '#')) {
             [$user, $status] = explode('#', $current);
+        } elseif (is_numeric($current) && (int)$current > 0) {
+            $user = $current;
+            $status = '0'; // مستخدم موجود لكن المايك مفتوح
         } else {
-            // لو مجرد رقم، فإما يكون user أو status، نحدده
-            if (is_numeric($current) && (int)$current > 0) {
-                $user = $current;
-                $status = 0;
-            } else {
-                $user = '0';
-                $status = $current;
-            }
+            $user = '0';
+            $status = $current;
         }
 
-        // معالجة الحالة حسب النوع
+        // تعديل حسب النوع
         if ($type == 'mute') {
             if ($status != -1) {
                 $status = -2;
             }
         } elseif ($type == 'unmute' || $type == 'open') {
-            if ($status != 0) {
-                $status = 0;
-            }
+            $status = 0;
         } elseif ($type == 'shut') {
             if ($status == 0 || $status === '0') {
                 $status = -1;
             }
         }
 
-        // إعادة التجميع
-        if ($user != '0') {
+        // تجميع القيمة النهائية
+        if ($user != '0' && $status !== null && $status !== '') {
             $microphone[$position] = $user . '#' . $status;
+        } elseif ($user != '0') {
+            $microphone[$position] = $user . '#0'; // تأكيد وجود status
         } else {
             $microphone[$position] = (string)$status;
         }
