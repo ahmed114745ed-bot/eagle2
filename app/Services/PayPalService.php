@@ -136,10 +136,11 @@ class PayPalService
         $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
 
         if ($coinLog->status){
-            return response('Payment successful.', 200);
+            if ($coinLog->status) {
+                return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);}
         }
 
-        return response('Payment failed.', 500);
+        return response()->json(['status' => 'failed', 'message' => 'Payment failed.',], 500);
     }
 
     public function callback(Request $request): JsonResponse

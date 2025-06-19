@@ -228,11 +228,11 @@ class ChargeReportController extends MainController
 
         Admin::style("
             @media (min-width: 992px) {
-                .filter-box .col-md-9 {
-                    width: 66% !important;
-                }
                 .ltr label {
-                margin: 0 25px 0 0 !important;
+                    margin: 0 20px 0 0 !important;
+                }
+                .col-md-8 {
+                    width: auto !important;
                 }
             }
         ");
