@@ -32,14 +32,14 @@ class OVipNewResource extends JsonResource
             'remaining_time' => $this->expire == null ? sprintf('%dd', $this->days) :  sprintf('%dd %dh %dm', $diff->d, $diff->h, $diff->i),
 
             'vip' => [
-                'id' => $oVip->id,
-                'level' => $oVip->level,
-                'sort' => $oVip->sort,
-                'name' => $oVip->name,
-                'img' => $oVip->img,
-                'price' => $oVip->price,
-                'expire' => $oVip->expire,
-                'exp' => $oVip->exp,
+                'id' => $oVip?->id ?? '',
+                'level' => $oVip?->level ?? '',
+                'sort' => $oVip?->sort ?? '',
+                'name' => $oVip?->name ?? '',
+                'img' => $oVip?->img ?? '',
+                'price' => $oVip?->price ?? '',
+                'expire' => $oVip?->expire ?? '',
+                'exp' => $oVip?->exp ?? '',
 
                 'privilegs' => VipPrivilegeResource::collection(
                     $vipPrivileges->map(function ($p) use ($wares, $activePrivilegeIds, $oVip) {

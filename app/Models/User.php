@@ -1528,13 +1528,12 @@ class User extends Authenticatable
 
         });
     }
-
     public function blockedUsers()
     {
         return $this->hasMany(BlackList::class, 'user_id');
     }
-
-    public function blockedByUsers()
+    
+    public function blockedMe()
     {
         return $this->hasMany(BlackList::class, 'from_uid');
     }
