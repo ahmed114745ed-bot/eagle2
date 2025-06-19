@@ -402,7 +402,7 @@ class MicService
         } else {
             $microphone[$position] = $status;
         }
-
+        \Log::info('micType: FINAL MIC micType', ['micType' => $microphone]);
         return implode(',', $microphone);
         // $microphone = explode(',', $microphone);
         // if ($type == 'mute') {
