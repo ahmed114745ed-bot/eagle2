@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -1581,22 +1580,13 @@
                                            placeholder="{{ __('days') }}">
                                 </div>
 
-                                <!-- Use Num Input -->
-                                <div class="mb-3 col-md-6">
-                                    <label for="use_num" class="form-label">{{ __('num') }}</label>
-                                    <input type="number" class="form-control" id="use_num" name="use_num"
-                                           placeholder="{{ __('num') }}">
-                                </div>
-
                             </div>
 
                         </div>
                     </div>
                     <div class="modal-footer mt-3">
-                        <button class="btn btn-secondary" type="button"
-                                data-bs-dismiss="modal">{{ __('cancel') }} </button>
-                        <button class="btn btn-primary add_country" type="submit">{{ __('save') }}
-                        </button>
+                        <button class="btn btn-secondary close-modal-btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }} </button>
+                        <button class="btn btn-primary add_country" type="submit">{{ __('save') }} </button>
                     </div>
                 </form>
             </div>
@@ -1612,6 +1602,41 @@
 
 
 <script>
+
+    $(document).ready(function () {
+    $('#add_form').on('submit', function (e) {
+        e.preventDefault(); // prevent default form submit
+
+        let form = $(this);
+        let formData = form.serialize();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: formData,
+            success: function (response) {
+                // ✅ close modal
+                $('#Add_model').modal('hide');
+
+                $('#Add_model').modal('hide');
+
+            // ✅ Reload the page
+            location.reload();
+
+            },
+            error: function (xhr) {
+                // show error message
+                let errors = xhr.responseJSON.errors;
+                let msg = '';
+                for (let key in errors) {
+                    msg += errors[key][0] + '\n';
+                }
+                alert(msg || 'Something went wrong!');
+            }
+        });
+    });
+});
+
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
         const selectedTab = urlParams.get('tab') || 'packs';
@@ -1768,7 +1793,9 @@
             // Open the modal
             $('#Add_model').modal('show');
         });
-
+            $(document).on('click', '.close-modal-btn', function () {
+                $('#Add_model').modal('hide');
+            });
 
         $(document).on('click', '.delete-btn', function () {
             let itemId = $(this).data('id');
