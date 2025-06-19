@@ -69,7 +69,7 @@ class WareTabController extends MainController
             //     $row->column(12, $this->tabsComponentEdit($id, $currentType));
             // })
             ->row(function (Row $row) use ($id) {
-                $row->column(12, $this->form()->edit($id));
+                $row->column(12, $this->form($id)->edit($id));
             }));
     }
 
@@ -219,7 +219,8 @@ class WareTabController extends MainController
         return $content;
     }
 
-    protected function form()
+
+    protected function form($id = null)
     {
         $form = new Form(new Ware());
         $form->display('ID');
@@ -228,29 +229,35 @@ class WareTabController extends MainController
             translate(GET_TYPE_WARE)
         )->default(4);
         if (\Str::contains(request()->fullUrl(), 'edit')) {
-            $wareType = Ware::find(request('id'))->type;
-            $type = request('type', $wareType);
-            $form->hidden('type', __('type'))->value($type)->attribute(['id' => 'type']);
-        } else {
+
+            $wareType = Ware::find($id)->type;
+
+            $form->hidden('type', __('type'))->value($wareType)->attribute(['id' => 'type']);
+        }
+        else {
+            $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+        }
+        if (!$form->isEditing()) {
             $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
         }
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        if (!$form->isEditing()) {
-            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
+        $form->currency('price', __('price'));
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
-        if ($form->isEditing()) {
+        // // if (!$form->isEditing()) {
+        // //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+        // //         $form->currency('price', __('price'));
+        // //         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        // //     }
+        // // }
+        // if ($form->isEditing()) {
 
-            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
+        //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+                
+        //     }
+        // }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
         $states = [

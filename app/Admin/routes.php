@@ -533,10 +533,11 @@ Route::group(
         Route::post('/ware-managements/create', [WareTabController::class, 'store']);
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
-            Route::get('/{id}/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+')->name('ware-management.edit');
-            Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+')->name('ware-management.update');;
-            Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
+            // Route::get('/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
+            // Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
+            // Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
+         Route::resource('ware-management', WareTabController::class);
 
         Route::resource('user-charges', UsersChargeController::class);
         //         Route::resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
