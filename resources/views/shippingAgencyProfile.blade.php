@@ -1120,14 +1120,18 @@
                         <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{ __('Sent Balance') }}</div>
                         
-                        <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$totalSend)}}</div>
+                        <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$totalSend)}}
+                            <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
+                        </div>
                         </div>
                         
                         <!-- Card 2 -->
                         <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{__("Received Balance")}}</div>
                         
-                        <div style="margin-top: 10px; font-size: 16px;">{{ numToString(@$totalReceive) }}</div>
+                        <div style="margin-top: 10px; font-size: 16px;">{{ numToString(@$totalReceive) }}
+                            <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
+                        </div>
                         </div>
                     </div>
                     </div>
@@ -1236,23 +1240,19 @@
                     </thead>
                     <tbody>
                         @foreach($resiveds as $index => $res)
+                                @php
+                                    $sender = \App\Helpers\Common::getChargerInfo($res);
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($res);
+                                @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
-                                    @if($res->sender instanceof \App\Models\User)
+                                    @if($sender)
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($res->sender->profile?->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                            <img src="{{ getImagePath($sender['image']) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
                                             <div>
-                                                <strong>{{ $res->sender->name }}</strong><br>
-                                                <small>ID: {{ $res->sender->id }}</small>
-                                            </div>
-                                        </div>
-                                    @elseif($res->sender instanceof \App\Models\Agency)
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($res->sender->logo_url) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
-                                            <div>
-                                                <strong>{{ $res->sender->name }}</strong><br>
-                                                <small>ID: {{ $res->sender->id }}</small>
+                                                <strong>{{ $sender['name'] }}</strong><br>
+                                                <small>ID: {{$sender['uuid'] }}</small>
                                             </div>
                                         </div>
                                     @else

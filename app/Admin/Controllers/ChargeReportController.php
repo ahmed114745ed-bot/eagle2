@@ -161,7 +161,27 @@ class ChargeReportController extends MainController
                     }
                 }, __('Sender UUID or Shipping Agency ID'));
             });
+            $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     $from = request('from_date');
+                // }, __('From Date'), 'from_date')->date();
+            });
 
+            $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     $to = request('to_date');
+                // }, __('To Date'), 'to_date')->date();
+            });
+            $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     $to = request('to_date');
+                // }, __('To Date'), 'to_date')->date();
+            });
+             $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     $to = request('to_date');
+                // }, __('To Date'), 'to_date')->date();
+            });
             $filter->column(1 / 4, function ($filter) {
                 $filter->where(function () {}, __('receiver type'), 'receiver_type')
                     ->select([
@@ -181,6 +201,16 @@ class ChargeReportController extends MainController
                         $query->whereHas('shippingAgency', fn($q) => $q->where('id', $value));
                     }
                 }, __('Receiver UUID or Shipping Agency ID'));
+            });
+             $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     $to = request('to_date');
+                // }, __('To Date'), 'to_date')->date();
+            });
+            $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     $to = request('to_date');
+                // }, __('To Date'), 'to_date')->date();
             });
 
             $filter->column(1 / 2, function ($filter) {

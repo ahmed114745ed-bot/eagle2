@@ -12,11 +12,13 @@
             <thead>
                 <tr>
                     <th>{{__('sender')}}</th>
+                    <th>{{__('sender id')}}</th>
                     <th>{{__('receiver')}}</th>
+                    <th>{{__('receiver id')}}</th>
+                    <th>{{__('type')}}</th>
                     <th>{{__('amount')}}</th>
                     <th>{{__('date')}}</th>
-                    <th>{{__('export/import')}}</th>
-                    <th>{{__('total wallet')}}</th>
+                    
                    
                 </tr>
             </thead>
@@ -28,18 +30,13 @@
                 @endphp
                     <tr>
                         <td>{{ $sender['name'] }}</td>
+                        <td>{{ $sender['uuid'] }}</td>
                         <td>{{ $receiver['name'] }}</td>
+                        <td>{{ $receiver['uuid'] }}</td>
+                        <td>{{ $charge->user_type }}</td>
                         <td>{{ $charge->amount }}</td>
                         <td>{{ $charge->created_at }}</td>
-                        <td> 
-                             @if ($charge->user_type == 'agency')
-                                🟢↑
-                            @elseif ($charge->charger_type == 'agency')
-                                🔴↓
-                            @endif
-                    </td>
-                        <td>{{ $charge->balance_before }}</td>
-                    </tr>
+                       
                 @endforeach
             </tbody>
         </table>

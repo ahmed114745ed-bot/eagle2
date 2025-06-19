@@ -1022,7 +1022,12 @@
 "kick": "Kick",
 "make_admin": "Make Admin",
 "are_you_sure_remove_member": "Are you sure you want to remove this member?",
-"are_you_sure_remove_admin": "Are you sure you want to remove this admin?"
+"are_you_sure_remove_admin": "Are you sure you want to remove this admin?",
+"image_type": "image type",
+"pack_not_found": "pack not found"
+
+
+
 
 
 
