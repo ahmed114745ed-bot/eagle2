@@ -13,7 +13,7 @@ class RankingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'exp' => $this->exp,
+            'exp' => numToString(ceil($thisv->exp)),
             'exp_diff' => $this->exp_diff,
             'exp_int' => $this->exp_int,
             'remaining' => $this->remaining,
