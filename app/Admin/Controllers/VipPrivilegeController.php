@@ -129,13 +129,13 @@ class VipPrivilegeController extends MainController
                 // 3=>trans ('Card Scroll'),
                 4 => trans('Avatar Frame'),
                 5 => trans('Bubble Frame'),
-                6 => trans('Entering Special Effects'),
+                6 => trans('Vehicle'),
                 // 7=>trans ('Microphone Aperture'),============
                // 8 => trans('Badge'), // ask
                 9 => trans('NoKick'),
                 10 => trans('Icon'),
                 // 11=>trans ('intro animation'),======
-                12 => trans('wapel'),
+                12 => trans('Wappel'),
                 13 => trans('hide country'),
                 14 => trans('vip gifts'),
                 15 => trans('no ban profile'), //ask
