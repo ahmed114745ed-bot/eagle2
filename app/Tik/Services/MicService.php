@@ -348,8 +348,9 @@ class MicService
             return Common::apiResponse(0, __('api_responses.you_dont_have_permission'), null, 408);
         }
 
-        $microphone = $room->microphone;
-        \Log::info('microphone: database ', ['$room->microphone' => $room->microphone]);
+     
+        $microphone = $room->microphone_only_users;
+        \Log::info('microphone: database ', ['$room->microphone' => $room->getOriginal('microphone')]);
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);

@@ -206,7 +206,10 @@ class RankingService
             $v->color_name = $color_name;
 
             $value = $v->exp;
-            $v->exp = numToString(ceil($v->exp));
+            info(gettype($v->exp));
+            info($v->exp);
+            $v->exp = numToString(ceil((float)$v->exp));
+            info(numToString(ceil((float)$v->exp)));
             $v->exp_int = ceil($value);
 
             $value2 = $v->exp_diff;
