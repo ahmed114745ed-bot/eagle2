@@ -3223,7 +3223,9 @@
   "To Date": "إلى التاريخ",
   "From Date": "من التاريخ",
   "Sender UUID or Shipping Agency ID": "معرّف المرسل (UUID) أو معرّف وكالة الشحن",
-  "Receiver UUID or Shipping Agency ID": "معرّف المستلم (UUID) أو معرّف وكالة الشحن"
+  "Receiver UUID or Shipping Agency ID": "معرّف المستلم (UUID) أو معرّف وكالة الشحن",
+  "pack_not_found": "العنصر غير موجود بالحقيبة  "
+
 
 
 
