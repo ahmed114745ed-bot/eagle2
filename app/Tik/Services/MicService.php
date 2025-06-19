@@ -269,6 +269,12 @@ class MicService
 
     public function goMicrophoneHand($user, $room)
     {
+        \Log::info('shami test goMicrophoneHand: START', [
+            'user_id' => $user->id,
+            'room_id' => $room->id,
+            'microphone' => $room->microphone,
+            'main_microphone' => $room->main_microphone,
+        ]);
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
@@ -303,6 +309,7 @@ class MicService
         // Save to DB
         $result = implode(',', $final);
         $this->updateMicAndPK($room, $result);
+        \Log::info('goMicrophoneHand: FINAL MIC RESULT', ['result' => $result]);
 
         // Clear mic timer and leave CP
         $this->timeLogRepository->deleteAth($room->uid, $user->id);
