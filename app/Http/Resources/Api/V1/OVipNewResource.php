@@ -45,7 +45,7 @@ class OVipNewResource extends JsonResource
                     $vipPrivileges->map(function ($p) use ($wares, $activePrivilegeIds, $oVip) {
                         $priv = clone $p;
                         $priv->item = $wares->where('type', $priv->type)->first();
-                        $priv->level = $oVip->level;
+                        $priv->level = $oVip?->level;
                         $priv->active = in_array($priv->id, $activePrivilegeIds);
                         return $priv;
                     })->sortByDesc('active')
