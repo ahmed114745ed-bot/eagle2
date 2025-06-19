@@ -235,10 +235,14 @@ class WareTabController extends MainController
             $form->hidden('type', __('type'))->value($wareType)->attribute(['id' => 'type']);
         }
         else {
-            $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            if (request('type')){
+                $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            }
         }
         if (!$form->isEditing()) {
-            $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            if (request('type')){
+                $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            }
         }
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
@@ -255,7 +259,7 @@ class WareTabController extends MainController
         // if ($form->isEditing()) {
 
         //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-                
+
         //     }
         // }
         //        $form->number('score', trans('score'));
