@@ -844,7 +844,7 @@ class UserController extends MainController
             ->paginate(10, ['*'], 'charges_page');
 
 
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType','charges' ,'tab', 'chargeTabType');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
@@ -1134,19 +1134,16 @@ class UserController extends MainController
             'id' => 'required|exists:packs,id',
             'type' => 'required|in:0,1',
             'days' => 'required|integer|min:1',
-            'use_num' => 'required|integer|min:1',
+
         ]);
 
         $pack = Pack::find($request->id);
         $ex = ($request->days ?: 0);
-        $num = $request->use_num ?: 0;
 
         if ($request->type == 0) {
             $pack->expire += $ex * 86400;
-            $pack->use_num += $num;
         } else {
             $pack->expire -= $ex * 86400;
-            $pack->use_num -= $num;
         }
         $pack->save();
         return Redirect::back();
