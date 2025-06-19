@@ -349,6 +349,7 @@ class MicService
         }
 
         $microphone = $room->microphone;
+        \Log::info('microphone: database ', ['$room->microphone' => $room->microphone]);
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);
