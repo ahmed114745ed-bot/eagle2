@@ -350,7 +350,6 @@ class MicService
 
      
         $microphone = $room->microphone_only_users;
-        \Log::info('microphone: database ', ['$room->microphone' => $room->getOriginal('microphone')]);
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);
@@ -381,25 +380,21 @@ class MicService
     {
 
         $microphone = explode(',', $microphone);
-        \Log::info('micType: 1111 ', ['micType' => $microphone]);
-
         $current = $microphone[$position] ?? '0';
-    
+
         $user = '0';
         $status = '0';
     
-        // ✅ فك التركيب الحالي
         if (str_contains($current, '#')) {
             [$user, $status] = explode('#', $current);
         } elseif (is_numeric($current) && (int)$current > 0) {
             $user = $current;
-            $status = '-1'; // نفترض أنه مقفل إن لم يكن مذكور
+            $status = '-1'; 
         } else {
             $user = '0';
             $status = $current;
         }
     
-        // ✅ تعديل حسب نوع العملية
         if ($type === 'mute') {
             $status = '-2';
         } elseif ($type === 'unmute' || $type === 'open') {
@@ -408,16 +403,11 @@ class MicService
             $status = '-1';
         }
     
-        // ✅ إعادة تركيب القيمة
         if ($user !== '0') {
             $microphone[$position] = $user . '#' . $status;
         } else {
             $microphone[$position] = $status;
-        }
-    
-        // ✅ تسجيل النتيجة
-        \Log::info('micType: FINAL MIC micType', ['micType' => $microphone]);
-    
+        }    
         return implode(',', $microphone);
         // $microphone = explode(',', $microphone);
         // if ($type == 'mute') {
