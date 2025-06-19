@@ -1447,7 +1447,7 @@ class Common
 
     public  static function getImageTotalReceiverOrSender($amount)
     {
-        $level = Vip::vipCollectionBuilder()->where('level', $amount)->orderByDesc('exp')->first();
+        $level = Vip::collectionBuilder()->where('level', $amount)->orderByDesc('exp')->first();
         return $level;
     }
 

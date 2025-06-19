@@ -565,7 +565,7 @@ trait CalcsTrait
 
         // $current_star_num       = self::getCurrentLevel(1, $star_level, 'exp');
 //        $vipsData = DB::table('vips')->get();
-        $vipsData = Vip::vipCollectionBuilder()->get();
+        $vipsData = Vip::collectionBuilder()->get();
 
         $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
 //        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
@@ -1273,11 +1273,11 @@ trait CalcsTrait
             ];
         }
         $expLevel = $user->total_charge_coins + $user->sub_charger_coins;
-        $currentLevel = Vip::vipCollectionBuilder()->where("level", $user->charge_level)->where('type', 5)->orderByDesc('level')->first();
+        $currentLevel = Vip::collectionBuilder()->where("level", $user->charge_level)->where('type', 5)->orderByDesc('level')->first();
         if ($currentLevel) {
-            $secondLevel = Vip::vipCollectionBuilder()->where("type", 5)->where("level", ">", $currentLevel->level)->orderBy('id')->first();
+            $secondLevel = Vip::collectionBuilder()->where("type", 5)->where("level", ">", $currentLevel->level)->orderBy('id')->first();
         } else {
-            $secondLevel = Vip::vipCollectionBuilder()->where("type", 5)->orderBy('level')->first();
+            $secondLevel = Vip::collectionBuilder()->where("type", 5)->orderBy('level')->first();
         }
 
 

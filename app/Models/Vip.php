@@ -30,7 +30,7 @@ class Vip extends Model
         return Cache::rememberForever('vips', fn () => self::all());
     }
 
-    public static function vipCollectionBuilder(): VipCollectionBuilderService
+    public static function collectionBuilder(): VipCollectionBuilderService
     {
         return new VipCollectionBuilderService();
     }
