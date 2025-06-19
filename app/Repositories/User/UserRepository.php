@@ -184,7 +184,7 @@ class UserRepository extends Repository
             'ownAgency',
             'agencyUserJob' => fn($q) => $q->where('type', 'requestManger'),
             'agencyJoinRequest' => fn($q) => $q->where('status', '!=', 2),
-            'packs',
+            'packs.ware',
             'country',
             'manager'
         ])
