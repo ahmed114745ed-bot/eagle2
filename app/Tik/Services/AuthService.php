@@ -85,6 +85,7 @@ class AuthService
                 $data = [
                     'phone' => $phone,
                     'password' => $request->password,
+                    'status' => 1
                 ];
 
                 $user = $this->userRepository->create($data);
