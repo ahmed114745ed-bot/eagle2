@@ -34,16 +34,16 @@ class OvipGiftTapController extends MainController
         $url = url('/admin/ovip'); // Define your button URL
         $back = __('back');
         $buttonHTML = <<<HTML
-    <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
-        <i class="fa fa-arrow-left"></i> {$back}
-    </a>
-    HTML;
-        $ovip = null;
-        if (request('ovip_id')) {
-            $ovip = OVip::find(request('ovip_id'));
-        } elseif (request('level')) {
-            $ovip = OVip::where('level', request('level'));
-        }
+        <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+            <i class="fa fa-arrow-left"></i> {$back}
+        </a>
+        HTML;
+            $ovip = null;
+            if (request('ovip_id')) {
+                $ovip = OVip::find(request('ovip_id'));
+            } elseif (request('level')) {
+                $ovip = OVip::where('level', request('level'));
+            }
 
 
 
@@ -134,9 +134,16 @@ class OvipGiftTapController extends MainController
 
         $type = request()->get('type', $firstType);
         $grid = new Grid(new Ware);
-
+         
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
+        $count = Ware::where('level', $level)
+            ->where('get_type', 1)
+            ->where('type', $type)
+            ->where('is_active_for_vip', 1)
+            ->count();
 
+     
+        
         $grid->id(__('ID'));
         if ($type == 18 ||  $type == 21) {
             $grid->column('color', __('Color'))->display(function ($color) {
@@ -228,21 +235,23 @@ class OvipGiftTapController extends MainController
         $grid->disableExport();
         if ($firstType && (Admin::user()->can('create-' . $this->permission_name) || Admin::user()->can('*'))) {
 
-
-            $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
-                $level = $level ?? request('level');
-                $url =    url('admin/ware-gift/' . $level . '/' . $type);
-                $add = __('add');
-
-                $customButtonHTML = <<<HTML
-
-            <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
-                    <i class="fa fa-plus"></i> {$add}
-                </a>
-
-            HTML;
-                $tools->append($customButtonHTML);
-            });
+            if (!$count >= 1) {
+                $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
+                    $level = $level ?? request('level');
+                    $url =    url('admin/ware-gift/' . $level . '/' . $type);
+                    $add = __('add');
+    
+                    $customButtonHTML = <<<HTML
+    
+                <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
+                        <i class="fa fa-plus"></i> {$add}
+                    </a>
+    
+                HTML;
+                    $tools->append($customButtonHTML);
+                });
+            }
+        
         }
 
         Admin::script("
