@@ -229,16 +229,27 @@ class OVipController extends MainController
             ]);
 
             if ($notActuveAll) {
+                $types = [];
 
                 foreach ($privilegs as $privileg) {
                     $type_preveleg = VipPrivilege::find($privileg);
 
+                    if (!$type_preveleg) continue;
+
+                    $type = $type_preveleg->type;
+            
+                    if (in_array($type, $types)) {
+                        admin_error('خـطأ', 'لا يمكن اختيار أكثر من امتياز من نفس النوع: ' );
+                        return back();
+                    }
+            
+                    $types[] = $type;
 
                     if (isset($type_preveleg->type)) {
 
                         $updateActive = Ware::where('type', $type_preveleg->type)->where('level', $level)->update([
                             'is_active_for_vip' => true
-                        ]);
+                    ]);
                         // if (!$updateActive) {
                         //     session()->flash('show_alert_vip', 'Your alert message');
                         //     return redirect()->back();
