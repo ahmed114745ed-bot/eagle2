@@ -148,8 +148,6 @@ class OvipGiftTapController extends MainController
                 return app()->getLocale() == 'ar' ? $name : $this->name_en;
             });
 
-            $grid->column('price', __('price'));
-
             $grid->column('show_img', __('show_img'))->display(function ($path) {
                 /** @var Ware $this */
                 $defaultImage = asset("images/image.png");
