@@ -155,14 +155,8 @@ class Room extends Model
 
     public function getMicrophoneOnlyUsersAttribute()
     {
-        $original = $this->attributes['microphone'] ?? '';
-        $seats = explode(',', $original);
-
-        $clean = array_map(function ($seat) {
-            return explode('#', $seat)[0];  // ترجع فقط المستخدم
-        }, $seats);
-
-        return implode(',', $clean);
+        return  $this->attributes['microphone'] ?? '';
+        
     }
 
     public function getMainMicrophoneAttribute()
