@@ -43,6 +43,13 @@
         /* background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%)!important; */
     }
 
+    .box-header {
+    /* color: #444; */
+    /* display: block; */
+    /* padding: 10px; */
+    /* position: relative; */
+}
+
     .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
         z-index: 2;
         color: #fff;
@@ -813,7 +820,7 @@
                 display: flex !important;
             }
 
-            .rtl .box-header .box-tools {
+            .rtl /**.box-header**/ .box-tools {
                 float: left;
                 top: -8px;
                 position: relative;
