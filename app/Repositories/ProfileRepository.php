@@ -72,7 +72,13 @@ class ProfileRepository
 
     public function getProfileVisits(User $user, $keyword)
     {
-        return $user->profileVisits()->with([
+        $blockedUserIds = array_unique(array_merge(
+            $user->blockedUsers()->pluck('from_uid')->toArray(),
+            $user->blockedMe()->pluck('user_id')->toArray()
+        ));
+        return $user->profileVisits()
+        ->whereNotIn('visitor_id', $blockedUserIds)
+        ->with([
             'room' => function ($query) {
                 return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
             },
