@@ -272,8 +272,7 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' => $this->packs->where('type', 28)->where('is_used', 1)->first()?->ware->img2 ??'' /*common::wareUserVip($this->id, 28, 'img2')*/,
-            'profile_frame_id' => $this->packs->where('type', 28)->where('is_used', 1)->first()?->ware->id ?? '' ,
+            'profile_frame_id' => $this->getProfileFrame()?->id ?? '' ,
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
