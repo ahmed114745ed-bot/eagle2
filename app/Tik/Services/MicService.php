@@ -379,11 +379,24 @@ class MicService
     {
 
         $microphone = explode(',', $microphone);
-        $current = $microphone[$position] ?? '0';
-        $parts = explode('#', $current);
-        $user = $parts[0] ?? '0';
-        $status = $parts[1] ?? '0';
 
+        $current = $microphone[$position] ?? '0';
+
+        // تأكد: لو فيها #
+        if (str_contains($current, '#')) {
+            [$user, $status] = explode('#', $current);
+        } else {
+            // لو مجرد رقم، فإما يكون user أو status، نحدده
+            if (is_numeric($current) && (int)$current > 0) {
+                $user = $current;
+                $status = 0;
+            } else {
+                $user = '0';
+                $status = $current;
+            }
+        }
+
+        // معالجة الحالة حسب النوع
         if ($type == 'mute') {
             if ($status != -1) {
                 $status = -2;
@@ -393,16 +406,20 @@ class MicService
                 $status = 0;
             }
         } elseif ($type == 'shut') {
-            if ($status == 0 || $status == '0') {
+            if ($status == 0 || $status === '0') {
                 $status = -1;
             }
         }
+
+        // إعادة التجميع
         if ($user != '0') {
             $microphone[$position] = $user . '#' . $status;
         } else {
-            $microphone[$position] = $status;
+            $microphone[$position] = (string)$status;
         }
+
         \Log::info('micType: FINAL MIC micType', ['micType' => $microphone]);
+
         return implode(',', $microphone);
         // $microphone = explode(',', $microphone);
         // if ($type == 'mute') {
