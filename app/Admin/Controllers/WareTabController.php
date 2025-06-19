@@ -278,13 +278,13 @@ class WareTabController extends MainController
             ]
         )->attribute(['id' => 'image_type1'])->required();
 
-        $form->select('profile_frame_type', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'png' => __('png'),
+        // $form->select('profile_frame_type', __('image_type'))->options(
+        //     [
+        //         'svga' => __('svga'),
+        //         'png' => __('png'),
 
-            ]
-        )->attribute(['id' => 'profile_frame']);
+        //     ]
+        // )->attribute(['id' => 'profile_frame']);
         $form->text('key', trans('key'));
         $script = <<<SCRIPT
              $(document).ready(function() {
