@@ -37,7 +37,7 @@ class SendNotificationToAllFollowers implements ShouldQueue
 
         // Get followers via relationship
         $followers = $owner->followerss()
-            ->select('id', 'notification_id', 'lan')
+            ->select('users.id', 'notification_id', 'lan')
             ->get();
 
         $usersTokenEn = $followers->where('lan', '!=', 'ar')->pluck('notification_id')->filter()->values();
