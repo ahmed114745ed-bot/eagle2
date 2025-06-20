@@ -3,9 +3,11 @@ namespace App\Repositories\Community;
 
 use App\Helpers\Common;
 use App\Http\Resources\Api\V1\CommunityResource;
+use App\Models\BlackList;
 use App\Models\OfficialMessage;
 use App\Models\Pack;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SearchRepository implements SearchRepositoryInterface
@@ -29,6 +31,11 @@ class SearchRepository implements SearchRepositoryInterface
     public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|array
     {
         // $user = User::searchByUuid($keywords)->first();
+        $user = Auth::user();
+        $blockedByMe = $user->blockedUsers()->pluck('from_uid')->toArray();
+        $blockedMe = $user->blockedMe()->pluck('user_id')->toArray();
+
+        $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
 
         $user = User::searchByUuid($keywords)
             ->with(['packs' => function ($q) {
@@ -51,6 +58,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
             ->where('users.status', 1)
+            ->whereNotIn('rooms.uid', $blockedUserIds)
             ->select([
                 'rooms.*',
                 'rooms.id as room_id',
@@ -78,22 +86,47 @@ class SearchRepository implements SearchRepositoryInterface
         if (!$userId || !$keywords) {
             return [];
         }
-
+   
         $whereOr = ['uuid' => $keywords];
 
+        $user = Auth::user();
+        $blockedByMe = $user->blockedUsers()->pluck('from_uid')->toArray();
+        $blockedMe = $user->blockedMe()->pluck('user_id')->toArray();
+
+        $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
+
+        // $users = User::query()
+        //     ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])
+        //     ->where(function ($query) use ($keywords) {
+        //         $query->where('uuid', 'like', '%' . $keywords . '%')
+        //               ->orWhere('special_id', 'like', '%' . $keywords . '%');
+        //     })
+        //     ->whereNotIn('id', $blockedUserIds)
+        //     ->where('status', 1)
+        //     ->with(['followedByAuthUser' , 'country']  )
+        //     ->orWhere(function ($query) use ($whereOr) {
+        //         $query->where($whereOr);
+        //     })
+        //     ->orderBy('matching_percentage', 'desc')
+        //     ->paginate();
         $users = User::query()
-            ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])
-            ->where(function ($query) use ($keywords) {
-                $query->where('uuid', 'like', '%' . $keywords . '%')
-                      ->orWhere('special_id', 'like', '%' . $keywords . '%');
+        ->select([
+            '*',
+            DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")
+        ])
+        ->where(function ($query) use ($keywords, $whereOr) {
+            $query->where(function ($subQuery) use ($keywords) {
+                $subQuery->where('uuid', 'like', '%' . $keywords . '%')
+                         ->orWhere('special_id', 'like', '%' . $keywords . '%');
             })
-            ->with(['followedByAuthUser' , 'country']  )
-            ->where('status', 1)
-            ->orWhere(function ($query) use ($whereOr) {
-                $query->where($whereOr);
-            })
-            ->orderBy('matching_percentage', 'desc')
-            ->paginate();
+            ->orWhere($whereOr);
+        })
+        ->whereNotIn('id', $blockedUserIds)
+        ->where('status', 1)
+        ->with(['followedByAuthUser', 'country'])
+        ->orderBy('matching_percentage', 'desc')
+        ->paginate(10, ['*'], 'page', $page);
+
 
 
 
@@ -102,6 +135,7 @@ class SearchRepository implements SearchRepositoryInterface
 
     public function getUserFriends(int $userId, string $keywords = null, int $perPage = 10, int $currentPage = 1): \Illuminate\Pagination\LengthAwarePaginator
     {
+     
         $usersQuery = User::query()
             ->whereHas('followers', fn($q) => $q->where('user_id', $userId))
             ->whereHas('followeds', fn($q) => $q->where('followed_user_id', $userId));

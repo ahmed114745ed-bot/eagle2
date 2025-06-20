@@ -49,32 +49,49 @@ class AgencySettingsController extends MainController
     {
         $lang = request()->header('X-localization', 'en');
 
-        $types = ['shipping', 'host', 'agency_owner', 'bd'];
-        $typeIds = ['shipping' => 3, 'host' => 2, 'agency_owner' => 1, 'bd' => 4]; // example IDs
+        $types = [
+            'shipping'     => 3,
+            'host'         => 2,
+            'agency_owner' => 1,
+            'bd'           => 4,
+        ];
+
         $suffixes = ['badge', 'intro', 'frame'];
+        $configNames = [];
 
-        $data = [];
-
-        foreach ($types as $type) {
-            $images = [];
+        // Collect all config names needed (localized and English fallback)
+        foreach ($types as $type => $id) {
             foreach ($suffixes as $suffix) {
-                $name = $suffix === 'badge'
-                    ? $lang . '_' . $type
-                    : $lang . '_' . $type . '_' . $suffix;
+                $localizedName = $suffix === 'badge' ? "{$lang}_{$type}" : "{$lang}_{$type}_{$suffix}";
+                $englishName   = $suffix === 'badge' ? "en_{$type}"   : "en_{$type}_{$suffix}";
 
-                $config = Config::where('name', $name)->first();
-                $images['image_' . $suffix] = $config?->value ?? null;
+                $configNames[] = $localizedName;
+                $configNames[] = $englishName;
+            }
+        }
+
+        // Fetch all needed configs in a single query
+        $configs = Config::whereIn('name', $configNames)->pluck('value', 'name');
+
+        // Build the final response data
+        $data = [];
+        foreach ($types as $type => $id) {
+            $images = [];
+
+            foreach ($suffixes as $suffix) {
+                $localizedName = $suffix === 'badge' ? "{$lang}_{$type}" : "{$lang}_{$type}_{$suffix}";
+                $englishName   = $suffix === 'badge' ? "en_{$type}"       : "en_{$type}_{$suffix}";
+
+                $images["image_{$suffix}"] = $configs[$localizedName] ?? $configs[$englishName] ?? null;
             }
 
-            $data[] = array_merge(
-                ['type' => $typeIds[$type]],
-                $images
-            );
+            $data[] = array_merge(['type' => $id], $images);
         }
-        settings()->set('badges-agency', false);
+
         return response([
             'status' => 'success',
-            'data' => $data
+            'data' => $data,
         ]);
     }
+
 }

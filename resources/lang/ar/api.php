@@ -52,6 +52,7 @@ return [
 
     'welcome'                          => 'مرحبا :name فى :app_name',
     'followed_you'                     => ' بمتابعتك:name قام',
+    'luckBox' => 'تهانينا! لقد فزت من صندوق الحظ بـ :coins عملة',
     'like_your_moment'                 => '  قام :name بالتفاعل على اللحظة الخاصة بك',
     'like_your_real'                   => 'قام :name بالتفاعل على الفيديو الخاصة بك',
     'follow_back'                      => ':name اصبحت صديق مع ',

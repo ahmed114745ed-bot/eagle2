@@ -46,6 +46,11 @@ class PayPalService
 
         $body = [
             "intent"         => "CAPTURE",
+            'application_context' => [
+                'return_url'  => url("/api/paypal-success/$referenceId"),
+                'cancel_url'  => url('/api/paypal-cancel'),
+                'user_action' => 'PAY_NOW',
+            ],
             "purchase_units" => [
                 [
                     "reference_id" => $referenceId,
@@ -75,23 +80,72 @@ class PayPalService
     /**
      * @return mixed
      */
-    public function complete($orderID)
+//    public function success(Request $request)
+//    {
+//        sleep(29);
+//        $orderId = $request->query('token');
+//        info('token-'.$this->getAccessToken());
+//        info('orderId-'.$orderId);
+//        if (! $orderId) {
+//            return response()->json([
+//                'status'  => 'error',
+//                'message' => 'Missing PayPal order id',
+//            ], 422);
+//        }
+//
+//        $url = config('paypal.base_url') . "/v2/checkout/orders/{$orderId}/capture";
+//        $headers = [
+//            'Content-Type'  => 'application/json',
+//            'Authorization' => 'Bearer ' . $this->getAccessToken(),
+//        ];
+//
+//        $response = Http::withHeaders($headers)->post($url, null);
+//
+//        info($response);
+//        if ($response->failed()) {
+//            return response()->json([
+//                'status'  => 'error',
+//                'message' => data_get($response->json(), 'message', 'Payment capture failed'),
+//                'details' => $response->json(),
+//            ], $response->status());
+//        }
+//
+//        $data = $response->json();
+//
+//        if (data_get($data, 'status') !== 'COMPLETED') {
+//            return response()->json([
+//                'status'  => 'error',
+//                'message' => 'Payment not completed',
+//                'details' => $data,
+//            ], 409);
+//        }
+//
+//        $referenceId = data_get($data, 'purchase_units.0.reference_id');
+//        $amount      = (float) data_get($data, 'purchase_units.0.payments.captures.0.amount.value');
+//
+//        return response()->json([
+//            'status'  => 'success',
+//            'order'   => $orderId,
+//            'amount'  => $amount,
+//        ], 200);
+//    }
+
+    public function success($orderId): mixed
     {
-        $url = config('paypal.base_url') . '/v2/checkout/orders/' . $orderID . '/capture';
+        sleep(20);
+        $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
 
-        $headers = [
-            'Content-Type'  => 'application/json',
-            'Authorization' => 'Bearer ' . $this->getAccessToken(),
-        ];
+        if ($coinLog->status){
+            if ($coinLog->status) {
+                return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);}
+        }
 
-        $response = Http::withHeaders($headers)
-            ->post($url, null);
-
-        return json_decode($response->body());
+        return response()->json(['status' => 'failed', 'message' => 'Payment failed.',], 500);
     }
 
     public function callback(Request $request): JsonResponse
     {
+        info('webhook-'.$request);
         $eventType = $request->get('event_type');
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
             return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);
@@ -101,11 +155,6 @@ class PayPalService
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
 
         return $this->webhookPayment($coinLogId);
-    }
-
-    public function cancel()
-    {
-        return response()->json(['status' => 'cancelled']);
     }
 
     private function updateDiForUser($amount)

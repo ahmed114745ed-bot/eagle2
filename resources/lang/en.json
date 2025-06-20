@@ -1001,6 +1001,14 @@
   "Browse daily gift": "Browse daily login gift",
   "Entering Special Effects": "Compound",
   "wapel": "entry effect",
+    "Kick switch agencies": "Kick",
+  "Make admin switch agencies": "Make Admin",
+  "Remove admin switch agencies": "Remove Admin",
+  "Member switch agencies": "Agency Members",
+  "Charge history switch agencies": "Agency Charge History",
+  "Salary switch agencies": "Agency Salary",
+  "Join switch agencies": "Join Agency Request",
+  "Target switch agencies": "Agency Target",
   "This target has already been achieved by some users and cannot be updated.": "This target has already been achieved by some users and cannot be updated."
 ,    "target_change_warning": "Increasing the target value will increase the dollar amount received by the hosts, while decreasing it will reduce their dollar value."
 ,"host":"Host",
@@ -1022,7 +1030,12 @@
 "kick": "Kick",
 "make_admin": "Make Admin",
 "are_you_sure_remove_member": "Are you sure you want to remove this member?",
-"are_you_sure_remove_admin": "Are you sure you want to remove this admin?"
+"are_you_sure_remove_admin": "Are you sure you want to remove this admin?",
+"image_type": "image type",
+"pack_not_found": "pack not found"
+
+
+
 
 
 

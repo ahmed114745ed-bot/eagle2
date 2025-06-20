@@ -59,6 +59,33 @@ trait AttributesTrait
         return $dr ?: '';
     }
 
+    public static function getUserDressV2($userPacks, $dress, $type, $item = 'img1', bool $isUsed = false)
+    {
+
+        $dr = '';
+        if (!$dress) {
+            return $dr;
+        }
+        $pack = self::checkPackV2($userPacks, $type,$dress);
+
+        if ($isUsed) {
+            $pack->where('is_used', 1);
+        }
+
+        if ($pack) {
+            $ware = Ware::query()
+                ->where('id', $dress)
+                ->where('type', $type)
+                ->first();
+
+            if ($ware) {
+                $dr = $ware->{$item};
+            }
+        }
+
+        return $dr ?: '';
+    }
+
     public static function pack_get($key, $user_id)
     {
         return Pack::query()

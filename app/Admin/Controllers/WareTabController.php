@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use App\Helpers\Common;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
@@ -68,7 +69,7 @@ class WareTabController extends MainController
             //     $row->column(12, $this->tabsComponentEdit($id, $currentType));
             // })
             ->row(function (Row $row) use ($id) {
-                $row->column(12, $this->form()->edit($id));
+                $row->column(12, $this->form($id)->edit($id));
             }));
     }
 
@@ -218,7 +219,8 @@ class WareTabController extends MainController
         return $content;
     }
 
-    protected function form()
+
+    protected function form($id = null)
     {
         $form = new Form(new Ware());
         $form->display('ID');
@@ -227,29 +229,39 @@ class WareTabController extends MainController
             translate(GET_TYPE_WARE)
         )->default(4);
         if (\Str::contains(request()->fullUrl(), 'edit')) {
-            $wareType = Ware::find(request('id'))->type;
-            $type = request('type', $wareType);
-            $form->hidden('type', __('type'))->value($type)->attribute(['id' => 'type']);
-        } else {
-            $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+
+            $wareType = Ware::find($id)->type;
+
+            $form->hidden('type', __('type'))->value($wareType)->attribute(['id' => 'type']);
+        }
+        else {
+            if (request('type')){
+                $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            }
+        }
+        if (!$form->isEditing()) {
+            if (request('type')){
+                $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            }
         }
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        if (!$form->isEditing()) {
-            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
+        $form->currency('price', __('price'));
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
-        if ($form->isEditing()) {
+        // // if (!$form->isEditing()) {
+        // //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+        // //         $form->currency('price', __('price'));
+        // //         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        // //     }
+        // // }
+        // if ($form->isEditing()) {
 
-            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
+        //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+
+        //     }
+        // }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
         $states = [
@@ -277,17 +289,18 @@ class WareTabController extends MainController
                     'alpha' => __('alpha'),
                     'mp4' => __('mp4'),
                     'vap' => __('vap'),
+                    'png' => __('png'),
 
                 ]
             )->attribute(['id' => 'image_type1']);
 
-            $form->select('profile_frame_type', __('image_type'))->options(
-                [
-                    'svga' => __('svga'),
-                    'png' => __('png'),
+            // $form->select('profile_frame_type', __('image_type'))->options(
+            //     [
+            //         'svga' => __('svga'),
+            //         'png' => __('png'),
 
-                ]
-            )->attribute(['id' => 'profile_frame']);
+            //     ]
+            // )->attribute(['id' => 'profile_frame']);
         }
 
 
@@ -428,7 +441,8 @@ class WareTabController extends MainController
         }
         $form->saving(function (Form $form) {
             $imageType1 = $form->input('image_type1');
-            $profileFrameType = $form->input('profile_frame_type');
+            // $profileFrameType = $form->input('profile_frame_type');
+            $profileFrameType = request('image_type1') ?? $form->input('image_type1');
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
             if (is_null($imageType1) && is_null($profileFrameType)) {

@@ -813,13 +813,71 @@ class Common
     }
 
 
-    public static function handelVip0($vip, $user, $expire,  $userVip)
+    public static function handelVip($vip, $user, $expire,  $userVip)
     {
-        //  dd($userVip->is_used);
-        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->delete();
+        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->update(['is_used' => 0]);
 
         $type = $vip->privilegs()->pluck('type')->toArray();
+        if (!empty($type)) {
+            foreach ($type as $wareType) {
+                $isSetWare = Ware::query()
+                    ->where('get_type', 1)
+                    ->where('level', $vip->level)
+                    ->where('type', $wareType)
+                    ->first();
 
+                if (!$isSetWare) {
+                    $typesArr = [
+                        1 => 'Gemstone',
+                        3 => 'Card Scroll',
+                        4 => 'Avatar Frame',
+                        5 => 'Bubble Frame',
+                        6 => 'Entering Special Effects',
+                        7 => 'Microphone Aperture',
+                        8 => 'Badge',
+                        9 => 'NoKick',
+                        10 => 'Icon',
+                        11 => 'intro animation',
+                        12 => 'maple',
+                        13 => 'hide country',
+                        14 => 'vip gifts',
+                        15 => 'no pan',
+                        19 => 'profile visitors hide in',
+                        20 => 'hide last active',
+                        28 => 'profile frame',
+                        29 => 'being kicked',
+                        30 => 'anti ban',
+                    ];
+
+                    $typeName = $typesArr[$wareType] ?? 'Unknown Type';
+                    Ware::create([
+                        'get_type' => 1,
+                        'type' => $wareType,
+                        'name' => $typeName  ?? 'VIP Ware',
+                        'name_en' => $typeName ?? 'VIP Ware',
+                        'title' => $typeName ?? '',
+                        'title_en' => $typeName ?? '',
+                        'level' => $vip->level,
+                        'price' =>  0,
+                        'enable' => 1,
+                        'expire' => $expire,
+                        'show_img' =>  '1.png',
+                        'img2' =>  '',
+                        'key' =>  '',
+                        'key_json' => '',
+                        'image_type' => 'png',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                        'is_active_for_vip' => 1
+                    ]);
+                } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
+                    $isSetWare->update([
+                        'is_active_for_vip' => 1,
+                        'enable' => 1,
+                    ]);
+                }
+            }
+        }
         $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
             ->where('level', $vip->level)
             ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
@@ -869,6 +927,9 @@ class Common
                 self::unUsePack($type, $user);
             }
         }
+        $userVip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->where('id', '!=', $userVip->id)->update(['is_used' => 0]);
         $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
             $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->orderBy('level', 'desc')->first();
@@ -886,13 +947,12 @@ class Common
     }
 
 
-    public static function handelVip($vip, $user, $expire,  $userVip)
+    public static function handelVip0($vip, $user, $expire,  $userVip)
     {
         //  dd($userVip->is_used);
         if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->update(['is_used' => 0]);
 
         $type = $vip->privilegs()->pluck('type')->toArray();
-        \Log::info('type', ['all' => $type]);
         $missingTypes = [];
         if (!empty($type)) {
             foreach ($type as $wareType) {
@@ -1186,7 +1246,24 @@ class Common
 
         return $ch->exists();
     }
+    public static function hasColorInPack($user_id, $type, $use_status = false)
+    {
+        $query = Pack::query()
+            ->with('ware')
+            ->where('user_id', $user_id)
+            ->where('type', $type)
+            ->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+            });
 
+        if ($use_status) {
+            $query->where('is_used', 1);
+        }
+
+        $pack = $query->first();
+
+        return $pack?->ware?->color ?? '';
+    }
     public static function hasInPackV2($userPacks, $type, $use_status = false)
     {
         $ch =  self::checkPackV2($userPacks, $type);
@@ -1459,16 +1536,16 @@ class Common
 
     public  static function getTargetUsd($diamonds, $percentage)
     {
-        $shipping_coins = Cache::rememberForever('shipping_coins', function () {
-            return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        });
+        // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
+        //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
+        // });
         // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
         //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
         // });
-        // $zones_coins = Cache::rememberForever('zones_coins', function () {
-        //     return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        // });
-        $coins = $shipping_coins;
+        $zones_coins = Cache::rememberForever('zones_coins', function () {
+            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
+        });
+        $coins = $zones_coins;
         // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
         $usd = $diamonds / $coins;
         $userUsd = $usd *  $percentage  / 100;
@@ -1479,20 +1556,21 @@ class Common
 
     public  static function getMaxCoins()
     {
-        $shipping_coins = Cache::rememberForever('shipping_coins', function () {
-            return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        });
+        // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
+        //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
+        // });
         // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
         //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
         // });
-        // $zones_coins = Cache::rememberForever('zones_coins', function () {
-        //     return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        // });
+        $zones_coins = Cache::rememberForever('zones_coins', function () {
+            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
+        });
 
         // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
 
+        $coins = $zones_coins;
 
-        return $shipping_coins;
+        return $coins;
     }
 
     public  static function getCoinsValue($key)
@@ -1669,7 +1747,6 @@ class Common
 
                 ];
             case 'user':
-            case 'bd':
                 return [
                     'name' => $resource->senderUser->name ?? '',
                     'image' => $resource->senderUser->profile->avatar ?? '',
@@ -1677,6 +1754,15 @@ class Common
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
                     'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
+                ];
+            case 'bd':
+                return [
+                    'name' => $resource->senderUser->name ?? '',
+                    'image' => $resource->senderUser->profile->avatar ?? '',
+                    'uuid' => $resource->senderUser->uuid ?? '',
+                    'id' => $resource->senderUser->id ?? '',
+                    'type' => 'user',
+                    'url' => $resource->senderUser ? url("admin/usersBd/{$resource->senderUser->id}") : '#',
                 ];
             default:
                 return [
@@ -1693,7 +1779,6 @@ class Common
 
     public static function getReceiverInfo($resource)
     {
-        
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
@@ -1702,14 +1787,16 @@ class Common
                     'uuid' => $resource->receiveragency->id ?? '',
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
+                    'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                 ];
             case 'user':
                 return [
-                    'id' => $resource->receiverUser->id ?? '',
+                    'id' => $resource->receivnerUser->id ?? '',
                     'name' => $resource->receiverUser->name ?? '',
                     'image' => $resource->receiverUser->profile->avatar ?? '',
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
+                    'url' => $resource->receiverUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
                 ];
             default:
                 return [
@@ -1756,6 +1843,6 @@ class Common
             return null;
         }
 
-        return $extras[$type]; 
+        return $extras[$type];
     }
 }

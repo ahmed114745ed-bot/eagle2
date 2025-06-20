@@ -240,10 +240,11 @@ class User extends Authenticatable
         if ($from_date) {
             $query->where('created_at', '>=', $from_date);
         }
+        $hours_days = \Cache::get('hours_days') ?? 2;
 
         $days = $query
             ->groupBy('date')
-            ->having('total_hours', '>', 1)
+            ->having('total_hours', '>=', $hours_days)
             ->get();
 
         return $days->count();
@@ -1526,5 +1527,19 @@ class User extends Authenticatable
             // Handle profile.avatar update
 
         });
+    }
+    public function blockedUsers()
+    {
+        return $this->hasMany(BlackList::class, 'user_id');
+    }
+
+    public function blockedMe()
+    {
+        return $this->hasMany(BlackList::class, 'from_uid');
+    }
+
+    public function getProfileFrame() : Ware | null
+    {
+        return $this->packs?->where('type', 28)->where('is_used', 1)->first()?->ware;
     }
 }

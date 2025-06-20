@@ -565,7 +565,7 @@
     "Card Scroll": "بطاقة التمرير",
     "Avatar Frame": "إطار الصورة الشخصية",
     "Bubble Frame": "إطار الفقاعة",
-    "Entering Special Effects": "مركبه ",
+    "Vehicle": "مركبه ",
     "Microphone Aperture": "فتحة الميكروفون",
     "Badge": "شارة",
     "NoKick": "عدم الطرد",
@@ -627,10 +627,12 @@
     "Received Level": "مستوى المتلقى",
     "Sender Level": "مستوى المرسل",
     "receiver": "المستلم",
+    "Receiver": "المستلم",
     "amount_type": "نوع القيمه",
     "balance_before": "المحفظه من قبل",
     "balance_after": "المحفظه بعد",
     "charger": "الشاحن",
+    "Charger": "الشاحن",
     "when submit this user will lose his monthly diamond?": "عند اضافة هذا المستخدم سيتم مسح الماسات الشهرية لدى المستخدم",
     "diamond": "ماسه",
     "pin": "مثبت",
@@ -3160,7 +3162,7 @@
   "Event Period": "فترة الفعالية",
   "add a daily login gift":"اضافه هدايه تسجيل دخول اليومى",
   "daily login gift": "هدية تسجيل الدخول اليومية",
-  "wapel":"وابل",
+  "Wappel":"وابل",
 "family profile": "ملف العائلة",
 "last login":"اخر نشاط للحالة",
 "active image": "الصورة المفعّلة",
@@ -3201,12 +3203,51 @@
   "Total recharge to recharge agencies":"مجموع الشحن إلى وكلات الشحن" ,
   "Sender UUID or shipping Agency ID": "معرّف المرسل (UUID) أو معرّف وكالة الشحن",
 "receiver UUID or shipping Agency ID": "معرّف المستلم (UUID) أو معرّف وكالة الشحن",
-
+"Balance": "الرصيد",
+  "Received Balance": "الرصيد المستلم",
+  "Sent Balance": "الرصيد المرسل",
+  "total wallet": "إجمالي المحفظة",
+  "export/import": "صادر / وارد",
+  "Sent Transactions":"المعاملات المرسلة",
+  "Received Transactions":"المعاملات المستلمة",
+"sender id": "معرّف المرسل",
+  "receiver id": "معرّف المستلم",
 "remove_admin": "إزالة من المشرفين",
 "kick": "طرد",
 "are_you_sure_remove_member": "هل أنت متأكد من إزالة هذا العضو؟",
-"are_you_sure_remove_admin": "هل أنت متأكد من إزالة هذا المسؤول؟"
-  
+"are_you_sure_remove_admin": "هل أنت متأكد من إزالة هذا المسؤول؟",
+"Dynamic Sender/Receiver Filter": "فلتر المرسل/المستلم الديناميكي",
+"Export to Excel": "تصدير إلى إكسل",
+"receiver type": "نوع المستلم",
+  "sender type": "نوع المرسل",
+  "To Date": "إلى التاريخ",
+  "From Date": "من التاريخ",
+  "Sender UUID or Shipping Agency ID": "معرّف المرسل (UUID) أو معرّف وكالة الشحن",
+  "Receiver UUID or Shipping Agency ID": "معرّف المستلم (UUID) أو معرّف وكالة الشحن",
+  "Kick switch agencies":" طرد",
+  "Make admin switch agencies":" اجعله مسئول",
+  "Remove admin switch agencies":"حذف المسؤول ",
+  "Member switch agencies":"  الاعضاء الوكاله",
+  "Charge history switch agencies":" سجل شحن الوكاله ",
+  "Salary switch agencies":" مرتب الوكاله",
+  "Join switch agencies":" طلب الانضمام للوكاله",
+  "Target switch agencies":" هدف الوكاله",
+  "pack_not_found": "العنصر غير موجود بالحقيبة  ",
+  "input": "إدخال",
+  "from date": "من التاريخ",
+  "to date": "إلى التاريخ",
+  "submit": "إرسال",
+  "search": "بحث",
+  "expiry": "تاريخ الانتهاء",
+"Entering Special Effects": "إدخال المؤثرات الخاصة",
+"Updated successfully": "تم التحديث بنجاح"
+
+
+
+
+
+
+
 
 
 

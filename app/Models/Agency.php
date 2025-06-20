@@ -33,6 +33,11 @@ class Agency extends Model
     {
         return $this->hasMany(Charge::class, 'user_id','id')->where('charger_type','host_agency');
     }
+    public function senderCharges()
+    {
+        return $this->hasMany(Charge::class, 'charger_id','id')->where('charger_type','host_agency');
+    }
+
 
     public function Countries()
     {
@@ -232,12 +237,12 @@ class Agency extends Model
     {
         $month ??= now()->month;
         $year ??= now()->year;
-        $sumTargets = 
+        $sumTargets =
              UserSallary::where('user_agency_id', $this->id)
                 ->where('month', $month)
                 ->where('year', $year)
                 ->sum('target_diamonds');
-        
+
 
         return floor($sumTargets ?? 0);
     }
@@ -283,7 +288,7 @@ class Agency extends Model
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
 
-        return floor($agencySalary ?? 0);
+            return round($agencySalary, 2);
     }
 
     public function getSalary($month = null, $year = null)
@@ -323,7 +328,7 @@ class Agency extends Model
                 $model->phone_code = request('phone_code');
             }
             if (request()->has('charge_agency')) {
-                if (request('charge_agency') === 1) {
+                if (request('charge_agency') == 1) {
                     ChargeAgency::firstOrCreate([
                         'agency_id' => $model->id,
                     ]);

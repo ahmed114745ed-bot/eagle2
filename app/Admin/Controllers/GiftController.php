@@ -264,12 +264,6 @@ class GiftController extends MainController
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
-        if (!$form->isEditing()) {
-            if (Admin::user()->can('add_gift_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('💎');
-                $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
-            }
-        }
 
         $form->file('img', __('img'));
         $form->file('show_img', __('show_img'))->name(function ($file) {

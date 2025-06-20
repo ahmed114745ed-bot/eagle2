@@ -6,6 +6,7 @@ namespace App\Services;
 use Exception;
 use Carbon\Carbon;
 use App\Helpers\Common;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
@@ -147,6 +148,17 @@ class VipService
         // }
         return  $data['target_id'] = $user_vip->id;
     }
+
+    public function usePack($request)
+    {
+        $user = $request->user();
+        $isUsed = (bool)$request->type;
+        return $this->userVipRepository->togglePackUsage($request->pack_id, $user->id, $isUsed);
+
+    }
+
+
+    
 
     public function sendVip($request)
     {

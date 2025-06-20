@@ -52,6 +52,7 @@ return [
     'spechEfeect_description_allow'    => 'you allow to show intro when enter any room',
     'welcome'                          => 'welcome in :app_name',
     'followed_you'                     => ':name followed you',
+    'luckBox'                          => 'Congratulation! , ypu are won from lucky bos :coins coins',
     'like_your_moment'                 => ':name reacted your moment',
     'like_your_real'                   => ':name reacted your real',
     'follow_back'                      => 'Now you are friend with :name',

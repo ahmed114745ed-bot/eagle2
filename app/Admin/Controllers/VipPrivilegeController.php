@@ -67,9 +67,17 @@ class VipPrivilegeController extends MainController
         $grid = new Grid(new VipPrivilege);
 
         $grid->id(__('admin.ID'));
-        $grid->column('name', __('name'));
-        $grid->column('en_name', __('en_name'));
-        $grid->column('title', __('title'));
+//        $grid->column('name', __('name'));
+//        $grid->column('en_name', __('en_name'));
+        $grid->column('name', __('name'))
+            ->display(function () {
+                return \App::isLocale('en') ? $this->en_name : $this->name;
+            });
+//        $grid->column('title', __('title'));
+        $grid->column('title', __('title'))
+            ->display(function () {
+                return \App::isLocale('en') ? $this->en_title : $this->title;
+            });
         $grid->column('type');
         $grid->column('img1', __('img'))->image('', 30);
         $grid->actions(function ($actions) {
@@ -114,19 +122,20 @@ class VipPrivilegeController extends MainController
         $form->text('name', __('name'));
         $form->text('en_name', __('en_name'));
         $form->text('title', __('title'));
+        $form->text('en_title', __('Title en'));
         $form->select('type', __('type'))->options(
             [
                 // 1=>trans ('Gemstone'),=========
                 // 3=>trans ('Card Scroll'),
                 4 => trans('Avatar Frame'),
                 5 => trans('Bubble Frame'),
-                6 => trans('Entering Special Effects'),
+                6 => trans('Vehicle'),
                 // 7=>trans ('Microphone Aperture'),============
                // 8 => trans('Badge'), // ask
                 9 => trans('NoKick'),
                 10 => trans('Icon'),
                 // 11=>trans ('intro animation'),======
-                12 => trans('wapel'),
+                12 => trans('Wappel'),
                 13 => trans('hide country'),
                 14 => trans('vip gifts'),
                 15 => trans('no ban profile'), //ask
@@ -138,11 +147,11 @@ class VipPrivilegeController extends MainController
                 21 => trans('sound effect'),
                 22 => trans('upload GIF image'),
                 28 => trans('profile frame'),
-    
+
             ]
-        );
-        $form->file('img1', __('active image'));
-        $form->file('img2', __('inactive image'));
+        )->rules('required');
+        $form->file('img1', __('active image'))->removable()->rules('required');
+        $form->file('img2', __('inactive image'))->removable()->rules('required');
         //        $form->display(trans('admin.created_at'));
         //        $form->display(trans('admin.updated_at'));
 
