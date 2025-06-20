@@ -11,50 +11,52 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
 {
-    protected $fileName = 'users_list.csv';
+    protected string $fileName = 'users_list.csv';
 
-    public function collection()
+    public function collection(): \Illuminate\Support\Collection
     {
         $month = request('month', now()->month);
         $year = request('year', now()->year);
 
-        $query = User::query()
+        // Step 1: Query users and eager load agency
+        $users = User::query()
+            ->with('agency')
             ->whereNotNull('agency_id')
-            ->where('agency_id', '!=', 0);
+            ->where('agency_id', '!=', 0)
+            ->when(request('agency_id'), fn ($q) => $q->where('agency_id', request('agency_id')))
+            ->get();
 
-        if (request('agency_id')) {
-            $query->where('agency_id', request('agency_id'));
-        }
+        // Step 2: Query salaries in one shot and map by user_id
+        $salaries = UserSallary::query()
+            ->select([
+                'user_id',
+                DB::raw('SUM(sallary) AS target'),
+                DB::raw('SUM(cut_amount) AS expenses'),
+                DB::raw('SUM(achieved_diamond) AS achieved_diamond'),
+                DB::raw('SUM(sallary) - SUM(cut_amount) AS salary'),
+                DB::raw('MAX(days) AS achieved_days'),
+                DB::raw('MAX(hours) AS achieved_hours'),
+                DB::raw('MAX(extras) AS extras'),
+                DB::raw('MAX(user_agency_id) AS user_agency_id'),
+            ])
+            ->where('month', '<=', $month)
+            ->where('year', '<=', $year)
+            ->where('is_paid', 0)
+            ->whereNotNull('user_agency_id')
+            ->groupBy('user_id')
+            ->get()
+            ->keyBy('user_id');
 
-        $users = $query->get();
-        $shippingData = [];
+        $data = [];
 
         foreach ($users as $user) {
-            $target = $user->target($month, $year);
-
-            $salary = UserSallary::where('user_id', $user->id)
-                ->where('month', '<=', $month)
-                ->where('year', '<=', $year)
-                ->where('is_paid', 0)
-                ->whereNotNull('user_agency_id')
-                ->select([
-                    DB::raw('SUM(sallary) AS target'),
-                    DB::raw('SUM(cut_amount) AS expenses'),
-                    DB::raw('SUM(achieved_diamond) AS achieved_diamond'),
-                    DB::raw('SUM(sallary) - SUM(cut_amount) AS salary'),
-                    DB::raw('MAX(days) AS achieved_days'),
-                    DB::raw('MAX(hours) AS achieved_hours'),
-                    DB::raw('MAX(extras) AS extras'),
-                    DB::raw('MAX(user_agency_id) AS user_agency_id'),
-                ])
-                ->groupBy('user_id')
-                ->first();
+            $salary = $salaries[$user->id] ?? null;
 
             $extras = json_decode($salary->extras ?? '{}', true);
             $moment = $extras['moment'] ?? [];
             $reel = $extras['reel'] ?? [];
 
-            $shippingData[] = [
+            $data[] = [
                 'uuid' => $user->uuid,
                 'name' => $user->name,
                 'diamonds' => number_format((int) ($salary->achieved_diamond ?? 0)).' 💎',
@@ -65,14 +67,19 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
                 'salary' => ($salary->target ?? 0).' 💲',
                 'withdrawn' => $salary->expenses ?? 0,
                 'remaining' => $salary->salary ?? 0,
-                'agency' => optional($salary?->agency)->name ?? '-',
+                'agency' => optional($user->agency)->name ?? '-',
                 'agency_id' => $salary->user_agency_id ?? '-',
                 'month' => $month,
                 'year' => $year,
             ];
         }
 
-        return collect($shippingData);
+        // sort this data with diamond
+        usort($data, function ($a, $b) {
+            return (int) str_replace(',', '', $b['diamonds']) <=> (int) str_replace(',', '', $a['diamonds']);
+        });
+
+        return collect($data);
     }
 
     public function headings(): array
@@ -107,9 +114,9 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
     {
         return sprintf(
             "رفع: %s\nإعجاب: %s\nتعليق: %s",
-            $data['upload'] ?? '0/0',
-            $data['likes'] ?? '0/0',
-            $data['comments'] ?? '0/0'
+            number_format((int) ($data['upload'] ?? 0)),
+            number_format((int) ($data['likes'] ?? 0)),
+            number_format((int) ($data['comments'] ?? 0))
         );
     }
 }
