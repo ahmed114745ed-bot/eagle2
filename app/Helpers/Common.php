@@ -1250,6 +1250,25 @@ class Common
         return $ownerPidTarget;
     }
 
+    public static function hasColorInPack($user_id, $type, $use_status = false)
+    {
+        $query = Pack::query()
+            ->with('ware')
+            ->where('user_id', $user_id)
+            ->where('type', $type)
+            ->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+            });
+
+        if ($use_status) {
+            $query->where('is_used', 1);
+        }
+
+        $pack = $query->first();
+
+        return $pack?->ware?->color ?? '';
+    }
+
 
     public static function CurantUsdHistoryOwner($user_id, $month = null, $year = null)
     {
