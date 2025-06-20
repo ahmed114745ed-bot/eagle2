@@ -6,6 +6,7 @@ use Modules\CP\Http\Controllers\web\LevelGiftController;
 use Modules\CP\Http\Controllers\web\CpRelationController;
 use Modules\CP\Http\Controllers\web\WeeklyCpGiftController;
 use Modules\CP\Http\Controllers\web\CpReportRelationController;
+use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
@@ -20,11 +21,10 @@ Route::group(
         ],
         'as' => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('cp-relations', CpRelationController::class);
-        $router->resource ('weekly-cp',WeeklyCpController::class);
-        $router->resource ('cp-reports',CpReportRelationController::class);//'CpReportRelationController');
-
+    function () {
+        Route::resource('cp-relations', CpRelationController::class);
+        Route::resource('weekly-cp', WeeklyCpController::class);
+        Route::resource('cp-reports', CpReportRelationController::class); //'CpReportRelationController');
 
 
         Route::prefix('cp-levels/{relation_id}')->group(function () {
@@ -54,9 +54,5 @@ Route::group(
             Route::put('/{id}', [WeeklyCpGiftController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [WeeklyCpGiftController::class, 'destroy'])->where('id', '[0-9]+');
         });
-
-
-    });
-
-
-
+    }
+);

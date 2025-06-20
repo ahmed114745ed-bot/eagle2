@@ -90,7 +90,7 @@ class SettingsController extends Controller
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token');
+        $data = $request->except('_token', 'super_admin_coins');
 
 
 
@@ -135,7 +135,6 @@ class SettingsController extends Controller
                 }
             }
         }
-
 
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;

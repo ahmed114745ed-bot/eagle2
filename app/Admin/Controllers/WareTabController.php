@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use App\Helpers\Common;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
@@ -68,7 +69,7 @@ class WareTabController extends MainController
             //     $row->column(12, $this->tabsComponentEdit($id, $currentType));
             // })
             ->row(function (Row $row) use ($id) {
-                $row->column(12, $this->form()->edit($id));
+                $row->column(12, $this->form($id)->edit($id));
             }));
     }
 
@@ -89,14 +90,13 @@ class WareTabController extends MainController
     {
         $type = request()->get('type', 4);
         $grid = new Grid(new Ware());
-      //  $types = [6, 4, 5];
+        //  $types = [6, 4, 5];
         $grid->model()->where('type',  $type)->whereNot('get_type', 1);
 
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-             $filter->disableIdFilter();
-
+            $filter->disableIdFilter();
         });
 
         $grid->id(__('ID'));
@@ -219,7 +219,8 @@ class WareTabController extends MainController
         return $content;
     }
 
-    protected function form()
+
+    protected function form($id = null)
     {
         $form = new Form(new Ware());
         $form->display('ID');
@@ -228,29 +229,39 @@ class WareTabController extends MainController
             translate(GET_TYPE_WARE)
         )->default(4);
         if (\Str::contains(request()->fullUrl(), 'edit')) {
-            $wareType = Ware::find(request('id'))->type;
-            $type = request('type', $wareType);
-            $form->hidden('type', __('type'))->value($type)->attribute(['id' => 'type']);
-        } else {
-            $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+
+            $wareType = Ware::find($id)->type;
+
+            $form->hidden('type', __('type'))->value($wareType)->attribute(['id' => 'type']);
+        }
+        else {
+            if (request('type')){
+                $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            }
+        }
+        if (!$form->isEditing()) {
+            if (request('type')){
+                $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            }
         }
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        if (!$form->isEditing()) {
-            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
+        $form->currency('price', __('price'));
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
-        if ($form->isEditing()) {
+        // // if (!$form->isEditing()) {
+        // //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+        // //         $form->currency('price', __('price'));
+        // //         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        // //     }
+        // // }
+        // if ($form->isEditing()) {
 
-            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
+        //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+
+        //     }
+        // }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
         $states = [
@@ -260,31 +271,40 @@ class WareTabController extends MainController
         $form->switch('is_active_for_vip', __("active vip"))->states($states);
         $form->number('exp', __('exp'));
 
+
+        //        $form->image('img1', trans('img'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-        //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        });
-        $form->select('image_type1', __('image_type'))->options(
-            [
-                'svga' => __('svga'),
-                'alpha' => __('alpha'),
-                'mp4' => __('mp4'),
-                'vap' => __('vap'),
-                'png' => __('png'),
+        $form->file('img2', trans('svg'))
+            ->name(function ($file) {
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            });
 
-            ]
-        )->attribute(['id' => 'image_type1'])->required();
 
-        // $form->select('profile_frame_type', __('image_type'))->options(
-        //     [
-        //         'svga' => __('svga'),
-        //         'png' => __('png'),
+        if ($form->isEditing()) {
+            $form->select('image_type1', __('image_type'))->options(
+                [
+                    'svga' => __('svga'),
+                    'alpha' => __('alpha'),
+                    'mp4' => __('mp4'),
+                    'vap' => __('vap'),
+                    'png' => __('png'),
 
-        //     ]
-        // )->attribute(['id' => 'profile_frame']);
+                ]
+            )->attribute(['id' => 'image_type1']);
+
+            // $form->select('profile_frame_type', __('image_type'))->options(
+            //     [
+            //         'svga' => __('svga'),
+            //         'png' => __('png'),
+
+            //     ]
+            // )->attribute(['id' => 'profile_frame']);
+        }
+
+
+
         $form->text('key', trans('key'));
         $script = <<<SCRIPT
              $(document).ready(function() {
@@ -322,6 +342,103 @@ class WareTabController extends MainController
         //        $form->number('sort', 'sort');
         $form->number('num', __('num'));
 
+        if (request('type') == 18) $form->color('color', trans('color'));
+        if (request('type') == 5) {
+            $form->html('<h1>' . __('padding') . '</h1>');
+            $form->decimal('top', __('top'))->default(0);
+            $form->decimal('left', __('left'))->default(0);
+            $form->decimal('right', __('right'))->default(0);
+            $form->decimal('bottom', __('bottom'))->default(0);
+        }
+        if (request('type') != 18) {
+            $form->saving(function (Form $form) {
+
+                if (!$form->show_img && !$form->img2) {
+                    $error = new MessageBag([
+                        'title'   => 'Error',
+                        'message' => 'Please upload at least one image',
+                    ]);
+
+                    return back()->with(compact('error'));
+                }
+
+                if ($form->show_img instanceof UploadedFile) {
+                    $allowedExtensions = [
+                        'svga',
+                        'mp4',
+                        'jpg',
+                        'jpeg',
+                        'png',
+                        'gif',
+                        'bmp',
+                        'tiff',
+                        'svg',
+                        'webp',
+                        'mov',
+                        'avi',
+                        'wmv',
+                        'flv',
+                        'mkv',
+                        'webm',
+                    ];
+
+                    $ext = strtolower($form->show_img->guessExtension());
+
+                    if (!in_array($ext, $allowedExtensions)) {
+                        throw ValidationException::withMessages([
+                            'show_img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+                        ]);
+                    }
+
+                    $form->image_type1 = $ext;
+                }
+
+                if ($form->img2 instanceof UploadedFile) {
+
+                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
+
+                    $ext = strtolower($form->img2->guessExtension());
+                    $originalExt = strtolower($form->img2->getClientOriginalExtension());
+
+                    if ($ext === 'zz' && $originalExt === 'svga') {
+                        $ext = 'svga';
+                    }
+
+                    if ($ext === 'mp4') {
+                        $urlVideo = upload($form->img2);
+
+
+                        $videoPath = getDriverUrl() . '/' . $urlVideo;
+
+                        $wareId = $form->model()->id;
+
+                        (new FfmpegService())->extract($videoPath, $wareId);
+
+                        $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
+
+                        $response = Http::attach(
+                            'image',
+                            Storage::disk('gcs')->get($imagePath),
+                            $wareId . '.jpg'
+                        )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+
+                        $responseData = $response->json();
+
+                        if ($response->successful() && isset($responseData['data']['video_type'])) {
+                            $ext = strtolower($responseData['data']['video_type']);
+                        }
+                    }
+
+                    if (!in_array($ext, $allowedExtensions)) {
+                        throw ValidationException::withMessages([
+                            'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+                        ]);
+                    } else {
+                        $form->profile_frame_type = $ext;
+                    }
+                }
+            });
+        }
         $form->saving(function (Form $form) {
             $imageType1 = $form->input('image_type1');
             // $profileFrameType = $form->input('profile_frame_type');

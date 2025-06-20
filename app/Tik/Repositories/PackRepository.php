@@ -124,7 +124,7 @@ class PackRepository extends AbstractRepository
     public function packsJoinWithWare($userId, $type,array $additionalRelations = []): Collection|array
     {
         return $this->model
-            ->with(array_merge(['ware:id,id,name,show_img,title,color,img2'], $additionalRelations))
+            ->with(array_merge(['ware:id,id,name,show_img,title,color,img2,image_type'], $additionalRelations))
             ->where('user_id', $userId)
             ->where('type', $type)
             ->get();

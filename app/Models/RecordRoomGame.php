@@ -2,50 +2,18 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RecordRoomGame extends Model
 {
-    use HasFactory;
-    protected $fillable=["id","room_id","room_game_id","user_id","type","coins","player_win_id","round_num","current_round"];
+    use HasFactory, TimestampsWithTimezone;
 
-    public function getCreatedAtAttribute($value)
+    protected $fillable = ['id', 'room_id', 'room_game_id', 'user_id', 'type', 'coins', 'player_win_id', 'round_num', 'current_round'];
+
+    public function players()
     {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-    public function players(){
-        return $this->hasMany(RecordRoomGameUser::class,"record_room_game_id");
+        return $this->hasMany(RecordRoomGameUser::class, 'record_room_game_id');
     }
 }

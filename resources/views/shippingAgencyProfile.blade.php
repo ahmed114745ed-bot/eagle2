@@ -845,9 +845,25 @@
     <div class="agency-profile-container">
         <!-- Header Section -->
         <div class="agency-header">
-            <div class="agency-avatar">
-                <img src="{{ getImagePath($agency->display_image) }}" alt="Agency Logo" class="logo-img">
-            </div>
+                    <div class="agency-avatar" style="
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-left: 10px;
+        ">
+            <img src="{{ getImagePath($agency->img) }}" alt="Agency Logo" class="logo-img" style="
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                padding: 5px;
+            ">
+        </div>
             <div class="agency-info">
                 <h1 class="agency-name">{{ @$agency?->name ?? ''}}</h1>
                 <div class="agency-meta">
@@ -861,8 +877,29 @@
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{__("Owner")}}:</span>
-                        <span class="meta-value">{{ @$agency?->owner?->name ?? 'N/A' }}</span>
-                        <span class="meta-uuid">({{ @$agency?->owner?->uuid ?? 'N/A' }})</span>
+                        <div style="
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 50%;
+                            overflow: hidden;
+                            background: #f0f0f0;
+                            border: 2px solid rgba(255,255,255,0.3);
+                        ">
+                            <img src="{{ getImagePath(@$agency?->owner?->profile->avatar) }}" 
+                                alt="Owner" 
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+
+                        <span class="meta-value">
+                            @if($agency?->owner)
+                                <a href="{{ url('admin/users/' . $agency->owner->id) }}">
+                                    {{ $agency->owner->name }}
+                                </a>
+                            @else
+                                N/A
+                            @endif
+                        </span>
+                        <span class="meta-uuid">( UUid:{{ @$agency?->owner?->uuid ?? 'N/A' }})</span>
                     </div>
                 </div>
                 <div class="agency-stats">
@@ -876,9 +913,14 @@
                     </div> -->
                 </div>
             </div>
-            <button class="btn-back" onclick="window.history.back()">
-                {{__("Go Back")}} <i class="fas fa-arrow-left"></i>
+             <a class="btn btn-success btn-back" href="{{ url('download-charge-agency/' . $agency->id) }}">
+            {{ __('Export to Excel') }}
+        </a>
+           <button class="btn-back" onclick="window.location.href='{{ url('admin/charge-agencies') }}'">
+                {{ __('Go Back') }} <i class="fas fa-arrow-left"></i>
             </button>
+
+           
         </div>
 
         <div class="card">
@@ -896,59 +938,213 @@
         </div>
         @endif
 
-                <div style="display: flex; gap: 20px;">
-                    <!-- Stars Section -->
-                    <div class="performers-card" style="flex: 1;">
-                        <div class="section-header">
-                            <h2 class="section-title">
-                                <i class="fas fa-star"></i>
-                                {{ __('Agency Coins') }}
-                            </h2>
-                        </div>
-                        <div class="avatar-grid">
-                            {{ @$agency->coins }}
-                        </div>
-                    </div>
 
-                    <!-- Filter Section -->
-                    <div class="card-target-filter-phone">
-                        <form method="GET" action="{{ url('admin/shipping-agencies/profile/' . $agency->id ) }}" class="filter-form">
-                            <div class="row">
-                                <input type="hidden" name="tab" value="charge">
-                                <div class="col-sm-12 col-md-8">
-                                    <div class="form-group mb-0">
-                                        <select name="filter_by" id="filter_by" class="form-control">
-                                            <option value="">{{ __('Select type') }}</option>
-                                            <option value="user" {{ request('filter_by') == 'user' ? 'selected' : '' }}>{{ __('User') }}</option>
-                                            <option value="agency" {{ request('filter_by') == 'agency' ? 'selected' : '' }}>{{ __('Agency') }}</option>
-                                        </select>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; padding: 15px;">
+                    <!-- Card 1: Balance -->
+                    <div class="performers-card" style="font-family: Arial, sans-serif;">
+                        <div class="card-content" style="
+                            padding: 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            background: linear-gradient(135deg, #3a4f6a 0%, #265329 100%);
+                            border-radius: 12px;
+                            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                            color: white;
+                            position: relative;
+                            overflow: hidden;
+                            min-height: 180px;
+                            height: 100%;
+                        ">
+                            <!-- Decorative elements -->
+                            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                            <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                            
+                            <!-- Left Content -->
+                            <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
+                                <div>
+                                    <div style="color: rgba(255,255,255,0.7); margin-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                                        {{ __('coin shipping agency wallet') }}
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="d-flex">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-filter"></i> {{ __('Apply') }}
-                                        </button>
-                                        @if(request()->has('month') || request()->has('year'))
-                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
-                                                <i class="fas fa-times"></i>
-                                            </a>
-                                        @endif
+                                <div>
+                                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                                        {{ __('Balance') }}
+                                    </div>
+                                    <div style="font-size: 28px; font-weight: bold; letter-spacing: 1px; font-family: 'Courier New', monospace; margin-top: 5px;">
+                                        {{ numToString(@$agency->coins) }}
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                            
+                            <!-- Right Content -->
+                            <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
+                                <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
+                                    {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
+                                </div>
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                    <span style="color: white; font-size: 14px; text-transform: uppercase;">
+                                        {{__('id')}} {{ @$agency->owner->uuid }}
+                                    </span>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                    <span style="color: white; font-size: 14px; text-transform: uppercase;">
+                                        {{ @$agency->owner->name }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Sent Balance -->
+                    {{-- <div class="performers-card" style="font-family: Arial, sans-serif;">
+                        <div class="card-content" style="
+                            padding: 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            background: linear-gradient(135deg, #3a4f6a 0%, #53264d 100%);
+                            border-radius: 12px;
+                            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                            color: white;
+                            position: relative;
+                            overflow: hidden;
+                            min-height: 180px;
+                            height: 100%;
+                        ">
+                            <!-- Decorative elements -->
+                            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                            <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                            
+                            <!-- Left Content -->
+                            <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
+                                <div>
+                                    <div style="color: rgba(255,255,255,0.7); margin-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                                        {{ __('coin shipping agency wallet') }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                                        {{ __('Sent Balance') }}
+                                    </div>
+                                    <div style="font-size: 28px; font-weight: bold; letter-spacing: 1px; font-family: 'Courier New', monospace; margin-top: 5px;">
+                                        {{ numToString(@$totalSend) }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Content -->
+                            <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
+                                <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
+                                    {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
+                                </div>
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <img src="{{ asset('images/dollar.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                    <span style="color: white; font-size: 14px; text-transform: uppercase;">
+                                        {{__('id')}} {{ @$agency->owner->uuid }}
+                                    </span>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                    <span style="color: white; font-size: 14px; text-transform: uppercase;">
+                                        {{ @$agency->owner->name }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Received Balance -->
+                    <div class="performers-card" style="font-family: Arial, sans-serif;">
+                        <div class="card-content" style="
+                            padding: 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            background: linear-gradient(135deg, #3a4f6a 0%, #532626 100%);
+                            border-radius: 12px;
+                            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                            color: white;
+                            position: relative;
+                            overflow: hidden;
+                            min-height: 180px;
+                            height: 100%;
+                        ">
+                            <!-- Decorative elements -->
+                            <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                            <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
+                            
+                            <!-- Left Content -->
+                            <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
+                                <div>
+                                    <div style="color: rgba(255,255,255,0.7); margin-bottom: 5px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                                        {{ __('coin shipping agency wallet') }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                                        {{ __('Received Balance') }}
+                                    </div>
+                                    <div style="font-size: 28px; font-weight: bold; letter-spacing: 1px; font-family: 'Courier New', monospace; margin-top: 5px;">
+                                        {{ numToString(@$totalReceive) }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Content -->
+                            <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
+                                <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
+                                    {{ \App\Helpers\Common::getSettingsValue(app()->getLocale() == 'ar' ? 'app_title_ar' : 'app_title_en') }}
+                                </div>
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <img src="{{ asset('images/dollar.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                    <span style="color: white; font-size: 14px; text-transform: uppercase;">
+                                        {{__('id')}} {{ @$agency->owner->uuid }}
+                                    </span>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                    <span style="color: white; font-size: 14px; text-transform: uppercase;">
+                                        {{ @$agency->owner->name }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div> --}}
+                </div>
+                 <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 15px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; max-width: 800px;">
+                        <!-- Card 1 -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{ __('Sent Balance') }}</div>
+                        
+                        <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$totalSend)}}
+                            <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
+                        </div>
+                        </div>
+                        
+                        <!-- Card 2 -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{__("Received Balance")}}</div>
+                        
+                        <div style="margin-top: 10px; font-size: 16px;">{{ numToString(@$totalReceive) }}
+                            <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
+                        </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
-            </div>
+                               
 @php
     $activeTab = request('tab', 'charges');
 @endphp
 
 <!-- Navigation Tabs -->
 <div class="agency-tabs">
-    <a href="?tab=charges" class="tab-btn {{ ($activeTab == 'charges') ? 'active' : '' }}" data-target="charges-tab">{{ __('Charges') }}</a>
-    <a href="?tab=resived" class="tab-btn {{ ($activeTab == 'resived') ? 'active' : '' }}" data-target="resived-tab">{{ __('receiver') }}</a>
+    <a href="?tab=charges" class="tab-btn {{ ($activeTab == 'charges') ? 'active' : '' }}" data-target="charges-tab">{{ __('Sent Transactions') }}</a>
+    <a href="?tab=resived" class="tab-btn {{ ($activeTab == 'resived') ? 'active' : '' }}" data-target="resived-tab">{{ __('Received Transactions') }}</a>
 </div>
 
 <!-- Loading Indicator -->
@@ -985,23 +1181,19 @@
                     </thead>
                     <tbody>
                         @foreach($charges as $index => $charge)
+                                 @php
+                                    $sender = \App\Helpers\Common::getChargerInfo($charge);
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge);
+                                @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
                                     @if($charge->receiverUser instanceof \App\Models\User)
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($charge->receiverUser->profile?->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                            <img src="{{ getImagePath($receiver['image']) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
                                             <div>
-                                                <strong>{{ $charge->receiverUser?->name }}</strong><br>
-                                                <small>ID: {{ $charge->receiverUser->id }}</small>
-                                            </div>
-                                        </div>
-                                    @elseif($charge->receiverAgency instanceof \App\Models\Agency)
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($charge->receiverAgency?->img) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
-                                            <div>
-                                                <strong>{{ $charge->receiverAgency?->name }}</strong><br>
-                                                <small>ID: {{ $charge->receiverAgency?->id }}</small>
+                                                <strong>{{ $receiver['name'] }}</strong><br>
+                                                <small>ID: {{ $receiver['uuid'] }}</small>
                                             </div>
                                         </div>
                                     @else
@@ -1041,23 +1233,19 @@
                     </thead>
                     <tbody>
                         @foreach($resiveds as $index => $res)
+                                @php
+                                    $sender = \App\Helpers\Common::getChargerInfo($res);
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($res);
+                                @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
-                                    @if($res->sender instanceof \App\Models\User)
+                                    @if($sender)
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($res->sender->profile?->avatar) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                            <img src="{{ getImagePath($sender['image']) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
                                             <div>
-                                                <strong>{{ $res->sender->name }}</strong><br>
-                                                <small>ID: {{ $res->sender->id }}</small>
-                                            </div>
-                                        </div>
-                                    @elseif($res->sender instanceof \App\Models\Agency)
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($res->sender->logo_url) ?? asset('/default-agency.png') }}" alt="agency" width="40" height="40" style="border-radius: 50%;">
-                                            <div>
-                                                <strong>{{ $res->sender->name }}</strong><br>
-                                                <small>ID: {{ $res->sender->id }}</small>
+                                                <strong>{{ $sender['name'] }}</strong><br>
+                                                <small>ID: {{$sender['uuid'] }}</small>
                                             </div>
                                         </div>
                                     @else

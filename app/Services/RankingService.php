@@ -110,6 +110,27 @@ class RankingService
         return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
 
+    public function getRankingV2($class, $type, $user, $limit, $room_uid, $sent_to_owner)
+    {
+        $user->loadMissing('profile', 'medals', 'medals.achievementLevel.achievement', 'UserVip.OVip');
+        if ($class == 4) {
+            $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
+            $this->transformDataV2($data, $class, 'user_id', 'user');
+            return $this->prepareResponseV2($data, $user, $type, 'user_id', $user->id, $class, $limit);
+        } elseif ($class == 6) {
+            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            return $this->prepareResponse2($data, $user, $type, $user->id, $class);
+            return \App\Http\Resources\RankingResource::collection($data);
+        }
+
+        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+
+        $data = $this->rankingRepo->getGiftLogsV2($class, $rel, $type, $limit, $keywords);
+        $this->transformDataV2($data, $class, $keywords, $rel);
+
+        return $this->prepareResponseV2($data, $user, $type, $keywords, $user->id, $class, $limit);
+    }
+
     protected function roomData($ownerRoom)
     {   if(!$ownerRoom) return null;
         $data = [];
@@ -185,7 +206,7 @@ class RankingService
             $v->color_name = $color_name;
 
             $value = $v->exp;
-            $v->exp = numToString(ceil($v->exp));
+            $v->exp = numToString(ceil((float)$v->exp));
             $v->exp_int = ceil($value);
 
             $value2 = $v->exp_diff;
@@ -220,6 +241,88 @@ class RankingService
             return $v == null;
         });
     }
+
+    protected function transformDataV2(&$data, $class, $key, $relation)
+    {
+        $data = $data->reject(function ($q) {
+            return $q->exp == 0;
+        });
+
+        $data = $data->values()->map(function ($item, $key) use ($data) {
+            if ($key === 0) {
+                $item->exp_diff = 0;
+            } else {
+                $item->exp_diff = $data[$key - 1]->exp - $item->exp  + 1;
+            }
+            return $item;
+        });
+
+
+        $data = $data->map(function ($v) use ($key, $class, $relation) {
+            $achievement_images = [];
+            $user = $v->$relation;
+            $user->loadMissing('packs', 'profile', 'medals.achievementLevel.achievement', 'UserVip.OVip');
+
+            if ($user == null) {
+                return null;
+            }
+
+            $hasColor = Common::hasInPackV2($user->packs, 18, true);
+
+            $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') ?? '' : '';
+            if ($user->medals) {
+                foreach ($user->medals as $medal) {
+                    if ($medal->achievementLevel) {
+                        $achievementData = [
+                            'image' => @$medal->achievementLevel->valid_image,
+                            'title' => @$medal->achievementLevel?->achievement?->name ?? '',
+                            'created_at' => @$medal->created_at,
+                        ];
+                        $achievement_images[] = $achievementData;
+                    }
+                }
+            }
+
+            $v->user_id = $user->id;
+            $v->color_name = $color_name;
+
+            $value = $v->exp;
+            $v->exp = numToString(ceil($v->exp));
+            $v->exp_int = ceil($value);
+
+            $value2 = $v->exp_diff;
+            $v->remaining = numToString(ceil($v->exp_diff));
+            $v->remaining_int = ceil($value2);
+
+            $v->name = $class == 3 ? (@$user->ownerRoom?->room_name ?? '') : $user->name;
+            $v->avatar = $class == 3 ? (@$user->ownerRoom?->room_cover ?? '') : $user->profile->avatar;
+            $v->frame = Common::getUserDressV2($user->packs, $user->dress_1, 4, 'img2', true) ?: Common::getUserDressV2($user->packs, $user->dress_1, 4, 'img1', true);
+            $v->frame_id = $user->dress_1;
+            $v->type_user =  intval(@$user->type_user) ?: 0;
+            $v->manger_type =  !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+
+            $v->vip_level = @$user->UserVip->level ?? 0;
+            $v->sender_level = @$user->total_sender_level;
+            $v->reciver_level = @$user->total_received_level;
+
+            $total_received_level_img = Common::getImageTotalReceiverOrSender($user->total_received_level);
+            $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
+
+            $v->vip_level_img = @$user->UserVip?->OVip?->img ?? '';
+            $v->sender_level_img = @$total_received_level_img->img ?? '';
+            $v->reciver_level_img = @$total_sender_level_img->img ?? '';
+
+            $v->country = @$user->country;
+            $v->age = @$user->profile->age ?? 'P';
+            $v->achievement_images = $achievement_images;
+            $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
+            unset($v->$relation);
+            return $v;
+        })->reject(function ($v) {
+            return $v == null;
+        });
+    }
+
 
     protected function prepareResponse2($data, $user)
     {
@@ -364,6 +467,108 @@ class RankingService
     }
 
 
+    protected function prepareResponseV2($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
+    {
+        $data->each(function ($item) use ($user){
+            $hasColor = Common::hasInPackV2($user->packs, 18, true) ?? '';
+            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '' ;
+            $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
+        });
+
+        $achievement_images = [];
+        if ($user->medals) {
+            foreach ($user->medals as $medal) {
+                if ($medal->achievementLevel) {
+                    $achievementData = [
+                        'image' => @$medal->achievementLevel->valid_image,
+                        'title' => @$medal->achievementLevel?->achievement?->name ?? '',
+                        'created_at' => @$medal->created_at,
+                    ];
+                    $achievement_images[] = $achievementData;
+                }
+            }
+        }
+        $kong['user_id']    = 0;
+        $kong['uuid']       = '';
+        $kong['exp']        = '0';
+        $kong['exp_int']        = 0;
+        $kong['remaining']        = '0';
+        $kong['remaining_int']        = 0;
+        $kong['name']       = '';
+        $kong['avatar']     = '';
+        $kong['frame']      = '';
+        $kong['frame_id']   = 0;
+        $kong['sender_img'] = '';
+        $kong['reseverimg'] = '';
+        $kong['vip_level']  =  0;
+        $kong['sender_level'] = 0;
+        $kong['reciver_level'] = 0;
+
+        $kong['vip_level_img'] = '';
+        $kong['sender_level_img'] = '';
+        $kong['reciver_level_img'] = '';
+        $kong['age'] = 0;
+
+        $kong['type_user'] = 0;
+        $kong['manger_type'] = null;
+        $kong['achievement_images'] = [];
+        $kong['color_name'] = '';
+
+
+
+        $data[0] = isset($data[0]) ? $data[0] : $kong;
+        $data[1] = isset($data[1]) ? $data[1] : $kong;
+        $data[2] = isset($data[2]) ? $data[2] : $kong;
+        //        if ($limit == 3) return $data;
+
+
+        $user->sort = $this->getUserSortValue($data, $userId);
+        $user->user_id = $user->id;
+
+        $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id', 'age');
+
+        $sender_img = @$user->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
+        $total_received_level_img = Common::getImageTotalReceiverOrSender($user->total_received_level);
+        $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
+        $vip_level  = Common::ovip_center_rank_v2($arr['user']);
+        $vip_level_img  = Common::ovip_center_rank_img_v2($arr['user']);
+        $hasColor = Common::hasInPackV2($user->packs, 18, true);
+
+        $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') ?? '' : '';
+
+        // $levels =Common::getSenderAndReceiverLevels($user->id);
+        if (gettype($vip_level) != 'integer') {
+            $vip_level = 0;
+        }
+
+        if (is_object($vip_level_img) && get_class($vip_level_img) === 'stdClass') {
+            $vip_level_img = 0;
+        }
+
+        $userData = $data->where($key, $user->id)->first();
+
+        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->exp ?? '0') : (@$userData->exp ?? '0');
+        $arr['user']['sender_img'] = $sender_img;
+        $arr['user']['vip_level']  = $vip_level ?? 0;
+        $arr['user']['sender_level']  = $user->total_sender_level ?? '';
+        $arr['user']['reciver_level']  = $user->total_received_level ?? '';
+        $arr['user']['vip_level_img']  = $vip_level_img == 0 ? "" : $vip_level_img;
+        $arr['user']['sender_level_img']  = $total_sender_level_img->img ?? '';
+        $arr['user']['reciver_level_img']  = $total_received_level_img->img ?? '';
+        $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
+        $arr['user']['country'] =  @$user->country;
+        $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+        $arr['user']['age'] = @$user->profile?->age ?? '';
+        $arr['user']['color_name'] = $color_name ?? '';
+        $arr['user']['achievement_images'] = $achievement_images;
+
+
+        $toArray = $data->toArray();
+        $countData = count($data);
+        $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
+        $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
+        return $arr;
+    }
 
     protected function getClassKeywordsAndRelation($class)
     {

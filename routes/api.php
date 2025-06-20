@@ -102,7 +102,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
     Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
-    Route::post('paypal-cancel', [PayPalService::class, 'cancel'])->name('paypal.cancel');
+    Route::get('paypal-success/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
+    Route::get('paypal-cancel', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
@@ -144,6 +145,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
     Route::post('/stripe-callback', [StripeController::class, 'handleWebhook']);
+    Route::get('/payment/success', [StripeController::class, 'success']);
+    Route::get('/payment/cancel', [StripeController::class, 'cancel']);
+
 
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
@@ -434,6 +438,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //start rankin
             Route::prefix('ranking')->group(function () {
                 Route::post('/', [RankingController::class, 'ranking']);
+                Route::post('/version2', [RankingController::class, 'rankingV2']);
                 Route::post('/room', [UserController::class, 'ranking_room']);
                 Route::get('/top_user_ranking', [RankingController::class, 'topUserRanking']);
                 Route::post('/one-room', [RankingController::class, 'oneRoomRanking']);
@@ -454,6 +459,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
                 Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
+                Route::post('/use-pack', [VipController::class, 'pack_use']);
                 Route::post('/send-to-user', [VipController::class, 'vip_send']);
             });
             Route::get('levels/badges', [VipController::class, 'badges']);

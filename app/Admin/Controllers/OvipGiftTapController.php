@@ -6,22 +6,21 @@ use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Helpers\Common;
-use App\Models\VipPrivilege;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
+use App\Models\VipPrivilege;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
-use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Modules\Public\Http\Services\UserCounterServices;
-use Encore\Admin\Widgets\Box;
 use Modules\Reals\Http\Services\FfmpegService;
+use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Public\Http\Services\UserCounterServices;
 
 
 class OvipGiftTapController extends MainController
@@ -35,16 +34,16 @@ class OvipGiftTapController extends MainController
         $url = url('/admin/ovip'); // Define your button URL
         $back = __('back');
         $buttonHTML = <<<HTML
-    <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
-        <i class="fa fa-arrow-left"></i> {$back}
-    </a>
-    HTML;
-        $ovip = null;
-        if (request('ovip_id')) {
-            $ovip = OVip::find(request('ovip_id'));
-        } elseif (request('level')) {
-            $ovip = OVip::where('level', request('level'));
-        }
+        <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+            <i class="fa fa-arrow-left"></i> {$back}
+        </a>
+        HTML;
+            $ovip = null;
+            if (request('ovip_id')) {
+                $ovip = OVip::find(request('ovip_id'));
+            } elseif (request('level')) {
+                $ovip = OVip::where('level', request('level'));
+            }
 
 
 
@@ -56,7 +55,10 @@ class OvipGiftTapController extends MainController
             })
             ->row(function (Row $row) use ($ovip) {
                 $type = request('type');
-                if (in_array($type, [13, 17, 14, 19, 16, 20, 9])) {
+
+                if (in_array($type, [13, 17, 14, 19, 16, 20, 9, 22, 15])) {
+                    $vipPrivilege = VipPrivilege::where('type', $type)->first();
+                    $image = getImagePath($vipPrivilege->img1);
                     switch ($type) {
                         case 13:
                             $text = __('hide user country');
@@ -65,7 +67,7 @@ class OvipGiftTapController extends MainController
                             $text = __('user ender room anonymous');
                             break;
                         case 14:
-                            $text = __('user can send  vip gift');
+                            $text = __('user can send vip gift');
                             break;
                         case 19:
                             $text = __('hide visitors to client pages');
@@ -79,10 +81,23 @@ class OvipGiftTapController extends MainController
                         case 9:
                             $text = __('user can not kick out from room');
                             break;
+                        case 22:
+                            $text = __('user can upload Gif image');
+                            break;
+                        case 15:
+                            $text = __('can not ban this user');
+                            break;
                         default:
                             $text = null;
                     }
-                    $row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . $text . '</div>');
+                    //$row->column(12, '<div style="text-align: center; font-size: 48px; font-weight: bold;">' . $text . '</div>');
+                    $row->column(12, '
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                                                <img src="' . $image . '" alt="VIP Image" style="max-height: 60px;">
+                                                <div style="font-size: 48px; font-weight: bold;">' . $text . '</div>
+                                            </div>
+                                        ');
+
                 } else {
                     $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
                 }
@@ -121,34 +136,51 @@ class OvipGiftTapController extends MainController
         $grid = new Grid(new Ware);
 
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
+        $count = Ware::where('level', $level)
+            ->where('get_type', 1)
+            ->where('type', $type)
+            ->where('is_active_for_vip', 1)
+            ->count();
+
+
 
         $grid->id(__('ID'));
-        $grid->column('name', __('name'));
+        if ($type == 18 ||  $type == 21) {
+            $grid->column('color', __('Color'))->display(function ($color) {
+                return "<div style='width: 30px; height: 30px; background-color: {$color}; border: 1px solid #ccc; border-radius: 4px;'></div>";
+            });
+        } else {
+            $grid->column('name', __('name'))->display(function ($name) {
 
-        $grid->column('price', __('price'));
+                return app()->getLocale() == 'ar' ? $name : $this->name_en;
+            });
 
-        $grid->column('show_img', __('show_img'))->display(function ($path) {
-            /** @var Ware $this */
-            $defaultImage = asset("images/image.png");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 101, 50);
-        });
-        $grid->column('img2', __('show_img'))->display(function ($path) {
-            /** @var Ware $this */
-            $defaultImage = asset("images/image.png");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 101, 50);
-        });
+            $grid->column('show_img', __('show_img'))->display(function ($path) {
+                /** @var Ware $this */
+                $defaultImage = asset("images/image.png");
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($this->id, $url, 101, 50);
+            });
+            $grid->column('img2', __('show_img'))->display(function ($path) {
+                /** @var Ware $this */
+                $defaultImage = asset("images/image.png");
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($this->id, $url, 101, 50);
+            });
 
 
-        $grid->title(__('title'));
-        $grid->expire(__('expire'));
+            $grid->title(__('title'))->display(function ($name) {
+
+                return app()->getLocale() == 'ar' ? $name : $this->title_en;
+            });;
+        }
+
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*') || Admin::user()->can('edit-' . $this->permission_name)) {
             $permission = $this->permission_name;
             $grid->column('actions', __('Actions'))->display(function () use ($type, $permission) {
@@ -203,21 +235,23 @@ class OvipGiftTapController extends MainController
         $grid->disableExport();
         if ($firstType && (Admin::user()->can('create-' . $this->permission_name) || Admin::user()->can('*'))) {
 
+            if (!$count >= 1) {
+                $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
+                    $level = $level ?? request('level');
+                    $url =    url('admin/ware-gift/' . $level . '/' . $type);
+                    $add = __('add');
 
-            $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
-                $level = $level ?? request('level');
-                $url =    url('admin/ware-gift/' . $level . '/' . $type);
-                $add = __('add');
+                    $customButtonHTML = <<<HTML
 
-                $customButtonHTML = <<<HTML
+                <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
+                        <i class="fa fa-plus"></i> {$add}
+                    </a>
 
-            <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
-                    <i class="fa fa-plus"></i> {$add}
-                </a>
+                HTML;
+                    $tools->append($customButtonHTML);
+                });
+            }
 
-            HTML;
-                $tools->append($customButtonHTML);
-            });
         }
 
         Admin::script("
@@ -250,7 +284,7 @@ class OvipGiftTapController extends MainController
         $form->hidden('enable')->value(1);
         $id = request()->route('ware_gift');
         $ware = Ware::find($id);
-        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
+        if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
 
             $form->display('ID');
             $form->text('name', trans('name'));
@@ -281,18 +315,25 @@ class OvipGiftTapController extends MainController
             )->attribute(['id' => 'image_type1']);
 
             $form->text('key', trans('key'));
+            if (request('type') == 5 || ($form->isEditing() && $ware && ($ware->type == 5))) {
+                $form->html('<h1>' . __('padding') . '</h1>');
+                $form->decimal('top', __('top'))->default(0);
+                $form->decimal('left', __('left'))->default(0);
+                $form->decimal('right', __('right'))->default(0);
+                $form->decimal('bottom', __('bottom'))->default(0);
+            }
         }
 
-        if (request('type') == 18) $form->color('color', trans('color'));
-        if (($form->isEditing() && $ware && ($ware->type == 18))) {
+        if (request('type') == 18 || request('type') == 21) $form->color('color', trans('color'));
+        if (($form->isEditing() && $ware && ($ware->type == 18 || $ware->type == 21))) {
 
-            if ($ware->type == 18)  $form->color('color', trans('color'));
+            if ($ware->type == 18 || $ware->type == 21)  $form->color('color', trans('color'));
         }
-        if ((request('type') && (request('type') != 18 || request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 || $ware->type != 21))) {
+        if ((request('type') && (request('type') != 18 && request('type') != 21)) || ($form->isEditing() && $ware && ($ware->type != 18 && $ware->type != 21))) {
 
             $form->saving(function (Form $form) {
-
-                if ($form->show_img instanceof UploadedFile && $form->img2 instanceof UploadedFile) {
+                //dd($form->isEditing(),$form->model()->show_img,$form->model()->img2,request('show_img'),request('img2'));
+                if (($form->isEditing() && (!($form->model()->show_img) && ! ($form->model()->img2))) && (!request('show_img') && !request('img2'))) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -301,15 +342,8 @@ class OvipGiftTapController extends MainController
                     return back()->with(compact('error'));
                 }
 
-                if ($form->input('show_img_file_del_') === '1' || !$form->input('show_img')) {
-                    $form->model()->show_img = null;
-                }
+                if (($form->model()->show_img != null && $form->model()->show_img instanceof UploadedFile) || request('show_img')) {
 
-                if ($form->input('img2_file_del_') === '1' || !$form->input('img2')) {
-                    $form->model()->img2 = null;
-                }
-
-                if ($form->show_img instanceof UploadedFile) {
                     $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
@@ -323,7 +357,7 @@ class OvipGiftTapController extends MainController
                     $form->image_type1 = $ext;
                 }
 
-                if ($form->img2 instanceof UploadedFile) {
+                if ($form->model()->img2 instanceof UploadedFile || request('img2')) {
 
                     $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
 
@@ -372,20 +406,20 @@ class OvipGiftTapController extends MainController
 
             $id = $form->model()->id;
 
-            $exists = Ware::where('level', $form->level)
+            $exists = Ware::where('level', $form->model()->level)
                 ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
                     $query->where('id', "!=", $id);
                 })->exists();
 
             if ($exists) {
-                $error = new MessageBag([
+                $error = new \Illuminate\Support\MessageBag([
                     'title' => 'Error',
                     'message' => __('This level and type combination already exists'),
                 ]);
 
                 return back()->with(compact('error'));
             }
-            if (request('type') != 18 || request('type') != 21) {
+            if (request('type') != 18 && request('type') != 21) {
                 $imageType1        = $form->input('image_type1')        ?? $form->model()->image_type;
                 $profileFrameType  = $form->input('profile_frame_type') ?? $form->model()->image_type;
 
@@ -404,7 +438,7 @@ class OvipGiftTapController extends MainController
 
         $form->saved(function (Form $form) {
             $level = $form->model()->level;
-            $type = $form->model()->type;
+            $type = $form->model()->type; // Get the saved model's ID
             $ovip = Ovip::where('level', $level)->first();
             $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
             return redirect()->to($url);
@@ -462,13 +496,12 @@ class OvipGiftTapController extends MainController
         // Inject JS to set type param on first load
         if (!request()->has('type') && $privilegeTypes->isNotEmpty()) {
             $firstType = $privilegeTypes->keys()->first();
+
             \Encore\Admin\Admin::script(<<<SCRIPT
-            document.addEventListener("DOMContentLoaded", function () {
                 const url = new URL(window.location.href);
                 url.searchParams.set('type', '$firstType');
                 window.location.href = url.toString(); // Force reload with type
-            });
-        SCRIPT);
+            SCRIPT);
         }
 
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [

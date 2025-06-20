@@ -224,7 +224,7 @@ Route::group(
         Route::post('/delete-user-vip/{id}', [UsersAppController::class, 'deleteUserVip']);
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
-        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
+//        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         Route::resource('free-users', 'FreeUserController');
 
@@ -278,6 +278,7 @@ Route::group(
         Route::post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         Route::post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
+        Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
         Route::resource('targets', 'TargetController');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
@@ -532,10 +533,11 @@ Route::group(
         Route::post('/ware-managements/create', [WareTabController::class, 'store']);
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
-            Route::get('/{id}/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
-            Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
-            Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
+            // Route::get('/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
+            // Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
+            // Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
+         Route::resource('ware-management', WareTabController::class);
 
         Route::resource('user-charges', UsersChargeController::class);
         //         Route::resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);

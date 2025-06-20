@@ -79,6 +79,19 @@ class VipController extends Controller
         return Common::apiResponse(1, 'success', $data, 200);
     }
 
+    public function pack_use(Request $request)
+    {
+        if (!$request->pack_id) {
+            return Common::apiResponse(false, __("api_responses.missing_params"), null, 422);
+        }
+        try {
+            $data = $this->vipService->usePack($request);
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, 'success', $data, 200);
+    }
+    
     public function vip_send(Request $request)
     {
         if (!$request->user_id || !$request->vip_id) {

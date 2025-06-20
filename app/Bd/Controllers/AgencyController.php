@@ -2,7 +2,6 @@
 
 namespace App\Bd\Controllers;
 
-use App\Admin\Controllers\MainController;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use App\Models\User;
@@ -18,14 +17,12 @@ use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
-use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Actions\Response;
-use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use App\Services\AppFeatureService;
 use Illuminate\Support\Facades\Auth;
@@ -33,20 +30,19 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
-use App\Traits\AdminTraits\AdminUserTrait;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Controllers\AdminController;
-
 
 class AgencyController extends Controller
 {
-    use HasResourceActions, AdminUserTrait;
+    use HasResourceActions;
 
     public $permission_name = 'agencies';
+
     public $hiddenColumns = [];
 
     protected $title = 'Agency';
+
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
@@ -58,9 +54,6 @@ class AgencyController extends Controller
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
-
-
-
                 $row->column(12, $this->grid());
             });
     }
@@ -236,25 +229,37 @@ class AgencyController extends Controller
                 ->get();
         });
 
-        $data = compact(
-            'agency', 'members', 'charges', 'salaries',
-            'agencyJoinRequests', 'giftLog', 'memberTargets',
-            'agencyTarget', 'rate', 'stars', 'heroes', 'tab'
-        );
-
-        return $content->title(__('agency profile'))
-            ->view('agency_profile', $data);
+        return $content
+            ->title(__('agency profile'))
+            ->view('agency_profile', compact(
+                'agency',
+                'members',
+                'charges',
+                'salaries',
+                'agencyJoinRequests',
+                'giftLog',
+                'memberTargets',
+                'agencyTarget',
+                'rate',
+                'stars',
+                'heroes',
+                'tab'
+            ));
     }
-
 
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
     {
-        return  GiftLog::where('agency_id', $agencyId)->whereHas($rel)->with($rel)->whereYear('created_at', $year)->whereMonth('created_at', $month)
-            ->selectRaw("sum(giftPrice) as exp, $keywords")
-            ->groupBy($keywords)->orderByRaw("exp desc")
-            ->get()->reject(function ($q) {
-                return $q->exp == 0;
-            });
+        return GiftLog::query()
+            ->whereHas($rel)
+            ->with($rel)
+            ->where('agency_id', $agencyId)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->selectRaw("SUM(giftPrice) as exp, $keywords")
+            ->groupBy($keywords)
+            ->havingRaw("exp > 0")
+            ->orderByRaw("exp DESC")
+            ->get();
     }
 
     public function rateAgency($agencyId, $month, $year)
@@ -303,7 +308,7 @@ class AgencyController extends Controller
 
     public function show($id, Content $content)
     {
-       return parent::show($id, $content
+        return parent::show($id, $content
             ->title(trans(''))
             ->body($this->detail($id)));
     }
@@ -421,10 +426,10 @@ class AgencyController extends Controller
                 </div>
             ";
         });
-       $permission =$this->permission_name;
-         $grid->actions(function ($actions)use($permission) {
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
-            // $actions->disableView(); // Disable the "View" action
+             $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
             if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
 
@@ -437,7 +442,7 @@ class AgencyController extends Controller
         });
         $grid->disableExport();
 
-//        $this->extendGrid($grid);
+        //        $this->extendGrid($grid);
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -537,7 +542,7 @@ class AgencyController extends Controller
         $grid->column('img', trans('img'))->image('', 30);
         $grid->disableActions();
         $grid->disableCreateButton();
-//        $this->extendGrid($grid);
+        //        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -561,7 +566,7 @@ class AgencyController extends Controller
         $show->field('url', __('url'));
         $show->field('img', __('image'))->image('', 200);
         $show->field('contents', __('contents'));
-//        $this->extendShow($show);
+        //        $this->extendShow($show);
         return $show;
     }
 
@@ -573,22 +578,8 @@ class AgencyController extends Controller
     protected function form()
     {
         $form = new Form(new Agency());
-        $ops = [];
-        foreach ($this->getAgencies() as $user) {
-            $ops[$user->id] = $user->name;
-        }
-
-        $opsAgencyManger = [];
-        foreach (User::where('is_manger', 1)->get() as $user) {
-            $opsAgencyManger[$user->id] = $user->uuid . '_' . $user->name;
-        }
-
-        $opsAgencyMangerDash = [];
-        foreach (DB::table('admin_users')->get() as $user) {
-            $opsAgencyMangerDash[$user->id] = $user->name;
-        }
-
         $form->display('ID');
+
         if (!$form->isEditing()) {
             $form->row(function ($row) {
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
@@ -703,7 +694,7 @@ class AgencyController extends Controller
 
         $form->saving(function (Form $form) {
             $form->input('bd_id', Auth::user()->app_id);
-            $form->model()->bd_id =Auth::user()->app_id;
+            $form->model()->bd_id = Auth::user()->app_id;
             $appOwnerId = $form->input('app_owner_id');
             // $Host_agency = $form->input('Host_agency');
 
@@ -782,7 +773,8 @@ class AgencyController extends Controller
             User::where('id', intval($appOwnerId))->update([
                 'type_user' => $newType,
                 'is_host' => 1,
-                'agency_id' => $form->model()->id,]);
+                'agency_id' => $form->model()->id,
+            ]);
             // }
 
 
