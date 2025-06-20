@@ -2,17 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Models\Room;
-use App\Models\User;
-use App\Models\Follow;
 use App\Helpers\Common;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 
 class SendNotificationToAllFollowers implements ShouldQueue
 {
@@ -26,28 +24,55 @@ class SendNotificationToAllFollowers implements ShouldQueue
         //
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
-        $appNameEn = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+        $appNameEn = Cache::rememberForever('app_title_en', fn () => Setting::where('key', 'app_title_en')->value('value') ?? 'Default');
+        $appNameAr = Cache::rememberForever('app_title_ar', fn () => Setting::where('key', 'app_title_ar')->value('value') ?? 'Default');
 
-        $appNameAr = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';
-        $followers = Follow::where('followed_user_id', $this->userId)->with(['follower' => fn($q) => $q->withoutAppends()])->get();
+        // Load user and profile in one query
+        $owner = User::query()
+            ->with(['profile:id,user_id,avatar'])
+            ->select('id', 'name')
+            ->findOrFail($this->userId); // safer than find()
 
-        $users = $followers->pluck('follower');
-        $usersTokenEn = $users->where('lan', '!=', 'ar')->pluck('notification_id');
-        $usersTokenAr = $users->where('lan', 'ar')->pluck('notification_id');
-        $OwnerRoom = User::find($this->userId);
+        // Get followers via relationship
+        $followers = $owner->followerss()
+            ->select('id', 'notification_id', 'lan')
+            ->get();
 
-        $body_ar = __('api.enter_room', ['name' => @$OwnerRoom->name], 'ar');
-        $body_en = __('api.enter_room', ['name' => @$OwnerRoom->name], 'en');
-        $icon = $OwnerRoom->profile->avatar;
-        $data['image'] = getDriverUrl() . '/' . $OwnerRoom->profile->avatar;
-        $data['owner_id'] = $this->userId;
-        $data['name'] = $OwnerRoom->name;
-        Common::send_firebase_notification($usersTokenEn, $appNameEn, $body_en, $icon, $data, messageType: 'enter-room',);
-        Common::send_firebase_notification($usersTokenAr, $appNameAr, $body_ar, $icon, $data, messageType: 'enter-room');
+        $usersTokenEn = $followers->where('lan', '!=', 'ar')->pluck('notification_id')->filter()->values();
+        $usersTokenAr = $followers->where('lan', 'ar')->pluck('notification_id')->filter()->values();
+
+        // Notification content
+        $bodyAr = __('api.enter_room', ['name' => $owner->name], 'ar');
+        $bodyEn = __('api.enter_room', ['name' => $owner->name], 'en');
+        $icon = $owner->profile->avatar;
+
+        $data = [
+            'image' => getDriverUrl().'/'.$icon,
+            'owner_id' => $owner->id,
+            'name' => $owner->name,
+        ];
+
+        // Send notifications in chunks
+        $usersTokenEn->chunk(100)->each(fn ($chunk) => Common::send_firebase_notification(
+            $chunk->all(),
+            $appNameEn,
+            $bodyEn,
+            $icon,
+            $data,
+            messageType: 'enter-room'
+        )
+        );
+
+        $usersTokenAr->chunk(100)->each(fn ($chunk) => Common::send_firebase_notification(
+            $chunk->all(),
+            $appNameAr,
+            $bodyAr,
+            $icon,
+            $data,
+            messageType: 'enter-room'
+        )
+        );
     }
 }
