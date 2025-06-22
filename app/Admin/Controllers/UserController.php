@@ -848,7 +848,7 @@ class UserController extends MainController
             ->paginate(10, ['*'], 'charges_page');
 
 
-        $giftSLog = GiftLog::where('sender_id', $id)->when($giftType == 'receiver', function ($q) use ($id) {
+        $giftSLogs = GiftLog::when($giftType == 'receiver', function ($q) use ($id) {
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
             $q->where('sender_id', $id);
@@ -858,7 +858,17 @@ class UserController extends MainController
                 Carbon::parse($end)->endOfDay()
             ]);
         })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLog',);
+        $diamonds = GiftLog::when($giftType == 'receiver', function ($q) use ($id) {
+            $q->where('receiver_id', $id);
+        })->when($giftType == 'sender', function ($q) use ($id) {
+            $q->where('sender_id', $id);
+        })->when(isset($start) && isset($end), function ($query) use ($start, $end) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($start)->startOfDay(),
+                Carbon::parse($end)->endOfDay()
+            ]);
+        })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType','diamonds');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }

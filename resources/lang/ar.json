@@ -20,6 +20,7 @@
     "action": "عمليات",
     "All Managers": " (DB)جميع المدرين ",
     "male": "ذكر",
+   
     "registered successfully": "تم التسجيل بنجاح",
     "required": "مطلوب",
     "exists": "محجوز",
@@ -272,6 +273,8 @@
     "agent": "الوكيل",
     "image Id": "صورة Id",
     "start": "بدء",
+  "Reset": "إعادة تعيين",
+   
     "to many send": "الكثير من الطلبات",
     "code is sent to your phone": "تم إرسال الرمز إلى هاتفك",
     "logged in successfully": "تم تسجيل الدخول بنجاح",
@@ -3238,9 +3241,17 @@
   "to date": "إلى التاريخ",
   "submit": "إرسال",
   "search": "بحث",
-  "expiry": "تاريخ الانتهاء",
+  "total diamonds received": "إجمالي الألماس المستلم",
+"total diamonds sent": "إجمالي الألماس المرسل",
+    "expiry": "تاريخ الانتهاء",
 "Entering Special Effects": "إدخال المؤثرات الخاصة",
 "Updated successfully": "تم التحديث بنجاح",
+"gift Reports": "تقارير الهدايا",
+"received gift": "الهدايا المستلمة",
+"sent gift": "الهدايا المرسلة",
+"quantity": "الكمية",
+"gift": "الهدية",
+"total price": "السعر الإجمالي",
 "level_num":"رقم المستوي"
 
 
