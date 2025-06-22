@@ -333,7 +333,6 @@ class WareTabController extends MainController
 
 
         $form->text('key', trans('key'));
-        if ($form->isEditing()){
             $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
@@ -356,12 +355,13 @@ class WareTabController extends MainController
              SCRIPT;
             Admin::script($script);
 
+        if ($form->isEditing()){
             if (Session::has('show_alert')) {
                 $form->html('<script>
-             $(document).ready(function () {
-                 alert("الرجاء اختيار نوع  الصوره");
-             });
-         </script>');
+                 $(document).ready(function () {
+                     alert("الرجاء اختيار نوع  الصوره");
+                 });
+             </script>');
             }
         }
 
@@ -426,7 +426,6 @@ class WareTabController extends MainController
                         $wareId = $form->model()->id;
 
                         (new FfmpegService())->extract($videoPath, $wareId);
-                        info('ffmpeg');
 
                         $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
 
@@ -435,13 +434,10 @@ class WareTabController extends MainController
                             Storage::disk('gcs')->get($imagePath),
                             $wareId . '.jpg'
                         )->post('https://utd-test.utdsoftware.com/api/analyze-media');
-                        info('ffmpeg call');
 
                         $responseData = $response->json();
 
-                        info($responseData);
                         if ($response->successful() && isset($responseData['data']['video_type'])) {
-                            info('success');
                             $ext = strtolower($responseData['data']['video_type']);
                         }
                     }
@@ -457,20 +453,25 @@ class WareTabController extends MainController
             });
         }
         $form->saving(function (Form $form) {
-            $imageType1 = $form->input('image_type1');
-            // $profileFrameType = $form->input('profile_frame_type');
-            $profileFrameType = request('image_type1') ?? $form->input('image_type1');
+            $isEditing = $form->isEditing();
+
+            $imageType1 = $isEditing ? $form->input('image_type1') : null;
+            $profileFrameType = $isEditing ? ($form->input('profile_frame_type') ?? request('image_type1')) : null;
+
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
-            if (is_null($imageType1) && is_null($profileFrameType)) {
+            info($imageType1);
+            info($profileFrameType);
 
-                session()->flash('show_alert', 'Your alert message');
+            if ($isEditing && is_null($imageType1) && is_null($profileFrameType)) {
+                info('null');
+                session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
                 return redirect()->back();
             }
 
-
             (new UserCounterServices)->eventUsers('ware');
         });
+
 
         $form->saved(function (Form $form) {
 
