@@ -80,7 +80,7 @@ class CoinService
                 }
                 $strip = new \App\Classes\PaymentGateways\Stripe();
                 $res = $strip->make($data);
-                return Common::apiResponse(1, 'ok', $res, 200);
+                return response()->json($res);
             } elseif ($request->pay_method == 'fawry') {
                 $oldFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
@@ -91,7 +91,7 @@ class CoinService
                     return $paymentUrl;
                 }
 
-                return response()->json($paymentUrl, 200);
+                return response()->json($paymentUrl);
             } else if ($request->pay_method == 'opay') {
                 $opay = new OPayController();
                 return $opay->make($data, $user);
@@ -101,8 +101,7 @@ class CoinService
             } else if ($request->pay_method == 'paypal') {
                 $paypalService = new PayPalService();
                 $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
-                return Common::apiResponse(1, 'ok', $paymentLink, 200);
-
+                return response()->json($paymentLink);
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
