@@ -140,7 +140,6 @@ class GiftController extends MainController
 
         $grid->id(__('ID'));
         $grid->name(__('Name'));
-        $grid->column('vip_level', __('level'));
         $grid->column('vip_level', trans('level'))->display(function () {
             /** @var Gift $this */
             $path = $this?->vip?->img;
