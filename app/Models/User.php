@@ -1532,9 +1532,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(BlackList::class, 'user_id');
     }
-    
+
     public function blockedMe()
     {
         return $this->hasMany(BlackList::class, 'from_uid');
+    }
+
+    public function getProfileFrame() : Ware | null
+    {
+        return $this->packs?->where('type', 28)->where('is_used', 1)->first()?->ware;
     }
 }
