@@ -48,9 +48,9 @@ class SearchRepository implements SearchRepositoryInterface
                     });
             }])->first();
 
-        if (!$user || $user->packs->isNotEmpty()) {
-            return [];
-        }
+        // if (!$user || $user->packs->isNotEmpty()) {
+        //     return [];
+        // }
 
         $rooms = Room::
              join('users', 'rooms.uid', '=', 'users.id')
