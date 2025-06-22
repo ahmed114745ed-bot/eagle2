@@ -52,12 +52,6 @@ class SearchRepository implements SearchRepositoryInterface
             return [];
         }
 
-\Log::info('test',['user' =>$user ]);
-        $keywords = $user->id;
-
-        
-\Log::info('test',['uid' =>$keywords ]);
-
         // $rooms = DB::table('rooms')
         //     ->join('users', 'rooms.uid', '=', 'users.id')
         //     ->where('rooms.uid', 'like', '%' . $keywords . '%')
@@ -81,17 +75,15 @@ class SearchRepository implements SearchRepositoryInterface
         //     ->orderBy('rooms.hot', 'desc')
         //     ->take(2)
         //     ->get();
+        $rooms = Room::with(['owner.medals.achievementLevel.achievement'])
+            ->whereHas('owner', function ($q) {
+                $q->where('status', 1);
+            })
+            ->where('uid', 'like', '%' . $keywords . '%')
+            ->orderBy('hot', 'desc')
+            ->take(2)
+            ->get();
 
-        $rooms = Room::with(['owner.medals.achievementLevel.achievement', 'country'])
-        ->whereHas('owner', function ($q) {
-            $q->where('status', 1);
-        })
-        ->where('uid', 'like', '%' . $keywords . '%')
-        ->orderBy('hot', 'desc')
-        ->take(2)
-        ->get();
-\Log::info('test',['rooms' =>$rooms ]);
-//dd( $rooms);
         return $rooms->toArray();
     }
 
