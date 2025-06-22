@@ -189,7 +189,7 @@ trait RoomTrait
         $microphone = $room->microphone;
         $mainMicrophone = $room->main_microphone;
 
-        $baseMic = $room->getOriginal('microphone');
+        $baseMic = $room->microphone_only_users;
         \Log::info('test owner le room',[$baseMic]);
         $microphone = explode(',', $microphone);
         $mainMicrophone = explode(',', $mainMicrophone);
@@ -209,7 +209,7 @@ trait RoomTrait
         }
 
         $microphone = implode(',', $baseMic);
-        \Log::info('end test owner le room',[$microphone]);
+        \Log::info('end test  le room',[$microphone]);
 
         $result = DB::table('rooms')->where('uid',$uid)->update(['microphone'=>$microphone]);
         $room = Room::query ()->where ('uid',$uid)->first ();
