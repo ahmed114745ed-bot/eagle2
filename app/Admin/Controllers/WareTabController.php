@@ -451,6 +451,7 @@ class WareTabController extends MainController
             $type = $form->model()->type;
 //            $url = url('admin/ware-management') . '?type=' . $type;
 
+            return back();
             return redirect('admin/ware-management?type=' . $type);
 
 //            return redirect()->to($url);
