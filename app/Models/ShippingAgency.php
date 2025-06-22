@@ -30,7 +30,7 @@ class ShippingAgency extends Model
         return $this->hasMany(ChargeAgency::class, 'agency_id');
     }
 
- 
+
     public function charges()
     {
         return $this->hasMany(Charge::class, 'user_id','id')->where('charger_type','agency');
@@ -316,7 +316,7 @@ class ShippingAgency extends Model
         self::saving(function ($model) {
 
             if (request()->has('charge_agency')) {
-                if (request('charge_agency') === 1) {
+                if (request('charge_agency') == 1) {
                     ChargeAgency::firstOrCreate([
                         'agency_id' => $model->id,
                     ]);
@@ -329,7 +329,7 @@ class ShippingAgency extends Model
                 $user = User::find($model->app_owner_id);
 
                 if ($user) {
-                    if (request('appear_charger_agency') === 1) {
+                    if (request('appear_charger_agency') == 1) {
                         $user->update(['appear_charger_agency' => 1]);
                     } else {
                         $user->update(['appear_charger_agency' => 0]);

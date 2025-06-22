@@ -34,10 +34,10 @@ class WareResource extends JsonResource
             'type'       => $this->type,
             'key_json'  => $this->key_json,
             'padding' => $this->when($this->type == 5, [
-                'top'    => $this->top  ?? 0,
-                'left'   => $this->left ?? 0,
-                'right'  => $this->right?? 0,
-                'bottom' => $this->bottom ?? 0,
+                'top'    => $this->top  ?? 20,
+                'left'   => $this->left ?? 15,
+                'right'  => $this->right?? 15,
+                'bottom' => $this->bottom ?? 15,
             ]),
 
         ];

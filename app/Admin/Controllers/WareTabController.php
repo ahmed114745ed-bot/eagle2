@@ -69,7 +69,7 @@ class WareTabController extends MainController
             //     $row->column(12, $this->tabsComponentEdit($id, $currentType));
             // })
             ->row(function (Row $row) use ($id) {
-                $row->column(12, $this->form()->edit($id));
+                $row->column(12, $this->form($id)->edit($id));
             }));
     }
 
@@ -219,7 +219,8 @@ class WareTabController extends MainController
         return $content;
     }
 
-    protected function form()
+
+    protected function form($id = null)
     {
         $form = new Form(new Ware());
         $form->display('ID');
@@ -228,29 +229,39 @@ class WareTabController extends MainController
             translate(GET_TYPE_WARE)
         )->default(4);
         if (\Str::contains(request()->fullUrl(), 'edit')) {
-            $wareType = Ware::find(request('id'))->type;
-            $type = request('type', $wareType);
-            $form->hidden('type', __('type'))->value($type)->attribute(['id' => 'type']);
-        } else {
-            $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+
+            $wareType = Ware::find($id)->type;
+
+            $form->hidden('type', __('type'))->value($wareType)->attribute(['id' => 'type']);
+        }
+        else {
+            if (request('type')){
+                $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            }
+        }
+        if (!$form->isEditing()) {
+            if (request('type')){
+                $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+            }
         }
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        if (!$form->isEditing()) {
-            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
+        $form->currency('price', __('price'));
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
-        if ($form->isEditing()) {
+        // // if (!$form->isEditing()) {
+        // //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+        // //         $form->currency('price', __('price'));
+        // //         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        // //     }
+        // // }
+        // if ($form->isEditing()) {
 
-            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-            }
-        }
+        //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+
+        //     }
+        // }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
         $states = [
@@ -334,42 +345,27 @@ class WareTabController extends MainController
         if (request('type') == 18) $form->color('color', trans('color'));
         if (request('type') == 5) {
             $form->html('<h1>' . __('padding') . '</h1>');
-            $form->decimal('top', __('top'))->default(0);
-            $form->decimal('left', __('left'))->default(0);
-            $form->decimal('right', __('right'))->default(0);
-            $form->decimal('bottom', __('bottom'))->default(0);
+            $form->decimal('top', __('top'))->default(20);
+            $form->decimal('left', __('left'))->default(15);
+            $form->decimal('right', __('right'))->default(15);
+            $form->decimal('bottom', __('bottom'))->default(15);
         }
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
 
-                if (!$form->show_img && !$form->img2) {
-                    $error = new MessageBag([
-                        'title'   => 'Error',
-                        'message' => 'Please upload at least one image',
-                    ]);
+                if (!$form->model()->exists || $form->show_img instanceof UploadedFile || $form->img2 instanceof UploadedFile) {
+                    if (!$form->show_img && !$form->img2) {
+                        $error = new MessageBag([
+                            'title'   => 'Error',
+                            'message' => 'Please upload at least one image',
+                        ]);
 
-                    return back()->with(compact('error'));
+                        return back()->with(compact('error'));
+                    }
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = [
-                        'svga',
-                        'mp4',
-                        'jpg',
-                        'jpeg',
-                        'png',
-                        'gif',
-                        'bmp',
-                        'tiff',
-                        'svg',
-                        'webp',
-                        'mov',
-                        'avi',
-                        'wmv',
-                        'flv',
-                        'mkv',
-                        'webm',
-                    ];
+                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
 
@@ -430,26 +426,36 @@ class WareTabController extends MainController
         }
         $form->saving(function (Form $form) {
             $imageType1 = $form->input('image_type1');
-            // $profileFrameType = $form->input('profile_frame_type');
             $profileFrameType = request('image_type1') ?? $form->input('image_type1');
-            $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
-            if (is_null($imageType1) && is_null($profileFrameType)) {
+            if ($form->isEditing()) {
+                if (!is_null($imageType1) || !is_null($profileFrameType)) {
+                    $form->model()->image_type = $imageType1 ?? $profileFrameType;
+                }
 
-                session()->flash('show_alert', 'Your alert message');
-                return redirect()->back();
+                if (
+                    is_null($imageType1) &&
+                    is_null($profileFrameType) &&
+                    ($form->img2 instanceof UploadedFile || $form->show_img instanceof UploadedFile)
+                ) {
+                    session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
+                    return redirect()->back();
+                }
             }
-
 
             (new UserCounterServices)->eventUsers('ware');
         });
 
-        $form->saved(function (Form $form) {
 
+        $form->saved(function (Form $form) {
             $type = $form->model()->type;
-            $url = url('admin/ware-management') . '?type=' . $type;
-            return redirect()->to($url);
+//            $url = url('admin/ware-management') . '?type=' . $type;
+
+            return redirect('admin/ware-management?type=' . $type);
+
+//            return redirect()->to($url);
         });
+
         return $form;
     }
 

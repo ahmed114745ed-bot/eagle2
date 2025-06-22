@@ -50,7 +50,7 @@ class UserRepository extends Repository
 
     public function searchUserAgency($key, $page, $perPage)
     {
-      
+
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
         ->where(function ($query) {
                 $query->where('agency_id', 0)
@@ -63,14 +63,14 @@ class UserRepository extends Repository
             ->whereDoesntHave('hostAgency', function ($query) {
                 $query->where('type', 1);
             })
-            ->whereDoesntHave('shippingAgency') 
+//            ->whereDoesntHave('shippingAgency')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('uuid', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%')
                     ->orWhere('special_id', 'like', '%' . $key . '%');
             })
-           
+
             ->paginate($perPage, ['*'], 'page', $page);
 
     }
@@ -86,7 +86,7 @@ class UserRepository extends Repository
             ->whereDoesntHave('hostAgency', function ($query) {
                 $query->where('type', 1);
             })
-            ->whereDoesntHave('shippingAgency') 
+            ->whereDoesntHave('shippingAgency')
             ->where(function ($query) use ($key) {
                 $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
@@ -114,8 +114,8 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
 
     }
-    
-    
+
+
     public function searchInAgency($key, $page, $perPage)
     {
         return ShippingAgency::selectRaw('concat(name, " - ", id) as name, id')
@@ -131,9 +131,10 @@ class UserRepository extends Repository
     public function searchUserAgencyShipping($key, $page, $perPage)
     {
         return User::selectRaw('concat(name, " - ", uuid) as name, id')
-            ->whereDoesntHave('shippingAgency', function ($query) {
-                $query->where('type', 2)->where('deleted_at' , null);
-            })
+//            ->whereDoesntHave('shippingAgency', function ($query) {
+//                $query->where('type', 2)->where('deleted_at' , null);
+//            })
+            ->whereDoesntHave('shippingAgency')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('uuid', 'like', '%' . $key . '%')
@@ -181,7 +182,7 @@ class UserRepository extends Repository
             'ownAgency',
             'agencyUserJob' => fn($q) => $q->where('type', 'requestManger'),
             'agencyJoinRequest' => fn($q) => $q->where('status', '!=', 2),
-            'packs',
+            'packs.ware',
             'country',
             'manager'
         ])
