@@ -170,6 +170,10 @@ class GiftController extends MainController
         $grid->column('img', trans('image'))->display(function ($path) {
             /** @var Gift $this */
             $img = getImagePath($path);
+            $defaultImage = asset("images/image.png");
+            if (!isImageExists($img)) {
+                $img = $defaultImage;
+            }
             $musicIcon = '';
 
             if ($this->music_gift == 1) {
