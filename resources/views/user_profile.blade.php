@@ -1585,61 +1585,61 @@
                     </ul>
                 </div>
             </div>
-
-            <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
-                 <input type="hidden" name="tab" value="gift-log">
-                  <input type="hidden" name="gift_type" value={{ $giftType }}>
-                <div class="row">
-                    <!-- From Date -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="from_date" class="col-sm-3 control-label">{{__('From Date')}}</label>
-                            <div class="col-sm-9">
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <input  type="date" class="form-control" id="from_date" name="start_at" placeholder="From Date" value="">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- To Date -->
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="to_date" class="col-sm-3 control-label">{{__('To Date')}}</label>
-                            <div class="col-sm-9">
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-addon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <input type="date" class="form-control" id="to_date" name="end_at" placeholder="To Date" value="">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Buttons -->
-                <div class="box-footer">
+            <div class="card-header">
+                <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
+                    <input type="hidden" name="tab" value="gift-log">
+                    <input type="hidden" name="gift_type" value={{ $giftType }}>
                     <div class="row">
-                        <div class="col-md-12 text-left">
-                            <div class="btn-group">
-                                <button type="submit" class="btn btn-info btn-sm">
-                                    <i class="fa fa-search"></i> {{__('Search')}}
-                                </button>
+                        <!-- From Date -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="from_date" class="col-sm-3 control-label">{{__('From Date')}}</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input  type="date" class="form-control" id="from_date" name="start_at" placeholder="From Date" value="">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="btn-group" style="margin-left: 10px;">
-                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
-                                    <i class="fa fa-undo"></i> {{__('Reset')}}
-                                </a>
+                        </div>
+
+                        <!-- To Date -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="to_date" class="col-sm-3 control-label">{{__('To Date')}}</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="date" class="form-control" id="to_date" name="end_at" placeholder="To Date" value="">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </form>
 
+                    <!-- Buttons -->
+                    <div class="box-footer">
+                        <div class="row">
+                            <div class="col-md-12 text-left">
+                                <div class="btn-group">
+                                    <button type="submit" class="btn btn-info btn-sm">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                </div>
+                                <div class="btn-group" style="margin-left: 10px;">
+                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 15px;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; max-width: 800px;">
                         <!-- Card 1 -->
