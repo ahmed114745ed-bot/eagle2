@@ -51,32 +51,31 @@ class SearchRepository implements SearchRepositoryInterface
         if (!$user || $user->packs->isNotEmpty()) {
             return [];
         }
-        \Log::info('test',['user' =>$user ]);
+
         $rooms = Room::
-            //  join('users', 'rooms.uid', '=', 'users.id')
-            where('rooms.uid', 'like', '%' . $keywords . '%')
-            // ->where('users.status', 1)
+             join('users', 'rooms.uid', '=', 'users.id')
+            ->where('rooms.uid', 'like', '%' . $keywords . '%')
+            ->where('users.status', 1)
             // ->whereNotIn('rooms.uid', $blockedUserIds)
-            // ->select([
-            //     'rooms.*',
-            //     'rooms.id as room_id',
-            //     'rooms.room_name',
-            //     'rooms.uid',
-            //     'rooms.numid',
-            //     'rooms.hot',
-            //     'rooms.room_cover',
-            //     'rooms.room_intro',
-            //     'rooms.room_welcome',
-            //     'rooms.room_pass',
-            //     'users.nickname',
-            //     'users.name',
-            //     'users.uuid'
-            // ])
+            ->select([
+                'rooms.*',
+                'rooms.id as room_id',
+                'rooms.room_name',
+                'rooms.uid',
+                'rooms.numid',
+                'rooms.hot',
+                'rooms.room_cover',
+                'rooms.room_intro',
+                'rooms.room_welcome',
+                'rooms.room_pass',
+                'users.nickname',
+                'users.name',
+                'users.uuid'
+            ])
             ->orderBy('rooms.hot', 'desc')
             ->take(2)
             ->get();
       
-            \Log::info('rooms',['rooms' =>$rooms ]);
 
         return $rooms->toArray();
     }
