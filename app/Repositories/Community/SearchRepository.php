@@ -47,7 +47,7 @@ class SearchRepository implements SearchRepositoryInterface
                     });
             }])->first();
 
-        if (!$user ) {
+        if (!$user || $user->packs->isNotEmpty()) {
             return [];
         }
         
@@ -59,7 +59,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
             ->where('users.status', 1)
-            ->whereNotIn('rooms.uid', $blockedUserIds)
+            // ->whereNotIn('rooms.uid', $blockedUserIds)
             ->select([
                 'rooms.*',
                 'rooms.id as room_id',
