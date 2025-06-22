@@ -17,6 +17,8 @@ class WarePaddingResource extends JsonResource
 
         return [
             'id'        =>  $this->id,
+            'image'     =>  $this->show_img == null ? '' : $this->show_img,
+            'img'       =>  $this->img1 == null ? '' : $this->img1,
             'padding' =>  [
                 'top'    => $this->top == 0 ?  20 : $this->top,
                 'left'   => $this->left == 0 ? 15 : $this->left,
