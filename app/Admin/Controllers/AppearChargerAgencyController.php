@@ -188,7 +188,7 @@ class AppearChargerAgencyController extends MainController
         $grid = new Grid(new ShippingAgency());
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
-        $grid->model()->with('owner.profile');
+        $grid->model()->whereHas('owner')->with('owner.profile');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
