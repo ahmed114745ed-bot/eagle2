@@ -46,13 +46,12 @@ class SearchRepository implements SearchRepositoryInterface
                         ->orWhere('expire', '>=', now()->timestamp);
                     });
             }])->first();
-            \Log::info('Starting RoomResource toArray', [' $user' =>  $user]);
 
-        if (!$user ) {
+        if (!$user || $user->packs->isNotEmpty()) {
             return [];
         }
         
-        \Log::info('Starting RoomResource toArray', [' $user->id' =>  $user->id]);
+
         $keywords = $user->id;
 
 
