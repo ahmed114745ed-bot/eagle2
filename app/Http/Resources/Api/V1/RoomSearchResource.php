@@ -29,7 +29,7 @@ class RoomSearchResource extends JsonResource
                 }
             }
         }
-        $isHideCountry = $this?->owner->getPackWithType(13);
+        $isHideCountry = $room?->owner->getPackWithType(13);
         $country = $room->country
             ? new CountryResource($room->country)
             : [
