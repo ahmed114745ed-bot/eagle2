@@ -6,7 +6,6 @@ use App\Http\Resources\Api\V1\CommunityResource;
 use App\Models\BlackList;
 use App\Models\OfficialMessage;
 use App\Models\Pack;
-use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,9 +50,13 @@ class SearchRepository implements SearchRepositoryInterface
         if (!$user || $user->packs->isNotEmpty()) {
             return [];
         }
-        $keywords= $user->id;
-        $rooms = Room::
-             join('users', 'rooms.uid', '=', 'users.id')
+        
+
+        $keywords = $user->id;
+
+
+        $rooms = DB::table('rooms')
+            ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
             ->where('users.status', 1)
             // ->whereNotIn('rooms.uid', $blockedUserIds)
@@ -75,8 +78,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->orderBy('rooms.hot', 'desc')
             ->take(2)
             ->get();
-      
-
+//dd( $rooms);
         return $rooms->toArray();
     }
 
