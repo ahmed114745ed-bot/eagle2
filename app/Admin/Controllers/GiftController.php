@@ -140,7 +140,6 @@ class GiftController extends MainController
 
         $grid->id(__('ID'));
         $grid->name(__('Name'));
-        $grid->column('vip_level', __('vip_level'));
 
         $grid->column('level', trans('vip'))->display(function () {
 
@@ -152,6 +151,8 @@ class GiftController extends MainController
             }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('vip_level', __('level_num'));
+
         
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
             $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
@@ -188,11 +189,11 @@ class GiftController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column("use_count", __('use count'));
-        $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
+        // $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
         // $grid->vip_level(__('vip_level'));
       //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
-        // $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
+        $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
         //        $grid->column('international_gift',trans ('international_gift'))->switch (Common::getSwitchStatesGiftINtrnahional());
 
 
