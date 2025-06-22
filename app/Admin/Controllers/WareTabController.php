@@ -363,7 +363,24 @@ class WareTabController extends MainController
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
+                    $allowedExtensions = [
+                        'svga',
+                        'mp4',
+                        'jpg',
+                        'jpeg',
+                        'png',
+                        'gif',
+                        'bmp',
+                        'tiff',
+                        'svg',
+                        'webp',
+                        'mov',
+                        'avi',
+                        'wmv',
+                        'flv',
+                        'mkv',
+                        'webm',
+                    ];
 
                     $ext = strtolower($form->show_img->guessExtension());
 
@@ -439,11 +456,11 @@ class WareTabController extends MainController
         });
 
         $form->saved(function (Form $form) {
+
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;
             return redirect()->to($url);
         });
-
         return $form;
     }
 
