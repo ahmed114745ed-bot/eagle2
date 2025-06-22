@@ -333,7 +333,6 @@ class WareTabController extends MainController
 
 
         $form->text('key', trans('key'));
-        if ($form->isEditing()){
             $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
@@ -356,12 +355,13 @@ class WareTabController extends MainController
              SCRIPT;
             Admin::script($script);
 
+        if ($form->isEditing()){
             if (Session::has('show_alert')) {
                 $form->html('<script>
-             $(document).ready(function () {
-                 alert("الرجاء اختيار نوع  الصوره");
-             });
-         </script>');
+                 $(document).ready(function () {
+                     alert("الرجاء اختيار نوع  الصوره");
+                 });
+             </script>');
             }
         }
 
