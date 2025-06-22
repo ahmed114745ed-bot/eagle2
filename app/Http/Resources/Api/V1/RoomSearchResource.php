@@ -42,8 +42,8 @@ class RoomSearchResource extends JsonResource
         $endCountry = !$isHideCountry  ?  $country: (object)[]; 
 
         return [
-            'id' => $this?->id ?? 0,
-            'room_id' => (string) $this?->id ?? '0',
+            'id' => $this->id ?? 0,
+            'room_id' => (string) $this->id ?? '0',
             "room_name" => $this->room_name ?? '',
             "numid" => $this->numid ?? 0,
             "hot" => $this->hot ?? '',
