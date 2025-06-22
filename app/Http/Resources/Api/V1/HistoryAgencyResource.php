@@ -65,8 +65,8 @@ class HistoryAgencyResource extends JsonResource
         return [
             'star' => ReceiverGiftLogResource::collection($giftLog),
             'heroes' => SenderGiftLogResource::collection($heroGiftLog),
-            'salary' => $isOwner ? $salary : 0,
-            'target' => $isOwner ? $target : 0,
+            'salary' => $isOwner ? (string)$salary : '0',
+            'target' => $isOwner ? (string)$target :'0',
             // $this->mergeWhen(request()->is_onwer_agency,
             //     [
             //         'salary' => @$salary ?? 0,
