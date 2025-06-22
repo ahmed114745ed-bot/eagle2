@@ -460,19 +460,37 @@ class WareTabController extends MainController
             });
         }
         $form->saving(function (Form $form) {
-            $isEditing = $form->isEditing();
+            $id = $form->model()->id;
 
-            $imageType1 = $form->input('image_type1');
-            $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
+            $exists = Ware::where('level', $form->model()->level)
+                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
+                    $query->where('id', "!=", $id);
+                })->exists();
 
-            $final = $profileFrameType ?? $imageType1;
+            if ($exists) {
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => __('This level and type combination already exists'),
+                ]);
 
-            if ($isEditing && is_null($final)) {
-                session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
-                return redirect()->back();
+                return back()->with(compact('error'));
             }
 
-            $form->model()->image_type = $final;
+            if (request('type') != 18 && request('type') != 21) {
+                $isEditing = $form->isEditing();
+
+                $imageType1 = $form->input('image_type1');
+                $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
+
+                $final = $profileFrameType ?? $imageType1;
+
+                if ($isEditing && is_null($final)) {
+                    session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
+                    return redirect()->back();
+                }
+
+                $form->model()->image_type = $final;
+            }
         });
 
         $form->saved(function (Form $form) {
