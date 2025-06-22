@@ -54,6 +54,8 @@ class SearchRepository implements SearchRepositoryInterface
 \Log::info('test',['user' =>$user ]);
         $keywords = $user->id;
 
+        
+\Log::info('test',['uid' =>$keywords ]);
 
         $rooms = DB::table('rooms')
             ->join('users', 'rooms.uid', '=', 'users.id')
