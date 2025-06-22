@@ -140,7 +140,9 @@ class GiftController extends MainController
 
         $grid->id(__('ID'));
         $grid->name(__('Name'));
-        $grid->column('vip_level', trans('level'))->display(function () {
+        $grid->column('vip_level', __('vip_level'));
+
+        $grid->column('level', trans('vip'))->display(function () {
 
             $path = $this?->vip?->img;
             $defaultImage = asset("images/image.png");
@@ -190,7 +192,7 @@ class GiftController extends MainController
         // $grid->vip_level(__('vip_level'));
       //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
-        $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
+        // $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
         //        $grid->column('international_gift',trans ('international_gift'))->switch (Common::getSwitchStatesGiftINtrnahional());
 
 
