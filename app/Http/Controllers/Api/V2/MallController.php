@@ -33,12 +33,11 @@ class MallController extends Controller
         return Common::apiResponse(true, '', WareResource::collection($wares), 200);
     }
 
-    public function padding($id)
+    public function padding()
     {
-        $wares = $this->mallService->warePadding($id);
-        if (!$wares) return Common::apiResponse(false, 'not found', null, 422);
+         $wares = $this->mallService->getWares(0, 5);
 
-        return Common::apiResponse(true, '',  new WarePaddingResource($wares), 200);
+        return Common::apiResponse(true, '',   WarePaddingResource::collection($wares), 200);
     }
 
     public function wabbleWare(Request $request)
