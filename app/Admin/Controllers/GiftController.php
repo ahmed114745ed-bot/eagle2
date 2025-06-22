@@ -140,7 +140,9 @@ class GiftController extends MainController
 
         $grid->id(__('ID'));
         $grid->name(__('Name'));
+        $grid->column('vip_level', __('level'));
 
+        
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
             $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         }
