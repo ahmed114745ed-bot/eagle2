@@ -37,7 +37,7 @@ class SearchRepository implements SearchRepositoryInterface
 
         $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
 
-        $user = User::searchByUuid($keywords)
+        $user = User::likeSearchByUuid($keywords)
             ->with(['packs' => function ($q) {
                 $q->where('type', 16)
                     ->where('is_used', 1)
