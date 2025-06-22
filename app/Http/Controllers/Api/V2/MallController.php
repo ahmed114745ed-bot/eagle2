@@ -8,8 +8,9 @@ use Illuminate\Http\Request;
 use App\Tik\Services\MallService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\WareResource;
-use App\Http\Resources\BestWareSaleResource;
 use App\Http\Resources\WareResourceAll;
+use App\Http\Resources\WarePaddingResource;
+use App\Http\Resources\BestWareSaleResource;
 use Modules\Public\Http\Services\UserCounterServices;
 
 
@@ -30,6 +31,14 @@ class MallController extends Controller
         $wares = $this->mallService->getWares($user->id, $request->type);
 
         return Common::apiResponse(true, '', WareResource::collection($wares), 200);
+    }
+
+    public function padding($id)
+    {
+        $wares = $this->mallService->warePadding($id);
+        if (!$wares) return Common::apiResponse(false, 'not found', null, 422);
+
+        return Common::apiResponse(true, '',  new WarePaddingResource($wares), 200);
     }
 
     public function wabbleWare(Request $request)
