@@ -29,6 +29,18 @@ class RoomSearchResource extends JsonResource
                 }
             }
         }
+        $isHideCountry = $this->owner->getPackWithType(13);
+        $country = $room->country
+            ? new CountryResource($room->country)
+            : [
+                'id' => 0,
+                'name' => '',
+                'flag' => '',
+                'lang' => '',
+                'phone_code' => ''
+            ];
+        $endCountry = !$isHideCountry  ?  $country: (object)[]; 
+
         return [
             'id' => $this->id ?? 0,
             'room_id' => (string) $this->id ?? '0',
@@ -55,17 +67,10 @@ class RoomSearchResource extends JsonResource
             "name" => $this->name ?? '',
 
             "nickname" => $this->nickname ?? '',
-            'country' => $room->country
-            ? new CountryResource($room->country)
-            : [
-                'id' => 0,
-                'name' => '',
-                'flag' => '',
-                'lang' => '',
-                'phone_code' => ''
-            ],
+            'country' =>$endCountry ,
             'achievement_images' => $achievement_images,
             'medals'               => @$room->owner?->medals()?->where('is_enable', true)->get() ?? [],
+            'country_hidden'=>$this->owner->getPackWithType(13), 
 
 
         ];
