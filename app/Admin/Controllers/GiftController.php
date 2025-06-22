@@ -140,7 +140,8 @@ class GiftController extends MainController
 
         $grid->id(__('ID'));
         $grid->name(__('Name'));
-        $grid->column('vip_level', trans('level'))->display(function () {
+
+        $grid->column('level', trans('vip'))->display(function () {
 
             $path = $this?->vip?->img;
             $defaultImage = asset("images/image.png");
@@ -150,6 +151,8 @@ class GiftController extends MainController
             }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('vip_level', __('level_num'));
+
         
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
             $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
@@ -167,6 +170,10 @@ class GiftController extends MainController
         $grid->column('img', trans('image'))->display(function ($path) {
             /** @var Gift $this */
             $img = getImagePath($path);
+            $defaultImage = asset("images/image.png");
+            if (!isImageExists($img)) {
+                $img = $defaultImage;
+            }
             $musicIcon = '';
 
             if ($this->music_gift == 1) {
@@ -186,7 +193,7 @@ class GiftController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column("use_count", __('use count'));
-        $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
+        // $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
         // $grid->vip_level(__('vip_level'));
       //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
