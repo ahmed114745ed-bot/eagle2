@@ -447,7 +447,8 @@ class WareTabController extends MainController
                             'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                         ]);
                     } else {
-                        $form->model()->profile_frame_type = $ext;
+                        $form->input('detected_profile_frame_type', $ext);
+                        $form->profile_frame_type = $ext;
                     }
                 }
             });
@@ -455,24 +456,19 @@ class WareTabController extends MainController
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
 
-            $imageType1 = $isEditing ? $form->input('image_type1') : null;
-            $profileFrameType = $isEditing
-                ? ($form->input('profile_frame_type') ?? $form->model()->profile_frame_type)
-                : $form->model()->profile_frame_type;
+            $imageType1 = $form->input('image_type1');
+            $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
 
-            info($imageType1);
-            info($profileFrameType);
-            $form->model()->image_type = $imageType1 ?? $profileFrameType;
-            $test = $imageType1 ?? $profileFrameType;
-            info($test);
+            $final = $imageType1 ?? $profileFrameType;
 
-            if ($isEditing && is_null($imageType1) && is_null($profileFrameType)) {
+            if ($isEditing && is_null($final)) {
                 session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
                 return redirect()->back();
             }
 
-            (new UserCounterServices)->eventUsers('ware');
+            $form->model()->image_type = $final;
         });
+
 
 
         $form->saved(function (Form $form) {
