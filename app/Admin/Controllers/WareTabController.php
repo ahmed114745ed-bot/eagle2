@@ -382,8 +382,10 @@ class WareTabController extends MainController
         }
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
+                $hasShowImg = $form->show_img || $form->model()->show_img;
+                $hasImg2 = $form->img2 || $form->model()->img2;
 
-                if (!$form->show_img && !$form->img2) {
+                if (!$hasShowImg && !$hasImg2) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -408,7 +410,7 @@ class WareTabController extends MainController
 
                 if ($form->img2 instanceof UploadedFile) {
 
-                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'gif'];
+                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
 
                     $ext = strtolower($form->img2->guessExtension());
                     $originalExt = strtolower($form->img2->getClientOriginalExtension());
@@ -473,19 +475,13 @@ class WareTabController extends MainController
             $form->model()->image_type = $final;
         });
 
-
-
         $form->saved(function (Form $form) {
-
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;
             return redirect()->to($url);
         });
         return $form;
     }
-
-
-
 
     private function tabsComponentEdit($id, $currentType)
     {
