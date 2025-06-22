@@ -45,7 +45,7 @@
         <ul class="nav nav-pills nav-stacked">
             <li class="{{ request('name') == 'users' ? 'active' : '' }}" style="{{ request('name') == 'users' || empty(request('name')) ? 'background-color: var(--primary-color);' : '' }}">
                 <a href="?name=users" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('users report') }}
+                    <i class="fa fa-arrow-right text-red"></i> {{ __('Host reports') }}
                 </a>
             </li>
             <li class="{{ request('name') == 'agencies' ? 'active' : '' }}" style="{{ request('name') == 'agencies' ? 'background-color: var(--primary-color);' : '' }}">
