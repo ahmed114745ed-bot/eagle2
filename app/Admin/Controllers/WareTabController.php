@@ -460,7 +460,11 @@ class WareTabController extends MainController
                 ? ($form->input('profile_frame_type') ?? $form->model()->profile_frame_type)
                 : $form->model()->profile_frame_type;
 
+            info($imageType1);
+            info($profileFrameType);
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
+            $test = $imageType1 ?? $profileFrameType;
+            info($test);
 
             if ($isEditing && is_null($imageType1) && is_null($profileFrameType)) {
                 session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
