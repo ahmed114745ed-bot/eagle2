@@ -6,7 +6,6 @@ use App\Http\Resources\Api\V1\CommunityResource;
 use App\Models\BlackList;
 use App\Models\OfficialMessage;
 use App\Models\Pack;
-use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,9 +31,9 @@ class SearchRepository implements SearchRepositoryInterface
     public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|array
     {
         // $user = User::searchByUuid($keywords)->first();
-        $authUser = Auth::user();
-        $blockedByMe = $authUser->blockedUsers()->pluck('from_uid')->toArray();
-        $blockedMe = $authUser->blockedMe()->pluck('user_id')->toArray();
+        $user = Auth::user();
+        $blockedByMe = $user->blockedUsers()->pluck('from_uid')->toArray();
+        $blockedMe = $user->blockedMe()->pluck('user_id')->toArray();
 
         $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
 
@@ -51,12 +50,16 @@ class SearchRepository implements SearchRepositoryInterface
         if (!$user || $user->packs->isNotEmpty()) {
             return [];
         }
-        $keywords= $user->id;
-        $rooms = Room::
-             join('users', 'rooms.uid', '=', 'users.id')
+        
+
+        $keywords = $user->id;
+
+
+        $rooms = DB::table('rooms')
+            ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
             ->where('users.status', 1)
-            // ->whereNotIn('rooms.uid', $blockedUserIds)
+            ->whereNotIn('rooms.uid', $blockedUserIds)
             ->select([
                 'rooms.*',
                 'rooms.id as room_id',
@@ -75,8 +78,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->orderBy('rooms.hot', 'desc')
             ->take(2)
             ->get();
-      
-
+//dd( $rooms);
         return $rooms->toArray();
     }
 
