@@ -219,6 +219,33 @@ class WareTabController extends MainController
         return $content;
     }
 
+    public function update($id)
+    {
+        $request = request();
+
+        $toggleFields = ['enable', 'is_active_for_vip'];
+
+        $editableField = collect($request->except(['_token', '_method', '_edit_inline']))->keys()->first();
+
+        if ($request->ajax() && $request->has('_edit_inline') && in_array($editableField, $toggleFields)) {
+            $field = array_key_first($request->all());
+
+            if (in_array($field, $toggleFields)) {
+                $model = Ware::findOrFail($id);
+                $model->$field = $request->input($field);
+                $model->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => __('Updated successfully')
+                ]);
+            }
+        }
+
+        return parent::update($id);
+    }
+
+
 
     protected function form($id = null)
     {
@@ -306,7 +333,8 @@ class WareTabController extends MainController
 
 
         $form->text('key', trans('key'));
-        $script = <<<SCRIPT
+        if ($form->isEditing()){
+            $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
                      var type = $('#type').val();
@@ -326,15 +354,17 @@ class WareTabController extends MainController
                  });
              });
              SCRIPT;
-        Admin::script($script);
+            Admin::script($script);
 
-        if (Session::has('show_alert')) {
-            $form->html('<script>
+            if (Session::has('show_alert')) {
+                $form->html('<script>
              $(document).ready(function () {
                  alert("الرجاء اختيار نوع  الصوره");
              });
          </script>');
+            }
         }
+
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
@@ -345,23 +375,21 @@ class WareTabController extends MainController
         if (request('type') == 18) $form->color('color', trans('color'));
         if (request('type') == 5) {
             $form->html('<h1>' . __('padding') . '</h1>');
-            $form->decimal('top', __('top'))->default(20);
-            $form->decimal('left', __('left'))->default(15);
-            $form->decimal('right', __('right'))->default(15);
-            $form->decimal('bottom', __('bottom'))->default(15);
+            $form->decimal('top', __('top'))->default(0);
+            $form->decimal('left', __('left'))->default(0);
+            $form->decimal('right', __('right'))->default(0);
+            $form->decimal('bottom', __('bottom'))->default(0);
         }
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
 
-                if (!$form->model()->exists || $form->show_img instanceof UploadedFile || $form->img2 instanceof UploadedFile) {
-                    if (!$form->show_img && !$form->img2) {
-                        $error = new MessageBag([
-                            'title'   => 'Error',
-                            'message' => 'Please upload at least one image',
-                        ]);
+                if (!$form->show_img && !$form->img2) {
+                    $error = new MessageBag([
+                        'title'   => 'Error',
+                        'message' => 'Please upload at least one image',
+                    ]);
 
-                        return back()->with(compact('error'));
-                    }
+                    return back()->with(compact('error'));
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
@@ -426,36 +454,28 @@ class WareTabController extends MainController
         }
         $form->saving(function (Form $form) {
             $imageType1 = $form->input('image_type1');
+            // $profileFrameType = $form->input('profile_frame_type');
             $profileFrameType = request('image_type1') ?? $form->input('image_type1');
+            $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
-            if ($form->isEditing()) {
-                if (!is_null($imageType1) || !is_null($profileFrameType)) {
-                    $form->model()->image_type = $imageType1 ?? $profileFrameType;
-                }
-
-                if (
-                    is_null($imageType1) &&
-                    is_null($profileFrameType) &&
-                    ($form->img2 instanceof UploadedFile || $form->show_img instanceof UploadedFile)
-                ) {
-                    session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
-                    return redirect()->back();
-                }
+            info($imageType1);
+            info($profileFrameType);
+            if (is_null($imageType1) && is_null($profileFrameType)) {
+                info('null');
+                session()->flash('show_alert', 'Your alert message');
+                return redirect()->back();
             }
+
 
             (new UserCounterServices)->eventUsers('ware');
         });
 
-
         $form->saved(function (Form $form) {
+
             $type = $form->model()->type;
-//            $url = url('admin/ware-management') . '?type=' . $type;
-
-            return redirect('admin/ware-management?type=' . $type);
-
-//            return redirect()->to($url);
+            $url = url('admin/ware-management') . '?type=' . $type;
+            return redirect()->to($url);
         });
-
         return $form;
     }
 
