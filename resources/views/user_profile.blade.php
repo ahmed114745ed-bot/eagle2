@@ -1585,7 +1585,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="card-header">
+            
                 <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
                     <input type="hidden" name="tab" value="gift-log">
                     <input type="hidden" name="gift_type" value={{ $giftType }}>
@@ -1639,7 +1639,7 @@
                         </div>
                     </div>
                 </form>
-            </div>
+            
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 15px;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; max-width: 800px;">
                         <!-- Card 1 -->
