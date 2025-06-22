@@ -447,7 +447,7 @@ class WareTabController extends MainController
                             'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                         ]);
                     } else {
-                        $form->profile_frame_type = $ext;
+                        $form->model()->profile_frame_type = $ext;
                     }
                 }
             });
