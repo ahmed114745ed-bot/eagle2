@@ -18,7 +18,8 @@ class RoomSearchResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
-    {
+    {    \Log::info('Starting RoomResource toArray', ['room_id' => $this->id]);
+
         $pks = !is_null(@$this?->room_id) ? $this->getRoomTwoLastPk(@$this?->room_id) : null;
         $room = Room::find(@$this->id);
         $achievement_images = [];
