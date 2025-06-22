@@ -141,13 +141,14 @@ class GiftController extends MainController
         $grid->id(__('ID'));
         $grid->name(__('Name'));
         $grid->column('vip_level', trans('level'))->display(function () {
-            /** @var Gift $this */
-            $path = $this?->vip?->img;
-            $img = getImagePath($path);
 
-            return "<div style='position: relative; display: inline-block;'>
-                        <img src='" . $img . "' style='width: 70px; height: 70px;' class='img img-thumbnail' />
-                    </div>";
+            $path = $this?->vip?->img;
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
