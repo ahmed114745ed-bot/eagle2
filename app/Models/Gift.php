@@ -28,4 +28,8 @@ class Gift extends Model
     {
         return $this->hasOne(LuckyGift::class, 'gift_id');
     }
+    public function vip()
+    {
+        return $this->hasOne(OVip::class,'id','vip_level');
+    }
 }
