@@ -219,6 +219,33 @@ class WareTabController extends MainController
         return $content;
     }
 
+    public function update($id)
+    {
+        $request = request();
+
+        $toggleFields = ['enable', 'is_active_for_vip'];
+
+        $editableField = collect($request->except(['_token', '_method', '_edit_inline']))->keys()->first();
+
+        if ($request->ajax() && $request->has('_edit_inline') && in_array($editableField, $toggleFields)) {
+            $field = array_key_first($request->all());
+
+            if (in_array($field, $toggleFields)) {
+                $model = Ware::findOrFail($id);
+                $model->$field = $request->input($field);
+                $model->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => __('Updated successfully')
+                ]);
+            }
+        }
+
+        return parent::update($id);
+    }
+
+
 
     protected function form($id = null)
     {
@@ -306,7 +333,8 @@ class WareTabController extends MainController
 
 
         $form->text('key', trans('key'));
-        $script = <<<SCRIPT
+        if ($form->isEditing()){
+            $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
                      var type = $('#type').val();
@@ -326,15 +354,17 @@ class WareTabController extends MainController
                  });
              });
              SCRIPT;
-        Admin::script($script);
+            Admin::script($script);
 
-        if (Session::has('show_alert')) {
-            $form->html('<script>
+            if (Session::has('show_alert')) {
+                $form->html('<script>
              $(document).ready(function () {
                  alert("الرجاء اختيار نوع  الصوره");
              });
          </script>');
+            }
         }
+
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
