@@ -47,10 +47,11 @@ class SearchRepository implements SearchRepositoryInterface
                     });
             }])->first();
 
-        if (!$user || $user->packs->isNotEmpty()) {
+        if (!$user ) {
             return [];
         }
 
+\Log::info('test',['user' =>$user ]);
         $keywords = $user->id;
 
 
