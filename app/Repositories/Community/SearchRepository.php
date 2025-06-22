@@ -46,6 +46,7 @@ class SearchRepository implements SearchRepositoryInterface
                         ->orWhere('expire', '>=', now()->timestamp);
                     });
             }])->first();
+            \Log::info('rooms' ,['$user->packs->isNotEmpty()',$user->packs->isNotEmpty()]);
 
         if (!$user || $user->packs->isNotEmpty()) {
             return [];
@@ -53,7 +54,8 @@ class SearchRepository implements SearchRepositoryInterface
         
 
         $keywords = $user->id;
-
+ 
+        \Log::info('rooms' ,['room_uid',$user->id]);
 
         $rooms = DB::table('rooms')
             ->join('users', 'rooms.uid', '=', 'users.id')
