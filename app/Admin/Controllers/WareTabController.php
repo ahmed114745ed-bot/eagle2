@@ -410,7 +410,7 @@ class WareTabController extends MainController
 
                 if ($form->img2 instanceof UploadedFile) {
 
-                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'gif'];
+                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
 
                     $ext = strtolower($form->img2->guessExtension());
                     $originalExt = strtolower($form->img2->getClientOriginalExtension());
