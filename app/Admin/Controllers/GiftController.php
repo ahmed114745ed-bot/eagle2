@@ -169,24 +169,26 @@ class GiftController extends MainController
         });
         $grid->column('img', trans('image'))->display(function ($path) {
             /** @var Gift $this */
-            $img = getImagePath($path);
+            $imgPath = getImagePath($path);
             $defaultImage = asset("images/image.png");
-            if (!isImageExists($img)) {
-                $img = $defaultImage;
+        
+            if (!isImageExists($imgPath)) {
+                $imgPath = $defaultImage;
             }
+        
             $musicIcon = '';
-
             if ($this->music_gift == 1) {
-                $musicIcon = "<img src='" . asset('images/music.jpg') . "'
-                                style='position: absolute; top: 10px; right: 10px; width: 20px; height: 20px;
-                                background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 5px;'>";
+                $musicIcon = "<img src='" . asset('images/music.jpg') . "' 
+                    style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
+                    background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>";
             }
-
+        
             return "<div style='position: relative; display: inline-block;'>
-                        <img src='" . $img . "' style='width: 70px; height: 70px;' class='img img-thumbnail' />
+                        <img src='" . $imgPath . "' style='width: 70px; height: 70px;' class='img img-thumbnail' />
                         $musicIcon
                     </div>";
         });
+        
         $grid->column('show_img', trans('show_img'))->display(function ($path) {
             /** @var Gift $this */
             $url = getImagePath($path);
