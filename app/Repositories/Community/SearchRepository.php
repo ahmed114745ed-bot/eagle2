@@ -51,7 +51,7 @@ class SearchRepository implements SearchRepositoryInterface
         if (!$user || $user->packs->isNotEmpty()) {
             return [];
         }
-
+        \Log::info('test',['user' =>$user ]);
         $rooms = Room::
              join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
@@ -76,6 +76,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->take(2)
             ->get();
       
+            \Log::info('rooms',['rooms' =>$rooms ]);
 
         return $rooms->toArray();
     }
