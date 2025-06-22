@@ -1591,7 +1591,7 @@
                     <input type="hidden" name="gift_type" value={{ $giftType }}>
                     <div class="row">
                         <!-- From Date -->
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label for="from_date" class="col-sm-3 control-label">{{__('From Date')}}</label>
                                 <div class="col-sm-9">
@@ -1606,7 +1606,7 @@
                         </div>
 
                         <!-- To Date -->
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label for="to_date" class="col-sm-3 control-label">{{__('To Date')}}</label>
                                 <div class="col-sm-9">
