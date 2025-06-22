@@ -453,22 +453,25 @@ class WareTabController extends MainController
             });
         }
         $form->saving(function (Form $form) {
-            $imageType1 = $form->input('image_type1');
-            // $profileFrameType = $form->input('profile_frame_type');
-            $profileFrameType = request('image_type1') ?? $form->input('image_type1');
+            $isEditing = $form->isEditing();
+
+            $imageType1 = $isEditing ? $form->input('image_type1') : null;
+            $profileFrameType = $isEditing ? ($form->input('profile_frame_type') ?? request('image_type1')) : null;
+
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
             info($imageType1);
             info($profileFrameType);
-            if (is_null($imageType1) && is_null($profileFrameType)) {
+
+            if ($isEditing && is_null($imageType1) && is_null($profileFrameType)) {
                 info('null');
-                session()->flash('show_alert', 'Your alert message');
+                session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
                 return redirect()->back();
             }
 
-
             (new UserCounterServices)->eventUsers('ware');
         });
+
 
         $form->saved(function (Form $form) {
 
