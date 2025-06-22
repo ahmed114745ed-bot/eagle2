@@ -333,7 +333,6 @@ class WareTabController extends MainController
 
 
         $form->text('key', trans('key'));
-        if ($form->isEditing()){
             $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
@@ -356,12 +355,13 @@ class WareTabController extends MainController
              SCRIPT;
             Admin::script($script);
 
+        if ($form->isEditing()){
             if (Session::has('show_alert')) {
                 $form->html('<script>
-             $(document).ready(function () {
-                 alert("الرجاء اختيار نوع  الصوره");
-             });
-         </script>');
+                 $(document).ready(function () {
+                     alert("الرجاء اختيار نوع  الصوره");
+                 });
+             </script>');
             }
         }
 
@@ -393,24 +393,7 @@ class WareTabController extends MainController
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = [
-                        'svga',
-                        'mp4',
-                        'jpg',
-                        'jpeg',
-                        'png',
-                        'gif',
-                        'bmp',
-                        'tiff',
-                        'svg',
-                        'webp',
-                        'mov',
-                        'avi',
-                        'wmv',
-                        'flv',
-                        'mkv',
-                        'webm',
-                    ];
+                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
 
@@ -475,8 +458,10 @@ class WareTabController extends MainController
             $profileFrameType = request('image_type1') ?? $form->input('image_type1');
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
 
+            info($imageType1);
+            info($profileFrameType);
             if (is_null($imageType1) && is_null($profileFrameType)) {
-
+                info('null');
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();
             }
