@@ -32,9 +32,9 @@ class SearchRepository implements SearchRepositoryInterface
     public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|array
     {
         // $user = User::searchByUuid($keywords)->first();
-        $user = Auth::user();
-        $blockedByMe = $user->blockedUsers()->pluck('from_uid')->toArray();
-        $blockedMe = $user->blockedMe()->pluck('user_id')->toArray();
+        $authUser = Auth::user();
+        $blockedByMe = $authUser->blockedUsers()->pluck('from_uid')->toArray();
+        $blockedMe = $authUser->blockedMe()->pluck('user_id')->toArray();
 
         $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
 
