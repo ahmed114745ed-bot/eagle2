@@ -2,16 +2,17 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Charge;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Agency;
+use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
+use App\Models\GiftLog;
 use App\Models\UserVip;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
@@ -28,6 +29,7 @@ use Encore\Admin\Auth\Permission;
 use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use App\Admin\Selectable\ImageColors;
 use Illuminate\Support\Facades\Cache;
 use App\Admin\Actions\DeletePackAction;
@@ -41,7 +43,6 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
-use Illuminate\Support\Facades\Auth;
 
 
 class UserController extends MainController
@@ -810,6 +811,8 @@ class UserController extends MainController
     {
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
+        $start = request('start_at');
+        $end = request('end_at');
         $tab = request('tab') ?? 'salary';
         $user = User::with('profile')->find($id);
         $type = request('type') ?? 4;
@@ -831,6 +834,7 @@ class UserController extends MainController
         $currentType = request()->get('type', $types->keys()->first());
 
         $chargeTabType = request()->get('type', 'receiver');
+        $giftType = request()->get('gift_type', 'receiver');
 
         $charges = Charge::query()
             ->when($chargeTabType == 'receiver', function ($q) use ($id) {
@@ -844,7 +848,17 @@ class UserController extends MainController
             ->paginate(10, ['*'], 'charges_page');
 
 
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType');
+        $giftSLog = GiftLog::where('sender_id', $id)->when($giftType == 'receiver', function ($q) use ($id) {
+            $q->where('receiver_id', $id);
+        })->when($giftType == 'sender', function ($q) use ($id) {
+            $q->where('sender_id', $id);
+        })->with('receiver', 'sender', 'gift', 'room')->when(isset($start) && isset($end), function ($query) use ($start, $end) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($start)->startOfDay(),
+                Carbon::parse($end)->endOfDay()
+            ]);
+        })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLog',);
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
