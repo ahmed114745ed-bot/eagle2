@@ -447,14 +447,14 @@ class WareTabController extends MainController
         });
 
 
-//        $form->saved(function (Form $form) {
-//            $type = $form->model()->type;
-////            $url = url('admin/ware-management') . '?type=' . $type;
-//
-//            return redirect('admin/ware-management?type=' . $type);
-//
-////            return redirect()->to($url);
-//        });
+        $form->saved(function (Form $form) {
+            $type = $form->model()->type;
+//            $url = url('admin/ware-management') . '?type=' . $type;
+
+            return redirect('admin/ware-management?type=' . $type);
+
+//            return redirect()->to($url);
+        });
 
         return $form;
     }
