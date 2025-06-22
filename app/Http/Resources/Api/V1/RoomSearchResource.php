@@ -20,7 +20,7 @@ class RoomSearchResource extends JsonResource
     public function toArray($request)
     {
         $pks = !is_null(@$this?->room_id) ? $this->getRoomTwoLastPk(@$this?->room_id) : null;
-        $room = Room::find(@$this->id);
+        $room = Room::with('owner')->find(@$this->id);
         $achievement_images = [];
         if (@$room->owner?->medals) {
             foreach (@$room->owner?->medals as $medal) {
@@ -29,9 +29,9 @@ class RoomSearchResource extends JsonResource
                 }
             }
         }
-        $isHideCountry = $this?->owner->getPackWithType(13);
-        $country = $room->country
-            ? new CountryResource($room->country)
+        $isHideCountry = $room?->owner->getPackWithType(13);
+        $country = $room?->country
+            ? new CountryResource($room?->country)
             : [
                 'id' => 0,
                 'name' => '',
