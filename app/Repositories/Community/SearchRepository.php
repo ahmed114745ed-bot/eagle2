@@ -47,7 +47,7 @@ class SearchRepository implements SearchRepositoryInterface
                     });
             }])->first();
 
-        if (!$user ) {
+        if (!$user || $user->packs->isNotEmpty()) {
             return [];
         }
 
@@ -78,6 +78,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->orderBy('rooms.hot', 'desc')
             ->take(2)
             ->get();
+\Log::info('test',['rooms' =>$rooms ]);
 //dd( $rooms);
         return $rooms->toArray();
     }
