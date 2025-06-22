@@ -55,7 +55,7 @@ class SearchRepository implements SearchRepositoryInterface
         $rooms = Room::
              join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
-            ->where('users.status', 1)
+            // ->where('users.status', 1)
             // ->whereNotIn('rooms.uid', $blockedUserIds)
             ->select([
                 'rooms.*',
