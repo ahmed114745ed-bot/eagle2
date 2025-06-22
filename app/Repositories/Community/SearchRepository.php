@@ -47,7 +47,7 @@ class SearchRepository implements SearchRepositoryInterface
                     });
             }])->first();
 
-        if (!$user || $user->packs->isNotEmpty()) {
+        if (!$user ) {
             return [];
         }
         
