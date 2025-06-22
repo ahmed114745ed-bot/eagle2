@@ -393,24 +393,7 @@ class WareTabController extends MainController
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = [
-                        'svga',
-                        'mp4',
-                        'jpg',
-                        'jpeg',
-                        'png',
-                        'gif',
-                        'bmp',
-                        'tiff',
-                        'svg',
-                        'webp',
-                        'mov',
-                        'avi',
-                        'wmv',
-                        'flv',
-                        'mkv',
-                        'webm',
-                    ];
+                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
 
@@ -443,6 +426,7 @@ class WareTabController extends MainController
                         $wareId = $form->model()->id;
 
                         (new FfmpegService())->extract($videoPath, $wareId);
+                        info('ffmpeg');
 
                         $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
 
@@ -451,10 +435,13 @@ class WareTabController extends MainController
                             Storage::disk('gcs')->get($imagePath),
                             $wareId . '.jpg'
                         )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+                        info('ffmpeg call');
 
                         $responseData = $response->json();
 
+                        info($responseData);
                         if ($response->successful() && isset($responseData['data']['video_type'])) {
+                            info('success');
                             $ext = strtolower($responseData['data']['video_type']);
                         }
                     }
