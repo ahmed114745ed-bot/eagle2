@@ -15,11 +15,7 @@ class PaymentMethodController extends Controller
     public function callback(Request $request)
     {
         $callbackData = $request->all();
-        if (isset($callbackData['fawryRefNumber']))
-            $fawryRefNumber = $callbackData['fawryRefNumber'];
-        else
-            $fawryRefNumber = $callbackData['referenceNumber'];
-
+        $fawryRefNumber = $callbackData['fawryRefNumber'] ?? $callbackData['referenceNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
