@@ -115,7 +115,7 @@ class AppServiceProvider extends ServiceProvider
 
                 'services.utd_fawry.utd_fawry_secret' => $settings['fawry_secret'] ?? '',
                 'services.utd_fawry.utd_fawry_merchant_code' => $settings['fawry_merchant_code'] ?? '',
-                'services.utd_fawry.utd_url' => $settings['fawry_utd_url'] ?? '',
+                'services.utd_fawry.utd_url' => $settings['utd_url'] ?? '',
                 'services.utd_fawry.utd_fawry_return_url' => $settings['fawry_return_url'] ?? '',
                 'services.utd_fawry.utd_fawry_url' => $settings['fawry_url'] ?? '',
 

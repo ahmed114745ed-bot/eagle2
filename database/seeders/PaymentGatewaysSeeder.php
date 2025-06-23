@@ -134,12 +134,12 @@ class PaymentGatewaysSeeder extends Seeder
 
             ],
             'new_3' => [
-                "name" => "fawry_utd_url",
+                "name" => "utd_url",
                 "type" => "input",
                 "value" => "Sit dignissimos aliq"
             ],
             'new_5' => [
-                "name" => "_utd_fawry_url",
+                "name" => "utd_fawry_url",
                 "type" => "input",
                 "value" => 'https://www.google.com'
             ],
