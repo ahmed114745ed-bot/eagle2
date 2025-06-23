@@ -94,7 +94,7 @@ class CoinService
                 $oldFawryService = new FawryPaymentService();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
-                $paymentUrl = $oldFawryService->makePayment($log->id, $coin->usd, $exterData);
+                $paymentUrl = $oldFawryService->makePayment($log->trx, $coin->usd, $exterData);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }

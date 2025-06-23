@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Models\CoinLog;
 use App\Models\GameWallet;
+use App\Traits\User\PaymentTrait;
 use Illuminate\Http\Request;
 use App\Models\GameChargeHistory;
 use App\Http\Controllers\Controller;
@@ -12,10 +14,11 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentMethodController extends Controller
 {
+    use PaymentTrait;
     public function callback(Request $request)
     {
         $callbackData = $request->all();
-        $fawryRefNumber = $callbackData['fawryRefNumber'] ?? $callbackData['referenceNumber'];
+        $fawryRefNumber = $callbackData['fawryRefNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
@@ -65,5 +68,30 @@ class PaymentMethodController extends Controller
 
         $trxId = $trx->id;
         return Common::apiResponse(1, 'created successfully', $trxId, 200);
+    }
+
+    public function utdCallback(Request $request)
+    {
+        info($request);
+        $callbackData = $request->all();
+        $fawryRefNumber = $callbackData['referenceNumber'];
+        $merchantRefNumber = $callbackData['merchantRefNumber'];
+        $orderStatus = $callbackData['orderStatus'];
+
+        info($merchantRefNumber);
+        $order = CoinLog::where('trx', $merchantRefNumber)->first();
+        if ($orderStatus === 'PAID') {
+            $order->status = "paid";
+            $this->webhookPayment($order->id);
+        } elseif ($orderStatus === 'CANCELLED') {
+            $order->status = "cancelled";
+        } else {
+            $order->status = "Error";
+        }
+        $order->ref_code = $fawryRefNumber;
+
+        $order->save();
+
+        return true;
     }
 }

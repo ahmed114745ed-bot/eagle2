@@ -674,6 +674,7 @@ class AgencyController extends Controller
                             const nationalNumber = input.value.replace(/\s/g, '');
 
                             const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden'; 
                             hiddenInput.name = 'phone_code';
                             hiddenInput.value = `+${dialCode}`;
                             form.appendChild(hiddenInput);
