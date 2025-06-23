@@ -32,7 +32,6 @@ class TaskCompleteController extends Controller
             $result = $this->taskService->collectTaskPoints($taskId, $userId);
             return $result;
         } catch (\Exception $e) {
-            \Log::error('Error collecting task points: ' . $e->getMessage());
             return Common::apiResponse(false,$e->getMessage(),null,500);
         }
     }
