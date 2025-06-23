@@ -68,6 +68,7 @@ class FawryPaymentService
                     'Content-Type' => 'application/json'
                 ]
             ]);
+            info($response);
             $responseBody = json_decode($response->getBody(), true);
             return $responseBody;
 //        } catch (RequestException $e) {
