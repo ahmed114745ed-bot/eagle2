@@ -1688,7 +1688,7 @@
                               }
                               $name = $userCharges['name'] ?? '-';
                               $uid = $userCharges['uuid'] ?? '-';
-                              $id = $userCharges->id;
+                              $id = $userCharges->id??0;
                               $image = $userCharges->profile->avatar ?? asset('images/businessman-icon.jpg');
                               $userImageDefault = asset('images/businessman-icon.jpg');
                               $image = $image ? getImagePath($image) : $userImageDefault;
