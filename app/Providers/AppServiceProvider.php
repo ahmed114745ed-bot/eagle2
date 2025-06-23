@@ -109,10 +109,15 @@ class AppServiceProvider extends ServiceProvider
 
                 'services.fawry.fawry_secret' => $settings['fawry_secret'] ?? '',
                 'services.fawry.fawry_merchant_code' => $settings['fawry_merchant_code'] ?? '',
-                'services.fawry.utd_url' => $settings['fawry_utd_url'] ?? '',
                 'services.fawry.fawry_return_url' => $settings['fawry_return_url'] ?? '',
                 'services.fawry.fawry_url' => $settings['fawry_url'] ?? '',
                 'services.fawry.fawry_webhook_url' => $settings['fawry_webhook_url'] ?? '',
+
+                'services.utd_fawry.utd_fawry_secret' => $settings['fawry_secret'] ?? '',
+                'services.utd_fawry.utd_fawry_merchant_code' => $settings['fawry_merchant_code'] ?? '',
+                'services.utd_fawry.utd_url' => $settings['fawry_utd_url'] ?? '',
+                'services.utd_fawry.utd_fawry_return_url' => $settings['fawry_return_url'] ?? '',
+                'services.utd_fawry.utd_fawry_url' => $settings['fawry_url'] ?? '',
 
                 'paysky.api_key'     => $settings['paysky_api_key'] ?? '',
                 'paysky.merchant_id' => $settings['paysky_merchant_id'] ?? '',
@@ -150,6 +155,7 @@ class AppServiceProvider extends ServiceProvider
                 'services.zinipay.url' => $settings[''] ?? '',
 
                 'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
+                'is_utdFawry_active' => $settings['is_utdFawry_active'] ?? 0,
                 'is_paysky_active' => $settings['is_paysky_active'] ?? 0,
                 'is_stripe_active' => $settings['is_strip_active'] ?? 0,
                 'is_opay_active' => $settings['is_opay_active'] ?? 0,

@@ -53,14 +53,16 @@ class PaymentGatewaysSeeder extends Seeder
             ->havingRaw('COUNT(*) > 1')
             ->get();
 
-        foreach ($duplicates as $dup) {
-            $settings = Setting::where('key', $dup->key)
+        foreach ($duplicates as $key) {
+            $settings = Setting::where('key', $key['key'])
 //                ->where('item_id', $dup->item_id)
 //                ->where('type', $dup->type)
                 ->orderBy('id')
                 ->get();
 
-            $settings->each->delete();
+            $settings->each(function ($setting) {
+                $setting->delete();
+            });
         }
 
         $fawry_id = PaymentCoin::updateOrCreate([
@@ -83,11 +85,6 @@ class PaymentGatewaysSeeder extends Seeder
                 "value" => "Impedit laborum bla"
 
             ],
-            'new_3' => [
-                "name" => "fawry_utd_url",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
-            ],
             'new_5' => [
                 "name" => "fawry_url",
                 "type" => "input",
@@ -109,6 +106,54 @@ class PaymentGatewaysSeeder extends Seeder
             Setting::updateOrCreate([
                 'key' => $value['name'],
                 'item_id' => $fawry_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],'input_type' => $value['type']
+            ]);
+        }
+
+        //utd fawry
+        $utd_fawry_id = PaymentCoin::updateOrCreate([
+            'title' => 'utdFawry',
+        ], [
+            'photo' => 'images/fawry.jpeg',
+            'status' => 1,
+            'type' => 'utd_fawry',
+        ]);
+        $utd_fawry_fields = [
+            'new_1' => [
+                "name" => "utd_fawry_secret",
+                "type" => "input",
+                "value" => "fiest1"
+
+            ],
+            'new_2' => [
+                "name" => "utd_fawry_merchant_code",
+                "type" => "input",
+                "value" => "Impedit laborum bla"
+
+            ],
+            'new_3' => [
+                "name" => "fawry_utd_url",
+                "type" => "input",
+                "value" => "Sit dignissimos aliq"
+            ],
+            'new_5' => [
+                "name" => "_utd_fawry_url",
+                "type" => "input",
+                "value" => 'https://www.google.com'
+            ],
+            'new_6' => [
+                "name" => "utd_fawry_return_url",
+                "type" => "input",
+                "value" => 'https://www.google.com'
+            ],
+        ];
+
+        foreach ($utd_fawry_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $utd_fawry_id->id,
                 'type' => 'payment'
             ], [
                 'value' => $value['value'],'input_type' => $value['type']
