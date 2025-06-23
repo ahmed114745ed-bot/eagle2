@@ -389,7 +389,7 @@ class AgencyController extends Controller
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+            $showUrl = $this->owner ? secure_url("admin/users/{$this->owner->id}") : 0;
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -610,7 +610,7 @@ class AgencyController extends Controller
                         $ops2[$user->id] = $user->uuid . '_' . $user->name;
                     }
                     return $ops2;
-                })->ajax(url('/api/search/users3'), 'id', 'name')->rules('required');
+                })->ajax(secure_url('/api/search/users3'), 'id', 'name')->rules('required');
 
                 // if (request()->route('form')->isEditing()) {
                 //     $row->hidden('agency_manger_id', __('app manger id'));
