@@ -13,7 +13,7 @@ class VerifyFawrySignature
     {
         $responseData           = $request->all();
         $secureKey              = config("services.fawry.fawry_secret");
-        $fawryRefNumber         = $responseData['fawryRefNumber'] ?? $responseData['referenceNumber'];
+        $fawryRefNumber         = $responseData['fawryRefNumber'];
         $merchantRefNumber      = $responseData['merchantRefNumber'];
         $paymentAmount          = number_format($responseData['paymentAmount'], 2, '.', '');
         $orderAmount            = number_format($responseData['orderAmount'], 2, '.', '');
