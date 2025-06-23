@@ -28,7 +28,7 @@ class Localization
             app()->setLocale($language->code);
         }
 
-   
+
 
         // // Check header request and determine localizaton
         // $local = ($request->hasHeader('X-localization')) ? $request->header('X-localization') : 'en';
