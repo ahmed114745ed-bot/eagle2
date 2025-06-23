@@ -84,7 +84,7 @@ class PaymentMethodController extends Controller
             $order->save();
             return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
         } elseif ($orderStatus === 'UNPAID') {
-            return response()->json(['pending' => true, 'message' => 'Payment is still unpaid.',],202);
+            return response()->json(['status' => 'pending', 'message' => 'Payment is still unpaid.',],202);
         } elseif ($orderStatus === 'CANCELLED') {
             return response()->json(['status' => 'cancelled', 'message' => 'Payment was cancelled.',]);
         }
