@@ -78,20 +78,21 @@ class PaymentMethodController extends Controller
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
-        info($merchantRefNumber);
         $order = CoinLog::where('trx', $merchantRefNumber)->first();
+        info($orderStatus);
         if ($orderStatus === 'PAID') {
-            $order->status = "paid";
             $this->webhookPayment($order->id);
+            $order->pid = $fawryRefNumber;
+            $order->save();
+            return response()->json(['success' => true, 'message' => 'Payment processed successfully',]);
+        } elseif ($orderStatus === 'UNPAID') {
+            return response()->json(['success' => true, 'message' => 'Payment UNPAID',]);
         } elseif ($orderStatus === 'CANCELLED') {
-            $order->status = "cancelled";
-        } else {
-            $order->status = "Error";
+            return response()->json(['success' => true, 'message' => 'Payment cancelled',]);
         }
-        $order->ref_code = $fawryRefNumber;
 
         $order->save();
 
-        return true;
+        return response()->json(['success' => false, 'message' => 'Unknown or failed order status',]);
     }
 }
