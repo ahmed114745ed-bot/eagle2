@@ -53,6 +53,7 @@ class PaymentGatewaysSeeder extends Seeder
             ->havingRaw('COUNT(*) > 1')
             ->get();
 
+        info($duplicates);
         foreach ($duplicates as $key) {
             $settings = Setting::where('key', $key['key'])
 //                ->where('item_id', $dup->item_id)
