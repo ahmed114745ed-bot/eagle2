@@ -52,7 +52,7 @@ return [
     'utd_fawry' => [
         "utd_fawry_secret"          => env('FAWRY_SECRET_KEY',"6ed92079-a485-4373-9453-505e20f6ef48"),
         "utd_fawry_merchant_code"   => env('FAWRY_MERCHANT_CODE','770000019812'),
-        "utd_utd_url"               => env('UTD_URL','http://utd_backend.test/api/fawry-initial'),
+        "utd_url"               => env('UTD_URL','http://utd_backend.test/api/fawry-initial'),
         "utd_fawry_return_url"      => env('FAWRY_RETURN_URL','/admin/payment-with-method'),
         "utd_fawry_url"        => env('FAWRY_URL','https://atfawry.fawrystaging.com/fawrypay-api/api/payments/init'),
     ],
