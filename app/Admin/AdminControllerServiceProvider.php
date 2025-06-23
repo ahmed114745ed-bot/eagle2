@@ -9,6 +9,8 @@ class AdminControllerServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        \URL::forceScheme('https');
+
         if (!$this->app->routesAreCached()) {
             $this->mapBdRoutes();
         }
