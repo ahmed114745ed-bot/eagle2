@@ -52,7 +52,7 @@ Route::group(
             'admin.auth',
             'admin.pjax',
             'admin.log',
-            // 'admin.bootstrap',
+            'admin.bootstrap',
             // 'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
