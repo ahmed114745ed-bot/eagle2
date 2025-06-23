@@ -1589,6 +1589,7 @@
                 <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
                     <input type="hidden" name="tab" value="gift-log">
                     <input type="hidden" name="gift_type" value={{ $giftType }}>
+                    <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
                     <div class="row">
                         <!-- From Date -->
                         <div class="col-md-3">
@@ -1599,7 +1600,7 @@
                                         <div class="input-group-addon">
                                             <i class="fa fa-calendar"></i>
                                         </div>
-                                        <input  type="date" class="form-control" id="from_date" name="start_at" placeholder="From Date" value="">
+                                        <input  type="date" class="form-control" id="from_date" name="start_at" placeholder="From Date" value="{{ request('start_at') }}">
                                     </div>
                                 </div>
                             </div>
@@ -1614,7 +1615,7 @@
                                         <div class="input-group-addon">
                                             <i class="fa fa-calendar"></i>
                                         </div>
-                                        <input type="date" class="form-control" id="to_date" name="end_at" placeholder="To Date" value="">
+                                        <input type="date" class="form-control" id="to_date" name="end_at" placeholder="To Date" value="{{ request('end_at') }}">
                                     </div>
                                 </div>
                             </div>
@@ -1664,13 +1665,7 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>
-                            @if($giftType == 'receiver')
-                                {{ __('sender') }}
-                            @else
-                                {{ __('Receiver') }}
-                            @endif
-                        </th>
+                        <th>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}</th>
                         <th>{{ __('room') }}</th>
                         <th>{{ __('gift') }}</th>
                         <th>{{ __('quantity') }}</th>
@@ -1683,36 +1678,30 @@
                             @php
                                 // Set default images first
                                 $userImageDefault = asset('images/businessman-icon.jpg');
-                                $defaultImage = asset("images/room.jpg");
+                                $defaultImage = asset("images/background_room.jpg");
 
-                                // Determine user (sender or receiver)
-                                if($giftType == 'receiver') {
-                                    $userCharges = $giftSLog->sender;
-                                } elseif($giftType == 'sender') {
-                                    $userCharges = $giftSLog->receiver;
-                                }
-
-                                $name = $userCharges['name'] ?? '-';
-                                $uid = $userCharges['uuid'] ?? '-';
-                                $id = $userCharges->id ?? 0;
+                               $userCharges = $giftType === 'receiver' ? $giftSLog->sender : $giftSLog->receiver;
+                                $name = @$userCharges->name ?? '';
+                                $uid = @$userCharges->uuid ?? '';
+                                $id = @$userCharges->id ?? 0;
 
                                 // Set user image
-                                $image = $userCharges->profile->avatar ?? null;
-                                $image = $image ? getImagePath($image) : $userImageDefault;
-                                if (!isImageExists($image)) {
-                                    $image = $userImageDefault;
+                                $avatar = @$giftSLog->sender->profile->avatar ;
+                                $image = getImagePath($avatar) ?? $userImageDefault;
+                                if (!isImageExists( $image)) {
+                                     $image = $userImageDefault;
                                 }
-
+                               
                                 // Set room image and name
-                                $roomName = $giftSLog->room->room_name ?? '-';
-                                $path = $giftSLog->room->room_cover ?? '';
-                                $url = $path ? getImagePath($path) : $defaultImage;
+                                $roomName = @$giftSLog->room->room_name ?? '-';
+                                $path = @$giftSLog->room->room_cover ;
+                                $url =  getImagePath($path) ?? $defaultImage;
                                 if (!isImageExists($url)) {
                                     $url = $defaultImage;
                                 }
 
                                 // Gift name based on locale
-                                $giftName = app()->getLocale() == 'ar' ? ($giftSLog->gift->name ?? '') : ($giftSLog->gift->e_name ?? '');
+                                $giftName = app()->getLocale() == 'ar' ? (@$giftSLog->gift->name ?? '') : (@$giftSLog->gift->e_name ?? '');
 
                             @endphp
 
@@ -1721,7 +1710,7 @@
                             <td>
                                <a href="{{ url('admin/users/' . $id) }}" target="_blank"
                                 style="display: inline-flex; align-items: center; text-decoration: none;">
-                                    <img src="{{ getImagePath($image) }}" width="40" height="40"
+                                    <img src="{{ $image }}" width="40" height="40"
                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <div style="display: flex; flex-direction: column;">
                                         <strong style="font-size: 14px;">{{ $name }}</strong>
@@ -1732,7 +1721,7 @@
                             <td>
                                     <a href="#" target="_blank"
                                     style="display: inline-flex; align-items: center; text-decoration: none;">
-                                        <img src="{{ getImagePath($url) }}"
+                                        <img src="{{ $url }}"
                                             width="30" height="30"
                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                             
@@ -1763,10 +1752,10 @@
                 <div class="pagination-container mt-3">
                     {{ $giftSLogs->appends([
                         'tab' => 'gift-log',
-                        'gift_page' => $giftSLogs?->currentPage(),
-                        'pack_page' => $packs?->currentPage(),
-                        'vip_page' => $userVips?->currentPage(),
-                        'salary_page' => $salaries?->currentPage(),
+                        'gift_type' => $giftType,
+                        'start_at' => request('start_at'),
+                        'end_at' => request('end_at'),
+                        'gift_page' => $giftSLogs->currentPage()
                     ])->links('vendor.pagination.bootstrap-4') }}
                 </div>
             @endif
