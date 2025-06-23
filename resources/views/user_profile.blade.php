@@ -1701,7 +1701,7 @@
                                 }
 
                                 // Gift name based on locale
-                                $giftName = app()->getLocale() == 'ar' ? ($giftSLog->gift->name ?? '') : ($giftSLog->gift->e_name ?? '');
+                                $giftName = app()->getLocale() == 'ar' ? (@$giftSLog->gift->name ?? '') : (@$giftSLog->gift->e_name ?? '');
 
                             @endphp
 
