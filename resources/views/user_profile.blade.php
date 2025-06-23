@@ -1679,36 +1679,44 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($giftSLogs as $index => $giftSLog)
-                        @php
-                            if($giftType == 'receiver') {
-                                $userCharges = $giftSLog->sender;
-                              } elseif($giftType == 'sender') {
-                                $userCharges = $giftSLog->receiver;
-                              }
-                              $name = $userCharges['name'] ?? '-';
-                              $uid = $userCharges['uuid'] ?? '-';
-                              $id = $userCharges->id??0;
-                              $image = $userCharges->profile->avatar ?? asset('images/businessman-icon.jpg');
-                              $userImageDefault = asset('images/businessman-icon.jpg');
-                              $image = $image ? getImagePath($image) : $userImageDefault;
+                   @foreach($giftSLogs as $index => $giftSLog)
+                            @php
+                                // Set default images first
+                                $userImageDefault = asset('images/businessman-icon.jpg');
+                                $defaultImage = asset("images/room.jpg");
 
-                                if (!isImageExists($image)) {
-                                    $image = $defaultImage;
+                                // Determine user (sender or receiver)
+                                if($giftType == 'receiver') {
+                                    $userCharges = $giftSLog->sender;
+                                } elseif($giftType == 'sender') {
+                                    $userCharges = $giftSLog->receiver;
                                 }
 
-                              $roomName = $giftSLog->room->room_name ?? '-';
-                                $path = $giftSLog->room->room_cover ?? '';
-                                $defaultImage = asset("images/room.jpg");
-                                $url = $path ? getImagePath($path) : $defaultImage;
+                                $name = $userCharges['name'] ?? '-';
+                                $uid = $userCharges['uuid'] ?? '-';
+                                $id = $userCharges->id ?? 0;
 
+                                // Set user image
+                                $image = $userCharges->profile->avatar ?? null;
+                                $image = $image ? getImagePath($image) : $userImageDefault;
+                                if (!isImageExists($image)) {
+                                    $image = $userImageDefault;
+                                }
+
+                                // Set room image and name
+                                $roomName = $giftSLog->room->room_name ?? '-';
+                                $path = $giftSLog->room->room_cover ?? '';
+                                $url = $path ? getImagePath($path) : $defaultImage;
                                 if (!isImageExists($url)) {
                                     $url = $defaultImage;
                                 }
-                                $giftName = app()->getLocale() == 'ar' ? @$giftSLog->gift->name??'':@$giftSLog->gift->e_name ??'';
 
-                               
-                        @endphp
+                                // Gift name based on locale
+                                $giftName = app()->getLocale() == 'ar' ? ($giftSLog->gift->name ?? '') : ($giftSLog->gift->e_name ?? '');
+
+                            @endphp
+                        @endforeach
+
                         <tr>
                             <td>{{ $giftSLog->id }}</td>
                             <td>
