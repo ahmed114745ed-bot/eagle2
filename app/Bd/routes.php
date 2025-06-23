@@ -46,25 +46,29 @@ Route::group(
 Route::group(
     [
         'prefix' => 'bd',
+        'namespace' => 'App\\Bd\\Controllers',
         'middleware' => [
             'web',
             'admin.auth',
             'admin.pjax',
             'admin.log',
             'admin.bootstrap',
+            // 'adminIp',
+            //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as' => 'bd.',
     ],
-    function () {
-        Route::get('/', [\App\Bd\Controllers\HomeController::class, 'index'])->name('home');
+    function () { 
+        Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/charges', [\App\Bd\Controllers\ChargeController::class, 'index'])->name('charges');
-        Route::resource('/agencies', \App\Bd\Controllers\AgencyController::class);
+        Route::resource('/agencies', AgencyController::class);
         Route::resource('/salaries', \App\Bd\Controllers\BdSalariesController::class);
         Route::resource('/charges', \App\Bd\Controllers\ChargeController::class);
-        Route::post('admin/wallet/charge', [\App\Bd\Controllers\WalletController::class, 'charge'])->name('wallet.charge');
-        Route::post('admin/salary/transfer', [\App\Bd\Controllers\WalletController::class, 'transfer'])->name('salary.transfer');
-        Route::resource('/request-agencies', \App\Bd\Controllers\RequestAgencyController::class);
+        // Route::resource('/wallet', 'WalletController');
+        Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+        Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+
+        Route::resource('/request-agencies', RequestAgencyController::class);
     }
 );
-
