@@ -476,7 +476,7 @@ if (!function_exists('getFileExtension')) {
     }
 }
 if (!function_exists('handleShowImageWithTypes')) {
-    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = null): string
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50): string
     {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
