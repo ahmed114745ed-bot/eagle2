@@ -9,6 +9,7 @@ class AdminControllerServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+
         if (!$this->app->routesAreCached()) {
             $this->mapBdRoutes();
         }
