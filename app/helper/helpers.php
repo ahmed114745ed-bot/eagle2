@@ -476,7 +476,7 @@ if (!function_exists('getFileExtension')) {
     }
 }
 if (!function_exists('handleShowImageWithTypes')) {
-    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null): string
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = null): string
     {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
@@ -494,7 +494,7 @@ if (!function_exists('handleShowImageWithTypes')) {
                 ";
         }
 
-        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: 50%; object-fit: cover;' alt='' />";
+        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: cover;' alt='' />";
     }
 }
 if (!function_exists('userType')) {
