@@ -72,26 +72,25 @@ class PaymentMethodController extends Controller
 
     public function utdCallback(Request $request)
     {
-        info($request);
         $callbackData = $request->all();
         $fawryRefNumber = $callbackData['referenceNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
-        info($merchantRefNumber);
         $order = CoinLog::where('trx', $merchantRefNumber)->first();
         if ($orderStatus === 'PAID') {
-            $order->status = "paid";
             $this->webhookPayment($order->id);
+            $order->pid = $fawryRefNumber;
+            $order->save();
+            return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
+        } elseif ($orderStatus === 'UNPAID') {
+            return response()->json(['status' => 'pending', 'message' => 'Payment is still unpaid.',],202);
         } elseif ($orderStatus === 'CANCELLED') {
-            $order->status = "cancelled";
-        } else {
-            $order->status = "Error";
+            return response()->json(['status' => 'cancelled', 'message' => 'Payment was cancelled.',]);
         }
-        $order->ref_code = $fawryRefNumber;
 
         $order->save();
 
-        return true;
+        return response()->json(['status' => 'error', 'message' => 'Payment status is invalid or failed.',],400);
     }
 }

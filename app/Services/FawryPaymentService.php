@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CoinLog;
 use App\Models\PaymentMethodHistory;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
@@ -35,6 +36,9 @@ class FawryPaymentService
         }
         PaymentMethodHistory::where(['id' => $trx])->update([
             "utd_code" => $response['merchantRefNum']
+        ]);
+        CoinLog::where(['id' => $trx])->update([
+            "trx" => $response['merchantRefNum']
         ]);
         $trx = $response['merchantRefNum'];
         $data = $this->getBodyForFawry($trx,$response['chargeItems'][0]['price']);
