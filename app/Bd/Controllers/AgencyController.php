@@ -610,7 +610,7 @@ class AgencyController extends Controller
                         $ops2[$user->id] = $user->uuid . '_' . $user->name;
                     }
                     return $ops2;
-                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
+                })->ajax(url('/api/search/users3'), 'id', 'name')->rules('required');
 
                 // if (request()->route('form')->isEditing()) {
                 //     $row->hidden('agency_manger_id', __('app manger id'));
