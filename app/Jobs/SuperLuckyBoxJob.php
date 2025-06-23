@@ -40,7 +40,7 @@ class SuperLuckyBoxJob implements ShouldQueue
     {
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
-        \Log::error('super box ');
+
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
         if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {

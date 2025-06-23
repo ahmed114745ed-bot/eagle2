@@ -46,8 +46,6 @@ class Handler extends ExceptionHandler
                 return Common::apiResponse (false,'Wrong passed data',[],401);
             }
 
-            \Log::error($e->getMessage() );
-            \Log::error($request->fullUrl() );
             return Common::apiResponse(0, $e->getMessage(), null, 500);
 
         }

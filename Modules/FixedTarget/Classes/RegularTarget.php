@@ -18,13 +18,13 @@ class RegularTarget implements TargetInterface
 
     public function calculateUsdFromTarget(Model $target, float $hours, int $days, array $extra): float
     {
-        \Log::info($target->toJson());
+       
         $targetReel =  explode(',', $target->reel);
         $targetMoment = explode(',', $target->moment);
         $extras = $extra;
         // $per = 0.50;
         $per = common::getDiamondsPercentage();
-        \Log::info($target->hours <= $hours);
+       
         if ($target->hours <= $hours) {
             $per += (((int) Common::getSettingsValue('hours')) ?? 0) / 100;
         }
@@ -49,7 +49,6 @@ class RegularTarget implements TargetInterface
         //            }
         //        }
         $usd = Common::getTargetUsd($target->diamonds, $target->usd);
-        \Log::info('This per for user id:' . \Auth::id() . ' ' . $per . PHP_EOL . ' Hours:' . $hours . ' Days:' . $days . PHP_EOL . ' USD:' . $usd);
         return $usd * $per;
     }
 

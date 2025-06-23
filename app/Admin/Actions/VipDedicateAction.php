@@ -92,7 +92,6 @@ class VipDedicateAction extends Action
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
             DB::rollBack();
-            \Log::error('VIP dedication error: ' . $exception->getMessage());
             return $this->response()->error(__('dashboard.error'))->refresh();
         }
     }
