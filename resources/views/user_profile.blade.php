@@ -1681,9 +1681,9 @@
                                 $defaultImage = asset("images/background_room.jpg");
 
                                $userCharges = $giftType === 'receiver' ? $giftSLog->sender : $giftSLog->receiver;
-                                $name = $userCharges['name'] ?? '-';
-                                $uid = $userCharges['uuid'] ?? '-';
-                                $id = $userCharges->id ?? 0;
+                                $name = @$userCharges->name ?? '';
+                                $uid = @$userCharges->uuid ?? '';
+                                $id = @$userCharges->id ?? 0;
 
                                 // Set user image
                                 $avatar = @$giftSLog->sender->profile->avatar ;
@@ -1693,7 +1693,7 @@
                                 }
                                
                                 // Set room image and name
-                                $roomName = $giftSLog->room->room_name ?? '-';
+                                $roomName = @$giftSLog->room->room_name ?? '-';
                                 $path = @$giftSLog->room->room_cover ;
                                 $url =  getImagePath($path) ?? $defaultImage;
                                 if (!isImageExists($url)) {
