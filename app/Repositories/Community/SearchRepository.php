@@ -6,7 +6,6 @@ use App\Http\Resources\Api\V1\CommunityResource;
 use App\Models\BlackList;
 use App\Models\OfficialMessage;
 use App\Models\Pack;
-use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -38,25 +37,48 @@ class SearchRepository implements SearchRepositoryInterface
 
         $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
 
-        $user = User::searchByUuid($keywords)
-            ->with(['packs' => function ($q) {
-                $q->where('type', 16)
-                    ->where('is_used', 1)
-                    ->where(function ($q) {
-                        $q->where('expire', 0)
+        // $user = User::likeSearchByUuid($keywords)
+        //     ->with(['packs' => function ($q) {
+        //         $q->where('type', 16)
+        //             ->where('is_used', 1)
+        //             ->where(function ($q) {
+        //                 $q->where('expire', 0)
+        //                 ->orWhere('expire', '>=', now()->timestamp);
+        //             });
+        //     }])->first();
+        $user = User::query()
+        ->where(function ($q) use ($keywords) {
+            $q->where('uuid', 'like', "%{$keywords}%")
+            ->orWhere('special_id', 'like', "%{$keywords}%");
+        })
+        ->with(['packs' => function ($q) {
+            $q->where('type', 16)
+                ->where('is_used', 1)
+                ->where(function ($q) {
+                    $q->where('expire', 0)
                         ->orWhere('expire', '>=', now()->timestamp);
-                    });
-            }])->first();
+                });
+        }])
+        ->addSelect([
+            '*',
+            DB::raw("((LENGTH(uuid) - LENGTH(REPLACE(uuid, '{$keywords}', ''))) / CHAR_LENGTH(uuid)) * 100 AS matching_percentage")
+        ])
+        ->orderByDesc('matching_percentage')
+        ->first();
+      
+        if (!$user || $user?->packs->isNotEmpty()) {
+            return [];
+        }
+        
 
-        // if (!$user || $user->packs->isNotEmpty()) {
-        //     return [];
-        // }
-$keywords= $user->id;
-        $rooms = Room::
-             join('users', 'rooms.uid', '=', 'users.id')
+        $keywords = $user->id;
+ 
+
+        $rooms = DB::table('rooms')
+            ->join('users', 'rooms.uid', '=', 'users.id')
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
             ->where('users.status', 1)
-            // ->whereNotIn('rooms.uid', $blockedUserIds)
+            ->whereNotIn('rooms.uid', $blockedUserIds)
             ->select([
                 'rooms.*',
                 'rooms.id as room_id',
@@ -75,8 +97,7 @@ $keywords= $user->id;
             ->orderBy('rooms.hot', 'desc')
             ->take(2)
             ->get();
-      
-
+//dd( $rooms);
         return $rooms->toArray();
     }
 

@@ -382,8 +382,10 @@ class WareTabController extends MainController
         }
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
+                $hasShowImg = $form->show_img || $form->model()->show_img;
+                $hasImg2 = $form->img2 || $form->model()->img2;
 
-                if (!$form->show_img && !$form->img2) {
+                if (!$hasShowImg && !$hasImg2) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -408,13 +410,17 @@ class WareTabController extends MainController
 
                 if ($form->img2 instanceof UploadedFile) {
 
-                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
+                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
 
                     $ext = strtolower($form->img2->guessExtension());
                     $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
                     if ($ext === 'zz' && $originalExt === 'svga') {
                         $ext = 'svga';
+                    }
+
+                    if ($ext === 'gif' && $originalExt === 'gif') {
+                        $ext = 'png';
                     }
 
                     if ($ext === 'mp4') {
@@ -447,45 +453,53 @@ class WareTabController extends MainController
                             'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                         ]);
                     } else {
-                        $form->model()->profile_frame_type = $ext;
+                        $form->input('detected_profile_frame_type', $ext);
+                        $form->profile_frame_type = $ext;
                     }
                 }
             });
         }
         $form->saving(function (Form $form) {
-            $isEditing = $form->isEditing();
+            $id = $form->model()->id;
 
-            $imageType1 = $isEditing ? $form->input('image_type1') : null;
-            $profileFrameType = $isEditing
-                ? ($form->input('profile_frame_type') ?? $form->model()->profile_frame_type)
-                : $form->model()->profile_frame_type;
+            $exists = Ware::where('level', $form->model()->level)
+                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
+                    $query->where('id', "!=", $id);
+                })->exists();
 
-            info($imageType1);
-            info($profileFrameType);
-            $form->model()->image_type = $imageType1 ?? $profileFrameType;
-            $test = $imageType1 ?? $profileFrameType;
-            info($test);
+            if ($exists) {
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => __('This level and type combination already exists'),
+                ]);
 
-            if ($isEditing && is_null($imageType1) && is_null($profileFrameType)) {
-                session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
-                return redirect()->back();
+                return back()->with(compact('error'));
             }
 
-            (new UserCounterServices)->eventUsers('ware');
+            if (request('type') != 18 && request('type') != 21) {
+                $isEditing = $form->isEditing();
+
+                $imageType1 = $form->input('image_type1');
+                $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
+
+                $final = $profileFrameType ?? $imageType1;
+
+                if ($isEditing && is_null($final)) {
+                    session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
+                    return redirect()->back();
+                }
+
+                $form->model()->image_type = $final;
+            }
         });
 
-
         $form->saved(function (Form $form) {
-
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;
             return redirect()->to($url);
         });
         return $form;
     }
-
-
-
 
     private function tabsComponentEdit($id, $currentType)
     {

@@ -5732,6 +5732,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|User onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|User query()
  * @method static \Illuminate\Database\Eloquent\Builder|User searchByUuid($toId)
+ * @method static \Illuminate\Database\Eloquent\Builder|User likeSearchByUuid($toId)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereAgencyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereAndroidVersion($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereAppearChargerAgency($value)

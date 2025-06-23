@@ -18,9 +18,10 @@ class RoomSearchResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
-    {
+    {    \Log::info('Starting RoomResource toArray', ['room_id' => $this->id]);
+
         $pks = !is_null(@$this?->room_id) ? $this->getRoomTwoLastPk(@$this?->room_id) : null;
-        $room = Room::with('owner')->find(@$this->id);
+        $room = Room::find(@$this->id);
         $achievement_images = [];
         if (@$room->owner?->medals) {
             foreach (@$room->owner?->medals as $medal) {
@@ -70,7 +71,6 @@ class RoomSearchResource extends JsonResource
             'country' =>$endCountry ,
             'achievement_images' => $achievement_images,
             'medals'               => @$room->owner?->medals()?->where('is_enable', true)->get() ?? [],
-            'country_hidden'=>$this->owner->getPackWithType(13), 
 
 
         ];
