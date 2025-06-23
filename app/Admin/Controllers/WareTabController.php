@@ -219,6 +219,33 @@ class WareTabController extends MainController
         return $content;
     }
 
+    public function update($id)
+    {
+        $request = request();
+
+        $toggleFields = ['enable', 'is_active_for_vip'];
+
+        $editableField = collect($request->except(['_token', '_method', '_edit_inline']))->keys()->first();
+
+        if ($request->ajax() && $request->has('_edit_inline') && in_array($editableField, $toggleFields)) {
+            $field = array_key_first($request->all());
+
+            if (in_array($field, $toggleFields)) {
+                $model = Ware::findOrFail($id);
+                $model->$field = $request->input($field);
+                $model->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => __('Updated successfully')
+                ]);
+            }
+        }
+
+        return parent::update($id);
+    }
+
+
 
     protected function form($id = null)
     {
@@ -306,7 +333,7 @@ class WareTabController extends MainController
 
 
         $form->text('key', trans('key'));
-        $script = <<<SCRIPT
+            $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
                      var type = $('#type').val();
@@ -326,15 +353,18 @@ class WareTabController extends MainController
                  });
              });
              SCRIPT;
-        Admin::script($script);
+            Admin::script($script);
 
-        if (Session::has('show_alert')) {
-            $form->html('<script>
-             $(document).ready(function () {
-                 alert("الرجاء اختيار نوع  الصوره");
-             });
-         </script>');
+        if ($form->isEditing()){
+            if (Session::has('show_alert')) {
+                $form->html('<script>
+                 $(document).ready(function () {
+                     alert("الرجاء اختيار نوع  الصوره");
+                 });
+             </script>');
+            }
         }
+
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
@@ -352,8 +382,10 @@ class WareTabController extends MainController
         }
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
+                $hasShowImg = $form->show_img || $form->model()->show_img;
+                $hasImg2 = $form->img2 || $form->model()->img2;
 
-                if (!$form->show_img && !$form->img2) {
+                if (!$hasShowImg && !$hasImg2) {
                     $error = new MessageBag([
                         'title'   => 'Error',
                         'message' => 'Please upload at least one image',
@@ -363,24 +395,7 @@ class WareTabController extends MainController
                 }
 
                 if ($form->show_img instanceof UploadedFile) {
-                    $allowedExtensions = [
-                        'svga',
-                        'mp4',
-                        'jpg',
-                        'jpeg',
-                        'png',
-                        'gif',
-                        'bmp',
-                        'tiff',
-                        'svg',
-                        'webp',
-                        'mov',
-                        'avi',
-                        'wmv',
-                        'flv',
-                        'mkv',
-                        'webm',
-                    ];
+                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
 
@@ -395,13 +410,17 @@ class WareTabController extends MainController
 
                 if ($form->img2 instanceof UploadedFile) {
 
-                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap'];
+                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
 
                     $ext = strtolower($form->img2->guessExtension());
                     $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
                     if ($ext === 'zz' && $originalExt === 'svga') {
                         $ext = 'svga';
+                    }
+
+                    if ($ext === 'gif' && $originalExt === 'gif') {
+                        $ext = 'png';
                     }
 
                     if ($ext === 'mp4') {
@@ -434,38 +453,53 @@ class WareTabController extends MainController
                             'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                         ]);
                     } else {
+                        $form->input('detected_profile_frame_type', $ext);
                         $form->profile_frame_type = $ext;
                     }
                 }
             });
         }
         $form->saving(function (Form $form) {
-            $imageType1 = $form->input('image_type1');
-            // $profileFrameType = $form->input('profile_frame_type');
-            $profileFrameType = request('image_type1') ?? $form->input('image_type1');
-            $form->model()->image_type = $imageType1 ?? $profileFrameType;
+            $id = $form->model()->id;
 
-            if (is_null($imageType1) && is_null($profileFrameType)) {
+            $exists = Ware::where('level', $form->model()->level)
+                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
+                    $query->where('id', "!=", $id);
+                })->exists();
 
-                session()->flash('show_alert', 'Your alert message');
-                return redirect()->back();
+            if ($exists) {
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => __('This level and type combination already exists'),
+                ]);
+
+                return back()->with(compact('error'));
             }
 
+            if (request('type') != 18 && request('type') != 21) {
+                $isEditing = $form->isEditing();
 
-            (new UserCounterServices)->eventUsers('ware');
+                $imageType1 = $form->input('image_type1');
+                $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
+
+                $final = $profileFrameType ?? $imageType1;
+
+                if ($isEditing && is_null($final)) {
+                    session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
+                    return redirect()->back();
+                }
+
+                $form->model()->image_type = $final;
+            }
         });
 
         $form->saved(function (Form $form) {
-
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;
             return redirect()->to($url);
         });
         return $form;
     }
-
-
-
 
     private function tabsComponentEdit($id, $currentType)
     {

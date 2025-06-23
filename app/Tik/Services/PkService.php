@@ -20,7 +20,8 @@ class PkService
     {
         $room =  $this->roomRepository->findRoomUserEnable($request->owner_id);
         if (!$room) throw new \Exception('not found');
-        if ($userId != $room->uid  && $room->room_visitor = '')  throw new \Exception('room closed');
+        if ($userId != $room->uid)  throw new \Exception(__('you don not have permission'));
+        if ($room->room_visitor = '') throw new \Exception(__('room closed'));
         $ex =  $this->pkRepository->getPk($room->id);
         if ($ex) $ex->update(['status' => 0]);
         $data =
@@ -51,8 +52,11 @@ class PkService
 
     public function showPkOrHide($ownerId, $status, bool $isPkCustom = false)
     {
+        $user = request()->user();
         $room =  $this->roomRepository->findRoomUserEnable($ownerId);
         if (!$room) throw new \Exception('not found');
+        if ($user->id != $room->uid) throw new \Exception(__('you don not have permission'));
+
         if ($room->mode != 3 && $room->mode != 9) {
             throw new \Exception('Mode Not Compatible');
         }

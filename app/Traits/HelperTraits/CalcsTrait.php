@@ -828,6 +828,9 @@ trait CalcsTrait
         $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
         $hasColor = Common::hasInPack($user->id, 18, true);
         $color    = Common::hasColorInPack($user->id, 21, true);
+        $vip_gifts = $vip->privilegs->contains(function ($priv) {
+            return $priv->type == 14;
+        });
 
         return [
             'id'        => 1,
@@ -841,6 +844,7 @@ trait CalcsTrait
             'expire'    => $vip->expire ?? 0,
             'ware_id' => $vipIcon?->id ?? 0,
             'color' =>  $color ?? '',
+            'vip_gifts' => $vip_gifts ?? 0,
             'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
         ];
     }

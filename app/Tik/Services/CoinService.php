@@ -82,16 +82,23 @@ class CoinService
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($request->pay_method == 'fawry') {
-                $oldFawryService = new FawryPaymentServiceV2();
+                $newFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
-                //  get url
+               $paymentUrl = $newFawryService->makePayment($log->id, $coin->usd, $exterData);
+                if (isset($response['status']) && $paymentUrl['status']  == 0) {
+                    return $paymentUrl;
+                }
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
+            } elseif ($request->pay_method == 'utd_fawry') {
+                $oldFawryService = new FawryPaymentService();
+                $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
+
                 $paymentUrl = $oldFawryService->makePayment($log->id, $coin->usd, $exterData);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
-
-                return response()->json($paymentUrl, 200);
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } else if ($request->pay_method == 'opay') {
                 $opay = new OPayController();
                 return $opay->make($data, $user);
@@ -102,7 +109,6 @@ class CoinService
                 $paypalService = new PayPalService();
                 $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
                 return Common::apiResponse(1, 'ok', $paymentLink, 200);
-
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);

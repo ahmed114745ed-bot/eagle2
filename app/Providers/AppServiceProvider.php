@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\Config;
 use App\Models\Language;
 use Encore\Admin\Form;
 use App\Admin\Fields\Image;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -54,6 +55,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
         Form::extend('image', Image::class);
 
         if ($this->app->isLocal()) {

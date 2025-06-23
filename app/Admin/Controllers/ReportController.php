@@ -16,13 +16,22 @@ use Carbon\Carbon;
 class ReportController extends MainController
 {
     public $permission_name = 'reports';
-
+   
     public function index(Content $content)
     {
         checkAgencyFeature();
 
+        $name = request('name', 'users');
+
+        $title = match ($name) {
+            'users'     => __('Host reports'),
+            'agencies'    => __('agencies report'),
+            'agencies_manger'  => __('admin.manger'),
+            default     => __('Host reports'),
+        };
+    
         return parent::index($content
-            ->title(trans('Host reports'))
+            ->title($title)
             ->description(__(request('desc', 'users')))
             ->row(function ($row) {
                 $row->column(2, view('admin.grid.common.actions'));
