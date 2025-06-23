@@ -89,9 +89,9 @@ class AgentSalaryTransactionController extends Controller
         $data = $data->when($type == 'sent', function ($q) use ($search, $agency) {
             $q->where("charger_id", $agency->id)
               ->where('charger_type',  'agency')
-             
+
               ->with('receiverUser','receiveragency');
-               
+
         })
         ->when($type == 'received', function ($q) use ($search, $agency) {
             $q->where('user_id', $agency->id)->where('user_type','agency')
@@ -103,9 +103,9 @@ class AgentSalaryTransactionController extends Controller
         })->orderByDesc('id')->paginate();
 
 
-     
 
-      
+
+
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }
 
@@ -204,7 +204,7 @@ class AgentSalaryTransactionController extends Controller
 
         $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")->withCount(['salaryRequests' => function ($query) {
             $query->where('status', 3);
-        }])->whereHas('owner')
+        }])->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))->with('owner')
             ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
             ->when($paymentId, fn($q) => $q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
             ->paginate(15);

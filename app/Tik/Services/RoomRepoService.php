@@ -300,8 +300,10 @@ class RoomRepoService
 
     public function changeMode($request, $currentMode)
     {
+        $user = request()->user();
         $room =  $this->findRoomUser($request->owner_id);
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
+        if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
         //get last mode of rooms to if is cinema mode and change it update room background
         $lastMode = $room->mode;
         $room->mode = $currentMode;
@@ -464,8 +466,8 @@ class RoomRepoService
 
         if (!$room)  throw new \Exception(__('room not founded'));
 
-        if (auth()->id() != $room->uid && ! in_array(auth()->id(), $room->admins)){
-            throw new \Exception(__('you dont have permission'));
+        if (auth()->id() != $room->uid && ! in_array(auth()->id(), $room->admins)) {
+            throw new \Exception(__('you don not have permission'));
         }
 
         $room->update(['is_comment_closed' => $request['status']]);

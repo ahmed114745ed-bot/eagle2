@@ -134,9 +134,7 @@ class UserRepository extends Repository
 //            ->whereDoesntHave('shippingAgency', function ($query) {
 //                $query->where('type', 2)->where('deleted_at' , null);
 //            })
-            ->whereDoesntHave('hostAgency', function ($query) {
-                $query->where('type', 1);
-            })
+            ->whereDoesntHave('shippingAgency')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('uuid', 'like', '%' . $key . '%')

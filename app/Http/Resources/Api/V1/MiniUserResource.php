@@ -52,7 +52,7 @@ class MiniUserResource extends JsonResource
 
         $packs = $this->packs;
         /** @var \Illuminate\Database\Eloquent\Collection $packs */
-        $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
+        $pack = $packs->where('is_used', 1)->where('type', $type)->where('target_id', $dress)->first();
         if ($pack) {
             if ($pack->ware) {
                 return $pack->ware->{$item};

@@ -141,6 +141,19 @@ class GiftController extends MainController
         $grid->id(__('ID'));
         $grid->name(__('Name'));
 
+        $grid->column('level', trans('vip'))->display(function () {
+
+            $path = $this?->vip?->img;
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $grid->column('vip_level', __('level_num'));
+
+        
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
             $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         }
@@ -156,27 +169,33 @@ class GiftController extends MainController
         });
         $grid->column('img', trans('image'))->display(function ($path) {
             /** @var Gift $this */
-            $img = getImagePath($path);
-            $musicIcon = '';
-
-            if ($this->music_gift == 1) {
-                $musicIcon = "<img src='" . asset('images/music.jpg') . "'
-                                style='position: absolute; top: 10px; right: 10px; width: 20px; height: 20px;
-                                background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 5px;'>";
+            $imgPath = getImagePath($path);
+            $defaultImage = asset("images/image.png");
+        
+            if (!isImageExists($imgPath)) {
+                $imgPath = $defaultImage;
             }
-
+        
+            $musicIcon = '';
+            if ($this->music_gift == 1) {
+                $musicIcon = "<img src='" . asset('images/music.jpg') . "' 
+                    style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
+                    background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>";
+            }
+        
             return "<div style='position: relative; display: inline-block;'>
-                        <img src='" . $img . "' style='width: 70px; height: 70px;' class='img img-thumbnail' />
+                        <img src='" . $imgPath . "' style='width: 70px; height: 70px;' class='img img-thumbnail' />
                         $musicIcon
                     </div>";
         });
+        
         $grid->column('show_img', trans('show_img'))->display(function ($path) {
             /** @var Gift $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column("use_count", __('use count'));
-        $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
+        // $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
         // $grid->vip_level(__('vip_level'));
       //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
