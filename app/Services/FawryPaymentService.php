@@ -60,6 +60,7 @@ class FawryPaymentService
 
         $client = new Client();
 
+        info($url);
 //        try {
             $response = Http::withOptions(['verify' => false])->post($url, [
                 'json' => $body,
@@ -83,6 +84,7 @@ class FawryPaymentService
 
     public function getBodyForFawry($trx,$amount)
     {
+        info(self::redirect_if_payment_success ($trx));
         $merchantCode = config("services.utd_fawry.utd_fawry_merchant_code");
         $merchantRefNum = $trx;
         $secure_key = config("services.utd_fawry.utd_fawry_secret");

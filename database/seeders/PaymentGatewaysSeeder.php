@@ -94,7 +94,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_6' => [
                 "name" => "fawry_return_url",
                 "type" => "input",
-                "value" => 'https://www.google.com'
+                "value" => 'https://eagle.utdsoftware.com/api/utd-fawry-callback'
             ],
             'new_7' => [
                 "name" => "fawry_webhook_url",
