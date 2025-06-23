@@ -1064,6 +1064,10 @@
         <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
 
+           <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
+           data-target="gift-log-tab">{{ __('gifts') }}</a>
+
+
 
     </div>
     <div id="tab-loading" style="
@@ -1165,6 +1169,7 @@
                 {{ $packs?->appends([
                     'vip_page' => $userVips?->currentPage(),
                     'salary_page' => $salaries?->currentPage(),
+                    'gift_page' => $giftSLogs?->currentPage(),
                 ])->links('vendor.pagination.default') }}
             </div>
 
@@ -1222,6 +1227,7 @@
                             {{ $userVips->appends([
                                 'pack_page' => $packs?->currentPage(),
                                 'salary_page' => $salaries?->currentPage(),
+                                'gift_page' => $giftSLogs?->currentPage(),
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
                     @endif
@@ -1285,13 +1291,13 @@
                             <div class="col-md-8">
                                 <div class="btn-group pull-left">
                                     <button class="btn btn-info submit btn-sm">
-                                        <i class="fa fa-search"></i>&nbsp;&nbsp;بحث
+                                        <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
                                     </button>
                                 </div>
                                 <div class="btn-group pull-left" style="margin-left: 10px;">
                                     <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
                                        class="btn btn-default btn-sm">
-                                        <i class="fa fa-undo"></i>&nbsp;&nbsp;تفريغ
+                                        <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
                                     </a>
                                 </div>
                             </div>
@@ -1406,6 +1412,7 @@
                             {{ $salaries->appends([
                                 'pack_page' => $packs?->currentPage(),
                                 'vip_page' => $userVips?->currentPage(),
+                                'gift_page' => $giftSLogs?->currentPage(),
 
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
@@ -1536,6 +1543,227 @@
                 <div class="pagination-container mt-3">
                     {{ $charges->appends([
                         'tab' => 'charge',
+                        'pack_page' => $packs?->currentPage(),
+                        'vip_page' => $userVips?->currentPage(),
+                        'salary_page' => $salaries?->currentPage(),
+                        'gift_page' => $giftSLogs?->currentPage(),
+                    ])->links('vendor.pagination.bootstrap-4') }}
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
+
+
+
+@if($activeTab == 'gift-log')
+    <div class="tab-content active" id="gift-log-tab">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">{{ __('gift Reports') }}</h4>
+            </div>
+
+            <div class="box-body no-padding">
+                <div class="nav-scroll-container">
+                    <ul class="nav nav-pills">
+
+                        <li class="{{ $giftType == 'receiver' ? 'active' : '' }}">
+                            <a class="nav-link @if($giftType == 'receiver') active @endif"
+                               href="?tab=gift-log&gift_type=receiver"
+                               role="tab">
+                                {{ __('received gift') }}
+                            </a>
+                        </li>
+                        <li class="{{ $giftType == 'sender' ? 'active' : '' }}">
+                            <a class="nav-link @if($giftType == 'sender') active @endif"
+                               href="?tab=gift-log&gift_type=sender"
+                               role="tab">
+                                {{ __('sent gift') }}
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            
+                <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
+                    <input type="hidden" name="tab" value="gift-log">
+                    <input type="hidden" name="gift_type" value={{ $giftType }}>
+                    <div class="row">
+                        <!-- From Date -->
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="from_date" class="col-sm-3 control-label">{{__('From Date')}}</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input  type="date" class="form-control" id="from_date" name="start_at" placeholder="From Date" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- To Date -->
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="to_date" class="col-sm-3 control-label">{{__('To Date')}}</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="date" class="form-control" id="to_date" name="end_at" placeholder="To Date" value="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="box-footer">
+                        <div class="row">
+                            <div class="col-md-12 text-left">
+                                <div class="btn-group">
+                                    <button type="submit" class="btn btn-info btn-sm">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                </div>
+                                <div class="btn-group" style="margin-left: 10px;">
+                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 15px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; max-width: 800px;">
+                        <!-- Card 1 -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
+                             @if($giftType == 'receiver')
+                             <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{__("total diamonds received")}}</div>
+
+                            @else
+                              <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{ __('total diamonds sent') }}</div>
+
+                            @endif
+                        
+                        <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$diamonds)}}
+                            <img src="{{ asset('images/diamond.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            <div class="table-responsive">
+                <table class="data-table" id="charge-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>
+                            @if($giftType == 'receiver')
+                                {{ __('sender') }}
+                            @else
+                                {{ __('Receiver') }}
+                            @endif
+                        </th>
+                        <th>{{ __('room') }}</th>
+                        <th>{{ __('gift') }}</th>
+                        <th>{{ __('quantity') }}</th>
+                        <th>{{ __('price') }}</th>
+                        <th>{{ __('Created at') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                   @foreach($giftSLogs as $index => $giftSLog)
+                            @php
+                                // Set default images first
+                                $userImageDefault = asset('images/businessman-icon.jpg');
+                                $defaultImage = asset("images/room.jpg");
+
+                                // Determine user (sender or receiver)
+                                if($giftType == 'receiver') {
+                                    $userCharges = $giftSLog->sender;
+                                } elseif($giftType == 'sender') {
+                                    $userCharges = $giftSLog->receiver;
+                                }
+
+                                $name = $userCharges['name'] ?? '-';
+                                $uid = $userCharges['uuid'] ?? '-';
+                                $id = $userCharges->id ?? 0;
+
+                                // Set user image
+                                $image = $userCharges->profile->avatar ?? null;
+                                $image = $image ? getImagePath($image) : $userImageDefault;
+                                if (!isImageExists($image)) {
+                                    $image = $userImageDefault;
+                                }
+
+                                // Set room image and name
+                                $roomName = $giftSLog->room->room_name ?? '-';
+                                $path = $giftSLog->room->room_cover ?? '';
+                                $url = $path ? getImagePath($path) : $defaultImage;
+                                if (!isImageExists($url)) {
+                                    $url = $defaultImage;
+                                }
+
+                                // Gift name based on locale
+                                $giftName = app()->getLocale() == 'ar' ? ($giftSLog->gift->name ?? '') : ($giftSLog->gift->e_name ?? '');
+
+                            @endphp
+
+                        <tr>
+                            <td>{{ $giftSLog->id }}</td>
+                            <td>
+                               <a href="{{ url('admin/users/' . $id) }}" target="_blank"
+                                style="display: inline-flex; align-items: center; text-decoration: none;">
+                                    <img src="{{ getImagePath($image) }}" width="40" height="40"
+                                        style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                    <div style="display: flex; flex-direction: column;">
+                                        <strong style="font-size: 14px;">{{ $name }}</strong>
+                                        <small style="color: #777;">UUID: {{ $uid }}</small>
+                                    </div>
+                                </a>
+                            </td>
+                            <td>
+                                    <a href="#" target="_blank"
+                                    style="display: inline-flex; align-items: center; text-decoration: none;">
+                                        <img src="{{ getImagePath($url) }}"
+                                            width="30" height="30"
+                                            style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                            
+                                        <div style="display: flex; flex-direction: column;">
+                                            <span>{{ $roomName }}</span>
+                                            <span style="color: #888; font-size: 12px;">Type: {{ $giftSLog->room->type ?? '-' }}</span>
+                                        </div>
+                                    </a>
+                                </td>
+                            <td><a href="#" target="_blank"
+                                    style="display: inline-flex; align-items: center; text-decoration: none;">
+                                        <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
+                                            width="30" height="30"
+                                            style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $giftName  }} </span>
+                                    </a> </td>
+                            <td>{{ $giftSLog->giftNum }}</td>
+                            <td>{{  $giftSLog->giftPrice}}</td>
+                            <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->format('Y-m-d H:i') }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination --}}
+            @if($giftSLogs instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                <div class="pagination-container mt-3">
+                    {{ $giftSLogs->appends([
+                        'tab' => 'gift-log',
+                        'gift_page' => $giftSLogs?->currentPage(),
                         'pack_page' => $packs?->currentPage(),
                         'vip_page' => $userVips?->currentPage(),
                         'salary_page' => $salaries?->currentPage(),

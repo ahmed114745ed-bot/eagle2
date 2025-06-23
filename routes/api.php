@@ -478,6 +478,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end levels
             Route::prefix('mall')->middleware(['appFeatureEnable:mall'])->group(function () {
                 Route::get('wares', [MallController::class, 'index']);
+                 Route::get('padding', [MallController::class, 'padding']);
                 Route::post('buy', [MallController::class, 'buyWare']);
                 Route::post('send', [MallController::class, 'sendWare']);
                 Route::get('best-sale', [MallController::class, 'bestWareSale']);

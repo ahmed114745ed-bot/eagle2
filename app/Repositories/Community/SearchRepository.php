@@ -37,23 +37,42 @@ class SearchRepository implements SearchRepositoryInterface
 
         $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
 
-        $user = User::searchByUuid($keywords)
-            ->with(['packs' => function ($q) {
-                $q->where('type', 16)
-                    ->where('is_used', 1)
-                    ->where(function ($q) {
-                        $q->where('expire', 0)
+        // $user = User::likeSearchByUuid($keywords)
+        //     ->with(['packs' => function ($q) {
+        //         $q->where('type', 16)
+        //             ->where('is_used', 1)
+        //             ->where(function ($q) {
+        //                 $q->where('expire', 0)
+        //                 ->orWhere('expire', '>=', now()->timestamp);
+        //             });
+        //     }])->first();
+        $user = User::query()
+        ->where(function ($q) use ($keywords) {
+            $q->where('uuid', 'like', "%{$keywords}%")
+            ->orWhere('special_id', 'like', "%{$keywords}%");
+        })
+        ->with(['packs' => function ($q) {
+            $q->where('type', 16)
+                ->where('is_used', 1)
+                ->where(function ($q) {
+                    $q->where('expire', 0)
                         ->orWhere('expire', '>=', now()->timestamp);
-                    });
-            }])->first();
-
-        if (!$user || $user->packs->isNotEmpty()) {
+                });
+        }])
+        ->addSelect([
+            '*',
+            DB::raw("((LENGTH(uuid) - LENGTH(REPLACE(uuid, '{$keywords}', ''))) / CHAR_LENGTH(uuid)) * 100 AS matching_percentage")
+        ])
+        ->orderByDesc('matching_percentage')
+        ->first();
+      
+        if (!$user || $user?->packs->isNotEmpty()) {
             return [];
         }
         
 
         $keywords = $user->id;
-
+ 
 
         $rooms = DB::table('rooms')
             ->join('users', 'rooms.uid', '=', 'users.id')
