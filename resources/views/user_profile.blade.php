@@ -1715,7 +1715,6 @@
                                 $giftName = app()->getLocale() == 'ar' ? ($giftSLog->gift->name ?? '') : ($giftSLog->gift->e_name ?? '');
 
                             @endphp
-                        @endforeach
 
                         <tr>
                             <td>{{ $giftSLog->id }}</td>
