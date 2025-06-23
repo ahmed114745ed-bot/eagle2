@@ -1686,16 +1686,16 @@
                                 $id = $userCharges->id ?? 0;
 
                                 // Set user image
-                                $avatar = $giftSLog->sender->profile->avatar ?? '';
-                               $image = $avatar ? getImagePath($avatar) : $userImageDefault;
-                                if (!isImageExists($image)) {
-                                    $image = $userImageDefault;
+                                $avatar = @$giftSLog->sender->profile->avatar ;
+                                $image = getImagePath($avatar) ?? $userImageDefault;
+                                if (!isImageExists( $image)) {
+                                     $image = $userImageDefault;
                                 }
-
+                               
                                 // Set room image and name
                                 $roomName = $giftSLog->room->room_name ?? '-';
-                                $path = $giftSLog->room->room_cover ?? '';
-                                $url = $path ? getImagePath($path) : $defaultImage;
+                                $path = @$giftSLog->room->room_cover ;
+                                $url =  getImagePath($path) ?? $defaultImage;
                                 if (!isImageExists($url)) {
                                     $url = $defaultImage;
                                 }
@@ -1710,7 +1710,7 @@
                             <td>
                                <a href="{{ url('admin/users/' . $id) }}" target="_blank"
                                 style="display: inline-flex; align-items: center; text-decoration: none;">
-                                    <img src="{{ getImagePath($image) }}" width="40" height="40"
+                                    <img src="{{ $image }}" width="40" height="40"
                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <div style="display: flex; flex-direction: column;">
                                         <strong style="font-size: 14px;">{{ $name }}</strong>
@@ -1721,7 +1721,7 @@
                             <td>
                                     <a href="#" target="_blank"
                                     style="display: inline-flex; align-items: center; text-decoration: none;">
-                                        <img src="{{ getImagePath($url) }}"
+                                        <img src="{{ $url }}"
                                             width="30" height="30"
                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                             
