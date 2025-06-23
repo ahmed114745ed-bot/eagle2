@@ -77,6 +77,7 @@ class PaymentMethodController extends Controller
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
+        info($merchantRefNumber);
         $order = CoinLog::where('trx', $merchantRefNumber)->first();
         if ($orderStatus === 'PAID') {
             $order->status = "paid";
