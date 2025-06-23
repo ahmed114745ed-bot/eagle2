@@ -1524,10 +1524,10 @@ use App\Models\Vip;
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="fawry_utd_url">{{ __('admin.utd_url') }}:</label>
-                                                            <input type="text" id="fawry_utd_url" name="fawry_utd_url"
+                                                            <label for="utd_url">{{ __('admin.utd_url') }}:</label>
+                                                            <input type="text" id="utd_url" name="utd_url"
                                                                    placeholder="utd_url"
-                                                                   value="{{ $settings['fawry_utd_url'] ?? '' }}"
+                                                                   value="{{ $settings['utd_url'] ?? '' }}"
                                                                    class="form-control" required>
                                                         </div>
                                                     </div>
