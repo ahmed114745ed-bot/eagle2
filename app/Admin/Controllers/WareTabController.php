@@ -252,6 +252,8 @@ class WareTabController extends MainController
         $form = new Form(new Ware());
         $form->display('ID');
 
+        $ware = Ware::find($id);
+
         $form->select('get_type', trans('get_type'))->options(
             translate(GET_TYPE_WARE)
         )->default(4);
@@ -260,14 +262,13 @@ class WareTabController extends MainController
             $wareType = Ware::find($id)->type;
 
             $form->hidden('type', __('type'))->value($wareType)->attribute(['id' => 'type']);
-        }
-        else {
-            if (request('type')){
+        } else {
+            if (request('type')) {
                 $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
             }
         }
         if (!$form->isEditing()) {
-            if (request('type')){
+            if (request('type')) {
                 $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
             }
         }
@@ -276,7 +277,7 @@ class WareTabController extends MainController
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
         $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
         // // if (!$form->isEditing()) {
         // //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
         // //         $form->currency('price', __('price'));
@@ -333,7 +334,7 @@ class WareTabController extends MainController
 
 
         $form->text('key', trans('key'));
-            $script = <<<SCRIPT
+        $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
                      var type = $('#type').val();
@@ -353,9 +354,9 @@ class WareTabController extends MainController
                  });
              });
              SCRIPT;
-            Admin::script($script);
+        Admin::script($script);
 
-        if ($form->isEditing()){
+        if ($form->isEditing()) {
             if (Session::has('show_alert')) {
                 $form->html('<script>
                  $(document).ready(function () {
@@ -373,13 +374,14 @@ class WareTabController extends MainController
         $form->number('num', __('num'));
 
         if (request('type') == 18) $form->color('color', trans('color'));
-        if (request('type') == 5) {
+        if ((request('type') &&request('type') == 5) || ($form->isEditing() && $ware && ($ware->type == 5))) {
             $form->html('<h1>' . __('padding') . '</h1>');
             $form->decimal('top', __('top'))->default(0);
             $form->decimal('left', __('left'))->default(0);
             $form->decimal('right', __('right'))->default(0);
             $form->decimal('bottom', __('bottom'))->default(0);
         }
+
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
                 $hasShowImg = $form->show_img || $form->model()->show_img;
@@ -460,36 +462,20 @@ class WareTabController extends MainController
             });
         }
         $form->saving(function (Form $form) {
-            $id = $form->model()->id;
-
-            $exists = Ware::where('level', $form->model()->level)
-                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
-                    $query->where('id', "!=", $id);
-                })->exists();
-
-            if ($exists) {
-                $error = new \Illuminate\Support\MessageBag([
-                    'title' => 'Error',
-                    'message' => __('This level and type combination already exists'),
-                ]);
-
-                return back()->with(compact('error'));
-            }
-
             if (request('type') != 18 && request('type') != 21) {
                 $isEditing = $form->isEditing();
 
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
 
-                $final = $profileFrameType ?? $imageType1;
+                $image = $profileFrameType ?? $imageType1;
 
-                if ($isEditing && is_null($final)) {
+                if ($isEditing && is_null($image)) {
                     session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
                     return redirect()->back();
                 }
 
-                $form->model()->image_type = $final;
+                $form->model()->image_type = $image;
             }
         });
 

@@ -19,6 +19,8 @@ class PayPalService
 
     protected function getAccessToken(): string
     {
+        info(config('paypal.client_id'));
+        info(config('paypal.client_secret'));
         $headers = [
             'Content-Type'  => 'application/x-www-form-urlencoded',
             'Authorization' => 'Basic ' . base64_encode(config('paypal.client_id') . ':' . config('paypal.client_secret'))
@@ -27,6 +29,7 @@ class PayPalService
         $response = Http::withHeaders($headers)
             ->withBody('grant_type=client_credentials')
             ->post(config('paypal.base_url') . '/v1/oauth2/token');
+
 
         return json_decode($response->body())->access_token;
     }
@@ -62,10 +65,12 @@ class PayPalService
             ],
         ];
 
+        info(config('paypal.base_url'));
         $response = Http::withHeaders($headers)
             ->withBody(json_encode($body))
             ->post(config('paypal.base_url'). '/v2/checkout/orders');
 
+        info($response);
         if (isset($response['id']) && $response['status'] == 'CREATED') {
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {

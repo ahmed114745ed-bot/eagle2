@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CoinLog;
 use App\Models\PaymentMethodHistory;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
@@ -14,12 +15,12 @@ class FawryPaymentService
     public function __construct()
     {
 
-        $this->fawryUrl = config('services.fawry.fawry_url');
+        $this->fawryUrl = config('services.utd_fawry.utd_fawry_url');
     }
 
     public static function redirect_if_payment_success($trx)
     {
-       return url(config("services.fawry.fawry_return_url"));
+       return url(config("services.utd_fawry.utd_fawry_return_url"));
     }
 
    public static function redirect_if_payment_faild($trx)
@@ -35,6 +36,9 @@ class FawryPaymentService
         }
         PaymentMethodHistory::where(['id' => $trx])->update([
             "utd_code" => $response['merchantRefNum']
+        ]);
+        CoinLog::where(['id' => $trx])->update([
+            "trx" => $response['merchantRefNum']
         ]);
         $trx = $response['merchantRefNum'];
         $data = $this->getBodyForFawry($trx,$response['chargeItems'][0]['price']);
@@ -52,7 +56,7 @@ class FawryPaymentService
             "code" => $trx
         ];
 
-        $url = config("services.fawry.utd_url");
+        $url = config("services.utd_fawry.utd_url");
 
         $client = new Client();
 
@@ -78,9 +82,9 @@ class FawryPaymentService
 
     public function getBodyForFawry($trx,$amount)
     {
-        $merchantCode = config("services.fawry.fawry_merchant_code");
+        $merchantCode = config("services.utd_fawry.utd_fawry_merchant_code");
         $merchantRefNum = $trx;
-        $secure_key = config("services.fawry.fawry_secret");
+        $secure_key = config("services.utd_fawry.utd_fawry_secret");
         $price = number_format($amount, 2, '.', '');
         $qty = 1;
         $syn = $merchantCode.$merchantRefNum."".self::redirect_if_payment_success ($trx).$trx.$qty.$price.$secure_key;

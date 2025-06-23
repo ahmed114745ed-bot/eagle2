@@ -57,9 +57,7 @@ class EnteranceController extends Controller
         return $this->enteranceRoomService->updateRoomCountFromPusher($request);
     }
 
-    public function updateRoomCountFromPusher_new(Request $request)
-    {
-    }
+    public function updateRoomCountFromPusher_new(Request $request) {}
 
 
     public function updateRoomCountFromZego(Request $request)
@@ -67,7 +65,7 @@ class EnteranceController extends Controller
         // Log::info('shami test now', [
         //     'data' => $request->all()
         // ]);
-        
+
         /*$library = Common::getConfig('library');
         if ($library == 2) return Common::apiResponse(false, 'you used pusher');*/
         return $this->enteranceRoomService->updateRoomCountFromZego($request);
@@ -250,7 +248,7 @@ class EnteranceController extends Controller
         $user = $request->user();
         $room_id = $request->input('room_id');
         $owner_id = $request->input('owner_id');
-    
+
         if (!$room_id && !$owner_id) {
             return Common::apiResponse(0, __('Please provide either owner_id or room_id.'));
         }
@@ -259,9 +257,9 @@ class EnteranceController extends Controller
             if (!$room) {
                 return Common::apiResponse(0, __('This room was not found.'));
             }
-            $owner_id = $room->uid; 
+            $owner_id = $room->uid;
         }
-    
+
 
         $ban = Common::ifRoomHasband($owner_id);
         if ($ban) {
@@ -479,14 +477,13 @@ class EnteranceController extends Controller
     public function update(EditRoomRequest $request, $id)
     {
         try {
+            $user = $request->user();
             $room = $this->repo->find($id);
             if (!$room) {
                 return Common::apiResponse(false, 'Room not found', null, 404);
             }
-            // return  $request->user ()->id;
-            if ($room->uid != $request->user()->id && !in_array($request->user()->id, explode(',', $room->room_admin))) {
-                return Common::apiResponse(false, 'not allowed', null, 422);
-            }
+            if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
+
             if ($request->room_name) {
                 $room->room_name = $request->room_name;
             }
@@ -594,7 +591,8 @@ class EnteranceController extends Controller
         }
     }
 
-    public function changeMode($request, $currentMode, Room $room){
+    public function changeMode($request, $currentMode, Room $room)
+    {
         $lastMode = $room->mode;
 
         $room->mode = $currentMode;
@@ -648,7 +646,6 @@ class EnteranceController extends Controller
     {
         if ($room == null) return '';
         return $room->final_room_image;
-
     }
 
     public function updateRoomVisitors($user_id, $owner_id, Room &$room): void
@@ -665,7 +662,8 @@ class EnteranceController extends Controller
 
     }
 
-    public function invite_user(Request $request){
+    public function invite_user(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
@@ -685,13 +683,7 @@ class EnteranceController extends Controller
             return $send;
         } catch (\Exception $th) {
             // \Log::error('Error inviting to room: ' . $th->getMessage());
-            return Common::apiResponse(0,     $th->getMessage(),[],500);
-
-
+            return Common::apiResponse(0,     $th->getMessage(), [], 500);
         }
     }
-
-
-
-
 }
