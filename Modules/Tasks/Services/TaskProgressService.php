@@ -159,7 +159,6 @@ class TaskProgressService
                 'tasks' => $tasks, 
             ], 200);
         } catch (\Exception $e) {
-            \Log::error('Error fetching user progress: ' . $e->getMessage());
             return Common::apiResponse(false, $e->getMessage(), null, 500);
         }
     }

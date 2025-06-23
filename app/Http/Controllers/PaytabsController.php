@@ -240,7 +240,7 @@ class PaytabsController extends Controller
 
                 $this->onPaymentSuccess($payment_data);
             }
-            \Log::info("📬 end payment_data:", ['on' => $payment_data]);
+           
 
         }
         return $this->payment_response($payment_data, 'success');

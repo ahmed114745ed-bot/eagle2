@@ -1013,7 +1013,6 @@ class Common
                         'using' => 1,
                     ]
                 );
-                \Log::info('missingTypes', ['all' => $missingTypes]);
 
                 foreach ($missingTypes ?? [] as $wareType) {
                     Pack::query()->create([
