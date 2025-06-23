@@ -317,7 +317,7 @@ class ChatRoomService
             $roomResource = new ChatRoomResourcePusher($checkRoom);
             event(new OpenChat($roomResource->toResponse(request())->getData()->data, $user2 ??$user , $checkRoom));
         } catch (\Throwable $th) {
-            Log::error($th->getMessage());
+           
             throw $th;
         }
     }

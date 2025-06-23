@@ -118,22 +118,13 @@ class NowPaymentsController extends Controller
     public function paymentCallback(Request $request)
     {
 
-        Log::info('Payment Callback all Data', [
-            'all' => $request->all(),
-           
-        ]);
-        // تسجيل المدخلات الواردة من الـ IPN
-    Log::info('Payment Callback received', [
-        'payment_id' => $request->input('payment_id'),
-        'payment_status' => $request->input('payment_status')
-    ]);
 
     $paymentId = $request->input('payment_id');
     $status = $request->input('payment_status');
 
     // تحقق  حالة الدفع
     if ($status === 'paid') {
-        Log::info('Payment is successful', ['payment_id' => $paymentId]);
+       
 
         // تحديث حالة الدفع في قاعدة البيانات
         $order = NowpaymentOrder::where('payment_id', $paymentId)->update([
@@ -142,18 +133,18 @@ class NowPaymentsController extends Controller
 
         // التحقق من نجاح التحديث في قاعدة البيانات
         if ($order) {
-            Log::info('Order status updated to paid', ['payment_id' => $paymentId]);
+           
             return redirect()->route('payment.success');
         } else {
-            Log::error('Failed to update order status', ['payment_id' => $paymentId]);
+           
             return redirect()->route('payment.cancel');
         }
     } else {
-        Log::warning('Payment status is not paid', ['payment_id' => $paymentId, 'status' => $status]);
+      
         return redirect()->route('payment.cancel');
     }
 
-    Log::info('Callback status received successfully', ['payment_id' => $paymentId]);
+   
     return response()->json(['status' => 'received']);
     }
 }

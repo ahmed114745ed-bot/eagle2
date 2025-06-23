@@ -77,20 +77,20 @@ class AllStatisticController extends MainController
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($onlineUsers, $allUsersCount) {
 
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Users') );
-                    $row->column(6, new InfoBox(__('Number of users'), 'dollar', 'green', route('admin.users'), $this->formatNumber(@$allUsersCount ?? 0)));
-                    $row->column(6, new InfoBox(__('Online Users'), 'dollar', 'green', route('admin.users', ['online' => 1]), $this->formatNumber(@$onlineUsers ?? 0)));
+                    $row->column(6, new InfoBox(__('Number of users'), 'users', 'green', route('admin.users'), $this->formatNumber(@$allUsersCount ?? 0)));
+                    $row->column(6, new InfoBox(__('Online Users'), 'users', 'green', route('admin.users', ['online' => 1]), $this->formatNumber(@$onlineUsers ?? 0)));
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($coins, $total_monthly_di_recieved) {
 
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Total Coins') );
 
-                    $row->column(6, new InfoBox(__('total coins'), 'dollar', 'green', route('admin.users', ['have_coins' => 1]), $this->formatNumber(@$coins ?? 0)));
-                    $row->column(6, new InfoBox(__('totalDiamond'), 'dollar', 'yellow', route('admin.users', ['have_coins' => 1]), $this->formatNumber(@$total_monthly_di_recieved ?? 0)));
+                    $row->column(6, new InfoBox(__('total coins'), 'circle-o', 'green', route('admin.users', ['have_coins' => 1]), $this->formatNumber(@$coins ?? 0)));
+                    $row->column(6, new InfoBox(__('totalDiamond'), 'diamond', 'yellow', route('admin.users', ['have_coins' => 1]), $this->formatNumber(@$total_monthly_di_recieved ?? 0)));
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($remainingDiamond) {
 
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Remaining diamond') );
-                    $row->column(6, new InfoBox(__('total remaining diamond'), 'dollar', 'yellow', route('admin.users', ['have_coins' => 1]), $this->formatNumber(@$remainingDiamond ?? 0)));
+                    $row->column(6, new InfoBox(__('total remaining diamond'), 'diamond', 'yellow', route('admin.users', ['have_coins' => 1]), $this->formatNumber(@$remainingDiamond ?? 0)));
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($user_sallaries, $agency_sallaries) {
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('salaries') );
@@ -115,7 +115,7 @@ class AllStatisticController extends MainController
 
     function formatNumber($number)
     {
-        return number_format($number ?? 0, 2);  // العرض برقمين عشريين
+        return number_format($number);  // العرض برقمين عشريين
     }
 
     public function appInformation()
