@@ -160,7 +160,7 @@ class UserResource extends JsonResource
 
     public function getUserDress($type, $dress, $item = 'img1')
     {
-        $pack = $this->packs
+        $pack = $this->packs->where('is_used', 1)
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
