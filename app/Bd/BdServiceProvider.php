@@ -12,9 +12,9 @@ class BdServiceProvider extends ServiceProvider
     public function boot()
     {
 
-        if (env('APP_ENV') === 'production') {
+        // if (env('APP_ENV') === 'production') {
             URL::forceScheme('https');
-        }
+        // }
         $this->loadRoutesFrom(__DIR__.'/routes.php');
         $this->loadViewsFrom(__DIR__.'/views', 'bd');
     }
