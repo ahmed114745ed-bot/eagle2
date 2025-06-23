@@ -82,15 +82,22 @@ class CoinService
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($request->pay_method == 'fawry') {
-                $oldFawryService = new FawryPaymentServiceV2();
+                $newFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
-                //  get url
-                $paymentUrl = $oldFawryService->makePayment($log->id, $coin->usd, $exterData);
+               $paymentUrl = $newFawryService->makePayment($log->id, $coin->usd, $exterData);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
+            } elseif ($request->pay_method == 'utd_fawry') {
+                $oldFawryService = new FawryPaymentService();
+                $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
+                $paymentUrl = $oldFawryService->makePayment($log->trx, $coin->usd, $exterData);
+                if (isset($response['status']) && $paymentUrl['status']  == 0) {
+                    return $paymentUrl;
+                }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } else if ($request->pay_method == 'opay') {
                 $opay = new OPayController();
