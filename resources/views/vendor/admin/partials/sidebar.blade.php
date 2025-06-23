@@ -88,7 +88,7 @@
                     <li>
                         <a href="{{ $link['uri'] }}">
                             <i class="fa {{ $link['icon'] }}"></i>
-                            <span>{{ $link['title'] }}</span>
+                            <span>{{ bd_url($link['title']) }}</span>
                         </a>
                     </li>
                 @endforeach
