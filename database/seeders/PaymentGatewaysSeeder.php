@@ -543,7 +543,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_3' => [
                 "name" => "paypal_client_secret",
                 "type" => "input",
-                "value" => "AbMnfYHyLXWcRTct1RGWW5tPFnd6SryR0ALvRMgSG4PQW5oV8uti7fYOTmQvXLPzGVJSOgZTrmJ_NpKR"
+                "value" => "EHWD7-rBHXm74Dv8e9_-EMYRWMt1LAt7qzmW-YW3pOBWdLPCVs-D5hoAwfqYyS7cNW5A7Uv3IyqUgqyA"
             ],
 //            'new_4' => [
 //                "name" => "paypal_payment_address",
@@ -553,7 +553,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_4' => [
                 "name" => "paypal_webhook_url",
                 "type" => "input",
-                "value" => 'asdasd'
+                "value" => 'https://eagle.utdsoftware.com/api/paypal-callback'
             ],
             'new_5' => [
                 "name" => "paypal_webhook_id",
