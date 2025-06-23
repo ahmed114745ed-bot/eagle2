@@ -1688,7 +1688,14 @@
                               }
                               $name = $userCharges['name'] ?? '-';
                               $uid = $userCharges['uuid'] ?? '-';
-                              $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
+                              $id = $userCharges->id;
+                              $image = $userCharges->profile->avatar ?? asset('images/businessman-icon.jpg');
+                              $userImageDefault = asset('images/businessman-icon.jpg');
+                              $image = $image ? getImagePath($image) : $userImageDefault;
+
+                                if (!isImageExists($image)) {
+                                    $image = $defaultImage;
+                                }
 
                               $roomName = $giftSLog->room->room_name ?? '-';
                                 $path = $giftSLog->room->room_cover ?? '';
@@ -1698,18 +1705,21 @@
                                 if (!isImageExists($url)) {
                                     $url = $defaultImage;
                                 }
-                                $giftName = app()->getLocale() == 'ar' ? $giftSLog->gift->name??'':$giftSLog->gift->e_name ??'';
+                                $giftName = app()->getLocale() == 'ar' ? @$giftSLog->gift->name??'':@$giftSLog->gift->e_name ??'';
 
                                
                         @endphp
                         <tr>
                             <td>{{ $giftSLog->id }}</td>
                             <td>
-                                <a href="{{  '#' }}" target="_blank"
-                                   style="display: inline-flex; align-items: center; text-decoration: none;">
-                                    <img src="{{ getImagePath( $image) }}" width="30" height="30"
-                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                    <span>{{ $name }} ({{ $uid }})</span>
+                               <a href="{{ url('admin/users/' . $id) }}" target="_blank"
+                                style="display: inline-flex; align-items: center; text-decoration: none;">
+                                    <img src="{{ getImagePath($image) }}" width="40" height="40"
+                                        style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                    <div style="display: flex; flex-direction: column;">
+                                        <strong style="font-size: 14px;">{{ $name }}</strong>
+                                        <small style="color: #777;">UUID: {{ $uid }}</small>
+                                    </div>
                                 </a>
                             </td>
                             <td>
