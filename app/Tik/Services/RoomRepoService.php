@@ -131,6 +131,30 @@ class RoomRepoService
         return $room;
     }
 
+    public function adminOwner($request, $user)
+    {
+        $adminOnlyTypes = ['clear_chat', 'music'];
+        $room = $this->findRoom($request->room_id);
+
+        if (!$room) {
+            throw new \Exception(__('room not found'));
+        }
+
+        $isRoomOwner = $user->id === $room->uid;
+
+        if (in_array($request->type, $adminOnlyTypes)) {
+            $adminIds = array_filter(explode(',', (string) $room->room_admin));
+
+            // Clean whitespace and remove empty strings
+            $adminIds = array_unique(array_map('trim', $adminIds));
+
+            return in_array($user->id, $adminIds) || $isRoomOwner;
+        }
+
+        return $isRoomOwner;
+    }
+
+
     public function getFirstRoomOwner($ownerId)
     {
         return $this->giftLogRepository->getFirstRoomByOwnerId($ownerId);

@@ -227,6 +227,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('add-block', [RoomController::class, 'addBlock']);
                 Route::post('{Room}/comment_status', [RoomController::class, 'commentStatus']);
                 Route::post('/yellow-banner', [RoomController::class, 'sendComment']);
+                Route::post('/check-admin-owner', [RoomController::class, 'adminOwner']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {

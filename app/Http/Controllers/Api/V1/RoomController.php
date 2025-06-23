@@ -1634,6 +1634,7 @@ class RoomController extends Controller
     {
         $ownerId = $request->owner_id;
 
+
         try {
             $room = $this->roomService->changeRoomImage($ownerId);
         } catch (Exception $e) {
@@ -1645,6 +1646,21 @@ class RoomController extends Controller
         Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
 
         return Common::apiResponse(true, __('success process'));
+    }
+
+    public function adminOwner(Request $request)
+    {
+        $user = $request->user();
+        if (!$request->type || !$request->room_id) return Common::apiResponse(0, 'missing param', null, 422);
+
+        try {
+            $check = $this->roomService->adminOwner($request, $user);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
+
+
+        return Common::apiResponse(true, __('success process'), $check, 200);
     }
 
     public function gameRoom()
