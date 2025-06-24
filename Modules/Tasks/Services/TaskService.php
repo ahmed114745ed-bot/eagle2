@@ -128,7 +128,6 @@ class TaskService
             //return $response;
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error collecting task points: ' . $e->getMessage());
             return Common::apiResponse(false, $e->getMessage(), null, 500);
         }
     }

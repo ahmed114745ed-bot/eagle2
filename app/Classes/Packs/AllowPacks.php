@@ -106,7 +106,6 @@ class AllowPacks
             $isAllow   = $this->isAllowToUser($ware) ?? false;
             $minLevel = @$ware->min_level;
 
-            \Log::info('ware',['$ware' ,$ware]);
             $data[]    = [
                 'key' => $key,
                 'title' => __('api.' . $key . '_title',[],'ar'),

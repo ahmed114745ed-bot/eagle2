@@ -26,7 +26,7 @@ class ChargeAgentResource extends JsonResource
         return [
             'agency_id' => $this->id,
             'id' => $user->id ?? 0,
-            'name' => $this->name ?? '',
+            'name' => $user->name ?? '',
             'phone' => $user->phone ?? '',
             'image' => $this->img ?? '',
             'uuid' => $user->uuid ?? '',

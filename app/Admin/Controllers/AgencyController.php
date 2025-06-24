@@ -34,7 +34,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Scopes\HostAgencyScope;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Http\Request as req;
- 
+
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
@@ -187,7 +187,7 @@ class AgencyController extends MainController
 
         switch ($tab) {
             case 'members':
-                $members = 
+                $members =
                 // Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
                     // return
                      $agency->mempers()
@@ -200,20 +200,20 @@ class AgencyController extends MainController
             case 'charges':
                 $charges =
                 //  Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
-                //     return 
+                //     return
                     $agency->senderCharges()
-                        ->with(Common::chargerRelationsQuery()) 
+                        ->with(Common::chargerRelationsQuery())
                         // ->select('id', 'amount', 'created_at')
                         ->latest()
                         ->paginate(10, ['*'], 'charges_page');
                 // });
-               
+
                 break;
 
             case 'salary':
-                $salaries = 
+                $salaries =
                 // Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
-                //     return 
+                //     return
                     AgencySallary::query()
                         ->where('agency_id', $id)
                         ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
@@ -225,7 +225,7 @@ class AgencyController extends MainController
             case 'requests':
                 $agencyJoinRequests =
                 //  Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
-                //     return 
+                //     return
                     AgencyJoinRequest::query()
                         ->where(['agency_id' => $id, 'status' => 0])
                         ->with('user')
@@ -236,8 +236,8 @@ class AgencyController extends MainController
                 break;
 
             case 'targets':
-              
-                $memberTargets = 
+
+                $memberTargets =
                     $agency
                         ->mempers()
                         ->whereHas('targets', function ($query) use ($agencyId, $month, $year) {
@@ -253,7 +253,7 @@ class AgencyController extends MainController
                                 ->where('add_year', $year);
                         }])
                         ->paginate(10, ['*'], 'target_page');
-               
+
 
                 [$agencyTarget, $rate] = Cache::remember(
                     "agency_{$id}_rate_{$month}_{$year}",
@@ -274,9 +274,9 @@ class AgencyController extends MainController
                 break;
         }
 
-        $giftLog = 
+        $giftLog =
         // Cache::remember("agency_{$id}_giftlog", 600, function () use ($id) {
-        //     return 
+        //     return
             GiftLog::where('agency_id', $id)
                 ->selectRaw("SUM(giftPrice) as exp, receiver_id")
                 ->with('receiver')
@@ -286,7 +286,7 @@ class AgencyController extends MainController
                 ->get();
         // });
 
-        $sumTargets = 
+        $sumTargets =
         Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
             return
              UserSallary::where('user_agency_id', $agencyId)
@@ -431,7 +431,7 @@ class AgencyController extends MainController
                     $url = $defaultImage;
                 }
 
-                return handleShowImageWithTypes($this->id, $url, 40, 40);
+                return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
             });
 
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
@@ -1149,7 +1149,7 @@ class AgencyController extends MainController
         $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->first();
         if ($admin) {
             $admin->delete();
-    
+
             return response()->json([
                 'status' => true,
                 'message' => __('Admin role removed from this agency')
@@ -1176,7 +1176,7 @@ class AgencyController extends MainController
         $isOwner = Agency::where('id', $user->agency_id)
             ->where('app_owner_id', $user->id)
             ->exists();
-    
+
         if ($isOwner) {
             return response()->json([
                 'status' => false,
@@ -1194,7 +1194,7 @@ class AgencyController extends MainController
         ]);
     }
 
-    
+
 
     public function rejectJoin($id)
     {

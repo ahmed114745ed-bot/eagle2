@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Models\CoinLog;
 use App\Models\GameWallet;
+use App\Traits\User\PaymentTrait;
 use Illuminate\Http\Request;
 use App\Models\GameChargeHistory;
 use App\Http\Controllers\Controller;
@@ -12,14 +14,11 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentMethodController extends Controller
 {
+    use PaymentTrait;
     public function callback(Request $request)
     {
         $callbackData = $request->all();
-        if (isset($callbackData['fawryRefNumber']))
-            $fawryRefNumber = $callbackData['fawryRefNumber'];
-        else
-            $fawryRefNumber = $callbackData['referenceNumber'];
-
+        $fawryRefNumber = $callbackData['fawryRefNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
@@ -69,5 +68,29 @@ class PaymentMethodController extends Controller
 
         $trxId = $trx->id;
         return Common::apiResponse(1, 'created successfully', $trxId, 200);
+    }
+
+    public function utdCallback(Request $request)
+    {
+        $callbackData = $request->all();
+        $fawryRefNumber = $callbackData['referenceNumber'];
+        $merchantRefNumber = $callbackData['merchantRefNumber'];
+        $orderStatus = $callbackData['orderStatus'];
+
+        $order = CoinLog::where('trx', $merchantRefNumber)->first();
+        if ($orderStatus === 'PAID') {
+            $this->webhookPayment($order->id);
+            $order->pid = $fawryRefNumber;
+            $order->save();
+            return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
+        } elseif ($orderStatus === 'UNPAID') {
+            return response()->json(['status' => 'pending', 'message' => 'Payment is still unpaid.',],202);
+        } elseif ($orderStatus === 'CANCELLED') {
+            return response()->json(['status' => 'cancelled', 'message' => 'Payment was cancelled.',]);
+        }
+
+        $order->save();
+
+        return response()->json(['status' => 'error', 'message' => 'Payment status is invalid or failed.',],400);
     }
 }

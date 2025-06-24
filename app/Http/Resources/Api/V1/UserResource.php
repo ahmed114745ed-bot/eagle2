@@ -199,7 +199,7 @@ class UserResource extends JsonResource
         //     }
         // }
         // return '';
-        $pack = $this->packs
+        $pack = $this->packs->where('is_used', 1)
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
