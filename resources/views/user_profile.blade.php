@@ -967,6 +967,22 @@
 
             }
         }
+
+        .date-flex-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-flex-row span {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .date-flex-row input[type="date"] {
+            flex-basis: 0;
+        }
+
     </style>
 
 
@@ -1588,50 +1604,112 @@
                     <input type="hidden" name="gift_type" value="{{ $giftType }}">
                     <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
 
-                    <div class="row mb-3">
-                        <!-- From Date -->
-                        <div class="col-md-4">
-                            <label for="from_date" class="form-label">{{__('From Date')}}</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                                <input type="date" class="form-control" id="from_date" name="start_at" placeholder="From Date" value="{{ request('start_at') }}">
+                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
+                        <input type="hidden" name="tab" value="gift-log">
+                        <input type="hidden" name="gift_type" value="{{ $giftType }}">
+                        <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
+
+                        <div class="row mb-3" style="align-items: flex-end;">
+                            <!-- From Date -->
+                            <div class="col-md-4">
+                                <div class="date-flex-row">
+                                    <i class="fa fa-calendar"></i>
+                                    <span>{{ __('From Date') }}</span>
+                                    <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
+                                </div>
+                            </div>
+                            <!-- To Date -->
+                            <div class="col-md-4">
+                                <div class="date-flex-row">
+                                    <i class="fa fa-calendar"></i>
+                                    <span>{{ __('To Date') }}</span>
+                                    <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
+                                </div>
+                            </div>
+                            <!-- Buttons -->
+                            <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                <button type="submit" class="btn btn-info btn-sm me-2">
+                                    <i class="fa fa-search"></i> {{__('Search')}}
+                                </button>
+                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                    <i class="fa fa-undo"></i> {{__('Reset')}}
+                                </a>
                             </div>
                         </div>
-
-                        <!-- To Date -->
-                        <div class="col-md-4">
-                            <label for="to_date" class="form-label">{{__('To Date')}}</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                                <input type="date" class="form-control" id="to_date" name="end_at" placeholder="To Date" value="{{ request('end_at') }}">
-                            </div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="col-md-4 d-flex align-items-end">
-                            <button type="submit" class="btn btn-info btn-sm me-2">
-                                <i class="fa fa-search"></i> {{__('Search')}}
-                            </button>
-                            <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
-                                <i class="fa fa-undo"></i> {{__('Reset')}}
-                            </a>
-                        </div>
-                    </div>
+                    </form>
                 </form>
-
                 <!-- Summary Box -->
-                <div class="d-flex flex-column align-items-center mb-4">
-                    <div class="bg-white rounded shadow-sm p-4 text-center w-100" style="max-width: 600px;">
-                        <div style="font-size: 22px; font-weight: bold;">
+                <div class="diamond-summary-container">
+                    <div class="diamond-summary-box">
+                        <div class="diamond-title">
                             {{ $giftType == 'receiver' ? __('total diamonds received') : __('total diamonds sent') }}
                         </div>
-                        <div style="margin-top: 10px; font-size: 18px;">
-                            {{ numToString(@$diamonds) }}
-                            <img src="{{ asset('images/diamond.jpg') }}" alt="Coin" style="width: 32px; height: 32px; vertical-align: middle;">
+                        <div class="diamond-count">
+                            <span>{{ numToString(@$diamonds) }}</span>
+                            <div class="diamond-icon-container">
+                                <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <style>
+                    .diamond-summary-container {
+                        display: flex;
+                        justify-content: center;
+                        width: 100%;
+                        padding: 20px;
+                    }
+
+                    .diamond-summary-box {
+                        max-width: 600px;
+                        width: 100%;
+                        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%);
+                        border-radius: 8px;
+                        padding: 1.5rem;
+                        text-align: center;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        transition: all 0.3s ease;
+                        margin: 0 auto; /* This also helps with centering */
+                    }
+
+                    .diamond-summary-box:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .diamond-title {
+                        font-size: 22px;
+                        font-weight: bold;
+                        color: var(--secondary-color);
+                        margin-bottom: 15px;
+                    }
+
+                    .diamond-count {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 24px;
+                        color: white;
+                    }
+
+                    .diamond-count span {
+                        margin-right: 10px;
+                    }
+
+                    .diamond-icon-container {
+                        background: rgba(255, 255, 255, 0.2);
+                        border-radius: 50%;
+                        padding: 8px;
+                        display: inline-flex;
+                    }
+
+                    .diamond-icon {
+                        width: 32px;
+                        height: 32px;
+                        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+                    }
+                </style>
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle">
