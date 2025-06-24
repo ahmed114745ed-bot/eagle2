@@ -83,19 +83,19 @@
                                     <label for="">{{__("from date")}}</label><br>
                                     <input type="date" name="from_date" value="{{request("from_date")}}">
                                 </div>
-                           
+
                                 <div class="col-md-3">
                                     <label for="">{{__("to date")}}</label><br>
                                     <input type="date" name="to_date"  value="{{request("to_date")}}">
                                 </div>
                                 <label for=""></label><br>
-                                <button class="btn btn-primary">submit</button>
+                                <button class="btn btn-primary">{{__('submit')}}</button>
                             </div>
                         </form>
 
                     </div>
                     <div class="box-body no-padding" style="margin: 10px">
-                        
+
                     </div>
                 </div>
 

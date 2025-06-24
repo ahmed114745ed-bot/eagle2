@@ -62,6 +62,7 @@ class MicService
         if (!$room)  throw new Exception(__('room does not exist'));
 
         $position = $data['position']; //mic sequence 0-8
+
         $mic_arr = explode(',', $room->microphone);
         $main_mic = explode(',', $room->main_microphone);
         $base_mic = explode(',', $room->getOriginal('microphone'));
@@ -269,6 +270,7 @@ class MicService
 
     public function goMicrophoneHand($user, $room)
     {
+
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
@@ -326,9 +328,11 @@ class MicService
     }
     public function mic($data, $type)
     {
+        $user = request()->user();
         $position = $data['position'];
         $room = $this->roomRepository->findRoomUser($data['owner_id']);
-
+        if (!$room) throw new Exception(__('room fot found'));
+        if ($user->id != $room->uid) throw new Exception(__('you don not have permission'));
         if ($room['mode'] == 0) {
             if ($position < 0 || $position > 9) throw new Exception(__('api_responses.position_error'));
         } else {
@@ -341,7 +345,8 @@ class MicService
             return Common::apiResponse(0, __('api_responses.you_dont_have_permission'), null, 408);
         }
 
-        $microphone = $room->microphone;
+
+        $microphone = $room->microphone_only_users;
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);
@@ -370,21 +375,52 @@ class MicService
 
     public function micType(string $type, $microphone, $position)
     {
+
         $microphone = explode(',', $microphone);
-        if ($type == 'mute') {
-            if (@$microphone[$position] != -1) {
-                $microphone[$position] = -2;
-            }
-        } elseif ($type == 'unmute' || $type == 'open') {
-            if (@$microphone[$position]) {
-                $microphone[$position] = 0;
-            }
-        } elseif ($type == 'shut') {
-            if (@$microphone[$position] == false) {
-                $microphone[$position] = -1;
-            }
+        $current = $microphone[$position] ?? '0';
+
+        $user = '0';
+        $status = '0';
+
+        if (str_contains($current, '#')) {
+            [$user, $status] = explode('#', $current);
+        } elseif (is_numeric($current) && (int)$current > 0) {
+            $user = $current;
+            $status = '-1';
+        } else {
+            $user = '0';
+            $status = $current;
         }
-        return $microphone = implode(',', $microphone);
+
+        if ($type === 'mute') {
+            $status = '-2';
+        } elseif ($type === 'unmute' || $type === 'open') {
+            $status = '0';
+        } elseif ($type === 'shut') {
+            $status = '-1';
+        }
+
+        if ($user !== '0') {
+            $microphone[$position] = $user . '#' . $status;
+        } else {
+            $microphone[$position] = $status;
+        }
+        return implode(',', $microphone);
+        // $microphone = explode(',', $microphone);
+        // if ($type == 'mute') {
+        //     if (@$microphone[$position] != -1) {
+        //         $microphone[$position] = -2;
+        //     }
+        // } elseif ($type == 'unmute' || $type == 'open') {
+        //     if (@$microphone[$position]) {
+        //         $microphone[$position] = 0;
+        //     }
+        // } elseif ($type == 'shut') {
+        //     if (@$microphone[$position] == false) {
+        //         $microphone[$position] = -1;
+        //     }
+        // }
+        // return $microphone = implode(',', $microphone);
     }
 
 

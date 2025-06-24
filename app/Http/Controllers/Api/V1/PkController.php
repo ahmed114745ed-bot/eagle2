@@ -45,7 +45,7 @@ class PkController extends Controller
 
     public function createPK(Request $request)
     {
-        $userId = Auth::id();
+        $userId = $request->user()->id;
         try {
             [$pk, $roomId] = $this->pkService->create($request, $userId);
         } catch (Exception $e) {

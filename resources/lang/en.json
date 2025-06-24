@@ -456,7 +456,7 @@
     "user_earn": " user earns",
     "parent_earn": " parent earns",
     "dash_repo": "Dash",
-    "app_repo": "App",
+    "app_repo": "Recharge Agency Activity",
     "coins_repo": "Coins",
     "sendTo": "sendTo",
     "use count": "use count",
@@ -995,10 +995,48 @@
   "Delete daily gift": "Delete daily login gift",
   "Show daily gift": "Show daily login gift details",
   "Browse daily gift": "Browse daily login gift",
-  "Entering Special Effects": "Compound",
+  "Entering Special Effects": "Entering Special Effects",
   "wapel": "entry effect",
+    "Kick switch agencies": "Kick",
+  "Make admin switch agencies": "Make Admin",
+  "Remove admin switch agencies": "Remove Admin",
+  "Member switch agencies": "Agency Members",
+  "Charge history switch agencies": "Agency Charge History",
+  "Salary switch agencies": "Agency Salary",
+  "Join switch agencies": "Join Agency Request",
+  "Target switch agencies": "Agency Target",
   "This target has already been achieved by some users and cannot be updated.": "This target has already been achieved by some users and cannot be updated."
 ,    "target_change_warning": "Increasing the target value will increase the dollar amount received by the hosts, while decreasing it will reduce their dollar value."
+,"host":"Host",
+"Host reports":"Host Reports",
+"Moments": "Moments",
+    "Reels": "Reels",
+    "Uploads:": "Uploads:",
+    "Likes:": "Likes:",
+    "Comments:": "Comments:",
+    "Moment Upload": "Moment Upload",
+    "Moment Likes": "Moment Likes",
+    "Moment Comments": "Moment Comments",
+    "Reel Upload": "Reel Upload",
+    "Reel Likes": "Reel Likes",
+    "Reel Comments": "Reel Comments",
+    "Withdraw": "Withdraw",
+    "prof_reports": "Proftes Reports",
+    "remove_admin": "Remove Admin",
+"kick": "Kick",
+"make_admin": "Make Admin",
+"are_you_sure_remove_member": "Are you sure you want to remove this member?",
+"are_you_sure_remove_admin": "Are you sure you want to remove this admin?",
+"image_type": "image type",
+"pack_not_found": "pack not found",
+"level_num":"level number",
+  "room_closed": "The room is closed, please contact the supervisor."
+
+
+
+
+
+
 
 
 

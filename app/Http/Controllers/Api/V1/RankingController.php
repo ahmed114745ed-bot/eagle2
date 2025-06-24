@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\AgencyRankingRecourse;
 use App\Services\RankingService;
 use App\Services\VipService;
 use Illuminate\Http\Request;
@@ -26,13 +27,33 @@ class RankingController extends Controller
         $class = $request->class ?: 1;
         $type = $request->type !== null ? $request->type : 1;
 
-        if (!in_array($class, [1, 2, 3, 4, 6]) || !in_array($type, [0, 1, 2, 3, 4])) {
+        if (!in_array($class, [1, 2, 3, 4,5, 6]) || !in_array($type, [0, 1, 2, 3, 4])) {
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 
         $limit = $request->is_home ? 3 : 20;
 
         $data = $this->rankingService->getRanking($class, $type, $request->user(), $limit, $request->room_uid, $request->sent_to_owner);
+
+        if ($class == 5) {
+            $data =   AgencyRankingRecourse::collection($data);
+        }
+        
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function rankingV2(Request $request)
+    {
+        $class = $request->class ?: 1;
+        $type = $request->type !== null ? $request->type : 1;
+
+        if (!in_array($class, [1, 2, 3, 4, 6]) || !in_array($type, [0, 1, 2, 3, 4])) {
+            return Common::apiResponse(0, 'Parameter error', null, 422);
+        }
+
+        $limit = $request->is_home ? 3 : 20;
+
+        $data = $this->rankingService->getRankingV2($class, $type, $request->user(), $limit, $request->room_uid, $request->sent_to_owner);
 
         return Common::apiResponse(1, '', $data);
     }

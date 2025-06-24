@@ -248,7 +248,7 @@ class RoomController extends Controller
                 Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
             }
             $this->handleLeaveCp($user, $roomId);
-            $room=Room::find($roomId);
+            $room = Room::find($roomId);
             $this->updateMicrophone($room->uid, $user->id);
             return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
         } catch (Exception $exception) {
@@ -1265,14 +1265,14 @@ class RoomController extends Controller
     //cancel manager
     public function remove_admin(Request $request)
     {
+        $user = $request->user();
         $uid      = $request->owner_id;
         $admin_id = $request->user_id;
-        if ($request->user()->id != $uid) {
-            return Common::apiResponse(0, 'not allowed', null, 403);
-        }
         if (!$uid || !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
         $room = Room::where('uid', $uid)->first();
         if (!$room) return Common::apiResponse(0, 'room not found', null, 422);
+        if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
+
         $roomAdmin = $room->room_admin;
         $adm_arr   = !$roomAdmin ? [] : explode(",", $roomAdmin);
         if (!in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is not an administrator of this room', null, 404);
@@ -1634,6 +1634,7 @@ class RoomController extends Controller
     {
         $ownerId = $request->owner_id;
 
+
         try {
             $room = $this->roomService->changeRoomImage($ownerId);
         } catch (Exception $e) {
@@ -1645,6 +1646,21 @@ class RoomController extends Controller
         Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
 
         return Common::apiResponse(true, __('success process'));
+    }
+
+    public function adminOwner(Request $request)
+    {
+        $user = $request->user();
+        if (!$request->type || !$request->room_id) return Common::apiResponse(0, 'missing param', null, 422);
+
+        try {
+            $check = $this->roomService->adminOwner($request, $user);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
+
+
+        return Common::apiResponse(true, __('success process'), $check, 200);
     }
 
     public function gameRoom()

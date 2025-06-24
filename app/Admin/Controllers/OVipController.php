@@ -148,8 +148,10 @@ class OVipController extends MainController
 
         if (Admin::user()->can('browse-' . 'vip-gift') || Admin::user()->can('*')) {
             $grid->column(__('file'))->display(function () {
+                $privilegeTypes =   $this->privilegs->pluck('en_name', 'type')->sortKeys();
+                $type = $privilegeTypes?->keys()->first();
                 // توليد الروابط
-                $url1 = url('admin/ovip-gift/' . $this->id);
+                $url1 = url('admin/ovip-gift/' . $this->id . '?type=' . $type);
 
                 $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";
                 return $button1;
@@ -230,19 +232,18 @@ class OVipController extends MainController
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
         if (!$form->isEditing()) {
-            if (Admin::user()->can('add_vip_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('🪙');
-            }
+
+            $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
         }
         if ($form->isEditing()) {
-            if (Admin::user()->can('edit_vip_price') || Admin::user()->can('*')) {
-                $form->currency('price', __('price'))->symbol('🪙');
-            }
+
+            $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
         }
+        
         if (Admin::user()->can('*')) {
-            $form->number('expire', __('expire'));
+            $form->number('expire', __('expire'))->rules('required|numeric|gt:0');
         } else {
-            $form->number('expire', __('expire'))->max(30);
+            $form->number('expire', __('expire'))->max(30)->rules('required|numeric|gt:0');
         }
         $form->belongsToMany('privilegs', Privileges::class, __('privileges'))->rules('required|array|min:1');
 
@@ -256,16 +257,28 @@ class OVipController extends MainController
             ]);
 
             if ($notActuveAll) {
+                $types = [];
 
                 foreach ($privilegs as $privileg) {
                     $type_preveleg = VipPrivilege::find($privileg);
 
+                    if (!$type_preveleg) continue;
+
+                    $type = $type_preveleg->type;
+             
+                    if (in_array($type, $types)) {
+                    
+                        admin_error('خـطأ', 'لا يمكن اختيار أكثر من امتياز من نفس النوع: ' );
+                        return back();
+                    }
+            
+                    $types[] = $type;
 
                     if (isset($type_preveleg->type)) {
 
                         $updateActive = Ware::where('type', $type_preveleg->type)->where('level', $level)->update([
                             'is_active_for_vip' => true
-                        ]);
+                    ]);
                         // if (!$updateActive) {
                         //     session()->flash('show_alert_vip', 'Your alert message');
                         //     return redirect()->back();

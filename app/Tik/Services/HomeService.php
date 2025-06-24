@@ -127,14 +127,16 @@ class HomeService
 
     public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
     {
+
         if (key_exists($type, $privilegeArr)) {
+
+
             $privilegeId = $privilegeArr[$type];
 
+
             if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
-
                 throw new \Exception('not found ');
-            } else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
-
+            } else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->exists()) {
                 throw new \Exception(__('api.notWare'));
             }
             $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->get();
@@ -148,7 +150,7 @@ class HomeService
                     }*/
                     break;
                 case 'room':
-                    Room::query()->where('uid', $user->id)->update(['room_status' => $isAvailable ? 2 : 1]);
+                    // Room::query()->where('uid', $user->id)->update(['room_status' => $isAvailable ? 2 : 1]);
                     break;
             }
         }

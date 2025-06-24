@@ -20,13 +20,14 @@ Route::group(
         'namespace'  => 'web',
         'middleware' => [
             'web',
-           'admin',
+            'admin',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
-    function (\Illuminate\Routing\Router $router) {
-        $router->resource('whatsapp-messages', WhatsappMessageController::class);
-    });
+    function () {
+        Route::resource('whatsapp-messages', WhatsappMessageController::class);
+    }
+);

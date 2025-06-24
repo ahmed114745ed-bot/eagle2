@@ -2,51 +2,18 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
-use Modules\Moment\Entities\Moment;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Http\Traits\AchievementGift;
-use App\Traits\PreventDeleteIfCreatedByDeveloper;
+use Modules\Moment\Entities\Moment;
 
 class Gift extends Model
 {
-    use AchievementGift ,PreventDeleteIfCreatedByDeveloper;
-   // protected $fillable=['use_count'];
-   protected $guarded = ['id'];
-   public function getCreatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
+    use AchievementGift, TimestampsWithTimezone;
 
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
+    // protected $fillable=['use_count'];
+    protected $guarded = ['id'];
 
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
     public function luckyGift()
     {
         return $this->hasOne(LuckyGift::class);
@@ -54,12 +21,16 @@ class Gift extends Model
 
     public function moments()
     {
-        return $this->belongsToMany(Moment::class, 'moment_user_gifts')->withPivot('num', 'created_at','updated_at')->withTimestamps();
+        return $this->belongsToMany(Moment::class, 'moment_user_gifts')->withPivot('num', 'created_at', 'updated_at')->withTimestamps();
     }
 
-    public function lucky_gift ()
+    public function lucky_gift()
     {
-        return $this->hasOne(LuckyGift::class,'gift_id');
+        return $this->hasOne(LuckyGift::class, 'gift_id');
+    }
+    public function vip()
+    {
+        return $this->hasOne(OVip::class,'id','vip_level');
     }
 
     protected static function boot()

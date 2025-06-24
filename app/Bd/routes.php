@@ -24,8 +24,6 @@ Route::prefix('bd')->name('bd.')->group(function () {
     // });
 });
 
-
-
 Route::group(
     [
         'prefix' => 'bd',
@@ -36,14 +34,13 @@ Route::group(
         ],
         'as' => 'bd.',
     ],
-    function (Router $router) {
+    function () {
         if (MultiLanguage::config("show-login-page", true)) {
             Route::get('login', [\App\Bd\Controllers\AuthController::class, 'showLoginForm'])->name('login');
         }
         Route::post('login', [\App\Bd\Controllers\AuthController::class, 'postLogin']);
         Route::get('logout', [\App\Bd\Controllers\AuthController::class, 'logout']);
     }
-
 );
 
 Route::group(
@@ -56,23 +53,22 @@ Route::group(
             'admin.pjax',
             'admin.log',
             'admin.bootstrap',
-            'adminIp',
+            // 'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as' => 'bd.',
     ],
-    function (Router $router) {
-
-        $router->get('/', [HomeController::class, 'index'])->name('home');
-        $router->get('/charges', [ChargeController::class, 'index'])->name('charges');
-        $router->resource('/agencies', Agency::class);
-        $router->resource('/salaries', BdSalariesController::class);
-        $router->resource('/charges', ChargeController::class);
-        // $router->resource('/wallet', 'WalletController');
+    function () {
+        Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::get('/charges', [\App\Bd\Controllers\ChargeController::class, 'index'])->name('charges');
+        Route::resource('/agencies', AgencyController::class);
+        Route::resource('/salaries', \App\Bd\Controllers\BdSalariesController::class);
+        Route::resource('/charges', \App\Bd\Controllers\ChargeController::class);
+        // Route::resource('/wallet', 'WalletController');
         Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
         Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
 
-        $router->resource('/request-agencies', RequestAgency::class);
+        Route::resource('/request-agencies', RequestAgencyController::class);
     }
 );

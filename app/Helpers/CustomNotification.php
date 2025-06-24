@@ -156,7 +156,7 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-        public function rejectAgency(Agency $agency, User $user)
+    public function rejectAgency(Agency $agency, User $user)
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $body_ar = __('api.reject_agency', ['name' => $agency->name],  'ar');
@@ -171,7 +171,7 @@ class CustomNotification
         ]);
         $result = Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'agency-reject-request');
         logger()->info('Firebase Send rejectAgency Result: ', ['result' => $result]);
-      
+
         Common::sendOfficialMessage($user->id, title: $body_en, content: $agency->name, titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
@@ -191,9 +191,9 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public function agencyAddAdmin( $agencyId, User $user)
+    public function agencyAddAdmin($agencyId, User $user)
     {
-        $agency =Agency::find($agencyId);
+        $agency = Agency::find($agencyId);
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $body_ar = __('api.add_admin_agency', ['name' => $agency->name],  'ar');
         $body_en = __('api.add_admin_agency', ['name' => $agency->name],  'en');
@@ -205,7 +205,7 @@ class CustomNotification
             'tokens_notification' => $tokens_notification,
             'user' => $user
         ]);
-       
+
         $result =  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-add-admin');
         logger()->info('Firebase Send Result: ', ['result' => $result]);
 
@@ -213,9 +213,9 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public function agencyRemoveAdmin( $agencyId, User $user)
+    public function agencyRemoveAdmin($agencyId, User $user)
     {
-        $agency =Agency::find($agencyId);
+        $agency = Agency::find($agencyId);
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $body_ar = __('api.remove_admin_agency', ['name' => $agency->name],  'ar');
         $body_en = __('api.remove_admin_agency', ['name' => $agency->name],  'en');
@@ -227,7 +227,7 @@ class CustomNotification
             'tokens_notification' => $tokens_notification,
             'user' => $user
         ]);
-        $result=  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-remove-admin');
+        $result =  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-remove-admin');
         logger()->info('Firebase Send Result: ', ['result' => $result]);
         Common::sendOfficialMessage($user->id, image: $agency->img, title: $body_en, content: $agency->name, titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
@@ -291,7 +291,7 @@ class CustomNotification
     public function adminFamily(Family $family, User $user)
     {
         $tokens_notification = $user?->notification_id;
-        $body_ar = __('api.admin_family', ['name' => $family->name,'appName' => $this->appName('ar')], 'ar');
+        $body_ar = __('api.admin_family', ['name' => $family->name, 'appName' => $this->appName('ar')], 'ar');
         $body_en = __('api.admin_family', ['name' => $family->name, 'appName' => $this->appName('en')], 'en');
         $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $icon = $family->img;
@@ -600,6 +600,21 @@ class CustomNotification
         $data['user_id'] = $user?->id;
         Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, data: $data, messageType: 'room-achievement-target');
         Common::sendOfficialMessage($user->id, $body_en, '', titleAr: $body_ar);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+
+    public function luckyBox(User $user, $coins, $imageBox)
+    {
+        $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $body_ar = __('api.luckBox', ['coins' => $coins], 'ar');
+        $body_en = __('api.luckBox', ['coins' => $coins], 'en');
+        $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
+        $content = ($user->lan === 'ar') ? 'lucky box' : 'صندوق الحظ';
+        $data['image'] = getImagePath(@$imageBox);
+        $icon = $data['image'];
+        Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'lucky_box');
+        Common::sendOfficialMessage($user->id,  title: $body_en, content: $content, titleAr: $body_ar,);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 }

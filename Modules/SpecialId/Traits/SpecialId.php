@@ -21,6 +21,16 @@ trait SpecialId
             $query->where('uuid', $toId)->orWhere(fn($q) => $q->where('special_id', $toId)->whereHas('specialId'));
         });
     }
+    public function scopeLikeSearchByUuid(Builder $builder, $toId): Builder
+    {
+        return $builder->where(function ($query) use ($toId) {
+            $query->where('uuid', 'like', '%' . $toId . '%')
+                ->orWhere(function ($q) use ($toId) {
+                    $q->where('special_id', 'like', '%' . $toId . '%')
+                        ->whereHas('specialId');
+                });
+        });
+    }
 
     public function scopeFitterByUuid(Builder $builder, $toId): Builder
     {

@@ -2,6 +2,7 @@
 
 namespace App\Tik\Repositories;
 
+use App\Models\Pack;
 use App\Models\UserVip;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -66,7 +67,31 @@ class UserVipRepository extends AbstractRepository
     {
         return $this->model->with("OVip")->has("OVip")->find($id);
     }
+    public function findByIdWithPack($id,$user_id)
+    {
+        return Pack::where('id', $id)
+        ->where('user_id', $user_id)
+        ->where(function ($q) {
+            $q->where('expire', 0)
+              ->orWhere('expire', '>=', time());
+        })
+        ->first();
+    }
+    public function togglePackUsage($pack_id, $user_id, bool $isUsed): bool
+    {
+        $pack = $this->findByIdWithPack($pack_id, $user_id);
 
+        if (!$pack) {
+            throw new \Exception(__("pack_not_found"));
+        }
+        if ($pack->is_used != $isUsed) {
+            $pack->is_used = $isUsed;
+            $pack->save();
+        }
+
+        return true;
+    }
+    
     public function updateIsUsedForUser($userId)
     {
         $this->model->where('user_id', $userId)->update(['is_used' => 0]);

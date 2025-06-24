@@ -29,7 +29,10 @@
     .ltr label {
         margin: 0 70px 0 0 !important;
     }
+    .fileinput-remove{
+        display: none;
 
+    }
     .rtl .pull-right{
         float: left !important;
     }
@@ -39,6 +42,13 @@
         /*background: #FF9428 !important;*/
         /* background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%)!important; */
     }
+
+    .box-header {
+    /* color: #444; */
+    /* display: block; */
+    /* padding: 10px; */
+    /* position: relative; */
+}
 
     .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
         z-index: 2;
@@ -795,7 +805,10 @@
                 display: math !important;
                 direction: rtl !important;
                 flex-direction: row-reverse !important;
+            }
 
+            .ltr .form-horizontal .row {
+                display: math !important;
             }
 
            .rtl .form-horizontal .box-footer .btn-group {
@@ -810,7 +823,7 @@
                 display: flex !important;
             }
 
-            .rtl .box-header .box-tools {
+            .rtl /**.box-header**/ .box-tools {
                 float: left;
                 top: -8px;
                 position: relative;

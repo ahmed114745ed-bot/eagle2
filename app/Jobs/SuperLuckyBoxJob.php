@@ -13,6 +13,7 @@ use App\Models\RoomVisitor;
 use App\Models\UserBoxGift;
 use App\Facades\RedisService;
 use Illuminate\Bus\Queueable;
+use App\Facades\CustomNotification;
 use Illuminate\Queue\SerializesModels;
 use App\Http\Services\LuckyBoxServices;
 use Illuminate\Queue\InteractsWithQueue;
@@ -39,11 +40,11 @@ class SuperLuckyBoxJob implements ShouldQueue
     {
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
-        \Log::error('super box ' );
+
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
         if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {
-            $keyBoxUse  = 'BoxUse_' . $userBox->bid;
+            $keyBoxUse  = 'BoxUse_' . $userBox->id;
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
             if (!$pickerBoxIds)  return;
             $users =  User::whereIn('id', $pickerBoxIds)->inRandomOrder()->get();
@@ -78,7 +79,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                         'label' => $userBox->label
                     ];
 
-                    if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => true])->exists()) {
+                    if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => $userBox->id])->exists()) {
                         return;
                     }
 
@@ -89,14 +90,36 @@ class SuperLuckyBoxJob implements ShouldQueue
                     $userBox['unused_coins'] -= $coins;
                     //update box use in redis
                     RedisService::updateUnSerialize($keyBoxUse, $userBox);
-                    dispatch(new OpenBoxJob($userBox->bid, $user->id, $user->name))->onQueue('luckyBox');
+                    dispatch(new OpenBoxJob($userBox->id, $user->id, $user->name))->onQueue('luckyBox');
 
                     $user->increment('di', $coins);
+                    if ($coins > 0) {
+                        CustomNotification::luckyBox($user, $coins, $userBox?->image);
+                    }
                 }
                 $user = User::where('id', $userBox->user_id)->first();
                 $user->increment('di', $userBox->unused_coins);
                 $userBox->is_closed = true;
                 $userBox->save();
+            }
+            $winners = UserBoxGift::where(['box_uses_id' => $userBox->id])->where('coins', '>', 0)->select('user_id', 'coins')->toArray();
+            $box_use = BoxUse::find($userBox->id);
+            $room    = Room::withoutAppends()->where('uid', $box_use->room_uid)->first();
+            if ($room && $room->owner) {
+                $m     = [
+                    "messageContent" => [
+                        "message"      => "hideluckybox",
+
+                        "boxUId" => $box_use->id,
+                        "ownerId" =>  @$room->owner->id,
+                        "ownerName" => @$room->owner->name ?? '',
+                        "ownerImage" => @$room->owner->profile->avatar ?? '',
+                        "ownerUuId" => @$room->owner->uuid,
+                        "winners"     => $winners,
+                    ]
+                ];
+                $json  = json_encode($m);
+                Common::sendToZego('SendCustomCommand', @$room->id, @$room->owner->id, $json);
             }
         }
     }

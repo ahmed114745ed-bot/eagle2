@@ -3,26 +3,18 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
-use App\Traits\AdminTraits\AdminUserTrait;
 use Encore\Admin\Facades\Admin;
 use App\Models\Agency;
 use App\Models\AgencySallary;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 
 class AgencyMangerAgencyesController extends MainController
 {
-    use AdminUserTrait;
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
 
     public $permission_name = 'agency-manager';
 
@@ -81,7 +73,6 @@ class AgencyMangerAgencyesController extends MainController
         $loggedInUserId = Admin::user()->app_id;
 
         $grid->model()->where('agency_manger_id', $loggedInUserId);
-
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
@@ -202,25 +193,6 @@ class AgencyMangerAgencyesController extends MainController
 
     protected function form()
     {
-        $ops = [];
-        foreach ($this->getAgencies() as $user) {
-            $ops[$user->id] = $user->name;
-        }
-
-        // $ops2 = [];
-        // foreach (User::where('agency_id', 0)->get() as $user) {
-        //     $ops2[$user->id] = $user->uuid . '_' . $user->name;
-        // }
-        $opsAgencyManger = [];
-        foreach (User::where('is_manger', 1)->get() as $user) {
-            $opsAgencyManger[$user->id] = $user->uuid . '_' . $user->name;
-        }
-
-        $opsAgencyMangerDash = [];
-        foreach (DB::table('admin_users')->get() as $user) {
-            $opsAgencyMangerDash[$user->id] = $user->name;
-        }
-
         $form = new Form(new Agency);
         $form->tools(function (Form\Tools $tools) {
             $tools->disableDelete();

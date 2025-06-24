@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Selectables\Privileges;
-use Carbon\Carbon;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDeleteIfCreatedByDeveloper;
 
@@ -12,62 +11,18 @@ class OVip extends Model
     use PreventDeleteIfCreatedByDeveloper;
 
     protected $table = 'o_vips';
+
     protected $fillable = [
         'name',
         'level',
         'price',
         'exp',
         'expire',
-        'img'
+        'img',
     ];
 
     protected $hidden = ['privileges'];
 
-/*    protected static function boot()
-    {
-        parent::boot();
-
-        static::deleting(function ($oVip){
-            $oVip->privilegs()->detach();
-
-            $oVip->wares()->forceDelete();
-        });
-    }*/
-
-    public function getCreatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
-
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
-
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
     public function privilegs()
     {
         return $this->belongsToMany(VipPrivilege::class, 'vip_prev', 'o_vip_id', 'o_vip_privilege_id', 'id', 'id');
@@ -85,7 +40,8 @@ class OVip extends Model
         return $this->hasMany(Ware::class, 'level', 'level');
     }
 
-    function getTranslation($key) {
+    public function getTranslation($key)
+    {
         switch ($key) {
             case 1:
                 return trans('Gemstone');
@@ -131,7 +87,6 @@ class OVip extends Model
                 return trans('Unknown'); // Fallback for unknown keys
         }
     }
-
 
     protected static function boot()
     {

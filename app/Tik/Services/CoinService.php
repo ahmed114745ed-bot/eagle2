@@ -56,27 +56,23 @@ class CoinService
             $data = [
                 'name' => $coin->coin . '_coins',
                 'amount' => $coin->usd,
-                'trx' => $log->trx
+                'trx' => $log->trx,
+                'order_id' => $log->id,
+                'user_id' => $user->id
             ];
             if ($request->pay_method == 'strip') {
-                $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
-                $is_stripe_active = Setting::where('key', 'is_stripe_active')->first();
-                $stripe_success_url = Setting::where('key', 'stripe_success_url')->first();
-                $stripe_cancel_url = Setting::where('key', 'stripe_cancel_url')->first();
-                $stripe_currency = Setting::where('key', 'stripe_currency')->first();
-                $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
+                $stripe_test_secret_key = config('stripe.test_secret_key');
+                $is_stripe_active = config('is_stripe_active');
+                $stripe_currency = config('stripe.currency');
+                $stripe_webhook_secret = config('stripe.webhook_secret');
 
                 $data['stripe_test_secret_key'] = $stripe_test_secret_key;
                 $data['is_stripe_active'] = $is_stripe_active;
-                $data['stripe_success_url'] = $stripe_success_url;
-                $data['stripe_cancel_url'] = $stripe_cancel_url;
                 $data['stripe_currency'] = $stripe_currency;
                 $data['stripe_webhook_secret'] = $stripe_webhook_secret;
 
                 if(!$stripe_test_secret_key
                 || !$is_stripe_active
-                || !$stripe_success_url
-                || !$stripe_cancel_url
                 || !$stripe_currency
                 || !$stripe_webhook_secret
                 ){
@@ -86,16 +82,23 @@ class CoinService
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($request->pay_method == 'fawry') {
-                $oldFawryService = new FawryPaymentServiceV2();
+                $newFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
-                //  get url
+               $paymentUrl = $newFawryService->makePayment($log->id, $coin->usd, $exterData);
+                if (isset($response['status']) && $paymentUrl['status']  == 0) {
+                    return $paymentUrl;
+                }
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
+            } elseif ($request->pay_method == 'utdFawry') {
+                $oldFawryService = new FawryPaymentService();
+                $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
+
                 $paymentUrl = $oldFawryService->makePayment($log->id, $coin->usd, $exterData);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
-
-                return response()->json($paymentUrl, 200);
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } else if ($request->pay_method == 'opay') {
                 $opay = new OPayController();
                 return $opay->make($data, $user);
@@ -103,8 +106,9 @@ class CoinService
                 $ziniPayService = new ZiniPaymentService();
                 return $ziniPayService->makePayment($log->id, $coin->usd, $user);
             } else if ($request->pay_method == 'paypal') {
-                $ziniPayService = new PayPalService();
-                return $ziniPayService->create($log->id, $coin->usd, $user);
+                $paypalService = new PayPalService();
+                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
+                return Common::apiResponse(1, 'ok', $paymentLink, 200);
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);

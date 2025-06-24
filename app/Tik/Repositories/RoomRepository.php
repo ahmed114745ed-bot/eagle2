@@ -103,13 +103,21 @@ class RoomRepository extends AbstractRepository
             ->orderByDesc('pin')
             ->withCount('roomVisitors')
             ->whereHas('owner')
+            ->whereDoesntHave('owner.packs', function ($q) {
+                $q->where('type', 16)
+                    ->where('is_used', 1)
+                    ->where(function ($q) {
+                        $q->where('expire', 0)
+                            ->orWhere('expire', '>=', now()->timestamp);
+                    });
+            })
             ->when($topRooms, function ($query) {
                 $query->orderByDesc('room_visitors_count');
-//                $query->where(function ($query) {
-//                    $query->where(fn($q) => $q->has("roomVisitors"))
-//                        ->orWhere(fn($q) => $q->where('pin', 1));
-                    // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
-//                });
+                //                $query->where(function ($query) {
+                //                    $query->where(fn($q) => $q->has("roomVisitors"))
+                //                        ->orWhere(fn($q) => $q->where('pin', 1));
+                // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
+                //                });
             })
             // ->where('uid','!=', Auth::id())
             ->where('room_status', 1);
@@ -140,10 +148,10 @@ class RoomRepository extends AbstractRepository
             case 'popular':
                 $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc');
                 break;
-                case 'last_create':
-                  //  dd(Carbon::now()->subDay());
-                    $result->whereDate('created_at', '>=', Carbon::now()->subDays(3))->orderByDesc('id');
-                    break;
+            case 'last_create':
+                //  dd(Carbon::now()->subDay());
+                $result->whereDate('created_at', '>=', Carbon::now()->subDays(3))->orderByDesc('id');
+                break;
             case 'pk':
                 // $result->where('is_show_pk', 1)->orderByDesc('room_visitors_count');
                 $result->has('lastPk');
@@ -174,26 +182,26 @@ class RoomRepository extends AbstractRepository
                 ;
                 break;
             case 'following':
-            //    $result->whereIn('uid', function ($query) use ($user) {
-            //         /* @var Builder $query*/
-            //         $query->select('followed_user_id')
-            //             ->from('follows')
-            //             ->where('user_id', $user->id);
-            //     })
-                    $result->whereIn('uid', $user->followeds_ids())
+                //    $result->whereIn('uid', function ($query) use ($user) {
+                //         /* @var Builder $query*/
+                //         $query->select('followed_user_id')
+                //             ->from('follows')
+                //             ->where('user_id', $user->id);
+                //     })
+                $result->whereIn('uid', $user->followeds_ids())
 
                     ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session');
 
                 break;
 
-                case 'friends':
+            case 'friends':
 
 
-                    $result->whereIn('uid', $user->friends_ids())
-                         ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
-                         ->orderByDesc('session');
-                     break;
+                $result->whereIn('uid', $user->friends_ids())
+                    ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
+                    ->orderByDesc('session');
+                break;
 
             case 'nearby':
                 $userLat  = $user->lat;
@@ -222,7 +230,7 @@ class RoomRepository extends AbstractRepository
         return $result->when($roomType != 'live', function ($q) use ($roomType) {
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
-             $q->whereIn('type', ['single_live', 'multi_live']);
+            $q->whereIn('type', ['single_live', 'multi_live']);
         })->paginate(10);
     }
 

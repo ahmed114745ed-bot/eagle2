@@ -21,7 +21,7 @@ class PkEventController extends Controller
     {
         $nowDate = Carbon::now();
         $pkEvent = PkEvent::currentEvent()->first();
-        if (!$pkEvent) return Common::apiResponse(0, __('there is not event now'), null, 422);
+        if (!$pkEvent) return Common::apiResponse(0, __('there is no event now'), null, 422);
 
         $columnRelations = [
             1 => 'sender',
@@ -85,8 +85,7 @@ class PkEventController extends Controller
     public function topDetails()
     {
         $nowDate = Carbon::now();
-        $pkEvent = PkEvent::currentEvent()->with(['rewards'])
-            ->first();
+        $pkEvent = PkEvent::currentEvent()->with(['rewards']) ->first();
         if (!$pkEvent) {
             return Common::apiResponse(0, __('there is no event now'), null, 422);
         }
@@ -108,7 +107,7 @@ class PkEventController extends Controller
         $yesterdayEnd = Carbon::yesterday()->copy()->toDateTimeString();
         $pkEvent   = PkEvent::currentEvent()->first();
 
-        if (!$pkEvent) return Common::apiResponse(0, __('there is weekly star now'), null, 422);
+        if (!$pkEvent) return Common::apiResponse(0, __('there is no event now'), null, 422);
 
         $dataSender = GiftLog::with('sender')->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
             ->groupBy('sender_id')->where('pk', 1)->whereBetween('created_at', [$yesterdayStart, $yesterdayEnd])->orderByDesc('totalGiftNum')->first();

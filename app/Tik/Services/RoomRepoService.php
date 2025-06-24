@@ -131,6 +131,30 @@ class RoomRepoService
         return $room;
     }
 
+    public function adminOwner($request, $user)
+    {
+        $adminOnlyTypes = ['clear_chat', 'music'];
+        $room = $this->findRoom($request->room_id);
+
+        if (!$room) {
+            throw new \Exception(__('room not found'));
+        }
+
+        $isRoomOwner = $user->id === $room->uid;
+
+        if (in_array($request->type, $adminOnlyTypes)) {
+            $adminIds = array_filter(explode(',', (string) $room->room_admin));
+
+            // Clean whitespace and remove empty strings
+            $adminIds = array_unique(array_map('trim', $adminIds));
+
+            return in_array($user->id, $adminIds) || $isRoomOwner;
+        }
+
+        return $isRoomOwner;
+    }
+
+
     public function getFirstRoomOwner($ownerId)
     {
         return $this->giftLogRepository->getFirstRoomByOwnerId($ownerId);
@@ -300,8 +324,10 @@ class RoomRepoService
 
     public function changeMode($request, $currentMode)
     {
+        $user = request()->user();
         $room =  $this->findRoomUser($request->owner_id);
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
+        if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
         //get last mode of rooms to if is cinema mode and change it update room background
         $lastMode = $room->mode;
         $room->mode = $currentMode;
@@ -464,8 +490,8 @@ class RoomRepoService
 
         if (!$room)  throw new \Exception(__('room not founded'));
 
-        if (auth()->id() != $room->uid && ! in_array(auth()->id(), $room->admins)){
-            throw new \Exception(__('you dont have permission'));
+        if (auth()->id() != $room->uid && ! in_array(auth()->id(), $room->admins)) {
+            throw new \Exception(__('you don not have permission'));
         }
 
         $room->update(['is_comment_closed' => $request['status']]);

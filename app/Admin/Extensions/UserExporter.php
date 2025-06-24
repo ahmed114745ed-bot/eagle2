@@ -3,120 +3,119 @@
 namespace App\Admin\Extensions;
 
 use App\Models\User;
-use App\Models\UserTarget;
 use App\Models\UserSallary;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use Encore\Admin\Grid\Exporters\ExcelExporter;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-use Maatwebsite\Excel\Concerns\FromCollection;
-
-
-class UserExporter implements FromCollection, WithHeadings
+class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
 {
+    protected string $fileName = 'users_list.csv';
 
-
-
-    protected $fileName = 'users_list.csv';
-    protected $headings = [
-       
-        "uuid",
-        "name",
-        'diamonds',
-        'salary',
-        'withdrawn',
-        'remaining',
-        'agency',
-        'month',
-        'year'
-    ];
-
-
-
-
-
-    /**
-     * @inheritDoc
-     */
-    public function collection()
+    public function collection(): \Illuminate\Support\Collection
     {
+        $month = request('month', now()->month);
+        $year = request('year', now()->year);
+
+        // Step 1: Query users and eager load agency
         $users = User::query()
+            ->with('agency')
+            ->whereNotNull('agency_id')
             ->where('agency_id', '!=', 0)
-            ->where('agency_id', '!=', '')
-            ->where('agency_id', '!=', null)
-            //            ->where ('salary','>',0)
-        ;
-        if (request('agency_id')) {
-            $users = $users->where('agency_id', request('agency_id'));
-        }
+            ->when(request('agency_id'), fn($q) => $q->where('agency_id', request('agency_id')))
+            ->get();
 
-        $users = $users->get();
+        // Step 2: Query salaries in one shot and map by user_id
+        $salaries = UserSallary::query()
+            ->select([
+                'user_id',
+                DB::raw('SUM(sallary) AS target'),
+                DB::raw('SUM(cut_amount) AS expenses'),
+                DB::raw('SUM(achieved_diamond) AS achieved_diamond'),
+                DB::raw('SUM(sallary) - SUM(cut_amount) AS salary'),
+                DB::raw('MAX(days) AS achieved_days'),
+                DB::raw('MAX(hours) AS achieved_hours'),
+                DB::raw('MAX(extras) AS extras'),
+                DB::raw('MAX(user_agency_id) AS user_agency_id'),
+            ])
+            ->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month)
+            ->where('is_paid', 0)
+            ->whereNotNull('user_agency_id')
+            ->groupBy('user_id')
+            ->get()
+            ->keyBy('user_id');
 
-        $arr = [];
+        $data = [];
 
         foreach ($users as $user) {
-            $target = @$user->target(request('month'), request('year'));
-            $userSalarys = UserSallary::where('user_id', $user->id)->when(isset($target->month), function ($query) use ($target) {
-                $query->where('month', '<=', $target->month);
-            })->when(isset($year), function ($query) use ($target) {
-                $query->where('year', '<=', $target->year);
-            })
-                ->where('is_paid', 0)
-                ->where('user_agency_id', '!=', null)->orderBy('user_id')
-                ->select(
-                    DB::raw('SUM(sallary) AS target'),
-                    DB::raw('SUM(cut_amount) AS expenses'),
-                    DB::raw('SUM(sallary) - SUM(cut_amount) AS salary')
-                )
-                ->groupBy('user_id')
-                ->first();
+            $salary = $salaries[$user->id] ?? null;
 
-            $diamonds = UserTarget::where('user_id', $user->id)->when(isset($target->month), function ($query) use ($target) {
-                $query->where('add_month', '<=', $target->month);
-            })->when(isset($target->year), function ($query) use ($target) {
-                $query->where('add_year', '<=', $target->year);
-            })
-                ->where('agency_id', '!=', null)
-                ->select(
-                    DB::raw('SUM(user_diamonds) AS diamond')
-                )->orderBy('user_id')
-                ->groupBy('user_id')
-                ->first();
-            //  dd($diamonds->diamond);
+            $extras = json_decode($salary->extras ?? '{}', true);
+            $moment = $extras['moment'] ?? [];
+            $reel = $extras['reel'] ?? [];
 
-
-            // $item['id'] = $user->id;
-            $item['uuid'] = $user->uuid;
-            $item['name'] = $user->name;
-            $item['diamonds'] = $diamonds->diamond ?? "0";
-            $item['salary'] = $userSalarys->target ?? "0";
-            $item['withdrawn'] = $userSalarys->expenses ?? "0";
-            $item['remaining'] = $userSalarys->salary ?? "0";
-            $item['agency'] = @$user->agency->name;
-            $item['month'] = @$target->month;
-            $item['year'] = @$target->year;
-            array_push($arr, $item);
+            $data[] = [
+                'uuid' => $user->uuid,
+                'name' => $user->name,
+                'diamonds' => $user->getTotalDiamond($month, $year) ?? 0 . ' 💎',
+                'days' => $salary->achieved_days ?? '0/0',
+                'hours' => $salary->achieved_hours ?? '0/0',
+                'moment' => $this->formatExtras($moment),
+                'reel' => $this->formatExtras($reel),
+                'salary' => ($salary->target ?? 0) . ' 💲',
+                'withdrawn' => $salary->expenses ?? 0,
+                'remaining' => $salary->salary ?? 0,
+                'agency' => @$user?->agency?->name ?? '-',
+                'agency_id' => $user->agency?->id ?? '-',
+                'month' => $month,
+                'year' => $year,
+            ];
         }
 
+        // sort this data with diamond
+        usort($data, function ($a, $b) {
+            return (int) str_replace(',', '', $b['diamonds']) <=> (int) str_replace(',', '', $a['diamonds']);
+        });
 
-        return collect($arr);
+        return collect($data);
     }
-
 
     public function headings(): array
     {
         return [
-            // __("id", [], 'ar'),
-            __("uuid", [], 'ar'),
+            __('uuid', [], 'ar'),
             __('name', [], 'ar'),
             __('diamonds', [], 'ar'),
+            __('days', [], 'ar'),
+            __('hours', [], 'ar'),
+            __('moment', [], 'ar'),
+            __('reel', [], 'ar'),
             __('salary', [], 'ar'),
             __('withdrawn', [], 'ar'),
             __('remaining', [], 'ar'),
             __('agency', [], 'ar'),
+            __('agency_id', [], 'ar'),
             __('month', [], 'ar'),
             __('year', [], 'ar'),
         ];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'F' => 40,
+            'G' => 100,
+        ];
+    }
+
+    protected function formatExtras(array $data): string
+    {
+        return sprintf(
+            "رفع: %s\nإعجاب: %s\nتعليق: %s",
+            number_format((int) ($data['upload'] ?? 0)),
+            number_format((int) ($data['likes'] ?? 0)),
+            number_format((int) ($data['comments'] ?? 0))
+        );
     }
 }

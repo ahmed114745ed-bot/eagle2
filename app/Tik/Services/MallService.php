@@ -163,4 +163,9 @@ class MallService
     {
         return $this->wareRepository->getFromType(12);
     }
+
+    public function warePadding($id)
+    {
+        return $this->wareRepository->getDressWare($id);
+    }
 }

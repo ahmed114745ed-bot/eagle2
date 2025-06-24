@@ -26,22 +26,21 @@ class MyDataResource extends JsonResource
 
         if ($family) {
 
-            $starsImagesFamily = GiftLog::
-            selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with(['receiver.profile'])
-            ->whereHas('receiver', function ($query) use ($family) {
-                $query->where('family_id', $family->id)->whereHas('profile');
-            })
-            ->groupBy('receiver_id')
-            ->orderByDesc('exp')
-            ->take(3)
-            ->get()
-            ->map(function ($log) {
-                return optional($log->receiver->profile)->avatar;
-            })
-            ->filter()
-            ->values()
-            ->toArray();
+            $starsImagesFamily = GiftLog::selectRaw("SUM(giftPrice) as exp, receiver_id")
+                ->with(['receiver.profile'])
+                ->whereHas('receiver', function ($query) use ($family) {
+                    $query->where('family_id', $family->id)->whereHas('profile');
+                })
+                ->groupBy('receiver_id')
+                ->orderByDesc('exp')
+                ->take(3)
+                ->get()
+                ->map(function ($log) {
+                    return optional($log->receiver->profile)->avatar;
+                })
+                ->filter()
+                ->values()
+                ->toArray();
 
             $f = [
                 'owner_id' => $family->user_id,
@@ -78,16 +77,16 @@ class MyDataResource extends JsonResource
         if ($agency_joined) {
 
             $starsImages = GiftLog::where('agency_id', $agency_joined->id)
-                    ->selectRaw("SUM(giftPrice) as exp, receiver_id")
-                    ->with(['receiver.profile'])
-                    ->whereHas('receiver.profile')
-                    ->groupBy('receiver_id')
-                    ->orderByDesc('exp')
-                    ->take(3)
-                    ->get()
-                    ->pluck('receiver.profile.avatar')
-                    ->filter()
-                    ->values();
+                ->selectRaw("SUM(giftPrice) as exp, receiver_id")
+                ->with(['receiver.profile'])
+                ->whereHas('receiver.profile')
+                ->groupBy('receiver_id')
+                ->orderByDesc('exp')
+                ->take(3)
+                ->get()
+                ->pluck('receiver.profile.avatar')
+                ->filter()
+                ->values();
 
             $owner = $agency_joined->app_owner_id == $this->id
                 ? new \stdClass()
@@ -188,8 +187,7 @@ class MyDataResource extends JsonResource
                 ->filter()
                 ->values()
                 ->toArray();
-
-            }
+        }
 
         $data = [
             'id' => @$this->id,
@@ -250,7 +248,16 @@ class MyDataResource extends JsonResource
             'has_color_name'       => Common::hasInPack($this->id, 18, true),
             'has_anti_ban'       => Common::hasInPack($this->id, 15, true),
             'anonymous' => $this->packs->where('type', 17)->count() >= 1,
-            'country' => $this->country ?? null,
+            //            'country' => $this->country ?? null,
+            'country' => $this->country ? [
+                'id' => $this->country->id,
+                'name' => $this->country->name,
+                'flag' => $this->country->flag,
+                'language' => $this->country->language,
+                'e_name' => $this->country->e_name,
+                'phone_code' => $this->country->phone_code,
+                'iso' => substr($this->country->iso, 0, 2),
+            ] : null,
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
             'country_hidden' => $isHideCountry,
             'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
@@ -263,8 +270,7 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
-            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
+            'profile_frame_id' => $this->getProfileFrame()?->id ?? '',
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
@@ -311,7 +317,7 @@ class MyDataResource extends JsonResource
 
     public function getUserDress($type, $dress, $item = 'img1')
     {
-        $pack = $this->packs
+        $pack = $this->packs->where('is_used', 1)
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
@@ -332,7 +338,7 @@ class MyDataResource extends JsonResource
     public function getUesdUserPack($type)
     {
         $pack = $this->packs->where('type', $type)->where('is_used', 1)->first();
-        
+
 
         return $pack ?  new GeneralUserPackResource($pack) : [
             'id'   =>  0,

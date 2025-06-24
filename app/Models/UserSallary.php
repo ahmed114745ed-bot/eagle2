@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\FixedTarget\Enums\TargetType;
 
 class UserSallary extends Model
 {
-    protected $table = 'user_sallaries';
+    use TimestampsWithTimezone;
 
-    public bool $allowSaving = true;
+    protected $table = 'user_sallaries';
 
     protected $guarded = ['id'];
 
@@ -23,40 +23,6 @@ class UserSallary extends Model
         'month' => 'integer',
     ];
 
-    public function getCreatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-        $timezone = \Cache::rememberForever($cacheKey, function () {
-            $setting = \App\Models\Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
-
-        // Get the timezone from the request header or use the cached setting
-        $timeZone = request()->header('tz') ?? $timezone;
-
-        // Parse the date and set the timezone
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
-
-    // Convert updated_at to the user's local time zone
-    public function getUpdatedAtAttribute($value)
-    {
-        $cacheKey = 'timezone';
-
-        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-        $timezone = \Cache::rememberForever($cacheKey, function () {
-            $setting = \App\Models\Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
-
-        // Get the timezone from the request header or use the cached setting
-        $timeZone = request()->header('tz') ?? $timezone;
-
-        // Parse the date and set the timezone
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
-    }
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
@@ -74,13 +40,13 @@ class UserSallary extends Model
 
     protected static function booted()
     {
-        static::saved(function ($model) {
+        self::saved(function ($model) {
             if ($model->agency_id) {
                 clearAgencyCache($model->agency_id);
             }
         });
 
-        static::deleted(function ($model) {
+        self::deleted(function ($model) {
             if ($model->agency_id) {
                 clearAgencyCache($model->agency_id);
             }

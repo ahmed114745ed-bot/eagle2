@@ -8,14 +8,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class VerifyFawrySignature
 {
-    
+
     public function handle(Request $request, Closure $next): Response
     {
         $responseData           = $request->all();
         $secureKey              = config("services.fawry.fawry_secret");
-        $fawryRefNumber         = $responseData['fawryRefNumber']; 
+        $fawryRefNumber         = $responseData['fawryRefNumber'];
         $merchantRefNumber      = $responseData['merchantRefNumber'];
-        $paymentAmount          = number_format($responseData['paymentAmount'], 2, '.', ''); 
+        $paymentAmount          = number_format($responseData['paymentAmount'], 2, '.', '');
         $orderAmount            = number_format($responseData['orderAmount'], 2, '.', '');
         $orderStatus            = $responseData['orderStatus'];
         $paymentMethod          = $responseData['paymentMethod'];

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Class Admin.
@@ -315,30 +316,27 @@ class Agency
 
         app('router')->group($attributes, function ($router) {
 
-            /* @var \Illuminate\Support\Facades\Route $router */
-            $router->namespace('\App\Agency\Controllers')->group(function ($router) {
+            Route::namespace('\App\Agency\Controllers')->group(function ($router) {
 
-                /* @var \Illuminate\Routing\Router $router */
-                $router->resource('auth/users', 'UserController')->names('auth.users');
-                $router->resource('auth/roles', 'RoleController')->names('auth.roles');
-                $router->resource('auth/permissions', 'PermissionController')->names('auth.permissions');
-                $router->resource('auth/menu', 'MenuController', ['except' => ['create']])->names('auth.menu');
-                $router->resource('auth/logs', 'LogController', ['only' => ['index', 'destroy']])->names('auth.logs');
+                Route::resource('auth/users', 'UserController')->names('auth.users');
+                Route::resource('auth/roles', 'RoleController')->names('auth.roles');
+                Route::resource('auth/permissions', 'PermissionController')->names('auth.permissions');
+                Route::resource('auth/menu', 'MenuController', ['except' => ['create']])->names('auth.menu');
+                Route::resource('auth/logs', 'LogController', ['only' => ['index', 'destroy']])->names('auth.logs');
 
-                $router->post('_handle_form_', 'HandleController@handleForm')->name('handle-form');
-                $router->post('_handle_action_', 'HandleController@handleAction')->name('handle-action');
-                $router->get('_handle_selectable_', 'HandleController@handleSelectable')->name('handle-selectable');
-                $router->get('_handle_renderable_', 'HandleController@handleRenderable')->name('handle-renderable');
+                Route::post('_handle_form_', 'HandleController@handleForm')->name('handle-form');
+                Route::post('_handle_action_', 'HandleController@handleAction')->name('handle-action');
+                Route::get('_handle_selectable_', 'HandleController@handleSelectable')->name('handle-selectable');
+                Route::get('_handle_renderable_', 'HandleController@handleRenderable')->name('handle-renderable');
             });
 
             $authController =  AuthController::class;
 
-            /* @var \Illuminate\Routing\Router $router */
-            $router->get('auth/login', $authController.'@getLogin')->name('agency.login');
-            $router->post('auth/login', $authController.'@postLogin');
-            $router->get('auth/logout', $authController.'@getLogout')->name('agency.logout');
-            $router->get('auth/setting', $authController.'@getSetting')->name('agency.setting');
-            $router->put('auth/setting', $authController.'@putSetting');
+            Route::get('auth/login', $authController . '@getLogin')->name('agency.login');
+            Route::post('auth/login', $authController . '@postLogin');
+            Route::get('auth/logout', $authController . '@getLogout')->name('agency.logout');
+            Route::get('auth/setting', $authController . '@getSetting')->name('agency.setting');
+            Route::put('auth/setting', $authController . '@putSetting');
         });
     }
 

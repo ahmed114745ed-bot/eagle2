@@ -85,6 +85,7 @@ class AuthService
                 $data = [
                     'phone' => $phone,
                     'password' => $request->password,
+                    'status' => 1
                 ];
 
                 $user = $this->userRepository->create($data);
@@ -99,7 +100,7 @@ class AuthService
             $user->is_points_first = 1;
             $user->save();
             $token = $user->createToken('api_token')->plainTextToken;
-            UserHandling::AddUserVip($user, 'register');
+          //  UserHandling::AddUserVip($user, 'register');
 
             DB::commit();
         } catch (\Exception $e) {

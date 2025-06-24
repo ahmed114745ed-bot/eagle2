@@ -53,14 +53,17 @@ class PaymentGatewaysSeeder extends Seeder
             ->havingRaw('COUNT(*) > 1')
             ->get();
 
-        foreach ($duplicates as $dup) {
-            $settings = Setting::where('key', $dup->key)
+        info($duplicates);
+        foreach ($duplicates as $key) {
+            $settings = Setting::where('key', $key['key'])
 //                ->where('item_id', $dup->item_id)
 //                ->where('type', $dup->type)
                 ->orderBy('id')
                 ->get();
 
-            $settings->each->delete();
+            $settings->each(function ($setting) {
+                $setting->delete();
+            });
         }
 
         $fawry_id = PaymentCoin::updateOrCreate([
@@ -74,29 +77,24 @@ class PaymentGatewaysSeeder extends Seeder
             'new_1' => [
                 "name" => "fawry_secret",
                 "type" => "input",
-                "value" => "fiest1"
+                "value" => "3a96b82d742c4531a5822ec6eb8c87a4"
 
             ],
             'new_2' => [
                 "name" => "fawry_merchant_code",
                 "type" => "input",
-                "value" => "Impedit laborum bla"
+                "value" => "400000019844"
 
-            ],
-            'new_3' => [
-                "name" => "fawry_utd_url",
-                "type" => "input",
-                "value" => "Sit dignissimos aliq"
             ],
             'new_5' => [
                 "name" => "fawry_url",
                 "type" => "input",
-                "value" => 'https://www.google.com'
+                "value" => 'https://atfawry.com/fawrypay-api/api/payments/init'
             ],
             'new_6' => [
                 "name" => "fawry_return_url",
                 "type" => "input",
-                "value" => 'https://www.google.com'
+                "value" => 'https://eagle.utdsoftware.com/api/utd-fawry-callback'
             ],
             'new_7' => [
                 "name" => "fawry_webhook_url",
@@ -109,6 +107,54 @@ class PaymentGatewaysSeeder extends Seeder
             Setting::updateOrCreate([
                 'key' => $value['name'],
                 'item_id' => $fawry_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],'input_type' => $value['type']
+            ]);
+        }
+
+        //utd fawry
+        $utd_fawry_id = PaymentCoin::updateOrCreate([
+            'title' => 'utdFawry',
+        ], [
+            'photo' => 'images/fawry.jpeg',
+            'status' => 1,
+            'type' => 'utd_fawry',
+        ]);
+        $utd_fawry_fields = [
+            'new_1' => [
+                "name" => "utd_fawry_secret",
+                "type" => "input",
+                "value" => "3a96b82d742c4531a5822ec6eb8c87a4"
+
+            ],
+            'new_2' => [
+                "name" => "utd_fawry_merchant_code",
+                "type" => "input",
+                "value" => "400000019844"
+
+            ],
+            'new_3' => [
+                "name" => "utd_url",
+                "type" => "input",
+                "value" => "https://utd-test.utdsoftware.com/api/fawry-initial"
+            ],
+            'new_5' => [
+                "name" => "utd_fawry_url",
+                "type" => "input",
+                "value" => 'https://atfawry.com/fawrypay-api/api/payments/init'
+            ],
+            'new_6' => [
+                "name" => "utd_fawry_return_url",
+                "type" => "input",
+                "value" => 'https://eagle.utdsoftware.com/api/utd-fawry-callback'
+            ],
+        ];
+
+        foreach ($utd_fawry_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $utd_fawry_id->id,
                 'type' => 'payment'
             ], [
                 'value' => $value['value'],'input_type' => $value['type']
@@ -177,17 +223,17 @@ class PaymentGatewaysSeeder extends Seeder
             'new_2' => [
                 "name" => "stripe_test_secret_key",
                 "type" => "input",
-                "value" => "Impedit laborum bla"
+                "value" => "sk_test_51RaYt2CoBjkPaaGmlmEc6BHnWEZuaX6V6QBh6r0thGsIJYO9bpdNwO1hVGhXXVIljELmMawLKdV1VqGwU5yNbGsP00rAwqVduC"
 
             ],
             'new_3' => [
                 "name" => "stripe_success_url",
                 "type" => "input",
-                "value" => "Sit dignissimos aliq"
+                "value" => "pk_test_51RaYt2CoBjkPaaGmno2Ug09jtT4dM6enLsQiIBm4fmt6ZnvZbD2JJN0ZGdWHYia00Cnil07Rn3vrcphwj8Cw5f0A00VNIgJtOA"
             ],
             'new_4' => [
                 "name" => "stripe_cancel_url",
-                "type" => "input",
+                "type" => "https://eagle.utdsoftware.com/api/stripe-callback",
                 "value" => true
             ],
             'new_5' => [
@@ -198,7 +244,7 @@ class PaymentGatewaysSeeder extends Seeder
             'new_6' => [
                 "name" => "stripe_webhook_secret",
                 "type" => "input",
-                "value" => 'webhook'
+                "value" => 'whsec_qLRlb2dGJLGqeJstj8lO5CNfYiKCzAaE'
             ],
             'new_7' => [
                 "name" => "stripe_webhook_url",
@@ -485,19 +531,19 @@ class PaymentGatewaysSeeder extends Seeder
             'new_1' => [
                 "name" => "paypal_base_url",
                 "type" => "input",
-                "value" => "paypal team"
+                "value" => "https://api-m.sandbox.paypal.com"
 
             ],
             'new_2' => [
                 "name" => "paypal_client_id",
                 "type" => "input",
-                "value" => "paypal team"
+                "value" => "AbMnfYHyLXWcRTct1RGWW5tPFnd6SryR0ALvRMgSG4PQW5oV8uti7fYOTmQvXLPzGVJSOgZTrmJ_NpKR"
 
             ],
             'new_3' => [
                 "name" => "paypal_client_secret",
                 "type" => "input",
-                "value" => "Sit dignissimos aliq"
+                "value" => "EHWD7-rBHXm74Dv8e9_-EMYRWMt1LAt7qzmW-YW3pOBWdLPCVs-D5hoAwfqYyS7cNW5A7Uv3IyqUgqyA"
             ],
 //            'new_4' => [
 //                "name" => "paypal_payment_address",
@@ -507,12 +553,12 @@ class PaymentGatewaysSeeder extends Seeder
             'new_4' => [
                 "name" => "paypal_webhook_url",
                 "type" => "input",
-                "value" => 'asdasd'
+                "value" => 'https://eagle.utdsoftware.com/api/paypal-callback'
             ],
             'new_5' => [
                 "name" => "paypal_webhook_id",
                 "type" => "input",
-                "value" => '123'
+                "value" => '4Y826428L32304057'
             ],
         ];
 

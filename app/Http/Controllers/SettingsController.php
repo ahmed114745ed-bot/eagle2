@@ -87,10 +87,11 @@ class SettingsController extends Controller
     public function update(Request $request)
     {
 
+        info($request);
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token', 'zones_coins', 'super_admin_coins');
+        $data = $request->except('_token', 'super_admin_coins');
 
 
 

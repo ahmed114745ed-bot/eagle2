@@ -58,9 +58,10 @@ class BoxService
                     "numOfBoxes" => (int)$c,
                     "ownerBoxImage" => $user->avatar,
                     "ownerBoxUId"  => $user->uuid,
-                    'usersNum' => $request->users_num ?: $box->users,
-                    'rem_time' => $rem_time,
-                    'is_closed' => $box->is_closed,
+                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->toDateTimeString(),
+                    //'usersNum' => $request->users_num ?: $box->users,
+                    //'rem_time' => $rem_time,
+                    //'is_closed' => $box->is_closed,
                 ]
             ];
             $json = json_encode($m);
@@ -135,15 +136,29 @@ class BoxService
         $d2 = [
             "messageContent" => [
                 "message" => "bannerSuperBox",
-                'ownerRoomId' => $room->uid,
-                'isRoomPassword' => $room->room_pass ? true : false,
-                'ownerBoxid' => $user->id,
-                "ownerBoxName" => $user->name,
                 'coins' => $request->coins ?: $box->coins,
-                "ownerBoxImage" => $user->profile?->avatar ?? '',
-                "ownerBoxUId"  => $user->uuid,
-                "ownerBoxSL"  => $user->total_sender_level,
-                "ownerBoxRL"  => $user->total_received_level,
+                "boxUId" => $boxUser->id,
+                "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->toDateTimeString(),
+                "room" => [
+                    "id" => $room->id,
+                    "uuid" => $room->owner->uuid,
+                    "room_name" => $room->room_name ?? '',
+                    "room_session" => $room->session,
+                    "room_owner_id" => $room->uid,
+                    "is_password" => $room->room_pass ? true : false,
+                    "room_cover" => $room->room_cover ?? '',
+                    "room_background" => $room->final_room_image ?? '',
+                    "room_mode" => $room->mode,
+                ],
+                "sender" => [
+                    "id" => $user->id,
+                    "name" => @$user->name ?? '',
+                    "s_image" => @$user->profile->avatar ?? '',
+                    "s_name" => @$user->name,
+                    "s_sender_level" => $user->total_sender_level,
+                    "s_receiver_level" => $user->total_received_level,
+                ],
+
                 "ownerBoxAL"  => $user->UserVip?->level ?? 0,
             ]
         ];
