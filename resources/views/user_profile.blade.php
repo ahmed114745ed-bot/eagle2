@@ -967,8 +967,115 @@
 
             }
         }
-    </style>
 
+        .date-flex-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-flex-row span {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .date-flex-row input[type="date"] {
+            flex-basis: 0;
+        }
+
+        .diamond-summary-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .diamond-summary-box {
+            max-width: 600px;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin: 0 auto; /* This also helps with centering */
+        }
+
+        .diamond-summary-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .diamond-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .diamond-count {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .diamond-count span {
+            margin-right: 10px;
+        }
+
+        .diamond-icon-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            padding: 8px;
+            display: inline-flex;
+        }
+
+        .diamond-icon {
+            width: 32px;
+            height: 32px;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+        }
+
+        .gift-log-form {
+            background-color: transparent !important;
+            filter: none !important;
+        }
+        .level-form {
+            background-color: transparent !important;
+            filter: none !important;
+            padding: 10px;
+        }
+        .level-label {
+            padding: 10px;
+        }
+        .rtl .gift-log-form {
+            padding-right: 13%;
+        }
+        .ltr .gift-log-form {
+            padding-left: 13%;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-top: 1px solid #dee2e6;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .card-title {
+            color: #333;
+            font-weight: 500;
+        }
+        .table tbody tr:nth-child(even) {
+            background-color: var(--secondary-color) !important;
+            filter: brightness(0.95);
+        }
+    </style>
 
 </head>
 <body>
@@ -985,12 +1092,12 @@
                 <div class="meta-item">
                     @if (@$user->uuid == @$user->original_uuid)
                         <span class="meta-label">{{ __("uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->uuid }}</span>
+                        <span class="meta-value">{{ @$user->original_uuid }}</span>
                     @else
                         <span class="meta-label">{{ __("uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->uuid }}</span><br>
+                        <span class="meta-value">{{ @$user->original_uuid }}</span><br>
                         <span class="meta-label">{{ __("special uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->original_uuid }}</span>
+                        <span class="meta-value">{{ @$user->uuid_v3 }}</span>
                     @endif
                 </div>
                 <div class="meta-item">
@@ -1095,7 +1202,7 @@
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('pack') }}</h4>
             </div>
-            <div class="box-body no-padding">
+            <div class="box-body">
                 <div class="nav-scroll-container">
                     <ul class="nav nav-pills">
                         @foreach($types as $id => $name)
@@ -1112,11 +1219,10 @@
                 </div>
             </div>
 
-
             <div class="table-responsive">
                 <div class="box-body ">
-                    <table class="data-table" id="pack">
-                        <thead>
+                    <table class="table table-bordered table-hover align-middle data-table" id="pack">
+                        <thead class="table-light">
                         <tr>
                             <th>#</th>
                             <th>{{ __('get type') }}</th>
@@ -1184,10 +1290,11 @@
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
             </div>
+
             <div class="table-responsive">
                 <div class="box-body ">
-                    <table class="data-table" id="vip">
-                        <thead>
+                    <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                        <thead class="table-light">
                         <tr>
                             <th>#</th>
                             <th>{{ __('level') }}</th>
@@ -1244,181 +1351,186 @@
                 <h4 class="card-title" style="text-align: left;">{{ __('user wallet') }}</h4>
             </div>
 
-            <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" pjax-container="">
-                <input type="hidden" name="tab" value="salary">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="box-body">
-                            <div class="fields-group">
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                            <input type="hidden" name="tab" value="salary">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="box-body">
+                                        <div class="fields-group">
 
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">السنة</label>
-                                    <div class="col-sm-8">
-                                        <div class="input-group input-group-sm">
-                                            <div class="input-group-addon">
-                                                <i class="fa fa-pencil"></i>
-                                            </div>
-                                            <input type="text" class="form-control year" placeholder="السنة" name="year"
-                                                   value="{{ request('year') }}" style="text-align: right;">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">الشهر</label>
-                                    <div class="col-sm-8">
-                                        <div class="input-group input-group-sm">
-                                            <div class="input-group-addon">
-                                                <i class="fa fa-pencil"></i>
-                                            </div>
-                                            <input type="text" class="form-control month" placeholder="الشهر"
-                                                   name="month" value="{{ request('month') }}"
-                                                   style="text-align: right;">
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- /.box-body -->
-                <div class="box-footer">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="col-md-2"></div>
-                            <div class="col-md-8">
-                                <div class="btn-group pull-left">
-                                    <button class="btn btn-info submit btn-sm">
-                                        <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
-                                    </button>
-                                </div>
-                                <div class="btn-group pull-left" style="margin-left: 10px;">
-                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
-                                       class="btn btn-default btn-sm">
-                                        <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </form>
-
-            <div class="table-responsive">
-                <div class="box-body ">
-                    <table class="data-table" id="vip">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('agency') }}</th>
-                            <th>{{ __('salary') }}</th>
-                            <th>{{ __('Withdraw') }}</th>
-                            <th>{{ __('net salary') }}</th>
-                            <th>{{ __('days') }}</th>
-                            <th>{{ __('hours') }}</th>
-                            <th>{{ __('Moments') }}</th>
-                            <th>{{ __('Reels') }}</th>
-                            <th>{{ __('diamonds') }}</th>
-                            <th>{{ __('date') }}</th>
-
-                        </tr>
-                        </thead>
-                        @if($salaries && $salaries->count())
-                            <tbody style="color: rgb(208, 115, 43);">
-                            @foreach($salaries as $index => $salary)
-
-                                @php
-                                    $agency = $salary->agency;
-                                    $name = $agency->name ?? '';
-
-                                    $path = @$agency->img;
-                                    $defaultImage = asset("images/icon-agency.jpg");
-                                    $url = getImagePath($path) ?? $defaultImage;
-
-                                    if (!isImageExists($url)) {
-                                        $url = $defaultImage;
-                                    }
-
-                                    $image = handleShowImageWithTypes($user->id, $url, 40, 40);
-                                    $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
-
-                                    $extras = json_decode($salary->extras, true);
-                                    $moment = $extras['moment'] ?? [];
-                                    $reel = $extras['reel'] ?? [];
-
-                                    $momentUpload = $moment['upload'] ?? '0/0';
-                                    $momentLikes = $moment['likes'] ?? '0/0';
-                                    $momentComments = $moment['comments'] ?? '0/0';
-
-                                    $reelUpload = $reel['upload'] ?? '0/0';
-                                    $reelLikes = $reel['likes'] ?? '0/0';
-                                    $reelComments = $reel['comments'] ?? '0/0';
-
-
-                                @endphp
-
-                                <tr>
-                                    <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
-                                    <td>
-                                        <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
-                                            <div style="display: flex; align-items: center; gap: 10px;">
-                                                {!! $image !!}
-                                                <div style="display: flex; flex-direction: column;">
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                    <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">السنة</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control year" placeholder="السنة" name="year"
+                                                               value="{{ request('year') }}" style="text-align: right;">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </a>
-                                    </td>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">الشهر</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control month" placeholder="الشهر"
+                                                               name="month" value="{{ request('month') }}"
+                                                               style="text-align: right;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- /.box-body -->
+                            <div class="box-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-8">
+                                            <div class="btn-group pull-left">
+                                                <button class="btn btn-info submit btn-sm">
+                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
+                                                </button>
+                                            </div>
+                                            <div class="btn-group pull-left" style="margin-left: 10px;">
+                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
+                                                   class="btn btn-default btn-sm">
+                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <div class="box-body ">
+                        <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('agency') }}</th>
+                                <th>{{ __('salary') }}</th>
+                                <th>{{ __('Withdraw') }}</th>
+                                <th>{{ __('net salary') }}</th>
+                                <th>{{ __('days') }}</th>
+                                <th>{{ __('hours') }}</th>
+                                <th>{{ __('Moments') }}</th>
+                                <th>{{ __('Reels') }}</th>
+                                <th>{{ __('diamonds') }}</th>
+                                <th>{{ __('date') }}</th>
+
+                            </tr>
+                            </thead>
+                            @if($salaries && $salaries->count())
+                                <tbody style="color: rgb(208, 115, 43);">
+                                @foreach($salaries as $index => $salary)
+
+                                    @php
+                                        $agency = $salary->agency;
+                                        $name = $agency->name ?? '';
+
+                                        $path = @$agency->img;
+                                        $defaultImage = asset("images/icon-agency.jpg");
+                                        $url = getImagePath($path) ?? $defaultImage;
+
+                                        if (!isImageExists($url)) {
+                                            $url = $defaultImage;
+                                        }
+
+                                        $image = handleShowImageWithTypes($user->id, $url, 40, 40);
+                                        $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+
+                                        $extras = json_decode($salary->extras, true);
+                                        $moment = $extras['moment'] ?? [];
+                                        $reel = $extras['reel'] ?? [];
+
+                                        $momentUpload = $moment['upload'] ?? '0/0';
+                                        $momentLikes = $moment['likes'] ?? '0/0';
+                                        $momentComments = $moment['comments'] ?? '0/0';
+
+                                        $reelUpload = $reel['upload'] ?? '0/0';
+                                        $reelLikes = $reel['likes'] ?? '0/0';
+                                        $reelComments = $reel['comments'] ?? '0/0';
 
 
-                                    <td>{{$salary->sallary}}</td>
-                                    <td>{{ $salary->cut_amount}}</td>
-                                    <td>{{ $salary->sallary - $salary->cut_amount }}</td>
-                                    <td>{{ $salary->days }}</td>
-                                    <td>{{ $salary->hours }}</td>
-                                    <td>
-                                        <div style="line-height: 1.6;">
-                                            <ul style="margin-left: 8px;">
-                                                <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
-                                                <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
-                                                <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div style="line-height: 1.6;">
-                                            <ul style="margin-left: 8px;">
-                                                <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
-                                                <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
-                                                <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                    <td>{{ $salary->achieved_diamond }}</td>
-                                    <td>{{ $salary->month .'/'. $salary->year }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
+                                    @endphp
+
+                                    <tr>
+                                        <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
+                                        <td>
+                                            <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    {!! $image !!}
+                                                    <div style="display: flex; flex-direction: column;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
+                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+
+
+                                        <td>{{$salary->sallary}}</td>
+                                        <td>{{ $salary->cut_amount}}</td>
+                                        <td>{{ $salary->sallary - $salary->cut_amount }}</td>
+                                        <td>{{ $salary->days }}</td>
+                                        <td>{{ $salary->hours }}</td>
+                                        <td>
+                                            <div style="line-height: 1.6;">
+                                                <ul style="margin-left: 8px;">
+                                                    <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
+                                                    <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
+                                                    <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="line-height: 1.6;">
+                                                <ul style="margin-left: 8px;">
+                                                    <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
+                                                    <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
+                                                    <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td>{{ $salary->achieved_diamond }}</td>
+                                        <td>{{ $salary->month .'/'. $salary->year }}</td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            @endif
+                        </table>
+
+                        @if($salaries)
+                            <div class="pagination-container">
+                                {{ $salaries->appends([
+                                    'pack_page' => $packs?->currentPage(),
+                                    'vip_page' => $userVips?->currentPage(),
+                                    'gift_page' => $giftSLogs?->currentPage(),
+
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
                         @endif
-                    </table>
-
-                    @if($salaries)
-                        <div class="pagination-container">
-                            {{ $salaries->appends([
-                                'pack_page' => $packs?->currentPage(),
-                                'vip_page' => $userVips?->currentPage(),
-                                'gift_page' => $giftSLogs?->currentPage(),
-
-                            ])->links('vendor.pagination.bootstrap-4') }}
-                        </div>
-                    @endif
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -1427,31 +1539,34 @@
             <div class="card-header">
                 <h4 class="card-title text-left">{{ __('level') }}</h4>
             </div>
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('/admin/edit-level') }}" id="user_level_update_form" method="POST"
+                              enctype="multipart/form-data" class="level-form">
+                            @csrf
+                            <div class="row" style="justify-content:space-evenly">
+                                <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
+                                <div class=" col-lg-6 form-Roles mb-3">
+                                    <label class="form-label level-label"> {{ __('Sender Level') }}</label>
+                                    <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control "
+                                           id="total_sender_level" name="total_sender_level" required>
+                                </div>
 
-            <div class="card-body">
-                <form action="{{ url('/admin/edit-level') }}" id="user_level_update_form" method="POST"
-                      enctype="multipart/form-data">
-                    @csrf
-                    <div class="row" style="justify-content:space-evenly">
-                        <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
-                        <div class=" col-lg-6 form-Roles mb-3">
-                            <label class="form-label"> {{ __('Sender Level') }}</label>
-                            <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control "
-                                   id="total_sender_level" name="total_sender_level" required>
-                        </div>
-
-                        <div class=" col-lg-6 form-Roles mb-3">
-                            <label class="form-label"> {{ __('Received Level') }}</label>
-                            <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control "
-                                   id="total_received_level" name="total_received_level" required>
-                        </div>
+                                <div class=" col-lg-6 form-Roles mb-3">
+                                    <label class="form-label level-label"> {{ __('Received Level') }}</label>
+                                    <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control "
+                                           id="total_received_level" name="total_received_level" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" type="button"
+                                        data-bs-dismiss="modal">{{ __('cancel') }} </button>
+                                <button class="btn btn-primary " type="submit">{{ __('save') }} </button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button"
-                                data-bs-dismiss="modal">{{ __('cancel') }} </button>
-                        <button class="btn btn-primary " type="submit">{{ __('save') }} </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -1464,7 +1579,7 @@
                 <h4 class="card-title">{{ __('Charge Reports') }}</h4>
             </div>
 
-            <div class="box-body no-padding">
+            <div class="box-body">
                 <div class="nav-scroll-container">
                     <ul class="nav nav-pills">
 
@@ -1485,57 +1600,58 @@
 
                     </ul>
                 </div>
-            </div>
 
-            <div class="table-responsive">
-                <table class="data-table" id="charge-table">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>
-                            @if($chargeTabType == 'receiver')
-                                {{ __('Charger') }}
-                            @else
-                                {{ __('Receiver') }}
-                            @endif
-                        </th>
-                        <th>{{ __('Type') }}</th>
-                        <th>{{ __('Amount') }}</th>
-                        <th>{{ __('usd') }}</th>
-                        <th>{{ __('Created at') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($charges as $index => $charge)
-                        @php
-                            if($chargeTabType == 'receiver') {
-                                $userCharges = Common::getChargerInfo($charge);
-                              } else {
-                                $userCharges = Common::getReceiverInfo($charge);
-                              }
-                              $name = $userCharges['name'] ?? '-';
-                              $uid = $userCharges['uuid'] ?? '-';
-                              $type = $userCharges['type'] ?? '-';
-                              $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
-                        @endphp
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
                         <tr>
-                            <td>{{ $charge->id }}</td>
-                            <td>
-                                <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
-                                   style="display: inline-flex; align-items: center; text-decoration: none;">
-                                    <img src="{{ getImagePath( $image) }}" width="30" height="30"
-                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                    <span>{{ $name }} ({{ $uid }})</span>
-                                </a>
-                            </td>
-                            <td>{{ $type }} </td>
-                            <td>{{ $charge->amount }} </td>
-                            <td>{{ $charge->usd }}</td>
-                            <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
+                            <th>#</th>
+                            <th>
+                                @if($chargeTabType == 'receiver')
+                                    {{ __('Charger') }}
+                                @else
+                                    {{ __('Receiver') }}
+                                @endif
+                            </th>
+                            <th>{{ __('Type') }}</th>
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('usd') }}</th>
+                            <th>{{ __('Created at') }}</th>
                         </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        @foreach($charges as $index => $charge)
+                            @php
+                                if($chargeTabType == 'receiver') {
+                                    $userCharges = Common::getChargerInfo($charge);
+                                  } else {
+                                    $userCharges = Common::getReceiverInfo($charge);
+                                  }
+                                  $name = $userCharges['name'] ?? '-';
+                                  $uid = $userCharges['uuid'] ?? '-';
+                                  $type = $userCharges['type'] ?? '-';
+                                  $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
+                            @endphp
+                            <tr>
+                                <td>{{ $charge->id }}</td>
+                                <td>
+                                    <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
+                                       style="display: inline-flex; align-items: center; text-decoration: none;">
+                                        <img src="{{ getImagePath( $image) }}" width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $name }} ({{ $uid }})</span>
+                                    </a>
+                                </td>
+                                <td>{{ $type }} </td>
+                                <td>{{ $charge->amount }} </td>
+                                <td>{{ $charge->usd }}</td>
+                                <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
 
             {{-- Pagination --}}
@@ -1563,10 +1679,9 @@
                 <h4 class="card-title">{{ __('gift Reports') }}</h4>
             </div>
 
-            <div class="box-body no-padding">
-                <div class="nav-scroll-container">
+            <div class="box-body p-3">
+                <div class="nav-scroll-container mb-3">
                     <ul class="nav nav-pills">
-
                         <li class="{{ $giftType == 'receiver' ? 'active' : '' }}">
                             <a class="nav-link @if($giftType == 'receiver') active @endif"
                                href="?tab=gift-log&gift_type=receiver"
@@ -1581,184 +1696,159 @@
                                 {{ __('sent gift') }}
                             </a>
                         </li>
-
                     </ul>
                 </div>
-            </div>
-            
-                <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
-                    <input type="hidden" name="tab" value="gift-log">
-                    <input type="hidden" name="gift_type" value={{ $giftType }}>
-                    <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
-                    <div class="row">
-                        <!-- From Date -->
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="from_date" class="col-sm-3 control-label">{{__('From Date')}}</label>
-                                <div class="col-sm-9">
-                                    <div class="input-group input-group-sm">
-                                        <div class="input-group-addon">
-                                            <i class="fa fa-calendar"></i>
-                                        </div>
-                                        <input  type="date" class="form-control" id="from_date" name="start_at" placeholder="From Date" value="{{ request('start_at') }}">
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="gift-log">
+                            <input type="hidden" name="gift_type" value="{{ $giftType }}">
+                            <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
+
+                            <div class="row mb-3" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('From Date') }}</span>
+                                        <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- To Date -->
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="to_date" class="col-sm-3 control-label">{{__('To Date')}}</label>
-                                <div class="col-sm-9">
-                                    <div class="input-group input-group-sm">
-                                        <div class="input-group-addon">
-                                            <i class="fa fa-calendar"></i>
-                                        </div>
-                                        <input type="date" class="form-control" id="to_date" name="end_at" placeholder="To Date" value="{{ request('end_at') }}">
+                                <!-- To Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('To Date') }}</span>
+                                        <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="box-footer">
-                        <div class="row">
-                            <div class="col-md-12 text-left">
-                                <div class="btn-group">
-                                    <button type="submit" class="btn btn-info btn-sm">
+                                <!-- Buttons -->
+                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
                                         <i class="fa fa-search"></i> {{__('Search')}}
                                     </button>
-                                </div>
-                                <div class="btn-group" style="margin-left: 10px;">
                                     <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
                                         <i class="fa fa-undo"></i> {{__('Reset')}}
                                     </a>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </form>
-            
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 15px;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; width: 100%; max-width: 800px;">
-                        <!-- Card 1 -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
-                             @if($giftType == 'receiver')
-                             <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{__("total diamonds received")}}</div>
-
-                            @else
-                              <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{ __('total diamonds sent') }}</div>
-
-                            @endif
-                        
-                        <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$diamonds)}}
-                            <img src="{{ asset('images/diamond.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
-                        </div>
-                        </div>
-                    </div>
+                        </form>
                     </div>
                 </div>
-            <div class="table-responsive">
-                <table class="data-table" id="charge-table">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}</th>
-                        <th>{{ __('room') }}</th>
-                        <th>{{ __('gift') }}</th>
-                        <th>{{ __('quantity') }}</th>
-                        <th>{{ __('price') }}</th>
-                        <th>{{ __('Created at') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                   @foreach($giftSLogs as $index => $giftSLog)
+                <!-- Summary Box -->
+                <div class="diamond-summary-container">
+                    <div class="diamond-summary-box">
+                        <div class="diamond-title">
+                            {{ $giftType == 'receiver' ? __('total diamonds received') : __('total diamonds sent') }}
+                        </div>
+                        <div class="diamond-count">
+                            <span>{{ numToString(@$diamonds) }}</span>
+                            <div class="diamond-icon-container">
+                                <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}</th>
+                            <th>{{ __('room') }}</th>
+                            <th>{{ __('gift') }}</th>
+                            <th>{{ __('quantity') }}</th>
+                            <th>{{ __('price') }}</th>
+                            <th>{{ __('Created at') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($giftSLogs as $index => $giftSLog)
                             @php
-                                // Set default images first
                                 $userImageDefault = asset('images/businessman-icon.jpg');
                                 $defaultImage = asset("images/background_room.jpg");
 
-                               $userCharges = $giftType === 'receiver' ? $giftSLog->sender : $giftSLog->receiver;
+                                $userCharges = $giftType === 'receiver' ? $giftSLog->sender : $giftSLog->receiver;
                                 $name = @$userCharges->name ?? '';
                                 $uid = @$userCharges->uuid ?? '';
                                 $id = @$userCharges->id ?? 0;
 
-                                // Set user image
-                                $avatar = @$giftSLog->sender->profile->avatar ;
+                                $avatar = @$userCharges->profile->avatar;
                                 $image = getImagePath($avatar) ?? $userImageDefault;
-                                if (!isImageExists( $image)) {
-                                     $image = $userImageDefault;
+                                if (!isImageExists($image)) {
+                                    $image = $userImageDefault;
                                 }
-                               
-                                // Set room image and name
+
                                 $roomName = @$giftSLog->room->room_name ?? '-';
-                                $path = @$giftSLog->room->room_cover ;
-                                $url =  getImagePath($path) ?? $defaultImage;
+                                $path = @$giftSLog->room->room_cover;
+                                $url = getImagePath($path) ?? $defaultImage;
                                 if (!isImageExists($url)) {
                                     $url = $defaultImage;
                                 }
 
-                                // Gift name based on locale
-                                $giftName = app()->getLocale() == 'ar' ? (@$giftSLog->gift->name ?? '') : (@$giftSLog->gift->e_name ?? '');
-
+                                $giftName = app()->getLocale() == 'ar'
+                                    ? (@$giftSLog->gift->name ?? '')
+                                    : (@$giftSLog->gift->e_name ?? '');
                             @endphp
 
-                        <tr>
-                            <td>{{ $giftSLog->id }}</td>
-                            <td>
-                               <a href="{{ url('admin/users/' . $id) }}" target="_blank"
-                                style="display: inline-flex; align-items: center; text-decoration: none;">
-                                    <img src="{{ $image }}" width="40" height="40"
-                                        style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                    <div style="display: flex; flex-direction: column;">
-                                        <strong style="font-size: 14px;">{{ $name }}</strong>
-                                        <small style="color: #777;">UUID: {{ $uid }}</small>
-                                    </div>
-                                </a>
-                            </td>
-                            <td>
-                                    <a href="#" target="_blank"
-                                    style="display: inline-flex; align-items: center; text-decoration: none;">
-                                        <img src="{{ $url }}"
-                                            width="30" height="30"
-                                            style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                            
-                                        <div style="display: flex; flex-direction: column;">
-                                            <span>{{ $roomName }}</span>
-                                            <span style="color: #888; font-size: 12px;">Type: {{ $giftSLog->room->type ?? '-' }}</span>
+                            <tr>
+                                <td>{{ $giftSLog->id }}</td>
+                                <td>
+                                    <a href="{{ url('admin/users/' . $id) }}" target="_blank"
+                                       class="d-flex align-items-center text-decoration-none">
+                                        <img src="{{ $image }}" width="40" height="40"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <div>
+                                            <strong style="font-size: 14px;">{{ $name }}</strong><br>
+                                            <small class="text-muted">UUID: {{ $uid }}</small>
                                         </div>
                                     </a>
                                 </td>
-                            <td><a href="#" target="_blank"
-                                    style="display: inline-flex; align-items: center; text-decoration: none;">
+                                <td>
+                                    <a href="#" target="_blank"
+                                       class="d-flex align-items-center text-decoration-none">
+                                        <img src="{{ $url }}"
+                                             width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <div>
+                                            <span>{{ $roomName }}</span><br>
+                                            <small class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#" target="_blank"
+                                       class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
-                                            width="30" height="30"
-                                            style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span>{{ $giftName  }} </span>
-                                    </a> </td>
-                            <td>{{ $giftSLog->giftNum }}</td>
-                            <td>{{  $giftSLog->giftPrice}}</td>
-                            <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->format('Y-m-d H:i') }}</td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- Pagination --}}
-            @if($giftSLogs instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                <div class="pagination-container mt-3">
-                    {{ $giftSLogs->appends([
-                        'tab' => 'gift-log',
-                        'gift_type' => $giftType,
-                        'start_at' => request('start_at'),
-                        'end_at' => request('end_at'),
-                        'gift_page' => $giftSLogs->currentPage()
-                    ])->links('vendor.pagination.bootstrap-4') }}
+                                             width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $giftName  }}</span>
+                                    </a>
+                                </td>
+                                <td>{{ $giftSLog->giftNum }}</td>
+                                <td>{{  $giftSLog->giftPrice}}</td>
+                                <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
                 </div>
-            @endif
+                {{-- Pagination --}}
+                @if($giftSLogs instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $giftSLogs->appends([
+                            'tab' => 'gift-log',
+                            'gift_type' => $giftType,
+                            'start_at' => request('start_at'),
+                            'end_at' => request('end_at'),
+                            'gift_page' => $giftSLogs->currentPage()
+                        ])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 @endif
