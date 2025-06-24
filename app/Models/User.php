@@ -1111,7 +1111,7 @@ class User extends Authenticatable
         if ($year === null) {
             $year = now()->year;
         }
-        
+
         if ($this->agency_id) {
             $userSallary = UserTarget::query()->where(function ($query) use ($year, $month) {
                 $query->where(DB::raw('concat(add_year,"-", add_month)'), '<=', $year . '-' . $month);
@@ -1121,7 +1121,7 @@ class User extends Authenticatable
                 ->sum(DB::raw('user_diamonds'));
             return floor($userSallary ?? 0);
         }
-   
+
         return 0;
     }
 
@@ -1194,7 +1194,8 @@ class User extends Authenticatable
     public function getLoadedPacks()
     {
         if ($this->loadedPacks === null) {
-            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
+//            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
+            $this->loadedPacks = $this->packs()->where('is_used', 1)->with('ware')->get();
         }
 
         return $this->loadedPacks;
@@ -1236,7 +1237,7 @@ class User extends Authenticatable
             ->where('ware.value', $this->special_id)
             ->first();
 
-        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : ($value ?? null);
+        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
     }
 
     // originalUuid
@@ -1496,7 +1497,6 @@ class User extends Authenticatable
 
             $originalProfile = $model->profile;
             $newAvatar = request()->input('photo'); // still okay if tightly coupled
-            $uuid = request()->input('original_uuid');
             if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
 
                 $newCount = $model->profile_count + 1;
@@ -1516,7 +1516,6 @@ class User extends Authenticatable
                     $model->profile->avatar = $model->profile->avatar;
                 }
             }
-            $model->uuid = $uuid;
             unset($model->photo);
             unset($model->original_uuid);
         });
