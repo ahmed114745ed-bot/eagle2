@@ -36,7 +36,7 @@ use Modules\SpecialId\Traits\SpecialId;
  */
 class User extends Authenticatable
 {
-    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait ,SoftDeletes, SpecialId, TimestampsWithTimezone ,UserTransferTrait;
+    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -691,14 +691,14 @@ class User extends Authenticatable
     public function UserVip()
     {
         return $this->hasOne(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where('is_used', 1)->where(fn ($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 
     public function userHaveVip()
     {
         return $this->hasMany(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where('is_used', 1)->where(fn ($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 
@@ -1090,7 +1090,7 @@ class User extends Authenticatable
         }
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
@@ -1131,7 +1131,7 @@ class User extends Authenticatable
         }
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
@@ -1168,7 +1168,7 @@ class User extends Authenticatable
         }
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })
                 ->where('user_id', $this->id)
                 ->where('is_paid', 0)
@@ -1213,6 +1213,14 @@ class User extends Authenticatable
             ->first();
 
         return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
+    }
+
+    public function getUuidV3Attribute()
+    {
+        $pack = $this->eligiblePacks->where('type', 25)
+            ->where('ware.value', $this->special_id)
+            ->first();
+        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : '';
     }
 
     /**
@@ -1538,7 +1546,7 @@ class User extends Authenticatable
         return $this->hasMany(BlackList::class, 'from_uid');
     }
 
-    public function getProfileFrame() : Ware | null
+    public function getProfileFrame(): Ware | null
     {
         return $this->packs?->where('type', 28)->where('is_used', 1)->first()?->ware;
     }
