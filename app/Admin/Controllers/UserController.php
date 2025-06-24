@@ -245,9 +245,9 @@ class UserController extends MainController
 
                 $uid = $this->original_uuid ;
 
-                if (!empty($this->uuid_v3)) {
-                    $uid .= '--'.'special:' . $this->uuid_v3;
-                }
+               
+                    $special =  $this->uuid_v3 ;
+                
                 $path = @$this->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
@@ -276,6 +276,7 @@ class UserController extends MainController
                             <div>
                                 <strong>$name</strong><br>
                                 <span style='font-size: smaller;'>UID: $uid</span><br>
+                                <span style='font-size: smaller;'>special: $special</span><br>
                                 <img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>
                                 <img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>
                                 <img src='$chargerImg' style='width: 20px; height: 20px; border-radius: 50%;'>
