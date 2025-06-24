@@ -23,7 +23,7 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             ->with('agency')
             ->whereNotNull('agency_id')
             ->where('agency_id', '!=', 0)
-            ->when(request('agency_id'), fn ($q) => $q->where('agency_id', request('agency_id')))
+            ->when(request('agency_id'), fn($q) => $q->where('agency_id', request('agency_id')))
             ->get();
 
         // Step 2: Query salaries in one shot and map by user_id
@@ -39,8 +39,7 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
                 DB::raw('MAX(extras) AS extras'),
                 DB::raw('MAX(user_agency_id) AS user_agency_id'),
             ])
-            ->where('month', '<=', $month)
-            ->where('year', '<=', $year)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->whereNotNull('user_agency_id')
             ->groupBy('user_id')
@@ -59,12 +58,12 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             $data[] = [
                 'uuid' => $user->uuid,
                 'name' => $user->name,
-                'diamonds' => $user->getTotalDiamond($month, $year) ?? 0 .' 💎',
+                'diamonds' => $user->getTotalDiamond($month, $year) ?? 0 . ' 💎',
                 'days' => $salary->achieved_days ?? '0/0',
                 'hours' => $salary->achieved_hours ?? '0/0',
                 'moment' => $this->formatExtras($moment),
                 'reel' => $this->formatExtras($reel),
-                'salary' => ($salary->target ?? 0).' 💲',
+                'salary' => ($salary->target ?? 0) . ' 💲',
                 'withdrawn' => $salary->expenses ?? 0,
                 'remaining' => $salary->salary ?? 0,
                 'agency' => @$salary?->agency?->name ?? '-',
