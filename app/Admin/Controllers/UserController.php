@@ -245,9 +245,9 @@ class UserController extends MainController
 
                 $uid = $this->original_uuid ;
 
-               
+
                     $special =  $this->uuid_v3 ;
-                
+
                 $path = @$this->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;

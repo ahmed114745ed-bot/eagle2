@@ -100,7 +100,7 @@ class UserResource extends JsonResource
             ]);
         }
         $isHideRoom = $this->getPackWithType(16);
-        $nowRoomOwner = User::where('uid', $this->now_room_uid)->first();
+        $nowRoomOwner = User::where('id', $this->now_room_uid)->first();
         $isHideNowRoom = $nowRoomOwner?->getPackWithType(16) ?? 0;
         
         $data      = [
