@@ -243,7 +243,7 @@ class UserController extends MainController
         $grid->column('name', __('Name'))
             ->display(function ($name) {
 
-                $uid = $this->uuid ;
+                $uid = $this->original_uuid ;
 
                 if (!empty($this->uuid_v3)) {
                     $uid .= '-'.'special:' . $this->uuid_v3;
