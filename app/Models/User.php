@@ -1113,8 +1113,9 @@ class User extends Authenticatable
         }
 
         if ($this->agency_id) {
-            $userSallary = UserTarget::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(add_year,"-", add_month)'), '<=', $year . '-' . $month);
+            $userSallary = UserTarget::query()
+            ->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(add_year,"-", add_month)'), '=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('agency_id', $this->agency_id)
                 ->orderByDesc('id')
