@@ -59,7 +59,7 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             $data[] = [
                 'uuid' => $user->uuid,
                 'name' => $user->name,
-                'diamonds' => number_format((int) ($salary->achieved_diamond ?? 0)).' 💎',
+                'diamonds' => $user->getTotalDiamond($month, $year) ?? 0 .' 💎',
                 'days' => $salary->achieved_days ?? '0/0',
                 'hours' => $salary->achieved_hours ?? '0/0',
                 'moment' => $this->formatExtras($moment),
@@ -67,7 +67,7 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
                 'salary' => ($salary->target ?? 0).' 💲',
                 'withdrawn' => $salary->expenses ?? 0,
                 'remaining' => $salary->salary ?? 0,
-                'agency' => optional($user->agency)->name ?? '-',
+                'agency' => optional($salary->agency)->name ?? '-',
                 'agency_id' => $salary->user_agency_id ?? '-',
                 'month' => $month,
                 'year' => $year,
