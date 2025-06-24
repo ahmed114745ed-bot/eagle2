@@ -94,7 +94,8 @@ class WareDedicateAction extends Action
                 $arr['is_read'] = 1;
                 
                 $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
-                $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;
+                // $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;
+                $arr['is_used'] = false;
                 
                 Pack::query()->create($arr);
                 if ($ware->type == 25) {
