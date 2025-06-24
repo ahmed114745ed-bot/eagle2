@@ -999,7 +999,7 @@
   "Delete daily gift": "Delete daily login gift",
   "Show daily gift": "Show daily login gift details",
   "Browse daily gift": "Browse daily login gift",
-  "Entering Special Effects": "Compound",
+  "Entering Special Effects": "Entering Special Effects",
   "wapel": "entry effect",
     "Kick switch agencies": "Kick",
   "Make admin switch agencies": "Make Admin",
@@ -1033,7 +1033,8 @@
 "are_you_sure_remove_admin": "Are you sure you want to remove this admin?",
 "image_type": "image type",
 "pack_not_found": "pack not found",
-"level_num":"level number"
+"level_num":"level number",
+  "room_closed": "The room is closed, please contact the supervisor."
 
 
 

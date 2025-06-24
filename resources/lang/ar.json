@@ -20,7 +20,7 @@
     "action": "عمليات",
     "All Managers": " (DB)جميع المدرين ",
     "male": "ذكر",
-   
+
     "registered successfully": "تم التسجيل بنجاح",
     "required": "مطلوب",
     "exists": "محجوز",
@@ -225,6 +225,7 @@
     "coin": "كوينز",
     "contact": "التواصل",
     "price": "السعر",
+    "there is no weekly star now": "لا يوجد نجم الأسبوع حالياً",
     "Price": "السعر",
     "expire": "الصلاحية",
     "users": "المستخدمين",
@@ -274,7 +275,7 @@
     "image Id": "صورة Id",
     "start": "بدء",
   "Reset": "إعادة تعيين",
-   
+
     "to many send": "الكثير من الطلبات",
     "code is sent to your phone": "تم إرسال الرمز إلى هاتفك",
     "logged in successfully": "تم تسجيل الدخول بنجاح",
@@ -3255,7 +3256,9 @@
 "level_num":"رقم المستوي",
 "you don not have permission":"ليس لديك الصلاحية",
 "there is weekly star now": "هناك نجم أسبوعي الآن",
-"there is no event now": "لا يوجد حدث الآن"
+"there is no event now": "لا يوجد حدث الآن",
+"room_closed": "الروم مغلقة، الرجاء التواصل مع المشرف"
+
 
 
 

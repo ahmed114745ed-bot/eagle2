@@ -198,7 +198,7 @@ class WareTabController extends MainController
         $content = new Row();
 
         // Define your type mapping
-        $typeMap = TYPE_WARE;
+        $typeMap = SELECTED_USED_WARE;
 
         // $types = Ware::whereIn('type', array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
         //     return [$type => $typeMap[$type] ?? "Type $type"];
@@ -468,14 +468,14 @@ class WareTabController extends MainController
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
 
-                $final = $profileFrameType ?? $imageType1;
+                $image = $profileFrameType ?? $imageType1;
 
-                if ($isEditing && is_null($final)) {
+                if ($isEditing && is_null($image)) {
                     session()->flash('show_alert', 'الرجاء اختيار نوع الصوره');
                     return redirect()->back();
                 }
 
-                $form->model()->image_type = $final;
+                $form->model()->image_type = $image;
             }
         });
 

@@ -805,7 +805,10 @@
                 display: math !important;
                 direction: rtl !important;
                 flex-direction: row-reverse !important;
+            }
 
+            .ltr .form-horizontal .row {
+                display: math !important;
             }
 
            .rtl .form-horizontal .box-footer .btn-group {

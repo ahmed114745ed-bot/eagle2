@@ -254,8 +254,11 @@ class UserHandling
         return  $message;
     }
 
-    public function hasReasonOfBan(string $uuid, $request): ?string
+    public function hasReasonOfBan(?string $uuid, $request): ?string
     {
+        if (is_null($uuid)) {
+            return false; 
+        }
         $banFounded = $this->getUserBan($uuid, $request);
         $message = null;
         if ($banFounded) {

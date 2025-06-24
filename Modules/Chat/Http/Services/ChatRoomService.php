@@ -324,9 +324,9 @@ class ChatRoomService
 
     public function getRoomData($user2)
     {
-        // Get room data and check if it has a password
         $room = Room::where('uid', $user2->now_room_uid)->first();
-
+        $isHideRoom = $room?->owner->getPackWithType(16);
+        $room = !$isHideRoom ? $room : null;
         return [
             'room_owner_id' => $user2->now_room_uid,
             'owner' => [
