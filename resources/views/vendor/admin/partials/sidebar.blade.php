@@ -76,17 +76,17 @@
   
                 @php
                     $bdLinks = [
-                        ['uri' => '/bd', 'icon' => 'fa-home', 'title' => __('home')],
-                        ['uri' => '/bd/charges', 'icon' => 'fa-building', 'title' => __('charges')],
-                        ['uri' => '/bd/agencies', 'icon' => 'fa-building', 'title' => __('agencies')],
-                        ['uri' => '/bd/salaries', 'icon' => 'fa-building', 'title' => __('salaries')],
-                        ['uri' => '/bd/request-agencies', 'icon' => 'fa-building', 'title' => __('request-agencies')],
+                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('home')],
+                        ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges')],
+                        ['uri' => '/agencies', 'icon' => 'fa-building', 'title' => __('agencies')],
+                        ['uri' => '/salaries', 'icon' => 'fa-building', 'title' => __('salaries')],
+                        ['uri' => '/request-agencies', 'icon' => 'fa-building', 'title' => __('request-agencies')],
                     ];
                 @endphp
 
                 @foreach($bdLinks as $link)
                     <li>
-                        <a href="{{ $link['uri'] }}">
+                        <a href="{{  bd_url($link['uri']) }}">
                             <i class="fa {{ $link['icon'] }}"></i>
                             <span>{{ $link['title'] }}</span>
                         </a>

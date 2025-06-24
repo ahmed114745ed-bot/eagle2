@@ -36,7 +36,7 @@ use Modules\SpecialId\Traits\SpecialId;
  */
 class User extends Authenticatable
 {
-    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait ,SoftDeletes, SpecialId, TimestampsWithTimezone ,UserTransferTrait;
+    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -691,14 +691,14 @@ class User extends Authenticatable
     public function UserVip()
     {
         return $this->hasOne(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where('is_used', 1)->where(fn ($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 
     public function userHaveVip()
     {
         return $this->hasMany(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where('is_used', 1)->where(fn ($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 
@@ -1090,7 +1090,7 @@ class User extends Authenticatable
         }
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
@@ -1105,16 +1105,21 @@ class User extends Authenticatable
 
     public function getTotalDiamond($month = null, $year = null)
     {
+        if ($month === null) {
+            $month = now()->month;
+        }
+        if ($year === null) {
+            $year = now()->year;
+        }
+
         if ($this->agency_id) {
-            $userSallary = UserTarget::query()->when(isset($month), function ($query) use ($month) {
-                $query->where('add_month', '<=', $month);
-            })->when(isset($year), function ($query) use ($year) {
-                $query->where('add_year', '<=', $year);
+            $userSallary = UserTarget::query()
+            ->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(add_year,"-", add_month)'), '=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('agency_id', $this->agency_id)
                 ->orderByDesc('id')
                 ->sum(DB::raw('user_diamonds'));
-
             return floor($userSallary ?? 0);
         }
 
@@ -1131,7 +1136,7 @@ class User extends Authenticatable
         }
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
@@ -1168,7 +1173,7 @@ class User extends Authenticatable
         }
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })
                 ->where('user_id', $this->id)
                 ->where('is_paid', 0)
@@ -1190,7 +1195,8 @@ class User extends Authenticatable
     public function getLoadedPacks()
     {
         if ($this->loadedPacks === null) {
-            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
+//            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
+            $this->loadedPacks = $this->packs()->where('is_used', 1)->with('ware')->get();
         }
 
         return $this->loadedPacks;
@@ -1215,6 +1221,14 @@ class User extends Authenticatable
         return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
     }
 
+    public function getUuidV3Attribute()
+    {
+        $pack = $this->eligiblePacks->where('type', 25)
+            ->where('ware.value', $this->special_id)
+            ->first();
+        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : '';
+    }
+
     /**
      * Custom accessor for UUID with special pack conditions.
      */
@@ -1224,7 +1238,7 @@ class User extends Authenticatable
             ->where('ware.value', $this->special_id)
             ->first();
 
-        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : ($value ?? null);
+        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
     }
 
     // originalUuid
@@ -1484,7 +1498,6 @@ class User extends Authenticatable
 
             $originalProfile = $model->profile;
             $newAvatar = request()->input('photo'); // still okay if tightly coupled
-
             if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
 
                 $newCount = $model->profile_count + 1;
@@ -1505,6 +1518,7 @@ class User extends Authenticatable
                 }
             }
             unset($model->photo);
+            unset($model->original_uuid);
         });
 
         self::updating(function ($user) {
@@ -1538,7 +1552,7 @@ class User extends Authenticatable
         return $this->hasMany(BlackList::class, 'from_uid');
     }
 
-    public function getProfileFrame() : Ware | null
+    public function getProfileFrame(): Ware | null
     {
         return $this->packs?->where('type', 28)->where('is_used', 1)->first()?->ware;
     }

@@ -90,7 +90,7 @@ class CoinService
                     return $paymentUrl;
                 }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
-            } elseif ($request->pay_method == 'utd_fawry') {
+            } elseif ($request->pay_method == 'utdFawry') {
                 $oldFawryService = new FawryPaymentService();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 

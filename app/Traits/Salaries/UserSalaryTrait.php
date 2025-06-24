@@ -95,7 +95,7 @@ trait UserSalaryTrait
 
                             $this->info("User ID {$user->id} processed.");
                         } catch (\Throwable $e) {
-                            \Log::error("Failed to calculate target for user ID {$user->id}: " . $e->getMessage());
+                           
                             $this->error("Failed user ID {$user->id}");
                         }
                     }

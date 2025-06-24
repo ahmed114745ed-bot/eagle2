@@ -15,12 +15,12 @@ class FawryPaymentService
     public function __construct()
     {
 
-        $this->fawryUrl = config('services.fawry.fawry_url');
+        $this->fawryUrl = config('services.utd_fawry.utd_fawry_url');
     }
 
     public static function redirect_if_payment_success($trx)
     {
-       return url(config("services.fawry.fawry_return_url"));
+       return url(config("services.utd_fawry.utd_fawry_return_url"));
     }
 
    public static function redirect_if_payment_faild($trx)
@@ -56,7 +56,7 @@ class FawryPaymentService
             "code" => $trx
         ];
 
-        $url = config("services.fawry.utd_url");
+        $url = config("services.utd_fawry.utd_url");
 
         $client = new Client();
 
@@ -69,7 +69,9 @@ class FawryPaymentService
                 ]
             ]);
             $responseBody = json_decode($response->getBody(), true);
-            return $responseBody;
+        info($responseBody);
+
+        return $responseBody;
 //        } catch (RequestException $e) {
 //            if ($e->hasResponse()) {
 //                $errorResponse = json_decode($e->getResponse()->getBody(), true);
@@ -82,9 +84,10 @@ class FawryPaymentService
 
     public function getBodyForFawry($trx,$amount)
     {
-        $merchantCode = config("services.fawry.fawry_merchant_code");
+        info(self::redirect_if_payment_success($trx));
+        $merchantCode = config("services.utd_fawry.utd_fawry_merchant_code");
         $merchantRefNum = $trx;
-        $secure_key = config("services.fawry.fawry_secret");
+        $secure_key = config("services.utd_fawry.utd_fawry_secret");
         $price = number_format($amount, 2, '.', '');
         $qty = 1;
         $syn = $merchantCode.$merchantRefNum."".self::redirect_if_payment_success ($trx).$trx.$qty.$price.$secure_key;

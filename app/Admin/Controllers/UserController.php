@@ -242,7 +242,12 @@ class UserController extends MainController
         //        });
         $grid->column('name', __('Name'))
             ->display(function ($name) {
-                $uid = @$this->uuid;
+
+                $uid = $this->original_uuid ;
+
+
+                    $special =  $this->uuid_v3 ;
+
                 $path = @$this->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
@@ -271,6 +276,7 @@ class UserController extends MainController
                             <div>
                                 <strong>$name</strong><br>
                                 <span style='font-size: smaller;'>UID: $uid</span><br>
+                                <span style='font-size: smaller;'>special: $special</span><br>
                                 <img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>
                                 <img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>
                                 <img src='$chargerImg' style='width: 20px; height: 20px; border-radius: 50%;'>
@@ -868,7 +874,7 @@ class UserController extends MainController
                 Carbon::parse($end)->endOfDay()
             ]);
         })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType','diamonds');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
@@ -925,7 +931,7 @@ class UserController extends MainController
             $form->hidden('oldDiValue')->default($oldDiValue);
             $form->hidden('oldDiamoundValue')->default($oldDiamoundValue);
         }
-        $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
+        $form->text('original_uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
         $form->image('photo', __('image'))->name(function ($file) {
@@ -1061,6 +1067,7 @@ class UserController extends MainController
             $type_user = request()->type_user;
             $model     = $form->model();
             $user_id   = $model->id;
+            $form->model()->uuid = $form->original_uuid;
             // $user = User::find($user_id);
             // $originalProfile = $user->profile;
             // $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled

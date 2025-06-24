@@ -115,11 +115,13 @@ class MomentService extends MomentBaseModelService
         }
         if ($request->hasFile('multi_image')) {
             foreach ($request->file('multi_image') as $file) {
-                $imagePath = Common::upload('profile', $file);
 
-                $moment->images()->create([
-                    'image' => $imagePath,
-                ]);
+                if ($file && $file->isValid()) {
+                    $imagePath = Common::upload('profile', $file);
+                    $moment->images()->create([
+                        'image' => $imagePath,
+                    ]);
+                }
             }
         }
 

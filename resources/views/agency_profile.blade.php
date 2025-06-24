@@ -741,9 +741,16 @@
             position: relative;
         }
 
-        .card-target-filter-phone .form-group {
+        .rtl .card-target-filter-phone .form-group {
             margin-bottom: 16px;
             right: 20px;
+            position: relative;
+            top: 10px;
+        }
+
+        .ltr .card-target-filter-phone .form-group {
+            margin-bottom: 16px;
+            left: 20px;
             position: relative;
             top: 10px;
         }
@@ -864,7 +871,7 @@
         <!-- Header Section -->
         <div class="agency-header">
             <div class="agency-avatar" style="width: 183px !important;">
-                <img src="{{ $agency->display_image }}" alt="Agency Logo" class="logo-img">
+                <img src="{{ @$imageUrl??asset('images/icon-agency.jpg') }}" alt="Agency Logo" class="logo-img">
             </div>
             <div class="agency-info">
                 <h1 class="agency-name">{{ @$agency?->name ?? ''}}</h1>
@@ -887,7 +894,7 @@
                         <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
                     </div>
-                  
+
                 </div>
             </div>
             <a class="btn-back" href="{{ route('admin.agencies.index') }}">
@@ -896,7 +903,7 @@
         </div>
 
         <div class="agency-header">
-       
+
 
             <div class="agency-avatar" style="border-radius: 50%;">
                 @php
@@ -912,9 +919,9 @@
                 <div class="agency-meta">
                     <div class="meta-item">
                         <span class="meta-label">{{__('UUID')}}:</span>
-                        
+
                         <span class="meta-value">{{ @$agency?->owner?->uuid ?? 'N/A' }}</span>
-                    
+
                     </div>
                     <!-- <div class="meta-item">
                         <span class="meta-label">{{__('dashboard.id')}}:</span>
@@ -923,7 +930,7 @@
                 </div>
                 </a>
             </div>
-            
+
 
         </div>
 
@@ -1022,7 +1029,7 @@
             </div>
         </div>
         @php
-                $activeTab = request('tab', 'tab=targets'); 
+                $activeTab = request('tab', 'tab=targets');
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
@@ -1061,7 +1068,7 @@
             {{ __('Loading...') }}
         </div>
         @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            
+
             <div class="tab-content active" id="members-tab">
                 <div class="card">
                     <div class="card-header">
@@ -1119,7 +1126,7 @@
                                                     @if (\Encore\Admin\Facades\Admin::user()->can('remove-admin-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
                                                         <button class="btn-action remove-admin-btn btn-danger" style="background-color: red;" data-id="{{ $member->id }}">
                                                             {{ __('remove_admin') }}
-                                                        </button> 
+                                                        </button>
                                                     @endif
                                                     @if (\Encore\Admin\Facades\Admin::user()->can('kick-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
                                                         <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
@@ -1160,7 +1167,7 @@
                     @endif
                 </div>
             </div>
-         @endif 
+         @endif
         <!-- Charges Section -->
         <div class="tab-content" id="charges-tab">
             <div class="card">
@@ -1180,7 +1187,7 @@
                                 <th>{{ __('Created at') }}</th>
                                 </tr>
                             </thead>
-    
+
 
                             @if($charges && $charges->count())
                                     <tbody style="color: rgb(208, 115, 43);">
@@ -1237,14 +1244,14 @@
                                     </div>
                                 </div>
 
-                              
+
                             </div> -->
                         </div>
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
                 </div>
-              
+
                 <div class="table-responsive">
                     <div class="box-body ">
                         <table class="data-table" id="salary">
@@ -1268,7 +1275,7 @@
                                             <td>{{ @$sumTargets }}</td>
                                             <td>{{ @$salary->month ?? '' }}</td>
                                             <td>{{ @$salary->year ?? '' }}</td>
-                                            
+
 
                                         </tr>
                                     @endforeach
@@ -1681,7 +1688,7 @@
                                                         $reelLikes = $reel['likes'] ?? '0/0';
                                                         $reelComments = $reel['comments'] ?? '0/0';
 
-                                                        
+
                                                             $target = $memberTarget->targets->first();
                                                  @endphp
 
