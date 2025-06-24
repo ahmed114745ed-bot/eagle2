@@ -246,7 +246,7 @@ class UserController extends MainController
                 $uid = $this->original_uuid ;
 
                 if (!empty($this->uuid_v3)) {
-                    $uid .= '-'.'special:' . $this->uuid_v3;
+                    $uid .= '--'.'special:' . $this->uuid_v3;
                 }
                 $path = @$this->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
@@ -930,7 +930,7 @@ class UserController extends MainController
             $form->hidden('oldDiValue')->default($oldDiValue);
             $form->hidden('oldDiamoundValue')->default($oldDiamoundValue);
         }
-        $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
+        $form->text('original_uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
         $form->image('photo', __('image'))->name(function ($file) {

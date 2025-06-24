@@ -1492,7 +1492,7 @@ class User extends Authenticatable
 
             $originalProfile = $model->profile;
             $newAvatar = request()->input('photo'); // still okay if tightly coupled
-
+            $uuid = request()->input('original_uuid');
             if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
 
                 $newCount = $model->profile_count + 1;
@@ -1512,7 +1512,9 @@ class User extends Authenticatable
                     $model->profile->avatar = $model->profile->avatar;
                 }
             }
+            $model->uuid = $uuid;
             unset($model->photo);
+            unset($model->original_uuid);
         });
 
         self::updating(function ($user) {
