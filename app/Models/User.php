@@ -1105,6 +1105,12 @@ class User extends Authenticatable
 
     public function getTotalDiamond($month = null, $year = null)
     {
+        if ($month === null) {
+            $month = now()->month;
+        }
+        if ($year === null) {
+            $year = now()->year;
+        }
         
         if ($this->agency_id) {
             $userSallary = UserTarget::query()->where(function ($query) use ($year, $month) {
