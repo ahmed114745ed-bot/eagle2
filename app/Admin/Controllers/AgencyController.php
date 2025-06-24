@@ -179,7 +179,7 @@ class AgencyController extends MainController
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
-        $agency->display_image = $imageUrl;
+        
 
         $agencyId = $agency->id;
 
@@ -310,7 +310,8 @@ class AgencyController extends MainController
                 'stars',
                 'heroes',
                 'tab',
-                'sumTargets'
+                'sumTargets',
+                'imageUrl'
             ));
     }
 

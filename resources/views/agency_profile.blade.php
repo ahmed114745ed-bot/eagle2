@@ -871,7 +871,7 @@
         <!-- Header Section -->
         <div class="agency-header">
             <div class="agency-avatar" style="width: 183px !important;">
-                <img src="{{ @$agency->display_image??asset('images/icon-agency.jpg') }}" alt="Agency Logo" class="logo-img">
+                <img src="{{ @$imageUrl??asset('images/icon-agency.jpg') }}" alt="Agency Logo" class="logo-img">
             </div>
             <div class="agency-info">
                 <h1 class="agency-name">{{ @$agency?->name ?? ''}}</h1>
