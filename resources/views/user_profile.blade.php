@@ -1090,7 +1090,7 @@
                         <span class="meta-label">{{ __("uuid") }}:</span>
                         <span class="meta-value">{{ @$user->uuid }}</span><br>
                         <span class="meta-label">{{ __("special uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->uuid_v3 }}</span>
+                        <span class="meta-value">{{ @$user->original_uuid }}</span>
                     @endif
                 </div>
                 <div class="meta-item">
@@ -1760,7 +1760,7 @@
                                 $uid = @$userCharges->uuid ?? '';
                                 $id = @$userCharges->id ?? 0;
 
-                                $avatar = @$giftSLog->profile->avatar;
+                                $avatar = @$userCharges->profile->avatar;
                                 $image = getImagePath($avatar) ?? $userImageDefault;
                                 if (!isImageExists($image)) {
                                     $image = $userImageDefault;
