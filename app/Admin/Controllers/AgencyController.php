@@ -175,13 +175,13 @@ class AgencyController extends MainController
 
         $path = $agency?->img;
         $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($path) ?? $defaultImage;
+        $imageUrl = getImagePath($path);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
-        $agency->display_image = $imageUrl;
+        
 
-        $agencyId = $agency->id;
+        $agencyId = $agency->id ?? $id;
 
         $members = $charges = $salaries = $agencyJoinRequests = $giftLog = $memberTargets = $agencyTarget = $rate = $stars = $heroes = null;
 
@@ -310,7 +310,8 @@ class AgencyController extends MainController
                 'stars',
                 'heroes',
                 'tab',
-                'sumTargets'
+                'sumTargets',
+                'imageUrl'
             ));
     }
 
