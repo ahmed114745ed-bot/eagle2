@@ -1043,6 +1043,14 @@
             background-color: transparent !important;
             filter: none !important;
         }
+        .level-form {
+            background-color: transparent !important;
+            filter: none !important;
+            padding: 10px;
+        }
+        .level-label {
+            padding: 10px;
+        }
         .rtl .gift-log-form {
             padding-right: 13%;
         }
@@ -1194,7 +1202,7 @@
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('pack') }}</h4>
             </div>
-            <div class="box-body no-padding">
+            <div class="box-body">
                 <div class="nav-scroll-container">
                     <ul class="nav nav-pills">
                         @foreach($types as $id => $name)
@@ -1211,11 +1219,10 @@
                 </div>
             </div>
 
-
             <div class="table-responsive">
                 <div class="box-body ">
-                    <table class="data-table" id="pack">
-                        <thead>
+                    <table class="table table-bordered table-hover align-middle data-table" id="pack">
+                        <thead class="table-light">
                         <tr>
                             <th>#</th>
                             <th>{{ __('get type') }}</th>
@@ -1283,10 +1290,11 @@
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
             </div>
+
             <div class="table-responsive">
                 <div class="box-body ">
-                    <table class="data-table" id="vip">
-                        <thead>
+                    <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                        <thead class="table-light">
                         <tr>
                             <th>#</th>
                             <th>{{ __('level') }}</th>
@@ -1343,181 +1351,186 @@
                 <h4 class="card-title" style="text-align: left;">{{ __('user wallet') }}</h4>
             </div>
 
-            <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" pjax-container="">
-                <input type="hidden" name="tab" value="salary">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="box-body">
-                            <div class="fields-group">
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                            <input type="hidden" name="tab" value="salary">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="box-body">
+                                        <div class="fields-group">
 
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">السنة</label>
-                                    <div class="col-sm-8">
-                                        <div class="input-group input-group-sm">
-                                            <div class="input-group-addon">
-                                                <i class="fa fa-pencil"></i>
-                                            </div>
-                                            <input type="text" class="form-control year" placeholder="السنة" name="year"
-                                                   value="{{ request('year') }}" style="text-align: right;">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="col-sm-2 control-label">الشهر</label>
-                                    <div class="col-sm-8">
-                                        <div class="input-group input-group-sm">
-                                            <div class="input-group-addon">
-                                                <i class="fa fa-pencil"></i>
-                                            </div>
-                                            <input type="text" class="form-control month" placeholder="الشهر"
-                                                   name="month" value="{{ request('month') }}"
-                                                   style="text-align: right;">
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- /.box-body -->
-                <div class="box-footer">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="col-md-2"></div>
-                            <div class="col-md-8">
-                                <div class="btn-group pull-left">
-                                    <button class="btn btn-info submit btn-sm">
-                                        <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
-                                    </button>
-                                </div>
-                                <div class="btn-group pull-left" style="margin-left: 10px;">
-                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
-                                       class="btn btn-default btn-sm">
-                                        <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </form>
-
-            <div class="table-responsive">
-                <div class="box-body ">
-                    <table class="data-table" id="vip">
-                        <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('agency') }}</th>
-                            <th>{{ __('salary') }}</th>
-                            <th>{{ __('Withdraw') }}</th>
-                            <th>{{ __('net salary') }}</th>
-                            <th>{{ __('days') }}</th>
-                            <th>{{ __('hours') }}</th>
-                            <th>{{ __('Moments') }}</th>
-                            <th>{{ __('Reels') }}</th>
-                            <th>{{ __('diamonds') }}</th>
-                            <th>{{ __('date') }}</th>
-
-                        </tr>
-                        </thead>
-                        @if($salaries && $salaries->count())
-                            <tbody style="color: rgb(208, 115, 43);">
-                            @foreach($salaries as $index => $salary)
-
-                                @php
-                                    $agency = $salary->agency;
-                                    $name = $agency->name ?? '';
-
-                                    $path = @$agency->img;
-                                    $defaultImage = asset("images/icon-agency.jpg");
-                                    $url = getImagePath($path) ?? $defaultImage;
-
-                                    if (!isImageExists($url)) {
-                                        $url = $defaultImage;
-                                    }
-
-                                    $image = handleShowImageWithTypes($user->id, $url, 40, 40);
-                                    $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
-
-                                    $extras = json_decode($salary->extras, true);
-                                    $moment = $extras['moment'] ?? [];
-                                    $reel = $extras['reel'] ?? [];
-
-                                    $momentUpload = $moment['upload'] ?? '0/0';
-                                    $momentLikes = $moment['likes'] ?? '0/0';
-                                    $momentComments = $moment['comments'] ?? '0/0';
-
-                                    $reelUpload = $reel['upload'] ?? '0/0';
-                                    $reelLikes = $reel['likes'] ?? '0/0';
-                                    $reelComments = $reel['comments'] ?? '0/0';
-
-
-                                @endphp
-
-                                <tr>
-                                    <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
-                                    <td>
-                                        <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
-                                            <div style="display: flex; align-items: center; gap: 10px;">
-                                                {!! $image !!}
-                                                <div style="display: flex; flex-direction: column;">
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                    <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">السنة</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control year" placeholder="السنة" name="year"
+                                                               value="{{ request('year') }}" style="text-align: right;">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </a>
-                                    </td>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">الشهر</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group input-group-sm">
+                                                        <div class="input-group-addon">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </div>
+                                                        <input type="text" class="form-control month" placeholder="الشهر"
+                                                               name="month" value="{{ request('month') }}"
+                                                               style="text-align: right;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- /.box-body -->
+                            <div class="box-footer">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="col-md-2"></div>
+                                        <div class="col-md-8">
+                                            <div class="btn-group pull-left">
+                                                <button class="btn btn-info submit btn-sm">
+                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
+                                                </button>
+                                            </div>
+                                            <div class="btn-group pull-left" style="margin-left: 10px;">
+                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
+                                                   class="btn btn-default btn-sm">
+                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <div class="box-body ">
+                        <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('agency') }}</th>
+                                <th>{{ __('salary') }}</th>
+                                <th>{{ __('Withdraw') }}</th>
+                                <th>{{ __('net salary') }}</th>
+                                <th>{{ __('days') }}</th>
+                                <th>{{ __('hours') }}</th>
+                                <th>{{ __('Moments') }}</th>
+                                <th>{{ __('Reels') }}</th>
+                                <th>{{ __('diamonds') }}</th>
+                                <th>{{ __('date') }}</th>
+
+                            </tr>
+                            </thead>
+                            @if($salaries && $salaries->count())
+                                <tbody style="color: rgb(208, 115, 43);">
+                                @foreach($salaries as $index => $salary)
+
+                                    @php
+                                        $agency = $salary->agency;
+                                        $name = $agency->name ?? '';
+
+                                        $path = @$agency->img;
+                                        $defaultImage = asset("images/icon-agency.jpg");
+                                        $url = getImagePath($path) ?? $defaultImage;
+
+                                        if (!isImageExists($url)) {
+                                            $url = $defaultImage;
+                                        }
+
+                                        $image = handleShowImageWithTypes($user->id, $url, 40, 40);
+                                        $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+
+                                        $extras = json_decode($salary->extras, true);
+                                        $moment = $extras['moment'] ?? [];
+                                        $reel = $extras['reel'] ?? [];
+
+                                        $momentUpload = $moment['upload'] ?? '0/0';
+                                        $momentLikes = $moment['likes'] ?? '0/0';
+                                        $momentComments = $moment['comments'] ?? '0/0';
+
+                                        $reelUpload = $reel['upload'] ?? '0/0';
+                                        $reelLikes = $reel['likes'] ?? '0/0';
+                                        $reelComments = $reel['comments'] ?? '0/0';
 
 
-                                    <td>{{$salary->sallary}}</td>
-                                    <td>{{ $salary->cut_amount}}</td>
-                                    <td>{{ $salary->sallary - $salary->cut_amount }}</td>
-                                    <td>{{ $salary->days }}</td>
-                                    <td>{{ $salary->hours }}</td>
-                                    <td>
-                                        <div style="line-height: 1.6;">
-                                            <ul style="margin-left: 8px;">
-                                                <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
-                                                <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
-                                                <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div style="line-height: 1.6;">
-                                            <ul style="margin-left: 8px;">
-                                                <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
-                                                <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
-                                                <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                    <td>{{ $salary->achieved_diamond }}</td>
-                                    <td>{{ $salary->month .'/'. $salary->year }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
+                                    @endphp
+
+                                    <tr>
+                                        <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
+                                        <td>
+                                            <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    {!! $image !!}
+                                                    <div style="display: flex; flex-direction: column;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
+                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+
+
+                                        <td>{{$salary->sallary}}</td>
+                                        <td>{{ $salary->cut_amount}}</td>
+                                        <td>{{ $salary->sallary - $salary->cut_amount }}</td>
+                                        <td>{{ $salary->days }}</td>
+                                        <td>{{ $salary->hours }}</td>
+                                        <td>
+                                            <div style="line-height: 1.6;">
+                                                <ul style="margin-left: 8px;">
+                                                    <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
+                                                    <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
+                                                    <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="line-height: 1.6;">
+                                                <ul style="margin-left: 8px;">
+                                                    <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
+                                                    <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
+                                                    <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td>{{ $salary->achieved_diamond }}</td>
+                                        <td>{{ $salary->month .'/'. $salary->year }}</td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            @endif
+                        </table>
+
+                        @if($salaries)
+                            <div class="pagination-container">
+                                {{ $salaries->appends([
+                                    'pack_page' => $packs?->currentPage(),
+                                    'vip_page' => $userVips?->currentPage(),
+                                    'gift_page' => $giftSLogs?->currentPage(),
+
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
                         @endif
-                    </table>
-
-                    @if($salaries)
-                        <div class="pagination-container">
-                            {{ $salaries->appends([
-                                'pack_page' => $packs?->currentPage(),
-                                'vip_page' => $userVips?->currentPage(),
-                                'gift_page' => $giftSLogs?->currentPage(),
-
-                            ])->links('vendor.pagination.bootstrap-4') }}
-                        </div>
-                    @endif
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -1526,31 +1539,34 @@
             <div class="card-header">
                 <h4 class="card-title text-left">{{ __('level') }}</h4>
             </div>
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('/admin/edit-level') }}" id="user_level_update_form" method="POST"
+                              enctype="multipart/form-data" class="level-form">
+                            @csrf
+                            <div class="row" style="justify-content:space-evenly">
+                                <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
+                                <div class=" col-lg-6 form-Roles mb-3">
+                                    <label class="form-label level-label"> {{ __('Sender Level') }}</label>
+                                    <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control "
+                                           id="total_sender_level" name="total_sender_level" required>
+                                </div>
 
-            <div class="card-body">
-                <form action="{{ url('/admin/edit-level') }}" id="user_level_update_form" method="POST"
-                      enctype="multipart/form-data">
-                    @csrf
-                    <div class="row" style="justify-content:space-evenly">
-                        <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
-                        <div class=" col-lg-6 form-Roles mb-3">
-                            <label class="form-label"> {{ __('Sender Level') }}</label>
-                            <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control "
-                                   id="total_sender_level" name="total_sender_level" required>
-                        </div>
-
-                        <div class=" col-lg-6 form-Roles mb-3">
-                            <label class="form-label"> {{ __('Received Level') }}</label>
-                            <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control "
-                                   id="total_received_level" name="total_received_level" required>
-                        </div>
+                                <div class=" col-lg-6 form-Roles mb-3">
+                                    <label class="form-label level-label"> {{ __('Received Level') }}</label>
+                                    <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control "
+                                           id="total_received_level" name="total_received_level" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" type="button"
+                                        data-bs-dismiss="modal">{{ __('cancel') }} </button>
+                                <button class="btn btn-primary " type="submit">{{ __('save') }} </button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button"
-                                data-bs-dismiss="modal">{{ __('cancel') }} </button>
-                        <button class="btn btn-primary " type="submit">{{ __('save') }} </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
