@@ -1067,6 +1067,7 @@ class UserController extends MainController
             $type_user = request()->type_user;
             $model     = $form->model();
             $user_id   = $model->id;
+            $form->model()->uuid = $form->original_uuid;
             // $user = User::find($user_id);
             // $originalProfile = $user->profile;
             // $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
