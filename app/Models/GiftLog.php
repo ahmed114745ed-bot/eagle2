@@ -47,4 +47,9 @@ class GiftLog extends Model
     {
         return $this->belongsTo(Cp::class, 'cp_id')->with('fromUser:id,uuid,name', 'toUser:id,uuid,name', 'level');
     }
+
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class, 'agency_id');
+    }
 }
