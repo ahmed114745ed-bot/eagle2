@@ -100,16 +100,16 @@ class UserObserver
                 $user->tokens()->delete();
             }
 
-            if ($user->isDirty('uuid') && !$user->uuid) {
-                do {
-                    // توليد قيمة uuid عشوائية
-                    $uuid = (string)rand(1000000, 9999999);
-                    $check_users = User::where("uuid", $uuid)->exists();
-                    $check_wares = Ware::where("value", $uuid)->exists();
-                } while ($check_users || $check_wares);
-
-                $user->uuid = $uuid;
-            }
+//            if ($user->isDirty('uuid')) {
+//                do {
+//                    // توليد قيمة uuid عشوائية
+//                    $uuid = (string)rand(1000000, 9999999);
+//                    $check_users = User::where("uuid", $uuid)->exists();
+//                    $check_wares = Ware::where("value", $uuid)->exists();
+//                } while ($check_users || $check_wares);
+//
+//                $user->uuid = $uuid;
+//            }
 
 
             $month_received = $user->monthly_diamond_received;

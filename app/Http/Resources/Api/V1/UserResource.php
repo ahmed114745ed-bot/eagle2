@@ -100,7 +100,9 @@ class UserResource extends JsonResource
             ]);
         }
         $isHideRoom = $this->getPackWithType(16);
-
+        $nowRoomOwner = User::where('id', $this->now_room_uid)->first();
+        $isHideNowRoom = $nowRoomOwner?->getPackWithType(16) ?? 0;
+        
         $data      = [
             'id'      => @$this->id, // both
             'uuid'    => @$this->uuid, // both
@@ -119,9 +121,9 @@ class UserResource extends JsonResource
             'is_follow'            => $this->is_follow, // user data  ----
             'is_friend'            => $this->isFriends(),  //  -------
             // 'room'                 => new UserRoomResource($this), // user data
-            'room'                 => !$isHideRoom ? (new UserRoomResource($this) ?? []) : [],
+            'room'                 => !$isHideRoom ? (new UserRoomResource($this) ?? (object)[]) : (object)[],
             // 'now_room'             =>  new NowRoomResource($this), // user data
-            'now_room'             => !$isHideRoom ? ( new NowRoomResource($this) ?? []) : [],
+            'now_room'             => !$isHideNowRoom ? ( new NowRoomResource($this) ?? (object)[]) : (object)[],
             'agency'               => @$agency_joined, // both  -------
             'family_id'            => @$this->family_id, // both   ----
             'family_data'          => @$f, // refactor   --------
