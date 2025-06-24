@@ -179,9 +179,9 @@ class AgencyController extends MainController
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
-        $agency->display_image = $imageUrl;
+        
 
-        $agencyId = $agency->id;
+        $agencyId = $agency->id ?? $id;
 
         $members = $charges = $salaries = $agencyJoinRequests = $giftLog = $memberTargets = $agencyTarget = $rate = $stars = $heroes = null;
 
@@ -310,7 +310,8 @@ class AgencyController extends MainController
                 'stars',
                 'heroes',
                 'tab',
-                'sumTargets'
+                'sumTargets',
+                'imageUrl'
             ));
     }
 
