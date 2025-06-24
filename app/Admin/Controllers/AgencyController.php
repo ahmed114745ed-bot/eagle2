@@ -181,7 +181,7 @@ class AgencyController extends MainController
         }
         
 
-        $agencyId = $agency->id;
+        $agencyId = $agency->id ?? $id;
 
         $members = $charges = $salaries = $agencyJoinRequests = $giftLog = $memberTargets = $agencyTarget = $rate = $stars = $heroes = null;
 
