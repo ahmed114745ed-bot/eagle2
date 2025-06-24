@@ -1084,10 +1084,10 @@
                 <div class="meta-item">
                     @if (@$user->uuid == @$user->original_uuid)
                         <span class="meta-label">{{ __("uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->uuid }}</span>
+                        <span class="meta-value">{{ @$user->original_uuid }}</span>
                     @else
                         <span class="meta-label">{{ __("uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->uuid }}</span><br>
+                        <span class="meta-value">{{ @$user->original_uuid }}</span><br>
                         <span class="meta-label">{{ __("special uuid") }}:</span>
                         <span class="meta-value">{{ @$user->original_uuid }}</span>
                     @endif
