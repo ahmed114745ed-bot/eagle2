@@ -1065,7 +1065,7 @@
         }
         .table tbody tr:nth-child(even) {
             background-color: var(--secondary-color) !important;
-            filter: brightness(0.90);
+            filter: brightness(0.95);
         }
     </style>
 
