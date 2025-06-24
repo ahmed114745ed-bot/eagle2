@@ -39,7 +39,7 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
                 DB::raw('MAX(extras) AS extras'),
                 DB::raw('MAX(user_agency_id) AS user_agency_id'),
             ])
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->whereNotNull('user_agency_id')
             ->groupBy('user_id')
