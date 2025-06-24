@@ -831,7 +831,10 @@ trait CalcsTrait
         $vip_gifts = $vip->privilegs->contains(function ($priv) {
             return $priv->type == 14;
         });
-
+        $vip_upload_gif = $vip->privilegs->contains(function ($priv) {
+            return $priv->type == 22;
+        });
+        
         return [
             'id'        => 1,
             'level'     => $vip->level ?? 0,
@@ -845,6 +848,7 @@ trait CalcsTrait
             'ware_id' => $vipIcon?->id ?? 0,
             'color' =>  $color ?? '',
             'vip_gifts' => $vip_gifts ?? 0,
+            'vip_upload_gif' => $vip_upload_gif ?? 0,
             'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
         ];
     }

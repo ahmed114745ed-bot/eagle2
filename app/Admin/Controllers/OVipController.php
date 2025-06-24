@@ -237,8 +237,9 @@ class OVipController extends MainController
                     if (!$type_preveleg) continue;
 
                     $type = $type_preveleg->type;
-            
+             
                     if (in_array($type, $types)) {
+                    
                         admin_error('خـطأ', 'لا يمكن اختيار أكثر من امتياز من نفس النوع: ' );
                         return back();
                     }
