@@ -66,8 +66,8 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
                 'salary' => ($salary->target ?? 0) . ' 💲',
                 'withdrawn' => $salary->expenses ?? 0,
                 'remaining' => $salary->salary ?? 0,
-                'agency' => @$salary?->agency?->name ?? '-',
-                'agency_id' => $salary->user_agency_id ?? '-',
+                'agency' => @$user?->agency?->name ?? '-',
+                'agency_id' => $user->agency?->id ?? '-',
                 'month' => $month,
                 'year' => $year,
             ];
