@@ -983,6 +983,90 @@
             flex-basis: 0;
         }
 
+        .diamond-summary-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .diamond-summary-box {
+            max-width: 600px;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin: 0 auto; /* This also helps with centering */
+        }
+
+        .diamond-summary-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .diamond-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .diamond-count {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .diamond-count span {
+            margin-right: 10px;
+        }
+
+        .diamond-icon-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            padding: 8px;
+            display: inline-flex;
+        }
+
+        .diamond-icon {
+            width: 32px;
+            height: 32px;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+        }
+
+        .gift-log-form {
+            background-color: transparent !important;
+            filter: none !important;
+        }
+        .rtl .gift-log-form {
+            padding-right: 13%;
+        }
+        .ltr .gift-log-form {
+            padding-left: 13%;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-top: 1px solid #dee2e6;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .card-title {
+            color: #333;
+            font-weight: 500;
+        }
+        .table tbody tr:nth-child(even) {
+            background-color: var(--secondary-color) !important;
+            filter: brightness(0.90);
+        }
     </style>
 
 
@@ -1579,7 +1663,7 @@
                 <h4 class="card-title">{{ __('gift Reports') }}</h4>
             </div>
 
-            <div class="box-body no-padding p-3">
+            <div class="box-body p-3">
                 <div class="nav-scroll-container mb-3">
                     <ul class="nav nav-pills">
                         <li class="{{ $giftType == 'receiver' ? 'active' : '' }}">
@@ -1599,45 +1683,43 @@
                     </ul>
                 </div>
 
-                <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
-                    <input type="hidden" name="tab" value="gift-log">
-                    <input type="hidden" name="gift_type" value="{{ $giftType }}">
-                    <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="gift-log">
+                            <input type="hidden" name="gift_type" value="{{ $giftType }}">
+                            <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
 
-                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal" method="GET" pjax-container>
-                        <input type="hidden" name="tab" value="gift-log">
-                        <input type="hidden" name="gift_type" value="{{ $giftType }}">
-                        <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
-
-                        <div class="row mb-3" style="align-items: flex-end;">
-                            <!-- From Date -->
-                            <div class="col-md-4">
-                                <div class="date-flex-row">
-                                    <i class="fa fa-calendar"></i>
-                                    <span>{{ __('From Date') }}</span>
-                                    <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
+                            <div class="row mb-3" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('From Date') }}</span>
+                                        <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
+                                    </div>
+                                </div>
+                                <!-- To Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('To Date') }}</span>
+                                        <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
+                                    </div>
+                                </div>
+                                <!-- Buttons -->
+                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
                                 </div>
                             </div>
-                            <!-- To Date -->
-                            <div class="col-md-4">
-                                <div class="date-flex-row">
-                                    <i class="fa fa-calendar"></i>
-                                    <span>{{ __('To Date') }}</span>
-                                    <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
-                                </div>
-                            </div>
-                            <!-- Buttons -->
-                            <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
-                                <button type="submit" class="btn btn-info btn-sm me-2">
-                                    <i class="fa fa-search"></i> {{__('Search')}}
-                                </button>
-                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
-                                    <i class="fa fa-undo"></i> {{__('Reset')}}
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </form>
+                        </form>
+                    </div>
+                </div>
                 <!-- Summary Box -->
                 <div class="diamond-summary-container">
                     <div class="diamond-summary-box">
@@ -1653,63 +1735,6 @@
                     </div>
                 </div>
 
-                <style>
-                    .diamond-summary-container {
-                        display: flex;
-                        justify-content: center;
-                        width: 100%;
-                        padding: 20px;
-                    }
-
-                    .diamond-summary-box {
-                        max-width: 600px;
-                        width: 100%;
-                        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%);
-                        border-radius: 8px;
-                        padding: 1.5rem;
-                        text-align: center;
-                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                        transition: all 0.3s ease;
-                        margin: 0 auto; /* This also helps with centering */
-                    }
-
-                    .diamond-summary-box:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-                    }
-
-                    .diamond-title {
-                        font-size: 22px;
-                        font-weight: bold;
-                        color: var(--secondary-color);
-                        margin-bottom: 15px;
-                    }
-
-                    .diamond-count {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-size: 24px;
-                        color: white;
-                    }
-
-                    .diamond-count span {
-                        margin-right: 10px;
-                    }
-
-                    .diamond-icon-container {
-                        background: rgba(255, 255, 255, 0.2);
-                        border-radius: 50%;
-                        padding: 8px;
-                        display: inline-flex;
-                    }
-
-                    .diamond-icon {
-                        width: 32px;
-                        height: 32px;
-                        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
-                    }
-                </style>
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle">
@@ -1735,7 +1760,7 @@
                                 $uid = @$userCharges->uuid ?? '';
                                 $id = @$userCharges->id ?? 0;
 
-                                $avatar = @$giftSLog->sender->profile->avatar;
+                                $avatar = @$giftSLog->profile->avatar;
                                 $image = getImagePath($avatar) ?? $userImageDefault;
                                 if (!isImageExists($image)) {
                                     $image = $userImageDefault;
@@ -1795,7 +1820,6 @@
                         </tbody>
                     </table>
                 </div>
-
                 {{-- Pagination --}}
                 @if($giftSLogs instanceof \Illuminate\Pagination\LengthAwarePaginator)
                     <div class="d-flex justify-content-center mt-3">
