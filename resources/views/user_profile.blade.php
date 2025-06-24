@@ -1069,7 +1069,6 @@
         }
     </style>
 
-
 </head>
 <body>
 
@@ -1564,7 +1563,7 @@
                 <h4 class="card-title">{{ __('Charge Reports') }}</h4>
             </div>
 
-            <div class="box-body no-padding">
+            <div class="box-body">
                 <div class="nav-scroll-container">
                     <ul class="nav nav-pills">
 
@@ -1585,57 +1584,58 @@
 
                     </ul>
                 </div>
-            </div>
 
-            <div class="table-responsive">
-                <table class="data-table" id="charge-table">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>
-                            @if($chargeTabType == 'receiver')
-                                {{ __('Charger') }}
-                            @else
-                                {{ __('Receiver') }}
-                            @endif
-                        </th>
-                        <th>{{ __('Type') }}</th>
-                        <th>{{ __('Amount') }}</th>
-                        <th>{{ __('usd') }}</th>
-                        <th>{{ __('Created at') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($charges as $index => $charge)
-                        @php
-                            if($chargeTabType == 'receiver') {
-                                $userCharges = Common::getChargerInfo($charge);
-                              } else {
-                                $userCharges = Common::getReceiverInfo($charge);
-                              }
-                              $name = $userCharges['name'] ?? '-';
-                              $uid = $userCharges['uuid'] ?? '-';
-                              $type = $userCharges['type'] ?? '-';
-                              $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
-                        @endphp
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
                         <tr>
-                            <td>{{ $charge->id }}</td>
-                            <td>
-                                <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
-                                   style="display: inline-flex; align-items: center; text-decoration: none;">
-                                    <img src="{{ getImagePath( $image) }}" width="30" height="30"
-                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                    <span>{{ $name }} ({{ $uid }})</span>
-                                </a>
-                            </td>
-                            <td>{{ $type }} </td>
-                            <td>{{ $charge->amount }} </td>
-                            <td>{{ $charge->usd }}</td>
-                            <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
+                            <th>#</th>
+                            <th>
+                                @if($chargeTabType == 'receiver')
+                                    {{ __('Charger') }}
+                                @else
+                                    {{ __('Receiver') }}
+                                @endif
+                            </th>
+                            <th>{{ __('Type') }}</th>
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('usd') }}</th>
+                            <th>{{ __('Created at') }}</th>
                         </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        @foreach($charges as $index => $charge)
+                            @php
+                                if($chargeTabType == 'receiver') {
+                                    $userCharges = Common::getChargerInfo($charge);
+                                  } else {
+                                    $userCharges = Common::getReceiverInfo($charge);
+                                  }
+                                  $name = $userCharges['name'] ?? '-';
+                                  $uid = $userCharges['uuid'] ?? '-';
+                                  $type = $userCharges['type'] ?? '-';
+                                  $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
+                            @endphp
+                            <tr>
+                                <td>{{ $charge->id }}</td>
+                                <td>
+                                    <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
+                                       style="display: inline-flex; align-items: center; text-decoration: none;">
+                                        <img src="{{ getImagePath( $image) }}" width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $name }} ({{ $uid }})</span>
+                                    </a>
+                                </td>
+                                <td>{{ $type }} </td>
+                                <td>{{ $charge->amount }} </td>
+                                <td>{{ $charge->usd }}</td>
+                                <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
 
             {{-- Pagination --}}
