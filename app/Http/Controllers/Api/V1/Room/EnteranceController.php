@@ -259,6 +259,9 @@ class EnteranceController extends Controller
             }
             $owner_id = $room->uid;
         }
+        if ($room->room_status == 2) {
+            return Common::apiResponse(0, __('room_closed'));
+        }
 
 
         $ban = Common::ifRoomHasband($owner_id);

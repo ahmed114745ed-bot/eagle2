@@ -3256,7 +3256,9 @@
 "level_num":"رقم المستوي",
 "you don not have permission":"ليس لديك الصلاحية",
 "there is weekly star now": "هناك نجم أسبوعي الآن",
-"there is no event now": "لا يوجد حدث الآن"
+"there is no event now": "لا يوجد حدث الآن",
+"room_closed": "الروم مغلقة، الرجاء التواصل مع المشرف"
+
 
 
 
