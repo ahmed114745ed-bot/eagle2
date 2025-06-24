@@ -1006,7 +1006,7 @@
                         <span class="meta-label">{{ __("uuid") }}:</span>
                         <span class="meta-value">{{ @$user->uuid }}</span><br>
                         <span class="meta-label">{{ __("special uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->original_uuid }}</span>
+                        <span class="meta-value">{{ @$user->uuid_v3 }}</span>
                     @endif
                 </div>
                 <div class="meta-item">

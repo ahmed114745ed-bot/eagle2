@@ -242,7 +242,12 @@ class UserController extends MainController
         //        });
         $grid->column('name', __('Name'))
             ->display(function ($name) {
-                $uid = @$this->uuid;
+
+                $uid = $this->uuid ;
+
+                if (!empty($this->uuid_v3)) {
+                    $uid .= '-'.'special:' . $this->uuid_v3;
+                }
                 $path = @$this->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
@@ -868,7 +873,7 @@ class UserController extends MainController
                 Carbon::parse($end)->endOfDay()
             ]);
         })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType','diamonds');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
