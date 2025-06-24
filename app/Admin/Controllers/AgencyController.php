@@ -175,7 +175,7 @@ class AgencyController extends MainController
 
         $path = $agency?->img;
         $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($path) ?? $defaultImage;
+        $imageUrl = getImagePath($path);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
