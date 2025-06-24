@@ -218,7 +218,7 @@ class ReportController extends MainController
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-            $showUrl = $this ? url("admin/agencies/profile/{$this->id}") : 0;
+            $showUrl = $this->agency ? url("admin/agencies/profile/{$this->agency->id }") : 0;
 
             if (!isImageExists($url)) {
                 $url = $defaultImage;
