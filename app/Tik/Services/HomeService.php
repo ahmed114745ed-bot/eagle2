@@ -150,7 +150,7 @@ class HomeService
                     }*/
                     break;
                 case 'room':
-                    Room::query()->where('uid', $user->id)->update(['room_status' => $isAvailable ? 2 : 1]);
+                    // Room::query()->where('uid', $user->id)->update(['room_status' => $isAvailable ? 2 : 1]);
                     break;
             }
         }
