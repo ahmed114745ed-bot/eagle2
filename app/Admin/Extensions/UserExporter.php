@@ -90,7 +90,7 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             __('days', [], 'ar'),
             __('hours', [], 'ar'),
             __('moment', [], 'ar'),
-            __('reel', [], 'ar'),
+            __('reels', [], 'ar'),
             __('salary', [], 'ar'),
             __('withdrawn', [], 'ar'),
             __('remaining', [], 'ar'),
