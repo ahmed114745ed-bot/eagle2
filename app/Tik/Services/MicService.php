@@ -65,7 +65,7 @@ class MicService
 
         $mic_arr = explode(',', $room->microphone);
         $main_mic = explode(',', $room->main_microphone);
-        $base_mic = explode(',', $room->getOriginal('microphone'));
+        $base_mic = explode(',', $room->microphone_only_users);
 
         if (!isset($main_mic[$position])) throw new Exception(__('This seat is out of the designated range'));
         $oldValue = $main_mic[$position];
