@@ -34,7 +34,7 @@ class FawryPaymentService
 //        if(isset($response['status']) && $response['status'] == 0){
 //            return $response;
 //        }
-        PaymentMethodHistory::where(['id' => $trx])->update([
+        PaymentMethodHistory::create([
             "amount" => $amount,
             "type" => 'game_type',
             "utd_code" => $trx
