@@ -46,7 +46,7 @@ use Illuminate\Support\Facades\URL;
 
 use Encore\Admin\Form;
 use App\Admin\Fields\Image;
-use Illuminate\Support\Facades\URL;
+
 
 class AppServiceProvider extends ServiceProvider
 {
