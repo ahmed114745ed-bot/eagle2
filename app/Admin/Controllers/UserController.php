@@ -840,7 +840,7 @@ class UserController extends MainController
         $userPackTypes = Pack::where('user_id', $id)->whereHas('ware')->pluck('type')->unique()->toArray();
 
         $currentType = request()->get('type', $types->keys()->first());
-        if (!$userPackTypes) {
+        if ($userPackTypes) {
             $types = collect($typeMap)->filter(function ($name, $key) use ($userPackTypes) {
                 return in_array($key, $userPackTypes);
             });
