@@ -243,10 +243,10 @@ class UserController extends MainController
         $grid->column('name', __('Name'))
             ->display(function ($name) {
 
-                $uid = $this->original_uuid ;
+                $uid = $this->original_uuid;
 
 
-                    $special =  $this->uuid_v3 ;
+                $special =  $this->uuid_v3;
 
                 $path = @$this->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
@@ -837,6 +837,8 @@ class UserController extends MainController
         $typeMap = PACK_USER;
 
         $types =  collect($typeMap);
+        $packsType = Pack::where('user_id', $id)->where('is_used', 1)->where('type', $type)->whereHas('ware')->pluck('type')->toArray();
+
         $currentType = request()->get('type', $types->keys()->first());
 
         $chargeTabType = request()->get('type', 'receiver');
@@ -874,7 +876,7 @@ class UserController extends MainController
                 Carbon::parse($end)->endOfDay()
             ]);
         })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds','packsType');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
