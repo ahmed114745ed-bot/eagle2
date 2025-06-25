@@ -274,7 +274,7 @@ class MicService
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
-
+          Log::info('goMicrophoneHand',['goMicrophoneHand'=> $microphone]);
         if (!$microphone || !in_array($user->id, $microphone)) {
             return 0;
         }
@@ -301,6 +301,7 @@ class MicService
                 $final[] = '0';
             }
         }
+        Log::info('goMicrophoneHand',['final'=> $final]);
 
         // Save to DB
         $result = implode(',', $final);
