@@ -61,30 +61,52 @@ class MicService
         $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
         if (!$room)  throw new Exception(__('room does not exist'));
 
-        $position = $data['position']; //mic sequence 0-8
-
+        // 
+        $position = $data['position']; // mic index
         $mic_arr = explode(',', $room->microphone);
         $main_mic = explode(',', $room->main_microphone);
-        $base_mic = explode(',', $room->getOriginal('microphone'));
+        $base_mic = explode(',', $room->microphone_only_users);
 
-        if (!isset($main_mic[$position])) throw new Exception(__('This seat is out of the designated range'));
-        $oldValue = $main_mic[$position];
+        if (!isset($mic_arr[$position])) {
+            throw new Exception(__('This seat is out of the designated range'));
+        }
 
-        //If it is on the mic, skip to the top mic, and the original mic is empty
+        $current = $mic_arr[$position] ?? '0';
+        $old_status = '0';
+        $old_user = '0';
+
+        if (str_contains($current, '#')) {
+            [$old_user, $old_status] = explode('#', $current);
+        } elseif (is_numeric($current) && (int)$current > 0) {
+            $old_user = $current;
+            $old_status = '-1'; // Assume occupied but no explicit status
+        } else {
+            $old_user = '0';
+            $old_status = $current;
+        }
+
+        if ($old_status == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
+            throw new Exception(__('هذا المايك مغلق ولا يمكن الصعود عليه'));
+        }
+
         if (in_array($user->id, $mic_arr)) {
-
             CpRoomHistory::where("user_one_id", $user->id)
                 ->orWhere("user_two_id", $user->id)->delete();
 
             $key = array_search($user->id, $mic_arr);
-            $old = $main_mic[$key];
+            $old = $main_mic[$key] ?? '0';
             $base_mic[$key] = $old;
         }
-        if (@$mic_arr[$position] != -1 || RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
 
-            $base_mic[$position] = $user->id . '#' . $oldValue ?: 0;
-        }
+        $base_mic[$position] = $user->id . '#' . $old_status;
+
         $mic = implode(',', $base_mic);
+
+        \Log::info('shami test go_microphone_hand', [
+            'microphoneold' => $mic_arr,
+            '$room->microphone_only_users' => $room->microphone_only_users,
+            'mic' => $mic,
+        ]);
         $this->updateMicAndPK($room, $mic);
         //Remove mic sequence
         Common::delMicHand($user->id);

@@ -188,6 +188,7 @@ return [
     'app_sign' => 'Uygulama İmzası',
 
     "fawry" => 'Fawry',
+    "utdFawry" => 'Utd Fawry',
     "merchant_code" => 'Mağaza Kodu',
     "utd_url" => 'UTD Bağlantısı',
     "return_url" => 'Geri Dönüş Bağlantısı',

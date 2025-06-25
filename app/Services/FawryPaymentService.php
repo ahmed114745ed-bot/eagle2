@@ -30,20 +30,21 @@ class FawryPaymentService
 
     public function makePayment($trx,$amount,$exterData)
     {
-        $response =  $this->utdFawryInitial($trx,$amount,$exterData);
-        if(isset($response['status']) && $response['status'] == 0){
-            return $response;
-        }
+//        $response =  $this->utdFawryInitial($trx,$amount,$exterData);
+//        if(isset($response['status']) && $response['status'] == 0){
+//            return $response;
+//        }
         PaymentMethodHistory::where(['id' => $trx])->update([
-            "utd_code" => $response['merchantRefNum']
+            "amount" => $amount,
+            "type" => 'game_type',
+            "utd_code" => $trx
         ]);
-        CoinLog::where(['id' => $trx])->update([
-            "trx" => $response['merchantRefNum']
-        ]);
-        $trx = $response['merchantRefNum'];
-        $data = $this->getBodyForFawry($trx,$response['chargeItems'][0]['price']);
-        $response = Http::post($this->fawryUrl, $data);
-        return $response->body();
+        $data = $this->getBodyForFawry($trx,$amount);
+        $data['paymentSubType'] = $exterData['type'];
+        $data['paymentType'] = $exterData['paymentType'];
+        $utdUrl = config("services.utd_fawry.utd_url");
+        $response = Http::post($utdUrl, $data);
+        return json_decode($response);
     }
 
     public function utdFawryInitial($trx,$amount,$exterData)
@@ -68,10 +69,9 @@ class FawryPaymentService
                     'Content-Type' => 'application/json'
                 ]
             ]);
-            $responseBody = json_decode($response->getBody(), true);
-        info($responseBody);
 
-        return $responseBody;
+        return json_decode($response->getBody(), true);
+
 //        } catch (RequestException $e) {
 //            if ($e->hasResponse()) {
 //                $errorResponse = json_decode($e->getResponse()->getBody(), true);
@@ -84,7 +84,6 @@ class FawryPaymentService
 
     public function getBodyForFawry($trx,$amount)
     {
-        info(self::redirect_if_payment_success($trx));
         $merchantCode = config("services.utd_fawry.utd_fawry_merchant_code");
         $merchantRefNum = $trx;
         $secure_key = config("services.utd_fawry.utd_fawry_secret");
@@ -103,7 +102,7 @@ class FawryPaymentService
                     "quantity"=> $qty,
                 ]
             ],
-            "returnUrl"=> self::redirect_if_payment_success ($trx),
+            "returnUrl"=> self::redirect_if_payment_success($trx),
             "signature"=> $signature
 
         ];

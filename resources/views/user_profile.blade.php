@@ -1143,6 +1143,9 @@
                     <div class="meta-item">
                         <span class="meta-label">{{__('type')}}:</span>
                         <span class="meta-value">{{@$user->userType() }}</span>
+                        
+                        <img src="{{getImagePath( @$user->userTypeBadge())  }}" alt="" class="">
+
                     </div>
 
                 </div>
