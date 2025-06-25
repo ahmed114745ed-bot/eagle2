@@ -146,9 +146,9 @@ class AgencyController extends Controller
 
     public function profile($id, req $request, Content $content)
     {
-        if (! Admin::user()->can('*')) {
-            Permission::check('show-' . $this->permission_name);
-        }
+        // if (! Admin::user()->can('*')) {
+        //     Permission::check('show-' . $this->permission_name);
+        // }
 
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
