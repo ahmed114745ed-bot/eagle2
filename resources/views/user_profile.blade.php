@@ -1202,32 +1202,41 @@
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('pack') }}</h4>
             </div>
-            <div class="box-body">
-                <div class="nav-scroll-container">
-                    <ul class="nav nav-pills">
-                          @php
-                         
-                                 $selectedType = request()->get('type', 4); // Default to 4
+           <div class="box-body">
+    <div class="nav-scroll-container">
+        <ul class="nav nav-pills">
+            @php
+                
+                $selectedType = request()->get('type', 4); // Default to 4
 
-                                // Only sort if type == 4 (or whichever tab you want to apply sorting on)
-                                if ($selectedType == 4) {
-                                    $sortedTypes = $types->sortBy(function ($value, $key) use ($packsType) {
-                                        return in_array($key, $packsType) ? 0 : 1;
-                                    });
-                                } else {
-                                    $sortedTypes = $types; // Keep original order
-                                }
-                        @endphp
-                        @foreach($sortedTypes as $typeId => $typeName)
-                            <li class="{{ $selectedType == $typeId ? 'active' : '' }}">
-                                <a href="{{ request()->fullUrlWithQuery(['type' => $typeId]) }}" class="charge_action">
-                                    {{ __($typeName) }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
+                $sortedTypes = collect();
+
+                // First add owned types if they exist in the master type list
+                foreach ($packsType as $typeId) {
+                    if ($types->has($typeId)) {
+                        $sortedTypes->put($typeId, $types[$typeId]);
+                    }
+                }
+
+                // Then add the remaining types (not owned)
+                foreach ($types as $typeId => $typeName) {
+                    if (!$sortedTypes->has($typeId)) {
+                        $sortedTypes->put($typeId, $typeName);
+                    }
+                }
+            @endphp
+
+            @foreach($sortedTypes as $typeId => $typeName)
+                <li class="{{ $selectedType == $typeId ? 'active' : '' }}">
+                    <a href="{{ request()->fullUrlWithQuery(['type' => $typeId]) }}" class="charge_action">
+                        {{ __($typeName) }}
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+
 
             <div class="table-responsive">
                 <div class="box-body ">
