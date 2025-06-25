@@ -65,7 +65,7 @@ class MicService
 
         $mic_arr = explode(',', $room->microphone);
         $main_mic = explode(',', $room->main_microphone);
-        $base_mic = explode(',', $room->getOriginal('microphone'));
+        $base_mic = explode(',', $room->microphone_only_users);
 
         if (!isset($main_mic[$position])) throw new Exception(__('This seat is out of the designated range'));
         $oldValue = $main_mic[$position];
@@ -85,6 +85,11 @@ class MicService
             $base_mic[$position] = $user->id . '#' . $oldValue ?: 0;
         }
         $mic = implode(',', $base_mic);
+        \Log::info('shami test go_microphone_hand', [
+            'microphoneold'=>$mic_arr,
+            '$room->microphone_only_users' => $room->microphone_only_users,
+            'mic' => $mic,
+        ]);
         $this->updateMicAndPK($room, $mic);
         //Remove mic sequence
         Common::delMicHand($user->id);
@@ -274,7 +279,7 @@ class MicService
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
-
+          Log::info('goMicrophoneHand',['goMicrophoneHand'=> $microphone]);
         if (!$microphone || !in_array($user->id, $microphone)) {
             return 0;
         }
@@ -301,6 +306,7 @@ class MicService
                 $final[] = '0';
             }
         }
+        Log::info('goMicrophoneHand',['final'=> $final]);
 
         // Save to DB
         $result = implode(',', $final);

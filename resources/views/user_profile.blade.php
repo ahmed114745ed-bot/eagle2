@@ -1207,7 +1207,8 @@
                     <ul class="nav nav-pills">
                         @foreach($types as $id => $name)
                             @php
-                                $selectedType = request()->get('type', 4); // Default to 1
+                             $defaultType = $types->keys()->first();
+                                $selectedType = request()->get('type', $defaultType); // Default to 1
                             @endphp
                             <li class="{{ $selectedType == $id ? 'active' : '' }}">
                                 <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">

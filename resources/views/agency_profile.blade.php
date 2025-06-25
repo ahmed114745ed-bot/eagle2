@@ -1196,7 +1196,7 @@
                                                     $receiver = \App\Helpers\Common::getReceiverInfo($charge);
                                                     $name = $receiver['name'] ?? '-';
                                                     $uid = $receiver['uuid'] ?? '-';
-                                                    $image = $receiver['image'] ?? asset('default-user.png');
+                                                    $image = getImagePath( $receiver['image']) ?? asset('default-user.png');
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $charge->id }}</td>
