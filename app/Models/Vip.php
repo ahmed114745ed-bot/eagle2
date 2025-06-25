@@ -44,7 +44,7 @@ class Vip extends Model
     public function getCreatedAtAttribute($value)
     {
         $cacheKey = 'timezone';
-
+    }
     /*public function gifts()
     {
         return $this->hasMany(GiftRoomLevel::class,'level_id');

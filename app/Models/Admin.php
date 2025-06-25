@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 use Illuminate\Support\Facades\Auth;
 
 class Admin extends Administrator
 {
+    use PreventDeleteIfCreatedByDeveloper;
     protected $table = 'admin_users';
 
     protected $appends = ['agency_id'];

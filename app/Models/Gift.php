@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Http\Traits\AchievementGift;
@@ -9,7 +10,7 @@ use Modules\Moment\Entities\Moment;
 
 class Gift extends Model
 {
-    use AchievementGift, TimestampsWithTimezone;
+    use AchievementGift, TimestampsWithTimezone,PreventDeleteIfCreatedByDeveloper;
 
     // protected $fillable=['use_count'];
     protected $guarded = ['id'];
