@@ -1205,13 +1205,23 @@
             <div class="box-body">
                 <div class="nav-scroll-container">
                     <ul class="nav nav-pills">
-                        @foreach($types as $id => $name)
-                            @php
-                                $selectedType = request()->get('type', 4); // Default to 1
-                            @endphp
-                            <li class="{{ $selectedType == $id ? 'active' : '' }}">
-                                <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">
-                                    {{ __($name) }}
+                          @php
+                         
+                                 $selectedType = request()->get('type', 4); // Default to 4
+
+                                // Only sort if type == 4 (or whichever tab you want to apply sorting on)
+                                if ($selectedType == 4) {
+                                    $sortedTypes = $types->sortBy(function ($value, $key) use ($packsType) {
+                                        return in_array($key, $packsType) ? 0 : 1;
+                                    });
+                                } else {
+                                    $sortedTypes = $types; // Keep original order
+                                }
+                        @endphp
+                        @foreach($sortedTypes as $typeId => $typeName)
+                            <li class="{{ $selectedType == $typeId ? 'active' : '' }}">
+                                <a href="{{ request()->fullUrlWithQuery(['type' => $typeId]) }}" class="charge_action">
+                                    {{ __($typeName) }}
                                 </a>
                             </li>
                         @endforeach

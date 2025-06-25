@@ -415,7 +415,9 @@ class EnteranceRoomServices
         $room = $this->roomRepository->findRoomUser($owner_id, false);
         if (!$room)return Common::apiResponse (false,'No room yet, please create first',null,404);
         // if(($room->count_room_socket == 0 ) && $room->uid != $user_id && $room->pin != 1 )return Common::apiResponse(false, __('api_responses.closedRoom'), null, 402);
-
+        if ($room->room_status == 2) {
+            return Common::apiResponse(0, __('room_closed'));
+        }
         $roomBlack = $room->room_black;
         if (!empty($roomBlack)) {
             $is_black = explode(',', $roomBlack);
