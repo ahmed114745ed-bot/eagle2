@@ -1218,7 +1218,7 @@
                             <tr>
                                 <td>{{ $charge->id}}</td>
                                 <td>
-                                    @if($charge->receiverUser instanceof \App\Models\User)
+                                    
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                            <img src="{{ $image }}" alt="user"
                                                 width="{{ $charge->user_type == 'agency' ? '50' : '40' }}"
@@ -1232,9 +1232,6 @@
                                                 <small>uuid: {{ $receiver['uuid'] }}</small>
                                             </div>
                                         </div>
-                                    @else
-                                        -
-                                    @endif
                                 </td>
                                 <td>{{ $charge->amount ?? '-' }}</td>
                                 <td>{{ $charge->created_at }}</td>
@@ -1282,7 +1279,7 @@
                             <tr>
                                 <td>{{ $res->id }}</td>
                                 <td>
-                                    @if($sender)
+                                   
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                             <img src="{{ $image }}" alt="user"
                                                 width="{{ $res->charger_type == 'agency' ? '50' : '40' }}"
@@ -1295,9 +1292,6 @@
                                                 <small>uuid: {{$sender['uuid'] }}</small>
                                             </div>
                                         </div>
-                                    @else
-                                        -
-                                    @endif
                                 </td>
                                 <td>{{ $res->amount ?? '-' }}</td>
                                 <td>{{ $res->created_at }}</td>
