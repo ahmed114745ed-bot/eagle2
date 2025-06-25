@@ -3,6 +3,9 @@
 namespace App\Bd\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ShippingAgency;
+use Encore\Admin\Auth\Permission;
+use Illuminate\Http\Request as req;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -141,97 +144,157 @@ class AgencyController extends Controller
 
     // }
 
-    public function profile($id, Request $request, Content $content)
+    public function profile($id, req $request, Content $content)
     {
+        if (! Admin::user()->can('*')) {
+            Permission::check('show-' . $this->permission_name);
+        }
+
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        $tab = request('tab') ?? 'members';
+        $tab = request('tab', 'members');
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return Agency::with(['admins', 'owner:id,name,uuid'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
-                ->findOrFail($id);
+            return Agency::query()
+                ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                ->find($id);
         });
 
-        $path = $agency->img;
+        if (!$agency) {
+            $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+                return ShippingAgency::query()
+                    ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
+                    ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                    ->find($id);
+            });
+        }
+
+        $path = $agency?->img;
         $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($path) ?? $defaultImage;
+        $imageUrl = getImagePath($path);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
-        $agency->display_image = $imageUrl;
+        
 
-        $agencyId = $agency->id;
+        $agencyId = $agency->id ?? $id;
 
         $members = $charges = $salaries = $agencyJoinRequests = $giftLog = $memberTargets = $agencyTarget = $rate = $stars = $heroes = null;
 
         switch ($tab) {
             case 'members':
-                $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
-                    return $agency->mempers()
+                $members =
+                // Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
+                    // return
+                     $agency->mempers()
                         ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
                         ->with('country', 'agencyUserJob')
                         ->paginate(10, ['*'], 'members_page');
-                });
+                // });
                 break;
 
             case 'charges':
-                $charges = Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
-                    return $agency->charges()
-                        ->select('id', 'amount', 'created_at')
+                $charges =
+                //  Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
+                //     return
+                    $agency->senderCharges()
+                        ->with(Common::chargerRelationsQuery())
+                        // ->select('id', 'amount', 'created_at')
                         ->latest()
                         ->paginate(10, ['*'], 'charges_page');
-                });
+                // });
+
                 break;
 
             case 'salary':
-                $salaries = Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
-                    return AgencySallary::where('agency_id', $id)
+                $salaries =
+                // Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
+                //     return
+                    AgencySallary::query()
+                        ->where('agency_id', $id)
                         ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
                         ->orderByDesc('id')
                         ->paginate(10, ['*'], 'salary_page');
-                });
+                // });
                 break;
 
             case 'requests':
-                $agencyJoinRequests = Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
-                    return AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
+                $agencyJoinRequests =
+                //  Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
+                //     return
+                    AgencyJoinRequest::query()
+                        ->where(['agency_id' => $id, 'status' => 0])
                         ->with('user')
                         ->whereHas('user')
                         ->orderByDesc('id')
                         ->paginate(10, ['*'], 'join_page');
-                });
+                // });
                 break;
 
             case 'targets':
-                $memberTargets = Cache::remember("agency_{$id}_targets_{$month}_{$year}_page_" . request('target_page', 1), 600, function () use ($agency, $agencyId, $month, $year) {
-                    return $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
-                        $query->where('agency_id', $agencyId)
-                            ->whereMonth('created_at', $month)
-                            ->whereYear('created_at', $year);
-                    }])->paginate(10, ['*'], 'target_page');
-                });
 
-                [$agencyTarget, $rate] = Cache::remember("agency_{$id}_rate_{$month}_{$year}", 600, fn() => $this->rateAgency($agencyId, $month, $year));
-                $stars = Cache::remember("agency_{$id}_stars_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'));
-                $heroes = Cache::remember("agency_{$id}_heroes_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'));
+                $memberTargets =
+                    $agency
+                        ->mempers()
+                        ->whereHas('targets', function ($query) use ($agencyId, $month, $year) {
+                            $query
+                                ->where('agency_id', $agencyId)
+                                ->where('add_month', $month)
+                                ->where('add_year', $year);
+                        })
+                        ->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+                            $query
+                                ->where('agency_id', $agencyId)
+                                ->where('add_month', $month)
+                                ->where('add_year', $year);
+                        }])
+                        ->paginate(10, ['*'], 'target_page');
+
+
+                [$agencyTarget, $rate] = Cache::remember(
+                    "agency_{$id}_rate_{$month}_{$year}",
+                    600,
+                    fn() => $this->rateAgency($agencyId, $month, $year),
+                );
+                $stars = Cache::remember(
+                    "agency_{$id}_stars_{$month}_{$year}",
+                    600,
+                    fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'),
+                );
+                $heroes = Cache::remember(
+                    "agency_{$id}_heroes_{$month}_{$year}",
+                    600,
+                    fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'),
+                );
 
                 break;
         }
 
-        $giftLog = Cache::remember("agency_{$id}_giftlog", 600, function () use ($id) {
-            return GiftLog::where('agency_id', $id)
+        $giftLog =
+        // Cache::remember("agency_{$id}_giftlog", 600, function () use ($id) {
+        //     return
+            GiftLog::where('agency_id', $id)
                 ->selectRaw("SUM(giftPrice) as exp, receiver_id")
                 ->with('receiver')
                 ->groupBy('receiver_id')
                 ->whereHas('receiver')
                 ->orderByDesc('exp')
                 ->get();
+        // });
+
+        $sumTargets =
+        Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
+            return
+             UserSallary::where('user_agency_id', $agencyId)
+                ->where('month', now()->month)
+                ->where('year', now()->year)
+                ->sum('target_diamonds');
         });
 
         return $content
             ->title(__('agency profile'))
-            ->view('agency_profile', compact(
+            ->view('bd_agency_profile', compact(
                 'agency',
                 'members',
                 'charges',
@@ -243,10 +306,11 @@ class AgencyController extends Controller
                 'rate',
                 'stars',
                 'heroes',
-                'tab'
+                'tab',
+                'sumTargets',
+                'imageUrl'
             ));
     }
-
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
     {
         return GiftLog::query()
@@ -361,7 +425,7 @@ class AgencyController extends Controller
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
-                $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
+                $profileUrl = route('bd.agency.profile', ['id' => $this->id]);
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
