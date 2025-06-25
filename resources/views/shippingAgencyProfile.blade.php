@@ -857,7 +857,18 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             margin-left: 10px;
         ">
-            <img src="{{ getImagePath($agency->img) }}" alt="Agency Logo" class="logo-img" style="
+                   @php
+                    $image =getImagePath($agency->img);
+                    $defaultImage =asset("images/icon-agency.jpg");
+                        
+
+                    if (!isImageExists($image)) {
+                        $image = $defaultImage;
+                    }
+
+                    
+                @endphp
+            <img src="{{ $image }}" alt="Agency Logo" class="logo-img" style="
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
@@ -885,7 +896,18 @@
                             background: #f0f0f0;
                             border: 2px solid rgba(255,255,255,0.3);
                         ">
-                            <img src="{{ getImagePath(@$agency?->owner?->profile->avatar) }}" 
+                              @php
+                                $image =getImagePath($agency?->owner?->profile->avatar);
+                                $defaultImage =asset("images/businessman-icon.jpg");
+                                    
+
+                                if (!isImageExists($image)) {
+                                    $image = $defaultImage;
+                                }
+
+                    
+                          @endphp
+                            <img src="{{ $image }}" 
                                 alt="Owner" 
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
@@ -893,13 +915,15 @@
                         <span class="meta-value">
                             @if($agency?->owner)
                                 <a href="{{ url('admin/users/' . $agency->owner->id) }}">
-                                    {{ $agency->owner->name }}
+                                    {{ $agency->owner->name ?? '' }}
                                 </a>
+                                 <br>
+                            <span class="meta-uuid">(UUID: {{ $agency->owner->uuid ?? 'N/A' }})</span>
                             @else
-                                N/A
+                               
                             @endif
                         </span>
-                        <span class="meta-uuid">( UUid:{{ @$agency?->owner?->uuid ?? 'N/A' }})</span>
+            
                     </div>
                 </div>
                 <div class="agency-stats">
@@ -1183,17 +1207,29 @@
                         @foreach($charges as $index => $charge)
                                  @php
                                     $sender = \App\Helpers\Common::getChargerInfo($charge);
-                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge);
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge); 
+                                    $url = $receiver['url'];
+                                    $image = getImagePath($receiver['image']);
+                                    $defaultImage = $charge->user_type == 'agency'?  asset("images/icon-agency.jpg") :asset('images/businessman-icon.jpg');
+                                     if (!isImageExists($image)) {
+                                            $image = $defaultImage;
+                                        }
                                 @endphp
                             <tr>
-                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $charge->id}}</td>
                                 <td>
                                     @if($charge->receiverUser instanceof \App\Models\User)
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($receiver['image']) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
+                                           <img src="{{ $image }}" alt="user"
+                                                width="{{ $charge->user_type == 'agency' ? '50' : '40' }}"
+                                                height="40"
+                                                style="border-radius: {{ $charge->user_type == 'agency' ? '0' : '50%' }};">
                                             <div>
-                                                <strong>{{ $receiver['name'] }}</strong><br>
-                                                <small>ID: {{ $receiver['uuid'] }}</small>
+                                                <strong>
+                                                     <a href="{{ $url }}" target="_blank" style="text-decoration: none; color: inherit;">
+                                                    {{ $receiver['name'] }}
+                                                </a></strong><br>
+                                                <small>uuid: {{ $receiver['uuid'] }}</small>
                                             </div>
                                         </div>
                                     @else
@@ -1236,16 +1272,27 @@
                                 @php
                                     $sender = \App\Helpers\Common::getChargerInfo($res);
                                     $receiver = \App\Helpers\Common::getReceiverInfo($res);
+                                    $image = getImagePath($sender['image']);
+                                    $url = $sender['url'];
+                                    $defaultImage = $res->charger_type == 'agency'?  asset("images/icon-agency.jpg") :asset('images/businessman-icon.jpg');
+                                     if (!isImageExists($image)) {
+                                            $image = $defaultImage;
+                                        }
                                 @endphp
                             <tr>
-                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $res->id }}</td>
                                 <td>
                                     @if($sender)
                                         <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ getImagePath($sender['image']) ?? asset('/default-user.png') }}" alt="user" width="40" height="40" style="border-radius: 50%;">
-                                            <div>
-                                                <strong>{{ $sender['name'] }}</strong><br>
-                                                <small>ID: {{$sender['uuid'] }}</small>
+                                            <img src="{{ $image }}" alt="user"
+                                                width="{{ $res->charger_type == 'agency' ? '50' : '40' }}"
+                                                height="40"
+                                                style="border-radius: {{ $res->charger_type == 'agency' ? '0' : '50%' }};">
+                                                 <div>
+                                                <strong> <a href="{{ $url }}" target="_blank" style="text-decoration: none; color: inherit;">
+                                                    {{ $sender['name'] }}
+                                                </a></strong><br>
+                                                <small>uuid: {{$sender['uuid'] }}</small>
                                             </div>
                                         </div>
                                     @else

@@ -1804,6 +1804,7 @@ class Common
                     'uuid' => '',
                     'id' => '',
                     'type' => '',
+                    'url' => '#',
                 ];
         }
     }
