@@ -217,8 +217,18 @@ class ChargeReportController extends MainController
         });
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
-
+            
             $sender = Common::getChargerInfo($this);
+            if (empty($sender['name']) && empty($sender['uuid'])) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
+
             $name = $sender['name'];
             $uuid = $sender['uuid'];
             $path = $sender['image'];
@@ -251,10 +261,20 @@ class ChargeReportController extends MainController
             ";
         });
         $grid->column('user_id', __('recipient'))->display(function ($recever) {
+
             // $name =  $this->receiver->name ?? '';
             // $uid = @$this->receiver->uuid ?? 0;
             // $path = @$this->receiver?->profile?->avatar;
             $sender = Common::getReceiverInfo($this);
+            if (empty($sender['name']) && empty($sender['uuid'])) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
             $name = $sender['name'];
             $uid = $sender['uuid'];
             $path = $sender['image'];
@@ -265,8 +285,8 @@ class ChargeReportController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-          //  $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-          $imageStyle = $this->user_type == 'agency'
+            //  $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $imageStyle = $this->user_type == 'agency'
                 ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'     // rectangle
                 : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
             $image = "<img src='{$url}' alt='User Image' style='{$imageStyle}'>";
@@ -403,6 +423,15 @@ class ChargeReportController extends MainController
 
         $grid->column('id', __('transaction id'));
         $grid->column('user_id', __('charger'))->display(function ($recever) {
+            if (!$this->user) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
             $name =  $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
             $path = @$this->user?->profile?->avatar;
@@ -495,6 +524,15 @@ class ChargeReportController extends MainController
         $grid->quickSearch();
         $grid->column('id', __('id'));
         $grid->column('user_id', __('charger'))->display(function ($recever) {
+            if (!$this->user) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
             $name =  $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
             $path = @$this->user?->profile?->avatar;
@@ -578,6 +616,15 @@ class ChargeReportController extends MainController
         $grid->quickSearch();
         $grid->column('id', __('id'));
         $grid->column('user_id', __('charger'))->display(function ($recever) {
+            if (!$this->user) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
             $name =  $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
             $path = @$this->user?->profile?->avatar;
