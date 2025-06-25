@@ -24,7 +24,7 @@ public function calculateMonthlyDiamondReceived()
         ->select('id', 'agency_id')
         ->whereNotNull('agency_id')
         ->where('agency_id', '>', 0)
-        ->where('type_user', 0) // ✅ تعديل حسب سؤالك
+        ->where('type_user', 1) 
         ->get();
 
     foreach ($users as $user) {
