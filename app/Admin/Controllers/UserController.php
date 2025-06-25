@@ -822,9 +822,9 @@ class UserController extends MainController
         $tab = request('tab') ?? 'salary';
         $user = User::with('profile')->find($id);
         $type = request('type') ?? 4;
-        $packs = Pack::where('user_id', $id)->where('is_used', 1)->where('type', $type)->whereHas('ware')->with(['ware' => function ($q) {
+        $packs = Pack::where('user_id', $id)->where('type', $type)->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
-        }])->paginate(10, ['*'], 'pack_page');
+        }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
         $salaries = UserSallary::where('user_id', $id)
             ->with('agency')
@@ -837,10 +837,12 @@ class UserController extends MainController
         $typeMap = PACK_USER;
 
         $types =  collect($typeMap);
-        $packsType = Pack::where('user_id', $id)->where('is_used', 1)->where('type', $type)->whereHas('ware')->pluck('type')->toArray();
+        $userPackTypes = Pack::where('user_id', $id)->whereHas('ware')->pluck('type')->unique()->toArray();
 
         $currentType = request()->get('type', $types->keys()->first());
-
+        $types = collect($typeMap)->filter(function ($name, $key) use ($userPackTypes) {
+            return in_array($key, $userPackTypes);
+        });
         $chargeTabType = request()->get('type', 'receiver');
         $giftType = request()->get('gift_type', 'receiver');
 
@@ -876,7 +878,7 @@ class UserController extends MainController
                 Carbon::parse($end)->endOfDay()
             ]);
         })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds','packsType');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', );
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
