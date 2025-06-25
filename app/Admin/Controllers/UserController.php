@@ -840,9 +840,13 @@ class UserController extends MainController
         $userPackTypes = Pack::where('user_id', $id)->whereHas('ware')->pluck('type')->unique()->toArray();
 
         $currentType = request()->get('type', $types->keys()->first());
-        $types = collect($typeMap)->filter(function ($name, $key) use ($userPackTypes) {
-            return in_array($key, $userPackTypes);
-        });
+        if ($userPackTypes) {
+            $types = collect($typeMap)->filter(function ($name, $key) use ($userPackTypes) {
+                return in_array($key, $userPackTypes);
+            });
+        } else {
+            $types = $types;
+        }
         $chargeTabType = request()->get('type', 'receiver');
         $giftType = request()->get('gift_type', 'receiver');
 
