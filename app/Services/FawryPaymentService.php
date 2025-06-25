@@ -69,7 +69,9 @@ class FawryPaymentService
                 ]
             ]);
             $responseBody = json_decode($response->getBody(), true);
-            return $responseBody;
+        info($responseBody);
+
+        return $responseBody;
 //        } catch (RequestException $e) {
 //            if ($e->hasResponse()) {
 //                $errorResponse = json_decode($e->getResponse()->getBody(), true);
@@ -82,6 +84,7 @@ class FawryPaymentService
 
     public function getBodyForFawry($trx,$amount)
     {
+        info(self::redirect_if_payment_success($trx));
         $merchantCode = config("services.utd_fawry.utd_fawry_merchant_code");
         $merchantRefNum = $trx;
         $secure_key = config("services.utd_fawry.utd_fawry_secret");

@@ -113,11 +113,11 @@ class AppServiceProvider extends ServiceProvider
                 'services.fawry.fawry_url' => $settings['fawry_url'] ?? '',
                 'services.fawry.fawry_webhook_url' => $settings['fawry_webhook_url'] ?? '',
 
-                'services.utd_fawry.utd_fawry_secret' => $settings['fawry_secret'] ?? '',
-                'services.utd_fawry.utd_fawry_merchant_code' => $settings['fawry_merchant_code'] ?? '',
+                'services.utd_fawry.utd_fawry_secret' => $settings['utd_fawry_secret'] ?? '',
+                'services.utd_fawry.utd_fawry_merchant_code' => $settings['utd_fawry_merchant_code'] ?? '',
                 'services.utd_fawry.utd_url' => $settings['utd_url'] ?? '',
-                'services.utd_fawry.utd_fawry_return_url' => $settings['fawry_return_url'] ?? '',
-                'services.utd_fawry.utd_fawry_url' => $settings['fawry_url'] ?? '',
+                'services.utd_fawry.utd_fawry_return_url' => $settings['utd_fawry_return_url'] ?? '',
+                'services.utd_fawry.utd_fawry_url' => $settings['utd_fawry_url'] ?? '',
 
                 'paysky.api_key'     => $settings['paysky_api_key'] ?? '',
                 'paysky.merchant_id' => $settings['paysky_merchant_id'] ?? '',
