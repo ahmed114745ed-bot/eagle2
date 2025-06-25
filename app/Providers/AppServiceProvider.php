@@ -155,6 +155,7 @@ class AppServiceProvider extends ServiceProvider
                 'services.zinipay.url' => $settings[''] ?? '',
 
                 'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
+                'is_paypal_active' => $settings['is_fawry_active'] ?? 0,
                 'is_utdFawry_active' => $settings['is_utdFawry_active'] ?? 0,
                 'is_paysky_active' => $settings['is_paysky_active'] ?? 0,
                 'is_stripe_active' => $settings['is_strip_active'] ?? 0,

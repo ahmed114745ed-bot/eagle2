@@ -72,7 +72,6 @@ class PaymentMethodController extends Controller
 
     public function utdCallback(Request $request)
     {
-        info($request);
         $callbackData = $request->all();
         $fawryRefNumber = $callbackData['referenceNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];
