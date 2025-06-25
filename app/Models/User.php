@@ -1351,6 +1351,29 @@ class User extends Authenticatable
         return $userType;
     }
 
+    public function userTypeBadge()
+    {
+        $lang = app()->getLocale();
+
+        $types = [
+            1 => 'agency_owner',
+            2 => 'host',
+            3 => 'shipping',
+            4 => 'bd',
+        ];
+    
+        if (!array_key_exists($this->type_user, $types)) {
+            return null; 
+        }
+    
+        $typeKey = $types[$this->type_user];
+        $localizedKey = "{$lang}_{$typeKey}";
+        $fallbackKey = "en_{$typeKey}";
+    
+        return Config::whereIn('name', [$localizedKey, $fallbackKey])
+            ->orderByRaw("FIELD(name, ?, ?)", [$localizedKey, $fallbackKey])
+            ->value('value');
+    }
     public function wallet()
     {
         return $this->hasOne(UserWallet::class);
