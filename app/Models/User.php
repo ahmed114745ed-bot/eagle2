@@ -30,6 +30,7 @@ use Modules\Reals\Traits\RealRelationshipTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
+use App\Models\Config as ConfigModel;
 
 /**
  * @method static withoutAppends()
@@ -1353,7 +1354,7 @@ class User extends Authenticatable
 
     public function userTypeBadge()
     {
-        $lang = app()->getLocale();
+        $lang = app()->getLocale() ?? 'en';
 
         $types = [
             1 => 'agency_owner',
@@ -1362,17 +1363,19 @@ class User extends Authenticatable
             4 => 'bd',
         ];
     
-        if (!array_key_exists($this->type_user, $types)) {
+        if (!isset($types[$this->type_user])) {
             return null; 
         }
     
-        $typeKey = $types[$this->type_user];
-        $localizedKey = "{$lang}_{$typeKey}";
-        $fallbackKey = "en_{$typeKey}";
+        $type = $types[$this->type_user];
+        $localizedKey = "{$lang}_{$type}";
+        $fallbackKey = "en_{$type}";
     
-        return Config::whereIn('name', [$localizedKey, $fallbackKey])
+        $config = ConfigModel::whereIn('name', [$localizedKey, $fallbackKey])
             ->orderByRaw("FIELD(name, ?, ?)", [$localizedKey, $fallbackKey])
             ->value('value');
+    
+        return $config;
     }
     public function wallet()
     {
