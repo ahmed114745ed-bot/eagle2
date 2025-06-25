@@ -85,12 +85,10 @@ class MicService
             $old_status = $current;
         }
 
-        // لا تصعد على المايك إذا كان مقفول للمستخدم العادي
         if ($old_status == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
             throw new Exception(__('هذا المايك مغلق ولا يمكن الصعود عليه'));
         }
 
-        // لو المستخدم موجود بالفعل على المايك، نحذفه أولًا من مكانه القديم
         if (in_array($user->id, $mic_arr)) {
             CpRoomHistory::where("user_one_id", $user->id)
                 ->orWhere("user_two_id", $user->id)->delete();
