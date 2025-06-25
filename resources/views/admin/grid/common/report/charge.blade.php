@@ -6,8 +6,8 @@
                     <i class="fa fa-arrow-right text-red"></i> {{ __('dash_repo') }}
                 </a>
             </li>
-            <li class="{{ request()->name == 'app' ? 'active' : '' }}">
-                <a href="?name=app" class="charge_action">
+            <li class="{{ request()->name == 'shipping-agency-activity' ? 'active' : '' }}">
+                <a href="?name=shipping-agency-activity" class="charge_action">
                     <i class="fa fa-arrow-right text-red"></i> {{ __('app_repo') }}
                 </a>
             </li>
@@ -117,7 +117,7 @@
     @php
         // Determine the current request name
         $isDashboard = request()->name == 'dash' || request()->name == null;
-        $isApp = request()->name == 'app';
+        $isApp = request()->name == 'shipping-agency-activity';
         $isStripe = request()->name == 'stripe';
         $isStripeNew = request()->name == 'stripenew';
         $isInApp = request()->name == 'in-app-purchas';
