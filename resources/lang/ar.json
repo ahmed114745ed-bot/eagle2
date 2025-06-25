@@ -244,6 +244,7 @@
     "trxs": "التحويلات",
     "worth": "مستوي المتلقى",
    "worth": " المتلقى",
+    "This payment method is currently unavailable. Please choose another one.": "طريقة الدفع هذه غير متاحة حالياً. يرجى اختيار طريقة أخرى.",
 
     "Balance": "الرصيد",
     "sender_level": "مستوى المرسل",
