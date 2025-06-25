@@ -85,6 +85,11 @@ class MicService
             $base_mic[$position] = $user->id . '#' . $oldValue ?: 0;
         }
         $mic = implode(',', $base_mic);
+        \Log::info('shami test go_microphone_hand', [
+            'microphoneold'=>$mic_arr,
+            '$room->microphone_only_users' => $room->microphone_only_users,
+            'mic' => $mic,
+        ]);
         $this->updateMicAndPK($room, $mic);
         //Remove mic sequence
         Common::delMicHand($user->id);
