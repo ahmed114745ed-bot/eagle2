@@ -30,6 +30,7 @@ use Modules\Reals\Traits\RealRelationshipTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
+use App\Models\Config as ConfigModel;
 
 /**
  * @method static withoutAppends()
@@ -1370,7 +1371,7 @@ class User extends Authenticatable
         $localizedKey = "{$lang}_{$typeKey}";
         $fallbackKey = "en_{$typeKey}";
     
-        return Config::whereIn('name', [$localizedKey, $fallbackKey])
+        return  ConfigModel::whereIn('name', [$localizedKey, $fallbackKey])
             ->orderByRaw("FIELD(name, ?, ?)", [$localizedKey, $fallbackKey])
             ->value('value');
     }
