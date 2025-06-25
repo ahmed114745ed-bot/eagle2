@@ -76,7 +76,7 @@ class CoinService
                 || !$stripe_currency
                 || !$stripe_webhook_secret
                 ){
-                    return Common::apiResponse(0, 'Please set strip information', null, 400);
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 }
                 $strip = new \App\Classes\PaymentGateways\Stripe();
                 $res = $strip->make($data);
