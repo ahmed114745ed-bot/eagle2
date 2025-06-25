@@ -775,6 +775,17 @@ class User extends Authenticatable
         //        }
     }
 
+    public function getSalaryWithoutCutAmountAttribute()
+    {
+        $userSallary = UserSallary::query()
+            ->where('user_id', $this->id)
+            ->sum(DB::raw('sallary'));
+
+    
+        
+    return round($userSallary, 2); 
+    }
+
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level + $this->sub_charger_level;
