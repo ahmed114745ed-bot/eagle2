@@ -34,7 +34,7 @@ class MyStoreResource extends JsonResource
         $userSalary   = $sallary;
         if (($this->type_user == 2 || $this->type_user == 4)) {
             $userSalary = $salary; //
-            $hostSalary = floor($agency_owner?->salary ?? 0);
+            $hostSalary = round($agency_owner?->salary ?? 0, 2);
             $sallary = $hostSalary;
         }
 
@@ -55,6 +55,7 @@ class MyStoreResource extends JsonResource
                 'diamonds' =>  (string)$diamonds,
                 'silver_coins' => (string)$this->gold,
                 'usd' => (double)$sallary,
+                'usd_new' =>  (string) $sallary,
                 'user_usd' => (string) $userSalary ?? '',
                 'host_usd' => (string) @$hostSalary ?? '',
                 'pending_dollar' => (string) $pendingDollar ?? '',
