@@ -22,7 +22,7 @@ use Illuminate\Validation\ValidationException;
 class ChangeAgencyAction extends RowAction
 {
     public $name;
-    
+
     public $id;
 
     public function __construct($id = 0)
