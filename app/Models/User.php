@@ -1390,7 +1390,7 @@ class User extends Authenticatable
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
             if ($url) {
-                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
+                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 20%; height: 20%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
             }
         }
 
