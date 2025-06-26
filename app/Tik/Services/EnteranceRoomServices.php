@@ -355,7 +355,7 @@ class EnteranceRoomServices
         } elseif ($event == 'room_logout') {
          
             UserHandling::calcTime($userId);
-            $this->updateMicrophone($room->uid, $userId);
+            // $this->updateMicrophone($room->uid, $userId);
             $visitors = array_diff($visitors, [$userId]);
         }
 

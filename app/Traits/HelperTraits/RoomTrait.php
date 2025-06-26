@@ -188,9 +188,14 @@ trait RoomTrait
         $room      = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
         $microphone = $room->microphone;
         $mainMicrophone = $room->main_microphone;
-        $baseMic = $room->microphone_only_users;
+        // $baseMic = $room->microphone_only_users;
+        $baseMic = $room->getOriginal('microphone');
+        \Log::info('shami test quit_room', [
+            'baseMic' => $baseMic,
+            '$room->microphone_only_users' => $room->microphone_only_users,
+        ]);
 
-        
+
         $microphone = explode(',', $microphone);
         $mainMicrophone = explode(',', $mainMicrophone);
         $baseMic = explode(',', $baseMic);
@@ -207,9 +212,12 @@ trait RoomTrait
         if ($microphone[$position] > 0){
             $baseMic[$position] = $mainMicrophone[$position];
         }
-        
-      
-        $result = DB::table('rooms')->where('uid',$uid)->update(['microphone'=>$microphone]);
+
+        \Log::info('shami test quit_room', [
+            'microphone' => $microphone
+        ]);
+
+        $result = DB::table('rooms')->where('uid',$uid)->update(['microphone'=>implode(',', $baseMic)]);
         $room = Room::query ()->where ('uid',$uid)->first ();
         $pk = Pk::query ()->where ('room_id',$room->id)->where ('status',1)->first ();
         if ($pk){
