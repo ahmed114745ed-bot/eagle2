@@ -847,7 +847,6 @@ class UserController extends MainController
         } else {
             $types = $types;
         }
-
         $chargeTabType = request()->get('type', 'receiver');
         $giftType = request()->get('gift_type', 'receiver');
 

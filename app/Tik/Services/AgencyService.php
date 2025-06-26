@@ -91,7 +91,7 @@ class AgencyService
         $joined = $user->agency_id;
         if ($joined) throw new \Exception(__('api_responses.you_are_already_under_agency'));
         $countRequest = $this->agencyJoinRequestRepository->countByMonth($user->id);
-        if ($countRequest > 5)   throw new \Exception(__('api_responses.you_have_+5_requests_not_allowed_to_request_other_more'));
+        // if ($countRequest > 5)   throw new \Exception(__('api_responses.you_have_+5_requests_not_allowed_to_request_other_more'));
         $agency_request = $this->agencyJoinRequestRepository->countByAgency($user->id, $agencyId);
         if ($agency_request > 0)  throw new \Exception(__('api_responses.you_already_send_request_to_this_agency'));
 
@@ -708,7 +708,7 @@ class AgencyService
         $totalDays = $user->getTotalDaysJoinedAgency($startDate);
      
         $saMonth = ltrim($month, '0');
-        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year);
+        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year,$agencyId);
 
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
