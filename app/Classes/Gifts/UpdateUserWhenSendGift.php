@@ -64,11 +64,19 @@ class UpdateUserWhenSendGift
         }
 
         $values['received_level'] = $receivedUser->received_level;
-
+        \Log::info('receivedUser',['receivedUser->id' =>$receivedUser->id]);
+        $logValues = [
+            'salary_is_updated' => 1,
+            'monthly_diamond_received' => 'monthly_diamond_received + ' . $totalCoins,
+            'total_diamond_received' => 'total_diamond_received + ' . $totalCoins,
+        ];
+        
+        // \Log::info('values', ['values' => $logValues]);
         User::where('id', $receivedUser->id)->lockForUpdate()
             ->update($values);
         $receivedUser->save();
         $receivedUser->enableSaving = true;
+        \Log::info('receivedUser',['receivedUser' =>$receivedUser]);
 
 
         return $receivedUser;
