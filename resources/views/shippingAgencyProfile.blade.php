@@ -1198,6 +1198,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                        <th>{{__("id")}}</th>
                             <th>{{ __('receiver') }}</th>
                             <th>{{ __('Amount') }}</th>
                             <th>{{ __('Date') }}</th>
@@ -1216,6 +1217,7 @@
                                         }
                                 @endphp
                             <tr>
+                                <td>{{$index + 1}}</td>
                                 <td>{{ $charge->id}}</td>
                                 <td>
                                     
@@ -1259,6 +1261,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>{{__("id")}}</th>
                             <th>{{ __('Sender') }}</th>
                             <th>{{ __('Amount') }}</th>
                             <th>{{ __('Date') }}</th>
@@ -1277,6 +1280,7 @@
                                         }
                                 @endphp
                             <tr>
+                                <td>{{$index + 1}}</td>
                                 <td>{{ $res->id }}</td>
                                 <td>
                                    
