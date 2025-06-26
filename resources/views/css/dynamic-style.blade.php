@@ -526,7 +526,7 @@
     .user-type-badges {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
 
 .user-type-badges img {
