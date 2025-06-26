@@ -50,7 +50,7 @@ class PayPalService
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
-                'return_url'  => url("/api/paypal-success/$referenceId"),
+                'return_url'  => url("/api/paypal/return_payment/$referenceId"),
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
             ],
