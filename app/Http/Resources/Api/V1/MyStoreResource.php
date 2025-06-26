@@ -29,7 +29,7 @@ class MyStoreResource extends JsonResource
 
         /** @var User $this*/
         $agency_owner = $this->agency;
-        $salary       = $this->salary;
+        $salary       =round( $this->salary,2);
         $sallary      = $salary; //
         $userSalary   = $sallary;
         if (($this->type_user == 2 || $this->type_user == 4)) {
