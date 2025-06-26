@@ -651,9 +651,9 @@ class AgencyService
         $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
         $joinedAgency = $member ??  $owner;
-        // if (! $joinedAgency) {
-        //     return [];
-        // }
+        if (! $joinedAgency) {
+            return [];
+        }
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
         ->where('agency_id', $user->agency_id)
         ->latest('join_date')
