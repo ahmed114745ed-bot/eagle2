@@ -152,7 +152,7 @@ class AgencyService
                     'minutes' => $minutes,
                 ],
 
-                'target' =>floor($target),
+                'target' => floor($target),
                 'rate_percentage' => $result,
                 'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
             ],
@@ -222,7 +222,6 @@ class AgencyService
             $action->status = 2;
             $action->save();
             CustomNotification::rejectAgency($agency, $user);
-
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
@@ -230,13 +229,13 @@ class AgencyService
             $this->userRepository->updateTypeUser($user);
             // $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
             // if (!$checkAgencyUser) {
-                $joinAgencyData = [
-                    'user_id' =>  $user->id,
-                    'agency_id' => $agency->id,
-                    'type' => 2,
-                    'join_date' => now(),
-                ];
-                $this->usersJoinedAgencyRepository->create($joinAgencyData);
+            $joinAgencyData = [
+                'user_id' =>  $user->id,
+                'agency_id' => $agency->id,
+                'type' => 2,
+                'join_date' => now(),
+            ];
+            $this->usersJoinedAgencyRepository->create($joinAgencyData);
             // }
             // add vip to user
             UserCommon::userVip($user);
@@ -357,7 +356,7 @@ class AgencyService
         return $agency;
     }
 
-    public function userHandlingRequest($userId, $agencyId ,$type =null)
+    public function userHandlingRequest($userId, $agencyId, $type = null)
     {
         $operator = $this->userRepository->findById($userId);
         if (!$operator) {
@@ -365,15 +364,15 @@ class AgencyService
         }
         // if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
 
-        if (!empty($type) && $type == 'remove'){
-               $this->agencyUserJobRepository->deleteAdmin($operator->id ,$agencyId) ;
-               $tokens_notfacion[] = $operator->notification_id;
-               $title = $operator->name;
-               $body = 'تم ازالتك من مشرفين الوكالة';
-               $type = $message->type ?? 'text';
-               CustomNotification::agencyRemoveAdmin($agencyId, $operator);
-               return 'تم ازالة  المستخدم بنجاح';
-           }
+        if (!empty($type) && $type == 'remove') {
+            $this->agencyUserJobRepository->deleteAdmin($operator->id, $agencyId);
+            $tokens_notfacion[] = $operator->notification_id;
+            $title = $operator->name;
+            $body = 'تم ازالتك من مشرفين الوكالة';
+            $type = $message->type ?? 'text';
+            CustomNotification::agencyRemoveAdmin($agencyId, $operator);
+            return 'تم ازالة  المستخدم بنجاح';
+        }
 
         if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
             throw new CValidationException(__('This user already has an agency job requested!'));
@@ -501,7 +500,7 @@ class AgencyService
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
-      ///  Common::createUserAdmin($agency->app_owner_id);
+        ///  Common::createUserAdmin($agency->app_owner_id);
         $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
         if (!$checkAgencyUser) {
             $joinAgencyData = [
@@ -599,6 +598,7 @@ class AgencyService
         $userJoin = $this->usersJoinedAgencyRepository->findByUser($userId, $agency->id);
         if ($userJoin) {
             $userJoin->leave_date = now();
+            $userJoin->status = 'leaving agency';
             $userJoin->save();
         } else {
             $joinAgencyData = [
@@ -607,6 +607,7 @@ class AgencyService
                 'type' => 2,
                 'join_date' => now(),
                 'leave_date' => now(),
+                'status' => 'leaving agency',
             ];
             $this->usersJoinedAgencyRepository->create($joinAgencyData);
         }
@@ -633,6 +634,8 @@ class AgencyService
 
         if ($user_kicked->agency_id != $auth->ownAgency->id || $user_kicked->id == $auth->ownAgency->app_owner_id) throw new Exception('لا يمكنك ازاله هذا المستخدم!');
         UserHandling::kickUserFromAgency($user_kicked);
+        $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
+        if ($joinedAgency) UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
         return true;
     }
 
@@ -644,10 +647,10 @@ class AgencyService
         return [$agencies, $agencyManger];
     }
 
-    public function dailyReport($user, $month, $year ,$agencyId = null)
+    public function dailyReport($user, $month, $year, $agencyId = null)
     {
 
-      
+
         $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
         $joinedAgency = $member ??  $owner;
@@ -655,13 +658,13 @@ class AgencyService
             return [];
         }
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
-        ->where('agency_id', $user->agency_id)
-        ->latest('join_date')
-        ->first();
+            ->where('agency_id', $user->agency_id)
+            ->latest('join_date')
+            ->first();
 
-            if (!$joinRecord) {
-                $joinRecord =  null;
-            }
+        if (!$joinRecord) {
+            $joinRecord =  null;
+        }
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
 
@@ -706,7 +709,7 @@ class AgencyService
         });
 
         $totalDays = $user->getTotalDaysJoinedAgency($startDate);
-     
+
         $saMonth = ltrim($month, '0');
         $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year);
 
@@ -739,9 +742,9 @@ class AgencyService
             'daly_reports' => []
         ];
         $hours_days = \Cache::get('hours_days') ?? 2;
-        
+
         for ($startDay = $reportStart; $startDay <= $endDay; $startDay++) {
-            
+
             $dailyHours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $dailyMinutes = $dailyHours * 60;
             $dailyTotalSeconds = (int) round($dailyMinutes * 60);
@@ -763,7 +766,7 @@ class AgencyService
                 'live_minutes' => (int)$dailyMinutes,
                 'live_minutes_formatted' => (string)$dailyFormatted,
                 'diamonds' => numToString((int)$diamonds),
-                'is_active_day' => $dailyHours >= $hours_days, 
+                'is_active_day' => $dailyHours >= $hours_days,
 
             ];
         }
@@ -1030,10 +1033,10 @@ class AgencyService
         $agency =  $this->agencyRepository->create($data);
         //Common::createUserAdmin($request->app_owner_id);
 
-        if ($request->type == 1 ) {
+        if ($request->type == 1) {
 
             $userType = 2;
-        } elseif ($request->type == 2 ) {
+        } elseif ($request->type == 2) {
             $userType = 3;
         }
 
@@ -1063,10 +1066,10 @@ class AgencyService
             //Common::createUserAdmin($request->app_owner_id);
         }
 
-        if ($request->type == 1 ) {
+        if ($request->type == 1) {
 
             $userType = 2;
-        } elseif ($request->type == 2 ) {
+        } elseif ($request->type == 2) {
             $userType = 3;
         }
 
