@@ -641,6 +641,7 @@ class AgencyController extends Controller
      */
     protected function form()
     {
+        dd(Auth::user()->app_id);
         $form = new Form(new Agency());
         $form->display('ID');
 
