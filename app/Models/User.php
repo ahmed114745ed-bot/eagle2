@@ -1381,7 +1381,7 @@ class User extends Authenticatable
 
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
 
-        $html = '';
+        $html = '<div class="user-type-badges">';
 
         foreach ($applicableTypes as $typeKey => $typeName) {
             $localizedKey = "{$lang}_{$typeName}";
@@ -1393,6 +1393,7 @@ class User extends Authenticatable
                 $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
             }
         }
+        $html .= '</div>';
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }

@@ -523,6 +523,21 @@
         border-top: 1px solid var(--primary-hover-alpha) !important;
     }
 
+    .user-type-badges {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-type-badges img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+
     .skin-black-light .content-wrapper, .skin-black-light .main-footer{
         background-image: none; !important;
     }
