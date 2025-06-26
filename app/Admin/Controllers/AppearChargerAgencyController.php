@@ -440,22 +440,22 @@ class AppearChargerAgencyController extends MainController
             }
         });
 
-        $form->saved(function (Form $form) {
-            $checkAgencyUser = UsersJoinedAgency::where([
-                'user_id' => $form->model()->app_owner_id,
-                'agency_id' => $form->model()->id,
-                'type' => 1,
-            ])->whereNull('leave_date')->exists();
+        // $form->saved(function (Form $form) {
+        //     $checkAgencyUser = UsersJoinedAgency::where([
+        //         'user_id' => $form->model()->app_owner_id,
+        //         'agency_id' => $form->model()->id,
+        //         'type' => 1,
+        //     ])->whereNull('leave_date')->exists();
 
-            if (!$checkAgencyUser) {
-                UsersJoinedAgency::create([
-                    'user_id' => $form->model()->app_owner_id,
-                    'agency_id' => $form->model()->id,
-                    'type' => 1,
-                    'join_date' => now(),
-                ]);
-            }
-        });
+        //     if (!$checkAgencyUser) {
+        //         UsersJoinedAgency::create([
+        //             'user_id' => $form->model()->app_owner_id,
+        //             'agency_id' => $form->model()->id,
+        //             'type' => 1,
+        //             'join_date' => now(),
+        //         ]);
+        //     }
+        // });
 
         return $form;
     }

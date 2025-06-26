@@ -16,4 +16,9 @@ class UsersJoinedAgency extends Model
     {
         return $this->belongsTo(Agency::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

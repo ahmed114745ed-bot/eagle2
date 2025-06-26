@@ -288,15 +288,16 @@ class User extends Authenticatable
         return $userSallary?->toArray() ?? [];
     }
 
-    public function getSallaryInfoByMonth2($month, $year): array
+    public function getSallaryInfoByMonth2($month, $year,$agencyId): array
     {
         $userSallary = UserSallary::query()
             ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
             ->where('user_id', $this->id)
+            ->where('user_agency_id', '=',$agencyId)
             ->where('month', $month)
             ->where('year', $year)
             ->first();
-
+            
         return $userSallary?->toArray() ?? [];
     }
 
@@ -1381,7 +1382,7 @@ class User extends Authenticatable
 
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
 
-        $html = '';
+        $html = '<div class="user-type-badges">';
 
         foreach ($applicableTypes as $typeKey => $typeName) {
             $localizedKey = "{$lang}_{$typeName}";
@@ -1390,9 +1391,11 @@ class User extends Authenticatable
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
             if ($url) {
-                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 20%; height: 20%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
+                 $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
+              //  $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '">';
             }
         }
+        $html .= '</div>';
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }

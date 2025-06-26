@@ -854,6 +854,8 @@ class AgencyController extends MainController
                 'type_user' => 2,
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
+                'monthly_diamond_received' => 0,
+
             ]);
             // }
 
@@ -874,10 +876,10 @@ class AgencyController extends MainController
                     'agency_id' => $form->model()->id,
                     'type' => 1,
                     'join_date' => now(),
+                    'status' =>'Joined',
                 ]);
             }
         });
-        // Add this to your admin view
         $form->footer(function ($footer) {
             $footer->disableEditingCheck();
             $footer->disableCreatingCheck();
@@ -1131,6 +1133,7 @@ class AgencyController extends MainController
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
+                'status' =>'Joined',
             ];
             UsersJoinedAgency::create($joinAgencyData);
         }

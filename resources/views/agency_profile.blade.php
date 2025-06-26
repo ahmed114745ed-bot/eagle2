@@ -1100,12 +1100,14 @@
                                             $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
                                                 ->where('id', $member->agency_id)
                                                 ->exists();
+                                            $showUrl = $member ? url("admin/users/{$member->id}") : "#";
                                         @endphp
 
                                         <tr>
                                             <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
                                             <td class="user-cell">
                                                 <div class="user-avatar">
+                                                    <a href='{{$showUrl}}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                                                     <img src="{{ getImagePath(@$member->profile->avatar) }}"
                                                         alt="{{ $member->name }}">
                                                 </div>
@@ -1338,6 +1340,7 @@
                                                     $country = $user->country;
                                                     $countryName = app()->getLocale() == 'ar' ? $country?->name : $country?->e_name;
                                                     $countryFlag = getImagePath($country?->flag ?? '');
+                                                    $showUrl = $agencyJoinRequest->user ? url("admin/users/{$agencyJoinRequest->user->id}") : "#";
                                         @endphp
 
                                         <tr>
@@ -1345,6 +1348,7 @@
 
                                             <td>
                                                 <div style="display: flex; align-items: center; gap: 10px;">
+                                                    <a href='{{$showUrl}}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                                                     {!! $image !!}
                                                     <div>
                                                         <strong>{{ $name }}</strong><br>
@@ -1355,7 +1359,7 @@
 
                                             <td>
                                                 <div style="display: flex; align-items: center;">
-                                                    <span>{{ $agencyJoinRequest->whatsapp }}</span>
+                                                    <span>{{ $agencyJoinRequest->user->phone }}</span>
                                                     <img src="{{ $iconUrl }}" alt="WhatsApp" width="20" height="20"
                                                         style="margin-left: 5px; filter: invert(1);">
                                                 </div>

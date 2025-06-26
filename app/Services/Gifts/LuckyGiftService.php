@@ -2,11 +2,13 @@
 
 namespace App\Services\Gifts;
 
+use App\Classes\Gifts\SendGiftService;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\RedisService;
 use App\Helpers\Common;
 use App\Models\CoreWallet;
+use App\Models\Cp;
 use App\Models\Gift;
 use App\Models\Room;
 use App\Models\User;
@@ -16,6 +18,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use Modules\CP\Http\Services\CpService;
 
 class LuckyGiftService
 {
@@ -51,6 +54,7 @@ class LuckyGiftService
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
 
+     
         if ($userCoins < $totalPrice) {
             throw  new InvalidArgumentException(__('api_responses.insufficient'));
         }
@@ -183,7 +187,7 @@ class LuckyGiftService
         $number = $number * $count;
 
         $newUserCoin = ($user->di - $userCoins);
-        $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
+        // $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
 
         if ($room->charizma_status && $coinsForReceiver > 1) {
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
@@ -192,10 +196,27 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
+        
 
+        /***********************************************/
+        $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
+        $cpIds = [];
+        if ($cpId != null) {
+            try {
+                $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPrice);
+            } catch (\Exception $e) {
+                return Common::apiResponse(0, $e->getMessage());
+            }
+        }
+        $sendGiftServices = new SendGiftService();
+      
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds  );
+        /***********************************************/
 
         return  $responseData;
     }
+
+ 
 
     public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
