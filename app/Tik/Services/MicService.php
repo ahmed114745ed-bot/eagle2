@@ -86,7 +86,7 @@ class MicService
         }
 
         if ($old_status == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
-            throw new Exception(__('هذا المايك مغلق ولا يمكن الصعود عليه'));
+            throw new Exception(__('This microphone is closed and cannot be accessed'));
         }
 
         if (in_array($user->id, $mic_arr)) {
