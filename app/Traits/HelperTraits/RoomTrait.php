@@ -191,7 +191,8 @@ trait RoomTrait
         // $baseMic = $room->microphone_only_users;
         $baseMic = $room->getOriginal('microphone');
         \Log::info('shami test quit_room', [
-            'baseMic' => $baseMic
+            'baseMic' => $baseMic,
+            '$room->microphone_only_users' => $room->microphone_only_users,
         ]);
 
         
