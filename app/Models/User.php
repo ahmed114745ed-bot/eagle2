@@ -1363,19 +1363,38 @@ class User extends Authenticatable
             4 => 'bd',
         ];
     
-        if (!isset($types[$this->type_user])) {
-            return null; 
+        $userType = $this->type_user;
+    
+        if (!isset($types[$userType])) {
+            return $lang === 'ar' ? 'مستخدم' : 'User';
         }
     
-        $type = $types[$this->type_user];
-        $localizedKey = "{$lang}_{$type}";
-        $fallbackKey = "en_{$type}";
+        $applicableTypes = array_filter($types, function ($key) use ($userType) {
+            return $key <= $userType;
+        }, ARRAY_FILTER_USE_KEY);
     
-        $config = ConfigModel::whereIn('name', [$localizedKey, $fallbackKey])
-            ->orderByRaw("FIELD(name, ?, ?)", [$localizedKey, $fallbackKey])
-            ->value('value');
+        $configKeys = [];
+        foreach ($applicableTypes as $key => $type) {
+            $configKeys[] = "{$lang}_{$type}";
+            $configKeys[] = "en_{$type}"; // fallback
+        }
     
-        return $config;
+        $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
+    
+        $html = '';
+    
+        foreach ($applicableTypes as $typeKey => $typeName) {
+            $localizedKey = "{$lang}_{$typeName}";
+            $fallbackKey = "en_{$typeName}";
+    
+            $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
+            $url =getImagePath($url);
+            if ($url) {
+                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="height: 24px; margin-right: 4px;">';
+            }
+        }
+    
+        return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
     public function wallet()
     {
