@@ -358,7 +358,7 @@ Route::get('/update-user-sallary', function () {
                 foreach ($users as $user) {
                     $cacheKey = 'cache-data-mystore-' . $user->id;
 
-                    if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
+                    // if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
                         try {
                             $app_feature = Cache::get('host_agency');
                             
@@ -371,7 +371,7 @@ Route::get('/update-user-sallary', function () {
                            
                             $this->error("Failed user ID {$user->id}");
                         }
-                    }
+                    // }
                 }
             });
 
