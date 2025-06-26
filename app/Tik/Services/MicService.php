@@ -296,7 +296,7 @@ class MicService
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
-          Log::info('goMicrophoneHand',['goMicrophoneHand'=> $original]);
+        //   Log::info('goMicrophoneHand',['goMicrophoneHand'=> $original]);
         if (!$microphone || !in_array($user->id, $microphone)) {
             return 0;
         }
@@ -326,7 +326,7 @@ class MicService
 
         // Save to DB
         $result = implode(',', $final);
-        Log::info('goMicrophoneHand',['final'=> $result]);
+        // Log::info('goMicrophoneHand',['final'=> $result]);
         $this->updateMicAndPK($room, $result);
 
         // Clear mic timer and leave CP
