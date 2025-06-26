@@ -3258,7 +3258,15 @@
 "you don not have permission":"ليس لديك الصلاحية",
 "there is weekly star now": "هناك نجم أسبوعي الآن",
 "there is no event now": "لا يوجد حدث الآن",
-"room_closed": "الروم مغلقة، الرجاء التواصل مع المشرف"
+"room_closed": "الروم مغلقة، الرجاء التواصل مع المشرف",
+"ID": "المعرف",
+"Agency Name": "اسم الوكالة",
+"Owner Name": "اسم المالك",
+"Owner UUID": "المعرف الفريد للمالك",
+"Owner Phone": "هاتف المالك",
+"Charge Agency_": "وكالة شحن موثقة",
+"Appear Charger Agency": "ظهور كوكالة شحن",
+"Is Frozen": "مجمدة"
 
 
 

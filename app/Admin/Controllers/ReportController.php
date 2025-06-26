@@ -301,12 +301,16 @@ class ReportController extends MainController
         $grid->column('target', __('target'))->display(function () {
             return @$this->getTotalTargetAgency(request('month'), request('year')) ?? 0;
         });
-        // $grid->column('expenses', __('expenses'))->display(function () {
-        //     return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
-        // });
+        $grid->column('net_salary', __('Net Salary'))->display(function () {
+            return @$this->getTotalNetSallaryAgency(request('month'), request('year')) ?? 0;
+        });
+        $grid->column('expenses', __('expenses'))->display(function () {
+            return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
+        });
 
+        
         $grid->column('total', __('salary'))->display(function () {
-            $salary = $this->getSalaryAgency(request('month'), request('year')) ?? 0;
+            $salary = $this->getSalaryWithOutCutAmountAgency(request('month'), request('year')) ?? 0;
             $image = asset('images/dollar.jpg');
             return "<div style='display: flex; align-items: center;'>
                     <span>{$salary}</span>
