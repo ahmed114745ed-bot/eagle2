@@ -29,7 +29,7 @@ class MyStoreResource extends JsonResource
 
         /** @var User $this*/
         $agency_owner = $this->agency;
-        $salary       = $this->salary;
+        $salary       =round( $this->salary,2);
         $sallary      = $salary; //
         $userSalary   = $sallary;
         if (($this->type_user == 2 || $this->type_user == 4)) {
@@ -56,6 +56,7 @@ class MyStoreResource extends JsonResource
                 'silver_coins' => (string)$this->gold,
                 'usd' => (double)$sallary,
                 'user_usd' => (string) $userSalary ?? '',
+                'user_usd_new' => (string) (isset($userSalary) ? round($userSalary, 0) : ''),
                 'host_usd' => (string) @$hostSalary ?? '',
                 'pending_dollar' => (string) $pendingDollar ?? '',
                 'room_salary' => (string) $roomSalary ?? '',
