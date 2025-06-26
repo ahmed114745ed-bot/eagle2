@@ -19,8 +19,6 @@ class PayPalService
 
     protected function getAccessToken(): string
     {
-        info(config('paypal.client_id'));
-        info(config('paypal.client_secret'));
         $headers = [
             'Content-Type'  => 'application/x-www-form-urlencoded',
             'Authorization' => 'Basic ' . base64_encode(config('paypal.client_id') . ':' . config('paypal.client_secret'))
@@ -50,7 +48,7 @@ class PayPalService
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
-                'return_url'  => url("/api/paypal/return_payment/$referenceId"),
+                'return_url'  => url("/api/paypal-return/$referenceId"),
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
             ],

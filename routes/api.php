@@ -104,7 +104,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('utd-fawry-callback', [PaymentMethodController::class, 'utdCallback'])->middleware("verify.utdFawry.signature");
     Route::get('/fawry/done', [PaymentMethodController::class, 'success']);
     Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
-    Route::get('paypal-success/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
+    Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
     Route::get('paypal-cancel', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
     Route::prefix('config')->group(function () {
