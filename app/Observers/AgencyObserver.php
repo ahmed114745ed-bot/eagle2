@@ -53,7 +53,7 @@ class AgencyObserver
             UserHandling::kickOfAllUsersFromAgency($agency);
             User::query()->where('agency_id', $agency->id)->update(['agency_id' => 0, 'type_user' => 0]);
             $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $agency->id])->get();
-            if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now()]);
+            if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now(),'status' =>'delete agency from admin']);
             $user = User::find($agency->app_owner_id);
             Admin::where('username', $user->uuid)->delete();
         }

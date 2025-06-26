@@ -3266,7 +3266,15 @@
 "Owner Phone": "هاتف المالك",
 "Charge Agency_": "وكالة شحن موثقة",
 "Appear Charger Agency": "ظهور كوكالة شحن",
-"Is Frozen": "مجمدة"
+"Is Frozen": "مجمدة",
+"Agency join logs":"سجلات انضمام الوكالة",
+"Join date": "تاريخ الانضمام",
+"Leave date": "تاريخ المغادرة",
+"leaving agency": "مغادرة الوكالة",
+"Joined": "انضم",
+"delete agency from admin": "حذف الوكالة من قبل المسؤول",
+"from admin": "من قبل المسؤول",
+"kicked off": "تم الطرد"
 
 
 
