@@ -369,7 +369,7 @@ class MicService
         }
 
 
-        $microphone = $room->microphone_only_users;
+        $microphone = $room->getOriginal('microphone');
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);
