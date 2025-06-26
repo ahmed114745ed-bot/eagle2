@@ -103,6 +103,7 @@ class UserRelationsResource extends JsonResource
                 "bio" => @$this->bio,
             ],
             'image_color'          => @$this->color_image,
+            'color_name'   => common::wareUserVipColor($this->id, 18) ?? '',
         ];
 
         return $data;

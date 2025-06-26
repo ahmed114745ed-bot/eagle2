@@ -1133,21 +1133,29 @@
                 <div class="agency-meta">
                     <div class="meta-item">
                         <span class="meta-label">{{ __('diamonds') }}:</span>
-                        <span class="meta-value">{{ @$user->getTotalDiamond() }}</span>
+                        @php
+
+                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->getTotalDiamond() ;
+
+                        @endphp
+                        <span class="meta-value">{{ @$user_diamonds }}</span>
 
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{__('coins')}}:</span>
                         <span class="meta-value">{{@$user->di }}</span>
                     </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('type')}}:</span>
-                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
-                        <img src="{{getImagePath( @$user->userTypeBadge())  }}" alt="" class="">
-
-                    </div>
+                  
 
                 </div>
+            </div>
+            <div class="agency-meta">
+                 <div class="meta-item">
+                        <span class="meta-label">{{__('type')}}:</span>
+                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->      
+                   {!! @$user->userTypeBadge() !!}
+                    </div>
+
             </div>
         </div>
         <button class="btn-back" onclick="window.location.href='{{ url('admin/users') }}'">
@@ -1970,15 +1978,27 @@
             }
 
             tab.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.getElementById('tab-loading').style.display = 'block';
-                allTabs.forEach(t => t.style.pointerEvents = 'none');
-                const href = tab.getAttribute('href');
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 300);
+                    e.preventDefault();
+
+                    const currentUrl = new URL(window.location.href);
+                    const href = tab.getAttribute('href');
+                    const targetUrl = new URL(href, currentUrl.origin);
+
+                    // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
+                    if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
+                        document.getElementById('tab-loading').style.display = 'block';
+                        allTabs.forEach(t => t.style.pointerEvents = 'none');
+
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 300);
+                    } else {
+                        // لا تعرض اللودر إذا الرابط خارج التابات
+                        window.location.href = href;
+                    }
+                });
             });
-        });
+    
 
         if (targetElement) {
             setTimeout(() => {
