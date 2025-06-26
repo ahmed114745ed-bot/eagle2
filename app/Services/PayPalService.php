@@ -65,7 +65,6 @@ class PayPalService
             ],
         ];
 
-        info(config('paypal.base_url'));
         $response = Http::withHeaders($headers)
             ->withBody(json_encode($body))
             ->post(config('paypal.base_url'). '/v2/checkout/orders');
@@ -142,7 +141,8 @@ class PayPalService
 
         if ($coinLog->status){
             if ($coinLog->status) {
-                return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);}
+                return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
+            }
         }
 
         return response()->json(['status' => 'failed', 'message' => 'Payment failed.',], 500);
