@@ -1149,7 +1149,7 @@
                         <span class="meta-label">{{__('type')}}:</span>
                         <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
                      
-                        {{   @$user->userTypeBadge() }} 
+                   {!! @$user->userTypeBadge() !!}
 
                         
 
