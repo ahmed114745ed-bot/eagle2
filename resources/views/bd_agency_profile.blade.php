@@ -897,7 +897,7 @@
 
                 </div>
             </div>
-            <a class="btn-back" href="{{ route('admin.agencies.index') }}">
+            <a class="btn-back" href="{{ route('bd.agencies.index') }}">
                 <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
             </a>
         </div>

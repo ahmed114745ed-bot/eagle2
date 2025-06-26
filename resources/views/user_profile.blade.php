@@ -1142,7 +1142,9 @@
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{__('type')}}:</span>
-                        <span class="meta-value">{{@$user->userType() }}</span>
+                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
+                        <img src="{{getImagePath( @$user->userTypeBadge())  }}" alt="" class="">
+
                     </div>
 
                 </div>
@@ -1207,7 +1209,8 @@
                     <ul class="nav nav-pills">
                         @foreach($types as $id => $name)
                             @php
-                                $selectedType = request()->get('type', 4); // Default to 1
+                             $defaultType = $types->keys()->first();
+                                $selectedType = request()->get('type', $defaultType); // Default to 1
                             @endphp
                             <li class="{{ $selectedType == $id ? 'active' : '' }}">
                                 <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">

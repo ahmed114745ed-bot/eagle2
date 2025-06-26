@@ -62,9 +62,7 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego(Request $request)
     {
-        // Log::info('shami test now', [
-        //     'data' => $request->all()
-        // ]);
+      
 
         /*$library = Common::getConfig('library');
         if ($library == 2) return Common::apiResponse(false, 'you used pusher');*/
@@ -259,9 +257,8 @@ class EnteranceController extends Controller
             }
             $owner_id = $room->uid;
         }
-        if ($room->room_status == 2) {
-            return Common::apiResponse(0, __('room_closed'));
-        }
+
+      
 
 
         $ban = Common::ifRoomHasband($owner_id);
