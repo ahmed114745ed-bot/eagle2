@@ -523,7 +523,7 @@
         border-top: 1px solid var(--primary-hover-alpha) !important;
     }
 
-    .user-type-badges {
+    /* .user-type-badges {
     display: flex;
     align-items: center;
     gap: 5px;
@@ -535,7 +535,7 @@
     object-fit: cover;
     border-radius: 4px;
     transition: all 0.2s ease;
-}
+} */
 
 
     .skin-black-light .content-wrapper, .skin-black-light .main-footer{
