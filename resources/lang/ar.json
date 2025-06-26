@@ -3276,7 +3276,9 @@
 "from admin": "من قبل المسؤول",
 "kicked off": "تم الطرد",
 "user setting": "إعدادات المستخدم",
-"This user is the agency owner and cannot be deleted":"هذا المستخدم هو مالك الوكالة ولا يمكن حذفة"
+"This user is the agency owner and cannot be deleted":"هذا المستخدم هو مالك الوكالة ولا يمكن حذفة",
+"User Setting": "إعدادات المستخدم",
+"Browse user setting": "تصفح إعدادات المستخدم"
 
 
 
