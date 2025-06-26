@@ -782,9 +782,9 @@ class User extends Authenticatable
             ->where('user_id', $this->id)
             ->sum(DB::raw('sallary'));
 
-    
-        
-    return round($userSallary, 2); 
+
+
+        return round($userSallary, 2);
     }
 
     public function setTotalChargeLevelAttribute(float $value)
@@ -1126,9 +1126,9 @@ class User extends Authenticatable
 
         if ($this->agency_id) {
             $userSallary = UserTarget::query()
-            ->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(add_year,"-", add_month)'), '=', $year . '-' . $month);
-            })->where('user_id', $this->id)
+                ->where(function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(add_year,"-", add_month)'), '=', $year . '-' . $month);
+                })->where('user_id', $this->id)
                 ->where('agency_id', $this->agency_id)
                 ->orderByDesc('id')
                 ->sum(DB::raw('user_diamonds'));
@@ -1207,7 +1207,7 @@ class User extends Authenticatable
     public function getLoadedPacks()
     {
         if ($this->loadedPacks === null) {
-//            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
+            //            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
             $this->loadedPacks = $this->packs()->where('is_used', 1)->with('ware')->get();
         }
 
@@ -1362,38 +1362,38 @@ class User extends Authenticatable
             3 => 'shipping',
             4 => 'bd',
         ];
-    
+
         $userType = $this->type_user;
-    
+
         if (!isset($types[$userType])) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
         }
-    
+
         $applicableTypes = array_filter($types, function ($key) use ($userType) {
             return $key <= $userType;
         }, ARRAY_FILTER_USE_KEY);
-    
+
         $configKeys = [];
         foreach ($applicableTypes as $key => $type) {
             $configKeys[] = "{$lang}_{$type}";
             $configKeys[] = "en_{$type}"; // fallback
         }
-    
+
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
-    
+
         $html = '';
-    
+
         foreach ($applicableTypes as $typeKey => $typeName) {
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
-    
+
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
-            $url =getImagePath($url);
+            $url = getImagePath($url);
             if ($url) {
-                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="height: 24px; margin-right: 4px;">';
+                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 24px; height: 24px; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
             }
         }
-    
+
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
     public function wallet()
