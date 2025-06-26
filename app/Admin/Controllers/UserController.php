@@ -815,7 +815,6 @@ class UserController extends MainController
 
     public function show($id, Content $content,)
     {
-        dd(123);
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
         $start = request('start_at');
