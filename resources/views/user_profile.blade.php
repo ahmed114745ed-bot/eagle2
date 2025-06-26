@@ -1145,17 +1145,17 @@
                         <span class="meta-label">{{__('coins')}}:</span>
                         <span class="meta-value">{{@$user->di }}</span>
                     </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('type')}}:</span>
-                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
-                     
-                   {!! @$user->userTypeBadge() !!}
-
-                        
-
-                    </div>
+                  
 
                 </div>
+            </div>
+            <div class="agency-meta">
+                 <div class="meta-item">
+                        <span class="meta-label">{{__('type')}}:</span>
+                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->      
+                   {!! @$user->userTypeBadge() !!}
+                    </div>
+
             </div>
         </div>
         <button class="btn-back" onclick="window.location.href='{{ url('admin/users') }}'">
