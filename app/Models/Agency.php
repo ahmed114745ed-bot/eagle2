@@ -259,8 +259,28 @@ class Agency extends Model
             ->orderByDesc('id')
             ->sum(DB::raw('cut_amount'));
 
-        return floor($agencySalary ?? 0);
+        return round($agencySalary, 2);
+
     }
+
+    public function getTotalNetSallaryAgency($month = null, $year = null)
+    {
+        $month ??= now()->month;
+        $year ??= now()->year;
+        $result = AgencySallary::query()
+        ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
+        ->where('is_paid', 0)
+        ->where('agency_id', $this->id)
+        ->selectRaw('SUM(sallary) - SUM(cut_amount) as total')
+        ->value('total');
+
+    return round($result, 2);
+
+    }
+
+
+
+    
 
     public function getOldAgency($month = null, $year = null)
     {
@@ -287,6 +307,21 @@ class Agency extends Model
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
+
+            return round($agencySalary, 2);
+    }
+
+    public function getSalaryWithOutCutAmountAgency($month = null, $year = null)
+    {
+        $month ??= now()->month;
+        $year ??= now()->year;
+
+        $agencySalary = AgencySallary::query()
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
+            ->where('is_paid', 0)
+            ->where('agency_id', $this->id)
+            ->orderByDesc('id')
+            ->sum(DB::raw('sallary'));
 
             return round($agencySalary, 2);
     }

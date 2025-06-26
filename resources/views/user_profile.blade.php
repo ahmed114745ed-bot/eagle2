@@ -1746,7 +1746,7 @@
                             {{ $giftType == 'receiver' ? __('total diamonds received') : __('total diamonds sent') }}
                         </div>
                         <div class="diamond-count">
-                            <span>{{ numToString(@$diamonds) }}</span>
+                            <span>{{ number_format(@$diamonds) }}</span>
                             <div class="diamond-icon-container">
                                 <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
                             </div>
