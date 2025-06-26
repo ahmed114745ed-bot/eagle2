@@ -296,6 +296,7 @@ class AgencyJoinRequestController extends MainController
                         'agency_id' => $form->model()->agency_id,
                         'type' => 2,
                         'join_date' => now(),
+                        'status' =>'Joined'
                     ]);
                 }
 
