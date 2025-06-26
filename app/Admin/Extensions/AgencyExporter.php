@@ -28,7 +28,8 @@ class AgencyExporter  implements FromCollection,WithHeadings
         'net salary',
         'agent',
         'month',
-        'year'
+        'year',
+        'hosts'
     ];
     public $month;
     public $year;
@@ -64,15 +65,16 @@ class AgencyExporter  implements FromCollection,WithHeadings
                 DB::raw('SUM(`cut_amount`) AS expenses'),
                 DB::raw('SUM(sallary) - SUM(cut_amount) AS salary'),
             )->groupBy('agency_id')->first();
-           
+            
             $item['id'] = $agency->id;
             $item['name'] = $agency->name;
             $item['salary'] = $agencySalarys->target ??"0";
             $item['expenses'] = $agencySalarys->expenses ??"0";
-            $item['net_salary'] = $agencySalarys->target ??"0";
+            $item['net_salary'] = $agencySalarys->salary ??"0";
             $item['agent'] = @$agency->owner->name ?: @$agency->dashOwner->name;
             $item['month'] = @$target->month;
             $item['year'] = @$target->year;
+            $item['hosts'] = @$agency->users_count;
             array_push($arr, $item);
     }
         return collect($arr);
@@ -86,10 +88,12 @@ class AgencyExporter  implements FromCollection,WithHeadings
             __('name', [], 'ar'),
             __('salary', [], 'ar'),
             __('expenses', [], 'ar'),
-            __('net_salary', [], 'ar'),
+            __('Net Salary', [], 'ar'),
             __('agent', [], 'ar'),
             __('month', [], 'ar'),
             __('year', [], 'ar'),
+            __('dashboard.hosts', [], 'ar'),
+            
         ];
     }
 }

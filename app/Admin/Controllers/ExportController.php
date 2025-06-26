@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\AgencyExporter;
+use App\Admin\Extensions\ChargeAgencyExporter;
 use App\Admin\Extensions\UserExporter;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,6 +24,13 @@ class ExportController extends Controller
     {
         $export = new AgencyExporter();
         $fileName = 'agency_target_salary.csv';
+
+        return Excel::download($export, $fileName);
+    }
+    public function chargeAgencies()
+    {
+        $export = new ChargeAgencyExporter();
+        $fileName = 'charge_agencies.csv';
 
         return Excel::download($export, $fileName);
     }
