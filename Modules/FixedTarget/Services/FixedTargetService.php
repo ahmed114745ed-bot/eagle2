@@ -339,6 +339,10 @@ class FixedTargetService
                         'achieved_diamond' =>  $month_received,
                         'app_profit' => 0,
                         'dB' =>  0,
+                        'diamond' => $month_received . ' / ' . 0,
+                        'target_diamonds'     => 0,
+                        'target_diamonds'     => 0,
+                        'remaining_diamond'   => ($month_received -  0),
                     ]
                 );
             }
