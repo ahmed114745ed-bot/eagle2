@@ -27,7 +27,7 @@ class CoinController extends Controller
 
     public function buyCoins(Request $request)
     {
-        if (!$request->pay_method || !$request->coin_id) return Common::apiResponse(0, 'missing param', null, 422);
+        if (!$request->coin_id) return Common::apiResponse(0, 'missing param', null, 422);
         $user = $request->user();
 
         try {
