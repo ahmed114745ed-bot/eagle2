@@ -367,8 +367,6 @@ Route::get('/update-user-sallary', function () {
                                 $targetService = new FixedTargetService($user, month: $month, year: $year);
                                 $targetService->calculateTarget();
                             }
-
-                            $this->info("User ID {$user->id} processed.");
                         } catch (\Throwable $e) {
                            
                             $this->error("Failed user ID {$user->id}");
@@ -376,6 +374,9 @@ Route::get('/update-user-sallary', function () {
                     }
                 }
             });
+
+
+    return "gooooooooooooooooooooooooooooooooood";
 });
 
 
