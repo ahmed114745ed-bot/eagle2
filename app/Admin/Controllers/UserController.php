@@ -43,7 +43,7 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
-
+use App\Models\UsersJoinedAgency;
 
 class UserController extends MainController
 {
@@ -820,6 +820,7 @@ class UserController extends MainController
         $start = request('start_at');
         $end = request('end_at');
         $tab = request('tab') ?? 'salary';
+        $joinDate = request('join_date');
         $user = User::with('profile')->find($id);
         $type = request('type') ?? 4;
         $packs = Pack::where('user_id', $id)->where('type', $type)->whereHas('ware')->with(['ware' => function ($q) {
@@ -882,7 +883,10 @@ class UserController extends MainController
                 Carbon::parse($end)->endOfDay()
             ]);
         })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', );
+        $userJoinAgencies = UsersJoinedAgency::where('user_id',$id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
+               $query->whereDate('join_date', $joinDate);
+            })->paginate(10, ['*'], 'user_agency_page');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies','types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', );
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
