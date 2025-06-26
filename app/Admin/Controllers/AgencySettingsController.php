@@ -39,11 +39,11 @@ class AgencySettingsController extends MainController
         $moments =  Common::getSettingValue('moments') ?? 0;
         $reels = Common::getSettingValue('reels') ?? 0;
         $diamonds = Common::getSettingValue('diamonds');
-        $transfer_salary = Common::getSettingValue('transfer_salary');
-        $stop_invite_code = Common::getSettingValue('stop_invite_code');
-        $stop_charge = Common::getSettingValue('stop_charge');
-        $make_rooms_top = Common::getSettingValue('make_rooms_top');
-        $make_gift_top = Common::getSettingValue('close_open_gifts');
+        $transfer_salary = settings()->get('transfer_salary');
+        $stop_invite_code = settings()->get('stop_invite_code');
+        $stop_charge = settings()->get('stop_charge');
+        $make_rooms_top = settings()->get('make_rooms_top');
+        $make_gift_top = settings()->get('close_open_gifts');
         $languages = Language::all();
         $configAll = Config::all();
         return parent::index($content
