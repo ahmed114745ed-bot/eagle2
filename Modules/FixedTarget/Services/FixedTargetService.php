@@ -51,10 +51,10 @@ class FixedTargetService
         $joinDate = UsersJoinedAgency::where('user_id', $user->id)
         ->where('agency_id', $user->agency_id)
         ->latest()
-        ->value('join_date'); 
+        ->value('join_date');
 
-        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');  
-        
+        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');
+
 
         $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->startOfMonth()->timezone('UTC');
         $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->endOfMonth()->timezone('UTC');
@@ -80,7 +80,7 @@ class FixedTargetService
                 $user = $this->calculateFixedTarget($month_received, $user);
             }
         } else {*/
-         
+
         $user = $this->calculateRegularTarget($month_received, $user);
         //        }
         $user->salary_is_updated = false;
@@ -256,8 +256,8 @@ class FixedTargetService
                                         ])->where('id','!=', $userSalary->id)->delete();*/
         }
 
-    
-       
+
+
     }
 
     /**
@@ -270,7 +270,7 @@ class FixedTargetService
         \Log::info('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
-            
+
             \Log::info('$target',['$target'=>$target]);
             \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
@@ -284,7 +284,7 @@ class FixedTargetService
 
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
-             
+
                 $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
@@ -325,22 +325,21 @@ class FixedTargetService
                     $days  = $user->monthly_days;
                 }
                  UserSallary::updateOrCreate(
-                    [   
+                    [
                         'user_id' => $user->id ,
                          'month' => $this->month,
                         'year' => $this->year,
+                        'user_agency_id' => $user->agency_id,
                     ],
                     [
                         'agency_sallary' => 0,
                         'sallary' => 0,
-                        'user_agency_id' => $user->agency_id,
                         'achieved_hours' =>   $hours,
                         'achieved_days' =>  $days,
                         'achieved_diamond' =>  $month_received,
                         'app_profit' => 0,
                         'dB' =>  0,
                         'diamond' => $month_received . ' / ' . 0,
-                        'target_diamonds'     => 0,
                         'target_diamonds'     => 0,
                         'remaining_diamond'   => ($month_received -  0),
                     ]

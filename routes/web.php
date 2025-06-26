@@ -369,7 +369,8 @@ Route::get('/update-user-sallary', function () {
                             }
                         } catch (\Throwable $e) {
 
-                            $this->error("Failed user ID {$user->id}");
+                            return response()->json($e->getMessage());
+
                         }
                     // }
                 }
