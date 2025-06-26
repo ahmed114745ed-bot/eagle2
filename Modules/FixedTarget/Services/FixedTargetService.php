@@ -269,7 +269,7 @@ class FixedTargetService
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
             
-
+\Log::inf('$target',['$target'=>$target]);
             if ($target) {
                 $hours = 0;
                 $days  = 0;
