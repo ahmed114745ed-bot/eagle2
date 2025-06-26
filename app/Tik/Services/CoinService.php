@@ -63,7 +63,7 @@ class CoinService
             ];
             if ($paymentMethod == 'strip') {
                 $stripe_test_secret_key = config('stripe.test_secret_key');
-                $is_stripe_active = config('is_stripe_active');
+                $is_stripe_active = config('is_strip_active');
                 $stripe_currency = config('stripe.currency');
                 $stripe_webhook_secret = config('stripe.webhook_secret');
 
@@ -94,7 +94,7 @@ class CoinService
                 }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } elseif ($paymentMethod == 'utd_fawry') {
-                $Active = config('is_utdFawry_active');
+                $Active = config('is_utd_fawry_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $oldFawryService = new FawryPaymentService();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "expenses"];
