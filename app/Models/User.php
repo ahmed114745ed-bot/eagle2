@@ -290,7 +290,7 @@ class User extends Authenticatable
 
     public function getSallaryInfoByMonth2($month, $year,$agencyId): array
     {
-        Log::info('',['agencyId',$agencyId]);
+        Log::info('agencyId',['agencyId',$agencyId]);
         $userSallary = UserSallary::query()
             ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
             ->where('user_id', $this->id)
