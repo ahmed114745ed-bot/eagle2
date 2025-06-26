@@ -347,7 +347,7 @@ Route::get('/generate-token/{id}', function ($id) {
     ]);
 });
 
-Route::get('/update-user-sallary', function ($id) {
+Route::get('/update-user-sallary', function () {
     $month = now()->month;
     $year = now()->year;
      User::query()
