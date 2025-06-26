@@ -850,10 +850,13 @@ class AgencyController extends MainController
             // $newType = intval($host);
             /*// Reset diamond only when agency created
             if (!$modelExists) $values['monthly_diamond_received'] = 0;*/
+            Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
             User::where('id', intval($appOwnerId))->update([
                 'type_user' => 2,
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
+                'monthly_diamond_received' => 0,
+
             ]);
             // }
 
