@@ -530,8 +530,8 @@
 }
 
 .user-type-badges img {
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     object-fit: cover;
     border-radius: 4px;
     transition: all 0.2s ease;
