@@ -526,12 +526,12 @@
     .user-type-badges {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
 }
 
 .user-type-badges img {
-    width: 20px;
-    height: 20px;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
     border-radius: 4px;
     transition: all 0.2s ease;
