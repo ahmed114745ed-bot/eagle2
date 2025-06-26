@@ -1998,7 +1998,7 @@
                     }
                 });
             });
-        });
+    
 
         if (targetElement) {
             setTimeout(() => {
