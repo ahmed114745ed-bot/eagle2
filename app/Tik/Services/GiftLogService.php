@@ -132,8 +132,12 @@ class GiftLogService
 
 
         $realPrice = (int)($number * $gift->price);
+        //  Log::info('realPrice',['realPrice' =>$realPrice]);
 
         $price = ceil($realPrice);
+        
+        // Log::info('price',['price' =>$price]);
+
         $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
 
         foreach ($receivedUsers as $receivedUser) {

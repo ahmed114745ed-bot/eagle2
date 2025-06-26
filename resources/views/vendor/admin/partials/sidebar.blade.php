@@ -87,7 +87,9 @@
                 @foreach($bdLinks as $link)
                     <li>
                         <a href="{{  bd_url($link['uri']) }}">
+
                             <i class="fa {{ $link['icon'] }}"></i>
+                            
                             <span>{{ $link['title'] }}</span>
                         </a>
                     </li>

@@ -24,7 +24,7 @@ public function calculateMonthlyDiamondReceived()
         ->select('id', 'agency_id')
         ->whereNotNull('agency_id')
         ->where('agency_id', '>', 0)
-        ->where('type_user', 1) 
+        ->whereIn('type_user', [1,2]) 
         ->get();
 
     foreach ($users as $user) {
@@ -42,7 +42,7 @@ public function calculateMonthlyDiamondReceived()
         $totalReceived = DB::table('gift_logs')
         ->where('receiver_id', $user->id)
         ->where('created_at', '>=', $startDate)
-        ->selectRaw('SUM(giftPrice * giftNum) as total')
+        ->selectRaw('SUM(giftPrice) as total')
         ->value('total');
 
         // تحديث جدول users

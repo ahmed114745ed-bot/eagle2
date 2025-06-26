@@ -59,7 +59,7 @@ Route::group(
         ],
         'as' => 'bd.',
     ],
-    function () {
+    function () { 
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/charges', [\App\Bd\Controllers\ChargeController::class, 'index'])->name('charges');
         Route::resource('/agencies', AgencyController::class);

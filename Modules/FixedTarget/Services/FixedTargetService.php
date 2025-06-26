@@ -177,6 +177,7 @@ class FixedTargetService
         logger('agency_usd Achieved:', [$agency_usd]);
         logger('percentageAchieved Achieved:', [$percentageAchieved]);
         logger(' Achieved:', [$agency_usd * $percentageAchieved]);
+        logger(' Achieved: user', [ $t]);
 
         try {
             $values = [
@@ -266,10 +267,12 @@ class FixedTargetService
      */
     public function calculateRegularTarget($month_received, User $user): User
     {
+        \Log::info('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
             
-
+            \Log::info('$target',['$target'=>$target]);
+            \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
                 $hours = 0;
                 $days  = 0;

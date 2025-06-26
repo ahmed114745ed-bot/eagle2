@@ -3,7 +3,7 @@
 return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'], // Restrict to relevant paths
     'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Define methods explicitly
-    'allowed_origins' => ['https://event.utdsoftware.com','https://event-test.utdsoftware.com','https://event.moon-light.sbs'], // Specify frontend origin
+    'allowed_origins' => ['https://event.utdsoftware.com','https://event-test.utdsoftware.com','https://event.zionlive.store'], // Specify frontend origin
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'X-Localization', '*'], // Limit headers
     'exposed_headers' => [],

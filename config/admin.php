@@ -318,6 +318,8 @@ return [
     */
     'skin' => env('ADMIN_SKIN', 'skin-black-light'),
 
+    'secure' => env('ADMIN_HTTPS', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application layout

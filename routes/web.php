@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ExportController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -8,6 +9,7 @@ use App\Models\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Carbon;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomSettings;
@@ -22,7 +24,7 @@ use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\ConfigController as ControllersConfigController;
-
+use Modules\FixedTarget\Services\FixedTargetService;
 
 /*
 |--------------------------------------------------------------------------
@@ -345,6 +347,41 @@ Route::get('/generate-token/{id}', function ($id) {
     ]);
 });
 
+Route::get('/update-user-sallary', function ($id) {
+    $month = now()->month;
+    $year = now()->year;
+     User::query()
+            ->where('agency_id', '!=', 0)
+            ->where('salary_is_updated', 1)
+            ->where('type_user', '!=', 0)
+            ->chunk(500, function ($users) use($month, $year){
+                foreach ($users as $user) {
+                    $cacheKey = 'cache-data-mystore-' . $user->id;
+
+                    if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
+                        try {
+                            $app_feature = Cache::get('host_agency');
+                            
+                            if ($app_feature) {
+
+                                $targetService = new FixedTargetService($user, month: $month, year: $year);
+                                $targetService->calculateTarget();
+                            }
+
+                            $this->info("User ID {$user->id} processed.");
+                        } catch (\Throwable $e) {
+                           
+                            $this->error("Failed user ID {$user->id}");
+                        }
+                    }
+                }
+            });
+});
+
 
 Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
 
+Route::get('/charge-agency-export-report', [
+    ExportController::class,
+    'chargeAgencies'
+])->name('charge-agency-export-report');

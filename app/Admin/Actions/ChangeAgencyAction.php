@@ -22,7 +22,7 @@ use Illuminate\Validation\ValidationException;
 class ChangeAgencyAction extends RowAction
 {
     public $name;
-    
+
     public $id;
 
     public function __construct($id = 0)
@@ -37,7 +37,7 @@ class ChangeAgencyAction extends RowAction
     public function handle(Model $model, Request $request)
     {
        $agencyOwner= Agency::query()->where('owner_id', $request->id)->orWhere('app_owner_id', $request->id)->exists();
-       if($agencyOwner)throw ValidationException::withMessages(['error' => __('This User is the host Of agency can\'t delete it')]);
+       if($agencyOwner)throw ValidationException::withMessages(['error' => __('This user is the agency owner and cannot be deleted')]);
         $user = User::find($request->id);
         $user->agency_id = $request->agency_id;
         $user->save();

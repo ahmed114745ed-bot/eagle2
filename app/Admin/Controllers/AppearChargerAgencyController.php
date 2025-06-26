@@ -292,6 +292,10 @@ class AppearChargerAgencyController extends MainController
             }
             $actions->disableDelete();
         });
+        $grid->disableExport();
+        $grid->tools(function (Grid\Tools $tools) {
+            $tools->append('<a href="' . route('charge-agency-export-report', ['month' => request('month'), 'year' => request()->year, 'agency_id' => request()->id]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+        });
 
         return $grid;
     }
@@ -436,22 +440,22 @@ class AppearChargerAgencyController extends MainController
             }
         });
 
-        $form->saved(function (Form $form) {
-            $checkAgencyUser = UsersJoinedAgency::where([
-                'user_id' => $form->model()->app_owner_id,
-                'agency_id' => $form->model()->id,
-                'type' => 1,
-            ])->whereNull('leave_date')->exists();
+        // $form->saved(function (Form $form) {
+        //     $checkAgencyUser = UsersJoinedAgency::where([
+        //         'user_id' => $form->model()->app_owner_id,
+        //         'agency_id' => $form->model()->id,
+        //         'type' => 1,
+        //     ])->whereNull('leave_date')->exists();
 
-            if (!$checkAgencyUser) {
-                UsersJoinedAgency::create([
-                    'user_id' => $form->model()->app_owner_id,
-                    'agency_id' => $form->model()->id,
-                    'type' => 1,
-                    'join_date' => now(),
-                ]);
-            }
-        });
+        //     if (!$checkAgencyUser) {
+        //         UsersJoinedAgency::create([
+        //             'user_id' => $form->model()->app_owner_id,
+        //             'agency_id' => $form->model()->id,
+        //             'type' => 1,
+        //             'join_date' => now(),
+        //         ]);
+        //     }
+        // });
 
         return $form;
     }

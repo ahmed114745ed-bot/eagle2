@@ -61,7 +61,7 @@ class MicService
         $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
         if (!$room)  throw new Exception(__('room does not exist'));
 
-        // 
+        //
         $position = $data['position']; // mic index
         $mic_arr = explode(',', $room->microphone);
         $main_mic = explode(',', $room->main_microphone);
@@ -102,11 +102,11 @@ class MicService
 
         $mic = implode(',', $base_mic);
 
-        \Log::info('shami test go_microphone_hand', [
-            'microphoneold' => $mic_arr,
-            '$room->microphone_only_users' => $room->microphone_only_users,
-            'mic' => $mic,
-        ]);
+        // \Log::info('shami test go_microphone_hand', [
+        //     'microphoneold' => $mic_arr,
+        //     '$room->microphone_only_users' => $room->microphone_only_users,
+        //     'mic' => $mic,
+        // ]);
         $this->updateMicAndPK($room, $mic);
         //Remove mic sequence
         Common::delMicHand($user->id);
@@ -296,7 +296,7 @@ class MicService
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
-          Log::info('goMicrophoneHand',['goMicrophoneHand'=> $microphone]);
+        //   Log::info('goMicrophoneHand',['goMicrophoneHand'=> $original]);
         if (!$microphone || !in_array($user->id, $microphone)) {
             return 0;
         }
@@ -323,10 +323,10 @@ class MicService
                 $final[] = '0';
             }
         }
-        Log::info('goMicrophoneHand',['final'=> $final]);
 
         // Save to DB
         $result = implode(',', $final);
+        // Log::info('goMicrophoneHand',['final'=> $result]);
         $this->updateMicAndPK($room, $result);
 
         // Clear mic timer and leave CP
@@ -369,7 +369,7 @@ class MicService
         }
 
 
-        $microphone = $room->microphone_only_users;
+        $microphone = $room->getOriginal('microphone');
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);

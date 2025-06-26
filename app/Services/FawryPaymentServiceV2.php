@@ -59,7 +59,7 @@ class FawryPaymentServiceV2
                     "quantity"=> $qty,
                 ]
             ],
-            "returnUrl"=> self::redirect_if_payment_success ($trx),
+            "returnUrl"=> self::redirect_if_payment_success($trx),
             "signature"=> $signature
 
         ];

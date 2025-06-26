@@ -39,10 +39,28 @@ class AgencySettingsController extends MainController
         $moments =  Common::getSettingValue('moments') ?? 0;
         $reels = Common::getSettingValue('reels') ?? 0;
         $diamonds = Common::getSettingValue('diamonds');
+        $transfer_salary = settings()->get('transfer_salary');
+        $stop_invite_code = settings()->get('stop_invite_code');
+        $stop_charge = settings()->get('stop_charge');
+        $make_rooms_top = settings()->get('make_rooms_top');
+        $make_gift_top = settings()->get('close_open_gifts');
         $languages = Language::all();
         $configAll = Config::all();
         return parent::index($content
-            ->view('agency_settings', compact('hours', 'days', 'moments', 'reels', 'diamonds', 'languages', 'configAll')));
+            ->view('agency_settings', compact(
+                'hours',
+                'days',
+                'moments',
+                'reels',
+                'diamonds',
+                'languages',
+                'configAll',
+                'transfer_salary',
+                'stop_invite_code',
+                'stop_charge',
+                'make_rooms_top',
+                'make_gift_top',
+            )));
     }
 
     public function badges()

@@ -6,10 +6,12 @@ use App\Helpers\Common;
 use App\Models\CoinLog;
 use App\Models\GameWallet;
 use App\Traits\User\PaymentTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\GameChargeHistory;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentMethodHistory;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
 class PaymentMethodController extends Controller
@@ -73,7 +75,6 @@ class PaymentMethodController extends Controller
     public function utdCallback(Request $request)
     {
         $callbackData = $request->all();
-        info($callbackData);
         $fawryRefNumber = $callbackData['fawryRefNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
@@ -98,5 +99,18 @@ class PaymentMethodController extends Controller
         $order->save();
 
         return response()->json(['status' => 'error', 'message' => 'Payment status is invalid or failed.',],400);
+    }
+
+    public function success(Request $request): JsonResponse
+    {
+        $query = Arr::only($request->query(), [
+            'statusCode',
+            'statusDescription',
+        ]);
+
+        return response()->json([
+            'status'     => $query['statusCode'] ?? 'unknown',
+            'message'    => $query['statusDescription'] ?? '',
+        ]);
     }
 }

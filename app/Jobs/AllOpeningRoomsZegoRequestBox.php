@@ -14,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 
 
-class AllOpeningRoomsZegoRequest implements ShouldQueue
+class AllOpeningRoomsZegoRequestBox implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

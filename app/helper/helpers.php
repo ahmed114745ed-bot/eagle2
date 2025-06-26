@@ -666,11 +666,10 @@ if (!function_exists('getToday')) {
                 return $path;
             }
 
-            // حدد base path الخاص بوحدة BD
             $base = trim(config('bd.route.prefix', 'bd'), '/');
 
-            $secure = $secure ?? (config('bd.https') || config('bd.secure'));
+            // $secure = $secure ?? (config('bd.https') || config('bd.secure'));
 
-            return secure_url($base . '/' . trim($path, '/'), $parameters, $secure);
+            return secure_url($base . '/' . trim($path, '/'), $parameters);
         }
 }

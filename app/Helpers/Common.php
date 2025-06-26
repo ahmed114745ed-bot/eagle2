@@ -1098,7 +1098,7 @@ class Common
                 ];
             }
             return $client->messages->create(
-                // Where to send a text message (your cell phone?)
+            // Where to send a text message (your cell phone?)
                 $phone,
                 $arr
             );
@@ -1491,6 +1491,7 @@ class Common
             'type' => 1,
         ])->where('leave_date', null)->first();
         $agencyUserJoined->leave_date = now();
+        $agencyUserJoined->status = 'from admin';
         $agencyUserJoined->save();
         $checkAgencyUser = UsersJoinedAgency::where([
             'user_id' => $newOwnerId,
@@ -1503,6 +1504,7 @@ class Common
                 'agency_id' =>  $agencyId,
                 'type' => 1,
                 'join_date' => now(),
+                'status' => 'Joined'
             ]);
         }
         return true;

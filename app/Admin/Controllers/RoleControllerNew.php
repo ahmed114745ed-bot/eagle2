@@ -79,12 +79,12 @@ class RoleControllerNew extends MainController
             </a>';
         });
 
-        // $grid->column('permissions', trans('admin.permission'))->pluck('name')->take(7)->label();
-        $grid->column('permissions', trans('admin.permission'))->display(function ($permissions) {
-            return collect($permissions)->pluck('name')->take(7)->map(function ($name) {
-                return __($name);
-            });
-        })->label();
+        $grid->column('permissions', trans('admin.permission'))->pluck('name')->take(7)->label();
+        // $grid->column('permissions', trans('admin.permission'))->display(function ($permissions) {
+        //     return collect($permissions)->pluck('name')->take(7)->map(function ($name) {
+        //         return __($name);
+        //     });
+        // })->label();
         $grid->column('created_at', trans('admin.created_at'));
         $grid->column('updated_at', trans('admin.updated_at'));
 
