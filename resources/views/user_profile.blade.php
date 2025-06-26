@@ -1133,7 +1133,12 @@
                 <div class="agency-meta">
                     <div class="meta-item">
                         <span class="meta-label">{{ __('diamonds') }}:</span>
-                        <span class="meta-value">{{ @$user->getTotalDiamond() }}</span>
+                        @php
+
+                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->getTotalDiamond() ;
+
+                        @endphp
+                        <span class="meta-value">{{ @$user_diamonds }}</span>
 
                     </div>
                     <div class="meta-item">
@@ -1143,7 +1148,10 @@
                     <div class="meta-item">
                         <span class="meta-label">{{__('type')}}:</span>
                         <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
-                        <img src="{{getImagePath( @$user->userTypeBadge())  }}" alt="" class="logo-img">
+                     
+                   {!! @$user->userTypeBadge() !!}
+
+                        
 
                     </div>
 
@@ -1970,13 +1978,25 @@
             }
 
             tab.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.getElementById('tab-loading').style.display = 'block';
-                allTabs.forEach(t => t.style.pointerEvents = 'none');
-                const href = tab.getAttribute('href');
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 300);
+                    e.preventDefault();
+
+                    const currentUrl = new URL(window.location.href);
+                    const href = tab.getAttribute('href');
+                    const targetUrl = new URL(href, currentUrl.origin);
+
+                    // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
+                    if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
+                        document.getElementById('tab-loading').style.display = 'block';
+                        allTabs.forEach(t => t.style.pointerEvents = 'none');
+
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 300);
+                    } else {
+                        // لا تعرض اللودر إذا الرابط خارج التابات
+                        window.location.href = href;
+                    }
+                });
             });
         });
 
