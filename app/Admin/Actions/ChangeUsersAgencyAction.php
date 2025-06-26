@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 class ChangeUsersAgencyAction extends RowAction
 {
     public $name;
-    
+
     public $id;
 
     public function __construct($id = 0)
@@ -30,7 +30,7 @@ class ChangeUsersAgencyAction extends RowAction
      */
     public function handle(Model $model, Request $request)
     {
-       
+
        $users = User::where('agency_id',$request->old_agency_id)->where('type_user',1)->get();
        $checkAgencyUser = UsersJoinedAgency::where([
 
@@ -88,13 +88,13 @@ class ChangeUsersAgencyAction extends RowAction
     public function html()
     {
         return '<a href="javascript:void(0);" onclick="pu('.$this->id.')" ></a>
-<script>
+            <script>
 
-function pu(val) {
+            function pu(val) {
 
-  $("#vid").val(val)
-}
-</script>
-';
+              $("#vid").val(val)
+            }
+            </script>
+            ';
     }
 }
