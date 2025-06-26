@@ -1034,7 +1034,15 @@
 "image_type": "image type",
 "pack_not_found": "pack not found",
 "level_num":"level number",
-  "room_closed": "The room is closed, please contact the supervisor."
+  "room_closed": "The room is closed, please contact the supervisor.",
+  "ID": "ID",
+  "Agency Name": "Agency Name",
+  "Owner Name": "Owner Name",
+  "Owner UUID": "Owner UUID",
+  "Owner Phone": "Owner Phone",
+  "Charge Agency_": "Charge Agency",
+  "Appear Charger Agency": "Appear Charger Agency",
+  "Is Frozen": "Is Frozen"
 
 
 
