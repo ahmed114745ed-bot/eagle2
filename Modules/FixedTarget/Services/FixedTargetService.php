@@ -266,12 +266,12 @@ class FixedTargetService
      */
     public function calculateRegularTarget($month_received, User $user): User
     {
-        \Log::inf('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
+        \Log::info('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
             
-            \Log::inf('$target',['$target'=>$target]);
-            \Log::inf('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
+            \Log::info('$target',['$target'=>$target]);
+            \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
                 $hours = 0;
                 $days  = 0;
