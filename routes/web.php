@@ -361,14 +361,14 @@ Route::get('/update-user-sallary', function () {
                     // if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
                         try {
                             $app_feature = Cache::get('host_agency');
-                            
+
                             if ($app_feature) {
 
-                                $targetService = new FixedTargetService($user, month: $month, year: $year);
+                                $targetService = new FixedTargetService($user);
                                 $targetService->calculateTarget();
                             }
                         } catch (\Throwable $e) {
-                           
+
                             $this->error("Failed user ID {$user->id}");
                         }
                     // }
