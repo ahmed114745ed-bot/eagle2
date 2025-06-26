@@ -64,11 +64,13 @@ class UpdateUserWhenSendGift
         }
 
         $values['received_level'] = $receivedUser->received_level;
+        \Log::info('receivedUser',['receivedUser->id' =>$receivedUser->id]);
 
         User::where('id', $receivedUser->id)->lockForUpdate()
             ->update($values);
         $receivedUser->save();
         $receivedUser->enableSaving = true;
+        \Log::info('receivedUser',['receivedUser' =>$receivedUser]);
 
 
         return $receivedUser;
