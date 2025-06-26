@@ -190,10 +190,7 @@ trait RoomTrait
         $mainMicrophone = $room->main_microphone;
         // $baseMic = $room->microphone_only_users;
         $baseMic = $room->getOriginal('microphone');
-        \Log::info('shami test quit_room', [
-            'baseMic' => $baseMic,
-            '$room->microphone_only_users' => $room->microphone_only_users,
-        ]);
+ 
 
 
         $microphone = explode(',', $microphone);
@@ -213,9 +210,6 @@ trait RoomTrait
             $baseMic[$position] = $mainMicrophone[$position];
         }
 
-        \Log::info('shami test quit_room', [
-            'microphone' => $microphone
-        ]);
 
         $result = DB::table('rooms')->where('uid',$uid)->update(['microphone'=>implode(',', $baseMic)]);
         $room = Room::query ()->where ('uid',$uid)->first ();
