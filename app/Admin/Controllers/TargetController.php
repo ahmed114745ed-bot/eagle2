@@ -396,7 +396,7 @@ class TargetController extends MainController
 
                 calculateUsdAmount();
             });
-            
+
         </script>');
         $form->html('<h1>' . __('days and hours') . '</h1>');
 
@@ -446,11 +446,11 @@ class TargetController extends MainController
 
             return @explode(',', $moment)[2] ?? 0;
         });
-      
+
         $form->editing(function (Form $form) {
-            
+
             $target = Target::find($form->model()->id);
-        
+
             if ($target) {
                 $users = User::where('monthly_diamond_received', '>=', $target->diamonds)->count();
                 if ($users > 0) {
@@ -476,7 +476,7 @@ class TargetController extends MainController
                 </script>
                 HTML);
 
-        
+
         $form->saving(function (Form $form) {
             // if ($form->isEditing()) {
             //     $original = $form->model();
@@ -610,7 +610,6 @@ class TargetController extends MainController
 
             return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
         } catch (\Exception $e) {
-            info($e->getMessage());
             return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
     }

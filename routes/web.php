@@ -345,3 +345,7 @@ Route::get('/generate-token/{id}', function ($id) {
         'user' => $user
     ]);
 });
+
+
+Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+

@@ -419,6 +419,7 @@ return [
     'paymob_accept' => 'بيموب أكسبت',
     'flutterwave'   => 'فلتر ويف',
     'paystack'      => 'باي ستاك',
+    'utdFawry'      => 'UTD دفع',
     'sslcommerz'    => 'إس إس إل كمرز',
     'google_pay'    => 'جوجل باي',
     'huawei_pay' => 'هواوي باي',

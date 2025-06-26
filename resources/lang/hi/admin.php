@@ -183,6 +183,7 @@ return [
     'app_sign' => 'ऐप हस्ताक्षर',
 
     "fawry" => 'फॉवरी',
+    "utdFawry" => 'Utd Fawry',
     "merchant_code" => 'व्यापारी कोड',
     "utd_url" => 'UTD यूआरएल',
     "return_url" => 'वापसी यूआरएल',

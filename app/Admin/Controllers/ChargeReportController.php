@@ -89,8 +89,8 @@ class ChargeReportController extends MainController
     protected function result()
     {
         $charger_type = "";
-        if (request("name") == "app") {
-            $charger_type = "app";
+        if (request("name") == "shipping-agency-activity") {
+            $charger_type = "shipping-agency-activity";
         } elseif (request("name") == "host") {
             $charger_type = "host";
         } else {
@@ -109,122 +109,94 @@ class ChargeReportController extends MainController
         } else {
             $grid->model()->where('charger_type', 'agency');
         }
+        if ($charger_type == "shipping-agency-activity") {
+            $grid->filter(function (Grid\Filter $filter) {
 
-        $grid->filter(function (Grid\Filter $filter) {
+                if (!request()->has('filter_type')) {
+                    request()->merge(['filter_type' => 'shipping']);
+                }
+                $filter->disableIdFilter();
+                $filter->expand();
 
-            if (!request()->has('filter_type')) {
-                request()->merge(['filter_type' => 'shipping']);
-            }
-            $filter->disableIdFilter();
-            $filter->expand();
+                $filter->column(1 / 4, function ($filter) {
+                    $filter->where(function () {}, __('Type'), 'filter_type')
+                        ->select([
+                            'user'     => 'User',
+                            'shipping' => 'Shipping Agency',
+                        ])->default('shipping');
+                });
 
-            $filter->column(1 / 4, function ($filter) {
-                $filter->where(function () {}, __('Type'), 'filter_type')
-                    ->select([
-                        'user'     => 'User',
-                        'shipping' => 'Shipping Agency',
-                    ])->default('shipping');
-            });
+                $filter->column(3 / 4, function ($filter) {
+                    $filter->where(function ($query) {
+                        $type  = request('filter_type');
+                        $value = trim($this->input);
 
-            $filter->column(3 / 4, function ($filter) {
-                $filter->where(function ($query) {
-                    $type  = request('filter_type');
-                    $value = trim($this->input);
+                        if ($type === 'user') {
+                            $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value))
+                                ->orWhereHas('receiverUser', fn($q) => $q->where('uuid', $value));
+                        } elseif ($type === 'shipping') {
+                            $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value))
+                                ->orWhereHas('shippingAgency', fn($q) => $q->where('id', $value));
+                        }
+                    }, __('Dynamic Sender/Receiver Filter'));
+                });
 
-                    if ($type === 'user') {
-                        $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value))
-                            ->orWhereHas('receiverUser', fn($q) => $q->where('uuid', $value));
-                    } elseif ($type === 'shipping') {
-                        $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value))
-                            ->orWhereHas('shippingAgency', fn($q) => $q->where('id', $value));
-                    }
-                }, __('Dynamic Sender/Receiver Filter'));
-            });
+                $filter->column(1 / 4, function ($filter) {
+                    $filter->where(function () {}, __('sender type'), 'sender_type')
+                        ->select([
+                            'user'     => 'User',
+                            'shipping' => 'Shipping Agency',
+                        ])->default('shipping');
+                });
 
-            $filter->column(1 / 4, function ($filter) {
-                $filter->where(function () {}, __('sender type'), 'sender_type')
-                    ->select([
-                        'user'     => 'User',
-                        'shipping' => 'Shipping Agency',
-                    ])->default('shipping');
-            });
+                $filter->column(3 / 4, function ($filter) {
+                    $filter->where(function ($query) {
+                        $type  = request('sender_type');
+                        $value = trim($this->input);
 
-            $filter->column(3 / 4, function ($filter) {
-                $filter->where(function ($query) {
-                    $type  = request('sender_type');
-                    $value = trim($this->input);
+                        if ($type === 'user') {
+                            $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value));
+                        } elseif ($type === 'shipping') {
+                            $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value));
+                        }
+                    }, __('Sender UUID or Shipping Agency ID'));
+                });
 
-                    if ($type === 'user') {
-                        $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value));
-                    } elseif ($type === 'shipping') {
-                        $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value));
-                    }
-                }, __('Sender UUID or Shipping Agency ID'));
-            });
-            $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     $from = request('from_date');
-                // }, __('From Date'), 'from_date')->date();
-            });
+                $filter->column(1 / 4, function ($filter) {
+                    $filter->where(function () {}, __('receiver type'), 'receiver_type')
+                        ->select([
+                            'user'     => 'User',
+                            'shipping' => 'Shipping Agency',
+                        ])->default('shipping');
+                });
 
-            $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     $to = request('to_date');
-                // }, __('To Date'), 'to_date')->date();
-            });
-            $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     $to = request('to_date');
-                // }, __('To Date'), 'to_date')->date();
-            });
-             $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     $to = request('to_date');
-                // }, __('To Date'), 'to_date')->date();
-            });
-            $filter->column(1 / 4, function ($filter) {
-                $filter->where(function () {}, __('receiver type'), 'receiver_type')
-                    ->select([
-                        'user'     => 'User',
-                        'shipping' => 'Shipping Agency',
-                    ])->default('shipping');
-            });
+                $filter->column(3 / 4, function ($filter) {
+                    $filter->where(function ($query) {
+                        $type  = request('receiver_type');
+                        $value = trim($this->input);
 
-            $filter->column(3 / 4, function ($filter) {
-                $filter->where(function ($query) {
-                    $type  = request('receiver_type');
-                    $value = trim($this->input);
+                        if ($type === 'user') {
+                            $query->whereHas('receiverUser', fn($q) => $q->where('uuid', $value));
+                        } elseif ($type === 'shipping') {
+                            $query->whereHas('shippingAgency', fn($q) => $q->where('id', $value));
+                        }
+                    }, __('Receiver UUID or Shipping Agency ID'));
+                });
 
-                    if ($type === 'user') {
-                        $query->whereHas('receiverUser', fn($q) => $q->where('uuid', $value));
-                    } elseif ($type === 'shipping') {
-                        $query->whereHas('shippingAgency', fn($q) => $q->where('id', $value));
-                    }
-                }, __('Receiver UUID or Shipping Agency ID'));
-            });
-             $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     $to = request('to_date');
-                // }, __('To Date'), 'to_date')->date();
-            });
-            $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     $to = request('to_date');
-                // }, __('To Date'), 'to_date')->date();
-            });
 
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $from = request('from_date');
-                }, __('From Date'), 'from_date')->date();
-            });
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        $from = request('from_date');
+                    }, __('From Date'), 'from_date')->date();
+                });
 
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $to = request('to_date');
-                }, __('To Date'), 'to_date')->date();
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        $to = request('to_date');
+                    }, __('To Date'), 'to_date')->date();
+                });
             });
-        });
+        }
 
         Admin::style("
             @media (min-width: 992px) {
@@ -245,8 +217,18 @@ class ChargeReportController extends MainController
         });
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
-
+            
             $sender = Common::getChargerInfo($this);
+            if (empty($sender['name']) && empty($sender['uuid'])) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
+
             $name = $sender['name'];
             $uuid = $sender['uuid'];
             $path = $sender['image'];
@@ -258,9 +240,13 @@ class ChargeReportController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
 
+            $imageStyle = $this->charger_type == 'agency'
+                ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'     // rectangle
+                : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
+            $image = "<img src='{$url}' alt='User Image' style='{$imageStyle}'>";
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -275,10 +261,20 @@ class ChargeReportController extends MainController
             ";
         });
         $grid->column('user_id', __('recipient'))->display(function ($recever) {
+
             // $name =  $this->receiver->name ?? '';
             // $uid = @$this->receiver->uuid ?? 0;
             // $path = @$this->receiver?->profile?->avatar;
             $sender = Common::getReceiverInfo($this);
+            if (empty($sender['name']) && empty($sender['uuid'])) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
             $name = $sender['name'];
             $uid = $sender['uuid'];
             $path = $sender['image'];
@@ -289,7 +285,11 @@ class ChargeReportController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            //  $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $imageStyle = $this->user_type == 'agency'
+                ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'     // rectangle
+                : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
+            $image = "<img src='{$url}' alt='User Image' style='{$imageStyle}'>";
 
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
@@ -354,7 +354,7 @@ class ChargeReportController extends MainController
                             <img src='{$image}' alt='USD' width='20' height='20'>
                         </div>";
                 });
-        } elseif ((request("name") == "host") || (request("name") == "app")) {
+        } elseif ((request("name") == "host") || (request("name") == "shipping-agency-activity")) {
             $grid->column('amount', __('amount'))->display(function ($coin) {
                 $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
                 return "
@@ -423,6 +423,15 @@ class ChargeReportController extends MainController
 
         $grid->column('id', __('transaction id'));
         $grid->column('user_id', __('charger'))->display(function ($recever) {
+            if (!$this->user) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
             $name =  $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
             $path = @$this->user?->profile?->avatar;
@@ -515,6 +524,15 @@ class ChargeReportController extends MainController
         $grid->quickSearch();
         $grid->column('id', __('id'));
         $grid->column('user_id', __('charger'))->display(function ($recever) {
+            if (!$this->user) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
             $name =  $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
             $path = @$this->user?->profile?->avatar;
@@ -598,6 +616,15 @@ class ChargeReportController extends MainController
         $grid->quickSearch();
         $grid->column('id', __('id'));
         $grid->column('user_id', __('charger'))->display(function ($recever) {
+            if (!$this->user) {
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                   
+                            <span style=' cursor: pointer;'>Unknown </span>
+                        
+                </div>
+            ";
+            }
             $name =  $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
             $path = @$this->user?->profile?->avatar;

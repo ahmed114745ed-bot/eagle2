@@ -68,6 +68,7 @@ Route::group(
         // Route::resource('/wallet', 'WalletController');
         Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
         Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+        Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
 
         Route::resource('/request-agencies', RequestAgencyController::class);
     }
