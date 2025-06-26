@@ -288,6 +288,69 @@
             grid-template-columns: 1fr;
         }
     }
+
+    .switch-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        margin-top: 16px;
+    }
+
+    .switch-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        margin-right: 20px;
+    }
+
+    .switch-label {
+        margin-left: 10px;
+        font-weight: 500;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+    .switch input {
+        display: none;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #00e6c3;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -302,7 +365,7 @@
                     style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Percentage target') }}</button>
                 <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
                 <button onclick="showSection('user_days')">{{ __('user days') }}</button>
-
+                <button onclick="showSection('agency_settings')">{{ __('Agency Settings') }}</button>
             </div>
         </div>
 
@@ -353,13 +416,14 @@
                 <div class="form">
                     <label>{{ __('Hours:') }} </label>
                     <input type="text" name="hours_days" value="{{ Cache::get('hours_days') }}" class="form-control">
-                  
+
                     <button type="submit">{{ __('Save') }}</button>
 
                 </div>
 
             </form>
             </div>
+
             <div id="Badges" class="settings-section">
                 <h3>{{ __('Badges') }}</h3>
 
@@ -462,7 +526,7 @@
                                                            name="{{ $inputName }}"
                                                            onchange="previewImage(this, 'preview_{{ $inputName }}')"
                                                            style="display: block; width: 100%; max-width: 200px;">
-                                                       
+
                                                     <div class="badge-preview" style="margin-top: 5px;">
                                                         @if ($row)
                                                             <img id="preview_{{ $inputName }}"
@@ -491,16 +555,56 @@
                 @endforeach
             </div>
 
-        </div>
+            <div id="agency_settings" class="settings-section ">
 
-        
+                <form id="agency_settings-form">
+                    <div class="switch-container mt-4">
+                        <div class="switch-item">
+                            <label for="stopCharge" class="switch-label">{{ __('dashboard.frazeCharge') }}</label>
+                            <label class="switch">
+                                <input type="checkbox" id="stopCharge" {{ $stop_charge == 1 ? 'checked' : '' }}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="switch-container mt-4">
+                        <div class="switch-item">
+                            <label for="stopInviteCode" class="switch-label">{{ __("dashboard.closeCose") }}</label>
+                            <label class="switch">
+                                <input type="checkbox" id="stopInviteCode" {{ $stop_invite_code == 1 ? 'checked' : '' }}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="switch-container mt-4">
+                        <div class="switch-item">
+                            <label for="stopTransferSalary" class="switch-label">{{ __("dashboard.transSalary") }}</label>
+                            <label class="switch">
+                                <input type="checkbox" id="stopTransferSalary" {{ $transfer_salary == 1 ? 'checked' : '' }}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="switch-container mt-4">
+                        <div class="switch-item">
+                            <label for="stopGiftCheckbox" class="switch-label">ايقاف ارسال الهدايا للجميع</label>
+                            <label class="switch">
+                                <input type="checkbox" id="stopGiftCheckbox" {{ $make_gift_top == 1 ? 'checked' : '' }}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
         </div>
 
 
-         
+
 
         <script>
             function previewImage(input, previewId) {
@@ -567,7 +671,7 @@
                 document.querySelectorAll('.settings-section').forEach(section => {
                     section.classList.remove('active');
                 });
-            
+
                 // Add active class to the selected section
                 document.getElementById(sectionId).classList.add('active');
 
@@ -594,10 +698,10 @@
                 // if (sectionId === 'user_days') {
                 //     const EnglishTabBtn = document.querySelector('.tab-button[onclick*="en"]');
                 //     if (EnglishTabBtn) {
-                //         EnglishTabBtn.click(); 
+                //         EnglishTabBtn.click();
                 //     }
                 // }
-                
+
                 // Update the URL with the selected tab without reloading
                 const url = new URL(window.location);
                 url.searchParams.set("firsttab", sectionId);
@@ -640,6 +744,33 @@
 
                     e.target.submit();
                 });
+
+            // works even after PJAX replaces the container
+            $(document).on('change', '#stopCharge,#stopInviteCode,#stopTransferSalary,#stopGiftCheckbox', function () {
+
+                const id        = this.id;                 // which switch fired
+                const isChecked = $(this).is(':checked');
+
+                // map each id to its endpoint & data key
+                const map = {
+                    stopCharge:         ['/admin/send-request-stop-charge',  'stop_charge'],
+                    stopInviteCode:     ['/admin/send-request-invite-code',        'stop_invite_code'],
+                    stopTransferSalary: ['/admin/send-request-transfer-salary','transfer_salary'],
+                    stopGiftCheckbox:   ['/admin/close-open-gift',           'make_rooms_top'],
+                };
+
+                const [url, key] = map[id];
+
+                $.ajax({
+                    url,
+                    type: 'POST',
+                    data: { [key]: isChecked },
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+                })
+                    .done(()   => toastr.success('Saved'))   // optional toast
+                    .fail(err => toastr.error('Error'));     // optional toast
+            });
+
         </script>
     </div>
 </body>
