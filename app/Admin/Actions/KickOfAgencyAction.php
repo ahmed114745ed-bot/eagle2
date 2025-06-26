@@ -29,7 +29,7 @@ class KickOfAgencyAction extends RowAction
     public function handle(Model $model, Request $request)
     {
         if (UserHandling::checkIfUserOwnerOfAgency($model)){
-            throw ValidationException::withMessages(['error' => __('This User is the host Of agency can\'t delete it')]);
+            throw ValidationException::withMessages(['error' => __('This user is the agency owner and cannot be deleted')]);
         }
 
         UserHandling::kickUserFromAgency($model);

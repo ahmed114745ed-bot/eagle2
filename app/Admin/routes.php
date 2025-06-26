@@ -58,6 +58,7 @@ use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
+use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
@@ -184,6 +185,7 @@ Route::group(
         Route::get('profile', [AdminAuthController::class, 'index']);
         Route::resource('payment-with-method', PaymentMethodController::class);
         Route::post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
+        Route::resource('users-settings', UserSettingController::class);
 
         Route::resource('auth/users', 'AdminUserController')->names([
             'index' => 'auth.users.index',
