@@ -745,13 +745,11 @@
                     e.target.submit();
                 });
 
-            // works even after PJAX replaces the container
             $(document).on('change', '#stopCharge,#stopInviteCode,#stopTransferSalary,#stopGiftCheckbox', function () {
 
-                const id        = this.id;                 // which switch fired
+                const id        = this.id;
                 const isChecked = $(this).is(':checked');
 
-                // map each id to its endpoint & data key
                 const map = {
                     stopCharge:         ['/admin/send-request-stop-charge',  'stop_charge'],
                     stopInviteCode:     ['/admin/send-request-invite-code',        'stop_invite_code'],
@@ -767,8 +765,8 @@
                     data: { [key]: isChecked },
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
                 })
-                    .done(()   => toastr.success('Saved'))   // optional toast
-                    .fail(err => toastr.error('Error'));     // optional toast
+                    .done(()   => toastr.success('Saved'))
+                    .fail(err => toastr.error('Error'));
             });
 
         </script>
