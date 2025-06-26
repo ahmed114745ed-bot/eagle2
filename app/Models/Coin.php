@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Coin extends Model
@@ -12,8 +13,13 @@ class Coin extends Model
 
     protected $guarded = ['id'];
 
-    public function paymentGateway()
+    public function paymentGateway(): BelongsTo
     {
         return $this->belongsTo(PaymentGateway::class, 'payment_gateway_id');
+    }
+
+    public function paymentCoin(): BelongsTo
+    {
+        return $this->belongsTo(PaymentCoin::class, 'payment_gateway_id');
     }
 }

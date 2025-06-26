@@ -38,6 +38,7 @@ class CoinService
     public function buyCoins($user, $request)
     {
         $coin = $this->coinRepository->findById($request->coin_id);
+        $paymentMethod = $coin->paymentCoin->type;
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $trx = rand(111111111111111111, 999999999999999999);
         // DB::beginTransaction();
@@ -60,7 +61,7 @@ class CoinService
                 'order_id' => $log->id,
                 'user_id' => $user->id
             ];
-            if ($request->pay_method == 'strip') {
+            if ($paymentMethod == 'strip') {
                 $stripe_test_secret_key = config('stripe.test_secret_key');
                 $is_stripe_active = config('is_stripe_active');
                 $stripe_currency = config('stripe.currency');
@@ -81,7 +82,7 @@ class CoinService
                 $strip = new \App\Classes\PaymentGateways\Stripe();
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
-            } elseif ($request->pay_method == 'fawry') {
+            } elseif ($paymentMethod == 'fawry') {
                 $Active = config('is_fawry_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $newFawryService = new FawryPaymentServiceV2();
@@ -92,7 +93,7 @@ class CoinService
                     return $paymentUrl;
                 }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
-            } elseif ($request->pay_method == 'utdFawry') {
+            } elseif ($paymentMethod == 'utd_fawry') {
                 $Active = config('is_utdFawry_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $oldFawryService = new FawryPaymentService();
@@ -109,7 +110,7 @@ class CoinService
             } else if ($request->pay_method == 'zinipay') {
                 $ziniPayService = new ZiniPaymentService();
                 return $ziniPayService->makePayment($log->id, $coin->usd, $user);
-            } else if ($request->pay_method == 'paypal') {
+            } else if ($paymentMethod == 'paypal') {
                 $Active = config('is_paypal_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $paypalService = new PayPalService();
