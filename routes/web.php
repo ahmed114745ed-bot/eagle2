@@ -1,31 +1,5 @@
 <?php
 
-use App\Admin\Controllers\ExportController;
-use App\Models\Room;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Models\RoomVisitor;
-use App\Models\VipPrivilege;
-use App\Exports\AgencyCharge;
-use App\Models\DeleteAccount;
-use Illuminate\Routing\Router;
-use Illuminate\Support\Carbon;
-use App\Facades\CustomNotification;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RoomSettings;
-use App\Admin\Controllers\CoinController;
-use App\Admin\Controllers\UserController;
-use App\Http\Controllers\PaytabsController;
-use App\Http\Controllers\SettingsController;
-use Encore\Admin\Controllers\AdminController;
-use App\Http\Controllers\addTOjesonController;
-use App\Http\Controllers\Api\V2\MallController;
-use App\Http\Controllers\NowPaymentsController;
-use App\Http\Controllers\Api\V1\ConfigController;
-use App\Admin\Controllers\MangerSettingController;
-use App\Admin\Controllers\ConfigController as ControllersConfigController;
-use Modules\FixedTarget\Services\FixedTargetService;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -37,353 +11,52 @@ use Modules\FixedTarget\Services\FixedTargetService;
 |
 */
 
-Route::get('applications/{id}', [SettingsController::class, 'downloadApp']);
-
-Route::get('/now-payment', [NowPaymentsController::class, 'rechargeForm']);
-Route::post('/create-payment', [NowPaymentsController::class, 'createPayment'])->name('now_payment_create');
-// Route::get('get-avaialble-currencies', [NowPaymentsController::class, 'getCurrencies']);
-Route::get('payment-status/{payment}', [NowPaymentsController::class, 'paymentStatus']);
-Route::get('/payment-success', function () {
-    return 'Payment was successful!';
-})->name('payment.success');
-
-Route::get('/payment-cancel', function () {
-    return 'Payment was cancelled.';
-})->name('payment.cancel');
-Route::get('update-need', function () {
-
-    $two = VipPrivilege::find(2);
-    $two->en_name = 'Special frame';
-    $two->save();
-
-    $three = VipPrivilege::find(3);
-    $three->en_name = 'Get the car';
-    $three->save();
-
-    $four = VipPrivilege::find(4);
-    $four->en_name = 'Special entry effect';
-    $four->save();
-
-
-    $four = VipPrivilege::find(7);
-    $four->en_name = 'Colorful message';
-    $four->save();
-
-
-    $five = VipPrivilege::find(8);
-    $five->en_name = 'Flying comment';
-    $five->save();
-
-
-    $six = VipPrivilege::find(10);
-    $six->en_name = 'Exclusive gift';
-    $six->save();
-
-    $seven = VipPrivilege::find(11);
-    $seven->en_name = 'Prevent from being kicked';
-    $seven->save();
-
-    $eight = VipPrivilege::find(12);
-    $eight->en_name = 'Anti ban';
-    $eight->save();
-
-    $nine = VipPrivilege::find(13);
-    $nine->en_name = 'Hidden';
-    $nine->save();
-
-    $ten = VipPrivilege::find(14);
-    $ten->en_name = 'Mystery man just entered the room';
-    $ten->save();
-
-    $eleven = VipPrivilege::find(15);
-    $eleven->en_name = 'Colorful nickname';
-    $eleven->save();
-
-    $twelve = VipPrivilege::find(16);
-    $twelve->en_name = 'Hide the viewing history';
-    $twelve->save();
-});
-Route::prefix('payment')->group(function () {
-    Route::get('payment-success', [\App\Http\Controllers\Web\PaymentController::class, 'success']);
-    Route::get('payment-fail', [\App\Http\Controllers\Web\PaymentController::class, 'fail']);
-});
-Route::get("ware_image", [MallController::class, "wareImage"]);
-Route::get('/page/{name}', function ($name) {
-    $page = \App\Models\Page::query()->where('name', $name)->firstOrFail();
-    return (app()->getLocale() == 'ar' ? $page->content : ($page->content_en ?? $page->content));
-})->middleware('localization');
-
-Route::get('/clear', function () {
-
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('view:clear');
-    Artisan::call('route:clear');
-    Artisan::call('config:cache');
-    Artisan::call('view:cache');
-
-    if (config('app.env') == 'production') {
-        Artisan::call('route:cache');
-    }
-
-    return "Cleared!";
-});
-Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
-    return Excel::download(new AgencyCharge($agencyId), 'shipping_agency.xlsx');
-});
-
-
-Route::get('/clear_clear', function () {
-
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('view:clear');
-    Artisan::call('route:clear');
-
-    return "Cleared!";
-});
-
-Route::get('/seed', function () {
-
-    Artisan::call('db:seed');
-
-    return "Seeded!";
-});
-
-Route::get('/change_agencies_type_test', function () {
-
-    DB::table('agencies')
-        ->where('type', 0)
-        ->update(['type' => 1]);
-
-    return "Done!";
-});
-
-Route::get('/change_agencies_type', function () {
-
-    DB::table('agencies')
-        ->where('Shipping_agency', 1)
-        ->where('Host_agency', 0)
-        ->update(['type' => 2]);
-
-    DB::table('agencies')
-        ->where('Host_agency', 1)
-        ->update(['type' => 1]);
-
-    return "agencies types changed successfully!";
-});
-
-Route::get('/config_cache', function () {
-    return Artisan::call('config:cache');
-});
-
-Route::get('/admin/custom-export-users', [
-    \App\Admin\Controllers\ExportController::class,
-    'usersSallaryTargets'
-])->name('custom-export-users');
-
-Route::get('/admin/agency-export-report', [
-    \App\Admin\Controllers\ExportController::class,
-    'usersAgencyTargets'
-])->name('agency-export-report');
-
-
-Route::get('/privacy-policy', function () {
-    $page = \App\Models\Page::where("name", "privacy-policy")->first();
-    return view('privacy.privacy', ['page' => $page]);
-});
-
-Route::get('delete-account', function () {
-    $data = DeleteAccount::get();
-    return view('deleteAccount', compact("data"));
-});
-
-Route::get('/', function () {
-    return response()->json();
-});
+use Modules\Achievement\Http\Controllers\web\AchievementDedicateController;
+use Modules\Achievement\Http\Controllers\web\AchievementsController;
+use Modules\Achievement\Http\Controllers\web\GiftAchievemntController;
+use Modules\Achievement\Http\Controllers\web\AchievementsLevelsController;
+use Modules\Achievement\Http\Controllers\web\UserAchievementLevelController;
+use Modules\Achievement\Http\Controllers\web\AchievementLevelsModuleController;
+use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
-        'prefix' => config('admin.route.prefix'),
-        'namespace' => config('admin.route.namespace'),
+        'prefix'     => config('admin.route.prefix'),
+        'namespace'  => 'web',
         'middleware' => [
             'web',
             'admin',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
+            'appFeatureEnable:achievement',
         ],
-        'as' => config('admin.route.prefix') . '.',
+        'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::get('create-payment-gateways', [MangerSettingController::class, 'createPaymentGateway'])->name('create-payment-gateway');
-        Route::post('store-payment-gateways', [MangerSettingController::class, 'storePaymentGateway'])->name('store-payment-gateway');
-        Route::put('update-payment-gateways/{id}', [MangerSettingController::class, 'UpdatePaymentGateway'])->name('update-payment-gateway');
-        Route::get('edit-payment-gateways/{id}', [MangerSettingController::class, 'editPaymentGateway'])->name('edit-payment-gateway');
-        Route::get('delete-payment-gateways/{id}', [MangerSettingController::class, 'deletePaymentGateway'])->name('delete-payment-gateway');
+        Route::resource('achievements', AchievementsController::class);
+        Route::post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
+        Route::get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class, 'getAchievementLevels'])->name('get-achievement-levels');
+        Route::get('/get-view-page', [AchievementLevelsModuleController::class, 'viewPage'])->name('get-view-page');
+        Route::resource('user-achievement-levels', UserAchievementLevelController::class);
+        Route::resource('achievement-dedicate', AchievementDedicateController::class);
+        // Route::post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
+        //  Route::get('achievement-levels/create/{id}', 'AchievementsLevelsController@create')->where('id', '[0-9]+')->name('achievement-levels.create');
+        Route::resource('gift-achievements', 'UserGiftAchController');
+        Route::resource('gift-achievment', 'GiftAchiementController');
+        Route::post('postAddGiftAchievement', [GiftAchievemntController::class, 'postAddGiftAchievemnt'])->name('postAddGiftAchievement');
+        Route::post('postAddGiftAchievementLevel', [GiftAchievemntController::class, 'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
+        Route::post('posteditGiftAchievementLevel', [GiftAchievemntController::class, 'posteditGiftAchievementLevel'])->name('posteditGiftAchievementLevel');
+        // Route::resource('achievement-levels', AchievementsLevelsController::class,['names'=>['create'=>'achievement-levels.create2']]);
 
-        Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
-        Route::post('android-setting', [addTOjesonController::class, 'android'])->name('android-setting');
-        Route::post('ios-setting', [addTOjesonController::class, 'ios'])->name('ios-setting');
-        Route::post('huawi-setting', [addTOjesonController::class, 'hawawi'])->name('huawi-setting');
-
-        Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
-        Route::post('update-config-group-chat', [ConfigController::class, 'updateConfigChatGroup'])->name('update-config-group-chat');
-        Route::post('upload-badges-setting', [ConfigController::class, 'uploadBadges'])->name('upload.badges');
-        Route::post('update-agora-zego', [ConfigController::class, 'updateConfigAgoraZego'])->name('update-agora-zego');
-        Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
-        Route::post("close-open-gift", [UserController::class, "close_open_gift"]);
-
-        Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
-        Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
-
-        Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
-        Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
-        Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
-        Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
-
-        // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
+        Route::prefix('achievements-levels/{achievement_id}')->group(function () {
+            Route::get('/', [AchievementsLevelsController::class, 'index']);
+            Route::get('/create', [AchievementsLevelsController::class, 'create']);
+            Route::post('/', [AchievementsLevelsController::class, 'store']);
+            Route::get('/{id}', [AchievementsLevelsController::class, 'show'])->where('id', '[0-9]+');
+            Route::get('/{id}/edit', [AchievementsLevelsController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [AchievementsLevelsController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [AchievementsLevelsController::class, 'destroy'])->where('id', '[0-9]+');
+        });
     }
 );
-
-Route::group([
-    'prefix' => '',
-    'namespace' => '',
-    'middleware' => [
-        'web',
-        'admin',
-        'adminIp',
-        //            'adminGeneralBan',
-        'multiLanguage',
-    ],
-    'as' => '',
-], function () {
-    Route::get('admin/auth', function () {
-        return view('checkLogin');
-    })->name('admin/auth');
-    Route::post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
-});
-
-Route::get('/update-rooms', function () {
-    RoomVisitor::whereDate('created_at', '<', date("Y-m-d"))->delete();
-    return "done";
-});
-
-Route::get('/update-rooms-microphone', function () {
-
-    Room::withoutVisitorsAndActiveMic()->update([
-        'microphone' => '0,0,0,0,0,0,0,0,0,0'
-    ]);
-    return "done";
-});
-
-Route::get('/clear-admin-error', function () {
-    session()->forget('error');         // If flashed as 'error'
-    session()->forget('danger');        // If flashed as 'danger'
-    session()->forget('info');          // If used admin_info()
-    session()->forget('success');
-    session()->flush();   // Or session()->forget('error');
-    return 'Session cleared!';
-});
-
-Route::get('/delete_reward_target', function () {
-    \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
-});
-
-Route::get('/test-fcm/{userid}', function ($userId) {
-    $testToken = 'fTFfWXoaQUqjCqFRqMqqGG:APA91bGw6rmXbrGm8XwPwwZ6sJOlcxeXrGNffGbpfXWBzIBK463WyoDFArkJJnYDRzvjDOP23Q2xqh6_c95vsdk08ww7v_R4GJeTOSxSDuWGTXVOLxpxzxE';
-
-    $language = 'ar'; // أو 'en'
-    $userLevel = 5; // مستوى افتراضي للاختبار
-
-    // نصوص الإشعار
-    $body_ar = "تهانينا! لقد تم ترقيتك إلى مستوى {$userLevel} كمرسل";
-    $body_en = "Congratulations! You've been upgraded to level {$userLevel} as a sender";
-    $firebaseBody = ($language === 'ar') ? $body_ar : $body_en;
-    $title = ($language === 'ar') ? "ترقية مستوى المرسل" : "Sender level upgraded";
-
-    // صورة افتراضية
-    $icon = "https://example.com/images/vip_badge.png";
-    $data = [
-        'image' => $icon,
-        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-        'type' => 'level_upgrade'
-    ];
-
-    // إرسال الإشعار
-    $result = Common::send_firebase_notification(
-        $testToken,
-        $title,
-        $firebaseBody,
-        icon: $icon,
-        data: $data
-    );
-
-    return response()->json([
-        'success' => true,
-        'message' => 'تم إرسال الإشعار التجريبي',
-        'notification_data' => [
-            'title' => $title,
-            'body' => $firebaseBody,
-            'icon' => $icon,
-            'data' => $data
-        ],
-        'fcm_response' => $result
-    ]);
-});
-
-Route::get('/generate-token/{id}', function ($id) {
-    $user = User::find($id);
-
-    if (! $user) {
-        return response()->json(['message' => 'User not found'], 404);
-    }
-
-    $token = $user->createToken('api_token')->plainTextToken;
-
-    return response()->json([
-        'token' => $token,
-        'user' => $user
-    ]);
-});
-
-Route::get('/update-user-sallary', function () {
-    $month = now()->month;
-    $year = now()->year;
-     User::query()
-            ->where('agency_id', '!=', 0)
-            ->where('salary_is_updated', 1)
-            ->where('type_user', '!=', 0)
-            ->chunk(500, function ($users) use($month, $year){
-                foreach ($users as $user) {
-                    $cacheKey = 'cache-data-mystore-' . $user->id;
-
-                    // if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
-                        try {
-                            $app_feature = Cache::get('host_agency');
-
-                            if ($app_feature) {
-
-                                $targetService = new FixedTargetService($user);
-                                $targetService->calculateTarget();
-                            }
-                        } catch (\Throwable $e) {
-
-                            return response()->json($e->getMessage());
-
-                        }
-                    // }
-                }
-            });
-
-
-    return "gooooooooooooooooooooooooooooooooood";
-});
-
-
-Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
-
-Route::get('/charge-agency-export-report', [
-    ExportController::class,
-    'chargeAgencies'
-])->name('charge-agency-export-report');
