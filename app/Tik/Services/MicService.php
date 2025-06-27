@@ -355,8 +355,8 @@ class MicService
         $position = $data['position'];
         $room = $this->roomRepository->findRoomUser($data['owner_id']);
         if (!$room) throw new Exception(__('room fot found'));
-        
-        if ($user->id != $room->uid && !in_array($user->id, $room->admins ?? [])) {
+
+        if ($user->id != $room->uid || !in_array($user->id, $room->admins ?? [])) {
             throw new Exception(__('you do not have permission'));
         }
 
