@@ -21,7 +21,7 @@ class UserAchievementLevelsResource extends JsonResource
         $type = @$achievementLevel?->achievement?->type?->value;
         return [
             'id' => $this->id,
-            'image' => $this->valid_image ?? $this->custom_image,
+            'image' => $this->valid_image ?? ($this->custom_image ?? $this->file),
             'description' => $this->custom_image ? ($title ?? '') : ($description ?? ''),
             'type'  => $this->type == "room_target" ? 2 : 1,
         ];
