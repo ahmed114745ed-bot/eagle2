@@ -18,11 +18,14 @@ class LogApiRequestResponse
     {
         $response = $next($request);
 
-        $user = \Auth::user();
 
-        if ($user && $user->id === 2) {
+        $userId = \Auth::id();
+
+        $matchedId = settings()->get('debug_id');
+
+        if ($matchedId && $userId === $matchedId) {
             $log = [
-                'user_id' => $user->id,
+                'user_id' => $userId,
                 'url' => $request->fullUrl(),
                 'method' => $request->method(),
                 'request_body' => $request->all(),
