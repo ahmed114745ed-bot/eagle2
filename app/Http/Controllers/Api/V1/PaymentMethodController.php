@@ -12,6 +12,7 @@ use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Log;
 use Throwable;
 
 class PaymentMethodController extends Controller
@@ -116,6 +117,8 @@ class PaymentMethodController extends Controller
                 'merchantRefNumber',
             ]);
 
+            Log::info('this response '.json_encode($request->all()));
+
             // Check if merchantRefNumber exists
             if (empty($query['merchantRefNumber'])) {
                 return response()->json([
@@ -134,6 +137,12 @@ class PaymentMethodController extends Controller
                     'message' => 'Transaction not found.',
                 ]);
             }
+
+            Log::info('this response '.json_encode([
+                'status' => $purchaseProduct->status === 1,
+                'trx' => $purchaseProduct->trx,
+                'message' => $query['statusDescription'] ?? '',
+            ]));
 
             return response()->json([
                 'status' => $purchaseProduct->status === 1,
