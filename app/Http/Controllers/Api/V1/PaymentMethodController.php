@@ -129,6 +129,7 @@ class PaymentMethodController extends Controller
             }
 
             $purchaseProduct = CoinLog::where('trx', $query['merchantRefNumber'])->first();
+            Log::info('$purchaseProduct->status '.json_encode($purchaseProduct->status));
 
             if (! $purchaseProduct) {
                 return response()->json([
