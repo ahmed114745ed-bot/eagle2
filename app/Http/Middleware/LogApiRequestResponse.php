@@ -2,28 +2,28 @@
 
 namespace App\Http\Middleware;
 
+use Auth;
 use Closure;
 use Illuminate\Http\Request;
+use Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class LogApiRequestResponse
 {
-
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
-
-        $userId = \Auth::id();
+        $userId = Auth::id();
 
         $matchedId = settings()->get('debug_id');
 
-        if ($matchedId && $userId === $matchedId) {
+        if ($matchedId && $userId == $matchedId) {
             $log = [
                 'user_id' => $userId,
                 'url' => $request->fullUrl(),
@@ -34,7 +34,7 @@ class LogApiRequestResponse
             ];
 
             // Write as a pure JSON line
-            \Log::channel('custom_log')->info($request->fullUrl(). ' '. PHP_EOL . json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            Log::channel('custom_log')->info($request->fullUrl().' '.PHP_EOL.json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
 
         return $response;
