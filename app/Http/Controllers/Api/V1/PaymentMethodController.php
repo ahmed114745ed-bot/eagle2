@@ -134,7 +134,11 @@ class PaymentMethodController extends Controller
                     'message' => 'Transaction not found.',
                 ]);
             }
-            \Log::info('this response '.json_encode($query));
+            \Log::info('this response '.json_encode([
+                    'status' => $query['statusCode'] == 200,
+                    'trx' => $purchaseProduct->trx,
+                    'message' => $query['statusDescription'] ?? 'No description provided.',
+                ]));
             return response()->json([
                 'status' => $query['statusCode'] == 200,
                 'trx' => $purchaseProduct->trx,
