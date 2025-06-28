@@ -135,8 +135,9 @@ class PaymentMethodController extends Controller
                 ]);
             }
 
+            \Log::info('this status '. json_encode($query['statusCode']));
             return response()->json([
-                'status' => (int) $query['statusCode'] === 200,
+                'status' => $query['statusCode'] === 200,
                 'trx' => $purchaseProduct->trx,
                 'message' => $query['statusDescription'] ?? 'No description provided.',
             ]);
