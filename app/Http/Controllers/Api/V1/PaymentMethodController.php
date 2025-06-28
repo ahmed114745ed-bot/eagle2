@@ -12,7 +12,6 @@ use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Log;
 use Throwable;
 
 class PaymentMethodController extends Controller
@@ -117,19 +116,16 @@ class PaymentMethodController extends Controller
                 'merchantRefNumber',
             ]);
 
-            Log::info('this response '.json_encode($request->all()));
-
-            // Check if merchantRefNumber exists
-            if (empty($query['merchantRefNumber'])) {
+            // Validate required parameters
+            if (empty($query['merchantRefNumber']) || empty($query['statusCode'])) {
                 return response()->json([
                     'status' => false,
                     'trx' => null,
-                    'message' => 'Missing merchant reference number.',
+                    'message' => 'Missing required parameters: merchantRefNumber or statusCode.',
                 ]);
             }
 
             $purchaseProduct = CoinLog::where('trx', $query['merchantRefNumber'])->first();
-            Log::info('$purchaseProduct->status '.json_encode($purchaseProduct->status));
 
             if (! $purchaseProduct) {
                 return response()->json([
@@ -139,22 +135,16 @@ class PaymentMethodController extends Controller
                 ]);
             }
 
-            Log::info('this response '.json_encode([
-                'status' => $purchaseProduct->status === 1,
-                'trx' => $purchaseProduct->trx,
-                'message' => $query['statusDescription'] ?? '',
-            ]));
-
             return response()->json([
-                'status' => $purchaseProduct->status === 1,
+                'status' => (int) $query['statusCode'] === 200,
                 'trx' => $purchaseProduct->trx,
-                'message' => $query['statusDescription'] ?? '',
+                'message' => $query['statusDescription'] ?? 'No description provided.',
             ]);
         } catch (Throwable $e) {
             return response()->json([
                 'status' => false,
                 'trx' => null,
-                'message' => 'Something went wrong: '.$e->getMessage(),
+                'message' => 'An error occurred: '.$e->getMessage(),
             ]);
         }
     }
