@@ -116,12 +116,12 @@ class PaymentMethodController extends Controller
                 'merchantRefNumber',
             ]);
 
-            // Check if merchantRefNumber exists
-            if (empty($query['merchantRefNumber'])) {
+            // Validate required parameters
+            if (empty($query['merchantRefNumber']) || empty($query['statusCode'])) {
                 return response()->json([
                     'status' => false,
                     'trx' => null,
-                    'message' => 'Missing merchant reference number.',
+                    'message' => 'Missing required parameters: merchantRefNumber or statusCode.',
                 ]);
             }
 
@@ -134,17 +134,21 @@ class PaymentMethodController extends Controller
                     'message' => 'Transaction not found.',
                 ]);
             }
-
+            \Log::info('this response '.json_encode([
+                    'status' => $query['statusCode'] == 200,
+                    'trx' => $purchaseProduct->trx,
+                    'message' => $query['statusDescription'] ?? 'No description provided.',
+                ]));
             return response()->json([
-                'status' => $purchaseProduct->status === 1,
+                'status' => $query['statusCode'] == 200,
                 'trx' => $purchaseProduct->trx,
-                'message' => $query['statusDescription'] ?? '',
+                'message' => $query['statusDescription'] ?? 'No description provided.',
             ]);
         } catch (Throwable $e) {
             return response()->json([
                 'status' => false,
                 'trx' => null,
-                'message' => 'Something went wrong: '.$e->getMessage(),
+                'message' => 'An error occurred: '.$e->getMessage(),
             ]);
         }
     }
