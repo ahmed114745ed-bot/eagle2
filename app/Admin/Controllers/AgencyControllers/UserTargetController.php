@@ -118,6 +118,41 @@ class UserTargetController extends MainController
         $grid->column('user_diamonds', __('user diamonds'));
         $grid->column('user_hours', __('user hours'));
         $grid->column('user_days', __('user days'));
+         $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
+           
+            $extras = json_decode($this->extras, true);
+        
+            $momentUpload = $extras['moment']['upload'] ?? '-';
+            $momentLikes = $extras['moment']['likes'] ?? '-';
+            $momentComments = $extras['moment']['comments'] ?? '-';
+        
+            $reelUpload = $extras['reel']['upload'] ?? '-';
+            $reelLikes = $extras['reel']['likes'] ?? '-';
+            $reelComments = $extras['reel']['comments'] ?? '-';
+
+            $labelMoments = __('Moments');
+            $labelReels = __('Reels');
+            $labelUploads = __('Uploads:');
+            $labelLikes = __('Likes:');
+            $labelComments = __('Comments:');
+        
+            return <<<HTML
+                <div style="line-height: 1.6;">
+                    <div><b>{$labelMoments}</b></div>
+                    <ul style="margin-left: 8px;width: 149px;">
+                        <li><b>{$labelUploads}</b> {$momentUpload}</li>
+                        <li><b>{$labelLikes}</b> {$momentLikes}</li>
+                        <li><b>{$labelComments}</b> {$momentComments}</li>
+                    </ul>
+                    <div><b>{$labelReels}</b></div>
+                    <ul style="margin-left: 8px;width: 149px;">
+                        <li><b>{$labelUploads}</b> {$reelUpload}</li>
+                        <li><b>{$labelLikes}</b> {$reelLikes}</li>
+                        <li><b>{$labelComments}</b> {$reelComments}</li>
+                    </ul>
+                </div>
+            HTML;
+        });
         $grid->column('user_obtain', __('salary'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
