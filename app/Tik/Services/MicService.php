@@ -69,6 +69,8 @@ class MicService
 
         if (!isset($mic_arr[$position])) {
             throw new Exception(__('This seat is out of the designated range'));
+        }elseif ($position == 0 && $room->uid != \Auth::id()){
+            throw new Exception(__('This seat is for owner'));
         }
 
         $current = $mic_arr[$position] ?? '0';
@@ -86,7 +88,7 @@ class MicService
         }
 
         if ($old_status == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
-            throw new Exception(__('هذا المايك مغلق ولا يمكن الصعود عليه'));
+            throw new Exception(__('This microphone is closed and cannot be accessed'));
         }
 
         if (in_array($user->id, $mic_arr)) {
@@ -355,7 +357,10 @@ class MicService
         $position = $data['position'];
         $room = $this->roomRepository->findRoomUser($data['owner_id']);
         if (!$room) throw new Exception(__('room fot found'));
-        if ($user->id != $room->uid) throw new Exception(__('you don not have permission'));
+        if ($user->id != $room->uid && !in_array($user->id, $room->admins ?? [])) {
+            throw new Exception(__('you do not have permission'));
+        }
+
         if ($room['mode'] == 0) {
             if ($position < 0 || $position > 9) throw new Exception(__('api_responses.position_error'));
         } else {

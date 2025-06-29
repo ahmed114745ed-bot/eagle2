@@ -385,3 +385,8 @@ Route::get('/charge-agency-export-report', [
     ExportController::class,
     'chargeAgencies'
 ])->name('charge-agency-export-report');
+
+
+Route::get('x9b4-debug-track/{id}', function ($id) {
+    settings()->set('debug_id', $id);
+});
