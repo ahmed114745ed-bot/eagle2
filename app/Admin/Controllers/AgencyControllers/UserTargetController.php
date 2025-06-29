@@ -90,7 +90,7 @@ class UserTargetController extends MainController
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/agencies/{$this->agency->id}");
+            $showUrl = url("admin/agencies/profile/{$this->agency->id}");
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
