@@ -158,7 +158,7 @@ class AppServiceProvider extends ServiceProvider
 
                 'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
                 'is_paypal_active' => $settings['is_fawry_active'] ?? 0,
-                'is_utd_fawry_active' => $settings['is_utdFawry_active'] ?? 0,
+                'is_utd_fawry_active' => $settings['is_utd_fawry_active'] ?? 0,
                 'is_paysky_active' => $settings['is_paysky_active'] ?? 0,
                 'is_strip_active' => $settings['is_strip_active'] ?? 0,
                 'is_opay_active' => $settings['is_opay_active'] ?? 0,
