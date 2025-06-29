@@ -248,7 +248,7 @@ class Room extends Model
         )->where('request_background_images.status', 1)->where(function ($q) {
                     $q->where('expair', '>=', now()->timestamp)
                         ->orWhere('expair', 0);
-                });
+                })->orderByDesc('id');
     }
 
     public function getVisitorsImages()
