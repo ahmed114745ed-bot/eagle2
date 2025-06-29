@@ -73,7 +73,7 @@ class UserTargetController extends MainController
     {
 
         $grid = new Grid(new UserSallary);
-        
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
@@ -85,6 +85,7 @@ class UserTargetController extends MainController
                 });
             }, __('UUID'));
         });
+        $grid->column('id', __('id'));
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name =@$this->user->name ?? '';
             $uid = @$this->user->uuid;
@@ -135,23 +136,25 @@ class UserTargetController extends MainController
             return $month . '/' . $this->year;
         });
 
-        $grid->column('hours',__ ('target hours'))->display(function ($hours) {
-            return explode('/', $hours)[1] ?? 0;
+        $grid->column('hours',__ ('hours'))->display(function ($hours) {
+            return $hours;
+//            return explode('/', $hours)[1] ?? 0;
         });
-        $grid->column('days',__ ('target days'))->display(function ($days) {
-            return explode('/', $days)[1] ?? 0;
+        $grid->column('days',__ ('days'))->display(function ($days) {
+            return $days;
+//            return explode('/', $days)[1] ?? 0;
         });
 
         $grid->column('target_diamonds',__ ('target diamonds'))->display(function ($diamond) {
             return explode('/', $diamond)[1] ?? 0;
         });
 
-        $grid->column('hours', __('user hours'))->display(function ($hours) {
-            return explode('/', $hours)[0] ?? 0;
-        });
-        $grid->column('days', __('user days'))->display(function ($days) {
-            return explode('/', $days)[0] ?? 0;
-        });
+//        $grid->column('hours', __('user hours'))->display(function ($hours) {
+//            return explode('/', $hours)[0] ?? 0;
+//        });
+//        $grid->column('days', __('user days'))->display(function ($days) {
+//            return explode('/', $days)[0] ?? 0;
+//        });
         $grid->column('diamond', __('user diamonds'))->display(function ($diamond) {
             $usd = explode('/', $diamond)[0] ?? 0;
             $image = asset('images/diamond.jpg'); // Adjust path as needed
