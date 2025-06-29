@@ -358,6 +358,7 @@ class RoomRepoService
             } else {
                 $mode = 'topCenter';
             }
+            $room =  $this->findRoomUser($request->owner_id);
         } catch (\Throwable $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
