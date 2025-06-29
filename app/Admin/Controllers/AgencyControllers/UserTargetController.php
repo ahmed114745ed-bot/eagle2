@@ -133,7 +133,7 @@ class UserTargetController extends MainController
                 ->where('year', $this->add_year)
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)
-                ->value('cut_amount');
+                ->value('cut_amount') ?? 0;
 
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
@@ -151,7 +151,7 @@ class UserTargetController extends MainController
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)
                 ->selectRaw('sallary - cut_amount AS net_salary')
-                ->value('net_salary');
+                ->value('net_salary') ?? 0;
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$userSalary}</span>
