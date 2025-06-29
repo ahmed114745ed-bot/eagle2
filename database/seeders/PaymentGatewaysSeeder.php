@@ -77,13 +77,13 @@ class PaymentGatewaysSeeder extends Seeder
             'new_1' => [
                 "name" => "fawry_secret",
                 "type" => "input",
-                "value" => "3a96b82d742c4531a5822ec6eb8c87a4"
+                "value" => ""
 
             ],
             'new_2' => [
                 "name" => "fawry_merchant_code",
                 "type" => "input",
-                "value" => "400000019844"
+                "value" => ""
 
             ],
             'new_5' => [
