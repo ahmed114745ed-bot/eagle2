@@ -72,6 +72,14 @@ class UserTargetController extends MainController
             ";
         });
         $grid->column('agency_id', __('agency'))->display(function () {
+            if (!@$this->agency )
+            {return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>'unknown agency'</span>
+            </div>
+        ";
+
+            }
             $name = @$this->agency->name ?? '';
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
