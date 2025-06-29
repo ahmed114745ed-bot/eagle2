@@ -555,7 +555,6 @@ class EnteranceController extends Controller
             if ($room->room_pass != null) {
                 $is_locked = true;
             }
-            dd($background_me ? @$background_me : $room->final_room_image);
             $data = [
                 "messageContent" => [
                     "message" => "changeBackground",
