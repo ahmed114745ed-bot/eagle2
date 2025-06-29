@@ -125,13 +125,13 @@ class PaymentGatewaysSeeder extends Seeder
             'new_1' => [
                 "name" => "utd_fawry_secret",
                 "type" => "input",
-                "value" => "123"
+                "value" => ""
 
             ],
             'new_2' => [
                 "name" => "utd_fawry_merchant_code",
                 "type" => "input",
-                "value" => "123"
+                "value" => ""
 
             ],
             'new_3' => [
