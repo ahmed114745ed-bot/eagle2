@@ -20,12 +20,13 @@ class RequestBackgroundImagService
         if ($request->hasFile('image')) {
             $img                                   = $request->file('image');
             $image                                 = Common::upload('images', $img);
-
+            $expire = Common::getConfig('background_expiration') ?? 1;
             $data = [
                 'owner_room_id' => $userId,
                 'img' => $image,
                 'price' => $price,
                 'status' => 1,
+                'expair' => now()->addDays($expire)->timestamp,
             ];
             $this->requestBackgroundImageRepository->create($data);
             $this->userRepository->decrementCoins($userId, $price);

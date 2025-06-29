@@ -1446,7 +1446,7 @@ class Common
 
     public  static function getImageTotalReceiverOrSender($amount)
     {
-        $level = Vip::query()->where('level', $amount)->orderByDesc('exp')->first();
+        $level = Vip::collectionBuilder()->where('level', $amount)->orderByDesc('exp')->first();
         return $level;
     }
 
@@ -1491,6 +1491,7 @@ class Common
             'type' => 1,
         ])->where('leave_date', null)->first();
         $agencyUserJoined->leave_date = now();
+        $agencyUserJoined->status = 'from admin';
         $agencyUserJoined->save();
         $checkAgencyUser = UsersJoinedAgency::where([
             'user_id' => $newOwnerId,
@@ -1503,6 +1504,7 @@ class Common
                 'agency_id' =>  $agencyId,
                 'type' => 1,
                 'join_date' => now(),
+                'status' => 'Joined'
             ]);
         }
         return true;

@@ -16,7 +16,6 @@ class UserTarget extends Model
 
     protected $casts = [
         'extras' => 'json',
-
     ];
 
     public function scopeOfAgency($q)

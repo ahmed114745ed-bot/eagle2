@@ -44,6 +44,7 @@ class FawryPaymentService
         $data['paymentType'] = $exterData['paymentType'];
         $utdUrl = config("services.utd_fawry.utd_url");
         $response = Http::post($utdUrl, $data);
+        info($response);
         return json_decode($response);
     }
 

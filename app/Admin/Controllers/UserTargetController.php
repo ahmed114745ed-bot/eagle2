@@ -73,7 +73,7 @@ class UserTargetController extends MainController
     {
 
         $grid = new Grid(new UserSallary);
-        
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
@@ -85,6 +85,7 @@ class UserTargetController extends MainController
                 });
             }, __('UUID'));
         });
+        $grid->column('id', __('id'));
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name =@$this->user->name ?? '';
             $uid = @$this->user->uuid;
@@ -123,9 +124,11 @@ class UserTargetController extends MainController
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this->agency ? url("admin/agencies/profile/{$this->agency->id}") : '#';
 
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
+                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                 $image
                 <span>$name</span>
             </div>
@@ -135,25 +138,28 @@ class UserTargetController extends MainController
             return $month . '/' . $this->year;
         });
 
-        $grid->column('hours',__ ('target hours'))->display(function ($hours) {
-            return explode('/', $hours)[1] ?? 0;
+        $grid->column('hours',__ ('hours'))->display(function ($hours) {
+            return $hours;
+//            return explode('/', $hours)[1] ?? 0;
         });
-        $grid->column('days',__ ('target days'))->display(function ($days) {
-            return explode('/', $days)[1] ?? 0;
-        });
-
-        $grid->column('target_diamonds',__ ('target diamonds'))->display(function ($diamond) {
-            return explode('/', $diamond)[1] ?? 0;
+        $grid->column('days',__ ('days'))->display(function ($days) {
+            return $days;
+//            return explode('/', $days)[1] ?? 0;
         });
 
-        $grid->column('hours', __('user hours'))->display(function ($hours) {
-            return explode('/', $hours)[0] ?? 0;
-        });
-        $grid->column('days', __('user days'))->display(function ($days) {
-            return explode('/', $days)[0] ?? 0;
-        });
+//        $grid->column('target_diamonds',__ ('target diamonds'))->display(function ($diamond) {
+//            return explode('/', $diamond)[1] ?? 0;
+//        });
+
+//        $grid->column('hours', __('user hours'))->display(function ($hours) {
+//            return explode('/', $hours)[0] ?? 0;
+//        });
+//        $grid->column('days', __('user days'))->display(function ($days) {
+//            return explode('/', $days)[0] ?? 0;
+//        });
         $grid->column('diamond', __('user diamonds'))->display(function ($diamond) {
-            $usd = explode('/', $diamond)[0] ?? 0;
+//            $usd = explode('/', $diamond)[0] ?? 0;
+            $usd = $diamond;
             $image = asset('images/diamond.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -162,8 +168,26 @@ class UserTargetController extends MainController
                     </div>";
         });
 
-        $grid->column('sallary', __('user obtain'))->display(function ($usd) {
+        $grid->column('sallary', __('salary'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('cut_amount', __('cut amount'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            $formattedUsd = number_format((float)$usd, 2);
+            return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$formattedUsd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('Net Salary', __('User Net Salary'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            $usd = $this->sallary - $this->cut_amount;
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$usd}</span>
@@ -172,9 +196,10 @@ class UserTargetController extends MainController
         });
         $grid->column('agency_sallary', __('agency obtain'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
+            $formattedUsd = number_format((float)$usd, 2);
             return "<div style='display: flex; align-items: center; '>
 
-                        <span>{$usd}</span>
+                        <span>{$formattedUsd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });

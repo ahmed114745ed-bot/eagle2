@@ -27,59 +27,110 @@ class UpdateUserWhenSendGift
     {
 
 
-        $receivedUser->enableSaving = false;
+//         $receivedUser->enableSaving = false;
 
 
-        $values = [
-            'salary_is_updated' => 1,
-            'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
-            'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
+//         $values = [
+//             'salary_is_updated' => 1,
+//             'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
+//             'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
 
-        ];
+//         ];
 
-        // add is salary updated
-        $receivedUser->salary_is_updated = true;
-        //update monthly diamond for received user
-        $receivedUser->monthly_diamond_received += $totalCoins;
-        $receivedUser->total_diamond_received   += $totalCoins;
-        // update levels
-        if ($receivedUser->type_user == 0 && $receivedUser->agency_id == 0) {
-            $values['exchange_diamonds'] =  DB::raw('exchange_diamonds + ' . $totalCoins);
-//            $receivedUser->exchange_diamonds += $totalCoins;
-        }
+//         // add is salary updated
+//         $receivedUser->salary_is_updated = true;
+//         //update monthly diamond for received user
+//         $receivedUser->monthly_diamond_received += $totalCoins;
+//         $receivedUser->total_diamond_received   += $totalCoins;
+//         // update levels
+//         if ($receivedUser->type_user == 0 && $receivedUser->agency_id == 0) {
+//             $values['exchange_diamonds'] =  DB::raw('exchange_diamonds + ' . $totalCoins);
+// //            $receivedUser->exchange_diamonds += $totalCoins;
+//         }
 
 
 
-        $lastReceivedLevel = $receivedUser->total_received_level;
+//         $lastReceivedLevel = $receivedUser->total_received_level;
 
-        try {
+//         try {
 
-            (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($receivedUser);
+//             (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($receivedUser);
 
-            if ($receivedUser->total_received_level > $lastReceivedLevel) {
-                dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
+//             if ($receivedUser->total_received_level > $lastReceivedLevel) {
+//                 dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
+//             }
+
+//         } catch (\Exception $e) {
+//         }
+
+//         $values['received_level'] = $receivedUser->received_level;
+        // \Log::info('receivedUser',['receivedUser->id' =>$receivedUser->id]);
+        // $logValues = [
+        //     'salary_is_updated' => 1,
+        //     'monthly_diamond_received' => 'monthly_diamond_received + ' . $totalCoins,
+        //     'total_diamond_received' => 'total_diamond_received + ' . $totalCoins,
+        // ];
+        
+        // // \Log::info('values', ['values' => $logValues]);
+        // User::where('id', $receivedUser->id)->lockForUpdate()
+        //     ->update($values);
+        // $receivedUser->save();
+        // $receivedUser->enableSaving = true;
+        // \Log::info('receivedUser',['receivedUser' =>$receivedUser]);
+
+
+        // return $receivedUser;
+
+        DB::transaction(function () use ($totalCoins, $receivedUser) {
+
+            $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
+    
+            $user->salary_is_updated = true;
+            $user->monthly_diamond_received += $totalCoins;
+            $user->total_diamond_received += $totalCoins;
+    
+            if ($user->type_user == 0 && $user->agency_id == 0) {
+                $user->exchange_diamonds += $totalCoins;
             }
-
-        } catch (\Exception $e) {
-        }
-
-        $values['received_level'] = $receivedUser->received_level;
-
-        User::where('id', $receivedUser->id)->lockForUpdate()
-            ->update($values);
-        $receivedUser->save();
-        $receivedUser->enableSaving = true;
-
-
-        return $receivedUser;
+    
+            $lastReceivedLevel = $user->total_received_level;
+    
+            try {
+                (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
+    
+                if ($user->total_received_level > $lastReceivedLevel) {
+                    dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
+                }
+            } catch (\Exception $e) {
+            }
+    
+            $user->save();
+    
+        });
     }
     public function updateUsers(int $totalCoins, array $userIds)
     {
-        DB::table('users')->whereIn('id', $userIds)->update([
-            'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
-            'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
-            'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
-        ]);
+        // DB::table('users')->whereIn('id', $userIds)->update([
+        //     'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
+        //     'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
+        //     'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
+        // ]);
+        DB::transaction(function () use ($totalCoins, $userIds) {
+            $users = DB::table('users')
+                ->whereIn('id', $userIds)
+                ->lockForUpdate()
+                ->get();
+    
+            foreach ($users as $user) {
+                DB::table('users')->where('id', $user->id)->update([
+                    'monthly_diamond_received' => $user->monthly_diamond_received + $totalCoins,
+                    'total_diamond_received'   => $user->total_diamond_received + $totalCoins,
+                    'exchange_diamonds'        => $user->agency_id == 0
+                        ? $user->exchange_diamonds + $totalCoins
+                        : $user->exchange_diamonds,
+                ]);
+            }
+        });
     }
     public function updateReceivedLevels(User $receivedUser)
     {

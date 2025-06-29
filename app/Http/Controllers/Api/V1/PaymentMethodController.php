@@ -3,18 +3,21 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
-use App\Models\CoinLog;
-use App\Models\GameWallet;
-use App\Traits\User\PaymentTrait;
-use Illuminate\Http\Request;
-use App\Models\GameChargeHistory;
 use App\Http\Controllers\Controller;
+use App\Models\CoinLog;
+use App\Models\GameChargeHistory;
+use App\Models\GameWallet;
 use App\Models\PaymentMethodHistory;
-use Illuminate\Support\Facades\Log;
+use App\Traits\User\PaymentTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Throwable;
 
 class PaymentMethodController extends Controller
 {
     use PaymentTrait;
+
     public function callback(Request $request)
     {
         $callbackData = $request->all();
@@ -22,20 +25,20 @@ class PaymentMethodController extends Controller
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
-        $order = PaymentMethodHistory::where("utd_code", $merchantRefNumber)->first();
+        $order = PaymentMethodHistory::where('utd_code', $merchantRefNumber)->first();
         if ($orderStatus === 'PAID') {
-            $order->status = "paid";
-            if ($order->type == "game_type") {
+            $order->status = 'paid';
+            if ($order->type === 'game_type') {
                 $this->updateDiForUser($order->amount);
                 GameChargeHistory::create([
-                    "value" => $order->amount,
-                    "admin_id" => 0,
+                    'value' => $order->amount,
+                    'admin_id' => 0,
                 ]);
             }
         } elseif ($orderStatus === 'CANCELLED') {
-            $order->status = "cancelled";
+            $order->status = 'cancelled';
         } else {
-            $order->status = "Error";
+            $order->status = 'Error';
         }
         $order->ref_code = $fawryRefNumber;
 
@@ -46,8 +49,8 @@ class PaymentMethodController extends Controller
 
     public function updateDiForUser($amount)
     {
-        $balance  = $amount * config("app.one_coins") * 2;
-        $gameWallet = GameWallet::whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"))->first();
+        $balance = $amount * config('app.one_coins') * 2;
+        $gameWallet = GameWallet::whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->first();
         if ($gameWallet) {
             $gameWallet->balance += $balance;
             $gameWallet->save();
@@ -61,12 +64,13 @@ class PaymentMethodController extends Controller
     public function store(Request $request)
     {
         $trx = PaymentMethodHistory::create([
-            "amount" => $request->amount,
-            "type" => 'game_type',
-            "utd_code" => $request->utd_code,
+            'amount' => $request->amount,
+            'type' => 'game_type',
+            'utd_code' => $request->utd_code,
         ]);
 
         $trxId = $trx->id;
+
         return Common::apiResponse(1, 'created successfully', $trxId, 200);
     }
 
@@ -77,25 +81,75 @@ class PaymentMethodController extends Controller
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
-        $paymentMethod = PaymentMethodHistory::where("utd_code", $merchantRefNumber)->first();
+        $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantRefNumber)->first();
         $order = CoinLog::where('trx', $merchantRefNumber)->first();
         if ($orderStatus === 'PAID') {
             $this->webhookPayment($order->id);
             $order->pid = $fawryRefNumber;
-            $paymentMethod->status = "paid";
+            $paymentMethod->status = 'paid';
             $order->save();
-            return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
-        } elseif ($orderStatus === 'UNPAID') {
-            return response()->json(['status' => 'pending', 'message' => 'Payment is still unpaid.',],202);
-        } elseif ($orderStatus === 'CANCELLED') {
-            $paymentMethod->status = "cancelled";
-            return response()->json(['status' => 'cancelled', 'message' => 'Payment was cancelled.',]);
+
+            return response()->json(['status' => 'success', 'message' => 'Payment successful.']);
+        }
+        if ($orderStatus === 'UNPAID') {
+            return response()->json(['status' => 'pending', 'message' => 'Payment is still unpaid.'], 202);
+        }
+        if ($orderStatus === 'CANCELLED') {
+            $paymentMethod->status = 'cancelled';
+
+            return response()->json(['status' => 'cancelled', 'message' => 'Payment was cancelled.']);
         }
 
-        $paymentMethod->status = "Error";
+        $paymentMethod->status = 'Error';
         $paymentMethod->save();
         $order->save();
 
-        return response()->json(['status' => 'error', 'message' => 'Payment status is invalid or failed.',],400);
+        return response()->json(['status' => 'error', 'message' => 'Payment status is invalid or failed.'], 400);
+    }
+
+    public function success(Request $request): JsonResponse
+    {
+        try {
+            $query = Arr::only($request->query(), [
+                'statusCode',
+                'statusDescription',
+                'merchantRefNumber',
+            ]);
+
+            // Validate required parameters
+            if (empty($query['merchantRefNumber']) || empty($query['statusCode'])) {
+                return response()->json([
+                    'status' => false,
+                    'trx' => null,
+                    'message' => 'Missing required parameters: merchantRefNumber or statusCode.',
+                ]);
+            }
+
+            $purchaseProduct = CoinLog::where('trx', $query['merchantRefNumber'])->first();
+
+            if (! $purchaseProduct) {
+                return response()->json([
+                    'status' => false,
+                    'trx' => $query['merchantRefNumber'],
+                    'message' => 'Transaction not found.',
+                ]);
+            }
+            \Log::info('this response '.json_encode([
+                    'status' => $query['statusCode'] == 200,
+                    'trx' => $purchaseProduct->trx,
+                    'message' => $query['statusDescription'] ?? 'No description provided.',
+                ]));
+            return response()->json([
+                'status' => $query['statusCode'] == 200,
+                'trx' => $purchaseProduct->trx,
+                'message' => $query['statusDescription'] ?? 'No description provided.',
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'trx' => null,
+                'message' => 'An error occurred: '.$e->getMessage(),
+            ]);
+        }
     }
 }

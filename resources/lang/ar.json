@@ -276,6 +276,8 @@
     "image Id": "صورة Id",
     "start": "بدء",
   "Reset": "إعادة تعيين",
+"This microphone is closed and cannot be accessed":"هذا المايك مغلق ولا يمكن الصعود عليه",
+"Stop sending gifts to everyone":"ايقاف ارسال الهدايا للجميع",
 
     "to many send": "الكثير من الطلبات",
     "code is sent to your phone": "تم إرسال الرمز إلى هاتفك",
@@ -2464,7 +2466,7 @@
   "edit admin profile": "تعديلالملف الشخصي للإدارة",
   "browse updates_family config": "استعراض إعدادات تحديث العائلة",
   "updates_family config": "إعدادات تحديث العائلة",
-  "setting agency system": "إعداد نظام الوكالة",
+  "setting agency system": "إعداد نظام الوكلات",
   "setting agency manager": "إعداد مدير الوكالة",
   "setting internal sales system": "إعداد نظام المبيعات الداخلية",
 "Settings charging agencies": "إعدادات وكالات الشحن",
@@ -3266,7 +3268,31 @@
 "Owner Phone": "هاتف المالك",
 "Charge Agency_": "وكالة شحن موثقة",
 "Appear Charger Agency": "ظهور كوكالة شحن",
-"Is Frozen": "مجمدة"
+"Is Frozen": "مجمدة",
+"Agency join logs":"سجلات انضمام الوكالة",
+"Join date": "تاريخ الانضمام",
+"Leave date": "تاريخ المغادرة",
+"leaving agency": "مغادرة الوكالة",
+"Joined": "انضم",
+"delete agency from admin": "حذف الوكالة من قبل المسؤول",
+"from admin": "من قبل المسؤول",
+"kicked off": "تم الطرد",
+"user setting": "إعدادات المستخدم",
+"This user is the agency owner and cannot be deleted":"هذا المستخدم هو مالك الوكالة ولا يمكن حذفة",
+"User Setting": "إعدادات المستخدم",
+
+    "cut amount": "السحب",
+    "User Net Salary": "صافي الراتب",
+
+"Browse user setting": "تصفح إعدادات المستخدم"
+
+
+
+
+
+
+
+
 
 
 

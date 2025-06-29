@@ -28,21 +28,27 @@ class RegularTarget implements TargetInterface
         if ($target->hours <= $hours) {
             $per += (((int) Common::getSettingsValue('hours')) ?? 0) / 100;
         }
+        // logger('hours Achieved:', [$per]);
+
 
 
         if ($target->days <= $days) {
             $per +=  (((int) Common::getSettingsValue('days')) ?? 0) / 100;
         }
+        // logger('days Achieved:', [$per]);
 
 
         if (((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1] ?? 0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0))) {
 
             $per += (((int)Common::getSettingsValue('moments')) ?? 0) / 100;
         }
+        // logger('targetMoment Achieved:', [$per]);
 
         if (((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0)) && ((@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0)) && ((@$targetReel[2] ?? 0) <= ($extras['reel']['comments'] ?? 0))) {
             $per += (((int)Common::getSettingsValue('reels')) ?? 0) / 100;
         }
+        // logger('targetReel Achieved:', [$per]);
+
         //        if (Common::getConf('all_target_or_nothing') == 'true') {
         //            if ($per < 1) {
         //                $per = 0;

@@ -62,7 +62,8 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego(Request $request)
     {
-      
+
+        Log::info('Zego req',[ 'key' =>$request->all()]);
 
         /*$library = Common::getConfig('library');
         if ($library == 2) return Common::apiResponse(false, 'you used pusher');*/
@@ -258,7 +259,7 @@ class EnteranceController extends Controller
             $owner_id = $room->uid;
         }
 
-      
+
 
 
         $ban = Common::ifRoomHasband($owner_id);
@@ -478,7 +479,7 @@ class EnteranceController extends Controller
     {
         try {
             $user = $request->user();
-            $room = $this->repo->find($id);
+            $room = Room::find($id);
             if (!$room) {
                 return Common::apiResponse(false, 'Room not found', null, 404);
             }
@@ -548,13 +549,7 @@ class EnteranceController extends Controller
             //    $this->repo->save ($room);
 
             $room->save();
-            // if($room->save ()){
-            // return "ايوووه يا باشا ";
-            //             }else{
-            // return "لا يا باشا ";
-
-            //             }
-
+            $room = Room::find($id);
 
             $request['owner_id'] = $room->uid;
             $is_locked = false;
@@ -564,7 +559,7 @@ class EnteranceController extends Controller
             $data = [
                 "messageContent" => [
                     "message" => "changeBackground",
-                    "imgbackground" => $room->final_room_image ?: @$background_me,
+                    "imgbackground" => $background_me ? @$background_me : $room->final_room_image,
                     "roomIntro" => $room->room_intro ?: "",
                     "roomImg" => $room->room_cover ?: "",
                     "room_type" => @$room->myType->name ?: "",

@@ -96,12 +96,21 @@ class AgencyJoinRequestController extends MainController
         $grid->model()->orderByDesc('id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
+
+            $filter->where(function ($query) {
+                $query->whereHas('user', function ($q) {
+                    $q->where('uuid', 'like', '%' . $this->input . '%');
+                });
+            }, __('uuid'), 'text')->placeholder('ادخل UUID')->default('');
+
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('status', __(key: 'status'))->select([0 => __('pending'), 1 => __('accepted'), 2 => __('denied')]);
+                $filter->equal('status', __( 'status'))->select([0 => __('pending'), 1 => __('accepted'), 2 => __('denied')]);
             });
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency.id', __('agency id'));
             });
+
+       
         });
 
         $grid->id(__('ID'));
@@ -117,9 +126,11 @@ class AgencyJoinRequestController extends MainController
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $showUrl = $this->user ? url("admin/users/{$this->user->id}") : "#";
 
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
                         <strong>$name</strong><br>
@@ -139,15 +150,17 @@ class AgencyJoinRequestController extends MainController
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $showUrl = $this->agency ?url("admin/agencies/profile/{$this->agency->id}") : '#';
 
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                     $image
                     <span>$name</span>
                 </div>
             ";
             });
-            $grid->column('whatsapp', __('whatsapp'))->display(function ($number) {
+            $grid->column('user.phone', __('whatsapp'))->display(function ($number) {
                 if (!$number) return '-';
 
                 $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
@@ -292,6 +305,7 @@ class AgencyJoinRequestController extends MainController
                         'agency_id' => $form->model()->agency_id,
                         'type' => 2,
                         'join_date' => now(),
+                        'status' =>'Joined'
                     ]);
                 }
 

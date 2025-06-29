@@ -16,10 +16,10 @@ class BackgroundController extends Controller
 
     protected $backgroundService;
 
-    public function __construct(BackgroundService $backgroundService,
-    private RequestBackgroundImagService $requestBackgroundImagService
-    )
-    {
+    public function __construct(
+        BackgroundService $backgroundService,
+        private RequestBackgroundImagService $requestBackgroundImagService
+    ) {
         $this->backgroundService = $backgroundService;
     }
 
@@ -31,15 +31,26 @@ class BackgroundController extends Controller
     }
 
 
-    public function allBackgrounds(Request $request){
+    public function allBackgrounds(Request $request)
+    {
         $data = $this->backgroundService->index();
-        return Common::apiResponse (1,Common::getConfig('cost_request_background'),$data,200);
+        return Common::apiResponse(1, Common::getConfig('cost_request_background'), $data, 200);
     }
 
-    public function allMyBackgrounds(Request $request){
-        $user = $request->user ();
+    public function backgroundSetting(Request $request)
+    {
+        $data = [
+            'cost' => Common::getConfig('cost_request_background'),
+            'expire' => Common::getConfig('background_expiration'),
+        ];
+        return Common::apiResponse(1, '', $data, 200);
+    }
+
+    public function allMyBackgrounds(Request $request)
+    {
+        $user = $request->user();
         $costRequestBackGround = Common::getConfig('cost_request_background');
         $data = $this->requestBackgroundImagService->findByUserId($user->id);
-        return Common::apiResponse (1,$costRequestBackGround,$data,200);
+        return Common::apiResponse(1, $costRequestBackGround, $data, 200);
     }
 }
