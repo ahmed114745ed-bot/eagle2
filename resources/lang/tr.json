@@ -185,6 +185,10 @@
   "Type": "Tip",
   "Level": "Seviye",
   "Exp": "Deneyim Puanı",
+
+    "cut amount": "Çekilen Tutar",
+    "User Net Salary": "Kullanıcının Net Maaşı",
+
   "Image": "Resim",
   "id type": "Kimlik Tipi",
   "big": "VIP",

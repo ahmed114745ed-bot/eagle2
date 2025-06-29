@@ -3280,6 +3280,10 @@
 "user setting": "إعدادات المستخدم",
 "This user is the agency owner and cannot be deleted":"هذا المستخدم هو مالك الوكالة ولا يمكن حذفة",
 "User Setting": "إعدادات المستخدم",
+
+    "cut amount": "السحب",
+    "User Net Salary": "صافي الراتب",
+
 "Browse user setting": "تصفح إعدادات المستخدم"
 
 
