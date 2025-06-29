@@ -47,7 +47,7 @@ class CoinService
                 'paid_usd' => $coin->usd,
                 'obtained_coins' => $coin->coin,
                 'user_id' => $user->id,
-                'method' => $request->pay_method,
+                'method' => $paymentMethod,
                 'trx' => $trx,
                 'status' => 0,
                 'coin_id' => $request->coin_id,
@@ -104,10 +104,10 @@ class CoinService
                     return $paymentUrl;
                 }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
-            } else if ($request->pay_method == 'opay') {
+            } else if ($paymentMethod == 'opay') {
                 $opay = new OPayController();
                 return $opay->make($data, $user);
-            } else if ($request->pay_method == 'zinipay') {
+            } else if ($paymentMethod == 'zinipay') {
                 $ziniPayService = new ZiniPaymentService();
                 return $ziniPayService->makePayment($log->id, $coin->usd, $user);
             } else if ($paymentMethod == 'paypal') {
