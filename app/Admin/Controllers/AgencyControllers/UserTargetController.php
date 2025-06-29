@@ -48,6 +48,9 @@ class UserTargetController extends MainController
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name = @$this->user->name ?? '';
             $uid = @$this->user->uuid;
+             if (request()->filled('_export_')) {
+                return "{$name} (UUID: {$uid})";
+            }
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -81,6 +84,9 @@ class UserTargetController extends MainController
 
             }
             $name = @$this->agency->name ?? '';
+             if (request()->filled('_export_')) {
+                return $name;
+            }
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -154,6 +160,9 @@ class UserTargetController extends MainController
             HTML;
         });
         $grid->column('user_obtain', __('salary'))->display(function ($usd) {
+            if (request()->filled('_export_')) {
+                return $usd;
+            }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -169,7 +178,10 @@ class UserTargetController extends MainController
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)
                 ->value('cut_amount') ?? 0;
-
+              if (request()->filled('_export_')) {
+                return $userSalary;
+            }
+              
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -187,6 +199,9 @@ class UserTargetController extends MainController
                 ->where('user_agency_id', $this->agency_id)
                 ->selectRaw('sallary - cut_amount AS net_salary')
                 ->value('net_salary') ?? 0;
+                if (request()->filled('_export_')) {
+                return $userSalary;
+            }
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$userSalary}</span>
@@ -194,6 +209,9 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('agency_obtain', __('agency salary'))->display(function ($usd) {
+            if (request()->filled('_export_')) {
+                return $usd;
+            }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
