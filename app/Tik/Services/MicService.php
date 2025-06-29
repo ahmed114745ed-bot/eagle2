@@ -69,6 +69,8 @@ class MicService
 
         if (!isset($mic_arr[$position])) {
             throw new Exception(__('This seat is out of the designated range'));
+        }elseif ($position == 0 && $room->uid != \Auth::id()){
+            throw new Exception(__('This seat is for owner'));
         }
 
         $current = $mic_arr[$position] ?? '0';
