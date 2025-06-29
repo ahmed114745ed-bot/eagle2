@@ -75,7 +75,7 @@ class UserTargetController extends MainController
             if (!@$this->agency )
             {return "
             <div style='display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>'unknown agency'</span>
+                         <span style='text-decoration: underline; cursor: pointer;'>unknown agency</span>
             </div>
         ";
 
