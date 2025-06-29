@@ -147,6 +147,7 @@ class EnteranceRoomServices
         $event = $request->event;
         $roomId = $request->room_id;
         $userId = $request->user_account;
+        Log::info('zego req 2',['req' => $request->all()]);
 
 
         
