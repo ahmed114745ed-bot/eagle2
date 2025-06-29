@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\UserTarget;
+use App\Models\UserSallary;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Admin\Controllers\MainController;
@@ -35,17 +36,17 @@ class UserTargetController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserTarget);
-         $grid->filter(function (Grid\Filter $filter) {
+        $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-             $filter->disableIdFilter();
+            $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('uuid'));
             });
         });
-        $grid->model ()->ofAgency()->where('agency_obtain','>',0);
+        $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
         $grid->id('ID');
-        $grid->column('user_id',__('user'))->display(function ($name) {
-            $name =@$this->user->name ?? '';
+        $grid->column('user_id', __('user'))->display(function ($name) {
+            $name = @$this->user->name ?? '';
             $uid = @$this->user->uuid;
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -70,7 +71,7 @@ class UserTargetController extends MainController
                 </div>
             ";
         });
-        $grid->column('agency_id',__ ('agency'))->display(function () {
+        $grid->column('agency_id', __('agency'))->display(function () {
             $name = @$this->agency->name ?? '';
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
@@ -81,27 +82,35 @@ class UserTargetController extends MainController
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
+            $showUrl = url("admin/agencies/{$this->agency->id}");
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
-                <span>$name</span>
+                 <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
             </div>
         ";
         });
-        $grid->column('target_id',__ ('target id'));
-        $grid->column('target_diamonds',__ ('target diamonds'));
         $grid->column('add_month', __('date'))->display(function ($month) {
             return $month . '/' . $this->add_year;
         });
-        $grid->column('target_usd',__('usd').' '.__ ('deserved'));
-        $grid->column('target_hours',__ ('target hours'));
-        $grid->column('target_days',__ ('target days'));
-        $grid->column('target_agency_share',__ ('agency share').'(%)');
-        $grid->column('user_diamonds',__ ('user diamonds'));
-        $grid->column('user_hours',__ ('user hours'));
-        $grid->column('user_days',__ ('user days'));
-        $grid->column('user_obtain',__ ('user obtain'))->display(function ($usd) {
+        $grid->column('target_id', __('target id'));
+        $grid->column('target_diamonds', __('target diamonds'));
+
+        $grid->column('target_usd', __('usd') . ' ' . __('deserved') . '(%)');
+        $grid->column('target_hours', __('target hours'))->display(function ($usd) {
+             return $usd . '/'.$this->target_hours;
+        });
+        $grid->column('target_days', __('target days'))->display(function ($usd) {
+            
+            return $usd . '/'.$this->target_days;
+        });
+        $grid->column('target_agency_share', __('agency share') . '(%)');
+        $grid->column('user_diamonds', __('user diamonds'));
+        $grid->column('user_hours', __('user hours'));
+        $grid->column('user_days', __('user days'));
+        $grid->column('user_obtain', __('salary'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -109,7 +118,39 @@ class UserTargetController extends MainController
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->column('agency_obtain',__ ('agency obtain'))->display(function ($usd) {
+        $grid->column('withdrawal', __('withdrawal'))->display(function () {
+            $userSalary = UserSallary::query()->where('user_id', $this->user_id)
+                ->where('month', $this->add_month)
+
+                ->where('year', $this->add_year)
+                ->where('target_id', $this->target_id)
+                ->where('user_agency_id', $this->agency_id)
+                ->value('cut_amount');
+
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$userSalary}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('net_salary', __('net salary'))->display(function () {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            $userSalary = UserSallary::query()->where('user_id', $this->user_id)
+                ->where('month', $this->add_month)
+
+                ->where('year', $this->add_year)
+                ->where('target_id', $this->target_id)
+                ->where('user_agency_id', $this->agency_id)
+                ->selectRaw('sallary - cut_amount AS net_salary')
+                ->value('net_salary');
+            return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$userSalary}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('agency_obtain', __('agency salary'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -117,10 +158,8 @@ class UserTargetController extends MainController
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->disableActions ();
-        $grid->disableCreateButton ();
+        $grid->disableActions();
+        $grid->disableCreateButton();
         return $grid;
     }
-
-
 }
