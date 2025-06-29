@@ -548,13 +548,7 @@ class EnteranceController extends Controller
             //    $this->repo->save ($room);
 
             $room->save();
-            // if($room->save ()){
-            // return "ايوووه يا باشا ";
-            //             }else{
-            // return "لا يا باشا ";
-
-            //             }
-
+            $room = Room::find($room->id);
 
             $request['owner_id'] = $room->uid;
             $is_locked = false;
