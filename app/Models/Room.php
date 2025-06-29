@@ -245,7 +245,10 @@ class Room extends Model
             'owner_room_id',
             'uid',
             'id'
-        )->where('request_background_images.status', 1);
+        )->where('request_background_images.status', 1)->where(function ($q) {
+                    $q->where('expair', '>=', now()->timestamp)
+                        ->orWhere('expair', 0);
+                })->orderByDesc('id');
     }
 
     public function getVisitorsImages()
@@ -268,7 +271,7 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
-
+   //  dd($this->backgroundImage?->img);
         $var = /*$this->mode == '3' ?
             'custom_image/back-black.png' :*/
             ($this->backgroundImage?->img ?: ($this->background?->img ?: (request()->default_background ?? DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img)));

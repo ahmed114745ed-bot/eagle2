@@ -35,6 +35,13 @@ class UserTargetController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserTarget);
+         $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+             $filter->disableIdFilter();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user.uuid', __('uuid'));
+            });
+        });
         $grid->model ()->ofAgency()->where('agency_obtain','>',0);
         $grid->id('ID');
         $grid->column('user_id',__('user'))->display(function ($name) {
