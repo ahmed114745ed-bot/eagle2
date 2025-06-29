@@ -182,6 +182,8 @@ class UserResource extends JsonResource
                 "image" => $this->shippingAgency->img ?? '',
                 "complete-transactions" => $this->shippingAgency->charges?->count() ?? 0,
             ] : null,
+        'has_anti_ban'       => Common::hasInPack($this->id, 15, true),
+
         ];
 
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {

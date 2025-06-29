@@ -121,15 +121,15 @@ class StripeController extends Controller
         try {
             Session::retrieve($sessionId);
 
-            return response('Payment successful.', 200);
+            return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
         } catch (\Exception $e) {
-            return response('Payment verification failed.', 500);
+            return response()->json(['status' => 'failed', 'message' => 'Payment failed.',], 500);
         }
     }
 
     public function cancel()
     {
-        return response('Payment was cancelled.', 200);
+        return response()->json(['status' => 'cancelled', 'message' => 'Payment cancelled.',]);
     }
 
 }

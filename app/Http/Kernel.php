@@ -100,6 +100,7 @@ class Kernel extends HttpKernel
         'auth.config' => ConfigLoginMiddleWare::class,
         'clear.session' => \App\Http\Middleware\ClearSessionAfterRequest::class,
         'verify.fawry.signature' => \App\Http\Middleware\VerifyFawrySignature::class,
+        'verify.utdFawry.signature' => \App\Http\Middleware\VerifyUtdFawrySignature::class,
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
         'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,

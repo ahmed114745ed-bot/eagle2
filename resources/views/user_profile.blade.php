@@ -1133,19 +1133,29 @@
                 <div class="agency-meta">
                     <div class="meta-item">
                         <span class="meta-label">{{ __('diamonds') }}:</span>
-                        <span class="meta-value">{{ @$user->getTotalDiamond() }}</span>
+                        @php
+
+                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->getTotalDiamond() ;
+
+                        @endphp
+                        <span class="meta-value">{{ @$user_diamonds }}</span>
 
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{__('coins')}}:</span>
                         <span class="meta-value">{{@$user->di }}</span>
                     </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('type')}}:</span>
-                        <span class="meta-value">{{@$user->userType() }}</span>
-                    </div>
+                  
 
                 </div>
+            </div>
+            <div class="agency-meta">
+                 <div class="meta-item">
+                        <span class="meta-label">{{__('type')}}:</span>
+                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->      
+                   {!! @$user->userTypeBadge() !!}
+                    </div>
+
             </div>
         </div>
         <button class="btn-back" onclick="window.location.href='{{ url('admin/users') }}'">
@@ -1173,6 +1183,8 @@
 
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
+           <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
+           
 
 
 
@@ -1207,7 +1219,8 @@
                     <ul class="nav nav-pills">
                         @foreach($types as $id => $name)
                             @php
-                                $selectedType = request()->get('type', 4); // Default to 1
+                             $defaultType = $types->keys()->first();
+                                $selectedType = request()->get('type', $defaultType); // Default to 1
                             @endphp
                             <li class="{{ $selectedType == $id ? 'active' : '' }}">
                                 <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">
@@ -1570,6 +1583,229 @@
             </div>
         </div>
     </div>
+
+    {{-- <div class="tab-content" id="user-agency-tab">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title" style="text-align: left;">{{ __('Agency join logs') }}</h4>
+            </div>
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="user-agency">
+                            
+                            <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
+
+                            <div class="row mb-3" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('Join date') }}</span>
+                                        <input type="date" class="form-control" id="from_date" name="join_date" value="{{ request('join_date') }}">
+                                    </div>
+                                </div>
+                        
+                                <!-- Buttons -->
+                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <div class="box-body ">
+                        <table class="table table-bordered table-hover align-middle data-table" id="user-agency">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('agency') }}</th>
+                                <th>{{ __('status') }}</th>
+                                <th>{{ __('Join date') }}</th>
+                                <th>{{ __('Leave date') }}</th>
+                               
+
+                            </tr>
+                            </thead>
+                            @if($userJoinAgencies && $userJoinAgencies->count())
+                                <tbody style="color: rgb(208, 115, 43);">
+                                @foreach($userJoinAgencies as $index => $userJoinAgency)
+
+                                    @php
+                                        $agency = $userJoinAgency->agency;
+                                        $name = $agency->name ?? '';
+
+                                        $path = @$agency->img;
+                                        $defaultImage = asset("images/icon-agency.jpg");
+                                        $url = getImagePath($path) ?? $defaultImage;
+
+                                        if (!isImageExists($url)) {
+                                            $url = $defaultImage;
+                                        }
+
+                                        $image = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>"; // ← rectangle with slightly rounded corners
+
+                                        $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+
+                
+                                    @endphp
+
+                                    <tr>
+                                        <td>{{ $index + 1 + (($userJoinAgencies->currentPage() - 1) * $userJoinAgencies->perPage()) }}</td>
+                                        <td>
+                                            <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    {!! $image !!}
+                                                    <div style="display: flex; flex-direction: column;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
+                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+
+
+                                        <td>{{$userJoinAgency->status}}</td>
+                                        <td>{{ $userJoinAgency->join_date}}</td>
+                                        <td>{{ $userJoinAgency->leave_date }}</td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            @endif
+                        </table>
+
+                        @if($userJoinAgencies)
+                            <div class="pagination-container">
+                                {{ $userJoinAgencies->appends([
+                                    'pack_page' => $packs?->currentPage(),
+                                    'vip_page' => $userVips?->currentPage(),
+                                    'gift_page' => $giftSLogs?->currentPage(),
+                                    'user_agency_page' => $userJoinAgencies?->currentPage(),
+
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div> --}}
+
+
+<div class="tab-content" id="user-agency-tab" style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title" style="text-align: left;">{{ __('Agency join logs') }}</h4>
+        </div>
+        <div class="box-body p-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
+                        <input type="hidden" name="tab" value="user-agency">
+                        
+                        <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
+
+                        <div class="row mb-3" style="align-items: flex-end;">
+                            <!-- From Date -->
+                            <div class="col-md-4">
+                                <div class="date-flex-row">
+                                    <i class="fa fa-calendar"></i>
+                                    <span>{{ __('Join date') }}</span>
+                                    <input type="date" class="form-control" id="from_date" name="join_date" value="{{ request('join_date') }}">
+                                </div>
+                            </div>
+                    
+                            <!-- Buttons -->
+                            <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                <button type="submit" class="btn btn-info btn-sm me-2">
+                                    <i class="fa fa-search"></i> {{__('Search')}}
+                                </button>
+                                <a href="{{ url('admin/users/' . $user->id. '?tab=user-agency') }}" class="btn btn-default btn-sm">
+                                    <i class="fa fa-undo"></i> {{__('Reset')}}
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <div class="box-body ">
+                    <table class="table table-bordered table-hover align-middle data-table" id="user-agency">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('agency') }}</th>
+                            <th>{{ __('status') }}</th>
+                            <th>{{ __('Join date') }}</th>
+                            <th>{{ __('Leave date') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            @if($userJoinAgencies && $userJoinAgencies->count())
+                                @foreach($userJoinAgencies as $index => $userJoinAgency)
+                                    @php
+                                        $agency = $userJoinAgency->agency;
+                                        $name = $agency->name ?? '';
+                                        $path = @$agency->img;
+                                        $defaultImage = asset("images/icon-agency.jpg");
+                                        $url = getImagePath($path) ?? $defaultImage;
+                                        if (!isImageExists($url)) {
+                                            $url = $defaultImage;
+                                        }
+                                        $image = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                        $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+                                    @endphp
+
+                                    <tr>
+                                        <td>{{ $index + 1 + (($userJoinAgencies->currentPage() - 1) * $userJoinAgencies->perPage()) }}</td>
+                                        <td>
+                                            <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
+                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                    {!! $image !!}
+                                                    <div style="display: flex; flex-direction: column;">
+                                                    <span style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
+                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td>{{$userJoinAgency->status}}</td>
+                                        <td>{{ $userJoinAgency->join_date}}</td>
+                                        <td>{{ $userJoinAgency->leave_date }}</td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="5" class="text-center">{{ __('No agency join logs found') }}</td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+
+                    @if($userJoinAgencies && $userJoinAgencies->count())
+                        <div class="pagination-container">
+                            {{ $userJoinAgencies->appends([
+                                'tab' => 'user-agency',
+                                'user_agency_page' => $userJoinAgencies?->currentPage(),
+                            ])->links('vendor.pagination.bootstrap-4') }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 @if($activeTab == 'charge')
@@ -1743,7 +1979,7 @@
                             {{ $giftType == 'receiver' ? __('total diamonds received') : __('total diamonds sent') }}
                         </div>
                         <div class="diamond-count">
-                            <span>{{ numToString(@$diamonds) }}</span>
+                            <span>{{ number_format(@$diamonds) }}</span>
                             <div class="diamond-icon-container">
                                 <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
                             </div>
@@ -1852,6 +2088,8 @@
         </div>
     </div>
 @endif
+
+    
 
 <div class="modal fade" id="Add_model" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
@@ -1967,15 +2205,27 @@
             }
 
             tab.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.getElementById('tab-loading').style.display = 'block';
-                allTabs.forEach(t => t.style.pointerEvents = 'none');
-                const href = tab.getAttribute('href');
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 300);
+                    e.preventDefault();
+
+                    const currentUrl = new URL(window.location.href);
+                    const href = tab.getAttribute('href');
+                    const targetUrl = new URL(href, currentUrl.origin);
+
+                    // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
+                    if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
+                        document.getElementById('tab-loading').style.display = 'block';
+                        allTabs.forEach(t => t.style.pointerEvents = 'none');
+
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 300);
+                    } else {
+                        // لا تعرض اللودر إذا الرابط خارج التابات
+                        window.location.href = href;
+                    }
+                });
             });
-        });
+    
 
         if (targetElement) {
             setTimeout(() => {

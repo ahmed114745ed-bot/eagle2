@@ -38,6 +38,7 @@ class CoinService
     public function buyCoins($user, $request)
     {
         $coin = $this->coinRepository->findById($request->coin_id);
+        $paymentMethod = $coin->paymentCoin->type;
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $trx = rand(111111111111111111, 999999999999999999);
         // DB::beginTransaction();
@@ -60,9 +61,9 @@ class CoinService
                 'order_id' => $log->id,
                 'user_id' => $user->id
             ];
-            if ($request->pay_method == 'strip') {
+            if ($paymentMethod == 'strip') {
                 $stripe_test_secret_key = config('stripe.test_secret_key');
-                $is_stripe_active = config('is_stripe_active');
+                $is_stripe_active = config('is_strip_active');
                 $stripe_currency = config('stripe.currency');
                 $stripe_webhook_secret = config('stripe.webhook_secret');
 
@@ -76,12 +77,14 @@ class CoinService
                 || !$stripe_currency
                 || !$stripe_webhook_secret
                 ){
-                    return Common::apiResponse(0, 'Please set strip information', null, 400);
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 }
                 $strip = new \App\Classes\PaymentGateways\Stripe();
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
-            } elseif ($request->pay_method == 'fawry') {
+            } elseif ($paymentMethod == 'fawry') {
+                $Active = config('is_fawry_active');
+                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $newFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
@@ -90,11 +93,13 @@ class CoinService
                     return $paymentUrl;
                 }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
-            } elseif ($request->pay_method == 'utdFawry') {
+            } elseif ($paymentMethod == 'utd_fawry') {
+                $Active = config('is_utd_fawry_active');
+                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $oldFawryService = new FawryPaymentService();
-                $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
+                $exterData = ["type" => 'charge_coin', 'paymentType' => "expenses"];
 
-                $paymentUrl = $oldFawryService->makePayment($log->id, $coin->usd, $exterData);
+                $paymentUrl = $oldFawryService->makePayment($log->trx, $coin->usd, $exterData);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
@@ -105,7 +110,9 @@ class CoinService
             } else if ($request->pay_method == 'zinipay') {
                 $ziniPayService = new ZiniPaymentService();
                 return $ziniPayService->makePayment($log->id, $coin->usd, $user);
-            } else if ($request->pay_method == 'paypal') {
+            } else if ($paymentMethod == 'paypal') {
+                $Active = config('is_paypal_active');
+                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $paypalService = new PayPalService();
                 $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
                 return Common::apiResponse(1, 'ok', $paymentLink, 200);

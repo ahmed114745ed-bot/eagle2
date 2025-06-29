@@ -19,8 +19,6 @@ class PayPalService
 
     protected function getAccessToken(): string
     {
-        info(config('paypal.client_id'));
-        info(config('paypal.client_secret'));
         $headers = [
             'Content-Type'  => 'application/x-www-form-urlencoded',
             'Authorization' => 'Basic ' . base64_encode(config('paypal.client_id') . ':' . config('paypal.client_secret'))
@@ -50,7 +48,7 @@ class PayPalService
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
-                'return_url'  => url("/api/paypal-success/$referenceId"),
+                'return_url'  => url("/api/paypal-return/$referenceId"),
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
             ],
@@ -65,7 +63,6 @@ class PayPalService
             ],
         ];
 
-        info(config('paypal.base_url'));
         $response = Http::withHeaders($headers)
             ->withBody(json_encode($body))
             ->post(config('paypal.base_url'). '/v2/checkout/orders');
@@ -137,12 +134,13 @@ class PayPalService
 
     public function success($orderId): mixed
     {
-        sleep(20);
+        sleep(25);
         $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
 
         if ($coinLog->status){
             if ($coinLog->status) {
-                return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);}
+                return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
+            }
         }
 
         return response()->json(['status' => 'failed', 'message' => 'Payment failed.',], 500);
@@ -150,7 +148,6 @@ class PayPalService
 
     public function callback(Request $request): JsonResponse
     {
-        info('webhook-'.$request);
         $eventType = $request->get('event_type');
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
             return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);

@@ -95,6 +95,7 @@ class UserVisitorResource extends JsonResource
                 "followers" => count(@$this->followers),
                 "bio" => @$this->bio,
             ],
+            'color_name'   => common::wareUserVipColor($this->id, 18) ?? '',
 
         ];
 

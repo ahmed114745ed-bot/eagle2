@@ -61,30 +61,54 @@ class MicService
         $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
         if (!$room)  throw new Exception(__('room does not exist'));
 
-        $position = $data['position']; //mic sequence 0-8
-
+        //
+        $position = $data['position']; // mic index
         $mic_arr = explode(',', $room->microphone);
         $main_mic = explode(',', $room->main_microphone);
-        $base_mic = explode(',', $room->getOriginal('microphone'));
+        $base_mic = explode(',', $room->microphone_only_users);
 
-        if (!isset($main_mic[$position])) throw new Exception(__('This seat is out of the designated range'));
-        $oldValue = $main_mic[$position];
+        if (!isset($mic_arr[$position])) {
+            throw new Exception(__('This seat is out of the designated range'));
+        }elseif ($position == 0 && $room->uid != \Auth::id()){
+            throw new Exception(__('This seat is for owner'));
+        }
 
-        //If it is on the mic, skip to the top mic, and the original mic is empty
+        $current = $mic_arr[$position] ?? '0';
+        $old_status = '0';
+        $old_user = '0';
+
+        if (str_contains($current, '#')) {
+            [$old_user, $old_status] = explode('#', $current);
+        } elseif (is_numeric($current) && (int)$current > 0) {
+            $old_user = $current;
+            $old_status = '-1'; // Assume occupied but no explicit status
+        } else {
+            $old_user = '0';
+            $old_status = $current;
+        }
+
+        if ($old_status == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
+            throw new Exception(__('This microphone is closed and cannot be accessed'));
+        }
+
         if (in_array($user->id, $mic_arr)) {
-
             CpRoomHistory::where("user_one_id", $user->id)
                 ->orWhere("user_two_id", $user->id)->delete();
 
             $key = array_search($user->id, $mic_arr);
-            $old = $main_mic[$key];
+            $old = $main_mic[$key] ?? '0';
             $base_mic[$key] = $old;
         }
-        if (@$mic_arr[$position] != -1 || RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
 
-            $base_mic[$position] = $user->id . '#' . $oldValue ?: 0;
-        }
+        $base_mic[$position] = $user->id . '#' . $old_status;
+
         $mic = implode(',', $base_mic);
+
+        // \Log::info('shami test go_microphone_hand', [
+        //     'microphoneold' => $mic_arr,
+        //     '$room->microphone_only_users' => $room->microphone_only_users,
+        //     'mic' => $mic,
+        // ]);
         $this->updateMicAndPK($room, $mic);
         //Remove mic sequence
         Common::delMicHand($user->id);
@@ -274,7 +298,7 @@ class MicService
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
-
+        //   Log::info('goMicrophoneHand',['goMicrophoneHand'=> $original]);
         if (!$microphone || !in_array($user->id, $microphone)) {
             return 0;
         }
@@ -304,6 +328,7 @@ class MicService
 
         // Save to DB
         $result = implode(',', $final);
+        // Log::info('goMicrophoneHand',['final'=> $result]);
         $this->updateMicAndPK($room, $result);
 
         // Clear mic timer and leave CP
@@ -332,7 +357,10 @@ class MicService
         $position = $data['position'];
         $room = $this->roomRepository->findRoomUser($data['owner_id']);
         if (!$room) throw new Exception(__('room fot found'));
-        if ($user->id != $room->uid) throw new Exception(__('you don not have permission'));
+        if ($user->id != $room->uid && !in_array($user->id, $room->admins ?? [])) {
+            throw new Exception(__('you do not have permission'));
+        }
+
         if ($room['mode'] == 0) {
             if ($position < 0 || $position > 9) throw new Exception(__('api_responses.position_error'));
         } else {
@@ -346,7 +374,7 @@ class MicService
         }
 
 
-        $microphone = $room->microphone_only_users;
+        $microphone = $room->getOriginal('microphone');
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);

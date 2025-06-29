@@ -31,6 +31,7 @@ use Modules\Reals\Traits\RealRelationshipTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
+use App\Models\Config as ConfigModel;
 
 /**
  * @method static withoutAppends()
@@ -291,15 +292,16 @@ class User extends Authenticatable
         return $userSallary?->toArray() ?? [];
     }
 
-    public function getSallaryInfoByMonth2($month, $year): array
+    public function getSallaryInfoByMonth2($month, $year,$agencyId): array
     {
         $userSallary = UserSallary::query()
             ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
             ->where('user_id', $this->id)
+            ->where('user_agency_id', '=',$agencyId)
             ->where('month', $month)
             ->where('year', $year)
             ->first();
-
+            
         return $userSallary?->toArray() ?? [];
     }
 
@@ -779,6 +781,17 @@ class User extends Authenticatable
         //        }
     }
 
+    public function getSalaryWithoutCutAmountAttribute()
+    {
+        $userSallary = UserSallary::query()
+            ->where('user_id', $this->id)
+            ->sum(DB::raw('sallary'));
+
+
+
+        return round($userSallary, 2);
+    }
+
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level + $this->sub_charger_level;
@@ -1118,9 +1131,9 @@ class User extends Authenticatable
 
         if ($this->agency_id) {
             $userSallary = UserTarget::query()
-            ->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(add_year,"-", add_month)'), '=', $year . '-' . $month);
-            })->where('user_id', $this->id)
+                ->where(function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(add_year,"-", add_month)'), '=', $year . '-' . $month);
+                })->where('user_id', $this->id)
                 ->where('agency_id', $this->agency_id)
                 ->orderByDesc('id')
                 ->sum(DB::raw('user_diamonds'));
@@ -1199,7 +1212,7 @@ class User extends Authenticatable
     public function getLoadedPacks()
     {
         if ($this->loadedPacks === null) {
-//            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
+            //            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
             $this->loadedPacks = $this->packs()->where('is_used', 1)->with('ware')->get();
         }
 
@@ -1344,6 +1357,52 @@ class User extends Authenticatable
         return $userType;
     }
 
+    public function userTypeBadge()
+    {
+        $lang = app()->getLocale() ?? 'en';
+
+        $types = [
+            1 => 'agency_owner',
+            2 => 'host',
+            3 => 'shipping',
+            4 => 'bd',
+        ];
+
+        $userType = $this->type_user;
+
+        if (!isset($types[$userType])) {
+            return $lang === 'ar' ? 'مستخدم' : 'User';
+        }
+
+        $applicableTypes = array_filter($types, function ($key) use ($userType) {
+            return $key <= $userType;
+        }, ARRAY_FILTER_USE_KEY);
+
+        $configKeys = [];
+        foreach ($applicableTypes as $key => $type) {
+            $configKeys[] = "{$lang}_{$type}";
+            $configKeys[] = "en_{$type}"; // fallback
+        }
+
+        $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
+
+        $html = '<div class="user-type-badges">';
+
+        foreach ($applicableTypes as $typeKey => $typeName) {
+            $localizedKey = "{$lang}_{$typeName}";
+            $fallbackKey = "en_{$typeName}";
+
+            $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
+            $url = getImagePath($url);
+            if ($url) {
+                 $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
+              //  $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '">';
+            }
+        }
+        $html .= '</div>';
+
+        return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
+    }
     public function wallet()
     {
         return $this->hasOne(UserWallet::class);

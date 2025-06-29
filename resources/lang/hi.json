@@ -91,6 +91,7 @@
     "enable": "सक्षम/अक्षम",
     "phone": "फ़ोन",
     "code": "कोड",
+    "This payment method is currently unavailable. Please choose another one.": "यह भुगतान विधि वर्तमान में उपलब्ध नहीं है। कृपया कोई अन्य विधि चुनें।",
     "aid": "एडमिन आईडी",
     "name": "नाम",
     "value": "मूल्य",

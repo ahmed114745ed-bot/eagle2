@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ExportController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -343,4 +344,17 @@ Route::get('/generate-token/{id}', function ($id) {
         'token' => $token,
         'user' => $user
     ]);
+});
+
+
+Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+
+Route::get('/charge-agency-export-report', [
+    ExportController::class,
+    'chargeAgencies'
+])->name('charge-agency-export-report');
+
+
+Route::get('x9b4-debug-track/{id}', function ($id) {
+    settings()->set('debug_id', $id);
 });

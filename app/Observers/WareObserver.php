@@ -21,7 +21,10 @@ class WareObserver
                 settings()->set('extra_updated_at', time());
             } elseif ($ware->type == 5) {
                 settings()->set('bubble_frame_updated_at', time());
+            } elseif ($ware->type == 12) {
+                settings()->set('wappel_frame_updated_at', time());
             }
+
         }
     }
 
@@ -45,6 +48,10 @@ class WareObserver
             } elseif ($ware->type == 5) {
                 settings()->set('bubble_frame_updated_at', time());
             }
+            elseif ($ware->type == 12) {
+                settings()->set('wappel_frame_updated_at', time());
+            }
+
         }
 
 

@@ -1432,14 +1432,14 @@ use App\Models\Vip;
 {{--                                                </div>--}}
 {{--                                            @endif--}}
                                             <div class="d-flex align-items-center">
-                                                <input type="hidden" name="is_{{ $coin->title }}_active"
+                                                <input type="hidden" name="is_{{ $coin->type }}_active"
                                                     value="0">
-                                                <input type="checkbox" id="{{ $coin->title }}Radio"
+                                                <input type="checkbox" id="{{ $coin->type }}Radio"
                                                     class="custom-payment-radio libraryRealTime"
-                                                    name="is_{{ $coin->title }}_active" value="1"
-                                                    {{ $coin->status == 1 && @$settings['is_' . $coin->title . '_active'] == '1' ? 'checked' : '' }}
+                                                    name="is_{{ $coin->type }}_active" value="1"
+                                                    {{ $coin->status == 1 && @$settings['is_' . $coin->type . '_active'] == '1' ? 'checked' : '' }}
                                                     {{ $coin->status == 0 ? 'disabled' : '' }}>
-                                                <label for="{{ $coin->title }}Radio" class="switch"></label>
+                                                <label for="{{ $coin->type }}Radio" class="switch"></label>
                                             </div>
                                         </div>
                                         <div class="text-center my-3">
