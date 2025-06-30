@@ -1723,7 +1723,7 @@ class Common
                 return [
                     'name' => $resource->admin->name ?? '',
                     'image' => $resource->admin->avatar ?? '',
-                    'uuid' => $resource->admin->uuid ?? '',
+                    'uuid' => $resource->admin->id ?? '',
                     'id' => $resource->admin->id ?? '',
                     'type' => 'dash',
                     'url' => $resource->admin ? url("admin/auth/users/{$resource->admin->id}") : '#',
