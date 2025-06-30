@@ -334,39 +334,61 @@ class ChargeReportController extends MainController
         }
         
         if ($charger_type == "dash") {
-            $grid->column('usd', __('amount $'))->display(function ($coin) {
-                $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-                return "
-                    <div style='display: flex; align-items: center; gap: 5px;'>
-                        <span>" . number_format($coin) . "</span>
-                        <img src='{$icon}' alt='Coin' width='20' height='20'>
+            // $grid->column('usd', __('amount $'))->display(function ($coin) {
+            //     $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            //     return "
+            //         <div style='display: flex; align-items: center; gap: 5px;'>
+            //             <span>" . number_format($coin) . "</span>
+            //             <img src='{$icon}' alt='Coin' width='20' height='20'>
 
-                    </div>
-                ";
-            });
+            //         </div>
+            //     ";
+            // });
 
-            $image = asset('images/coin.png');
-            $grid->column('balance_before', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
-                ->display(function ($coin) {
-                    $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+            // $image = asset('images/coin.png');
+            // $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
+            //     ->display(function ($coin) {
+            //         $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
 
-                    return "<div style='display: flex; align-items: center; gap: 5px;'>
-                            <span>{$coin}</span>
-                            <img src='{$image}' alt='USD' width='20' height='20'>
-                        </div>";
-                });
+            //         return "<div style='display: flex; align-items: center; gap: 5px;'>
+            //                 <span>{$coin}</span>
+            //                 <img src='{$image}' alt='USD' width='20' height='20'>
+            //             </div>";
+            //     });
         } elseif ((request("name") == "host") || (request("name") == "shipping-agency-activity")) {
-            $grid->column('amount', __('amount'))->display(function ($coin) {
-                $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-                return "
-                    <div style='display: flex; align-items: center; gap: 5px;'>
-                        <span>" . number_format($coin) . "</span>
-                        <img src='{$icon}' alt='Coin' width='20' height='20'>
+            // $grid->column('amount', __('amount'))->display(function ($coin) {
+            //     $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            //     return "
+            //         <div style='display: flex; align-items: center; gap: 5px;'>
+            //             <span>" . number_format($coin) . "</span>
+            //             <img src='{$icon}' alt='Coin' width='20' height='20'>
 
-                    </div>
-                ";
-            });
+            //         </div>
+            //     ";
+            // });
         }
+        $grid->column('usd', __('amount $'))->display(function ($coin) {
+            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
+
+
+        $image = asset('images/coin.png');
+        $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
+            ->display(function ($coin) {
+                $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$coin}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+            });
 
 
         //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
