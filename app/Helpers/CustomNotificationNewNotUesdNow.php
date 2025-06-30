@@ -335,50 +335,67 @@ class CustomNotificationNewNotUesdNow
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public  function officialMsg(OfficialMessageAdmin $msg)
+    public function officialMsg(OfficialMessageAdmin $msg): void
     {
-        $user_id = $msg->user_id;
-        if ($user_id == 0) {
-            $usersChunk = User::where('notification_id', '!=', NULL)->select(['id', 'notification_id'])->get()->unique('notification_id')->chunk(100);
-            $body             = $msg->content;
-            $title = $msg->title;
-            $data['image'] = null;
-            $icon = null;
-            if ($msg->img) {
-                $data['image'] = getImagePath($msg->img);
-                $icon = $data['image'];
-            }
+        $title = $msg->title;
+        $body = $msg->content;
+        $data = ['image' => null];
+        $icon = null;
 
-
-            foreach ($usersChunk as $user) {
-                $user = $user->pluck('notification_id')->toArray();
-
-                Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
-                // dd($data);
-            }
-            (new UserCounterServices)->eventUsers('system-messages');
-            // $users->chunk(200, function ($chunkedUsers) use ($usersTokenAr, $body, $title) {
-            //     foreach ($chunkedUsers as $user) {
-            //         Common::send_firebase_notification($usersTokenAr, $title, $body);
-            //     }
-            // });
+        if (!empty($msg->img)) {
+            $imagePath = getImagePath($msg->img);
+            $data['image'] = $imagePath;
+            $icon = $imagePath;
         }
 
-        if ($user_id != 0) {
-            // $user = $msg->user;
-            $tokens_notfacion = User::where('id', $user_id)->value('notification_id');
-            $body             = $msg->content;
-            $title = $msg->title;
-            $data['image'] = null;
-            $icon = null;
-            if ($msg->img) {
-                $data['image'] = getImagePath($msg->img);
-                $icon = $data['image'];
-            }
+        if ($msg->user_id == 0) {
+            // Send to all users in chunks
+            User::whereNotNull('notification_id')
+                ->select('id', 'notification_id')
+                ->orderBy('id')
+                ->chunkById(100, function ($users) use ($title, $body, $icon, $data) {
+                    $notificationIds = $users
+                        ->pluck('notification_id')
+                        ->unique()
+                        ->filter()
+                        ->values()
+                        ->toArray();
 
-            Common::send_firebase_notification($tokens_notfacion, $title, $body, icon: $icon, data: $data, messageType: 'system-msg');
+                    if (!empty($notificationIds)) {
+                        Common::send_firebase_notification(
+                            $notificationIds,
+                            title: $title,
+                            body: $body,
+                            icon: $icon,
+                            data: $data,
+                            messageType: 'system-msg'
+                        );
+                    }
+                });
+
+            app(UserCounterServices::class)->eventUsers('system-messages');
+        } else {
+            // Send to single user
+            $notificationId = User::where('id', $msg->user_id)
+                ->whereNotNull('notification_id')
+                ->value('notification_id');
+
+            if ($notificationId) {
+                Common::send_firebase_notification(
+                    $notificationId,
+                    title: $title,
+                    body: $body,
+                    icon: $icon,
+                    data: $data,
+                    messageType: 'system-msg'
+                );
+            } else {
+                // Optionally log missing notification token
+                \Log::warning("User {$msg->user_id} has no notification ID.");
+            }
         }
     }
+
 
 
     public function acceptRequestAgency(User $user)
