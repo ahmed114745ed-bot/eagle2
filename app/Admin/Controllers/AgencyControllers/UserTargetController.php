@@ -48,9 +48,9 @@ class UserTargetController extends MainController
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name = @$this->user->name ?? '';
             $uid = @$this->user->uuid ?? '';
-             if (request()->filled('_export_')) {
-                return "{$name} (UUID: {$uid})";
-            }
+            //  if (request()->filled('_export_')) {
+            //     return "{$name} (UUID: {$uid})";
+            // }
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -84,9 +84,9 @@ class UserTargetController extends MainController
 
             }
             $name = @$this->agency->name ?? '';
-             if (request()->filled('_export_')) {
-                return $name ?? '';
-            }
+            //  if (request()->filled('_export_')) {
+            //     return $name ?? '';
+            // }
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
