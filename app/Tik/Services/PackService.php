@@ -112,7 +112,8 @@ class PackService
         if (!$pack)  throw new \Exception('item not found');
 
         $this->packRepository->updateIsUsedByType($user->id, $pack->type);
-        $this->packRepository->updateIsUsedByPackId($user->id, $itemId);
+        $expire = $pack->expire ? $pack->expire : ($pack->days != 0 ? now()->addDays($pack->days)->timestamp : 0);
+        $this->packRepository->updateIsUsedByPackId($user->id, $itemId, $expire);
 
         if (!in_array($pack->type, $types))  throw new \Exception('unusable item');
         $this->userRepository->updateDress($user, $user_dress_after_i_changed, $pack->type, $pack->target_id);
