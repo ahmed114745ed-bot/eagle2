@@ -245,9 +245,7 @@ class ChargeReportController extends MainController
                 'final_url' => $url,
                 'sender_raw' => $sender // يمكن أن تسجل الـ array كاملة أيضًا
             ]);            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+          
             // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
 
