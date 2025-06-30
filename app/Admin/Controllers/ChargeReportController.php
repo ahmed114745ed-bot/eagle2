@@ -235,7 +235,7 @@ class ChargeReportController extends MainController
             $showUrl = $sender['url'];
            
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $url = $path ?? $defaultImage;
             \Log::info('Sender Info', [
                 'name' => $name,
                 'uuid' => $uuid,
