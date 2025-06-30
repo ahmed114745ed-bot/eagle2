@@ -563,7 +563,7 @@ class UserController extends MainController
             if (! Admin::user()->can('edit-' . $permission) || !Admin::user()->can('*')) {
                 $actions->disableEdit();
             }
-            if (! Admin::user()->can('show-' . $$permission) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('show-' . $permission) || !Admin::user()->can('*')) {
                 $actions->disableView();
             }
         });
