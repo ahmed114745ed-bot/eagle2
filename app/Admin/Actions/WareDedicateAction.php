@@ -90,8 +90,9 @@ class WareDedicateAction extends Action
                 $arr['get_type'] = $ware->get_type;
                 $arr['target_id'] = $ware->id;
                 $arr['num'] = 1; //$qty;
-                $arr['expire'] = $request->days ? time() + (($request->days ?? $ware->expire) * 86400) : 0;
+              //  $arr['expire'] = $request->days ? time() + (($request->days ?? $ware->expire) * 86400) : 0;
                 $arr['is_read'] = 1;
+                 $arr['days'] = $request->days? $request->days?? $ware->expire : 0;
                 
                 $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
                 // $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;
