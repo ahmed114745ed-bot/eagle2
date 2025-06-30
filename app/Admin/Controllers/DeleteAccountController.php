@@ -10,7 +10,8 @@ use App\Models\DeleteAccount;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\AdminController;
 
-class DeleteAccountController extends AdminController
+// class DeleteAccountController extends AdminController
+class DeleteAccountController extends MainController
 {
     /**
      * Title for current resource.

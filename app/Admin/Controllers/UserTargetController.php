@@ -89,6 +89,10 @@ class UserTargetController extends MainController
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name =@$this->user->name ?? '';
             $uid = @$this->user->uuid;
+            if (request()->filled('_export_')) {
+                return "{$name} (UUID: {$uid})";
+            }
+
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -115,6 +119,9 @@ class UserTargetController extends MainController
 
         $grid->column('user_agency_id', __('agency'))->display(function () {
             $name = @$this->agency->name ?? '';
+            if (request()->filled('_export_')) {
+                return $name;
+            }
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -158,17 +165,22 @@ class UserTargetController extends MainController
 //            return explode('/', $days)[0] ?? 0;
 //        });
         $grid->column('diamond', __('user diamonds'))->display(function ($diamond) {
+            if (request()->filled('_export_')) {
+                return $diamond;
+            }
 //            $usd = explode('/', $diamond)[0] ?? 0;
-            $usd = $diamond;
             $image = asset('images/diamond.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
-                        <span>{$usd}</span>
+                        <span>{$diamond}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
 
         $grid->column('sallary', __('salary'))->display(function ($usd) {
+            if (request()->filled('_export_')) {
+                return $usd;
+            }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -177,6 +189,9 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('cut_amount', __('cut amount'))->display(function ($usd) {
+            if (request()->filled('_export_')) {
+                return $usd;
+            }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             $formattedUsd = number_format((float)$usd, 2);
             return "<div style='display: flex; align-items: center; '>
@@ -186,8 +201,11 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('Net Salary', __('User Net Salary'))->display(function ($usd) {
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
             $usd = $this->sallary - $this->cut_amount;
+            if (request()->filled('_export_')) {
+                return $usd;
+            }
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$usd}</span>
@@ -195,6 +213,9 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('agency_sallary', __('agency obtain'))->display(function ($usd) {
+            if (request()->filled('_export_')) {
+                return $usd;
+            }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             $formattedUsd = number_format((float)$usd, 2);
             return "<div style='display: flex; align-items: center; '>
