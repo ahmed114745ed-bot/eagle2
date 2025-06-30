@@ -233,11 +233,13 @@ class ChargeReportController extends MainController
             $uuid = $sender['uuid'];
             $path = $sender['image'];
             $showUrl = $sender['url'];
-           
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = $path ?? $defaultImage;
-                 // Check if the image exists
-          
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
 
@@ -330,7 +332,7 @@ class ChargeReportController extends MainController
                 ";
             });
         }
-        
+
         if ($charger_type == "dash") {
             // $grid->column('usd', __('amount $'))->display(function ($coin) {
             //     $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -427,35 +429,17 @@ class ChargeReportController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
 
-                // $filter->where(function ($query) {
-                //     if ($this->input != null) {
-                //         $query->where('method', $this->input);
-                //     }
-                // }, __('Select type'), 'name_for_url_shortcut')->radio([
-                //     '' => __('All'),
-                //     'oPay' => __('oPay'),
-                //     'stripe' => __('stripe'),
-                //     'fawry' => __('fawry'),
-                //     'sky_pay' => __('sky pay'),
-                //     'google_pay' => __('google pay'),
-                //     'cashfree' => __('cashfree'),
-                //     'applepay' => __('apple pay'),
-                //     'paytabs' => __('paytabs'),
-                //     'paypal' => __('paypal'),
-                //     'utdFawry' => __('utd Fawry'),
-                // ]);
-                $paymentMethods = PaymentCoin::all()->mapWithKeys(function ($coin) {
-                    return [$coin->type => __($coin->title)];
-                })->toArray();
-                
-                $paymentMethods = ['' => __('All')] + $paymentMethods;
-                
-                // استخدمه في الفلتر
                 $filter->where(function ($query) {
                     if ($this->input != null) {
                         $query->where('method', $this->input);
                     }
-                }, __('Select type'), 'name_for_url_shortcut')->radio($paymentMethods);
+                }, __('Select type'), 'name_for_url_shortcut')->radio([
+                    '' => __('All'),
+                    'oPay' => __('oPay'),
+                    'stripe' => __('stripe'),
+                    'fawry' => __('fawry'),
+                    'sky_pay' => __('sky pay')
+                ]);
             });
         });
 
@@ -522,8 +506,6 @@ class ChargeReportController extends MainController
 
             return $options[$paymentCoin->title] ?? '';
         });
-
-        
         $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
                 return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
