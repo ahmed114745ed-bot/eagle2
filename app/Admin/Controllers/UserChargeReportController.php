@@ -127,26 +127,36 @@ class UserChargeReportController extends MainController
 
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
-            if ($charger_type == "dash") {
-                $name = @$this->admin_user->name ?? '';
-                $uuid = @$this->admin_user->id;
-                $path = @$this->admin_user->avatar;
-            } else {
-                $name = @$this->sender->name ?? '';
-                $uuid = @$this->sender->uuid;
-                $path = @$this->sender?->profile?->avatar;
-            }
-
+            // if ($charger_type == "dash") {
+            //     $name = @$this->admin_user->name ?? '';
+            //     $uuid = @$this->admin_user->id;
+            //     $path = @$this->admin_user->avatar;
+            // } else {
+            //     $name = @$this->sender->name ?? '';
+            //     $uuid = @$this->sender->uuid;
+            //     $path = @$this->sender?->profile?->avatar;
+            // }
+            $sender = Common::getChargerInfo($this);
+            $name = $sender['name'];
+            $uuid = $sender['uuid'];
+            $path = $sender['image'];
+            $showUrl = $sender['url'];
+           
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $url = $path ?? $defaultImage;
+
+            // $defaultImage = asset("images/businessman-icon.jpg");
+            // $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+            // if (!isImageExists($url)) {
+            //     $url = $defaultImage;
+            // }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
             return "
+                 <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
@@ -154,6 +164,8 @@ class UserChargeReportController extends MainController
                         <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
                     </div>
                 </div>
+             </a>
+
             ";
         });
         // $grid->column('user_id', __('recipient'))->display(function ($recever) {
@@ -211,21 +223,8 @@ class UserChargeReportController extends MainController
             // });
         }
         if ($charger_type == "dash") {
-            $grid->column('usd', __('amount $'))->display(function ($coin) {
-                $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+       
 
-
-
-                return "
-                    <div style='display: flex; align-items: center; gap: 5px;'>
-                        <span>" . number_format($coin) . "</span>
-                        <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                    </div>
-                ";
-            });
-
-            $image = asset('images/coin.png');
             // $grid->column('balance_before', __('balance_before') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
             //     ->display(function ($coin) {
             //         $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
@@ -245,15 +244,7 @@ class UserChargeReportController extends MainController
                 //         </div>";
                 // });
 
-                $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
-                ->display(function ($coin) {
-                 $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
-
-                 return "<div style='display: flex; align-items: center; gap: 5px;'>
-                         <span>{$coin}</span>
-                         <img src='{$image}' alt='USD' width='20' height='20'>
-                     </div>";
-             });
+             
         } elseif ((request("name") == "host") || (request("name") == "app")) {
             // $grid->column('amount', __('amount'))->display(function ($coin) {
             //     $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -291,7 +282,39 @@ class UserChargeReportController extends MainController
         //     <img src='{$icon}' alt='USD' width='20' height='20'>
         //     </div>";
         // });
+        $grid->column('usd', __('amount $'))->display(function ($coin) {
+            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
 
+                </div>
+            ";
+        });
+        $image = asset('images/coin.png');
+
+
+        $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
+            ->display(function ($coin) {
+            $image = asset('images/coin.png'); 
+
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$coin}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+                });
+
+                $grid->column('change_type', __('change_type'))
+                    ->display(function () {
+                        if ($this->amount > 0) {
+                            return "<span style='color:green; font-weight:bold;'>" . __('increase') . "</span>";
+                        } elseif ($this->amount < 0) {
+                            return "<span style='color:red; font-weight:bold;'>" . __('decrease') . "</span>";
+                        } else {
+                            return "<span style='color:gray;'>" . __('no_change') . "</span>"; 
+                        }
+                    });
 
         $grid->column('created_at', __('shipping date'));
 
