@@ -479,7 +479,7 @@ class EnteranceController extends Controller
     {
         try {
             $user = $request->user();
-            $room = Room::find($id);
+            $room = $this->repo->find($id);
             if (!$room) {
                 return Common::apiResponse(false, 'Room not found', null, 404);
             }
@@ -549,7 +549,7 @@ class EnteranceController extends Controller
             //    $this->repo->save ($room);
 
             $room->save();
-            $room = Room::find($id);
+            $room = Room::find($room->id);
 
             $request['owner_id'] = $room->uid;
             $is_locked = false;
