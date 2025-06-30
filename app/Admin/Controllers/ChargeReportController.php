@@ -332,7 +332,8 @@ class ChargeReportController extends MainController
                 ";
             });
         }
-        if (request("name") == "dash") {
+        
+        if ($charger_type == "dash") {
             $grid->column('usd', __('amount $'))->display(function ($coin) {
                 $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
                 return "
@@ -345,7 +346,7 @@ class ChargeReportController extends MainController
             });
 
             $image = asset('images/coin.png');
-            $grid->column('balance_before', __('Amount') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
+            $grid->column('balance_before', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
                 ->display(function ($coin) {
                     $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
 
