@@ -217,14 +217,14 @@ class ChargeReportController extends MainController
         });
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
-            
+
             $sender = Common::getChargerInfo($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                   
+
                             <span style=' cursor: pointer;'>Unknown </span>
-                        
+
                 </div>
             ";
             }
@@ -269,9 +269,9 @@ class ChargeReportController extends MainController
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                   
+
                             <span style=' cursor: pointer;'>Unknown </span>
-                        
+
                 </div>
             ";
             }
@@ -426,9 +426,9 @@ class ChargeReportController extends MainController
             if (!$this->user) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                   
+
                             <span style=' cursor: pointer;'>Unknown </span>
-                        
+
                 </div>
             ";
             }
@@ -527,9 +527,9 @@ class ChargeReportController extends MainController
             if (!$this->user) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                   
+
                             <span style=' cursor: pointer;'>Unknown </span>
-                        
+
                 </div>
             ";
             }
@@ -619,9 +619,9 @@ class ChargeReportController extends MainController
             if (!$this->user) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                   
+
                             <span style=' cursor: pointer;'>Unknown </span>
-                        
+
                 </div>
             ";
             }

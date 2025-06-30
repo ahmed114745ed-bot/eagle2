@@ -62,7 +62,8 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego(Request $request)
     {
-      
+
+        Log::info('Zego req',[ 'key' =>$request->all()]);
 
         /*$library = Common::getConfig('library');
         if ($library == 2) return Common::apiResponse(false, 'you used pusher');*/
@@ -558,7 +559,7 @@ class EnteranceController extends Controller
             $data = [
                 "messageContent" => [
                     "message" => "changeBackground",
-                    "imgbackground" => $room->final_room_image ?: @$background_me,
+                    "imgbackground" => $background_me ? @$background_me : $room->final_room_image,
                     "roomIntro" => $room->room_intro ?: "",
                     "roomImg" => $room->room_cover ?: "",
                     "room_type" => @$room->myType->name ?: "",

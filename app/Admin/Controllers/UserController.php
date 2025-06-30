@@ -558,10 +558,18 @@ class UserController extends MainController
             if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
+
+
+            if (! Admin::user()->can('edit-' . $permission) || !Admin::user()->can('*')) {
+                $actions->disableEdit();
+            }
+            if (! Admin::user()->can('show-' . $permission) || !Admin::user()->can('*')) {
+                $actions->disableView();
+            }
         });
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
-        $this->extendGrid($grid);
+
 
         return $grid;
     }
@@ -827,6 +835,8 @@ class UserController extends MainController
             $q->select('id', 'show_img');
         }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
+        $hasVip = $userVips->total() > 0;
+
         $salaries = UserSallary::where('user_id', $id)
             ->with('agency')
             ->when(isset($year), function ($query) use ($year) {
@@ -838,8 +848,8 @@ class UserController extends MainController
         $typeMap = PACK_USER;
 
         $types =  collect($typeMap);
-        $userPackTypes = Pack::where('user_id', $id)->whereHas('ware')->pluck('type')->unique()->toArray();
-
+        // $userPackTypes = Pack::where('user_id', $id)->whereHas('ware')->pluck('type')->unique()->toArray();
+        $userPackTypes = $this->typesByLevel($id);
         $currentType = request()->get('type', $types->keys()->first());
         if ($userPackTypes) {
             $types = collect($typeMap)->filter(function ($name, $key) use ($userPackTypes) {
@@ -883,13 +893,39 @@ class UserController extends MainController
                 Carbon::parse($end)->endOfDay()
             ]);
         })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
-        $userJoinAgencies = UsersJoinedAgency::where('user_id',$id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
-               $query->whereDate('join_date', $joinDate);
-            })->paginate(10, ['*'], 'user_agency_page');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies','types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', );
+        $userJoinAgencies = UsersJoinedAgency::where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
+            $query->whereDate('join_date', $joinDate);
+        })->paginate(10, ['*'], 'user_agency_page');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
+
+    public static function typesByLevel($id)
+    {
+        $userVipLevels = UserVip::where('user_id', $id)
+            ->with(['OVip.privilegs'])
+            ->get()
+            ->filter(fn($vip) => $vip->OVip)
+            ->groupBy(fn($vip) => $vip->OVip->level);
+
+        $typesByLevel = [];
+
+        foreach ($userVipLevels as $level => $vips) {
+            $types = $vips
+                ->flatMap(function ($vip) {
+                    return $vip->OVip->privilegs->pluck('type');
+                })
+                ->unique()
+                ->values();
+
+            $typesByLevel[$level] = $types->toArray();
+        }
+
+        return $typesByLevel;
+    }
+
+
 
     /**
      * Make a form builder.
