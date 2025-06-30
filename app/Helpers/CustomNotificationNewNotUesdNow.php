@@ -353,7 +353,7 @@ class CustomNotificationNewNotUesdNow
             User::whereNotNull('notification_id')
                 ->select('id', 'notification_id')
                 ->orderBy('id')
-                ->chunkById(100, function ($users) use ($title, $body, $icon, $data) {
+                ->chunkById(50, function ($users) use ($title, $body, $icon, $data) {
                     $notificationIds = $users
                         ->pluck('notification_id')
                         ->unique()
