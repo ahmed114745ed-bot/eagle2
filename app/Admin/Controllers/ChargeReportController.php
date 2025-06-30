@@ -438,7 +438,13 @@ class ChargeReportController extends MainController
                     'oPay' => __('oPay'),
                     'stripe' => __('stripe'),
                     'fawry' => __('fawry'),
-                    'sky_pay' => __('sky pay')
+                    'sky_pay' => __('sky pay'),
+                    'google_pay' => __('google pay'),
+                    'cashfree' => __('cashfree'),
+                    'applepay' => __('apple pay'),
+                    'paytabs' => __('paytabs'),
+                    'paypal' => __('paypal'),
+                    'utdFawry' => __('utd Fawry'),
                 ]);
             });
         });
@@ -506,6 +512,8 @@ class ChargeReportController extends MainController
 
             return $options[$paymentCoin->title] ?? '';
         });
+
+        
         $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
                 return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
