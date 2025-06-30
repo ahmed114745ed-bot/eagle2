@@ -1058,7 +1058,12 @@
   "applepay": "Apple Pay",
   "paytabs": "PayTabs",
   "paypal": "PayPal",
-  "utdFawry": "UTD Fawry"
+  "utdFawry": "UTD Fawry",
+  "increase": "Increase",
+  "decrease": "Decrease",
+  "coins": "Coins",
+  "change_type": "Change Type"
+
 
 
 

@@ -231,8 +231,9 @@ class UsersChargeController extends MainController
                         </div>
                     </div>";
             });
+
         $grid->column('di', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/coin.jpg'); 
             $coin = (float) $coin;
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
@@ -242,6 +243,17 @@ class UsersChargeController extends MainController
                 </div>
             ";
         });
+        // $grid->column('di', __('coins'))->display(function ($coin) {
+        //     $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+        //     $coin = (float) $coin;
+        //     return "
+        //         <div style='display: flex; align-items: center; gap: 5px;'>
+        //             <span>" . number_format($coin) . "</span>
+        //             <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+        //         </div>
+        //     ";
+        // });
         // $grid->column('di', __('coins'))->display(function ($coin) {
         //     $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
         //         $setting =   Setting::where('key', 'shipping_coins')->first();
