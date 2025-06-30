@@ -367,7 +367,6 @@ class OvipGiftTapController extends MainController
                     $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
 
                     $ext = strtolower($form->img2->guessExtension());
-                    info($ext);
                     $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
                     if ($ext === 'zz' && $originalExt === 'svga') {
@@ -385,7 +384,7 @@ class OvipGiftTapController extends MainController
 
                         $wareId = $form->model()->id;
 
-                        (new FfmpegService())->extract($videoPath, $wareId);
+                        (new FfmpegService())->extractByDuration($videoPath, $wareId);
 
                         $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
 
@@ -402,7 +401,6 @@ class OvipGiftTapController extends MainController
                         }
                     }
 
-                    info($ext);
                     if (!in_array($ext, $allowedExtensions)) {
                         throw ValidationException::withMessages([
                             'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
