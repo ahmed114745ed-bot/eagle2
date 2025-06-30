@@ -1763,7 +1763,7 @@ class Common
                     'uuid' => $resource->senderUser->uuid ?? '',
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/usersBd/{$resource->senderUser->id}") : '#',
+                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
                 ];
             default:
                 return [
