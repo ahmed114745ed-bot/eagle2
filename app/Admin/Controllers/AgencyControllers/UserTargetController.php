@@ -75,6 +75,9 @@ class UserTargetController extends MainController
             ";
         });
         $grid->column('agency_id', __('agency'))->display(function () {
+             if (request()->filled('_export_')) {
+                return $name ?? '';
+            }
             if (!@$this->agency) {
                 return "
             <div style='display: flex; align-items: center; gap: 10px;'>
