@@ -367,6 +367,7 @@ class OvipGiftTapController extends MainController
                     $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
 
                     $ext = strtolower($form->img2->guessExtension());
+                    info($ext);
                     $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
                     if ($ext === 'zz' && $originalExt === 'svga') {
