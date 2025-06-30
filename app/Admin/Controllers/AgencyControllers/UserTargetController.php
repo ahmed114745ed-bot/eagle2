@@ -46,8 +46,8 @@ class UserTargetController extends MainController
         $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
         $grid->id('ID');
         $grid->column('user_id', __('user'))->display(function ($name) {
-            $name = @$this->user->name ?? '';
-            $uid = @$this->user->uuid ?? '';
+            $name = @$this?->user?->name ?? '';
+            $uid = @$this?->user?->uuid ?? '';
             if (request()->filled('_export_')) {
                 return "{$name} (UUID: {$uid})";
             }
@@ -82,7 +82,7 @@ class UserTargetController extends MainController
             </div>
         ";
             }
-            $name = @$this->agency->name ?? '';
+            $name = @$this?->agency?->name ?? '';
             if (request()->filled('_export_')) {
                 return $name ?? '';
             }
