@@ -752,12 +752,12 @@ class ChargeReportController extends MainController
         // Add tabs to the header
         $grid->header(function () {
             $scope = request('scope', 'dash');
-            return '
-        <div class="tab-buttons">
-            <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
-            <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
-        </div>
-    ';
+    //         return '
+    //     <div class="tab-buttons">
+    //         <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
+    //         <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
+    //     </div>
+    // ';
         });
 
         // Apply scope based on query parameter
@@ -787,7 +787,7 @@ class ChargeReportController extends MainController
         // Define columns
         $grid->column('id', __('ID'));
         if ($scope === 'dash') {
-            $grid->column('admin.name', __('creator'))->display(function () {
+            $grid->column('admin.name', __('sender'))->display(function () {
                 $name = $this->admin->name ?? '';
                 $path = $this->admin->avatar ?? null;
                 $defaultImage = asset("images/businessman-icon.jpg");
@@ -866,8 +866,27 @@ class ChargeReportController extends MainController
             });
         }
 
-        $grid->column('amount', __('Amount'));
-        $grid->column('amount', __('Amount'));
+        $grid->column('amount', __('coins'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
+        $grid->column('usd', __('usd'))->display(function ($coin) {
+            
+            $icon = asset('images/dollar.jpg');
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . $coin . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
         if ($scope === 'not_dash') {
             // dd(123);
             $grid->column('amount_type', __('status'))->display(function () use ($agency_id) {
@@ -878,7 +897,7 @@ class ChargeReportController extends MainController
                 return $this->amount < 0 ? __('decrement') : __('increment');
             });
         }
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('charge date'));
 
         // Disable unnecessary buttons
         $grid->disableCreateButton();
