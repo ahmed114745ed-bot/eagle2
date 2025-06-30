@@ -555,15 +555,15 @@ class UserController extends MainController
                 $actions->disableDelete();
             }
 
-            if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
 
 
-            if (! Admin::user()->can('edit-' . $permission) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableEdit();
             }
-            if (! Admin::user()->can('show-' . $permission) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('show-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableView();
             }
         });
