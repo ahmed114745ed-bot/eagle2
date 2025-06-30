@@ -46,10 +46,8 @@ class UserTargetController extends MainController
         $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
         $grid->id('ID');
         $grid->column('user_id', __('user'))->display(function ($name) {
-            $name = @$this?->user?->name ?? '';
-            $uid = @$this?->user?->uuid ?? '';
-            info($name);
-            info($uid);
+            $name = @$this->user->name ?? '';
+            $uid = @$this->user->uuid ?? '';
             if (request()->filled('_export_')) {
                 return "{$name} (UUID: {$uid})";
             }
@@ -84,8 +82,7 @@ class UserTargetController extends MainController
             </div>
         ";
             }
-            $name = @$this?->agency?->name ?? '';
-            info($name);
+            $name = @$this->agency->name ?? '';
             if (request()->filled('_export_')) {
                 return $name ?? '';
             }
@@ -128,8 +125,11 @@ class UserTargetController extends MainController
         $grid->column('user_days', __('user days'));
         $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
 
-            $extras = $this->extras; //json_decode($this->extras, true);
+            $extras = $this->extras ?? [];
 
+            if (is_string($extras)) {
+                $extras = json_decode($extras, true) ?: [];
+            }
             $momentUpload = $extras['moment']['upload'] ?? '-';
             $momentLikes = $extras['moment']['likes'] ?? '-';
             $momentComments = $extras['moment']['comments'] ?? '-';
@@ -143,12 +143,6 @@ class UserTargetController extends MainController
             $labelUploads = __('Uploads:');
             $labelLikes = __('Likes:');
             $labelComments = __('Comments:');
-            info($momentUpload);
-            info($momentLikes);
-            info($momentComments);
-            info($reelUpload);
-            info($reelLikes);
-            info($reelComments);
             if (request()->filled('_export_')) {
                 return "Moments:\nUploads: $momentUpload, Likes: $momentLikes, Comments: $momentComments\n" .
                     "Reels:\nUploads: $reelUpload, Likes: $reelLikes, Comments: $reelComments";
@@ -171,7 +165,6 @@ class UserTargetController extends MainController
             HTML;
         });
         $grid->column('user_obtain', __('salary'))->display(function ($usd) {
-            info($usd);
             if (request()->filled('_export_')) {
                 return $usd ?? 0;
             }
@@ -190,7 +183,6 @@ class UserTargetController extends MainController
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)
                 ->value('cut_amount') ?? 0;
-            info($userSalary);
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
@@ -212,7 +204,6 @@ class UserTargetController extends MainController
                 ->where('user_agency_id', $this->agency_id)
                 ->selectRaw('sallary - cut_amount AS net_salary')
                 ->value('net_salary') ?? 0;
-            info($userSalary);
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
@@ -223,7 +214,6 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('agency_obtain', __('agency salary'))->display(function ($usd) {
-            info($usd);
             if (request()->filled('_export_')) {
                 return $usd ?? 0;
             }
