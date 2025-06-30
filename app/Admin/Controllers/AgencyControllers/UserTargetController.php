@@ -128,7 +128,7 @@ class UserTargetController extends MainController
         $grid->column('user_days', __('user days'));
         $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
 
-            $extras = json_decode($this->extras, true);
+            $extras = $this->extras; //json_decode($this->extras, true);
 
             $momentUpload = $extras['moment']['upload'] ?? '-';
             $momentLikes = $extras['moment']['likes'] ?? '-';
