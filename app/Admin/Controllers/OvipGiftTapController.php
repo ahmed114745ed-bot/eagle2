@@ -402,6 +402,7 @@ class OvipGiftTapController extends MainController
                         }
                     }
 
+                    info($ext);
                     if (!in_array($ext, $allowedExtensions)) {
                         throw ValidationException::withMessages([
                             'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
