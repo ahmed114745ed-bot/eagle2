@@ -54,7 +54,6 @@ class LuckyGiftService
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
 
-     
         if ($userCoins < $totalPrice) {
             throw  new InvalidArgumentException(__('api_responses.insufficient'));
         }
@@ -187,7 +186,7 @@ class LuckyGiftService
         $number = $number * $count;
 
         $newUserCoin = ($user->di - $userCoins);
-        // $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
+        $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
 
         if ($room->charizma_status && $coinsForReceiver > 1) {
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
@@ -198,6 +197,7 @@ class LuckyGiftService
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
         
 
+        
         /***********************************************/
         $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
         $cpIds = [];

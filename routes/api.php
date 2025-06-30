@@ -376,6 +376,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('backgrounds')->group(function () {
                 Route::get('/', [BackgroundController::class, 'allBackgrounds']);
                 Route::get('/me', [BackgroundController::class, 'allMyBackgrounds']);
+                Route::get('/setting', [BackgroundController::class, 'backgroundSetting']);
             });
 
             Route::prefix('user_info')->group(function () {
@@ -481,7 +482,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end levels
             Route::prefix('mall')->middleware(['appFeatureEnable:mall'])->group(function () {
                 Route::get('wares', [MallController::class, 'index']);
-                 Route::get('padding', [MallController::class, 'padding']);
+                Route::get('padding', [MallController::class, 'padding']);
                 Route::post('buy', [MallController::class, 'buyWare']);
                 Route::post('send', [MallController::class, 'sendWare']);
                 Route::get('best-sale', [MallController::class, 'bestWareSale']);
@@ -527,8 +528,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
                 Route::get('old-agencies', [AgencyController::class, 'gitOldAgencies']);
-
-
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
@@ -588,12 +587,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
-
-
         }
     );
 
-Route::get('/languages', [LanguageController::class, 'index']);
+    Route::get('/languages', [LanguageController::class, 'index']);
 
     Route::get('/privacy-policy', function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
@@ -603,5 +600,3 @@ Route::get('/languages', [LanguageController::class, 'index']);
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
 Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
-
-
