@@ -429,23 +429,35 @@ class ChargeReportController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
 
+                // $filter->where(function ($query) {
+                //     if ($this->input != null) {
+                //         $query->where('method', $this->input);
+                //     }
+                // }, __('Select type'), 'name_for_url_shortcut')->radio([
+                //     '' => __('All'),
+                //     'oPay' => __('oPay'),
+                //     'stripe' => __('stripe'),
+                //     'fawry' => __('fawry'),
+                //     'sky_pay' => __('sky pay'),
+                //     'google_pay' => __('google pay'),
+                //     'cashfree' => __('cashfree'),
+                //     'applepay' => __('apple pay'),
+                //     'paytabs' => __('paytabs'),
+                //     'paypal' => __('paypal'),
+                //     'utdFawry' => __('utd Fawry'),
+                // ]);
+                $paymentMethods = PaymentCoin::all()->mapWithKeys(function ($coin) {
+                    return [$coin->type => __($coin->title)];
+                })->toArray();
+                
+                $paymentMethods = ['' => __('All')] + $paymentMethods;
+                
+                // استخدمه في الفلتر
                 $filter->where(function ($query) {
                     if ($this->input != null) {
                         $query->where('method', $this->input);
                     }
-                }, __('Select type'), 'name_for_url_shortcut')->radio([
-                    '' => __('All'),
-                    'oPay' => __('oPay'),
-                    'stripe' => __('stripe'),
-                    'fawry' => __('fawry'),
-                    'sky_pay' => __('sky pay'),
-                    'google_pay' => __('google pay'),
-                    'cashfree' => __('cashfree'),
-                    'applepay' => __('apple pay'),
-                    'paytabs' => __('paytabs'),
-                    'paypal' => __('paypal'),
-                    'utdFawry' => __('utd Fawry'),
-                ]);
+                }, __('Select type'), 'name_for_url_shortcut')->radio($paymentMethods);
             });
         });
 
