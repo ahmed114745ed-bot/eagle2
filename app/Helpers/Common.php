@@ -720,6 +720,10 @@ class Common
 
         $result = json_decode($result);
 
+        if ($messageType === 'system-msg'){
+            \Log::info('Response for system-msg : ' .PHP_EOL .json_encode($result));
+        }
+
 
         //remove group with $key if is group
         if ($result  && $isGroup) {
