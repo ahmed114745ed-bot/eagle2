@@ -280,6 +280,7 @@ class ChargeController extends Controller
         //done
         //        return Common::apiResponse(0, 'try again');
         $user = $request->user();
+        if ($user->transfer_salary == 1) return Common::apiResponse(false, __('Transfer salary has been disabled!'), null, 407);
         if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
 
         $count = $request->amount;
@@ -315,6 +316,7 @@ class ChargeController extends Controller
         //done
         //        return Common::apiResponse(0, 'try again');
         $user = $request->user();
+        if ($user->transfer_salary == 1) return Common::apiResponse(false, __('Transfer salary has been disabled!'), null, 407);
         if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
 
         $count = $request->amount;
