@@ -47,7 +47,6 @@ class VersionController extends Controller
         $wapple = $this->isUpdated('wappel_frame_updated_at', @$request->wappel_time);
         $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
-
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (int)$version && (int)$version <= 40,
@@ -120,15 +119,24 @@ class VersionController extends Controller
      * @return bool
      */
     public function isUpdated($key, $time): bool
-    {
+    {  
         if ($time) {
             $time /= 1000;
         }
         $settingGiftUpdate = settings()->get($key);
         $isGiftUpdated     = true;
-        if ($settingGiftUpdate == null && $time != null) {
+        // if ($settingGiftUpdate == null && $time != null) {
+        //     $isGiftUpdated = false;
+          
+        // } elseif ($time) {
+        //     $isGiftUpdated = $settingGiftUpdate > $time;  
+        // }
+
+        if ($settingGiftUpdate === null && $time !== null) {
             $isGiftUpdated = false;
-        } elseif ($time) {
+        }
+
+        if ($time !== null) {
             $isGiftUpdated = $settingGiftUpdate > $time;
         }
         return $isGiftUpdated;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Builders\VipCollectionBuilderService;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -49,4 +50,14 @@ class Vip extends Model
     {
         return $this->hasMany(GiftRoomLevel::class,'level_id');
     }*/
+
+    public static function getCached(): Collection
+    {
+        return Cache::rememberForever('vips', fn () => self::all());
+    }
+
+    public static function collectionBuilder(): VipCollectionBuilderService
+    {
+        return new VipCollectionBuilderService();
+    }
 }

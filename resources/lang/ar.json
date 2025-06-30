@@ -276,6 +276,9 @@
     "image Id": "صورة Id",
     "start": "بدء",
   "Reset": "إعادة تعيين",
+"agency salary": "راتب الوكالة",
+"withdrawal":"سحب",
+"Moments & Reels": "اللحظات والمقاطع",
 "This microphone is closed and cannot be accessed":"هذا المايك مغلق ولا يمكن الصعود عليه",
 "Stop sending gifts to everyone":"ايقاف ارسال الهدايا للجميع",
 
@@ -3280,6 +3283,10 @@
 "user setting": "إعدادات المستخدم",
 "This user is the agency owner and cannot be deleted":"هذا المستخدم هو مالك الوكالة ولا يمكن حذفة",
 "User Setting": "إعدادات المستخدم",
+
+    "cut amount": "السحب",
+    "User Net Salary": "صافي الراتب",
+
 "Browse user setting": "تصفح إعدادات المستخدم"
 
 

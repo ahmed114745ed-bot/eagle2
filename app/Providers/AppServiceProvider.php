@@ -17,6 +17,7 @@ use App\Models\Room;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
+use App\Models\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
 use App\Observers\AgencyObserver;
@@ -28,6 +29,7 @@ use App\Observers\UserObserver;
 use App\Observers\UserSallaryObserver;
 use App\Observers\EmojiObserver;
 use App\Observers\GiftObserver;
+use App\Observers\VipObserver;
 use App\Observers\WareObserver;
 use App\Repositories\Room\RoomRepo;
 use App\Repositories\Room\RoomRepoInterface;
@@ -158,7 +160,7 @@ class AppServiceProvider extends ServiceProvider
 
                 'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
                 'is_paypal_active' => $settings['is_fawry_active'] ?? 0,
-                'is_utd_fawry_active' => $settings['is_utdFawry_active'] ?? 0,
+                'is_utd_fawry_active' => $settings['is_utd_fawry_active'] ?? 0,
                 'is_paysky_active' => $settings['is_paysky_active'] ?? 0,
                 'is_strip_active' => $settings['is_strip_active'] ?? 0,
                 'is_opay_active' => $settings['is_opay_active'] ?? 0,
@@ -194,5 +196,6 @@ class AppServiceProvider extends ServiceProvider
         Pk::observe(PKObserver::class);
         Agency::observe(AgencyObserver::class);
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
+        Vip::observe(VipObserver::class);
     }
 }

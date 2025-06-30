@@ -96,12 +96,21 @@ class AgencyJoinRequestController extends MainController
         $grid->model()->orderByDesc('id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
+
+            $filter->where(function ($query) {
+                $query->whereHas('user', function ($q) {
+                    $q->where('uuid', 'like', '%' . $this->input . '%');
+                });
+            }, __('uuid'), 'text')->placeholder('ادخل UUID')->default('');
+
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('status', __(key: 'status'))->select([0 => __('pending'), 1 => __('accepted'), 2 => __('denied')]);
+                $filter->equal('status', __( 'status'))->select([0 => __('pending'), 1 => __('accepted'), 2 => __('denied')]);
             });
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency.id', __('agency id'));
             });
+
+       
         });
 
         $grid->id(__('ID'));
