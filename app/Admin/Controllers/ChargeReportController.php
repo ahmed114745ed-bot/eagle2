@@ -236,15 +236,7 @@ class ChargeReportController extends MainController
            
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = $path ?? $defaultImage;
-            \Log::info('Sender Info', [
-                'name' => $name,
-                'uuid' => $uuid,
-                'image_path' => $path,
-                'defaultImage' => $defaultImage,
-                'show_url' => $showUrl,
-                'final_url' => $url,
-                'sender_raw' => $sender // يمكن أن تسجل الـ array كاملة أيضًا
-            ]);            // Check if the image exists
+                 // Check if the image exists
           
             // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
