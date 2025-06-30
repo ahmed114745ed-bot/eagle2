@@ -3294,7 +3294,25 @@
 "apple pay": "أبل باي",
 "paytabs": "بايتابس",
 "paypal": "باي بال",
-"utd Fawry": "فوري UTD"
+"utd Fawry": "فوري UTD",
+  "google_pay": "Google Pay",
+  "stripe": "Stripe",
+  "oPay": "oPay",
+  "skyPay": "Sky Pay",
+  "cashfree": "Cashfree",
+  "applepay": "Apple Pay",
+  "paytabs": "PayTabs",
+  "paypal": "PayPal",
+  "utdFawry": "UTD Fawry",
+  "google_pay": "جوجل باي",
+  "stripe": "سترايب",
+  "oPay": "أو باي",
+  "skyPay": "سكاي باي",
+  "cashfree": "كاش فري",
+  "applepay": "أبل باي",
+  "paytabs": "بايتابس",
+  "paypal": "باي بال",
+  "utdFawry": "فوري UTD"
 
 
 
