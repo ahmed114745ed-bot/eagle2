@@ -140,7 +140,10 @@ class UserTargetController extends MainController
             $labelUploads = __('Uploads:');
             $labelLikes = __('Likes:');
             $labelComments = __('Comments:');
-
+            if (request()->filled('_export_')) {
+                return "Moments:\nUploads: $momentUpload, Likes: $momentLikes, Comments: $momentComments\n" .
+                    "Reels:\nUploads: $reelUpload, Likes: $reelLikes, Comments: $reelComments";
+            }
             return <<<HTML
                 <div style="line-height: 1.6;">
                     <div><b>{$labelMoments}</b></div>
