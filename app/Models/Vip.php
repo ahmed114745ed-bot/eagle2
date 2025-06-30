@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Cache;
 class Vip extends Model
 {
     use HasFactory ,PreventDeleteIfCreatedByDeveloper;
+    public static int $useCache = 1;
+
         protected $fillable = [
             'type',
             'img',
