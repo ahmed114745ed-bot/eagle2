@@ -233,13 +233,11 @@ class ChargeReportController extends MainController
             $uuid = $sender['uuid'];
             $path = $sender['image'];
             $showUrl = $sender['url'];
+           
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+            $url = $path ?? $defaultImage;
+                 // Check if the image exists
+          
             // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
 
