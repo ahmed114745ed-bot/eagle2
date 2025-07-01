@@ -754,15 +754,20 @@ class ChargeReportController extends MainController
         $grid->model()->where('agency_id', $agency_id);
 
         // Add tabs to the header
-        $grid->header(function () {
-            $scope = request('scope', 'dash');
-    //         return '
-    //     <div class="tab-buttons">
-    //         <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
-    //         <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
-    //     </div>
-    // ';
-        });
+   $grid->header(function () {
+    $scope = request('scope', 'dash');
+    return '
+    <style>
+        .tab-buttons .tab-button {
+            color: black !important;
+        }
+    </style>
+    <div class="tab-buttons">
+        <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
+        <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
+    </div>
+    ';
+});
 
         // Apply scope based on query parameter
         $scope = request('scope');
@@ -794,6 +799,7 @@ class ChargeReportController extends MainController
             $grid->column('admin.name', __('sender'))->display(function () {
                 $name = $this->admin->name ?? '';
                 $path = $this->admin->avatar ?? null;
+                $id =  $this->admin->id ?? 0;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
@@ -808,14 +814,17 @@ class ChargeReportController extends MainController
                     $showUrl = url("admin/auth/users/{$this->admin->id}");
                 }
 
-                return "
-                 <div style='display: flex; align-items: center; gap: 10px;'>
-                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         $image
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                     </a>
-                 </div>
-                ";
+               return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        $image
+                        <div style='display: flex; flex-direction: column;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                            <span style='font-size: 12px; color: #666;'>ID: $id</span>
+                        </div>
+                    </a>
+                </div>
+            ";
             });
         }
 
@@ -830,7 +839,7 @@ class ChargeReportController extends MainController
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
-                    $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                   
 
                     $showUrl = $this->agency ? url("admin/agencies/{$this->agency->id}") : '#';
                     $link = $this->agency ? "
@@ -838,7 +847,7 @@ class ChargeReportController extends MainController
                                                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
                                                 </a>
                                             " : "<span style='color: gray;'>No Agency</span>";
-
+                     $image = "<img src='{$url}' style='width: 60px; height: 40px; object-fit: cover;'>";
                     return "
                                 <div style='display: flex; align-items: center; gap: 10px;'>
                                     $image
@@ -855,17 +864,20 @@ class ChargeReportController extends MainController
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
+                     $showUrl = $this->user ? url("admin/users/{$this->user->id}") : '#';
                     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
                     return "
-                                <div style='display: flex; align-items: center; gap: 10px;'>
-                                    $image
-                                    <div>
-                                        <strong>$name</strong><br>
-                                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                                    </div>
-                                </div>
-                            ";
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            $image
+                            <div style='display: flex; flex-direction: column;'>
+                                <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
+                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                                </a>
+                                <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                            </div>
+                        </div>
+                    ";
                 }
             });
         }

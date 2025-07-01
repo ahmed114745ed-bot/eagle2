@@ -2,6 +2,7 @@
 
 namespace Modules\CP\Entities;
 
+use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -48,6 +49,21 @@ class Cp extends Model
     {
         return $query->whereHas('relation', function ($query) use ($type) {
             $query->where('type', $type);
+        });
+    }
+
+
+    protected static function booted()
+    {
+        static::created(function ($cp) {
+            if (($cp->user_id ?? null) && ($cp->price ?? 0) > 0) {
+                UserCoinLogHelper::log(
+                    $cp->user_id,
+                    'cp',
+                    'cps',
+                    $cp->price
+                );
+            }
         });
     }
 }
