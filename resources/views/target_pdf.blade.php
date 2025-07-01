@@ -46,6 +46,8 @@
     }
         body {
             font-family: 'dejavu sans', sans-serif; /* Use the font you configured */
+            direction: rtl;
+            text-align: right;
         }
         thead.custom-header {
             background-color: var(--primary-color) !important;
