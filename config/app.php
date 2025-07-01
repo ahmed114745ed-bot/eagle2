@@ -225,6 +225,8 @@ return [
         App\Providers\ConfigServiceProvider::class,
 //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class
+
     ],
 
     /*
@@ -282,6 +284,7 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'FFMpeg' => ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::class,
         'RedisService' => \App\Facades\RedisService::class,
+        'PDF' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class
 
     ],
 
