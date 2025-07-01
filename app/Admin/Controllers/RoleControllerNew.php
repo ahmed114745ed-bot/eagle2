@@ -140,34 +140,7 @@ class RoleControllerNew extends MainController
      *
      * @return Form
      */
-    // public function form()
-    // {
-    //     $permissionModel = config('admin.database.permissions_model');
-    //     $permissions = $permissionModel::all();
-    //     $roleModel = config('admin.database.roles_model');
-
-    //     $form = new Form(new $roleModel());
-
-
-    //     $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug');
-
-    //     $form->text('name', trans('admin.name'))->rules('required|unique:admin_roles,name');
-    //     $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
-    //     $form->html(view('admin.permissions-tabs', [
-    //         'permissions' => $permissions,
-    //         //'selectedPermissions' => $selectedPermissions
-    //     ])->render());
-
-    //     $form->text('desc_en', __('Description en'));
-    //     $form->text('desc_ar', __('Description ar'));
-    //     $form->image('image', __('Image'))->help('Image will appear beside user in app');
-
-    //     $form->display('created_at', trans('admin.created_at'));
-    //     $form->display('updated_at', trans('admin.updated_at'));
-
-    //     return $form;
-    // }
-
+    
     public function form($id = null)
     {
         $permissionModel = config('admin.database.permissions_model');
@@ -260,7 +233,6 @@ class RoleControllerNew extends MainController
             $form->model()->permissions()->sync($finalPermissionIds);
 
             admin_toastr(__('Updated successfully'), 'success');
-           // return redirect(admin_url('roles/' . $form->model()->id . '/edit'));
         });
 
         return $form;
