@@ -30,7 +30,7 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
         $salaries = UserSallary::query()
             ->select([
                 'user_id',
-                DB::raw('SUM(sallary) AS target'),
+                DB::raw('MAX(target_id) AS target'),
                 DB::raw('SUM(cut_amount) AS expenses'),
                 DB::raw('SUM(achieved_diamond) AS achieved_diamond'),
                 DB::raw('SUM(sallary) - SUM(cut_amount) AS salary'),
@@ -58,14 +58,14 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             $data[] = [
                 'uuid' => $user->uuid,
                 'name' => $user->name,
-                'diamonds' => $user->getTotalDiamond($month, $year) ?? 0 . ' 💎',
+                'diamonds' => (string) ($user->getTotalDiamond($month, $year) ?? 0) . ' 💎',
                 'days' => $salary->achieved_days ?? '0/0',
                 'hours' => $salary->achieved_hours ?? '0/0',
                 'moment' => $this->formatExtras($moment),
                 'reel' => $this->formatExtras($reel),
-                'salary' => ($salary->target ?? 0) . ' 💲',
+                'target' => ($salary->target ?? 0) ,
                 'withdrawn' => $salary->expenses ?? 0,
-                'remaining' => $salary->salary ?? 0,
+                'salary' => round($salary?->salary ?? 0, 2). '💲',
                 'agency' => @$user?->agency?->name ?? '-',
                 'agency_id' => $user->agency?->id ?? '-',
                 'month' => $month,
@@ -91,9 +91,9 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             __('hours', [], 'ar'),
             __('moment', [], 'ar'),
             __('reels', [], 'ar'),
-            __('salary', [], 'ar'),
+            __('target', [], 'ar'),
             __('withdrawn', [], 'ar'),
-            __('remaining', [], 'ar'),
+            __('salary', [], 'ar'),
             __('agency', [], 'ar'),
             __('agency_id', [], 'ar'),
             __('month', [], 'ar'),
@@ -109,13 +109,23 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
         ];
     }
 
+    // protected function formatExtras(array $data): string
+    // {
+    //     return sprintf(
+    //         "رفع: %s\nإعجاب: %s\nتعليق: %s",
+    //         number_format((int) ($data['upload'] ?? 0)),
+    //         number_format((int) ($data['likes'] ?? 0)),
+    //         number_format((int) ($data['comments'] ?? 0))
+    //     );
+    // }
+
     protected function formatExtras(array $data): string
-    {
-        return sprintf(
-            "رفع: %s\nإعجاب: %s\nتعليق: %s",
-            number_format((int) ($data['upload'] ?? 0)),
-            number_format((int) ($data['likes'] ?? 0)),
-            number_format((int) ($data['comments'] ?? 0))
-        );
-    }
+{
+    return sprintf(
+        "رفع: %s\nإعجاب: %s\nتعليق: %s",
+        $data['upload'] ?? '0/0',
+        $data['likes'] ?? '0/0',
+        $data['comments'] ?? '0/0'
+    );
+}
 }
