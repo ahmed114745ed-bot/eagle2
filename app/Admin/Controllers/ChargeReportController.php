@@ -795,7 +795,7 @@ class ChargeReportController extends MainController
             $grid->column('admin.name', __('sender'))->display(function () {
                 $name = $this->admin->name ?? '';
                 $path = $this->admin->avatar ?? null;
-                $id =  $this->admin->id;
+                $id =  $this->admin->id ?? 0;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
