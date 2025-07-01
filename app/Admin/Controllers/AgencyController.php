@@ -286,14 +286,17 @@ class AgencyController extends MainController
                 ->get();
         // });
 
+
+
         $sumTargets =
-        Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
-            return
+        // Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
+        //     return
              UserSallary::where('user_agency_id', $agencyId)
                 ->where('month', now()->month)
                 ->where('year', now()->year)
                 ->sum('target_diamonds');
-        });
+        // });
+        
 
         return $content
             ->title(__('agency profile'))
