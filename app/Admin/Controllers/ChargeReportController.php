@@ -810,15 +810,17 @@ class ChargeReportController extends MainController
                     $showUrl = url("admin/auth/users/{$this->admin->id}");
                 }
 
-                return "
-                 <div style='display: flex; align-items: center; gap: 10px;'>
-                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         $image
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                          <span style='cursor: pointer;'>id: $id</span>
-                     </a>
-                 </div>
-                ";
+               return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        $image
+                        <div style='display: flex; flex-direction: column;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                            <span style='font-size: 12px; color: #666;'>ID: $id</span>
+                        </div>
+                    </a>
+                </div>
+            ";
             });
         }
 
@@ -833,7 +835,7 @@ class ChargeReportController extends MainController
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
-                    $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                   
 
                     $showUrl = $this->agency ? url("admin/agencies/{$this->agency->id}") : '#';
                     $link = $this->agency ? "
@@ -841,7 +843,7 @@ class ChargeReportController extends MainController
                                                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
                                                 </a>
                                             " : "<span style='color: gray;'>No Agency</span>";
-
+                     $image = "<img src='{$url}' style='width: 60px; height: 40px; object-fit: cover;'>";
                     return "
                                 <div style='display: flex; align-items: center; gap: 10px;'>
                                     $image
@@ -862,17 +864,16 @@ class ChargeReportController extends MainController
                     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
                     return "
-                                <div style='display: flex; align-items: center; gap: 10px;'>
-                                    $image
-                                    <div>
-                                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                                                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                                                </a>
-                                        
-                                    </div>
-                                </div>
-                            ";
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            $image
+                            <div style='display: flex; flex-direction: column;'>
+                                <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
+                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                                </a>
+                                <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                            </div>
+                        </div>
+                    ";
                 }
             });
         }
