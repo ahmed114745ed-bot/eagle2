@@ -233,11 +233,13 @@ class ChargeReportController extends MainController
             $uuid = $sender['uuid'];
             $path = $sender['image'];
             $showUrl = $sender['url'];
-           
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = $path ?? $defaultImage;
-                 // Check if the image exists
-          
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
 
@@ -330,7 +332,7 @@ class ChargeReportController extends MainController
                 ";
             });
         }
-        
+
         if ($charger_type == "dash") {
             // $grid->column('usd', __('amount $'))->display(function ($coin) {
             //     $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -388,6 +390,13 @@ class ChargeReportController extends MainController
                     </div>";
             });
 
+        $grid->column('status', __('Status'))->display(function () {
+            if ($this->amount > 1) {
+                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Increment</span>';
+            } elseif ($this->amount < 0) {
+                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Decrement</span>';
+            }
+        });
 
         //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
         //            $balance_after = $this->amount + $this->balance_before;
@@ -427,35 +436,17 @@ class ChargeReportController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
 
-                // $filter->where(function ($query) {
-                //     if ($this->input != null) {
-                //         $query->where('method', $this->input);
-                //     }
-                // }, __('Select type'), 'name_for_url_shortcut')->radio([
-                //     '' => __('All'),
-                //     'oPay' => __('oPay'),
-                //     'stripe' => __('stripe'),
-                //     'fawry' => __('fawry'),
-                //     'sky_pay' => __('sky pay'),
-                //     'google_pay' => __('google pay'),
-                //     'cashfree' => __('cashfree'),
-                //     'applepay' => __('apple pay'),
-                //     'paytabs' => __('paytabs'),
-                //     'paypal' => __('paypal'),
-                //     'utdFawry' => __('utd Fawry'),
-                // ]);
-                $paymentMethods = PaymentCoin::all()->mapWithKeys(function ($coin) {
-                    return [$coin->type => __($coin->title)];
-                })->toArray();
-                
-                $paymentMethods = ['' => __('All')] + $paymentMethods;
-                
-                // استخدمه في الفلتر
                 $filter->where(function ($query) {
                     if ($this->input != null) {
                         $query->where('method', $this->input);
                     }
-                }, __('Select type'), 'name_for_url_shortcut')->radio($paymentMethods);
+                }, __('Select type'), 'name_for_url_shortcut')->radio([
+                    '' => __('All'),
+                    'oPay' => __('oPay'),
+                    'stripe' => __('stripe'),
+                    'fawry' => __('fawry'),
+                    'sky_pay' => __('sky pay')
+                ]);
             });
         });
 
@@ -522,8 +513,6 @@ class ChargeReportController extends MainController
 
             return $options[$paymentCoin->title] ?? '';
         });
-
-        
         $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
                 return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
@@ -763,12 +752,12 @@ class ChargeReportController extends MainController
         // Add tabs to the header
         $grid->header(function () {
             $scope = request('scope', 'dash');
-            return '
-        <div class="tab-buttons">
-            <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
-            <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
-        </div>
-    ';
+    //         return '
+    //     <div class="tab-buttons">
+    //         <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
+    //         <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
+    //     </div>
+    // ';
         });
 
         // Apply scope based on query parameter
@@ -798,7 +787,7 @@ class ChargeReportController extends MainController
         // Define columns
         $grid->column('id', __('ID'));
         if ($scope === 'dash') {
-            $grid->column('admin.name', __('creator'))->display(function () {
+            $grid->column('admin.name', __('sender'))->display(function () {
                 $name = $this->admin->name ?? '';
                 $path = $this->admin->avatar ?? null;
                 $defaultImage = asset("images/businessman-icon.jpg");
@@ -877,8 +866,27 @@ class ChargeReportController extends MainController
             });
         }
 
-        $grid->column('amount', __('Amount'));
-        $grid->column('amount', __('Amount'));
+        $grid->column('amount', __('coins'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
+        $grid->column('usd', __('usd'))->display(function ($coin) {
+            
+            $icon = asset('images/dollar.jpg');
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . $coin . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
         if ($scope === 'not_dash') {
             // dd(123);
             $grid->column('amount_type', __('status'))->display(function () use ($agency_id) {
@@ -889,7 +897,7 @@ class ChargeReportController extends MainController
                 return $this->amount < 0 ? __('decrement') : __('increment');
             });
         }
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('charge date'));
 
         // Disable unnecessary buttons
         $grid->disableCreateButton();

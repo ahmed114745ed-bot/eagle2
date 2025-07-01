@@ -720,6 +720,10 @@ class Common
 
         $result = json_decode($result);
 
+        if ($messageType === 'system-msg'){
+            \Log::info('Response for system-msg : ' .PHP_EOL .json_encode($result));
+        }
+
 
         //remove group with $key if is group
         if ($result  && $isGroup) {
@@ -1763,7 +1767,7 @@ class Common
                     'uuid' => $resource->senderUser->uuid ?? '',
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/usersBd/{$resource->senderUser->id}") : '#',
+                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
                 ];
             default:
                 return [
