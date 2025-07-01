@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\UserCoinLogHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,5 +22,18 @@ class UserVip extends Model
     public function packs()
     {
         return $this->hasMany(Pack::class, 'vip_user_id');
+    }
+    protected static function booted()
+    {
+        static::created(function ($userVip) {
+            if ($userVip->user_id && ($userVip->price ?? 0) > 0) {
+                UserCoinLogHelper::log(
+                    $userVip->user_id,
+                    'vip',
+                    'users_vips',
+                    $userVip->price
+                );
+            }
+        });
     }
 }
