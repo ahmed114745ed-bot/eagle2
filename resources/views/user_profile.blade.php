@@ -1145,14 +1145,14 @@
                         <span class="meta-label">{{__('coins')}}:</span>
                         <span class="meta-value">{{@$user->di }}</span>
                     </div>
-                  
+
 
                 </div>
             </div>
             <div class="agency-meta">
                  <div class="meta-item">
                         <span class="meta-label">{{__('type')}}:</span>
-                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->      
+                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
                    {!! @$user->userTypeBadge() !!}
                     </div>
 
@@ -1186,7 +1186,7 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           
+
 
 
 
@@ -1250,7 +1250,7 @@
                         </tr>
                         </thead>
                         @if($packs && $packs->count())
-                        
+
                             <tbody style="color: rgb(208, 115, 43);">
                             @foreach($packs as $index => $pack)
                                 @php
@@ -1598,7 +1598,7 @@
                     <div class="card-body">
                         <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
                             <input type="hidden" name="tab" value="user-agency">
-                            
+
                             <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
 
                             <div class="row mb-3" style="align-items: flex-end;">
@@ -1610,7 +1610,7 @@
                                         <input type="date" class="form-control" id="from_date" name="join_date" value="{{ request('join_date') }}">
                                     </div>
                                 </div>
-                        
+
                                 <!-- Buttons -->
                                 <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
                                     <button type="submit" class="btn btn-info btn-sm me-2">
@@ -1635,7 +1635,7 @@
                                 <th>{{ __('status') }}</th>
                                 <th>{{ __('Join date') }}</th>
                                 <th>{{ __('Leave date') }}</th>
-                               
+
 
                             </tr>
                             </thead>
@@ -1659,7 +1659,7 @@
 
                                         $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
 
-                
+
                                     @endphp
 
                                     <tr>
@@ -1716,7 +1716,7 @@
                 <div class="card-body">
                     <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
                         <input type="hidden" name="tab" value="user-agency">
-                        
+
                         <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
 
                         <div class="row mb-3" style="align-items: flex-end;">
@@ -1728,7 +1728,7 @@
                                     <input type="date" class="form-control" id="from_date" name="join_date" value="{{ request('join_date') }}">
                                 </div>
                             </div>
-                    
+
                             <!-- Buttons -->
                             <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
                                 <button type="submit" class="btn btn-info btn-sm me-2">
@@ -1884,7 +1884,7 @@
                                 </td>
                                 <td>{{ $type }} </td>
                                 <td>{{ $charge->amount }} </td>
-                                <td>{{ $charge->usd }}</td>
+                                <td>{{ $formattedUsd = number_format((float)$charge->usd, 2) }}</td>
                                 <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
                             </tr>
                         @endforeach
@@ -2093,7 +2093,7 @@
     </div>
 @endif
 
-    
+
 
 <div class="modal fade" id="Add_model" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
@@ -2229,7 +2229,7 @@
                     }
                 });
             });
-    
+
 
         if (targetElement) {
             setTimeout(() => {
