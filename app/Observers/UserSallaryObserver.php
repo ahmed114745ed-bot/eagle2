@@ -46,8 +46,8 @@ class UserSallaryObserver
             $agency = Agency::find($userSalary->user_agency_id);
             if ($userSalary->user_agency_id != 0 && $agency && $agency->status == 1) {
                 $agency_id    = $userSalary->user_agency_id;
-                $month        = now()->month;
-                $year         = now()->year;
+                $month        = $userSalary->month;
+                $year         = $userSalary->year;
                 $agencySalary = AgencySallary::query()
                     ->where('month', $month)
                     ->where('year', $year)
@@ -56,8 +56,8 @@ class UserSallaryObserver
 
                 $salary = UserSallary::query()
                     ->where('user_agency_id', $agency_id)
-                    ->where('month', now()->month)
-                    ->where('year', now()->year)
+                    ->where('month', $month )
+                    ->where('year', $year)
                     ->sum('agency_sallary');
 
                 if ($agencySalary) {
