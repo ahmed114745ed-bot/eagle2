@@ -71,17 +71,12 @@ class DedicateWareController extends MainController
     protected function grid()
     {
         $typeSpecial = false;
-        $request = request('type');
-        if ($request != null && ($request == 25)) {
-            $typeSpecial = true;
-        }
+       
         $grid = new Grid(new Ware);
         $grid->model()->orderByDesc('created_at');
-        if ($typeSpecial) {
-            $grid->model()->whereNotNull('get_type')->where('type', '=', 25);
-        } else {
+        
             $grid->model()->where('get_type', 4)->where('type', '!=', 25);
-        }
+    
         $grid->id('ID');
         $grid->column('name', __('name'));
         $grid->column('price', __('price'))->currency();

@@ -140,7 +140,11 @@ class HomeService
                 throw new \Exception(__('api.notWare'));
             }
             $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->get();
-            Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
+            $data = ['is_used' => $isAvailable, 'using' => 1];
+            if (is_null($pack->expire) && !empty($pack->days)) {
+                $data['expire'] = ($pack->days != 0 ? now()->addDays($pack->days)->timestamp : 0);
+            }
+            Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update($data);
 
             switch ($type) {
                 case 'country':
