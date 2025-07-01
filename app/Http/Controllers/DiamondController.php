@@ -9,6 +9,7 @@ use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Modules\FixedTarget\Services\FixedTargetService;
 
 class DiamondController extends Controller
 {
@@ -58,4 +59,31 @@ public function calculateMonthlyDiamondReceived()
         'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
     ]);
 }
+
+public function calculateSalary()
+{
+    $month = now()->month;
+    $year = now()->year;
+     User::query()
+            ->where('agency_id', '!=', 0)
+            ->where('salary_is_updated', 1)
+            ->where('type_user', '!=', 0)
+            ->chunk(500, function ($users) use($month, $year){
+                foreach ($users as $user) {
+                    try {
+                        $targetService = new FixedTargetService($user, month: $month, year: $year);
+                        $targetService->calculateTarget();
+                    } catch (\Throwable $e) {
+                        
+                        $this->error("Failed user ID {$user->id}");
+                    }
+                }
+            });
+
+    return response()->json([
+        'status' => true,
+        'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
+    ]);
+}
+
 }
