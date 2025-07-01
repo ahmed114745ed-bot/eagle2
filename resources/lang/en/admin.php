@@ -437,7 +437,8 @@ return [
     "db_percentage" => 'BD Percentage',
     "hours" => "Hours",
     "days" => "Days",
-
+    "reals" => 'reals',
+    "moments" => 'moments',
 
     'creator' => 'admin',
 ];
