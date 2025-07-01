@@ -1784,7 +1784,7 @@
                                                 </div>
                                             </a>
                                         </td>
-                                        <td>{{$userJoinAgency->status}}</td>
+                                        <td>{{__($userJoinAgency->status)}}</td>
                                         <td>{{ $userJoinAgency->join_date}}</td>
                                         <td>{{ $userJoinAgency->leave_date }}</td>
                                     </tr>
