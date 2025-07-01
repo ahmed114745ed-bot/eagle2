@@ -1169,9 +1169,9 @@
     @endphp
         <!-- Navigation Tabs -->
     <div class="agency-tabs">
-        @if($hasVip)
+       
           <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
-        @endif
+      
         <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
@@ -1211,7 +1211,7 @@
 
 
     <!-- packs Section -->
-    @if($hasVip)
+    
     <div class="tab-content active" id="packs-tab">
         <div class="card">
             <div class="card-header">
@@ -1299,7 +1299,7 @@
         </div>
 
     </div>
-    @endif
+  
 
     <!-- vips Section -->
     <div class="tab-content" id="vips-tab">
