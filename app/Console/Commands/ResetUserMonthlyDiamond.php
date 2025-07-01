@@ -44,7 +44,8 @@ class ResetUserMonthlyDiamond extends Command
     public function handle()
     {
         $timezone = getTimezone();
-        $dt = new \DateTime('now', new \DateTimeZone($timezone));
+        $dt       = Carbon::now($timezone);
+//        $dt = new \DateTime('now', new \DateTimeZone($timezone));
         if ($dt->format('j') == 1){
             $carbon = $dt->subDay();
 
