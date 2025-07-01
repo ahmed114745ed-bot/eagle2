@@ -64,7 +64,7 @@
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.total') }}</label>
 
-            <input type="text" class="form-control " id="target" name="target" value="{{ $targe }}" readonly>
+            <input type="text" class="form-control " id="target" name="target" value="{{rtrim(rtrim(number_format($targe, 10, '.', ''), '0'), '.')  }}" readonly>
         </div>
 {{--        <br>--}}
 {{--        <div class=" col  my-1 form-Roles">--}}
