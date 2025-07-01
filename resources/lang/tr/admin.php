@@ -425,6 +425,8 @@ return [
     "db_percentage" => 'BD Yüzdesi',
     "hours" => 'Saatler',
     "days" => 'Günler',
+    "reals" => 'reels',
+    "moments" => 'anlar',
 
     "charge_level" => "şarj seviyesi",
 ];

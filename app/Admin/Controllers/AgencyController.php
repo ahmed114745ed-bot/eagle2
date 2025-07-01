@@ -287,16 +287,30 @@ class AgencyController extends MainController
         // });
 
 
+        if (!$agency) {
+            abort(404, 'Agency not found.');
+        }
+        
+        $memberIds = $agency->mempers()->pluck('id');
 
-        $sumTargets =
+        $sumTargets = GiftLog::whereIn('receiver_id', $memberIds)
+            ->where('agency_id', $agencyId)
+            ->whereBetween('created_at', [
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth(),
+            ])
+            ->sum('giftPrice');
+
         // Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
         //     return
-             UserSallary::where('user_agency_id', $agencyId)
-                ->where('month', now()->month)
-                ->where('year', now()->year)
-                ->sum('target_diamonds');
+            //  UserSallary::where('user_agency_id', $agencyId)
+            //     ->where('month', now()->month)
+            //     ->where('year', now()->year)
+            //     ->sum('target_diamonds');
+          
         // });
-        
+
+     
 
         return $content
             ->title(__('agency profile'))
