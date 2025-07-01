@@ -422,6 +422,8 @@ return [
     "db_percentage" => 'BD प्रतिशत',
     "hours" => 'घंटे',
     "days" => 'दिन',
+    "reals" => 'रील्स',
+    "moments" => 'क्षण',
 
     "charge_level" => "चार्ज स्तर",
 ];
