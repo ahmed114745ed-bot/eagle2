@@ -390,15 +390,16 @@ class ChargeReportController extends MainController
                     </div>";
             });
 
-        $grid->column('status', __('Status'))->display(function () {
-            if ($this->amount > 1) {
-                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Increment</span>';
-            } elseif ($this->amount < 0) {
-                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Decrement</span>';
-            }
-        });
-
-        //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
+        if ($charger_type == "dash") {
+            $grid->column('status', __('Status'))->display(function () {
+                if ($this->amount > 1) {
+                    return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Increment</span>';
+                } elseif ($this->amount < 0) {
+                    return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Decrement</span>';
+                }
+            });
+        }
+            //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
         //            $balance_after = $this->amount + $this->balance_before;
         //            $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
         //
