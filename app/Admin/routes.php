@@ -329,6 +329,10 @@ Route::group(
             ExportController::class,
             'usersAgencyTargets'
         ])->name('agency-export-report');
+        Route::get('/agency-manger-export', [
+            ExportController::class,
+            'agencyMangerExport'
+        ])->name('agency-manger-export');
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
         //        Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
         Route::resource('wares-vips', WareVipController::class);
