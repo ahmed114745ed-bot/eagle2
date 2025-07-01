@@ -750,15 +750,20 @@ class ChargeReportController extends MainController
         $grid->model()->where('agency_id', $agency_id);
 
         // Add tabs to the header
-        $grid->header(function () {
-            $scope = request('scope', 'dash');
-    //         return '
-    //     <div class="tab-buttons">
-    //         <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
-    //         <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
-    //     </div>
-    // ';
-        });
+   $grid->header(function () {
+    $scope = request('scope', 'dash');
+    return '
+    <style>
+        .tab-buttons .tab-button {
+            color: black !important;
+        }
+    </style>
+    <div class="tab-buttons">
+        <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
+        <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
+    </div>
+    ';
+});
 
         // Apply scope based on query parameter
         $scope = request('scope');
@@ -790,6 +795,7 @@ class ChargeReportController extends MainController
             $grid->column('admin.name', __('sender'))->display(function () {
                 $name = $this->admin->name ?? '';
                 $path = $this->admin->avatar ?? null;
+                $id =  $this->admin->id;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
@@ -809,6 +815,7 @@ class ChargeReportController extends MainController
                      <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                          $image
                          <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                          <span style='cursor: pointer;'>id: $id</span>
                      </a>
                  </div>
                 ";
@@ -851,14 +858,18 @@ class ChargeReportController extends MainController
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
+                     $showUrl = $this->user ? url("admin/users/{$this->user->id}") : '#';
                     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
                     return "
                                 <div style='display: flex; align-items: center; gap: 10px;'>
                                     $image
                                     <div>
-                                        <strong>$name</strong><br>
-                                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                                                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                                                </a>
+                                        
                                     </div>
                                 </div>
                             ";
