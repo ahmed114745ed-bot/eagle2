@@ -1211,7 +1211,7 @@
 
 
     <!-- packs Section -->
-    @if($hasVip)
+    
     <div class="tab-content active" id="packs-tab">
         <div class="card">
             <div class="card-header">
@@ -1299,7 +1299,7 @@
         </div>
 
     </div>
-    @endif
+  
 
     <!-- vips Section -->
     <div class="tab-content" id="vips-tab">
