@@ -9,6 +9,7 @@ use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Modules\FixedTarget\Services\FixedTargetService;
 
 class DiamondController extends Controller
@@ -74,8 +75,9 @@ public function calculateSalary()
                         $targetService = new FixedTargetService($user, month: $month, year: $year);
                         $targetService->calculateTarget();
                     } catch (\Throwable $e) {
-                        
-                        $this->error("Failed user ID {$user->id}");
+                         Log::error("Failed to calculate target for user {$user->id} ({$month}/{$year}): " . $e->getMessage(), [
+                            'exception' => $e
+                        ]);
                     }
                 }
             });
