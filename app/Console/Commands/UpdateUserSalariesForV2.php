@@ -35,7 +35,6 @@ class UpdateUserSalariesForV2 extends Command
                 ->chunk(500, function ($users) use($month, $year){
                     foreach ($users as $user) {
                         try {
-                            Log::info('user',['test'=>$user->id ]);
 
                             $targetService = new FixedTargetV2Service($user, month: $month, year: $year);
                             $targetService->calculateTarget();
