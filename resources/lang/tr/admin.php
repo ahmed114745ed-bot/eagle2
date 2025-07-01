@@ -188,6 +188,7 @@ return [
     'app_sign' => 'Uygulama İmzası',
 
     "fawry" => 'Fawry',
+    'My Fawry'      => 'My Fawry',
     "utdFawry" => 'Utd Fawry',
     "merchant_code" => 'Mağaza Kodu',
     "utd_url" => 'UTD Bağlantısı',
@@ -424,6 +425,8 @@ return [
     "db_percentage" => 'BD Yüzdesi',
     "hours" => 'Saatler',
     "days" => 'Günler',
+    "reals" => 'reels',
+    "moments" => 'anlar',
 
     "charge_level" => "şarj seviyesi",
 ];

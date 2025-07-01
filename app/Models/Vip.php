@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Cache;
 class Vip extends Model
 {
     use HasFactory, TimestampsWithTimezone;
-    public static int $useCache = 1;
+    // public static int $useCache = 1;
+    public static $useCache = true;
+
 
     protected $fillable = [
         'type',

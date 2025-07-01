@@ -1727,7 +1727,7 @@ class Common
                 return [
                     'name' => $resource->admin->name ?? '',
                     'image' => $resource->admin->avatar ?? '',
-                    'uuid' => $resource->admin->uuid ?? '',
+                    'uuid' => $resource->admin->id ?? '',
                     'id' => $resource->admin->id ?? '',
                     'type' => 'dash',
                     'url' => $resource->admin ? url("admin/auth/users/{$resource->admin->id}") : '#',
@@ -1767,7 +1767,7 @@ class Common
                     'uuid' => $resource->senderUser->uuid ?? '',
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/usersBd/{$resource->senderUser->id}") : '#',
+                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
                 ];
             default:
                 return [

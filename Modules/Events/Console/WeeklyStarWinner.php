@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\Events\Entities\WeeklyStar;
 use Modules\Events\Entities\Winner;
+use App\Helpers\UserCoinLogHelper;
 
 class WeeklyStarWinner extends Command
 {
@@ -62,6 +63,12 @@ class WeeklyStarWinner extends Command
                         if ($reward->type == "coins"){
                             $entry->sender->di+=$reward->target;
                             $entry->sender->save();
+                            UserCoinLogHelper::log(
+                                $entry->sender->id,
+                                'rewards',
+                                'weeklyStar',
+                                $reward->target
+                            );
                         }elseif ($reward->type == "vip"){
                             $vip=OVip::query()->find($reward->target);
                             UserCommon::addVipToUser($entry->sender,$vip,$reward->expire);

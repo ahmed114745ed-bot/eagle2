@@ -555,15 +555,15 @@ class UserController extends MainController
                 $actions->disableDelete();
             }
 
-            if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
 
 
-            if (! Admin::user()->can('edit-' . $permission) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableEdit();
             }
-            if (! Admin::user()->can('show-' . $permission) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('show-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableView();
             }
         });
@@ -848,8 +848,8 @@ class UserController extends MainController
         $typeMap = PACK_USER;
 
         $types =  collect($typeMap);
-        // $userPackTypes = Pack::where('user_id', $id)->whereHas('ware')->pluck('type')->unique()->toArray();
-        $userPackTypes = $this->typesByLevel($id);
+         $userPackTypes = Pack::where('user_id', $id)->pluck('type')->unique()->toArray();
+      // $userPackTypes = $this->typesByLevel($id);
         $currentType = request()->get('type', $types->keys()->first());
         if ($userPackTypes) {
             $types = collect($typeMap)->filter(function ($name, $key) use ($userPackTypes) {

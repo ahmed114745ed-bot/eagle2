@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,7 +37,16 @@ class RequestBackgroundImage extends Model
                     $res = Common::sendToZego('SendCustomCommand', $room?->id, $model->owner_room_id, $json);
                 }
             }
+            UserCoinLogHelper::log(
+                $model->user_id,
+                'background',
+                'request_background_images',
+                $model->app_profit_coins
+            );
+            
         });
+
+    
     }
 
     public function owner()

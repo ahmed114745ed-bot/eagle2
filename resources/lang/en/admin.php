@@ -198,6 +198,7 @@ return [
     "charge_level" => "charge level",
 
     "fawry" => 'Fawry',
+    'My Fawry'      => 'My Fawry',
     "utdFawry" => 'Utd Fawry',
     "merchant_code" => 'Merchant Code',
     "utd_url" => 'Utd Url',
@@ -436,7 +437,8 @@ return [
     "db_percentage" => 'BD Percentage',
     "hours" => "Hours",
     "days" => "Days",
-
+    "reals" => 'reals',
+    "moments" => 'moments',
 
     'creator' => 'admin',
 ];

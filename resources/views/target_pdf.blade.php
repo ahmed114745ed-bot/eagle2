@@ -46,6 +46,8 @@
     }
         body {
             font-family: 'dejavu sans', sans-serif; /* Use the font you configured */
+            direction: rtl;
+            text-align: right;
         }
         thead.custom-header {
             background-color: var(--primary-color) !important;
@@ -121,6 +123,14 @@
                                     $endFormatted = $coins ? ($target->diamonds / $coins) : 0;
                                     $endFormatted = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted);
                                     echo "$$endFormatted";
+                                } elseif ($column == 'reals' || $column == 'reel') {
+                                    echo 'Update: ' . ($target->reel_parts[0] ?? 0) . '<br>';
+                                    echo 'Like: ' . ($target->reel_parts[1] ?? 0) . '<br>';
+                                    echo 'Comment: ' . ($target->reel_parts[2] ?? 0);
+                                } elseif ($column == 'moments' || $column == 'moment') {
+                                    echo 'Update: ' . ($target->moment_parts[0] ?? 0) . '<br>';
+                                    echo 'Like: ' . ($target->moment_parts[1] ?? 0) . '<br>';
+                                    echo 'Comment: ' . ($target->moment_parts[2] ?? 0);
                                 } else {
                                     echo $target->$column ?? '-';
                                 }

@@ -183,6 +183,7 @@ return [
     'app_sign' => 'ऐप हस्ताक्षर',
 
     "fawry" => 'फॉवरी',
+    'My Fawry'      => 'My Fawry',
     "utdFawry" => 'Utd Fawry',
     "merchant_code" => 'व्यापारी कोड',
     "utd_url" => 'UTD यूआरएल',
@@ -421,6 +422,8 @@ return [
     "db_percentage" => 'BD प्रतिशत',
     "hours" => 'घंटे',
     "days" => 'दिन',
+    "reals" => 'रील्स',
+    "moments" => 'क्षण',
 
     "charge_level" => "चार्ज स्तर",
 ];
