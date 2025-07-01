@@ -433,7 +433,7 @@ class WareTabController extends MainController
 
                         $wareId = $form->model()->id;
 
-                        (new FfmpegService())->extract($videoPath, $wareId);
+                        (new FfmpegService())->extractByDuration($videoPath, $wareId);
 
                         $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
 

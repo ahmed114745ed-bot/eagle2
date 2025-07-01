@@ -94,6 +94,8 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/update-user-salaries.log'))
             ->runInBackground();
+        $schedule->command('log:app-profit-coins')->everyTenMinutes();
+
     }
 
     protected function commands(): void

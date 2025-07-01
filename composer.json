@@ -67,7 +67,9 @@
         "files": [
             "app/helpers.php",
             "app/helper/helpers.php",
-            "app/helper/helperType.php"
+            "app/helper/helperType.php",
+            "app/Helpers/UserCoinLogHelper.php"
+
         ]
     },
     "autoload-dev": {
