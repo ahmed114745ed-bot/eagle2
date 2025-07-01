@@ -220,7 +220,7 @@ class ChargeReportController extends MainController
 
             info('this'.$this);
             $sender = Common::getChargerInfo($this);
-            info('sender'.$sender);
+            info($sender);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -269,7 +269,7 @@ class ChargeReportController extends MainController
             // $path = @$this->receiver?->profile?->avatar;
             info('this'.$this);
             $sender = Common::getReceiverInfo($this);
-            info('sender'.$sender);
+            info($sender);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
