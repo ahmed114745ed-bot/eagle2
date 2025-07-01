@@ -41,28 +41,42 @@ class FixedTargetV2Service
 
     public function __construct(private User $user, private? int $month = null, private? int $year = null)
     {
-            $timezone = getTimezone();
-        if (is_null($this->month) || is_null($this->year)){
-            $tz = new \DateTimeZone($timezone);
-            $dt = new \DateTime('now', $tz);
-            $this->month = $dt->format('m');
-            $this->year = $dt->format('Y');
-        }
+        $timezone = getTimezone();
 
+        // جلب تاريخ انضمام المستخدم
         $joinDate = UsersJoinedAgency::where('user_id', $user->id)
-        ->where('agency_id', $user->agency_id)
-        ->latest()
-        ->value('join_date'); 
-
-        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');  
-        
-
-        $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->startOfMonth()->timezone('UTC');
-        $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->endOfMonth()->timezone('UTC');
-
-        $targetType           = $this->getUserTargetType($user->id);
-        $this->userTargetType = $targetType;
+            ->where('agency_id', $user->agency_id)
+            ->latest()
+            ->value('join_date');
+    
+        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');
+    
+        // استخدام التاريخ الحالي كافتراضي إذا لم يُرسل شهر وسنة
+        $now = Carbon::now($timezone);
+        $inputMonth = $this->month ?? $now->month;
+        $inputYear  = $this->year  ?? $now->year;
+    
+        // بناء startDate من الشهر والسنة المدخلة
+        $inputStartDate = Carbon::createFromDate($inputYear, $inputMonth, 1, $timezone)->startOfMonth()->timezone('UTC');
+    
+        // تحقق: هل التاريخ المدخل قبل تاريخ الانضمام؟
+        if ($inputStartDate->lt($this->joinDate)) {
+            // إذا كان التاريخ أقدم من الانضمام، استخدم شهر الانضمام
+            $this->month = $this->joinDate->month;
+            $this->year  = $this->joinDate->year;
+            $this->startDate = $this->joinDate->copy()->startOfMonth();
+            $this->endDate   = $this->joinDate->copy()->endOfMonth();
+        } else {
+            // إذا كان التاريخ صالحًا، استخدمه
+            $this->month = $inputMonth;
+            $this->year  = $inputYear;
+            $this->startDate = $inputStartDate->copy()->startOfMonth();
+            $this->endDate   = $inputStartDate->copy()->endOfMonth();
+        }
+    
+        $this->userTargetType = $this->getUserTargetType($user->id);
         $this->targetInstance = new RegularTarget();
+  
     }
 
     private function getUserTargetType(int $userId): TargetType
@@ -81,7 +95,7 @@ class FixedTargetV2Service
                 $user = $this->calculateFixedTarget($month_received, $user);
             }
         } else {*/
-        
+       
             $month_received = GiftLog::where('receiver_id', $user->id)->whereBetween('created_at', [$this->startDate, $this->endDate])->sum('giftPrice');
 
             $user = $this->calculateRegularTarget($month_received, $user);
@@ -287,16 +301,20 @@ class FixedTargetV2Service
             if ($target) {
                 $hours = 0;
                 $days  = 0;
+                $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
+
                 $times = $this->getUserLiveTime($user);
                 if ($times) {
+                    
                     $hours = $times->hnum;
-                    $days  = $user->monthly_days;
+                    // $days  = $user->monthly_days;
+                    $days  = $user->getTotalDaysJoinedAgencyByMonth($startDate,$this->endDate,$this->year);
                 }
+
 
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
              
-                $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
 
