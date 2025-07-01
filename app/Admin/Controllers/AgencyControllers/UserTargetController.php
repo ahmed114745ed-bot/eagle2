@@ -42,6 +42,12 @@ class UserTargetController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('uuid'));
             });
+             $filter->column(1 / 2, function ($filter) {
+                $filter->equal('add_month', __('month'));
+            });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('add_year', __('year'));
+            });
         });
         $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
         $grid->id('ID');
