@@ -218,7 +218,9 @@ class ChargeReportController extends MainController
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
 
+            info('this'.$this);
             $sender = Common::getChargerInfo($this);
+            info('sender'.$sender);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -265,7 +267,9 @@ class ChargeReportController extends MainController
             // $name =  $this->receiver->name ?? '';
             // $uid = @$this->receiver->uuid ?? 0;
             // $path = @$this->receiver?->profile?->avatar;
+            info('this'.$this);
             $sender = Common::getReceiverInfo($this);
+            info('sender'.$sender);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -877,7 +881,7 @@ class ChargeReportController extends MainController
             ";
         });
         $grid->column('usd', __('usd'))->display(function ($coin) {
-            
+
             $icon = asset('images/dollar.jpg');
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
