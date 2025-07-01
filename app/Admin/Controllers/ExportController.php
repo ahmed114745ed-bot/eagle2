@@ -2,12 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Extensions\AgencyExporter;
-use App\Admin\Extensions\AgencyMangerExporter;
-use App\Admin\Extensions\ChargeAgencyExporter;
-use App\Admin\Extensions\UserExporter;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Admin\Extensions\UserExporter;
+use App\Admin\Extensions\AgencyExporter;
+use App\Admin\Extensions\WalletExportUser;
+use App\Admin\Extensions\WalletExportAgency;
+use App\Admin\Extensions\AgencyMangerExporter;
+use App\Admin\Extensions\ChargeAgencyExporter;
 
 
 class ExportController extends Controller
@@ -36,7 +38,6 @@ class ExportController extends Controller
             new AgencyExporter($id, $month, $year),
             'agency_report.csv'
         );
-
     }
     public function agencyMangerExport()
     {
@@ -53,4 +54,22 @@ class ExportController extends Controller
         return Excel::download($export, $fileName);
     }
 
+    public function walletExportUser()
+    {
+        $id = request('uuid');
+        $export = new WalletExportUser($id);
+        $fileName = 'wallet_users.csv';
+
+        return Excel::download($export, $fileName);
+    }
+
+    public function walletExportAgency()
+    {
+        $id = request('id');
+      
+        $export = new WalletExportAgency($id);
+        $fileName = 'wallet_agencies.csv';
+
+        return Excel::download($export, $fileName);
+    }
 }

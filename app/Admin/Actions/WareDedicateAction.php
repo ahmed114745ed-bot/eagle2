@@ -85,19 +85,27 @@ class WareDedicateAction extends Action
         }
         DB::beginTransaction();
         try {
+            $types = [8, 9, 12, 14, 17];
             $arr['user_id'] = $user->id;
             $arr['type'] = $ware->type;
             $arr['get_type'] = $ware->get_type;
             $arr['target_id'] = $ware->id;
             $arr['num'] = 1; //$qty;
-            //  $arr['expire'] = $request->days ? time() + (($request->days ?? $ware->expire) * 86400) : 0;
+            if (in_array($ware->type, $types)) {
+                $arr['expire'] = $request->days ? time() + (($request->days ?? $ware->expire) * 86400) : 0;
+                $arr['is_used'] = 1;
+                $arr['using'] = 1;
+            } else {
+                $arr['is_used'] = 0;
+                $arr['using'] = 0;
+            }
+
             $arr['is_read'] = 1;
             $arr['days'] = $request->days ? $request->days ?? $ware->expire : 0;
 
             $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
             // $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;
-            $arr['is_used'] = 0;
-            $arr['using'] = 0;
+
 
             Pack::query()->create($arr);
             if ($ware->type == 25) {

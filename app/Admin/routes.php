@@ -325,6 +325,14 @@ Route::group(
             ExportController::class,
             'usersSallaryTargets'
         ])->name('custom-export-users');
+        Route::get('/wallet-export-users', [
+            ExportController::class,
+            'walletExportUser'
+        ])->name('wallet-export-users');
+         Route::get('/wallet-export-agency', [
+            ExportController::class,
+            'walletExportAgency'
+        ])->name('wallet-export-agency');
         Route::get('/agency-export-report', [
             ExportController::class,
             'usersAgencyTargets'
