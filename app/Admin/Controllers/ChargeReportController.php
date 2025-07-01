@@ -107,7 +107,7 @@ class ChargeReportController extends MainController
 
             $grid->model()->where('charger_type', 'host_agency');
         } else {
-            $grid->model()->where('charger_type', 'agency');
+            $grid->model()->where('charger_type', 'agency')->orWhere('user_type', 'agency');
         }
         if ($charger_type == "shipping-agency-activity") {
             $grid->filter(function (Grid\Filter $filter) {
@@ -390,15 +390,16 @@ class ChargeReportController extends MainController
                     </div>";
             });
 
-        $grid->column('status', __('Status'))->display(function () {
-            if ($this->amount > 1) {
-                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Increment</span>';
-            } elseif ($this->amount < 0) {
-                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Decrement</span>';
-            }
-        });
-
-        //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
+        if ($charger_type == "dash") {
+            $grid->column('status', __('Status'))->display(function () {
+                if ($this->amount > 1) {
+                    return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Increment</span>';
+                } elseif ($this->amount < 0) {
+                    return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Decrement</span>';
+                }
+            });
+        }
+            //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
         //            $balance_after = $this->amount + $this->balance_before;
         //            $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
         //
@@ -835,7 +836,7 @@ class ChargeReportController extends MainController
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
-                   
+
 
                     $showUrl = $this->agency ? url("admin/agencies/{$this->agency->id}") : '#';
                     $link = $this->agency ? "
@@ -889,7 +890,7 @@ class ChargeReportController extends MainController
             ";
         });
         $grid->column('usd', __('usd'))->display(function ($coin) {
-            
+
             $icon = asset('images/dollar.jpg');
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>

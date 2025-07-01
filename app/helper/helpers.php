@@ -634,7 +634,6 @@ if (!function_exists('getTimezone')) {
             $setting = \App\Models\Setting::where('key', 'timezone')->first();
             return $setting?->value ?? 'UTC';
         });
-
     }
 }
 
