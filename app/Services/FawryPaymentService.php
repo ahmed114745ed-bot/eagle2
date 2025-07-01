@@ -43,7 +43,6 @@ class FawryPaymentService
         $data['paymentSubType'] = $exterData['type'];
         $data['paymentType'] = $exterData['paymentType'];
         $utdUrl = config("services.utd_fawry.utd_url");
-        info($data);
         $response = Http::post($utdUrl, $data);
         info($response);
         return json_decode($response);
@@ -84,7 +83,7 @@ class FawryPaymentService
 //        }
     }
 
-    public function getBodyForFawry($trx,$amount): array
+    public function getBodyForFawry($trx,$amount)
     {
         $merchantCode = config("services.utd_fawry.utd_fawry_merchant_code");
         $merchantRefNum = $trx;

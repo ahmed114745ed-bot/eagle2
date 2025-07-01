@@ -42,6 +42,12 @@ class UserTargetController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('uuid'));
             });
+             $filter->column(1 / 2, function ($filter) {
+                $filter->equal('add_month', __('month'));
+            });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('add_year', __('year'));
+            });
         });
         $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
         $grid->id('ID');
@@ -75,6 +81,9 @@ class UserTargetController extends MainController
             ";
         });
         $grid->column('agency_id', __('agency'))->display(function () {
+             if (request()->filled('_export_')) {
+                return $name ?? '';
+            }
             if (!@$this->agency) {
                 return "
             <div style='display: flex; align-items: center; gap: 10px;'>
@@ -125,8 +134,11 @@ class UserTargetController extends MainController
         $grid->column('user_days', __('user days'));
         $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
 
-            $extras = json_decode($this->extras, true);
+            $extras = $this->extras ?? [];
 
+            if (is_string($extras)) {
+                $extras = json_decode($extras, true) ?: [];
+            }
             $momentUpload = $extras['moment']['upload'] ?? '-';
             $momentLikes = $extras['moment']['likes'] ?? '-';
             $momentComments = $extras['moment']['comments'] ?? '-';

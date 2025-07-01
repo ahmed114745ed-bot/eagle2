@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserWareResource;
 use App\Models\Config;
@@ -79,7 +80,12 @@ class SpecialIdRequestController extends Controller
                     'price'     => $total_price,
                 ];
                 Pack::create($packData);
-
+                UserCoinLogHelper::log(
+                    $user->id ,
+                    'pack',
+                    'packs',
+                    $total_price ?? 0
+                );
                 // Upgrade user level
                 (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
             } else {

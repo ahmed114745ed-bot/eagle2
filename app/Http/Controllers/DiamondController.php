@@ -9,6 +9,9 @@ use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Modules\FixedTarget\Services\FixedTargetService;
+use Modules\FixedTarget\Services\FixedTargetV2Service;
 
 class DiamondController extends Controller
 {
@@ -58,4 +61,64 @@ public function calculateMonthlyDiamondReceived()
         'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
     ]);
 }
+
+public function calculateSalary()
+{
+    $month =request()->month ?? now()->month;
+    $year =request()->year ?? now()->year;
+     User::query()
+            ->where('agency_id', '!=', 0)
+            ->where('salary_is_updated', 1)
+            ->where('type_user', '!=', 0)
+            ->chunk(500, function ($users) use($month, $year){
+                foreach ($users as $user) {
+                    try {
+                        $targetService = new FixedTargetV2Service($user, month: $month, year: $year);
+                        $targetService->calculateTarget();
+                    } catch (\Throwable $e) {
+                        
+                        $this->error("Failed user ID {$user->id}");
+                    }
+                }
+            });
+
+    return response()->json([
+        'status' => true,
+        'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
+    ]);
 }
+
+public function calculateSalaryV2()
+{
+    $month =request()->month ?? now()->month;
+    $year =request()->year ?? now()->year;
+    Log::info('user',['test'=>$year ]);
+
+     User::query()
+            ->where('agency_id', '!=', 0)
+            // ->where('salary_is_updated', 1)
+            ->where('type_user', '!=', 0)
+            ->chunk(500, function ($users) use($month, $year){
+                foreach ($users as $user) {
+                    try {
+                        Log::info('user',['test'=>$user->id ]);
+
+                        $targetService = new FixedTargetV2Service($user, month: $month, year: $year);
+                        $targetService->calculateTarget();
+                    } catch (\Throwable $e) {
+                        dd($e->getMessage());
+                        // $this->error("Failed user ID {$user->id}");
+                    }
+                }
+            });
+
+    return response()->json([
+        'status' => true,
+        'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
+    ]);
+}
+
+}
+
+
+

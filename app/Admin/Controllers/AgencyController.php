@@ -286,14 +286,31 @@ class AgencyController extends MainController
                 ->get();
         // });
 
-        $sumTargets =
-        Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
-            return
-             UserSallary::where('user_agency_id', $agencyId)
-                ->where('month', now()->month)
-                ->where('year', now()->year)
-                ->sum('target_diamonds');
-        });
+
+        if (!$agency) {
+            abort(404, 'Agency not found.');
+        }
+        
+        $memberIds = $agency->mempers()->pluck('id');
+
+        $sumTargets = GiftLog::whereIn('receiver_id', $memberIds)
+            ->where('agency_id', $agencyId)
+            ->whereBetween('created_at', [
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth(),
+            ])
+            ->sum('giftPrice');
+
+        // Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
+        //     return
+            //  UserSallary::where('user_agency_id', $agencyId)
+            //     ->where('month', now()->month)
+            //     ->where('year', now()->year)
+            //     ->sum('target_diamonds');
+          
+        // });
+
+     
 
         return $content
             ->title(__('agency profile'))
@@ -679,26 +696,6 @@ class AgencyController extends MainController
         } else {
 
             $form->row(function ($row) {
-                // $row->width(12)->select('bd_id', __('app bd id'))->options(function ($value) {
-                //     $ops2 = [];
-                //     foreach (User::Where('id', $value)->get() as $user) {
-                //         $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                //     }
-                //     return $ops2;
-                // })->ajax('/api/search/users-bd2', 'id', 'name');
-
-                $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                    $ops2 = [];
-                    foreach (User::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                    }
-                    return $ops2;
-                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
-
-                // if (request()->route('form')->isEditing()) {
-                //     $row->hidden('agency_manger_id', __('app manger id'));
-                // }
-
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
                 $row->width(12)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');

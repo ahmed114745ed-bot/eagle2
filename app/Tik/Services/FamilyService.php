@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Facades\CustomNotification;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Helpers\Common;
 use Carbon\CarbonInterface;
@@ -67,6 +68,12 @@ class FamilyService
         $this->familyUserRepository->create($familyUserData);
         $this->userRepository->decrementCoins($user->id, $price);
         $this->userRepository->updateFamilyId($user, $family->id);
+        UserCoinLogHelper::log(
+            $user->id,
+            'family',
+            'families',
+            $price
+        );
         return $family;
     }
 

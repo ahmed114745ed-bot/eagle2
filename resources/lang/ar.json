@@ -20,7 +20,7 @@
     "action": "عمليات",
     "All Managers": " (DB)جميع المدرين ",
     "male": "ذكر",
-
+   "charge date":"تاريخ الشحن",
     "registered successfully": "تم التسجيل بنجاح",
     "required": "مطلوب",
     "exists": "محجوز",
@@ -3312,7 +3312,11 @@
   "applepay": "أبل باي",
   "paytabs": "بايتابس",
   "paypal": "باي بال",
-  "utdFawry": "فوري UTD"
+  "utdFawry": "فوري UTD",
+  "increase": "زيادة",
+  "decrease": "نقصان",
+  "coins": "العملات",
+  "change_type": "نوع التغيير"
 
 
 

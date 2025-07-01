@@ -10,6 +10,7 @@ use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\UserVip;
 use App\Models\FamilyUser;
+use Encore\Admin\Admin;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Models\UserSallary;
@@ -27,6 +28,8 @@ class ChangeAgencyAction extends RowAction
 
     public function __construct($id = 0)
     {
+        Admin::script('$.fn.modal.Constructor.prototype.enforceFocus = function () {};');
+
         $this->name = __("dashboard.changeAgency");
         $this->id = $id;
         parent::__construct();
@@ -64,12 +67,12 @@ class ChangeAgencyAction extends RowAction
     public function html()
     {
         return '<a href="javascript:void(0);" onclick="pu('.$this->id.')"  ></a>
-<script>
-function pu(val) {
+            <script>
+            function pu(val) {
 
-  $("#vid").val(val)
-}
-</script>
-';
+              $("#vid").val(val)
+            }
+            </script>
+        ';
     }
 }

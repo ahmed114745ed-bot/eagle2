@@ -434,6 +434,8 @@ return [
     "db_percentage" => 'نسبة BD',
     "hours" => 'ساعات',
     "days" => 'أيام',
+    "reals" => 'فيديوهات',
+    "moments" => 'لحظات',
 
     "charge_level" => "مستوي الشحن",
 

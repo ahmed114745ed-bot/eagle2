@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Console;
 
+use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 use App\Models\OVip;
 use App\Models\Ware;
@@ -98,6 +99,13 @@ class PKEventWinnerCommand extends Command
                 case "coins":
                     $user->di += $reward->target;
                     $user->save();
+
+                    UserCoinLogHelper::log(
+                        $winner->user_id,
+                        'rewards',
+                        'pkEvent',
+                        $reward->target
+                    );
                     break;
                 case "vip":
                     $vip = OVip::find($reward->target);

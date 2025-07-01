@@ -385,7 +385,7 @@ class UserController extends MainController
             $class        = 1 == 0 ? 'btn-danger' : 'btn-success';
             if (request()->filled('_export_')) {
                 return $users->map(function ($user) {
-                    return "{$user->name} (UUID: {$user->uuid})";
+                    return "{$user->name} (UUID: {$user->uuid}) (phone: {$user?->phone})";
                 })->implode("\n");
             }
             return $users->count();

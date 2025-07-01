@@ -158,6 +158,10 @@ class Room extends Model
         return  $this->attributes['microphone'] ?? '';
         
     }
+    public function getAllMicrophoneAttribute()
+    {
+        return  $this->attributes['microphone'] ?? '';
+    }
 
     public function getMainMicrophoneAttribute()
     {
