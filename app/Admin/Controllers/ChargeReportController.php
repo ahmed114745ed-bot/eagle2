@@ -267,7 +267,7 @@ class ChargeReportController extends MainController
             // $name =  $this->receiver->name ?? '';
             // $uid = @$this->receiver->uuid ?? 0;
             // $path = @$this->receiver?->profile?->avatar;
-            info('this'.$this);
+            info('this'.$this->id);
             $sender = Common::getReceiverInfo($this);
             info($sender);
             if (empty($sender['name']) && empty($sender['uuid'])) {
