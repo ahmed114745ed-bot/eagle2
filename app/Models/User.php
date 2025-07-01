@@ -1363,41 +1363,45 @@ class User extends Authenticatable
             3 => 'shipping',
             4 => 'bd',
         ];
+        $hasShippingAgency = ShippingAgency::where('app_owner_id', $this->id)->exists();
 
-        $userType = $this->type_user;
+            $applicableTypes = array_filter($types, function ($key) use ($userType) {
+                return $key <= $userType;
+            }, ARRAY_FILTER_USE_KEY);
 
-        if (!isset($types[$userType])) {
-            return $lang === 'ar' ? 'مستخدم' : 'User';
-        }
-
-        $applicableTypes = array_filter($types, function ($key) use ($userType) {
-            return $key <= $userType;
-        }, ARRAY_FILTER_USE_KEY);
-
-        $configKeys = [];
-        foreach ($applicableTypes as $key => $type) {
-            $configKeys[] = "{$lang}_{$type}";
-            $configKeys[] = "en_{$type}"; // fallback
-        }
-
-        $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
-
-        $html = '<div class="user-type-badges">';
-
-        foreach ($applicableTypes as $typeKey => $typeName) {
-            $localizedKey = "{$lang}_{$typeName}";
-            $fallbackKey = "en_{$typeName}";
-
-            $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
-            $url = getImagePath($url);
-            if ($url) {
-                 $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
-              //  $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '">';
+            if ($hasShippingAgency && !isset($applicableTypes[3])) {
+                $applicableTypes[3] = $types[3]; // نضيفه يدوياً
+                ksort($applicableTypes); // ترتيب الأنواع من الأصغر إلى الأكبر
             }
-        }
-        $html .= '</div>';
 
-        return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
+            if (empty($applicableTypes)) {
+                return $lang === 'ar' ? 'مستخدم' : 'User';
+            }
+
+            $configKeys = [];
+            foreach ($applicableTypes as $key => $type) {
+                $configKeys[] = "{$lang}_{$type}";
+                $configKeys[] = "en_{$type}"; // fallback
+            }
+
+            $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
+
+            $html = '<div class="user-type-badges">';
+
+            foreach ($applicableTypes as $typeKey => $typeName) {
+                $localizedKey = "{$lang}_{$typeName}";
+                $fallbackKey = "en_{$typeName}";
+
+                $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
+                $url = getImagePath($url);
+                if ($url) {
+                    $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
+                }
+            }
+
+            $html .= '</div>';
+
+            return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
     public function wallet()
     {
