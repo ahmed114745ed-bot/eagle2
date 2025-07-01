@@ -348,6 +348,7 @@ Route::get('/generate-token/{id}', function ($id) {
 
 
 Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 
 Route::get('/charge-agency-export-report', [
     ExportController::class,

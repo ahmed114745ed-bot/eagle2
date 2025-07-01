@@ -66,7 +66,7 @@ class UserHandling
     {
         $vip = OVip::query()->whereLevel(2)->first();
 
-        if($vip){
+        if ($vip) {
             $userVip = UserVip::query()->create(
                 [
                     'type' => 1,
@@ -81,7 +81,7 @@ class UserHandling
                     'type_send' => $type,
                 ]
             );
-            Common::handelVip($vip, $user,null, userVip: $userVip);
+            Common::handelVip($vip, $user, null, userVip: $userVip);
         }
     }
     public function kickUserFromAgency(User &$user)
@@ -131,8 +131,18 @@ class UserHandling
 
         $user->monthly_days = 0;
         $user->save();
-        AgencyUserJob::where(['user_id' => $user->id , 'agency_id' => $agencyId])->delete();
+        AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
+        $agencyUserJoined = UsersJoinedAgency::where([
+            'user_id' => $user->id,
+            'agency_id' =>  $agencyId,
+            'type' => 2,
+        ])->whereNull('leave_date')->first();
 
+        if ($agencyUserJoined) {
+            $agencyUserJoined->leave_date = now();
+            $agencyUserJoined->status = 'from admin';
+            $agencyUserJoined->save();
+        }
     }
 
     public function kickOfAllUsersFromAgency(\App\Models\Agency $agency)
@@ -185,7 +195,6 @@ class UserHandling
         AgencyUserJob::where(['agency_id' => $agency_id])->delete();
         $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $agency->id])->get();
         if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now()]);
-
     }
 
 
@@ -209,7 +218,7 @@ class UserHandling
     {
         $now = now();
         return Ban::query()
-            ->where(fn ($q) => $q->where('uid', $uuid)->where('type', '!=', 'action')->orWhere(fn ($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))->orWhere(fn ($q) => $q->where('device_number', '!=', null)->where('device_number', $request->header('device'))))
+            ->where(fn($q) => $q->where('uid', $uuid)->where('type', '!=', 'action')->orWhere(fn($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))->orWhere(fn($q) => $q->where('device_number', '!=', null)->where('device_number', $request->header('device'))))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->exists();
     }
@@ -219,7 +228,7 @@ class UserHandling
         $now = now();
 
         return Ban::query()->where('type', '!=', 'action')
-            ->where(fn ($q) => $q->where('uid', $uuid)->orWhere(fn ($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))->orWhere(fn ($q) => $q->where('device_number', '!=', null)->where('device_number', $request->device_token)))
+            ->where(fn($q) => $q->where('uid', $uuid)->orWhere(fn($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))->orWhere(fn($q) => $q->where('device_number', '!=', null)->where('device_number', $request->device_token)))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->first();
     }
@@ -257,7 +266,7 @@ class UserHandling
     public function hasReasonOfBan(?string $uuid, $request): ?string
     {
         if (is_null($uuid)) {
-            return false; 
+            return false;
         }
         $banFounded = $this->getUserBan($uuid, $request);
         $message = null;
