@@ -1364,25 +1364,32 @@ class User extends Authenticatable
             4 => 'bd',
         ];
     
-        $userType = $this->type_user ?? 0; // <-- هذا السطر كان ناقصًا
+        $applicableTypes = [];
     
-        $hasShippingAgency = ShippingAgency::where('app_owner_id', $this->id)->exists();
+        if ($this->type_user >= 1) {
+            $applicableTypes[1] = $types[1];
+        }
     
-        $applicableTypes = array_filter($types, function ($key) use ($userType) {
-            return $key <= $userType;
-        }, ARRAY_FILTER_USE_KEY);
+        if ($this->type_user >= 2) {
+            $applicableTypes[2] = $types[2];
+        }
     
-        if ($hasShippingAgency && !isset($applicableTypes[3])) {
-            $applicableTypes[3] = $types[3]; // نضيفه يدوياً
-            ksort($applicableTypes); // ترتيب الأنواع
+        if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
+            $applicableTypes[3] = $types[3];
+        }
+    
+        if ($this->is_bd) {
+            $applicableTypes[4] = $types[4];
         }
     
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
         }
     
+        ksort($applicableTypes);
+    
         $configKeys = [];
-        foreach ($applicableTypes as $key => $type) {
+        foreach ($applicableTypes as $type) {
             $configKeys[] = "{$lang}_{$type}";
             $configKeys[] = "en_{$type}";
         }
@@ -1390,8 +1397,7 @@ class User extends Authenticatable
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
     
         $html = '<div class="user-type-badges">';
-    
-        foreach ($applicableTypes as $typeKey => $typeName) {
+        foreach ($applicableTypes as $typeName) {
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
     
@@ -1406,6 +1412,7 @@ class User extends Authenticatable
     
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
+    
     public function wallet()
     {
         return $this->hasOne(UserWallet::class);
