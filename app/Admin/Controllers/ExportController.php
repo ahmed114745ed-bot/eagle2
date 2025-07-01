@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\AgencyExporter;
+use App\Admin\Extensions\AgencyMangerExporter;
 use App\Admin\Extensions\ChargeAgencyExporter;
 use App\Admin\Extensions\UserExporter;
 use App\Http\Controllers\Controller;
@@ -22,8 +23,25 @@ class ExportController extends Controller
     }
     public function usersAgencyTargets()
     {
-        $export = new AgencyExporter();
-        $fileName = 'agency_target_salary.csv';
+        // $export = new AgencyExporter();
+        // $fileName = 'agency_target_salary.csv';
+
+        // return Excel::download($export, $fileName);
+
+        $month = request('month');
+        $year = request('year');
+        $id = request('id');
+
+        return Excel::download(
+            new AgencyExporter($id, $month, $year),
+            'agency_report.csv'
+        );
+
+    }
+    public function agencyMangerExport()
+    {
+        $export = new AgencyMangerExporter();
+        $fileName = 'agency_manger_target_salary.csv';
 
         return Excel::download($export, $fileName);
     }

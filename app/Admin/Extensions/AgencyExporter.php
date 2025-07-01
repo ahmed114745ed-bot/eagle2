@@ -35,9 +35,9 @@ class AgencyExporter  implements FromCollection,WithHeadings
     public $year;
 
 
-    public function __construct($agency_id = null, $month = null, $year = null)
+    public function __construct($id = null, $month = null, $year = null)
     {
-        $this->agency_id = $agency_id;
+        $this->agency_id = $id;
         $this->month = $month;
         $this->year = $year;
     }
@@ -47,37 +47,48 @@ class AgencyExporter  implements FromCollection,WithHeadings
      */
     public function collection()
     {
-        $agencies = Agency::query()->get();
-        //$agencies = $agencies->get();
-        $arr = [];
-
-        foreach ($agencies as $agency) {
-            $target = @$agency->target($this->month, $this->year);
-            $agencySalarys =   AgencySallary::query()
-            ->where('agency_id', '!=', null)
-            ->where('is_paid', 0)->where('agency_id', $agency->id)->when(isset($target->month), function ($query) use ($target) {
-                $query->where('month', '<=', $target->month);
-            })->when(isset($target->year), function ($query) use ($target) {
-                $query->where('year', '<=', $target->year);
-            })
-            ->orderBy('agency_id')->select(
-                DB::raw('SUM(`sallary`) AS target'),
-                DB::raw('SUM(`cut_amount`) AS expenses'),
-                DB::raw('SUM(sallary) - SUM(cut_amount) AS salary'),
-            )->groupBy('agency_id')->first();
-            
-            $item['id'] = $agency->id;
-            $item['name'] = $agency->name;
-            $item['salary'] = $agencySalarys->target ??"0";
-            $item['expenses'] = $agencySalarys->expenses ??"0";
-            $item['net_salary'] = $agencySalarys->salary ??"0";
-            $item['agent'] = @$agency->owner->name ?: @$agency->dashOwner->name;
-            $item['month'] = @$target->month;
-            $item['year'] = @$target->year;
-            $item['hosts'] = @$agency->users_count;
-            array_push($arr, $item);
-    }
-        return collect($arr);
+            $query = Agency::withCount('users');
+        
+            if ($this->agency_id) {
+                $query->where('id', $this->agency_id);
+            }
+        
+            $agencies = $query->get();
+        
+            $arr = [];
+        
+            foreach ($agencies as $agency) {
+                $target = $agency->target($this->month, $this->year);
+        
+                $agencySalarys = AgencySallary::query()
+                    ->where('agency_id', $agency->id)
+                    ->where('is_paid', 0)
+                    ->when($this->month, fn($q) => $q->where('month', '<=', $this->month))
+                    ->when($this->year, fn($q) => $q->where('year', '<=', $this->year))
+                    ->select(
+                        DB::raw('SUM(`sallary`) AS target'),
+                        DB::raw('SUM(`cut_amount`) AS expenses'),
+                        DB::raw('SUM(sallary) - SUM(cut_amount) AS salary')
+                    )
+                    ->groupBy('agency_id')
+                    ->first();
+        
+                $arr[] = [
+                    'id' => $agency->id,
+                    'name' => $agency->name,
+                    'salary' => round($agencySalarys->target ?? 0, 2),
+                    'expenses' => round($agencySalarys->expenses ?? 0, 2),
+                    'net_salary' => round($agencySalarys->salary ?? 0, 2),
+                    'agent' => $agency->owner->name ?? $agency->dashOwner->name ?? '-',
+                    'month' => $target->month ?? $this->month,
+                    'year' => $target->year ?? $this->year,
+                    'hosts' => $agency->users_count ?? 0
+                ];
+            }
+        
+            return collect($arr);
+        
+        
     }
 
 
