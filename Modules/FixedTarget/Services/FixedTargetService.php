@@ -316,6 +316,34 @@ class FixedTargetService
 
 
                 $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db, $percentageAchieved);
+            }else{
+                 $hours = 0;
+                $days  = 0;
+                $times = $this->getUserLiveTime($user);
+                if ($times) {
+                    $hours = $times->hnum;
+                    $days  = $user->monthly_days;
+                }
+                 UserSallary::updateOrCreate(
+                    [
+                        'user_id' => $user->id ,
+                         'month' => $this->month,
+                        'year' => $this->year,
+                        'user_agency_id' => $user->agency_id,
+                    ],
+                    [
+                        'agency_sallary' => 0,
+                        'sallary' => 0,
+                        'achieved_hours' =>   $hours,
+                        'achieved_days' =>  $days,
+                        'achieved_diamond' =>  $month_received,
+                        'app_profit' => 0,
+                        'dB' =>  0,
+                        'diamond' => $month_received . ' / ' . 0,
+                        'target_diamonds'     => 0,
+                        'remaining_diamond'   => ($month_received -  0),
+                    ]
+                );
             }
         }
         return $user;
