@@ -42,7 +42,7 @@ class UserHandling
 
 
             $hours = (int)$user_hours;
-            $num = \Cache::get('hours_days');
+            $num = \Cache::get('hours_days') ?? 2;
 
             if ($hours >= $num && $user->today_days == 0) {
                 DB::statement("
