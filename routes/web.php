@@ -8,7 +8,6 @@ use App\Models\RoomVisitor;
 use App\Models\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
-use Illuminate\Routing\Router;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomSettings;
@@ -348,6 +347,9 @@ Route::get('/generate-token/{id}', function ($id) {
 
 
 Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
+Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
+
 
 Route::get('/charge-agency-export-report', [
     ExportController::class,

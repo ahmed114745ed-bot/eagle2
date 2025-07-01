@@ -43,20 +43,22 @@ class ResetUserMonthlyDiamond extends Command
      */
     public function handle()
     {
-        $timezone = getTimezone();
-        $dt = new \DateTime('now', new \DateTimeZone($timezone));
-        if ($dt->format('j') == 1){
-            $carbon = $dt->subDay();
+        try {
+            $timezone = getTimezone();
+            $dt       = Carbon::now($timezone);
+//        $dt = new \DateTime('now', new \DateTimeZone($timezone));
+            if ($dt->format('j') == 1){
+                $carbon = $dt->subDay();
 
-            $this->calculateUserSalary(month: $carbon->month, year: $carbon->year);
-        }else{
+                $this->calculateUserSalary(month: $carbon->month, year: $carbon->year);
+            }else{
 
-            $this->calculateUserSalary();
-        }
+                $this->calculateUserSalary();
+            }
 
 
 
-        DB::statement("
+            DB::statement("
             UPDATE users
             SET monthly_diamond_received = 0
             WHERE agency_id != 0
@@ -76,6 +78,10 @@ class ResetUserMonthlyDiamond extends Command
 
 
 
-        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
-    }
+            $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+
+        }catch (\Exception $exception){
+            $this->error('reset monthly diamond failed: '.$exception->getMessage());
+        }
+      }
 }

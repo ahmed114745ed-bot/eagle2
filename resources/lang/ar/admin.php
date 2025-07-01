@@ -420,6 +420,7 @@ return [
     'flutterwave'   => 'فلتر ويف',
     'paystack'      => 'باي ستاك',
     'utdFawry'      => 'UTD دفع',
+    'My Fawry'      => 'My Fawry',
     'sslcommerz'    => 'إس إس إل كمرز',
     'google_pay'    => 'جوجل باي',
     'huawei_pay' => 'هواوي باي',
@@ -433,6 +434,8 @@ return [
     "db_percentage" => 'نسبة BD',
     "hours" => 'ساعات',
     "days" => 'أيام',
+    "reals" => 'فيديوهات',
+    "moments" => 'لحظات',
 
     "charge_level" => "مستوي الشحن",
 

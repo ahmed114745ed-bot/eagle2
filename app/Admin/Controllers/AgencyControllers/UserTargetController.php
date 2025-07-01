@@ -42,13 +42,19 @@ class UserTargetController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('uuid'));
             });
+             $filter->column(1 / 2, function ($filter) {
+                $filter->equal('add_month', __('month'));
+            });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('add_year', __('year'));
+            });
         });
         $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
         $grid->id('ID');
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name = @$this->user->name ?? '';
-            $uid = @$this->user->uuid;
-             if (request()->filled('_export_')) {
+            $uid = @$this->user->uuid ?? '';
+            if (request()->filled('_export_')) {
                 return "{$name} (UUID: {$uid})";
             }
             $path = @$this->user?->profile?->avatar;
@@ -75,17 +81,19 @@ class UserTargetController extends MainController
             ";
         });
         $grid->column('agency_id', __('agency'))->display(function () {
-            if (!@$this->agency )
-            {return "
+             if (request()->filled('_export_')) {
+                return $name ?? '';
+            }
+            if (!@$this->agency) {
+                return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                          <span style='text-decoration: underline; cursor: pointer;'>unknown agency</span>
             </div>
         ";
-
             }
             $name = @$this->agency->name ?? '';
-             if (request()->filled('_export_')) {
-                return $name;
+            if (request()->filled('_export_')) {
+                return $name ?? '';
             }
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
@@ -114,24 +122,27 @@ class UserTargetController extends MainController
 
         $grid->column('target_usd', __('usd') . ' ' . __('deserved') . '(%)');
         $grid->column('target_hours', __('target hours'))->display(function ($usd) {
-             return $usd . '/'.$this->target_hours;
+            return $usd . '/' . $this->target_hours;
         });
         $grid->column('target_days', __('target days'))->display(function ($usd) {
-            
-            return $usd . '/'.$this->target_days;
+
+            return $usd . '/' . $this->target_days;
         });
         $grid->column('target_agency_share', __('agency share') . '(%)');
         $grid->column('user_diamonds', __('user diamonds'));
         $grid->column('user_hours', __('user hours'));
         $grid->column('user_days', __('user days'));
-         $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
-           
-            $extras = json_decode($this->extras, true);
-        
+        $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
+
+            $extras = $this->extras ?? [];
+
+            if (is_string($extras)) {
+                $extras = json_decode($extras, true) ?: [];
+            }
             $momentUpload = $extras['moment']['upload'] ?? '-';
             $momentLikes = $extras['moment']['likes'] ?? '-';
             $momentComments = $extras['moment']['comments'] ?? '-';
-        
+
             $reelUpload = $extras['reel']['upload'] ?? '-';
             $reelLikes = $extras['reel']['likes'] ?? '-';
             $reelComments = $extras['reel']['comments'] ?? '-';
@@ -141,7 +152,10 @@ class UserTargetController extends MainController
             $labelUploads = __('Uploads:');
             $labelLikes = __('Likes:');
             $labelComments = __('Comments:');
-        
+            if (request()->filled('_export_')) {
+                return "Moments:\nUploads: $momentUpload, Likes: $momentLikes, Comments: $momentComments\n" .
+                    "Reels:\nUploads: $reelUpload, Likes: $reelLikes, Comments: $reelComments";
+            }
             return <<<HTML
                 <div style="line-height: 1.6;">
                     <div><b>{$labelMoments}</b></div>
@@ -161,7 +175,7 @@ class UserTargetController extends MainController
         });
         $grid->column('user_obtain', __('salary'))->display(function ($usd) {
             if (request()->filled('_export_')) {
-                return $usd;
+                return $usd ?? 0;
             }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
@@ -178,10 +192,10 @@ class UserTargetController extends MainController
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)
                 ->value('cut_amount') ?? 0;
-              if (request()->filled('_export_')) {
+            if (request()->filled('_export_')) {
                 return $userSalary;
             }
-              
+
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -199,7 +213,7 @@ class UserTargetController extends MainController
                 ->where('user_agency_id', $this->agency_id)
                 ->selectRaw('sallary - cut_amount AS net_salary')
                 ->value('net_salary') ?? 0;
-                if (request()->filled('_export_')) {
+            if (request()->filled('_export_')) {
                 return $userSalary;
             }
             return "<div style='display: flex; align-items: center; '>
@@ -210,7 +224,7 @@ class UserTargetController extends MainController
         });
         $grid->column('agency_obtain', __('agency salary'))->display(function ($usd) {
             if (request()->filled('_export_')) {
-                return $usd;
+                return $usd ?? 0;
             }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>

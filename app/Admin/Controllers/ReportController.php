@@ -346,9 +346,19 @@ class ReportController extends MainController
             return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
         });
 
+        // $grid->tools(function (Grid\Tools $tools) {
+        //     $tools->append('<a href="' . route('agency-export-report', ['month' => request('month'), 'year' => request()->year, 'agency_id' => request()->id]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+        // });
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('agency-export-report', ['month' => request('month'), 'year' => request()->year, 'agency_id' => request()->id]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+            $query = http_build_query([
+                'id' => request('id'),
+                'month' => request('month'),
+                'year' => request('year'),
+            ]);
+        
+            $tools->append('<a href="' . route('agency-export-report') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
+        
 
         return $grid;
     }
@@ -358,7 +368,7 @@ class ReportController extends MainController
         $grid = new Grid(new AdminUser());
         $grid->model()
             ->where('app_id', '!=', 0);
-
+         
         $grid->column('user.id', __('Id'));
 
         $grid->column('user.name', __('name'))->display(function ($name) {
@@ -401,6 +411,9 @@ class ReportController extends MainController
             });
         });
 
+        $grid->tools(function (Grid\Tools $tools) {
+            $tools->append('<a href="' . route('admin.agency-manger-export', ['month' => request('month'), 'year' => request()->year]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+        });
         $grid->disableExport();
 
         return $grid;

@@ -1038,7 +1038,28 @@
   "Owner Phone": "Owner Phone",
   "Charge Agency_": "Charge Agency",
   "Appear Charger Agency": "Appear Charger Agency",
-  "Is Frozen": "Is Frozen"
+  "Is Frozen": "Is Frozen",
+  "sky pay": "Sky Pay",
+  "google pay": "Google Pay",
+  "cashfree": "Cashfree",
+  "apple pay": "Apple Pay",
+  "paytabs": "PayTabs",
+  "paypal": "PayPal",
+  "utd Fawry": "UTD Fawry",
+  "google_pay": "Google Pay",
+  "stripe": "Stripe",
+  "oPay": "oPay",
+  "skyPay": "Sky Pay",
+  "cashfree": "Cashfree",
+  "applepay": "Apple Pay",
+  "paytabs": "PayTabs",
+  "paypal": "PayPal",
+  "utdFawry": "UTD Fawry",
+  "increase": "Increase",
+  "decrease": "Decrease",
+  "coins": "Coins",
+  "change_type": "Change Type"
+
 
 
 

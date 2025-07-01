@@ -43,7 +43,7 @@ class ChargeAgencyExporter  implements FromCollection,WithHeadings
             $item['name'] = $agency->name;
             $item['owner_name'] = optional($agency->owner)->name ?? '-';
             $item['owner_uuid'] = optional($agency->owner)->uuid ?? '-';
-            $item['owner_phone'] = optional($agency->owner)->phone ?? '-';
+            $item['owner_phone'] = '"' . optional($agency->owner)->phone . '"';
             $item['charge_agency'] = ChargeAgency::where('agency_id', $agency->id)->exists() ? 'Yes' : 'No';
             $item['appear_charger_agency'] = optional($agency->owner)->appear_charger_agency ? 'Yes' : 'No';
             $item['is_frozen'] = $agency->is_frozen ? 'Yes' : 'No';

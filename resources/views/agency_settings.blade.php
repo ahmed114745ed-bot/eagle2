@@ -415,7 +415,7 @@
                 @endif
                 <div class="form">
                     <label>{{ __('Hours:') }} </label>
-                    <input type="text" name="hours_days" value="{{ Cache::get('hours_days') }}" class="form-control">
+                    <input type="number" name="hours_days" value="{{ Cache::get('hours_days') }}" class="form-control">
 
                     <button type="submit">{{ __('Save') }}</button>
 
