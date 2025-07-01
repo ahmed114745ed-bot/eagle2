@@ -314,30 +314,31 @@ class Agency
             'middleware' => config('agency.route.middleware'),
         ];
 
-        app('router')->group($attributes, function ($router) {
+        app('router')->group($attributes, function () {
 
-            Route::namespace('\App\Agency\Controllers')->group(function ($router) {
-
+            Route::namespace('\App\Agency\Controllers')->group(function () {
+        
                 Route::resource('auth/users', 'UserController')->names('auth.users');
                 Route::resource('auth/roles', 'RoleController')->names('auth.roles');
                 Route::resource('auth/permissions', 'PermissionController')->names('auth.permissions');
                 Route::resource('auth/menu', 'MenuController', ['except' => ['create']])->names('auth.menu');
                 Route::resource('auth/logs', 'LogController', ['only' => ['index', 'destroy']])->names('auth.logs');
-
+        
                 Route::post('_handle_form_', 'HandleController@handleForm')->name('handle-form');
                 Route::post('_handle_action_', 'HandleController@handleAction')->name('handle-action');
                 Route::get('_handle_selectable_', 'HandleController@handleSelectable')->name('handle-selectable');
                 Route::get('_handle_renderable_', 'HandleController@handleRenderable')->name('handle-renderable');
             });
-
-            $authController =  AuthController::class;
-
+        
+            $authController = AuthController::class;
+        
             Route::get('auth/login', $authController . '@getLogin')->name('agency.login');
             Route::post('auth/login', $authController . '@postLogin');
             Route::get('auth/logout', $authController . '@getLogout')->name('agency.logout');
             Route::get('auth/setting', $authController . '@getSetting')->name('agency.setting');
             Route::put('auth/setting', $authController . '@putSetting');
         });
+        
     }
 
     /**
