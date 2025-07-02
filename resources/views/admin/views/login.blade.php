@@ -7,7 +7,7 @@
     if (Schema::hasTable('settings')) {
         $logoDb = DB::table('settings')->where('key', 'app_logo')->value('value');
 
-        
+
         if ($logoDb) {
             $logo = getImagePath( $logoDb);
         }
@@ -97,13 +97,21 @@
 <!-- iCheck -->
 <script src="{{ admin_asset("vendor/laravel-admin/AdminLTE/plugins/iCheck/icheck.min.js")}}"></script>
 <script>
-  $(function () {
-    $('input').iCheck({
-      checkboxClass: 'icheckbox_square-blue',
-      radioClass: 'iradio_square-blue',
-      increaseArea: '20%' // optional
+
+    $(function () {
+        $('input').iCheck({
+            checkboxClass: 'icheckbox_square-blue',
+            radioClass: 'iradio_square-blue',
+            increaseArea: '20%' // optional
+        });
+
+        // Prevent double submission
+        $('form').on('submit', function () {
+        var $btn = $(this).find('button[type="submit"]');
+        $btn.prop('disabled', true).text('{{ trans('admin.logging_in') ?? 'Logging in...' }}');
+        });
     });
-  });
+    
 </script>
 </body>
 </html>
