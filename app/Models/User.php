@@ -251,7 +251,7 @@ class User extends Authenticatable
         return $days->count();
     }
 
-    public function getTotalDaysJoinedAgencyByMonth($startDate,$endDate,$year)
+    public function getTotalDaysJoinedAgencyByMonth($startDate, $endDate, $year)
     {
         $month = \Carbon\Carbon::parse($startDate)->month;
 
@@ -273,7 +273,6 @@ class User extends Authenticatable
             ->get();
 
         return $days->count();
-
     }
 
     public function getSallaryInfo(): array
@@ -313,12 +312,12 @@ class User extends Authenticatable
         return $userSallary?->toArray() ?? [];
     }
 
-    public function getSallaryInfoByMonth2($month, $year,$agencyId): array
+    public function getSallaryInfoByMonth2($month, $year, $agencyId): array
     {
         $userSallary = UserSallary::query()
             ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
             ->where('user_id', $this->id)
-            ->where('user_agency_id', '=',$agencyId)
+            ->where('user_agency_id', '=', $agencyId)
             ->where('month', $month)
             ->where('year', $year)
             ->first();
@@ -1174,6 +1173,63 @@ class User extends Authenticatable
                 ->where('user_agency_id', $this->agency_id)
                 ->orderByDesc('id')
                 ->sum(DB::raw('cut_amount'));
+
+            return floor($userSallary ?? 0);
+        }
+
+        return 0;
+    }
+
+    public function sumCutAmount($month = null, $year = null)
+    {
+
+        if ($this->agency_id) {
+            $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
+                $query->where(function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                });
+            })->where('user_id', $this->id)
+                ->where('is_paid', 0)
+                ->orderByDesc('id')
+                ->sum(DB::raw('cut_amount'));
+
+            return floor($userSallary ?? 0);
+        }
+
+        return 0;
+    }
+
+    public function sumSalary($month = null, $year = null)
+    {
+
+        if ($this->agency_id) {
+            $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
+                $query->where(function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                });
+            })->where('user_id', $this->id)
+                ->where('is_paid', 0)
+                ->orderByDesc('id')
+                ->sum(DB::raw('sallary'));
+
+            return floor($userSallary ?? 0);
+        }
+
+        return 0;
+    }
+
+    public function sumNetSalary($month = null, $year = null)
+    {
+
+        if ($this->agency_id) {
+            $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
+                $query->where(function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                });
+            })->where('user_id', $this->id)
+                ->where('is_paid', 0)
+                ->orderByDesc('id')
+                ->sum(DB::raw('sallary - cut_amount'));
 
             return floor($userSallary ?? 0);
         }
