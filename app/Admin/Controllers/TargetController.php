@@ -30,6 +30,11 @@ class TargetController extends MainController
             ->body($this->grid()));
     }
 
+    public function gridInstance()
+    {
+        return $this->grid();
+    }
+
     /**
      * Show interface.
      *
@@ -116,11 +121,6 @@ class TargetController extends MainController
                 </div>
             ";
             });
-
-
-
-
-
 
         // $grid->usd(__('User Percentage'));
 
@@ -215,7 +215,7 @@ class TargetController extends MainController
         Admin::html(
             '<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
-                    <form id="exportPdfForm" method="GET" action="/admin/download-target-pdf" target="_blank">
+                    <form id="exportPdfForm" method="GET" action="/admin/download-target-pdf" target="_blank" class="exportPdfForm">
                       <div class="modal-content">
                         <div class="modal-header">
                           <h5 class="modal-title" id="exportPdfLabel">' . __('Choose Columns to Export') . '</h5>
