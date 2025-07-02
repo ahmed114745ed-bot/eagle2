@@ -4,14 +4,9 @@ namespace App\Http\Controllers\utd;
 
 use Exception;
 use App\Models\User;
-use App\Models\Charge;
 use App\Helpers\Common;
-use App\Models\CoinLog;
-use App\Models\Country;
 use App\Models\UserSallary;
-use App\Models\CoinGameUser;
 use Illuminate\Http\Request;
-use App\Models\UserLuckyGift;
 use App\Models\RequestTakeSalary;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
@@ -21,7 +16,6 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\AcceptRequestToGetSalary;
 use App\Notifications\RefuseRequestToGetSalary;
 use App\Http\Resources\RequestTakeSalaryResource;
-use Modules\SalaryTransaction\Entities\ChargeCountry;
 
 class RequestTakeSalaryController extends Controller
 {

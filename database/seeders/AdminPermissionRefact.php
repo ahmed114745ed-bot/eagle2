@@ -121,6 +121,11 @@ class AdminPermissionRefact extends Seeder
                         'except' => ['create', 'edit', 'delete', 'show'],
                         'additional' => ['add-switch', 'charge-report-switch'],
                     ],
+                    [
+                        'key' => 'charge-to-user',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['add-switch', 'history-switch'],
+                    ],
                 ],
             ],
             [

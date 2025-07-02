@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\UserCoinLog;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
@@ -903,7 +904,9 @@ class UserController extends MainController
         $userJoinAgencies = UsersJoinedAgency::where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
             $query->whereDate('join_date', $joinDate);
         })->paginate(10, ['*'], 'user_agency_page');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip');
+
+        $usersCoins = UserCoinLog::where('user_id',$id)->orderByDesc('id')->paginate(10, ['*'], 'coins_page');;
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip','usersCoins');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }

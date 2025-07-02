@@ -281,7 +281,7 @@
 "Moments & Reels": "اللحظات والمقاطع",
 "This microphone is closed and cannot be accessed":"هذا المايك مغلق ولا يمكن الصعود عليه",
 "Stop sending gifts to everyone":"ايقاف ارسال الهدايا للجميع",
-
+"change agency by admin": "تغيير الوكالة بواسطة المشرف",
     "to many send": "الكثير من الطلبات",
     "code is sent to your phone": "تم إرسال الرمز إلى هاتفك",
     "logged in successfully": "تم تسجيل الدخول بنجاح",
@@ -3325,8 +3325,15 @@
   "weekly-cp": "تقرير CP الأسبوعي",
   "cp reports": "تقارير CP",
   "cp relations": "علاقات CP",
+
+    "Charge To User": "الشحن للمستخدم",
+    "Browse charge to user": "تصفح الشحن للمستخدم",
+    "Add switch charge to user": "اضافة الشحن للمستخدم",
+    "History switch charge to user": "تاريخ الشحن للمستخدم",
+    "Total Gift Price:": "إجمالي سعر الهدايا:",
+
   "weekly cp": "تقرير CP الأسبوعي"
-  
+
 
 
 
