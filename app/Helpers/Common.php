@@ -1492,21 +1492,23 @@ class Common
         $agencyUserJoined = UsersJoinedAgency::where([
             'user_id' => $originalOwnerId,
             'agency_id' =>  $agencyId,
-            'type' => 1,
+            'type' => 2,
         ])->where('leave_date', null)->first();
-        $agencyUserJoined->leave_date = now();
-        $agencyUserJoined->status = 'from admin';
-        $agencyUserJoined->save();
+        if ($agencyUserJoined) {
+            $agencyUserJoined->leave_date = now();
+            $agencyUserJoined->status = 'from admin';
+            $agencyUserJoined->save();
+        }
         $checkAgencyUser = UsersJoinedAgency::where([
             'user_id' => $newOwnerId,
             'agency_id' =>  $agencyId,
-            'type' => 1,
+            'type' => 2,
         ])->where('leave_date', null)->exists();
         if (!$checkAgencyUser) {
             UsersJoinedAgency::create([
                 'user_id' => $newOwnerId,
                 'agency_id' =>  $agencyId,
-                'type' => 1,
+                'type' => 2,
                 'join_date' => now(),
                 'status' => 'Joined'
             ]);
