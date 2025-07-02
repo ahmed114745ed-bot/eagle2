@@ -37,6 +37,17 @@ class RankingRepository
         )->groupBy('user_id')->with('user')->orderByRaw("exp desc")->limit($limit)->get();
     }
 
+    public function getUserGameCoinsV2($type, $limit)
+    {
+        $query = CoinGameUser::query();
+        $this->applyDateFiltersV2($query, $type);
+
+        return   $query->select(
+            'user_id',
+            DB::raw(" SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp")
+        )->groupBy('user_id')->with('user')->orderByRaw("exp desc")->limit($limit)->get();
+    }
+
     public function getGiftLogs($class, $rel, $type, $limit, $keywords)
     {
         $query = GiftLog::query()->whereHas($rel)
