@@ -1187,7 +1187,7 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           <a href="?tab=user-coins" class="tab-btn" data-target="user-coins-tab">{{ __('User Coins ') }}</a>
+           <a href="?tab=user-coins" class="tab-btn" data-target="user-coins-tab">{{ __('User Coins') }}</a>
 
 
 
