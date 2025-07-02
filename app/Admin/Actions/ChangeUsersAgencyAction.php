@@ -48,7 +48,7 @@ class ChangeUsersAgencyAction extends RowAction
 
         'agency_id' => $request->old_agency_id,
         'type' => 2,
-    ])->where('leave_date', null)->update(['leave_date'=> now(),'status' => 'from admin']);
+    ])->where('leave_date', null)->update(['leave_date'=> now(),'status' => 'change agency by admin']);
         foreach($users as $user)
         {
             $user->agency_id = $request->new_agency_id;
