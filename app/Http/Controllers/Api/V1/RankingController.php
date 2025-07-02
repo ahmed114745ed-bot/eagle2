@@ -8,7 +8,6 @@ use App\Http\Resources\Api\V1\AgencyRankingRecourse;
 use App\Services\RankingService;
 use App\Services\VipService;
 use Illuminate\Http\Request;
-use App\Http\Resources\Api\V1\AgencyRankingRecourse;
 use Illuminate\Support\Facades\Log;
 
 class RankingController extends Controller
