@@ -258,22 +258,22 @@ class User extends Authenticatable
         if (!$year) {
             $year = \Carbon\Carbon::parse($startDate)->year;
         }
-    
+
         $query = $this->liveTime()
             ->selectRaw('DATE(created_at) as date, SUM(hours) as total_hours')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month);
-    
+
         $hours_days = \Cache::get('hours_days') ?? 2;
-    
+
         $days = $query
             ->groupBy('date')
             ->having('total_hours', '>=', $hours_days)
             ->get();
-    
+
         return $days->count();
-    
+
     }
 
     public function getSallaryInfo(): array
@@ -322,7 +322,7 @@ class User extends Authenticatable
             ->where('month', $month)
             ->where('year', $year)
             ->first();
-            
+
         return $userSallary?->toArray() ?? [];
     }
 
@@ -781,25 +781,21 @@ class User extends Authenticatable
 
     public function getSalaryAttribute()
     {
-
-        //        if ($this->agency_id) {
-        $userSallary = UserSallary::query()
+        $userSalary = UserSallary::query()
 
             ->where('user_id', $this->id)
-            //   ->where('is_paid', 0)
-            //   ->where('user_agency_id', $this->agency_id)
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
+
         $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
             $q->where('uid', $this->id);
         })
             ->orderByDesc('id')
             ->sum(DB::raw('salary - cut_amount'));
 
-        return floor($userSallary + (int) $roomSalary);
-        //        } else {
-        //            return 0;
-        //        }
+        $total = $userSalary + $roomSalary;
+
+        return floor($total * 100) / 100;
     }
 
     public function getSalaryWithoutCutAmountAttribute()
@@ -807,8 +803,6 @@ class User extends Authenticatable
         $userSallary = UserSallary::query()
             ->where('user_id', $this->id)
             ->sum(DB::raw('sallary'));
-
-
 
         return round($userSallary, 2);
     }
@@ -1381,63 +1375,63 @@ class User extends Authenticatable
     public function userTypeBadge()
     {
         $lang = app()->getLocale() ?? 'en';
-    
+
         $types = [
             1 => 'agency_owner',
             2 => 'host',
             3 => 'shipping',
             4 => 'bd',
         ];
-    
+
         $applicableTypes = [];
-    
+
         if ($this->type_user >= 1) {
             $applicableTypes[1] = $types[1];
         }
-    
+
         if ($this->type_user >= 2) {
             $applicableTypes[2] = $types[2];
         }
-    
+
         if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
             $applicableTypes[3] = $types[3];
         }
-    
+
         if ($this->is_bd) {
             $applicableTypes[4] = $types[4];
         }
-    
+
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
         }
-    
+
         ksort($applicableTypes);
-    
+
         $configKeys = [];
         foreach ($applicableTypes as $type) {
             $configKeys[] = "{$lang}_{$type}";
             $configKeys[] = "en_{$type}";
         }
-    
+
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
-    
+
         $html = '<div class="user-type-badges">';
         foreach ($applicableTypes as $typeName) {
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
-    
+
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
             if ($url) {
                 $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
             }
         }
-    
+
         $html .= '</div>';
-    
+
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
-    
+
     public function wallet()
     {
         return $this->hasOne(UserWallet::class);
