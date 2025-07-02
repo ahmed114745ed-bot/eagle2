@@ -316,6 +316,7 @@ class SendGiftService
         $info['giftNum']      = $number;
         $info['giftName']     = $gift->name ?: '_';
         $info['giftPrice']    = $totalPrice;
+        $info['app_profit_coins']    = $totalPrice;
         $info['sender_id']    = $senderUser->id;
         $info['receiver_id']  = $receivedUser->id;
         $info['is_play']      = $isPlay ? 2 : 1;
