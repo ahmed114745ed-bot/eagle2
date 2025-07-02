@@ -1062,7 +1062,16 @@
   "increase": "Increase",
   "decrease": "Decrease",
   "coins": "Coins",
-  "change_type": "Change Type"
+  "change_type": "Change Type",
+  "Cp-reports": "CP Reports",
+  "Cp-relations": "CP Relations",
+  "Weekly-cp": "Weekly CP",
+  "cp-reports": "CP Reports",
+  "cp-relations": "CP Relations",
+  "weekly-cp": "Weekly CP",
+  "cp reports": "CP Reports",
+  "cp relations": "CP Relations",
+  "weekly cp": "Weekly CP"
 
 
 

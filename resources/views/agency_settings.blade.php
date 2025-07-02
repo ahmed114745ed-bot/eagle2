@@ -351,6 +351,30 @@
         transform: translateX(26px);
     }
 
+    .grid-per-pager .input, select{
+        width: auto !important;
+    }
+
+    .exportPdfForm {
+        background: transparent !important;
+    }
+
+    .modal-body input,
+    .modal-body select {
+        width: auto !important;
+    }
+
+    .close {
+        right: 0 !important;
+        top: 0 !important;
+        font-size: 30px !important;
+    }
+
+    button.close {
+        width: auto !important;
+    }
+
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -366,6 +390,8 @@
                 <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
                 <button onclick="showSection('user_days')">{{ __('user days') }}</button>
                 <button onclick="showSection('agency_settings')">{{ __('Agency Settings') }}</button>
+
+                <button onclick="showSection('targets_table')">{{ __('Targets') }}</button>
             </div>
         </div>
 
@@ -596,6 +622,12 @@
                     </div>
                 </form>
 
+            </div>
+
+            <div id="targets_table" class="settings-section">
+                <h3>{{ __('Targets table') }}</h3>
+
+                {!! $targetGrid !!}
             </div>
 
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
