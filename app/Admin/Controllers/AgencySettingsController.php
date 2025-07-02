@@ -66,22 +66,6 @@ class AgencySettingsController extends MainController
                        'targetGrid' => $targetGridHtml
                    ]))
            );
-
-        return parent::index($content
-            ->view('agency_settings', compact(
-                'hours',
-                'days',
-                'moments',
-                'reels',
-                'diamonds',
-                'languages',
-                'configAll',
-                'transfer_salary',
-                'stop_invite_code',
-                'stop_charge',
-                'make_rooms_top',
-                'make_gift_top',
-            )));
     }
 
     public function badges()
