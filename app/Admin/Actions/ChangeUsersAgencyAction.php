@@ -38,7 +38,7 @@ class ChangeUsersAgencyAction extends RowAction
     $ownerId = Agency::where('id', $request->old_agency_id)->value('app_owner_id');
 
     $users = User::where('agency_id', $request->old_agency_id)
-        ->where('type_user', 1)
+        // ->where('type_user', 1)
         ->when($ownerId, function ($query) use ($ownerId) {
             $query->where('id', '!=', $ownerId);
         })
