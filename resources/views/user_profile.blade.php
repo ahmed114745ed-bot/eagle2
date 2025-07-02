@@ -1135,7 +1135,7 @@
                         <span class="meta-label">{{ __('diamonds') }}:</span>
                         @php
 
-                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->getTotalDiamond() ;
+                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->monthly_diamond_received;
 
                         @endphp
                         <span class="meta-value">{{ @$user_diamonds }}</span>
