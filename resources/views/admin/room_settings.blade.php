@@ -210,6 +210,10 @@
                         <input class="form-control" type="text" name="private_comment_price"
                             value="{{ $settings['private_comment_price'] ?? '' }}">
 
+                        <label>{{ __('Total Gift Price:') }}</label>
+                        <input class="form-control" type="number" name="total_gift_price"
+                               value="{{ $settings['total_gift_price'] ?? '' }}">
+
                         <button type="submit">{{ __('save') }}</button>
                     </div>
                 </form>
