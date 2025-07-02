@@ -1266,7 +1266,7 @@
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
                                     </td>
-                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :(empty($pack->expire)? '':'∞') }}</td>
+                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :'∞' }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"

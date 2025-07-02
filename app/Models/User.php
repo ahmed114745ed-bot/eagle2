@@ -251,6 +251,31 @@ class User extends Authenticatable
         return $days->count();
     }
 
+    public function getTotalDaysJoinedAgencyByMonth($startDate,$endDate,$year)
+    {
+        $month = \Carbon\Carbon::parse($startDate)->month;
+
+        if (!$year) {
+            $year = \Carbon\Carbon::parse($startDate)->year;
+        }
+    
+        $query = $this->liveTime()
+            ->selectRaw('DATE(created_at) as date, SUM(hours) as total_hours')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month);
+    
+        $hours_days = \Cache::get('hours_days') ?? 2;
+    
+        $days = $query
+            ->groupBy('date')
+            ->having('total_hours', '>=', $hours_days)
+            ->get();
+    
+        return $days->count();
+    
+    }
+
     public function getSallaryInfo(): array
     {
         $month = (int) @request()->month;
