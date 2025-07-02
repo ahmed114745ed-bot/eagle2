@@ -75,6 +75,8 @@ class Bd extends Model
             $userApp = User::find($bd->app_id);
             if ($userApp) {
                 $userApp->is_bd = 0;
+                $userApp->type_user = 0;
+                $userApp->agency_id = 0;
                 $userApp->save();
             }
         });

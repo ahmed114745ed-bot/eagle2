@@ -41,18 +41,26 @@ class ExportController extends Controller
     }
     public function agencyMangerExport()
     {
-        $export = new AgencyMangerExporter();
-        $fileName = 'agency_manger_target_salary.csv';
-
+        $userId = request('user_id'); // استقبلناه بشكل مسطح من الرابط
+    
+        $export = new AgencyMangerExporter($userId);
+        $fileName = 'agency_manger_export_' . now()->format('Y_m_d_His') . '.csv';
+    
         return Excel::download($export, $fileName);
     }
     public function chargeAgencies()
     {
-        $export = new ChargeAgencyExporter();
-        $fileName = 'charge_agencies.csv';
-
+        $search = request('search');
+        $agencyId = request('agency_id');
+        $month = request('month');
+        $year = request('year');
+    
+        $export = new ChargeAgencyExporter($agencyId, $month, $year, $search);
+        $fileName = 'charge_agencies_' . now()->format('Y_m_d_His') . '.csv';
+    
         return Excel::download($export, $fileName);
     }
+    
 
     public function walletExportUser()
     {

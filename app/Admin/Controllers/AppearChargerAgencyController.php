@@ -294,7 +294,13 @@ class AppearChargerAgencyController extends MainController
         });
         $grid->disableExport();
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('charge-agency-export-report', ['month' => request('month'), 'year' => request()->year, 'agency_id' => request()->id]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . route('charge-agency-export-report', [
+                'search' => request('search'),
+                'agency_id' => request('id'),
+                'month' => request('month'),
+                'year' => request('year'),
+            ]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+
         });
 
         return $grid;
