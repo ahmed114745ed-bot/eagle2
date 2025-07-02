@@ -108,6 +108,12 @@
                 location.reload();
             });
         });
+
+        // Prevent double submission
+        $('form').on('submit', function () {
+            var $btn = $(this).find('button[type="submit"]');
+            $btn.prop('disabled', true).text('{{ trans('admin.logging_in') ?? 'Logging in...' }}');
+        });
     });
 </script>
 </body>
