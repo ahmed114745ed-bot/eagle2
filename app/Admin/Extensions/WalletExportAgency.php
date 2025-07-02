@@ -30,11 +30,15 @@ class WalletExportAgency  implements FromCollection, WithHeadings
     ];
 
     public $id;
+    protected $month;
+    protected $year;
 
 
-    public function __construct($id = null)
+    public function __construct($id = null, $month = null, $year = null)
     {
         $this->id = $id;
+        $this->month = $month;
+        $this->year = $year;
     }
 
     /**
@@ -43,9 +47,11 @@ class WalletExportAgency  implements FromCollection, WithHeadings
     public function collection()
     {
         $id = $this->id;
+        $month = $this->month;
+        $year = $this->year;
         $query = Agency::query();
         if ($this->id) {
-           
+
             $query->where('id', $id) // Match directly on agency_id
                 ->orWhereHas('owner', function ($subQuery) use ($id) {
                     $subQuery->where('uuid', $id); // Match on related owner UUID
@@ -59,25 +65,13 @@ class WalletExportAgency  implements FromCollection, WithHeadings
         foreach ($agencies as $agency) {
 
 
-            $agencySalarys = AgencySallary::query()
-                ->where('agency_id', $agency->id)
-                ->where('is_paid', 0)
-
-                ->select(
-                    DB::raw('SUM(`sallary`) AS target'),
-                    DB::raw('SUM(`cut_amount`) AS expenses'),
-                    DB::raw('SUM(sallary) - SUM(cut_amount) AS salary')
-                )
-                ->groupBy('agency_id')
-                ->first();
 
             $arr[] = [
                 'id' => $agency->id,
                 'name' => $agency->name,
-                'balance' => round($agencySalarys->target ?? 0, 2). '💲',
-                'withdrawal' => round($agencySalarys->expenses ?? 0, 2). '💲',
-                'salary' => round($agencySalarys->salary ?? 0, 2). '💲',
-
+                'balance' => round($agency->sumNetSalary($month, $year) ?? 0, 2) . '💲',
+                'withdrawal' => round($agency->sumCutAmount($month, $year) ?? 0, 2) . '💲',
+                'salary' => round($agency->sumSalary($month, $year) ?? 0, 2) . '💲',
             ];
         }
 
@@ -90,7 +84,7 @@ class WalletExportAgency  implements FromCollection, WithHeadings
         return [
             __("id", [], 'ar'),
             __('name', [], 'ar'),
-            __('wallet balance', [], 'ar'),
+            __('net salary', [], 'ar'),
             __('withdrawal', [], 'ar'),
             __('salary', [], 'ar'),
 
