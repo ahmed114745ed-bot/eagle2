@@ -374,7 +374,9 @@
         width: auto !important;
     }
 
-
+    .btn-sm {
+        margin: 0 !important;
+    }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
