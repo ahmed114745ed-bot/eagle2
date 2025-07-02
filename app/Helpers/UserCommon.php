@@ -211,6 +211,7 @@ class UserCommon
             'total_num_win' => $totalNumWin,
             'total_win' => $totalUserWin,
             'gift_price' => @$gift->price,
+            'app_profit_coins' => @$gift->price,
             'created_at' => now(),
             'updated_at' => now(),
         ];
