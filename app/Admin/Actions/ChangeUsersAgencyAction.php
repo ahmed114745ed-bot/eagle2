@@ -61,7 +61,7 @@ class ChangeUsersAgencyAction extends RowAction
             if (!$checkAgencyUser) {
                 UsersJoinedAgency::create([
                     'user_id' => $user->id,
-                    'agency_id' => $request->old_agency_id,
+                    'agency_id' =>$request->new_agency_id,
                     'type' => 2,
                     'join_date' => now(),
                     'status' =>'Joined'
