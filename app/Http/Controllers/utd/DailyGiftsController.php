@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DailyGiftResource;
+use App\Models\Ware;
 use Illuminate\Http\Request;
 use Modules\DailyPrize\Entities\DailyGift;
 
@@ -52,6 +54,9 @@ class DailyGiftsController extends Controller
             'expir' => $request->expir,
             'type' => $type
         ]);
+        $coins = Ware::find()
+    
+
 
         return Common::apiResponse(true, 'Success', $result);
     }

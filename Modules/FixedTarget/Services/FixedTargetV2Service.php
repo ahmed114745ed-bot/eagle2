@@ -4,6 +4,7 @@ namespace Modules\FixedTarget\Services;
 
 use App\Helpers\Common;
 use App\Models\BDSallary;
+use App\Models\GiftLog;
 use App\Models\UsersJoinedAgency;
 use App\Services\WalletService;
 use Carbon\Carbon;
@@ -27,7 +28,7 @@ use Modules\FixedTarget\Classes\RegularTarget;
 use Modules\FixedTarget\Classes\FixedTargetClass;
 use Modules\FixedTarget\Interfaces\TargetInterface;
 
-class FixedTargetService
+class FixedTargetV2Service
 {
 
     private TargetInterface $targetInstance;
@@ -40,28 +41,42 @@ class FixedTargetService
 
     public function __construct(private User $user, private? int $month = null, private? int $year = null)
     {
-            $timezone = getTimezone();
-        if (is_null($this->month) || is_null($this->year)){
-            $tz = new \DateTimeZone($timezone);
-            $dt = new \DateTime('now', $tz);
-            $this->month = $dt->format('m');
-            $this->year = $dt->format('Y');
-        }
+        $timezone = getTimezone();
 
+        // جلب تاريخ انضمام المستخدم
         $joinDate = UsersJoinedAgency::where('user_id', $user->id)
-        ->where('agency_id', $user->agency_id)
-        ->latest()
-        ->value('join_date'); 
-
-        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');  
-        
-
-        $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->startOfMonth()->timezone('UTC');
-        $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->endOfMonth()->timezone('UTC');
-
-        $targetType           = $this->getUserTargetType($user->id);
-        $this->userTargetType = $targetType;
+            ->where('agency_id', $user->agency_id)
+            ->latest()
+            ->value('join_date');
+    
+        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');
+    
+        // استخدام التاريخ الحالي كافتراضي إذا لم يُرسل شهر وسنة
+        $now = Carbon::now($timezone);
+        $inputMonth = $this->month ?? $now->month;
+        $inputYear  = $this->year  ?? $now->year;
+    
+        // بناء startDate من الشهر والسنة المدخلة
+        $inputStartDate = Carbon::createFromDate($inputYear, $inputMonth, 1, $timezone)->startOfMonth()->timezone('UTC');
+    
+        // تحقق: هل التاريخ المدخل قبل تاريخ الانضمام؟
+        if ($inputStartDate->lt($this->joinDate)) {
+            // إذا كان التاريخ أقدم من الانضمام، استخدم شهر الانضمام
+            $this->month = $this->joinDate->month;
+            $this->year  = $this->joinDate->year;
+            $this->startDate = $this->joinDate->copy()->startOfMonth();
+            $this->endDate   = $this->joinDate->copy()->endOfMonth();
+        } else {
+            // إذا كان التاريخ صالحًا، استخدمه
+            $this->month = $inputMonth;
+            $this->year  = $inputYear;
+            $this->startDate = $inputStartDate->copy()->startOfMonth();
+            $this->endDate   = $inputStartDate->copy()->endOfMonth();
+        }
+    
+        $this->userTargetType = $this->getUserTargetType($user->id);
         $this->targetInstance = new RegularTarget();
+  
     }
 
     private function getUserTargetType(int $userId): TargetType
@@ -73,16 +88,20 @@ class FixedTargetService
     public function calculateTarget()
     {
         $user           = $this->user;
-        $month_received = $user->monthly_diamond_received;
+        // $month_received = $user->monthly_diamond_received;
         /*     $agency=Agency::find($user->agency_id);
         if ($this->userTargetType == TargetType::FIXED) {
             if ($agency->users->where("type_user",1)->sum("monthly_diamond_received") >= $agency->monthly_target) {
                 $user = $this->calculateFixedTarget($month_received, $user);
             }
         } else {*/
-         
-        $user = $this->calculateRegularTarget($month_received, $user);
-        //        }
+       
+            $month_received = GiftLog::where('receiver_id', $user->id)->whereBetween('created_at', [$this->startDate, $this->endDate])->sum('giftPrice');
+
+            $user = $this->calculateRegularTarget($month_received, $user);
+
+        //  }
+       
         $user->salary_is_updated = false;
         $user->save();
     }
@@ -109,13 +128,17 @@ class FixedTargetService
             }
 
             $countMoments  = Moment::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth()
+                // Carbon::now()->startOfMonth(),
+                // Carbon::now()->endOfMonth()
+                $this->startDate,
+                $this->endDate
             ])->count();
 
             $countReels         = Real::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth()
+                // Carbon::now()->startOfMonth(),
+                // Carbon::now()->endOfMonth()
+                $this->startDate,
+                $this->endDate
             ])->count();
 
 
@@ -174,10 +197,12 @@ class FixedTargetService
         //     ['target_id' => $target->id],
         //     'get_target'
         // );
-        logger('agency_usd Achieved:', [$agency_usd]);
-        logger('percentageAchieved Achieved:', [$percentageAchieved]);
-        logger(' Achieved:', [$agency_usd * $percentageAchieved]);
-        logger(' Achieved: user', [ $t]);
+        \Log::info('updateSalaries',['test'=>$user->id ,'$this->month' => $this->month,'$t'=>$t]);
+
+        // logger('agency_usd Achieved:', [$agency_usd]);
+        // logger('percentageAchieved Achieved:', [$percentageAchieved]);
+        // logger(' Achieved:', [$agency_usd * $percentageAchieved]);
+        // logger(' Achieved: user', [ $t]);
 
         try {
             $values = [
@@ -268,24 +293,28 @@ class FixedTargetService
     public function calculateRegularTarget($month_received, User $user): User
     {
         // \Log::info('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
+      
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
             
-            // \Log::info('$target',['$target'=>$target]);
             // \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
                 $hours = 0;
                 $days  = 0;
+                $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
+
                 $times = $this->getUserLiveTime($user);
                 if ($times) {
+                    
                     $hours = $times->hnum;
-                    $days  = $user->monthly_days;
+                    // $days  = $user->monthly_days;
+                    $days  = $user->getTotalDaysJoinedAgencyByMonth($startDate,$this->endDate,$this->year);
                 }
+
 
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
              
-                $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
 
@@ -296,9 +325,9 @@ class FixedTargetService
                 $appProfit        = $target->app_profit_percentage / 100;
                 $db               = $target->db_percentage / 100;
                 $user->target_usd = $t;
-                logger('t:', [$t]);
-                logger('Percentage Achieved:', [$percentageAchieved]);
-                logger('target_usd Achieved:', [$user->target_usd]);
+                // logger('t:', [$t]);
+                // logger('Percentage Achieved:', [$percentageAchieved]);
+                // logger('target_usd Achieved:', [$user->target_usd]);
 
                 $extras = [
                     "moment" => [

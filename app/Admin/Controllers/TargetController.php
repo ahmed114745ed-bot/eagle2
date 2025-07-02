@@ -231,6 +231,8 @@ class TargetController extends MainController
                           <label><input type="checkbox" name="columns[]" value="db_percentage" checked> ' . __('DB Percentage') . '</label><br>
                           <label><input type="checkbox" name="columns[]" value="hours" checked> ' . __('Hours') . '</label><br>
                           <label><input type="checkbox" name="columns[]" value="days" checked> ' . __('Days') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="reals" checked> ' . __('Reals') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="moments" checked> ' . __('Moments') . '</label><br>
                         </div>
                         <div class="modal-footer">
                           <button type="submit" class="btn btn-primary">' . __('Export PDF') . '</button>
@@ -599,7 +601,13 @@ class TargetController extends MainController
         try {
             $selectedColumns = $request->input('columns', []);
 
-            $targets = Target::orderBy('diamonds')->get();
+            $targets = Target::orderBy('diamonds')->get()->map(function ($target) {
+                // Convert reel and moment string fields into arrays for view
+                $target->reel_parts = array_map('trim', explode(',', $target->reel));
+                $target->moment_parts = array_map('trim', explode(',', $target->moment));
+                return $target;
+            });
+//            $targets = Target::orderBy('diamonds')->get();
             //$pdf = Pdf::loadView('target_pdf', compact('targets'));
 //            $pdf = PDF::loadView('target_pdf', compact('targets'));
 //            return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');

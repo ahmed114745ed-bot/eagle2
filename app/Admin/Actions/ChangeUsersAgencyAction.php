@@ -6,6 +6,7 @@ namespace App\Admin\Actions;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\UserSallary;
+use Encore\Admin\Admin;
 use Illuminate\Http\Request;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,8 @@ class ChangeUsersAgencyAction extends RowAction
 
     public function __construct($id = 0)
     {
+        Admin::script('$.fn.modal.Constructor.prototype.enforceFocus = function () {};');
+
         $this->id = $id;
         $this->name = __("dashboard.changeMemberAgency");
         parent::__construct();
@@ -31,8 +34,17 @@ class ChangeUsersAgencyAction extends RowAction
     public function handle(Model $model, Request $request)
     {
 
-       $users = User::where('agency_id',$request->old_agency_id)->where('type_user',1)->get();
-       $checkAgencyUser = UsersJoinedAgency::where([
+    //    $users = User::where('agency_id',$request->old_agency_id)->where('type_user',1)->get();
+    $ownerId = Agency::where('id', $request->old_agency_id)->value('app_owner_id');
+
+    $users = User::where('agency_id', $request->old_agency_id)
+        ->where('type_user', 1)
+        ->when($ownerId, function ($query) use ($ownerId) {
+            $query->where('id', '!=', $ownerId);
+        })
+        ->get();
+   
+    $checkAgencyUser = UsersJoinedAgency::where([
 
         'agency_id' => $request->old_agency_id,
         'type' => 2,

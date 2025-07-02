@@ -502,13 +502,14 @@ class ChargeRepoService
 
         $authAgency->decrement('coins', $amount);
         $chargeAgency->increment('coins', $amount);
+        $usdRate = $amount / Common::getCoinsValue('shipping_coins');
 
         $this->agencyCharge(
             chargerId: $authAgency->id,
             userId: $chargeAgency->id,
             amount: $amount,
             type: 'agency',
-            usd: null,
+            usd: $usdRate,
             chargeType: 'agency',
             agencyId: null,
         );
@@ -518,13 +519,14 @@ class ChargeRepoService
     {
         $authAgency->decrement('coins', $amount);
         $receiver->increment('di', $amount);
+        $usdRate = $amount / Common::getCoinsValue('user_coins');
 
         $this->agencyCharge(
             chargerId: $authAgency->id,
             userId: $receiver->id,
             amount: $amount,
             type: 'user',
-            usd: null,
+            usd: $usdRate,
             chargeType: 'agency',
             agencyId: null,
         );

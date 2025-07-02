@@ -20,7 +20,7 @@
     "action": "عمليات",
     "All Managers": " (DB)جميع المدرين ",
     "male": "ذكر",
-
+   "charge date":"تاريخ الشحن",
     "registered successfully": "تم التسجيل بنجاح",
     "required": "مطلوب",
     "exists": "محجوز",
@@ -3287,7 +3287,37 @@
     "cut amount": "السحب",
     "User Net Salary": "صافي الراتب",
 
-"Browse user setting": "تصفح إعدادات المستخدم"
+"Browse user setting": "تصفح إعدادات المستخدم",
+"sky pay": "سكاي باي",
+"google pay": "جوجل باي",
+"cashfree": "كاش فري",
+"apple pay": "أبل باي",
+"paytabs": "بايتابس",
+"paypal": "باي بال",
+"utd Fawry": "فوري UTD",
+  "google_pay": "Google Pay",
+  "stripe": "Stripe",
+  "oPay": "oPay",
+  "skyPay": "Sky Pay",
+  "cashfree": "Cashfree",
+  "applepay": "Apple Pay",
+  "paytabs": "PayTabs",
+  "paypal": "PayPal",
+  "utdFawry": "UTD Fawry",
+  "google_pay": "جوجل باي",
+  "stripe": "سترايب",
+  "oPay": "أو باي",
+  "skyPay": "سكاي باي",
+  "cashfree": "كاش فري",
+  "applepay": "أبل باي",
+  "paytabs": "بايتابس",
+  "paypal": "باي بال",
+  "utdFawry": "فوري UTD",
+  "increase": "زيادة",
+  "decrease": "نقصان",
+  "coins": "العملات",
+  "change_type": "نوع التغيير"
+
 
 
 

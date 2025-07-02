@@ -255,6 +255,31 @@ class User extends Authenticatable
         return $days->count();
     }
 
+    public function getTotalDaysJoinedAgencyByMonth($startDate,$endDate,$year)
+    {
+        $month = \Carbon\Carbon::parse($startDate)->month;
+
+        if (!$year) {
+            $year = \Carbon\Carbon::parse($startDate)->year;
+        }
+    
+        $query = $this->liveTime()
+            ->selectRaw('DATE(created_at) as date, SUM(hours) as total_hours')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month);
+    
+        $hours_days = \Cache::get('hours_days') ?? 2;
+    
+        $days = $query
+            ->groupBy('date')
+            ->having('total_hours', '>=', $hours_days)
+            ->get();
+    
+        return $days->count();
+    
+    }
+
     public function getSallaryInfo(): array
     {
         $month = (int) @request()->month;
@@ -1190,7 +1215,7 @@ class User extends Authenticatable
         }
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
             })
                 ->where('user_id', $this->id)
                 ->where('is_paid', 0)
@@ -1360,49 +1385,63 @@ class User extends Authenticatable
     public function userTypeBadge()
     {
         $lang = app()->getLocale() ?? 'en';
-
+    
         $types = [
             1 => 'agency_owner',
             2 => 'host',
             3 => 'shipping',
             4 => 'bd',
         ];
-
-        $userType = $this->type_user;
-
-        if (!isset($types[$userType])) {
+    
+        $applicableTypes = [];
+    
+        if ($this->type_user >= 1) {
+            $applicableTypes[1] = $types[1];
+        }
+    
+        if ($this->type_user >= 2) {
+            $applicableTypes[2] = $types[2];
+        }
+    
+        if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
+            $applicableTypes[3] = $types[3];
+        }
+    
+        if ($this->is_bd) {
+            $applicableTypes[4] = $types[4];
+        }
+    
+        if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
         }
-
-        $applicableTypes = array_filter($types, function ($key) use ($userType) {
-            return $key <= $userType;
-        }, ARRAY_FILTER_USE_KEY);
-
+    
+        ksort($applicableTypes);
+    
         $configKeys = [];
-        foreach ($applicableTypes as $key => $type) {
+        foreach ($applicableTypes as $type) {
             $configKeys[] = "{$lang}_{$type}";
-            $configKeys[] = "en_{$type}"; // fallback
+            $configKeys[] = "en_{$type}";
         }
-
+    
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
-
+    
         $html = '<div class="user-type-badges">';
-
-        foreach ($applicableTypes as $typeKey => $typeName) {
+        foreach ($applicableTypes as $typeName) {
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
-
+    
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
             if ($url) {
-                 $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
-              //  $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '">';
+                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
             }
         }
+    
         $html .= '</div>';
-
+    
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
+    
     public function wallet()
     {
         return $this->hasOne(UserWallet::class);
