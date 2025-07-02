@@ -495,16 +495,17 @@ class AgencyController extends Controller
             $model = $actions->row;
             $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
-            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+            // if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
 
-                $actions->add(new DeleteAgencyAction());
-            }
-            if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
+            //     $actions->add(new DeleteAgencyAction());
+            // }
+            // if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
 
-                $actions->add(new ChangeUsersAgencyAction($model->id));
-            }
+            //     $actions->add(new ChangeUsersAgencyAction($model->id));
+            // }
         });
         $grid->disableExport();
+        $grid->disableRowSelector();
 
         //        $this->extendGrid($grid);
 
@@ -669,13 +670,7 @@ class AgencyController extends Controller
         } else {
 
             $form->row(function ($row) {
-                $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                    $ops2 = [];
-                    foreach (User::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                    }
-                    return $ops2;
-                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
+               
 
                 // if (request()->route('form')->isEditing()) {
                 //     $row->hidden('agency_manger_id', __('app manger id'));

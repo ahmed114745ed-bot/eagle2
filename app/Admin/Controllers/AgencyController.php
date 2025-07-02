@@ -526,7 +526,7 @@ class AgencyController extends MainController
             }
         });
         $grid->disableExport();
-
+        $grid->disableRowSelector();
         $this->extendGrid($grid);
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -695,7 +695,15 @@ class AgencyController extends MainController
             });
         } else {
 
+            
             $form->row(function ($row) {
+                $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
+                    $ops2 = [];
+                    foreach (User::Where('id', $value)->get() as $user) {
+                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                    }
+                    return $ops2;
+                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
                 $row->width(12)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
@@ -771,7 +779,7 @@ class AgencyController extends MainController
     JS);
 
         $form->saving(function (Form $form) {
-
+   
             $appOwnerId = $form->input('app_owner_id');
             // $Host_agency = $form->input('Host_agency');
 
@@ -779,18 +787,21 @@ class AgencyController extends MainController
             $host = 0;
             $form->model()->type = 1;
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
-            $newOwnerId = $form->model()->app_owner_id;
+            $newOwnerId = request()->app_owner_id;
+            // $newOwnerId = $form->model()->app_owner_id;
             // Create admin dashboard for agency when accept it
             $modelExists = $form->model()->exists;
             // if (!$modelExists)  Common::createUserAdmin($appOwnerId);
-
+            
+           
             if ($modelExists && $newOwnerId != $originalOwnerId) {
                 //   Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
+               
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
 
-                Admin::where('username', $user->uuid)->delete();
+                // Admin::where('username', $user->uuid)->delete();
                 $user->update([
                     'type_user' => 0,
                     'agency_id' => 0,
