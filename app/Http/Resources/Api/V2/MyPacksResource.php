@@ -72,7 +72,7 @@ class MyPacksResource extends JsonResource
             'type' => __($types[$this->type]),
             'target_id' => $this->target_id,
             'num' => $this->num,
-            'expire' => $this->expire != 0 ? date("Y-m-d H:i:s", $this->expire) : 0,
+            'expire' => ($this->expire != 0  && !empty($pack->expire))? date("Y-m-d H:i:s", $this->expire) : 0,
             'is_read' => $this->is_read,
             'created_at' => Carbon::parse($this->created_at)->setTimezone($request->hasHeader('tz') ? $request->header()['tz'][0] : 'UTC')->format('Y-m-d H:i:s') ?? '',
             'updated_at' => $this->updated_at,

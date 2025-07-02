@@ -42,11 +42,15 @@ class UserTargetController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('uuid'));
             });
-             $filter->column(1 / 2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->equal('add_month', __('month'));
             });
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('add_year', __('year'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('agency.id', __('agency id'));
             });
         });
         $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
@@ -81,7 +85,7 @@ class UserTargetController extends MainController
             ";
         });
         $grid->column('agency_id', __('agency'))->display(function () {
-             if (request()->filled('_export_')) {
+            if (request()->filled('_export_')) {
                 return $name ?? '';
             }
             if (!@$this->agency) {
@@ -213,6 +217,7 @@ class UserTargetController extends MainController
                 ->where('user_agency_id', $this->agency_id)
                 ->selectRaw('sallary - cut_amount AS net_salary')
                 ->value('net_salary') ?? 0;
+            $userSalary =  rtrim(rtrim(number_format($userSalary, 10, '.', ''), '0'), '.');
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
