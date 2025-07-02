@@ -135,7 +135,7 @@ class GiftLogService
         //  Log::info('realPrice',['realPrice' =>$realPrice]);
 
         $price = ceil($realPrice);
-        
+
         // Log::info('price',['price' =>$price]);
 
         $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
@@ -188,7 +188,9 @@ class GiftLogService
         } catch (BadResponseException $e) {
         }
 
-        if ($totalPrice > 2000) {
+        $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
+
+        if ($totalPrice > $totalGiftPrice) {
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
 

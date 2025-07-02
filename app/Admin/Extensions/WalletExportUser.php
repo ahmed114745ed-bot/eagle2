@@ -31,11 +31,15 @@ class WalletExportUser  implements FromCollection, WithHeadings
     ];
 
     public $uuid;
+    protected $month;
+    protected $year;
 
 
-    public function __construct($uuid = null)
+    public function __construct($uuid = null, $month = null, $year = null)
     {
         $this->uuid = $uuid;
+        $this->month = $month;
+        $this->year = $year;
     }
 
     /**
@@ -44,6 +48,8 @@ class WalletExportUser  implements FromCollection, WithHeadings
     public function collection()
     {
         $uuid = $this->uuid;
+        $month = $this->month;
+        $year = $this->year;
         $query = User::query();
 
         if ($this->uuid) {
@@ -51,30 +57,18 @@ class WalletExportUser  implements FromCollection, WithHeadings
         }
 
         $users = $query->get();
+      
 
         $arr = [];
 
         foreach ($users as $user) {
 
-
-            $userSalarys = UserSallary::query()
-                ->where('user_id', $user->id)
-                ->where('is_paid', 0)
-
-                ->select(
-                    DB::raw('SUM(`sallary`) AS target'),
-                    DB::raw('SUM(`cut_amount`) AS expenses'),
-                    DB::raw('SUM(sallary) - SUM(cut_amount) AS salary')
-                )
-                ->groupBy('user_id')
-                ->first();
-
             $arr[] = [
                 'id' => $user->id,
                 'name' => $user->name,
-                'balance' => round($userSalarys->target ?? 0, 2) . '💲',
-                'withdrawal' => round($userSalarys->expenses ?? 0, 2) . '💲',
-                'salary' => round($userSalarys->salary ?? 0, 2) . '💲',
+                'balance' => round($user->sumNetSalary($month, $year) ?? 0, 2) . '💲',
+                'withdrawal' => round($user->sumCutAmount($month, $year)?? 0, 2) . '💲',
+                'salary' => round($user->sumSalary($month, $year) ?? 0, 2) . '💲',
 
             ];
         }
@@ -88,7 +82,7 @@ class WalletExportUser  implements FromCollection, WithHeadings
         return [
             __("id", [], 'ar'),
             __('name', [], 'ar'),
-            __('wallet balance', [], 'ar'),
+            __('net salary', [], 'ar'),
             __('withdrawal', [], 'ar'),
             __('salary', [], 'ar'),
 
