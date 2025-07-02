@@ -14,41 +14,50 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 
-
-class ChargeAgencyExporter  implements FromCollection,WithHeadings
+class ChargeAgencyExporter implements FromCollection, WithHeadings
 {
-
-
-
     public $agency_id;
-    protected $fileName = 'agencies_list.csv';
     public $month;
     public $year;
+    public $search;
 
-    public function __construct($agency_id = null, $month = null, $year = null)
+    public function __construct($agency_id = null, $month = null, $year = null, $search = null)
     {
         $this->agency_id = $agency_id;
         $this->month = $month;
         $this->year = $year;
+        $this->search = $search;
     }
 
     public function collection()
     {
-        $agencies = ShippingAgency::with(['owner.profile'])->get();
+        $agencies = ShippingAgency::with(['owner.profile'])
+            ->when($this->agency_id, function ($query) {
+                $query->where('id', $this->agency_id);
+            })
+            ->when($this->search, function ($query) {
+                $search = $this->search;
+                $query->whereHas('owner', function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                      ->orWhere('uuid', 'like', "%$search%")
+                      ->orWhere('phone', 'like', "%$search%");
+                });
+            })
+            ->get();
 
         $arr = [];
 
         foreach ($agencies as $agency) {
-            $item['id'] = $agency->id;
-            $item['name'] = $agency->name;
-            $item['owner_name'] = optional($agency->owner)->name ?? '-';
-            $item['owner_uuid'] = optional($agency->owner)->uuid ?? '-';
-            $item['owner_phone'] = '"' . optional($agency->owner)->phone . '"';
-            $item['charge_agency'] = ChargeAgency::where('agency_id', $agency->id)->exists() ? 'Yes' : 'No';
-            $item['appear_charger_agency'] = optional($agency->owner)->appear_charger_agency ? 'Yes' : 'No';
-            $item['is_frozen'] = $agency->is_frozen ? 'Yes' : 'No';
-
-            $arr[] = $item;
+            $arr[] = [
+                'id' => $agency->id,
+                'name' => $agency->name,
+                'owner_name' => optional($agency->owner)->name ?? '-',
+                'owner_uuid' => optional($agency->owner)->uuid ?? '-',
+                'owner_phone' => '"' . optional($agency->owner)->phone . '"',
+                'charge_agency' => ChargeAgency::where('agency_id', $agency->id)->exists() ? 'Yes' : 'No',
+                'appear_charger_agency' => optional($agency->owner)->appear_charger_agency ? 'Yes' : 'No',
+                'is_frozen' => $agency->is_frozen ? 'Yes' : 'No',
+            ];
         }
 
         return collect($arr);
