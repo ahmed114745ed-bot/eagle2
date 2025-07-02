@@ -831,11 +831,18 @@ class UserController extends MainController
         $joinDate = request('join_date');
         $user = User::with('profile')->find($id);
         $type = request('type') ?? 4;
+        
+        $userJoinAgencies = UsersJoinedAgency::where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
+            $query->whereDate('join_date', $joinDate);
+        })->paginate(10, ['*'], 'user_agency_page');
+
         $packs = Pack::where('user_id', $id)->where('type', $type)->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
-        $hasVip = $userVips->total() > 0;
+        $hasVip = UserVip::where('user_id', $id)
+        ->where('is_used', 1)
+        ->exists();
 
         $salaries = UserSallary::where('user_id', $id)
             ->with('agency')
