@@ -831,7 +831,7 @@ class UserController extends MainController
         $joinDate = request('join_date');
         $user = User::with('profile')->find($id);
         $type = request('type') ?? 4;
-        
+
         $userJoinAgencies = UsersJoinedAgency::where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
             $query->whereDate('join_date', $joinDate);
         })->paginate(10, ['*'], 'user_agency_page');
@@ -841,8 +841,8 @@ class UserController extends MainController
         }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
         $hasVip = UserVip::where('user_id', $id)
-        ->where('is_used', 1)
-        ->exists();
+            ->where('is_used', 1)
+            ->exists();
 
         $salaries = UserSallary::where('user_id', $id)
             ->with('agency')
@@ -855,8 +855,8 @@ class UserController extends MainController
         $typeMap = PACK_USER;
 
         $types =  collect($typeMap);
-         $userPackTypes = Pack::where('user_id', $id)->pluck('type')->unique()->toArray();
-      // $userPackTypes = $this->typesByLevel($id);
+        $userPackTypes = Pack::where('user_id', $id)->pluck('type')->unique()->toArray();
+        // $userPackTypes = $this->typesByLevel($id);
         $currentType = request()->get('type', $types->keys()->first());
         if ($userPackTypes) {
             $types = collect($typeMap)->filter(function ($name, $key) use ($userPackTypes) {
@@ -1225,6 +1225,11 @@ class UserController extends MainController
 
         $pack = Pack::find($request->id);
         $ex = ($request->days ?: 0);
+        if (empty($pack->expire)) {
+            $pack->days += $ex;
+            $pack->save();
+            return Redirect::back();
+        }
 
         if ($request->type == 0) {
             $pack->expire += $ex * 86400;
