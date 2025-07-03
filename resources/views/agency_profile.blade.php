@@ -1257,7 +1257,9 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>{{ __('salary') }}</th>
+                                    <th>{{ __('net salary') }}</th>
+                                     <th>{{ __('salary') }}</th>
+                                     <th>{{ __('withdrawal') }}</th>
                                     <th>{{ __('Target') }}</th>
                                     <th>{{ __('month') }}</th>
                                     <th>{{ __('year') }}</th>
@@ -1270,7 +1272,9 @@
                                     @foreach($salaries as $index => $salary)
                                         <tr>
                                             <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
-                                            <td>{{ number_format(@$salary->sallary - $salary->cut_amount, 2) }}</td>
+                                            <td>{{ truncateAndTrim(@$salary->sallary - $salary->cut_amount) }}</td>
+                                             <td>{{ truncateAndTrim(@$salary->sallary) }}</td>
+                                              <td>{{ truncateAndTrim(@$salary->cut_amount) }}</td>
                                             <td>{{ @$sumTargets }}</td>
                                             <td>{{ @$salary->month ?? '' }}</td>
                                             <td>{{ @$salary->year ?? '' }}</td>
@@ -1479,7 +1483,7 @@
                                         <i class="fas fa-bullseye"></i>
                                     </div>
                                     <div class="stat-info">
-                                        <div class="stat-value">{{number_format( $agencyTarget, 2) }}</div>
+                                        <div class="stat-value">{{truncateAndTrim($agencyTarget) }}</div>
                                         <div class="stat-label">{{ __('Target') }}</div>
                                     </div>
                                 </div>
@@ -1714,8 +1718,8 @@
                                                             {{ $target->next_diamond ?? 0 }}
                                                         </span>
                                                     </td>
-                                                    <td>{{ $target->user_hours ?? 0 }}</td>
-                                                    <td>{{ $target->user_days ?? 0 }}</td>
+                                                    <td>{{ ($target->user_hours ?? 0) . '/' . ($target->target_hours ?? 0) }}</td>
+                                                    <td>{{ ($target->user_days ?? 0) . '/' . ($target->target_days ?? 0) }}</td>
                                                     <td>
                                                             <div style="line-height: 1.6;">
                                                                 <ul style="margin-left: 8px; width: 141px;">
