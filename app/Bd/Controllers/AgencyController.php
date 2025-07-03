@@ -668,7 +668,7 @@ class AgencyController extends Controller
                 }
             });
         } else {
-            $form->disableDeleteButton();
+            
             $form->row(function ($row) {
                
 
