@@ -590,14 +590,23 @@ if (!function_exists('showSvgaImage')) {
         return $model;
     }
 
-    if (! function_exists('checkAgencyFeature')){
+    if (! function_exists('checkAgencyFeature')) {
         function checkAgencyFeature()
         {
             $app_feature = \Cache::get('host_agency');
             if (!($app_feature == '1' || $app_feature == 1)) {
                 abort(403, __('This feature has not been activated for you'));
-//                return redirect()->back()->send();
+                //                return redirect()->back()->send();
             }
+        }
+    }
+
+    if (!function_exists('truncateAndTrim')) {
+        function truncateAndTrim($number, $decimals = 2)
+        {
+            $factor = pow(10, $decimals);
+            $truncated = floor($number * $factor) / $factor;
+            return rtrim(rtrim(number_format($truncated, $decimals, '.', ''), '0'), '.');
         }
     }
 
@@ -644,32 +653,31 @@ if (!function_exists('getToday')) {
         $timezone = getTimezone();
         return [Carbon::now($timezone)->startOfDay()->timezone('UTC'), Carbon::now($timezone)->endOfDay()->timezone('UTC')];
     }
-
 }
 
 
 
-    if (!function_exists('bd_url')) {
-        /**
-         * Get BD admin url.
-         *
-         * @param string $path
-         * @param mixed  $parameters
-         * @param bool   $secure
-         *
-         * @return string
-         */
-        function bd_url($path = '', $parameters = [], $secure = null)
-        {
-            if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
-                return $path;
-            }
-
-            // حدد base path الخاص بوحدة BD
-            $base = trim(config('bd.route.prefix', 'bd'), '/');
-
-            $secure = $secure ?? (config('bd.https') || config('bd.secure'));
-
-            return secure_url($base . '/' . trim($path, '/'), $parameters, $secure);
+if (!function_exists('bd_url')) {
+    /**
+     * Get BD admin url.
+     *
+     * @param string $path
+     * @param mixed  $parameters
+     * @param bool   $secure
+     *
+     * @return string
+     */
+    function bd_url($path = '', $parameters = [], $secure = null)
+    {
+        if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
+            return $path;
         }
+
+        // حدد base path الخاص بوحدة BD
+        $base = trim(config('bd.route.prefix', 'bd'), '/');
+
+        $secure = $secure ?? (config('bd.https') || config('bd.secure'));
+
+        return secure_url($base . '/' . trim($path, '/'), $parameters, $secure);
+    }
 }
