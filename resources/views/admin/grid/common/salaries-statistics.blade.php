@@ -8,17 +8,17 @@
     @if ($users)
         @php
             $user = \App\Models\User::where('uuid', @request('uuid') ?? '0')->first();
-            $year = request('year') == null ? now()->year : request('year');
-            $month = request('month') == null ? now()->month : request('month');
+            $year =  request('year');
+            $month =   request('month');
             $userSalaries = \App\Models\UserSallary::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
                 $query->where('user_id', @$user->id);
             })
                 // ->when(request()->has('agency_id') && request('agency_id') != null, function ($query) {
                 //     $query->where('user_agency_id', request('agency_id'));
                 // })
-                // ->where(function ($query) use ($year, $month) {
-                //     $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
-                // })
+                ->when(isset($year)&&isset($month),function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                })
                 ->whereHas('user', function ($q) {
                     $q->where('agency_id', '!=', 0);
                 })
@@ -64,7 +64,7 @@
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.total') }}</label>
 
-            <input type="text" class="form-control " id="target" name="target" value="{{rtrim(rtrim(number_format($targe, 10, '.', ''), '0'), '.')  }}" readonly>
+            <input type="text" class="form-control " id="target" name="target" value="{{truncateAndTrim($targe)  }}" readonly>
         </div>
 {{--        <br>--}}
 {{--        <div class=" col  my-1 form-Roles">--}}
@@ -80,10 +80,10 @@
 {{--        </div>--}}
     @else
         @php
-            $year = request('year') == null ? now()->year : request('year');
-            $month = request('month') == null ? now()->month : request('month');
+            $year = request('year');
+            $month =request('month');
             $agencySallary = \App\Models\AgencySallary::where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
             })
                 ->when(request()->has('id') && request('id') != null, function ($query) {
                     $query->where('agency_id', request('id'));
