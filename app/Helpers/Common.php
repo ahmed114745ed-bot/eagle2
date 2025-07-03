@@ -761,7 +761,7 @@ class Common
 
         $response = curl_exec($ch);
 
-        curl_close($ch);
+       
         if (!curl_errno($ch)) {
 
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -770,6 +770,7 @@ class Common
                 return $response->notification_key;
             }
         }
+        curl_close($ch);
 
 
         return null;
