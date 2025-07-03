@@ -36,7 +36,7 @@ class LeaveAgencyRequest extends Model
         self::saving(function ($model) {
             if ($model->status === 1) {
                 $user = User::find($model->user_id);
-                UserHandling::kickUserFromAgency($user);
+                UserHandling::kickUserFromAgency($user, 1);
             }
         });
     }
