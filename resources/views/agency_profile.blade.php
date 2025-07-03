@@ -886,10 +886,7 @@
                     </div>
                 </div>
                 <div class="agency-stats">
-                    <div class="stat-card">
-                        <div class="stat-value">{{ number_format(@$agency->coins) ?? 0 }}</div>
-                        <div class="stat-label">{{__("coins")}}</div>
-                    </div>
+
                     <div class="stat-card">
                         <div class="stat-value">{{ @$agency->salary ?? 0 }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
@@ -1273,7 +1270,7 @@
                                     @foreach($salaries as $index => $salary)
                                         <tr>
                                             <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
-                                            <td>{{ @$salary->sallary - $salary->cut_amount }}</td>
+                                            <td>{{ number_format(@$salary->sallary - $salary->cut_amount, 2) }}</td>
                                             <td>{{ @$sumTargets }}</td>
                                             <td>{{ @$salary->month ?? '' }}</td>
                                             <td>{{ @$salary->year ?? '' }}</td>
