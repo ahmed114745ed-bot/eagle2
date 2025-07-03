@@ -1565,9 +1565,9 @@
                                 $uid = @$userSender->uuid ?? '';
                                 $id = @$userSender->id ?? 0;
                                $receiver = $giftSLog->receiver;
-                                $receiverName = @$$receiver->name ?? '';
-                                $receiverUid = @$$receiver->uuid ?? '';
-                                $receiverId = @$$receiver->id ?? 0;
+                                $receiverName = @$receiver->name ?? '';
+                                $receiverUid = @$receiver->uuid ?? '';
+                                $receiverId = @$receiver->id ?? 0;
 
                                 $avatar = @$userSender->profile->avatar;
                                 $image = getImagePath($avatar) ?? $userImageDefault;
