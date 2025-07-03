@@ -29,7 +29,7 @@ class GameChargeHistoryController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new GameChargeHistory());
-        
+
         $grid->model()->orderByDesc('id');
         $grid->column('id', __('Id'));
         $grid->column('value', __('Value'));
@@ -74,7 +74,7 @@ class GameChargeHistoryController extends AdminController
 
         $form->saving(function (Form $form) {
 
-            $balance  = $form->input('value') * config("app.one_coins") * 2;
+            $balance  = $form->input('value') * config("app.one_coins") * 4;
             $gameWallet = GameWallet::whereMonth("created_at",date("m"))->whereYear("created_at",date("Y"))->first();
             if ($gameWallet) {
                 $gameWallet->balance += $balance;
@@ -95,11 +95,11 @@ class GameChargeHistoryController extends AdminController
         $password = $request->input('password');
 
         // Define your credentials
-        $validUsername = config("app.balance_user_name"); 
+        $validUsername = config("app.balance_user_name");
         $validPassword = config("app.balance_password");
         // Check if the provided credentials are correct
         if ($username == $validUsername && $password == $validPassword) {
-           
+
             // Store a session variable to indicate the user is authenticated
             session(['auth' => true]);
 
