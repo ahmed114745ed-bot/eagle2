@@ -512,7 +512,7 @@ class AgencyController extends MainController
         </div>";
         });
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
-            $coin = $this->salary;
+            $coin = truncateAndTrim($this->salary??0);
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>

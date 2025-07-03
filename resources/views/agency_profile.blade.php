@@ -953,7 +953,7 @@
                 <div class="agency-stats">
 
                     <div class="stat-card">
-                        <div class="stat-value">{{ @$agency->salary ?? 0 }}</div>
+                        <div class="stat-value">{{ truncateAndTrim(@$agency->salary ?? 0) }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
                     </div>
 
