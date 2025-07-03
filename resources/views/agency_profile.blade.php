@@ -891,7 +891,7 @@
                         <div class="stat-label">{{__("coins")}}</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
+                        <div class="stat-value">{{ @$agency->salary ?? 0 }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
                     </div>
 
