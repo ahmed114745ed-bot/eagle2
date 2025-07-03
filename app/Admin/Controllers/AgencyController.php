@@ -146,7 +146,10 @@ class AgencyController extends MainController
     //         ->view('agency_profile', $data);
 
     // }
-
+    public function show($id, Content $content)
+    {
+        return $this->profile($id, request(), $content);
+    }
     public function profile($id, req $request, Content $content)
     {
         if (! Admin::user()->can('*')) {
@@ -395,19 +398,6 @@ class AgencyController extends MainController
         return parent::update($id);
     }
 
-    // public function show($id, Content $content)
-    // {
-
-    //     return parent::show($id, $content
-    //         ->title(__("agency details"))
-    //         ->row(function ($row) use ($id) {
-    //             $agency = Agency::find($id);
-    //             $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
-    //             $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
-    //             $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
-    //                 ->groupByRaw('agency_id,add_month,add_year')->count()));
-    //         }));
-    // }
 
 
     /**
@@ -695,7 +685,7 @@ class AgencyController extends MainController
             });
         } else {
 
-            
+
             $form->row(function ($row) {
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
                     $ops2 = [];
@@ -779,7 +769,7 @@ class AgencyController extends MainController
     JS);
 
         $form->saving(function (Form $form) {
-   
+
             $appOwnerId = $form->input('app_owner_id');
             // $Host_agency = $form->input('Host_agency');
 
@@ -792,12 +782,12 @@ class AgencyController extends MainController
             // Create admin dashboard for agency when accept it
             $modelExists = $form->model()->exists;
             // if (!$modelExists)  Common::createUserAdmin($appOwnerId);
-            
-           
+
+
             if ($modelExists && $newOwnerId != $originalOwnerId) {
                 //   Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
-               
+
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
 
@@ -1009,6 +999,7 @@ class AgencyController extends MainController
 
         return $this->response;
     }
+
 
 
 
