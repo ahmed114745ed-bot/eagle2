@@ -1271,10 +1271,10 @@
                                     <td>
                                         <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
-                                                    data-id="{{ @$pack->id }}">
+                                                    data-id="{{ $pack->id }}">
                                                 {{ __('dashboard.free') }}
                                             </button>
-                                            <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
+                                            <button class="btn btn-danger delete-btn" data-id="{{ $pack->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
@@ -1335,7 +1335,7 @@
                                     <td>
                                         <div class="d-flex">
 
-                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
+                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ $userVip->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
@@ -1787,7 +1787,7 @@
                                                 $url = $defaultImage;
                                             }
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("admin/users/{$kickedBy->id ?? 0}");
+                                            $kickedByUrl = url("admin/users/{$kickedBy->id}");
                                         }
 
                                         if ($userJoinAgency->kicked_by_admin){
@@ -1802,7 +1802,7 @@
                                                 $url = $defaultImage;
                                             }
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("admin/auth/users/{$kickedBy->id ?? 0}");
+                                            $kickedByUrl = url("admin/auth/users/{$kickedBy->id}");
                                         }
                                     @endphp
 
@@ -1889,7 +1889,7 @@
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$coin->id }}">
+                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ $coin->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
@@ -1976,7 +1976,7 @@
                                   $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
                             @endphp
                             <tr>
-                                <td>{{ @$charge->id ?? 0 }}</td>
+                                <td>{{ $charge->id }}</td>
                                 <td>
                                     <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
@@ -2140,7 +2140,7 @@
                             @endphp
 
                             <tr>
-                                <td>{{ @$giftSLog->id ?? 0 }}</td>
+                                <td>{{ $giftSLog->id }}</td>
                                 <td>
                                     <a href="{{ url('admin/users/' . $id) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
