@@ -1557,22 +1557,43 @@ class User extends Authenticatable
 
     public function getUserTypesAttribute(): array
     {
-        $userTypes = match (true) {
-            in_array($this->type_user, [2, 4]) => [1, 2],
-            $this->type_user === 1 => [1],
-            default => []
-        };
+        // $userTypes = match (true) {
+        //     in_array($this->type_user, [2, 4]) => [1, 2],
+        //     $this->type_user === 1 => [1],
+        //     default => []
+        // };
 
-        if ($this->is_bd) {
-            return [4];
+        // if ($this->is_bd) {
+        //     return [4];
+        // }
+
+        // if ($this->hasShippingAgency()) {
+        //     $userTypes[] = 3;
+        // }
+
+        // $userTypes = array_unique($userTypes);
+
+        // return empty($userTypes) ? [0] : $userTypes;
+        $userTypes = [];
+
+        if ($this->type_user >= 1) {
+            $userTypes[] = 1;
         }
-
+    
+        if ($this->type_user >= 2) {
+            $userTypes[] = 2;
+        }
+    
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
         }
-
+    
+        if ($this->is_bd) {
+            $userTypes[] = 4;
+        }
+    
         $userTypes = array_unique($userTypes);
-
+    
         return empty($userTypes) ? [0] : $userTypes;
     }
 
