@@ -847,7 +847,7 @@ class UserService
         if (UserHandling::checkIfUserOwnerOfAgency($user)) throw new Exception(__('This User is the host Of agency can\'t delete it'));
 
 
-        UserHandling::kickUserFromAgency($user);
+        UserHandling::kickUserFromAgency($user, 1);
         return true;
     }
 

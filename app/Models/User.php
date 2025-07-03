@@ -211,12 +211,13 @@ class User extends Authenticatable
         if (! $year) {
             $year = now()->year;
         }
+        $hours_days = \Cache::get('hours_days') ?? 2;
         $subQuery = DB::table('live_times')
             ->select('uid', DB::raw('COUNT(*) AS entry_count'))
             ->whereMonth('created_at', $month)->whereYear('created_at', $year)
             ->where('uid', $this->id)
             ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
-            ->havingRaw('SUM(hours) > 1')
+            ->havingRaw('SUM(hours) >= ?', [$hours_days])
             ->get();
 
         return $subQuery->count('entry_count');
@@ -1186,14 +1187,14 @@ class User extends Authenticatable
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
                 });
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->orderByDesc('id')
                 ->sum(DB::raw('cut_amount'));
 
-            return floor($userSallary ?? 0);
+            return truncateAndTrim($userSallary ??0);
         }
 
         return 0;
@@ -1205,14 +1206,14 @@ class User extends Authenticatable
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
                 });
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->orderByDesc('id')
                 ->sum(DB::raw('sallary'));
 
-            return floor($userSallary ?? 0);
+            return truncateAndTrim($userSallary ?? 0);
         }
 
         return 0;
@@ -1224,14 +1225,14 @@ class User extends Authenticatable
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
                 });
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->orderByDesc('id')
                 ->sum(DB::raw('sallary - cut_amount'));
 
-            return floor($userSallary ?? 0);
+            return truncateAndTrim($userSallary);
         }
 
         return 0;
@@ -1479,7 +1480,7 @@ class User extends Authenticatable
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
             if ($url) {
-                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
+                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
             }
         }
 
@@ -1557,18 +1558,39 @@ class User extends Authenticatable
 
     public function getUserTypesAttribute(): array
     {
-        $userTypes = match (true) {
-            in_array($this->type_user, [2, 4]) => [1, 2],
-            $this->type_user === 1 => [1],
-            default => []
-        };
+        // $userTypes = match (true) {
+        //     in_array($this->type_user, [2, 4]) => [1, 2],
+        //     $this->type_user === 1 => [1],
+        //     default => []
+        // };
 
-        if ($this->is_bd) {
-            return [4];
+        // if ($this->is_bd) {
+        //     return [4];
+        // }
+
+        // if ($this->hasShippingAgency()) {
+        //     $userTypes[] = 3;
+        // }
+
+        // $userTypes = array_unique($userTypes);
+
+        // return empty($userTypes) ? [0] : $userTypes;
+        $userTypes = [];
+
+        if ($this->type_user >= 1) {
+            $userTypes[] = 1;
+        }
+
+        if ($this->type_user >= 2) {
+            $userTypes[] = 2;
         }
 
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
+        }
+
+        if ($this->is_bd) {
+            $userTypes[] = 4;
         }
 
         $userTypes = array_unique($userTypes);

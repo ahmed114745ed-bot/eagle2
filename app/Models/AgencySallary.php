@@ -18,6 +18,11 @@ class AgencySallary extends Model
         return floor($this->sallary - $this->cut_amount);
     }
 
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class,'agency_id');
+    }
+
     protected static function booted()
     {
         self::saved(function ($model) {

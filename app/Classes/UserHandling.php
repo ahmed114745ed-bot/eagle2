@@ -84,7 +84,7 @@ class UserHandling
             Common::handelVip($vip, $user, null, userVip: $userVip);
         }
     }
-    public function kickUserFromAgency(User &$user)
+    public function kickUserFromAgency(User &$user, $isApp = 0): void
     {
         // decrement total diamond with monthly diamond when user not in agency
         $user->total_diamond_received -= $user->monthly_diamond_received;
@@ -140,7 +140,12 @@ class UserHandling
 
         if ($agencyUserJoined) {
             $agencyUserJoined->leave_date = now();
-            $agencyUserJoined->status = 'from admin';
+            $agencyUserJoined->status = 'kick off';
+            if ($isApp){
+                $agencyUserJoined->kicked_by_app = auth()->id();
+            }else{
+                $agencyUserJoined->kicked_by_admin = auth()->id();
+            }
             $agencyUserJoined->save();
         }
     }
