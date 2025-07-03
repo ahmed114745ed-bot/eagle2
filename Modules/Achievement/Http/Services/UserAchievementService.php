@@ -4,6 +4,7 @@ namespace Modules\Achievement\Http\Services;
 
 use App\Models\Gift;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Achievement\Entities\Achievement;
 use Modules\Achievement\Entities\UserAchievement;
 use Modules\Achievement\Entities\UserAchievementLevel;
@@ -146,6 +147,28 @@ class UserAchievementService
                                 with('achievementLevel')->get();
 
         return $usersAchievementLevels;
+    }
+
+    public function getAllUserAchievement(User $user): Collection|array
+    {
+        return UserAchievementLevel::query()
+                ->where('user_id', $user->id)
+                ->where('is_enable', true)
+                ->leftJoin('achievement_levels', 'user_achievement_levels.achievement_level_id', 'achievement_levels.id')
+                ->leftJoin('achievements', 'achievement_levels.achievement_id', 'achievements.id')
+                ->orderByDesc('achievements.id')
+                ->orderByDesc('achievement_levels.target')
+                ->select([
+                    'user_achievement_levels.id',
+                    'achievement_levels.id as achievement_level_id',
+                    'achievement_levels.target',
+                    'achievement_levels.valid_image',
+                    'user_achievement_levels.custom_image',
+                    'achievement_levels.ar_description',
+                    'achievement_levels.en_description',
+                    'achievements.type as type'
+                ])->
+                with('achievementLevel')->get();
     }
 
     public function roomAchievement(int $ownerId)

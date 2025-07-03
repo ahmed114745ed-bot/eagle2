@@ -29,8 +29,8 @@ class AchievementLevelController extends Controller
             return Common::apiResponse(false, 'No user Founded');
         }
 
-        $userAchievementLevels = $this->achievementService->getUserAchievement($user); 
-        
+        $userAchievementLevels = $this->achievementService->getAllUserAchievement($user);
+
         return Common::apiResponse(true, 'success',UserAchievementLevelsResource::collection($userAchievementLevels));
     }
 
