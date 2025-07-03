@@ -746,10 +746,9 @@ class Common
         $accessToken = self::getGoogleAccessToken();
         $projectId = config("app.senderId");
 
-        // إعداد الطلب
         $payload = [
             'message' => [
-                'topic' => $topic,
+                'topic' => $topic, // لا تستخدم "token"
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
@@ -761,6 +760,7 @@ class Common
                 ],
             ],
         ];
+        
 
         // رؤوس الطلب
         $headers = [
