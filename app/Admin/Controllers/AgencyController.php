@@ -159,6 +159,10 @@ class AgencyController extends MainController
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab', 'members');
+        $giftType = request()->get('gift_type', 'receiver');
+        $start = request('start_at');
+        $end = request('end_at');
+
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
@@ -313,7 +317,18 @@ class AgencyController extends MainController
 
         // });
 
-
+        $giftSLogs = GiftLog::where('agency_id', $id)->with('receiver', 'sender', 'gift', 'room')->when(isset($start) && isset($end), function ($query) use ($start, $end) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($start)->startOfDay(),
+                Carbon::parse($end)->endOfDay()
+            ]);
+        })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
+        $diamonds = GiftLog::where('agency_id', $id)->when(isset($start) && isset($end), function ($query) use ($start, $end) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($start)->startOfDay(),
+                Carbon::parse($end)->endOfDay()
+            ]);
+        })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
 
         return $content
             ->title(__('agency profile'))
@@ -324,6 +339,8 @@ class AgencyController extends MainController
                 'salaries',
                 'agencyJoinRequests',
                 'giftLog',
+                'giftSLogs',
+                'diamonds',
                 'memberTargets',
                 'agencyTarget',
                 'rate',
