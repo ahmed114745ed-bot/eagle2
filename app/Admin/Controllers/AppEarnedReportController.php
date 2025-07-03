@@ -1,10 +1,7 @@
 <?php
 namespace App\Admin\Controllers;
-use App\Models\Charge;
-use App\Models\CoinGameUser;
 use App\Models\UserLuckyGift;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 
 class AppEarnedReportController extends MainController {
     protected function grid()
@@ -68,6 +65,6 @@ class AppEarnedReportController extends MainController {
         return $grid;
     }
 
-    
+
 
 }

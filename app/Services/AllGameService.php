@@ -35,7 +35,7 @@ class AllGameService
         $key = [
             "baishun_channel" => config('app.baishun_channel') ?? '',
             "baishun_app_id" => config('app.baishun_app_id') ?? '',
-            "baishun_gsp" => (int)(config('app.baishun_gsp') ?? 101),
+            "baishun_gsp" => (int)(config('app.baishun_gsp') ?? 201),
         ];
         return [
             'full' => $fullGames,
@@ -140,7 +140,7 @@ class AllGameService
         $balanceDollar = $balanceDollar->sum("value");
         $allBalance = $balance->balance ?? 0;
         $availableBalance = $balance ? $balance->balance - $balance->used : 0;
-        $dollarValue =  config("app.one_coins") * 2;
+        $dollarValue =  config("app.one_coins") * 4;
         $usedDollar = (@$balance->used ?? 0) / $dollarValue;
         $availableBalanceDollar = (@$availableBalance ?? 0) / $dollarValue;
         return $data = [

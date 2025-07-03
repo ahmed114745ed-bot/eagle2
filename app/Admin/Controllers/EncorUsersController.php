@@ -175,6 +175,8 @@ class EncorUsersController extends AdminController
 
     protected function grid()
     {
+        $permission_name = $this->permission_name;
+
         $userModel = config('admin.database.users_model');
 
         $grid = new Grid(new $userModel());
@@ -192,11 +194,34 @@ class EncorUsersController extends AdminController
         $grid->column('created_at', trans('admin.created_at'));
         $grid->column('updated_at', trans('admin.updated_at'));
 
-        $grid->actions(function (Grid\Displayers\Actions $actions) {
+        $grid->actions(function (Grid\Displayers\Actions $actions) use ($permission_name){
+
+            if (Admin::user()->can('*')) {
+                return;
+            }
+
+            if (! Admin::user()->can('show-' . $permission_name)) {
+                $actions->disableView();
+            }
+            if (! Admin::user()->can('edit-' . $permission_name)) {
+                $actions->disableEdit();
+            }
+            if (! Admin::user()->can('delete-' . $permission_name)) {
+                $actions->disableDelete();
+            }
+
             if ($actions->getKey() == 1) {
                 $actions->disableDelete();
             }
         });
+
+        if (
+            ! Admin::user()->can('show-' . $permission_name) &&
+            ! Admin::user()->can('edit-'   . $permission_name) &&
+            ! Admin::user()->can('delete-' . $permission_name)
+        ) {
+            $grid->disableActions();
+        }
 
         $grid->tools(function (Grid\Tools $tools) {
             $tools->batch(function (Grid\Tools\BatchActions $actions) {

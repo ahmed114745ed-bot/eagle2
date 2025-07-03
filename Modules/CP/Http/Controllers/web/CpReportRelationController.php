@@ -18,7 +18,7 @@ class CpReportRelationController extends MainController
             ->title(trans('reports'))
             ->row(function ($row) {
                 //$row->column(2, view('admin.grid.common.cp-report-actions'));
-                $row->column(10, $this->grid());
+                $row->column(12, $this->grid());
             });
     }
 

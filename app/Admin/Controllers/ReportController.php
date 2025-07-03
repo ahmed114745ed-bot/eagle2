@@ -368,9 +368,13 @@ class ReportController extends MainController
         $grid = new Grid(new AdminUser());
         $grid->model()
             ->where('app_id', '!=', 0);
-         
+        
         $grid->column('user.id', __('Id'));
-
+        
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+            $filter->equal('user.id', 'User ID');
+        });
         $grid->column('user.name', __('name'))->display(function ($name) {
             $uid = @$this->user->uuid;
             $path = @$this?->user->profile?->avatar;
@@ -412,8 +416,10 @@ class ReportController extends MainController
         });
 
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('admin.agency-manger-export', ['month' => request('month'), 'year' => request()->year]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
-        });
+            $tools->append('<a href="' . route('admin.agency-manger-export', [
+                'user_id' => request('user.id') ?? request('filters.user.id') ?? null
+            ]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+                    });
         $grid->disableExport();
 
         return $grid;

@@ -38,7 +38,7 @@ class ChangeUsersAgencyAction extends RowAction
     $ownerId = Agency::where('id', $request->old_agency_id)->value('app_owner_id');
 
     $users = User::where('agency_id', $request->old_agency_id)
-        ->where('type_user', 1)
+        // ->where('type_user', 1)
         ->when($ownerId, function ($query) use ($ownerId) {
             $query->where('id', '!=', $ownerId);
         })
@@ -48,7 +48,7 @@ class ChangeUsersAgencyAction extends RowAction
 
         'agency_id' => $request->old_agency_id,
         'type' => 2,
-    ])->where('leave_date', null)->update(['leave_date'=> now(),'status' => 'from admin']);
+    ])->where('leave_date', null)->update(['leave_date'=> now(),'status' => 'change agency by admin']);
         foreach($users as $user)
         {
             $user->agency_id = $request->new_agency_id;
@@ -61,7 +61,7 @@ class ChangeUsersAgencyAction extends RowAction
             if (!$checkAgencyUser) {
                 UsersJoinedAgency::create([
                     'user_id' => $user->id,
-                    'agency_id' => $request->old_agency_id,
+                    'agency_id' =>$request->new_agency_id,
                     'type' => 2,
                     'join_date' => now(),
                     'status' =>'Joined'

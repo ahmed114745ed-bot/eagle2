@@ -50,17 +50,28 @@ class SallariesController extends MainController
     {
         $grid = new Grid(new User());
         $model =
-            $grid->model()->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
-        if (request('salary_only') == 1) {
-            $model->having('total', '>', 0);
-        }
-        $model->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'), DB::raw('SUM(user_sallaries.sallary) AS salary'), DB::raw('SUM(user_sallaries.cut_amount) AS withdrawal'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
+            //$grid->model()->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
+            $grid->model()->where('agency_id', '!=', 0);
+
+        // $model->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'), DB::raw('SUM(user_sallaries.sallary) AS salary'), DB::raw('SUM(user_sallaries.cut_amount) AS withdrawal'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('uuid', __('uuid'));
             });
+
+            $filter->column(1 / 2, function ($filter) {
+
+                $filter->where(function ($query) {
+                    $year = request('year');
+                }, __('Year'), 'year')->integer();
+            });
+
+            $filter->where(function ($query) {
+                $month = request('month');
+            }, __('Month'), 'month')->integer();
         });
 
         $grid->column('name', __('name'))->display(function ($name) {
@@ -88,27 +99,19 @@ class SallariesController extends MainController
                 </div>
             ";
         });;
-        $grid->column('total', __('wallet balance'))->display(function ($usd) {
-
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
-            return "<div style='display: flex; align-items: center; '>
-
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        })->default(0);
-        $grid->column('salary', __('salary'))->display(function ($usd) {
-            $usd = $usd ?? 0;
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
+        $grid->column('total', __('net salary'))
+            ->display(function () {
+                $usd =   @$this->sumNetSalary(request('month'), request('year')) ?? 0;
+                $image = asset('images/dollar.jpg'); // Adjust path as needed
+                $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
+                return "<div style='display: flex; align-items: center; '>
 
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
-        })->default(0);
-        $grid->column('withdrawal', __('withdrawal'))->display(function ($usd) {
-            $usd = $usd ?? 0;
+            })->default(0);
+        $grid->column('salary', __('salary'))->display(function () {
+            $usd =   @$this->sumSalary(request('month'), request('year')) ?? 0;
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
@@ -116,14 +119,20 @@ class SallariesController extends MainController
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         })->default(0);
-        //        $grid->column('cashing', __('cashing'))->display(function () {
-        //            return (new SalariesAction($this->id, 'user'))->render();
-        //        });
-        //        $grid->column('pay', __('pay'))->display(function () {
-        //            return (new PaySalariesAction($this->id, 'user', $this->salary))->render();
-        //        });
+        $grid->column('withdrawal', __('withdrawal'))->display(function () {
+            $usd =   @$this->sumCutAmount(request('month'), request('year')) ?? 0;
+
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        })->default(0);
+
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . url('admin/wallet-export-users?uuid=' . request('uuid')) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            //  $tools->append('<a href="' . url('admin/wallet-export-users?uuid=' . request('uuid')) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . url('admin/wallet-export-users?uuid=' . request('uuid') . '&month=' . request('month') . '&year=' . request('year')) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
 
             $tools->append('<a href="' . url('/admin/sallaries_history?type=0') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
@@ -135,16 +144,16 @@ class SallariesController extends MainController
     {
         $grid = new Grid(new Agency());
 
-        $model = $grid->model()
-            ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
-            ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total', DB::raw('SUM(agency_sallaries.sallary) AS salary'), DB::raw('SUM(agency_sallaries.cut_amount) AS withdrawal')))
-            //            ->where('agencies.id', request('id'))
-            ->orderByRaw('total desc')
-            ->groupBy('agencies.id', 'agencies.name');
+        // $model = $grid->model()
+        //     ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
+        //     ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total', DB::raw('SUM(agency_sallaries.sallary) AS salary'), DB::raw('SUM(agency_sallaries.cut_amount) AS withdrawal')))
+        //     //            ->where('agencies.id', request('id'))
+        //     ->orderByRaw('total desc')
+        //     ->groupBy('agencies.id', 'agencies.name');
 
-        if (request('salary_only') == 1) {
-            $model->having('total', '>', 0);
-        }
+        // if (request('salary_only') == 1) {
+        //     $model->having('total', '>', 0);
+        // }
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             $filter->expand();
@@ -155,6 +164,17 @@ class SallariesController extends MainController
                         $subQuery->where('uuid', $this->input); // Match on related owner UUID
                     });
             }, __('UUID'))->placeholder(__('search for agency or host by UUID'));
+
+            $filter->column(1 / 2, function ($filter) {
+
+                $filter->where(function ($query) {
+                    $year = request('year');
+                }, __('Year'), 'year')->integer();
+            });
+
+            $filter->where(function ($query) {
+                $month = request('month');
+            }, __('Month'), 'month')->integer();
         });
 
         $grid->column('name', __('Agency'))
@@ -186,8 +206,28 @@ class SallariesController extends MainController
                     </a>
                 ";
             });
-        $grid->column('total', __('wallet balance'))->display(function ($usd) {
-            $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
+        $grid->column('total', __('net salary'))
+            ->display(function () {
+                $usd =   @$this->sumNetSalary(request('month'), request('year')) ?? 0;
+                $image = asset('images/dollar.jpg'); // Adjust path as needed
+                $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
+                return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+            })->default(0);
+        $grid->column('salary', __('salary'))->display(function () {
+            $usd =   @$this->sumSalary(request('month'), request('year')) ?? 0;
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        })->default(0);
+        $grid->column('withdrawal', __('withdrawal'))->display(function () {
+            $usd =   @$this->sumCutAmount(request('month'), request('year')) ?? 0;
 
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
@@ -196,35 +236,15 @@ class SallariesController extends MainController
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         })->default(0);
-        $grid->column('salary', __('salary'))->display(function ($usd) {
-            $usd = $usd ?? 0;
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
 
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        })->default(0);
-        $grid->column('withdrawal', __('withdrawal'))->display(function ($usd) {
-            $usd = $usd ?? 0;
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
 
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        })->default(0);
-
-        //        $grid->column('cashing', __('cashing'))->display(function () {
-        //            $options = ['agency' => __('agency')];
-        //            return (new SalariesAction($this->id, 'agency'))->render();
-        //        });
-        //        $grid->column('pay', __('pay'))->display(function () {
-        //            return (new PaySalariesAction($this->id, 'agency', $this->salary))->render();
-        //        });
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . url('admin/wallet-export-agency?id=' . request('2f787fe5f965209024c8597149cbb43e')) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
-
+            //  $tools->append('<a href="' . url('admin/wallet-export-agency?id=' . request('2f787fe5f965209024c8597149cbb43e')) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . url('admin/wallet-export-agency', [
+                'id' => request('2f787fe5f965209024c8597149cbb43e'),
+                'month' => request('month'),
+                'year' => request('year'),
+            ]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
             $tools->append('<a href="' . url('/admin/sallaries_history?type=1') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
 

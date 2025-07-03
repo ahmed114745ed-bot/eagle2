@@ -252,6 +252,7 @@ class UserController extends Controller
     public function user_bd(Request $request)
     {
         $key = $request->q;
+       
         $page = $request->get('page', 1);
         $users = $this->userService->user_bd($key, $page);
 
