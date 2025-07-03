@@ -1828,7 +1828,7 @@
                                                 <span>{{ @$kickedByName }} ({{ @$kickedByUuid }})</span>
                                             </a>
                                         </td>
-                                        <td>{{ $status }}</td>
+                                        <td>{{ @$status }}</td>
                                         <td>{{ $userJoinAgency->join_date }}</td>
                                         <td>{{ $userJoinAgency->leave_date }}</td>
                                     </tr>
