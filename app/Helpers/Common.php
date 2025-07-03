@@ -792,6 +792,7 @@ class Common
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
     {
+        return $registrationIds;
         // $url = 'https://fcm.googleapis.com/fcm/notification';
         // $senderId = config("app.senderId");
 
@@ -831,50 +832,7 @@ class Common
 
 
         // return null;
-        $url = 'https://fcm.googleapis.com/fcm/notification';
-        $senderId = config("app.senderId");
-    
-        if (empty($registrationIds)) return null;
-    
-        $headers = [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $accessToken,
-            'project_id: ' . $senderId,
-        ];
-    
-        $payload = [
-            'operation' => $operation,
-            'notification_key_name' => $notificationKeyName,
-            'registration_ids' => $registrationIds,
-        ];
-    
-        $ch = curl_init();
-    
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    
-        $response = curl_exec($ch);
-        $curlError = curl_error($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-    
-        if ($httpCode == 200) {
-            $json = json_decode($response);
-            return $json->notification_key ?? null;
-        }
-    
-        \Log::error('❌ makeGroup FCM error', [
-            'http_code'   => $httpCode,
-            'curl_error'  => $curlError,
-            'response'    => $response,
-            'headers'     => $headers,
-            'payload'     => $payload,
-        ]);
-    
-        return null;
+       
     }
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
