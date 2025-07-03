@@ -11,13 +11,12 @@ use App\Services\AppFeatureService;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
 use App\Admin\Controllers\MainController;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Widgets\Table as WidgetsTable;
 use Illuminate\Support\Facades\Auth;
 
-class RequestAgencyController extends Controller
+class RequestAgencyController extends AdminController
 {
      public $permission_name = 'agencies-request';
     public function __construct()
@@ -26,12 +25,12 @@ class RequestAgencyController extends Controller
     }
 
 
-    public function index(Content $content)
-    {
-        return parent::index($content
-            ->title(trans('Request agencies'))
-            ->body($this->grid()));
-    }
+    // public function index(Content $content)
+    // {
+    //     return parent::index($content
+    //         ->title(trans('Request agencies'))
+    //         ->body($this->grid()));
+    // }
 
     /**
      * Show interface.
