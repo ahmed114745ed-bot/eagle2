@@ -591,36 +591,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::get('/public-test', function () {
-                $userIds=[1138];
-                $users = User::whereIn('id', $userIds)
-                ->whereNotNull('notification_id')
-                ->get();
-        
-            $tokens = [];
-            $title_ar = 'تنبيه تجريبي';
-            $title_en = 'Test Notification';
-            $data = ['test' => true];
-            $messageType = 'test';
-        
-            foreach ($users as $user) {
-                $tokens[] = $user->notification_id;
-            }
-        
-            $firebaseBody = $users->first()?->lan === 'ar'
-                ? 'هذا إشعار تجريبي.'
-                : 'This is a test notification.';
-        
-            $title = $users->first()?->lan === 'ar' ? $title_ar : $title_en;
-        
-            Common::send_firebase_notification(
-                $tokens,
-                $title,
-                $firebaseBody,
-                data: $data,
-                messageType: $messageType
-            );
-        
-            return '✅ تم إرسال الإشعار لجميع المستخدمين المحددين.';
+               
+                $title = 'System‑wide Test';
+                $body  = 'This is only a test.';
+            
+                $tokens = User::whereNotNull('notification_id')
+                    ->pluck('notification_id')
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->toArray();
+            
+                return Common::send_firebase_notification($tokens, $title, $body);
             });
 
         }
