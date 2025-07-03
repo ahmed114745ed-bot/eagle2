@@ -734,7 +734,7 @@ class Common
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
     {
-        $url = 'https://fcm.googleapis.com/fcm/notification';
+        $url = 'https://fcm.googleapis.com/fcm/send';
         $senderId = config("app.senderId");
 
         if ($registrationIds == null) return;

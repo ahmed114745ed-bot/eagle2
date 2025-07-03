@@ -1187,7 +1187,7 @@ class User extends Authenticatable
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
                 });
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
@@ -1206,7 +1206,7 @@ class User extends Authenticatable
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
                 });
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
@@ -1225,7 +1225,7 @@ class User extends Authenticatable
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
                 });
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
