@@ -31,11 +31,11 @@ class Agency extends Model
 
     public function charges()
     {
-        return $this->hasMany(Charge::class, 'user_id','id')->where('charger_type','host_agency');
+        return $this->hasMany(Charge::class, 'user_id', 'id')->where('charger_type', 'host_agency');
     }
     public function senderCharges()
     {
-        return $this->hasMany(Charge::class, 'charger_id','id')->where('charger_type','host_agency');
+        return $this->hasMany(Charge::class, 'charger_id', 'id')->where('charger_type', 'host_agency');
     }
 
 
@@ -225,7 +225,7 @@ class Agency extends Model
         $year ??= now()->year;
 
         $agencySalary = AgencySallary::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -238,10 +238,10 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
         $sumTargets =
-             UserSallary::where('user_agency_id', $this->id)
-                ->where('month', $month)
-                ->where('year', $year)
-                ->sum('target_diamonds');
+            UserSallary::where('user_agency_id', $this->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->sum('target_diamonds');
 
 
         return floor($sumTargets ?? 0);
@@ -253,14 +253,13 @@ class Agency extends Model
         $year ??= now()->year;
 
         $agencySalary = AgencySallary::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
             ->sum(DB::raw('cut_amount'));
 
         return round($agencySalary, 2);
-
     }
 
     public function getTotalNetSallaryAgency($month = null, $year = null)
@@ -268,19 +267,18 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
         $result = AgencySallary::query()
-        ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
-        ->where('is_paid', 0)
-        ->where('agency_id', $this->id)
-        ->selectRaw('SUM(sallary) - SUM(cut_amount) as total')
-        ->value('total');
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where('is_paid', 0)
+            ->where('agency_id', $this->id)
+            ->selectRaw('SUM(sallary) - SUM(cut_amount) as total')
+            ->value('total');
 
-    return round($result, 2);
-
+        return round($result, 2);
     }
 
 
 
-    
+
 
     public function getOldAgency($month = null, $year = null)
     {
@@ -302,13 +300,13 @@ class Agency extends Model
         $year ??= now()->year;
 
         $agencySalary = AgencySallary::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
 
-            return round($agencySalary, 2);
+        return round($agencySalary, 2);
     }
 
     public function getSalaryWithOutCutAmountAgency($month = null, $year = null)
@@ -317,13 +315,13 @@ class Agency extends Model
         $year ??= now()->year;
 
         $agencySalary = AgencySallary::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
             ->sum(DB::raw('sallary'));
 
-            return round($agencySalary, 2);
+        return round($agencySalary, 2);
     }
 
     public function getSalary($month = null, $year = null)
@@ -336,6 +334,47 @@ class Agency extends Model
             ->where('month', $month)
             ->where('agency_id', $this->id)
             ->sum(DB::raw('sallary - cut_amount'));
+
+        return floor($agencySalary ?? 0);
+    }
+
+    public function sumNetSalary($month = null, $year = null)
+    {
+        $agencySalary = AgencySallary::query()
+            ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
+                $query->where(function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                });
+            })
+            ->where('agency_id', $this->id)
+            ->sum(DB::raw('sallary - cut_amount'));
+
+        return floor($agencySalary ?? 0);
+    }
+
+    public function sumCutAmount($month = null, $year = null)
+    {
+        $agencySalary = AgencySallary::query()
+            ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
+                $query->where(function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                });
+            })
+            ->where('agency_id', $this->id)
+            ->sum(DB::raw('cut_amount'));
+
+        return floor($agencySalary ?? 0);
+    }
+    public function sumSalary($month = null, $year = null)
+    {
+        $agencySalary = AgencySallary::query()
+            ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
+                $query->where(function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                });
+            })
+            ->where('agency_id', $this->id)
+            ->sum(DB::raw('sallary'));
 
         return floor($agencySalary ?? 0);
     }

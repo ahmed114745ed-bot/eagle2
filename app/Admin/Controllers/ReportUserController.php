@@ -105,7 +105,10 @@ class ReportUserController extends MainController
             $grid->column('id', __('Id'));
             $grid->column('name', __('user'))->display(function ($name) {
                 $name = @$this->name ?? '';
-                $uid = @$this->uuid;
+                $uid = @$this->uuid ?? '';
+                if (request()->filled('_export_')) {
+                    return "{$name} (UUID: {$uid})";
+                }
                 $path = @$this?->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
@@ -146,24 +149,38 @@ class ReportUserController extends MainController
 
                     $days = $subQuery->count('entry_count');
                 }
+                if (request()->filled('_export_')) {
+                    return $days;
+                }
                 return "<span style='color:green; font-weight: bold;'>{$days}</span>";
             });
             $grid->column(__('reals_count'))->display(function () {
-
                 $count = request()->year == null && request()->month == null ? $this->reals()->count() : $this->reals()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+                if (request()->filled('_export_')) {
+                    return $count;
+                }
                 return "<span style='color:orange; font-weight: bold;'>{$count}</span>";
             });
             $grid->column(__('moment_count'))->display(function () {
                 $count = request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+                if (request()->filled('_export_')) {
+                    return $count;
+                }
                 return "<span style='color:yellow; font-weight: bold;'>{$count}</span>";
             });
             $grid->column(__('total_hours'))->display(function () {
                 $count =  request()->year == null && request()->month == null ? $this->liveTime()->sum("hours") : $this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
+                if (request()->filled('_export_')) {
+                    return $count;
+                }
                 return "<span style='color:red; font-weight: bold;'>{$count}</span>";
             });
 
             $grid->column(__('Filtered salary'))->display(function () {
                 $usd =  request()->year == null && request()->month == null ? $this->salary : $this->getSalary(request()->month, request()->year);
+                if (request()->filled('_export_')) {
+                    return $usd;
+                }
                 $image = asset('images/dollar.jpg'); // Adjust path as needed
                 return "<div style='display: flex; align-items: center; '>
 
@@ -174,6 +191,9 @@ class ReportUserController extends MainController
 
             $grid->column(__('Current Salary'))->display(function () {
                 $usd =  $this->salary;
+                if (request()->filled('_export_')) {
+                    return $usd;
+                }
                 $image = asset('images/dollar.jpg'); // Adjust path as needed
                 return "<div style='display: flex; align-items: center; '>
 

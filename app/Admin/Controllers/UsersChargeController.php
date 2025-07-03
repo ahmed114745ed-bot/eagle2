@@ -21,7 +21,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class UsersChargeController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'coin-recharge';
+    public $permission_name = 'charge-to-user';
 
 
     /**
@@ -192,9 +192,9 @@ class UsersChargeController extends MainController
             }, __('name'));
 
             $filter->where(function ($query) {
-               
+
                     $query->where('uuid', 'like', "%{$this->input}%");
-             
+
             }, __('uuid'));
         });
 
@@ -205,7 +205,7 @@ class UsersChargeController extends MainController
 
         $grid->id(__('ID'));
 
-   
+
 
         $grid->column('name', trans('owner'))
             ->display(function ($name) {
@@ -233,7 +233,7 @@ class UsersChargeController extends MainController
             });
 
         $grid->column('di', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); 
+            $icon = asset('images/coin.jpg');
             $coin = (float) $coin;
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
@@ -276,7 +276,7 @@ class UsersChargeController extends MainController
         //         </div>
         //     ";
         // });
-        if (\Encore\Admin\Facades\Admin::user()->can('browse-' .'add-coins-Switch') || \Encore\Admin\Facades\Admin::user()->can('*') || \Encore\Admin\Facades\Admin::user()->can('browse-' .'charge-report-Switch')) {
+        if (\Encore\Admin\Facades\Admin::user()->can('add-switch-' . $this->permission_name) || \Encore\Admin\Facades\Admin::user()->can('*') || \Encore\Admin\Facades\Admin::user()->can('history-switch-' . $this->permission_name)) {
             $grid->column('actions', __('Actions'))
                 ->display(function () {
 

@@ -28,6 +28,7 @@ class GiftLogSeeder extends Seeder
                 'cp_id' => $cp->id,
                 'giftNum' => 2,
                 'giftPrice' => 100,
+                'app_profit_coins' => 100
             ]);
         }
     }

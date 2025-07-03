@@ -1135,7 +1135,7 @@
                         <span class="meta-label">{{ __('diamonds') }}:</span>
                         @php
 
-                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->getTotalDiamond() ;
+                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->monthly_diamond_received;
 
                         @endphp
                         <span class="meta-value">{{ @$user_diamonds }}</span>
@@ -1165,7 +1165,8 @@
 
 
     @php
-        $activeTab = @$tab ;
+           $activeTab = request('tab', 'salary');
+
     @endphp
         <!-- Navigation Tabs -->
     <div class="agency-tabs">
@@ -1186,7 +1187,7 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-
+           <a href="?tab=user-coins" class="tab-btn" data-target="user-coins-tab">{{ __('User Coins') }}</a>
 
 
 
@@ -1266,7 +1267,7 @@
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
                                     </td>
-                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :(empty($pack->expire)? '':'∞') }}</td>
+                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :'∞' }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
@@ -1812,6 +1813,65 @@
 </div>
 </div>
 
+@if($activeTab == 'user-coins')
+
+<div class="tab-content" id="user-coins-tab" style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title" style="text-align: left;">{{ __('') }}</h4>
+        </div>
+        <div class="table-responsive">
+            <div class="box-body ">
+                <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('type') }}</th>
+                            <th>{{ __('sub type') }}</th>
+                            <th>{{ __('amount') }}</th>
+                            <th>{{ __('from date') }}</th>
+                            <th>{{ __('to date') }}</th>
+                        </tr>
+                    </thead>
+                    @if($usersCoins && $usersCoins->count())
+                        <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($usersCoins as $index => $coin)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $coin->type }}</td>
+                                    <td>{{ @$coin->sub_type ?? 0 }}</td>
+                                    <td>{{ @$coin->amount ?? 0 }}</td>
+                                    <td>{{ @$coin->from_date ?? 0 }}</td>
+                                    <td>{{ @$coin->to_date ?? 0 }}</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ $coin->id }}">
+                                                {{ __('dashboard.delete') }}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    @endif
+                </table>
+
+                @if($usersCoins)
+                    <div class="pagination-container">
+                        {{ $usersCoins->appends([
+                            'pack_page' => $packs?->currentPage(),
+                            'salary_page' => $salaries?->currentPage(),
+                            'gift_page' => $giftSLogs?->currentPage(),
+                        ])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 @if($activeTab == 'charge')
     <div class="tab-content active" id="charge-tab">
         <div class="card">
@@ -1990,6 +2050,8 @@
                         </div>
                     </div>
                 </div>
+
+                
 
                 <!-- Table -->
                 <div class="table-responsive">

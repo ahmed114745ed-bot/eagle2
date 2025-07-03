@@ -126,6 +126,16 @@ Route::get('/clear', function () {
 
     return "Cleared!";
 });
+
+Route::get('/clear-config', function () {
+
+    Artisan::call('config:clear');
+    Artisan::call('config:cache');
+
+
+    return "Cleared!";
+});
+
 Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
     return Excel::download(new AgencyCharge($agencyId), 'shipping_agency.xlsx');
 });

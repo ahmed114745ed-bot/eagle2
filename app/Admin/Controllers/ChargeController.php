@@ -246,7 +246,7 @@ class ChargeController extends MainController
                         </div>
                     </div>";
             });
-        $grid->column('amount', __('coins'))->display(function ($coin) {
+        $grid->column('coins', __('coins'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
