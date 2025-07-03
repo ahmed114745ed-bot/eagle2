@@ -55,7 +55,7 @@ class MyStoreResource extends JsonResource
                 'diamonds' =>  (string)$diamonds,
                 'silver_coins' => (string)$this->gold,
                 'usd' => (double)$sallary,
-                'user_usd' => (string) $userSalary ?? '',
+                'user_usd' => (string) truncateAndTrim($userSalary) ?? '',
                 'user_usd_new' => (string) (isset($userSalary) ? round($userSalary, 0) : ''),
                 'host_usd' => (string) @$hostSalary ?? '',
                 'pending_dollar' => (string) $pendingDollar ?? '',
