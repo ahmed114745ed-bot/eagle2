@@ -658,77 +658,135 @@ class Common
             'body'         => $body,
             //            'sound'        => 'default',
         ];
-        if (count($tokens) == 1) {
-            $token = $tokens[0];
+        // if (count($tokens) == 1) {
+        //     $token = $tokens[0];
+        // } else {
+
+        //     if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
+        //     //make group and get token
+        //     $token = self::makeGroup($tokens, $key,  $api_access_key);
+
+        //     $isGroup = true;
+        // }
+      
+        // if ($user) {
+        //     $userData = [
+        //         'user_id' => $user->id,
+        //         'name' => $user->name,
+        //         'uuid' => $user->uuid,
+        //         'has_color_name'       => self::hasInPack($user->id, 18, true),
+        //         'image' => $user->profile->avatar,
+        //         // Any other user-specific data
+        //     ];
+        // }
+
+        // $payload = [
+        //     'token' => $token,
+        //     'notification'     => $notification,
+        //     //            'priority'         => 'high',
+        //     'data' => [
+        //         'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+        //         'message-type' => json_encode($messageType ?? ''),
+        //         'data' => !empty($data) ? json_encode($data) : "",
+        //     ],
+        // ];
+
+        // //        if (!empty($icon)) {
+        // //            $payload['notification']['icon'] = $icon;
+        // //        }
+        // if (isset($userData) && is_array($userData)) {
+        //     $payload['data']['user'] = json_encode($userData);
+        // }
+
+        // if (isset($data['image']) && !empty($data['image'])) {
+        //     $payload['notification']['image'] = $data['image'];
+        // } else {
+        //     // $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+        // }
+
+        // $headers = [
+        //     'Authorization' => 'Bearer ' . $api_access_key,
+        //     'Content-Type' => 'application/json',
+        // ];
+
+
+
+        // $projectId = env('FIREBASE_PROJECT_NAME');
+
+        // $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+        //     'message' => $payload
+        // ]);
+
+
+        // $result = json_decode($result);
+
+        // if ($messageType === 'system-msg'){
+        //     \Log::info('Response for system-msg : ' .PHP_EOL .json_encode($result));
+        // }
+
+
+        // //remove group with $key if is group
+        // if ($result  && $isGroup) {
+        //     self::removeGroupName($key, $token, $tokens, $api_access_key);
+        // }
+        // return $result;
+
+        if (count($tokens) === 1) {
+            $tokenPayloadKey = 'token';
+            $tokenPayloadValue = $tokens[0];
         } else {
-
-            if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-            //make group and get token
-            $token = self::makeGroup($tokens, $key,  $api_access_key);
-
-            $isGroup = true;
+            $tokenPayloadKey = 'registration_ids';
+            $tokenPayloadValue = self::makeGroup($tokens, $key, $api_access_key); // ترجع نفس التوكنات
         }
-
         if ($user) {
             $userData = [
-                'user_id' => $user->id,
-                'name' => $user->name,
-                'uuid' => $user->uuid,
-                'has_color_name'       => self::hasInPack($user->id, 18, true),
-                'image' => $user->profile->avatar,
-                // Any other user-specific data
+                'user_id'         => $user->id,
+                'name'            => $user->name,
+                'uuid'            => $user->uuid,
+                'has_color_name'  => self::hasInPack($user->id, 18, true),
+                'image'           => $user->profile->avatar ?? '',
             ];
         }
-
+    
         $payload = [
-            'token' => $token,
-            'notification'     => $notification,
-            //            'priority'         => 'high',
-            'data' => [
-                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                'message-type' => json_encode($messageType ?? ''),
-                'data' => !empty($data) ? json_encode($data) : "",
+            $tokenPayloadKey => $tokenPayloadValue,
+            'notification'   => $notification,
+            'data'           => [
+                'click_action'  => 'FLUTTER_NOTIFICATION_CLICK',
+                'message-type'  => json_encode($messageType ?? ''),
+                'data'          => !empty($data) ? json_encode($data) : "",
             ],
         ];
-
-        //        if (!empty($icon)) {
-        //            $payload['notification']['icon'] = $icon;
-        //        }
-        if (isset($userData) && is_array($userData)) {
+    
+        if (!empty($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
-
-        if (isset($data['image']) && !empty($data['image'])) {
+    
+        if (!empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
-        } else {
-            // $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
         }
-
+    
         $headers = [
             'Authorization' => 'Bearer ' . $api_access_key,
-            'Content-Type' => 'application/json',
+            'Content-Type'  => 'application/json',
         ];
-
-
-
+    
         $projectId = env('FIREBASE_PROJECT_NAME');
-
-        $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+    
+        $response = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
-
-
-        $result = json_decode($result);
-
-        if ($messageType === 'system-msg'){
-            \Log::info('Response for system-msg : ' .PHP_EOL .json_encode($result));
-        }
-
-
-        //remove group with $key if is group
-        if ($result  && $isGroup) {
-            self::removeGroupName($key, $token, $tokens, $api_access_key);
-        }
+    
+        $result = json_decode($response);
+    
+        // Log response
+        \Log::info('[FCM Response]', [
+            'success'     => $response->successful(),
+            'status'      => $response->status(),
+            'body'        => $response->body(),
+            'payload'     => $payload,
+        ]);
+    
         return $result;
     }
 
