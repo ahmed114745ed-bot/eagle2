@@ -195,7 +195,7 @@ class AgencyAppController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
-    public function kick_of_agency(Request $request)
+    public function kick_of_agency(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
         if (Carbon::now()->day < 5 || Carbon::now()->day > 10 ) return Common::apiResponse(0, __("api.kickAgency"), []);
@@ -203,7 +203,7 @@ class AgencyAppController extends Controller
         $user_kicked = User::find($request->user_id);
 
         if ($user_kicked->agency_id != $user->ownAgency->id || $user_kicked->id == $user->ownAgency->app_owner_id) return Common::apiResponse(0, 'لا يمكنك ازاله هذا المستخدم!', []);
-        UserHandling::kickUserFromAgency($user_kicked);
+        UserHandling::kickUserFromAgency($user_kicked, 1);
         return Common::apiResponse(1, 'تم حذف المستخدم بنجاح', []);
     }
 

@@ -1170,9 +1170,9 @@
     @endphp
         <!-- Navigation Tabs -->
     <div class="agency-tabs">
-       
+
           <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
-      
+
         <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
@@ -1212,7 +1212,7 @@
 
 
     <!-- packs Section -->
-    
+
     <div class="tab-content active" id="packs-tab">
         <div class="card">
             <div class="card-header">
@@ -1300,7 +1300,7 @@
         </div>
 
     </div>
-  
+
 
     <!-- vips Section -->
     <div class="tab-content" id="vips-tab">
@@ -1752,6 +1752,8 @@
                             <th>#</th>
                             <th>{{ __('agency') }}</th>
                             <th>{{ __('status') }}</th>
+                            <th>{{ __('kicked By') }}</th>
+                            <th>{{ __('kicked By status') }}</th>
                             <th>{{ __('Join date') }}</th>
                             <th>{{ __('Leave date') }}</th>
                         </tr>
@@ -1772,6 +1774,38 @@
                                         $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
                                     @endphp
 
+                                    @php
+                                        if ($userJoinAgency->kicked_by_app){
+                                            $status = 'app';
+                                            $kickedBy = $userJoinAgency['kickedByApp'];
+                                            $kickedByName = $kickedBy->name ?? '';
+                                            $kickedByUuid = $kickedBy->uuid ?? '';
+                                            $kickedByPath = @$kickedBy->profile?->avatar;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = getImagePath($kickedByPath) ?? $defaultImage;
+                                            if (!isImageExists($url)) {
+                                                $url = $defaultImage;
+                                            }
+                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                            $kickedByUrl = url("admin/users/{$kickedBy->id}");
+                                        }
+
+                                        if ($userJoinAgency->kicked_by_admin){
+                                            $status = 'admin';
+                                            $kickedBy = $userJoinAgency['kickedByAdmin'];
+                                            $kickedByName = $kickedBy->name ?? '';
+                                            $kickedByUuid = $kickedBy->uuid ?? '';
+                                            $kickedByPath = @$kickedBy->profile?->avatar;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = getImagePath($kickedByPath) ?? $defaultImage;
+                                            if (!isImageExists($url)) {
+                                                $url = $defaultImage;
+                                            }
+                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                            $kickedByUrl = url("admin/auth/users/{$kickedBy->id}");
+                                        }
+                                    @endphp
+
                                     <tr>
                                         <td>{{ $index + 1 + (($userJoinAgencies->currentPage() - 1) * $userJoinAgencies->perPage()) }}</td>
                                         <td>
@@ -1785,8 +1819,17 @@
                                                 </div>
                                             </a>
                                         </td>
-                                        <td>{{__($userJoinAgency->status)}}</td>
-                                        <td>{{ $userJoinAgency->join_date}}</td>
+                                        <td>{{ $userJoinAgency->status }}</td>
+                                        <td>
+                                            <a href="{{ @$kickedByUrl ?? '#' }}" target="_blank"
+                                               style="display: inline-flex; align-items: center; text-decoration: none;">
+                                                <img src="{{ getImagePath( @$kickedByImage) }}" width="30" height="30"
+                                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                <span>{{ @$kickedByName }} ({{ @$kickedByUuid }})</span>
+                                            </a>
+                                        </td>
+                                        <td>{{ $status }}</td>
+                                        <td>{{ $userJoinAgency->join_date }}</td>
                                         <td>{{ $userJoinAgency->leave_date }}</td>
                                     </tr>
                                 @endforeach
@@ -2051,7 +2094,7 @@
                     </div>
                 </div>
 
-                
+
 
                 <!-- Table -->
                 <div class="table-responsive">
