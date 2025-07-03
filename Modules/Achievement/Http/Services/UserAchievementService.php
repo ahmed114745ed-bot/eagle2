@@ -148,6 +148,7 @@ class UserAchievementService
         return $usersAchievementLevels;
     }
 
+
     public function roomAchievement(int $ownerId)
     {
         $roomAchievement   = Achievement::query()->where('type', AchievementType::ROOM_TARGET)
