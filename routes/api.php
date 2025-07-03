@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\AgencySettingsController;
+use App\Events\PublicTestEvent;
 use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\PaytabsController;
@@ -8,6 +9,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
 use App\Helpers\Common;
+use App\Notifications\PublicTestNotification;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -587,6 +589,22 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
+
+            Route::get('/public-test', function () {
+               
+                $title = 'System‑wide Test';
+                $body  = 'This is only a test.';
+            
+                $tokens = User::whereNotNull('notification_id')
+                    ->pluck('notification_id')
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->toArray();
+            
+                return Common::send_firebase_notification($tokens, $title, $body);
+            });
+
         }
     );
 

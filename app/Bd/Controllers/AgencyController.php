@@ -668,9 +668,13 @@ class AgencyController extends Controller
                 }
             });
         } else {
-
+            $form->tools(function (Form\Tools $tools) {
+                $tools->disableDelete(); // ✅ disable delete button
+                // $tools->disableView(); // optional: disable view
+                // $tools->disableList(); // optional: disable list
+            });
             $form->row(function ($row) {
-               
+
 
                 // if (request()->route('form')->isEditing()) {
                 //     $row->hidden('agency_manger_id', __('app manger id'));
@@ -855,7 +859,7 @@ class AgencyController extends Controller
                     'agency_id' => $form->model()->id,
                     'type' => 1,
                     'join_date' => now(),
-                    'status' =>'Joined'
+                    'status' => 'Joined'
                 ]);
             }
         });
@@ -1125,7 +1129,7 @@ class AgencyController extends Controller
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
-                'status' =>'Joined'
+                'status' => 'Joined'
             ];
             UsersJoinedAgency::create($joinAgencyData);
         }

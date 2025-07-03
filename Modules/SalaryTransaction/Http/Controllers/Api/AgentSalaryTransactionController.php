@@ -108,6 +108,41 @@ class AgentSalaryTransactionController extends Controller
 
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }
+    public function chargeDollarForUserHistory(Request $request)
+    {
+        $usrAuth = $request->user();
+        $agency = $usrAuth->agency;
+        $search = $request->search;
+        $type = $request->type ?? null;
+        if (!$type) {
+            return Common::apiResponse(0, __("type not found"));
+        }
+        if (!$agency) {
+            return Common::apiResponse(0, __("api_responses.agency"));
+        }
+
+        $data = Charge::query();
+                    
+        $data = $data->when($type == 'sent', function ($q) use ($search, $agency) {
+            $q->where("charger_id", $agency->id)
+              ->where('charger_type',  'host_agency')
+              ->with(Common::chargerRelationsQuery());
+            //   ->with('receiverUser','receiveragency');
+
+        })
+        ->when($type == 'received', function ($q) use ($search, $agency) {
+            $q->where('user_id', $agency->id)->where('user_type','agency')
+            ->with(Common::chargerRelationsQuery());
+            // ->with('senderUser','senderShippingAgency','senderAgency','admin');
+
+        })->orderByDesc('id')->paginate();
+
+
+
+
+
+        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
+    }
 
     public function send_money_for_the_host(Request $request)
     {

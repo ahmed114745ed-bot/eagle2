@@ -27,12 +27,24 @@ class ChargeEventController extends Controller
 
 
         $user =  User::query()
+        // ->leftJoinSub(
+        //     function ($query) use ($fromDate,$tillDate) {
+        //         $query->select('user_id', \DB::raw('SUM(amount) as charges_sum_amount'))
+        //               ->from('charges')
+        //              -> whereBetween('created_at',[$fromDate,$tillDate])
+        //               ->groupBy('user_id');
+        //     },
+        //     'charges',
+        //     'users.id',
+        //     'charges.user_id'
+        // )
         ->leftJoinSub(
-            function ($query) use ($fromDate,$tillDate) {
-                $query->select('user_id', \DB::raw('SUM(amount) as charges_sum_amount'))
-                      ->from('charges')
-                     -> whereBetween('created_at',[$fromDate,$tillDate])
-                      ->groupBy('user_id');
+            function ($query) use ($fromDate, $tillDate) {
+                $query->select('charges.user_id', \DB::raw('SUM(charges.amount) as charges_sum_amount'))
+                    ->from('charges')
+                    ->where('charges.user_type', 'user') 
+                    ->whereBetween('charges.created_at', [$fromDate . ' 00:00:00', $tillDate . ' 23:59:59'])
+                    ->groupBy('charges.user_id');
             },
             'charges',
             'users.id',
@@ -42,7 +54,8 @@ class ChargeEventController extends Controller
             function ($query) use ($fromDate,$tillDate) {
                 $query->select('user_id', \DB::raw('SUM(obtained_coins) as coin_logs_sum_obtained_coins'))
                       ->from('coin_logs')
-                      ->whereBetween('created_at',[$fromDate,$tillDate])
+                    //   ->whereBetween('created_at',[$fromDate,$tillDate])
+                      ->whereBetween('coin_logs.created_at', [$fromDate . ' 00:00:00', $tillDate . ' 23:59:59'])
                       ->groupBy('user_id');
             },
             'coin_logs',
@@ -57,8 +70,10 @@ class ChargeEventController extends Controller
 
     public function chargeEventRole(Request $request)
     {
-        $start =  Carbon::now()->startOfMonth();
-        $end = Carbon::now()->endOfMonth();
+        // $start =  Carbon::now()->startOfMonth();
+        // $end = Carbon::now()->endOfMonth();
+        $start = Carbon::now()->subMonth()->startOfMonth();
+        $end = Carbon::now()->subMonth()->endOfMonth();
         $user = User::where('id', $request->user()->id)->with(['charges' => function ($query) use ($start, $end) {
             $query->whereBetween('created_at', [$start, $end]);
         }, 'coinLogs' => function ($query) use ($start, $end) {

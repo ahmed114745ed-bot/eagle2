@@ -349,7 +349,7 @@ class Agency extends Model
             ->where('agency_id', $this->id)
             ->sum(DB::raw('sallary - cut_amount'));
 
-        return floor($agencySalary ?? 0);
+        return truncateAndTrim($agencySalary ?? 0);
     }
 
     public function sumCutAmount($month = null, $year = null)
@@ -376,7 +376,7 @@ class Agency extends Model
             ->where('agency_id', $this->id)
             ->sum(DB::raw('sallary'));
 
-        return floor($agencySalary ?? 0);
+        return truncateAndTrim($agencySalary ?? 0);
     }
 
     public function joinRequests()
