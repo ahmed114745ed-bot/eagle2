@@ -734,40 +734,47 @@ class Common
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
     {
+        $topic = 'global_broadcast'; // تأكد أن المستخدمين مشتركين فيه من التطبيق
+
+        // بيانات الإشعار - يمكنك تعديلها حسب الاستخدام
+        $title = 'رسالة جماعية';
+        $body = 'هذا إشعار تم إرساله عبر topic';
+        $data = []; // بيانات إضافية إن أردت
+        $messageType = null; // يمكن تخصيصه لاحقاً
+
+        // الحصول على Access Token (إجباري)
+        $accessToken = self::getGoogleAccessToken();
         $projectId = config("app.senderId");
 
-        foreach ($registrationIds as $token) {
-            $payload = [
-                'message' => [
-                    'token' => $token,
-                    'notification' => [
-                        'title' => 'Broadcast', // يمكنك تعديلها لاحقًا
-                        'body'  => 'Message content here',
-                    ],
-                    'data' => [
-                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                        'message-type' => '',
-                        'data' => '',
-                    ],
-                ]
-            ];
+        // إعداد الطلب
+        $payload = [
+            'message' => [
+                'topic' => $topic,
+                'notification' => [
+                    'title' => $title,
+                    'body' => $body,
+                ],
+                'data' => [
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    'message-type' => json_encode($messageType ?? ''),
+                    'data' => !empty($data) ? json_encode($data) : "",
+                ],
+            ],
+        ];
+
+        // رؤوس الطلب
+        $headers = [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ];
+
+        // إرسال الطلب إلى FCM
+        $response = Http::withHeaders($headers)
+            ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
+
+        return $response->json();
+
     
-            $headers = [
-                'Authorization: Bearer ' . $accessToken,
-                'Content-Type: application/json',
-            ];
-    
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send");
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_exec($ch);
-            curl_close($ch);
-        }
-    
-        return null; // لا يوجد group key حاليًا
         // $url = 'https://fcm.googleapis.com/fcm/notification';
         // $senderId = config("app.senderId");
 
