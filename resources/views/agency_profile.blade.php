@@ -1479,7 +1479,7 @@
                                         <i class="fas fa-bullseye"></i>
                                     </div>
                                     <div class="stat-info">
-                                        <div class="stat-value">{{ $agencyTarget }}</div>
+                                        <div class="stat-value">{{number_format( $agencyTarget, 2) }}</div>
                                         <div class="stat-label">{{ __('Target') }}</div>
                                     </div>
                                 </div>
