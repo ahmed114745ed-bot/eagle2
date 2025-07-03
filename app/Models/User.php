@@ -211,12 +211,13 @@ class User extends Authenticatable
         if (! $year) {
             $year = now()->year;
         }
+        $hours_days = \Cache::get('hours_days') ?? 2;
         $subQuery = DB::table('live_times')
             ->select('uid', DB::raw('COUNT(*) AS entry_count'))
             ->whereMonth('created_at', $month)->whereYear('created_at', $year)
             ->where('uid', $this->id)
             ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
-            ->havingRaw('SUM(hours) > 1')
+            ->havingRaw('SUM(hours) >= ?', [$hours_days])
             ->get();
 
         return $subQuery->count('entry_count');
