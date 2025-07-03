@@ -1479,7 +1479,7 @@ class User extends Authenticatable
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
             if ($url) {
-                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50%; height: 50%; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
+                $html .= '<img src="' . e($url) . '" alt="' . e($typeName) . '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 4px;">';
             }
         }
 
@@ -1579,21 +1579,21 @@ class User extends Authenticatable
         if ($this->type_user >= 1) {
             $userTypes[] = 1;
         }
-    
+
         if ($this->type_user >= 2) {
             $userTypes[] = 2;
         }
-    
+
         if ($this->hasShippingAgency()) {
             $userTypes[] = 3;
         }
-    
+
         if ($this->is_bd) {
             $userTypes[] = 4;
         }
-    
+
         $userTypes = array_unique($userTypes);
-    
+
         return empty($userTypes) ? [0] : $userTypes;
     }
 
