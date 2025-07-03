@@ -734,45 +734,79 @@ class Common
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
     {
-        $url = 'https://fcm.googleapis.com/fcm/send';
-        $senderId = config("app.senderId");
+        $projectId = config("app.senderId");
 
-        if ($registrationIds == null) return;
-        $headers = [
-            'Content-Type: application/json',
-            'access_token_auth: true',
-            'Authorization: Bearer ' . $accessToken,
-            'project_id: ' . $senderId,
-        ];
-
-        $payload = [
-            'operation' => $operation,
-            'notification_key_name' => $notificationKeyName,
-            'registration_ids' => $registrationIds,
-        ];
-
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $response = curl_exec($ch);
-
-        curl_close($ch);
-        if (!curl_errno($ch)) {
-
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if ($httpCode == 200) {
-                $response = json_decode($response);
-                return $response->notification_key;
-            }
+        foreach ($registrationIds as $token) {
+            $payload = [
+                'message' => [
+                    'token' => $token,
+                    'notification' => [
+                        'title' => 'Broadcast', // يمكنك تعديلها لاحقًا
+                        'body'  => 'Message content here',
+                    ],
+                    'data' => [
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                        'message-type' => '',
+                        'data' => '',
+                    ],
+                ]
+            ];
+    
+            $headers = [
+                'Authorization: Bearer ' . $accessToken,
+                'Content-Type: application/json',
+            ];
+    
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send");
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($ch);
+            curl_close($ch);
         }
+    
+        return null; // لا يوجد group key حاليًا
+        // $url = 'https://fcm.googleapis.com/fcm/notification';
+        // $senderId = config("app.senderId");
+
+        // if ($registrationIds == null) return;
+        // $headers = [
+        //     'Content-Type: application/json',
+        //     'access_token_auth: true',
+        //     'Authorization: Bearer ' . $accessToken,
+        //     'project_id: ' . $senderId,
+        // ];
+
+        // $payload = [
+        //     'operation' => $operation,
+        //     'notification_key_name' => $notificationKeyName,
+        //     'registration_ids' => $registrationIds,
+        // ];
+
+        // $ch = curl_init();
+
+        // curl_setopt($ch, CURLOPT_URL, $url);
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // $response = curl_exec($ch);
+
+        // curl_close($ch);
+        // if (!curl_errno($ch)) {
+
+        //     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        //     if ($httpCode == 200) {
+        //         $response = json_decode($response);
+        //         return $response->notification_key;
+        //     }
+        // }
 
 
-        return null;
+        // return null;
     }
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
