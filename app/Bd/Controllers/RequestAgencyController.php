@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RequestAgencyController extends AdminController
 {
-     public $permission_name = 'agencies-request';
+    public $permission_name = 'agencies-request';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
@@ -77,11 +77,11 @@ class RequestAgencyController extends AdminController
     {
         $grid = new Grid(new Agency());
         $grid->model()
-        ->where('bd_id',Auth::user()->app_id)
-        ->where('status', 0)->orderByDesc("id")
-        ->whereHas('additionalInfo', function ($query) {
-            $query->where('status', 0);
-        });
+            ->where('bd_id', Auth::user()->app_id)
+            ->where('status', 0)->orderByDesc("id")
+            ->whereHas('additionalInfo', function ($query) {
+                $query->where('status', 0);
+            });
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -114,7 +114,7 @@ class RequestAgencyController extends AdminController
                 </div>
             ";
         });
-       
+
         $grid->column('name', __('agency'))->display(function () {
             $name = @$this->name ?? '';
             $path = @$this->img;
@@ -265,6 +265,8 @@ class RequestAgencyController extends AdminController
     protected function form()
     {
         $form = new Form(new Agency());
+        $this->disableFormTools($form);
+
 
         $form->number('owner_id', __('Owner id'));
         $form->text('name', __('Name'));

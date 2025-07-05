@@ -148,6 +148,7 @@ class SpecialWareController extends  MainController
     protected function form()
     {
         $form = new Form(new Ware());
+        $this->disableFormTools($form);
 
         $form->select('get_type', trans('get_type'))->options(
             [

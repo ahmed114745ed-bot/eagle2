@@ -152,6 +152,8 @@ class BackgroundController extends MainController
     protected function form()
     {
         $form = new Form(new Background);
+        $this->disableFormTools($form);
+
 
         $form->display(__('ID'));
         $form->image('img', trans('image'));

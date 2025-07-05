@@ -153,7 +153,7 @@ class GiftController extends MainController
         });
         $grid->column('vip_level', __('level_num'));
 
-        
+
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
             $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         }
@@ -171,24 +171,24 @@ class GiftController extends MainController
             /** @var Gift $this */
             $imgPath = getImagePath($path);
             $defaultImage = asset("images/image.png");
-        
+
             if (!isImageExists($imgPath)) {
                 $imgPath = $defaultImage;
             }
-        
+
             $musicIcon = '';
             if ($this->music_gift == 1) {
                 $musicIcon = "<img src='" . asset('images/music.jpg') . "' 
                     style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
                     background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>";
             }
-        
+
             return "<div style='position: relative; display: inline-block;'>
                         <img src='" . $imgPath . "' style='width: 70px; height: 70px;' class='img img-thumbnail' />
                         $musicIcon
                     </div>";
         });
-        
+
         $grid->column('show_img', trans('show_img'))->display(function ($path) {
             /** @var Gift $this */
             $url = getImagePath($path);
@@ -197,7 +197,7 @@ class GiftController extends MainController
         $grid->column("use_count", __('use count'));
         // $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
         // $grid->vip_level(__('vip_level'));
-      //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
+        //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
         $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
         //        $grid->column('international_gift',trans ('international_gift'))->switch (Common::getSwitchStatesGiftINtrnahional());
@@ -248,13 +248,15 @@ class GiftController extends MainController
     protected function form()
     {
         $form = new TabsFrom(new Gift);
+        $this->disableFormTools($form);
+
         $form->display(__('ID'));
         $form->text('name', __('name'));
 
         $form->select('type', __('type'))->options(
             translate(TYPE_GIFT)
         )
-            ->when(6, function() use ($form) {
+            ->when(6, function () use ($form) {
                 $form->number('luckyGift.win_probability', __('win probability'))
                     ->min(10)->max(100)
                     ->placeholder(__('Enter win probability'))
@@ -265,24 +267,24 @@ class GiftController extends MainController
                 $probabilityTimes3 = \Cache::get('probability_times_3', []);
 
                 $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
-                    ->help('<span id="min_percent_display">'.'[' .implode(', ', $probabilityTimes1) . '] - ' . __('percentage_chash_back') .  '</span>')
+                    ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('percentage_chash_back') .  '</span>')
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
-                
+
                 $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
-                    ->help('<span id="mid_percent_display">'.'[' .implode(', ', $probabilityTimes2). ' ]- ' . __('percentage_chash_back') .  '</span>')
+                    ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . ' ]- ' . __('percentage_chash_back') .  '</span>')
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
-                
+
                 $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
-                    ->help('<span id="max_percent_display">'.'[' .implode(', ', $probabilityTimes3) .'] - ' . __('percentage_chash_back') .  '</span>')
+                    ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('percentage_chash_back') .  '</span>')
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
-        
-                    $form->html(<<<'HTML'
+
+                $form->html(<<<'HTML'
                     <script>
                         (function () {
                             const fields = ['min_percentag', 'mid_percentag', 'max_percentag'];
@@ -340,11 +342,8 @@ class GiftController extends MainController
                         </script>
 
                     HTML);
-                    
-                    
-                    
             })
-            ->when(9, function() use ($form) {
+            ->when(9, function () use ($form) {
                 $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
             });
 
@@ -366,14 +365,14 @@ class GiftController extends MainController
             ]
         )->required();
 
-   
-        
-        
-        
-        
+
+
+
+
+
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
         $form->saving(function (Form $form) {
-           
+
             if ($form->model()->type != "6") {
                 $type = $form->input('type');
                 $win_probability = $form->input('luckyGift.win_probability');

@@ -37,7 +37,7 @@ class BoxUseController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->header(trans('admin.detail'))
             ->description(trans('admin.description'))
             ->body($this->detail($id)));
@@ -52,7 +52,7 @@ class BoxUseController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
             ->body($this->form()->edit($id)));
@@ -193,7 +193,8 @@ class BoxUseController extends MainController
         $grid->users_num(__('users_num'));
         $grid->column('type', __('Type'))->display(function ($value) {
             return $value == 1 ? __('type_global') : __('type_local');
-        });        $grid->label(__('label'));
+        });
+        $grid->label(__('label'));
         $grid->used_num(__('used_num'));
         $grid->not_used_num(__('not_used_num'));
 
@@ -240,6 +241,8 @@ class BoxUseController extends MainController
     protected function form()
     {
         $form = new Form(new BoxUse);
+        $this->disableFormTools($form);
+
 
         $form->display('ID');
         $form->text('box_id', 'box_id');

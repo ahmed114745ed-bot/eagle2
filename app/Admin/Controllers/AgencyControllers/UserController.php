@@ -97,6 +97,8 @@ class UserController extends MainController
     protected function form()
     {
         $form = new Form(new User());
+        $this->disableFormTools($form);
+
         if ($form->isEditing()) {
             $userId           = request()->route('user');
             $user             = User::findOrFail($userId);

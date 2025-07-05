@@ -204,6 +204,8 @@ class WeeklyCpGiftController extends MainController
     protected function form()
     {
         $form = new Form(new WeeklyCpGift());
+        $this->disableFormTools($form);
+
         $form->hidden('weekly_cp_id')->value(request('weekly_cp_id'));
         $form->hidden('level')->value(request('level'));
 
@@ -252,7 +254,7 @@ class WeeklyCpGiftController extends MainController
         $form->saved(function (Form $form) {
 
 
-            $route = url('admin/weekly-cp-gift/'.request('weekly_cp_id'));
+            $route = url('admin/weekly-cp-gift/' . request('weekly_cp_id'));
             return redirect($route);
         });
 

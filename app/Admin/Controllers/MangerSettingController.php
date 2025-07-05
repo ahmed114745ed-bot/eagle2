@@ -134,27 +134,29 @@ class MangerSettingController extends MainController
         $result->delete();
         return back();
     }
-    public function editPaymentGateway($id,Content $content)
+    public function editPaymentGateway($id, Content $content)
     {
         $gateway = PaymentGateway::findOrFail($id);
 
-        return parent::edit($id,$content
-        ->body($this->editForm()->edit($id)));
+        return parent::edit($id, $content
+            ->body($this->editForm()->edit($id)));
         // view('paymentGatewayEdit', compact('gateway'));
     }
-    
+
     protected function editForm()
     {
         $form = new Form(new PaymentGateway);
+        $this->disableFormTools($form);
+
         // $form->setMethod('PUT');
         $form->setAction(route('admin.update-payment-gateway', ['id' => request()->route('id')]));
-        
+
         $form->display(__('ID'));
         $form->text('title', __('title'));
         $form->image('photo', trans('image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
-    
+
         return $form;
     }
 
@@ -177,10 +179,11 @@ class MangerSettingController extends MainController
         return redirect('/admin/agency-setting-manger');
     }
 
-    public function createPaymentGateway(Content $content){
+    public function createPaymentGateway(Content $content)
+    {
         return $content
-        ->title(title: trans('Payment Gateways'))
-        ->body($this->form());
+            ->title(title: trans('Payment Gateways'))
+            ->body($this->form());
         // ->view('paymentGatewayCreate');
     }
     protected function form()
@@ -193,11 +196,12 @@ class MangerSettingController extends MainController
         $form->image('photo', trans('image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
-    
+
         return $form;
     }
 
-    public function storePaymentGateway(){
+    public function storePaymentGateway()
+    {
 
         $title = request('title');
         $photo = Common::upload('images', request('photo'));
@@ -209,6 +213,4 @@ class MangerSettingController extends MainController
 
         return redirect('/admin/agency-setting-manger');
     }
-
- 
 }
