@@ -293,6 +293,7 @@ class ReportMomentController extends MainController
     protected function form()
     {
         $form = new Form(new ReportMoment());
+        $this->disableFormTools($form);
 
         $form->number('moment_id', __('Moment id'));
         $form->number('Reporter_id', __('Reporter id'));

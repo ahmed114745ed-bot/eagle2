@@ -34,7 +34,7 @@ class ExchangeController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('Exchanges'))
             ->body($this->detail($id)));
     }
@@ -48,7 +48,7 @@ class ExchangeController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Exchanges'))
             ->body($this->form()->edit($id)));
     }
@@ -96,7 +96,7 @@ class ExchangeController extends MainController
         });
 
         $grid->column('type', __('type'));
-        $this->extendGrid ($grid);
+        $this->extendGrid($grid);
         $grid->disableExport();
 
         return $grid;
@@ -112,10 +112,10 @@ class ExchangeController extends MainController
     {
         $show = new Show(Exchange::findOrFail($id));
 
-//        $show->field('id', __('ID'));
-//        $show->field('created_at', __('Created at'));
-//        $show->field('updated_at', __('Updated at'));
-        $this->extendShow ($show);
+        //        $show->field('id', __('ID'));
+        //        $show->field('created_at', __('Created at'));
+        //        $show->field('updated_at', __('Updated at'));
+        $this->extendShow($show);
         return $show;
     }
 
@@ -127,14 +127,15 @@ class ExchangeController extends MainController
     protected function form()
     {
         $form = new Form(new Exchange());
+        $this->disableFormTools($form);
 
         $form->display('id', __('ID'));
         $form->number('diamonds', __('diamonds'));
         $form->number('value', __('value'));
-        $form->select('type', __('type'))->options (
+        $form->select('type', __('type'))->options(
             [
-                0=>__('coin'),
-                1=>__('silver'),
+                0 => __('coin'),
+                1 => __('silver'),
             ]
         );
 

@@ -114,6 +114,7 @@ class LanguageController extends MainController
     protected function form()
     {
         $form = new Form(new Language());
+        $this->disableFormTools($form);
 
         $form->text('name', __('Name'));
         $form->text('code', __('Code'));
