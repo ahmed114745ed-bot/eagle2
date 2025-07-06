@@ -680,66 +680,10 @@ class Common
            
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
             //make group and get token
-            foreach (collect($tokens)->chunk(100) as $chunk) {
-                foreach ($chunk as $tokenItem) {
-                    $userData = [];
-                    if ($user) {
-                        $userData = [
-                            'user_id' => $user->id,
-                            'name' => $user->name,
-                            'uuid' => $user->uuid,
-                            'has_color_name' => self::hasInPack($user->id, 18, true),
-                            'image' => $user->profile->avatar ?? '',
-                        ];
-                    }
-        
-                    $payload = [
-                        'token' => $tokenItem,
-                        'notification' => $notification,
-                        'data' => [
-                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                            'message-type' => json_encode($messageType ?? ''),
-                            'data' => !empty($data) ? json_encode($data) : "",
-                        ],
-                    ];
-        
-                    if (!empty($userData)) {
-                        $payload['data']['user'] = json_encode($userData);
-                    }
-        
-                    if (isset($data['image']) && !empty($data['image'])) {
-                        $payload['notification']['image'] = $data['image'];
-                    }
-        
-                    $headers = [
-                        'Authorization' => 'Bearer ' . $api_access_key,
-                        'Content-Type' => 'application/json',
-                    ];
-        
-                    $projectId = env('FIREBASE_PROJECT_NAME');
-        
-                    $response = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
-                        'message' => $payload
-                    ]);
-        
-                    \Log::info('FCM Response', [
-                        'token' => $tokenItem,
-                        'status' => $response->status(),
-                        'body' => $response->body(),
-                    ]);
-                }
-            }
-        
-            $token = 'SENT_WITH_CHUNK';
+
+            $token = self::makeGroup($tokens, $key,  $api_access_key);
+           
             $isGroup = true;
-
-
-            // $token = self::makeGroup($tokens, $key,  $api_access_key);
-            // dispatch(new SendFirebaseNotificationJob(
-            //     $tokens, $title, $body, $data, $messageType, $user, $action, $type, $id, $notification_type
-            // ));
-            // $token = 'DISPATCHED_IN_JOB';
-            // $isGroup = true;
         }
 
         if ($user) {
@@ -803,34 +747,60 @@ class Common
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
     {
-        $url = 'https://fcm.googleapis.com/fcm/notification';
-        $senderId = config("app.senderId");
+        // $url = 'https://fcm.googleapis.com/fcm/notification';
+        // $senderId = config("app.senderId");
 
-        if ($registrationIds == null) return;
+        // if ($registrationIds == null) return;
+        // $headers = [
+        //     'Content-Type: application/json',
+        //     'access_token_auth: true',
+        //     'Authorization: Bearer ' . $accessToken,
+        //     'project_id: ' . $senderId,
+        // ];
+
+        // $payload = [
+        //     'operation' => $operation,
+        //     'notification_key_name' => $notificationKeyName,
+        //     'registration_ids' => $registrationIds,
+        // ];
+
+        // $ch = curl_init();
+
+        // curl_setopt($ch, CURLOPT_URL, $url);
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // $response = curl_exec($ch);
+
+        // curl_close($ch);
+
+        $url = "https://iid.googleapis.com/iid/v1:batchAdd";
+
         $headers = [
-            'Content-Type: application/json',
-            'access_token_auth: true',
             'Authorization: Bearer ' . $accessToken,
-            'project_id: ' . $senderId,
+            'Content-Type: application/json',
         ];
-
+    
         $payload = [
-            'operation' => $operation,
-            'notification_key_name' => $notificationKeyName,
-            'registration_ids' => $registrationIds,
+            'to' => '/topics/' . $notificationKeyName,
+            'registration_tokens' => $registrationIds,
         ];
-
+    
         $ch = curl_init();
-
+    
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
+    
         $response = curl_exec($ch);
-
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+
         if (!curl_errno($ch)) {
 
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
