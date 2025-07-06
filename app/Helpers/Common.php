@@ -795,9 +795,8 @@ class Common
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-    
+        $topicName = time();
         // ✅ إنشاء topic ثابت مثلاً لكل إشعارات النظام
-        $topicName = 'remove-ban-user';
     
         // ✅ اشترك جميع التوكنات في التوبيك (مرة واحدة تكفي)
         self::subscribeToTopic($tokens, $topicName);
