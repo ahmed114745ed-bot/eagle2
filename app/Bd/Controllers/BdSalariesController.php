@@ -112,7 +112,9 @@ class BdSalariesController extends AdminController
         
         $grid->column('agency.name', trans('agency'))->display(function () {
             $agency = $this->agency;
-    
+            if (request()->filled('_export_')) {
+                return $agency?->name;
+            }
             if (!$agency) {
                 return "<span style='color:red;'>No agency</span>";
             }
