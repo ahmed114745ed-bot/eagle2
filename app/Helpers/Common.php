@@ -757,10 +757,11 @@ class Common
                     'title' => $title,
                     'body' => $body,
                 ],
-                'data' => array_merge([
+              'data' => [
                     'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    'message_type' => $messageType,
-                ], $data),
+                    'msg_type' => 'group_notification',
+                    'custom_key_1' => 'value1',
+                ],
             ],
         ];
 
@@ -773,7 +774,6 @@ class Common
             ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
          
             
-            // أو يمكنك طباعتها مؤقتاً على الشاشة أثناء التطوير
             dd([
                 'status' => $response->status(),
                 'success' => $response->successful(),
