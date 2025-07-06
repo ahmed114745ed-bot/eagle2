@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Support\Renderable;
 use Modules\Achievement\Entities\Achievement;
-use Modules\DailyPrize\Entities\DailyGift;
 use Modules\DailyPrize\Entities\DailyUserGift;
 use Modules\DailyPrize\Entities\DailyGiftCount;
 use Modules\Achievement\Entities\UserAchievement;
@@ -39,20 +38,32 @@ class DailyGiftController extends Controller
 
         (new DailyPrizeService())->reset(Carbon::createFromTimestamp($user->real_online_time), $user->id);
 
-        // $currentDay= $this->getCurrentDay();
-        $currentDay= $this->current_week();
-      
+        $currentDay= $this->getCurrentDay();
+
         $result=DailyGiftCount::query()->where('user_id',$user->id)->first();
 
         $check_received=DailyGiftCount::query()->where('user_id',$user->id)->where("day_count",$currentDay)->first();
         $data=[
             'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
-            'gift'          => $this->getGift($currentDay) ??null,
+            'gift'          => $this->getWeekGifts(),
             'is_received'   => $check_received != null ? true : false,
         ];
         return Common::apiResponse(1, '', $data);
     }
 
+    public function getWeekGifts()
+    {
+        $gifts = [];
+
+        for ($day = 1; $day <= 7; $day++) {
+            $gifts[] = [
+                'day' => $day,
+                'gift' => $this->getGift($day),
+            ];
+        }
+
+        return $gifts;
+    }
     public function receive_daily_prize()
     {
         $user = Auth::user();
@@ -101,7 +112,6 @@ class DailyGiftController extends Controller
 
         return $currentDay;
     }
-
     public function assignGiftToUser(mixed $type, \App\Models\Admin|\Illuminate\Contracts\Auth\Authenticatable|null $user, mixed $target, mixed $expire): void
     {
         if ($type == "coins") {
@@ -142,38 +152,4 @@ class DailyGiftController extends Controller
         $data=$this->dailyPrizeService->getDayGift($currentDay);
         return  $data!=null? new WeeklyStarGift($data) :null;
     }
-
-
-    public function current_week()
-{
-    $user = Auth::user();
-
-    // احسب اليوم الحالي
-    $currentDay = $this->getCurrentDay(); // موجودة لديك مسبقًا
-    $result     = DailyGiftCount::where('user_id', $user->id)->first();
-
-    $days = [];
-
-    for ($i = 1; $i <= 7; $i++) {
-        $check_received = false;
-
-        if ($result && $result->day_count >= $i) {
-            if ($i < $currentDay || ($i == $currentDay && !$this->dailyPrizeService->isNewDay($user->id))) {
-                $check_received = true;
-            }
-        }
-
-        $days[] = [
-            'day_number'  => $i,
-            'is_today'    => ($i == ($currentDay % 7 == 0 ? 7 : $currentDay % 7)),
-            'is_received' => $check_received,
-            'gift'        => $this->getGift($i) ?? null,
-        ];
-    }
-
-    return Common::apiResponse(1, '', [
-        'current_day' => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
-        'week_days'   => $days
-    ]);
-}
 }
