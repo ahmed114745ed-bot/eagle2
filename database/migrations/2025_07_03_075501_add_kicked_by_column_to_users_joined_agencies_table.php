@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users_joined_agencies', function (Blueprint $table) {
-            $table->foreignId('kicked_by_app')->nullable()->constrained('users')->cascadeOnUpdate();
-            $table->foreignId('kicked_by_admin')->nullable()->constrained('admin_users')->cascadeOnUpdate();
+            if (!Schema::hasColumn('users_joined_agencies', 'kicked_by_app')) {
+                $table->foreignId('kicked_by_app')->nullable();
+            }
+
+            if (!Schema::hasColumn('users_joined_agencies', 'kicked_by_admin')) {
+                $table->foreignId('kicked_by_admin')->nullable();
+            }
         });
     }
 
@@ -23,7 +28,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users_joined_agencies', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('users_joined_agencies', 'kicked_by_app')) {
+                $table->dropColumn('kicked_by_app');
+            }
+
+            if (Schema::hasColumn('users_joined_agencies', 'kicked_by_admin')) {
+                $table->dropColumn('kicked_by_admin');
+            }
         });
     }
 };

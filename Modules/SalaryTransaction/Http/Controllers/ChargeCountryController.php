@@ -81,9 +81,16 @@ class ChargeCountryController extends MainController
         $grid->column('country.e_name',trans('english name'));
         $grid->column('country.phone_code',trans('phone code'));
         $grid->column('country.language',trans ('language'));
-        $grid->column ('country.flag',trans ('flag'))->image ('',30);
+        $grid->column('country.flag', __('flag'))
+            ->display(function ($value) {
+                if (request()->filled('_export_')) {
+                    return '=IMAGE("' . getImagePath($value) . '","flag",1)';
+                }
 
-        $this->extendGrid ($grid);
+                $url = getImagePath($value);
+                return "<img src=\"{$url}\" style=\"max-height:30px\" class=\"img img-thumbnail\" />";
+            });
+        $this->extendGrid($grid);
 
         return $grid;
     }
