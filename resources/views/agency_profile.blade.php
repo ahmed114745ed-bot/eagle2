@@ -956,6 +956,10 @@
                         <div class="stat-value">{{ truncateAndTrim(@$agency->salary ?? 0) }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ truncateAndTrim(@$diamondsHosts ?? 0) }}</div>
+                        <div class="stat-label">{{__("diamonds")}}</div>
+                    </div>
 
                 </div>
             </div>
@@ -1148,6 +1152,7 @@
                                         <th>#</th>
                                         <th>{{ __('Member') }}</th>
                                         <th>{{ __('Reals') }}</th>
+                                        <th>{{ __('Moments') }}</th>
                                         <th>{{ __('Live Hours') }}</th>
                                         <th>{{ __('Monthly DI') }}</th>
                                         <th>{{ __('Salary') }}</th>
@@ -1165,6 +1170,17 @@
                                                 ->where('id', $member->agency_id)
                                                 ->exists();
                                             $showUrl = $member ? url("admin/users/{$member->id}") : "#";
+                                             $moment = App\Helpers\Common::getUserMediaStats($member->id, 'moment') ?? [];
+                                                        $reel = App\Helpers\Common::getUserMediaStats($member->id, 'reel') ?? [];
+
+                                                        $momentUpload = $moment['upload'] ?? '0/0';
+                                                        $momentLikes = $moment['likes'] ?? '0/0';
+                                                        $momentComments = $moment['comments'] ?? '0/0';
+
+                                                        $reelUpload = $reel['upload'] ?? '0/0';
+                                                        $reelLikes = $reel['likes'] ?? '0/0';
+                                                        $reelComments = $reel['comments'] ?? '0/0';
+
                                         @endphp
 
                                         <tr>
@@ -1180,7 +1196,24 @@
                                                     <small>UID: {{ @$member->uuid ?? '' }}</small>
                                                 </div>
                                             </td>
-                                            <td>{{ count($member->reals) ?? 0 }}</td>
+                                                        <td>
+                                                            <div style="line-height: 1.6;">
+                                                                <ul style="margin-left: 8px; width: 141px;">
+                                                                    <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
+                                                                    <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
+                                                                    <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div style="line-height: 1.6;">
+                                                                <ul style="margin-left: 8px; width: 141px;">
+                                                                    <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
+                                                                    <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
+                                                                    <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
                                             <td>{{ $member->liveTime->sum("hours") }}</td>
                                             <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
                                             <td>{{ $member->salary_without_cut_amount ?? 0 }}</td>
@@ -1971,8 +2004,9 @@
                                                             {{ $target->next_diamond ?? 0 }}
                                                         </span>
                                                     </td>
-                                                    <td>{{ ($target->user_hours ?? 0) . '/' . ($target->target_hours ?? 0) }}</td>
+                                                   
                                                     <td>{{ ($target->user_days ?? 0) . '/' . ($target->target_days ?? 0) }}</td>
+                                                    <td>{{ ($target->user_hours ?? 0) . '/' . ($target->target_hours ?? 0) }}</td>
                                                     <td>
                                                             <div style="line-height: 1.6;">
                                                                 <ul style="margin-left: 8px; width: 141px;">

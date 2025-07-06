@@ -385,6 +385,7 @@ class VipController extends MainController
     protected function form()
     {
         $form = new Form(new Vip());
+        $this->disableFormTools($form);
 
         $tabToTypeMap = [
             'Appsender' => 2,   // honor

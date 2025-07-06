@@ -90,6 +90,7 @@ class ChargeAgencyController extends MainController
     protected function form()
     {
         $form = new Form(new EntitiesChargeAgency);
+        $this->disableFormTools($form);
 
         $form->display(__('admin.ID'));
         $form->select('agency_id', __('agency'))->options (function (){

@@ -99,9 +99,9 @@ class SpecialHistoryController extends MainController
                 </div>
             ';
         });
-          $grid->column('ware.value', __('value'))->display(function ($coin) {
+        $grid->column('ware.value', __('value'))->display(function ($coin) {
             $icon = asset('images/coin.png'); // Ensure this path is correct
-            return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
+            return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
         });
         $grid->column('ware.show_img', __('image'))->display(function ($path) {
             /** @var Ware $this */
@@ -119,7 +119,7 @@ class SpecialHistoryController extends MainController
             ->display(function ($value) {
                 return Carbon::parse($value)->format('Y-m-d');
             });
-//        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
+        //        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableEdit();
             $actions->disableView();
@@ -163,6 +163,7 @@ class SpecialHistoryController extends MainController
     protected function form()
     {
         $form = new Form(new SpecialHistory());
+        $this->disableFormTools($form);
 
         $form->switch('status', __('Status'));
         $form->number('user_id', __('User id'));

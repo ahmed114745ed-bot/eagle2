@@ -190,7 +190,8 @@ class TicketController extends MainController
     protected function form()
     {
         $form = new Form(new Ticket);
-
+        $this->disableFormTools($form);
+        
         $form->display('ID');
 //        $form->text('user_id', 'user_id');
         $form->text('contact_num', __('contact'));

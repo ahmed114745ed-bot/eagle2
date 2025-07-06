@@ -42,7 +42,7 @@ class RewardLevelIntervalController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('Level Gifts'))
             ->body($this->detail($id)));
     }
@@ -58,7 +58,7 @@ class RewardLevelIntervalController extends MainController
     {
         $id = request()->route('id');
 
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Level Gifts'))
             ->body($this->form()->edit($id)));
     }
@@ -85,21 +85,20 @@ class RewardLevelIntervalController extends MainController
     {
         $level_interval = request('level_interval_id');
         $grid = new Grid(new RewardLevelInterval());
-        $grid->model()->where('level_interval_id',$level_interval);
+        $grid->model()->where('level_interval_id', $level_interval);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('gift_id', __('Gifts'))->display(function (){
-            if ($this->type == "ware"){
+        $grid->column('gift_id', __('Gifts'))->display(function () {
+            if ($this->type == "ware") {
                 return @$this->ware->name;
-            }elseif ($this->type == "vip"){
+            } elseif ($this->type == "vip") {
                 return @$this->vip->name;
-            }elseif ($this->type == "coins"){
+            } elseif ($this->type == "coins") {
                 return @$this->target;
-            }elseif ($this->type == "achievement"){
+            } elseif ($this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
             }
-
         });
 
         return $grid;
@@ -130,43 +129,44 @@ class RewardLevelIntervalController extends MainController
     protected function form()
     {
         $form = new Form(new RewardLevelInterval());
+        $this->disableFormTools($form);
 
         $form->hidden('level_interval_id')->value(request('level_interval_id'));
-        $form->select('type', trans('type'))->options(["ware" => __('ware'),"vip" => __('vip'), "coins" => __('coins'),"achievement" => __('achievement')])
-            ->when("ware" ,function () use ($form){
-                $form->select('target1', trans('wares'))->options(function (){
-                    $ops = [0=>''];
-                    $wares = Ware::query()->select(['id','name', 'type'])->whereIn('type',[4,5,6])->get();
-                    foreach ($wares as  $ware){
-                        $ops[$ware->id]=$ware->name.'_'.$ware->id;
+        $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
+            ->when("ware", function () use ($form) {
+                $form->select('target1', trans('wares'))->options(function () {
+                    $ops = [0 => ''];
+                    $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
+                    foreach ($wares as  $ware) {
+                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
 
                         if ($ware->type == 4) {
-                            $ops[$ware->id] .='_' .'frame';
+                            $ops[$ware->id] .= '_' . 'frame';
                         } elseif ($ware->type == 5) {
-                            $ops[$ware->id] .= '_' .'bubble';
+                            $ops[$ware->id] .= '_' . 'bubble';
                         } elseif ($ware->type == 6) {
-                            $ops[$ware->id] .= '_' .'intro';
+                            $ops[$ware->id] .= '_' . 'intro';
                         }
                     }
                     return $ops;
                 });
             })
-        ->when("vip",function () use ($form){
-            $form->select('target2', trans('vips'))->options(function (){
-                $vips = OVip::query()->select('id','name')->get();
-                foreach ($vips as  $vip){
-                    $ops[$vip->id]=$vip->name;
-                }
-                return $ops;
+            ->when("vip", function () use ($form) {
+                $form->select('target2', trans('vips'))->options(function () {
+                    $vips = OVip::query()->select('id', 'name')->get();
+                    foreach ($vips as  $vip) {
+                        $ops[$vip->id] = $vip->name;
+                    }
+                    return $ops;
+                });
+            })
+            ->when("coins", function () use ($form) {
+                $form->number("target3", __("coins"));
+            })->when("achievement", function () use ($form) {
+                $form->image("target4", __('image'))->name(function ($file) {
+                    return now()->timestamp . '.' . $file->guessExtension();
+                });
             });
-        })
-         ->when("coins",function () use ($form){
-            $form->number("target3",__("coins"));
-        })->when("achievement",function () use ($form){
-            $form->image("target4", __('image'))->name(function ($file) {
-                return now()->timestamp.'.'.$file->guessExtension();
-            });
-        });
         return $form;
     }
-    }
+}

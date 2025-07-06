@@ -16,9 +16,7 @@ class FamilyLevelController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'families-level';
-    public $hiddenColumns = [
-
-    ];
+    public $hiddenColumns = [];
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("families");
@@ -61,8 +59,8 @@ class FamilyLevelController extends MainController
     {
         $grid = new Grid(new FamilyLevel);
 
-        $grid->id( __ ('ID'));
-        $grid->column('name',__ ('level'))->display(function ($name) {
+        $grid->id(__('ID'));
+        $grid->column('name', __('level'))->display(function ($name) {
             $path = @$this->img;
             $defaultImage = asset("images/level.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -80,16 +78,16 @@ class FamilyLevelController extends MainController
             </div>
         ";
         });
-        $grid->column('exp',__ ('exp'));
-        $grid->column('members',__ ('members'));
-        $grid->column('admins',__ ('admins'));
+        $grid->column('exp', __('exp'));
+        $grid->column('members', __('members'));
+        $grid->column('admins', __('admins'));
 
 
-        $grid->actions (function ($actions){
+        $grid->actions(function ($actions) {
             $actions->disableView();
         });
         $grid->disableExport();
-        $this->extendGrid ($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -103,14 +101,14 @@ class FamilyLevelController extends MainController
     {
         $show = new Show(FamilyLevel::findOrFail($id));
 
-//        $show->id('ID');
-//        $show->name('name');
-//        $show->img('img');
-//        $show->exp('exp');
-//        $show->type('type');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow ($show);
+        //        $show->id('ID');
+        //        $show->name('name');
+        //        $show->img('img');
+        //        $show->exp('exp');
+        //        $show->type('type');
+        //        $show->created_at(trans('admin.created_at'));
+        //        $show->updated_at(trans('admin.updated_at'));
+        $this->extendShow($show);
         return $show;
     }
 
@@ -122,16 +120,18 @@ class FamilyLevelController extends MainController
     protected function form()
     {
         $form = new Form(new FamilyLevel);
+        $this->disableFormTools($form);
 
-        $form->display( __ ('ID'));
+
+        $form->display(__('ID'));
         $form->text('name', __('name'));
         $form->image('img', __('img'));
         $form->number('exp', __('exp'));
         $form->number('members', __('members'));
         $form->number('admins', __('admins'));
-//        $form->text('type', 'type');
-//        $form->display(trans('admin.created_at'));
-//        $form->display(trans('admin.updated_at'));
+        //        $form->text('type', 'type');
+        //        $form->display(trans('admin.created_at'));
+        //        $form->display(trans('admin.updated_at'));
 
         return $form;
     }

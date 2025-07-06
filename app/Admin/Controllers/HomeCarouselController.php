@@ -112,6 +112,7 @@ class HomeCarouselController extends MainController
     protected function form()
     {
         $form = new Form(new HomeCarousel);
+        $this->disableFormTools($form);
 
         $form->display(__('admin.ID'));
         $form->number('sort', __('sort'));

@@ -36,7 +36,7 @@ class PageController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('Pages'))
             ->body($this->detail($id)));
     }
@@ -50,7 +50,7 @@ class PageController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Pages'))
             ->body($this->form()->edit($id)));
     }
@@ -94,7 +94,7 @@ class PageController extends MainController
             // For simplicity, let's just return the entire decoded content
             return $decodedContent;
         });
-       $this->extendGrid($grid);
+        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -127,7 +127,7 @@ class PageController extends MainController
     protected function form()
     {
         $form = new Form(new Page);
-
+        $this->disableFormTools($form);
         $form->display('ID');
         // $form->text('type', __('type'));
         $form->text('name', __('name_en'));

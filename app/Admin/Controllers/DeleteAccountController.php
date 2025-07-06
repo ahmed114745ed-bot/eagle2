@@ -107,6 +107,7 @@ class DeleteAccountController extends MainController
     protected function form()
     {
         $form = new Form(new DeleteAccount());
+        $this->disableFormTools($form);
         $form->textarea('title', __('Title'))->required();
         $form->image('image', __('Image'))->required();
 

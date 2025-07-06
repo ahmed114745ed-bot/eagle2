@@ -133,6 +133,7 @@ class BoxController extends MainController
     protected function form()
     {
         $form = new Form(new Box);
+        $this->disableFormTools($form);
 
         $form->display(__('ID'));
         $form->select('type', __('type'))

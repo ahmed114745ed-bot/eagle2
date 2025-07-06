@@ -120,6 +120,7 @@ class CountryController extends MainController
     protected function form()
     {
         $form = new Form(new Country);
+        $this->disableFormTools($form);
 
         $form->display(__ ('ID'));
         $form->text('name', trans('name'))->rules ('required');;
