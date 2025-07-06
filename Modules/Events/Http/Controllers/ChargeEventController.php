@@ -106,7 +106,7 @@ class ChargeEventController extends Controller
         $user = User::query()->withSum(['charges' => function ($query) use ($currentMonth) {
             $query->whereMonth('created_at', $currentMonth);
         }], 'amount')->withSum(['coinLogs' => function ($query) use ($currentMonth) {
-            $query->whereMonth('created_at', $currentMonth);
+            $query->whereMonth('created_at', $currentMonth)->where('status', 1);
         }], 'obtained_coins')->find(auth()->user()->id);
         if ($user->type_user == 3) {
             return Common::apiResponse(0, __('api_responses.notAllowed'));
