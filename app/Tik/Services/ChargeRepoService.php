@@ -107,6 +107,7 @@ class ChargeRepoService
                 (new UserAchievementService())->insertCharging($toUser, $coins);
             }
             UserCommon::UserEarnedInvitation($toUser->id, $coins);
+            UserCommon::addChargeLevel($toUser->id, $coins);
 
             return true;
         } catch (Exception $e) {
@@ -170,14 +171,14 @@ class ChargeRepoService
     {
         $charge = $this->chargeRepository->getChargeHistory($chargeType);
         if ($type === 'received') {
-            $charge = $charge/* ->where('user_type', $charger_type) */ ->where('user_id', $userId);
+            $charge = $charge/* ->where('user_type', $charger_type) */->where('user_id', $userId);
         }
         if ($type === 'sent') {
-            $charge = $charge/* ->where('charger_type', $charger_type) */ ->where('action_user_id', $userId);
+            $charge = $charge/* ->where('charger_type', $charger_type) */->where('action_user_id', $userId);
         }
 
         if ($searchKey !== null) {
-            $charge = $charge->when($searchKey, fn ($query) => $query->whereHas('sender', fn ($q) => $q->where('uuid', 'like', $searchKey)));
+            $charge = $charge->when($searchKey, fn($query) => $query->whereHas('sender', fn($q) => $q->where('uuid', 'like', $searchKey)));
         }
         if ($by_date) {
             $charge = $charge->where('created_at', 'like', "%$by_date%");
@@ -464,7 +465,6 @@ class ChargeRepoService
     public function getChargeAgencyHistory()
     {
         return $this->chargeRepository->getChargeToAgencyHistory();
-
     }
 
     private function handleAgencyCharge($authAgency, $request)
@@ -536,5 +536,6 @@ class ChargeRepoService
         }
 
         UserCommon::UserEarnedInvitation($receiver->id, $amount);
+        UserCommon::addChargeLevel($receiver->id, $amount);
     }
 }
