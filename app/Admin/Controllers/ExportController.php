@@ -50,12 +50,10 @@ class ExportController extends Controller
     }
     public function chargeAgencies()
     {
-        $search = request('search');
-        $agencyId = request('agency_id');
-        $month = request('month');
-        $year = request('year');
+        $uuid = request('owner')['uuid'] ?? null;
+        $id = request('id') ?? null;
 
-        $export = new ChargeAgencyExporter($agencyId, $month, $year, $search);
+        $export = new ChargeAgencyExporter($id, $uuid);
         $fileName = 'charge_agencies_' . now()->format('Y_m_d_His') . '.csv';
 
         return Excel::download($export, $fileName);

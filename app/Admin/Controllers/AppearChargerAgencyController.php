@@ -192,16 +192,8 @@ class AppearChargerAgencyController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->column('1/2', function ($filter) {
-                $filter->where(function ($query) {
-                    $input = $this->input;
-                    $query->whereHas('owner', function ($q) use ($input) {
-                        $q->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%")
-                            ->orWhere('phone', 'like', "%$input%");
-                    });
-                }, __('User'))->placeholder(__('Search by name , UUID , phone'));
-            });
+            $filter->like('owner.uuid', __('UUID'))->placeholder(__('Search by UUID'));
+
         });
 
 
@@ -294,13 +286,11 @@ class AppearChargerAgencyController extends MainController
         });
         $grid->disableExport();
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('charge-agency-export-report', [
-                'search' => request('search'),
-                'agency_id' => request('id'),
-                'month' => request('month'),
-                'year' => request('year'),
-            ]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
-
+            $query = request()->query(); // يحصل على كل الفلاتر المفعّلة في الصفحة
+            
+            $exportUrl = route('charge-agency-export-report') . '?' . http_build_query($query);
+           
+            $tools->append('<a href="' . $exportUrl . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
 
         return $grid;

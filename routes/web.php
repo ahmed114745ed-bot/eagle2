@@ -8,21 +8,15 @@ use App\Models\RoomVisitor;
 use App\Models\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
-use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomSettings;
-use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\UserController;
-use App\Http\Controllers\PaytabsController;
 use App\Http\Controllers\SettingsController;
-use Encore\Admin\Controllers\AdminController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
-use App\Admin\Controllers\ConfigController as ControllersConfigController;
-
 
 /*
 |--------------------------------------------------------------------------

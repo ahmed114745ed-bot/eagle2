@@ -36,6 +36,7 @@ use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Support\MessageBag;
 
 class AgencyController extends MainController
 {
@@ -154,22 +155,37 @@ class AgencyController extends MainController
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab', 'members');
+        $user = Auth::user();
 
-        $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+        $agency = Cache::remember("agency_{$id}", 600, function () use ($id,$user) {
             return Agency::query()
+                ->where('bd_id' ,$user->app_id )
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->find($id);
         });
 
         if (!$agency) {
-            $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+            $agency = Cache::remember("agency_{$id}", 600, function () use ($id ,$user) {
                 return ShippingAgency::query()
+                    ->where('bd_id' ,$user->app_id )
                     ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                     ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                     ->find($id);
             });
         }
+
+        if (!$agency) {
+            $error = new MessageBag([
+                'title'   => __('error_title_div'),
+                'message' => __('Agency not found'),
+            ]);
+    
+            session()->flash('error', $error);
+            throw new \Exception(__('Agency not found'));
+        }
+
+
 
         $path = $agency?->img;
         $defaultImage = asset("images/icon-agency.jpg");
@@ -485,7 +501,7 @@ class AgencyController extends MainController
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
