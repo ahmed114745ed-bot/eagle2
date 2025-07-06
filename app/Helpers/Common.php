@@ -797,7 +797,7 @@ class Common
         }
     
         // ✅ إنشاء topic ثابت مثلاً لكل إشعارات النظام
-        $topicName = 'system_users_group';
+        $topicName = 'remove-ban-user';
     
         // ✅ اشترك جميع التوكنات في التوبيك (مرة واحدة تكفي)
         self::subscribeToTopic($tokens, $topicName);
