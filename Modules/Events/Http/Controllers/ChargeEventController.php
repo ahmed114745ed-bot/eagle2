@@ -101,6 +101,7 @@ class ChargeEventController extends Controller
 
     public function received_rewards(Request $request)
     {
+        return Common::apiResponse(0, __('معطل لبعض الوقت'));
         $currentMonth = now()->month;
 
         $user = User::query()->withSum(['charges' => function ($query) use ($currentMonth) {
