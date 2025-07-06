@@ -28,8 +28,8 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
     public function handle()
     {
-        \Log::info('Job started for token: ' . $this->tokens);
-
+       
+       
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
     
@@ -42,31 +42,36 @@ class SendFirebaseNotificationJob implements ShouldQueue
             $userData = [];
             if ($this->user) {
                 $userData = [
-                    'user_id' => $this->user->id,
-                    'name'    => $this->user->name,
-                    'uuid'    => $this->user->uuid,
+                    'user_id'        => $this->user->id,
+                    'name'           => $this->user->name,
+                    'uuid'           => $this->user->uuid,
                     'has_color_name' => Common::hasInPack($this->user->id, 18, true),
-                    'image'   => $this->user->profile->avatar,
+                    'image'          => $this->user->profile->avatar ?? '',
                 ];
             }
     
-            $payload = [
-                'token' => $token,
-                'notification' => $notification,
-                'data' => [
-                    'click_action'    => 'FLUTTER_NOTIFICATION_CLICK',
-                    'message-type'    => json_encode($this->messageType ?? ''),
-                    'data'            => json_encode($this->data),
-                    'action'          => $this->action,
-                    'type'            => $this->type,
-                    'id'              => $this->id,
-                    'notification_type' => $this->notification_type,
-                ],
+            $dataPayload = [
+                'click_action'       => 'FLUTTER_NOTIFICATION_CLICK',
+                'message-type'       => (string) ($this->messageType ?? ''),
+                'action'             => $this->action,
+                'type'               => $this->type,
+                'id'                 => $this->id,
+                'notification_type'  => $this->notification_type,
             ];
-    
-            if (!empty($userData)) {
-                $payload['data']['user'] = json_encode($userData);
+            
+            foreach ($this->data as $key => $value) {
+                $dataPayload[$key] = is_array($value) ? json_encode($value) : (string) $value;
             }
+            
+            if (!empty($userData)) {
+                $dataPayload['user'] = json_encode($userData); // ✅ user أيضاً لازم يكون نص
+            }
+            
+            $payload = [
+                'token'        => $token,
+                'notification' => $notification,
+                'data'         => $dataPayload,
+            ];
     
             if (isset($this->data['image'])) {
                 $payload['notification']['image'] = $this->data['image'];
@@ -82,10 +87,10 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 ['message' => $payload]
             );
     
-            \Log::info('FCM Response: ', [
-                'token' => $token,
+            \Log::info('FCM Response', [
+                'token'  => $token,
                 'status' => $response->status(),
-                'body' => $response->body(),
+                'body'   => $response->body(),
             ]);
         }
     }
