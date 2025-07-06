@@ -59,7 +59,7 @@ $grid->column('user_id', __('receiver'))->display(function () {
             return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
         });
 
-        $profileUrl = route('admin.agency.profile', ['id' => $info['uuid']]);
+        $profileUrl = route('bd.agency.profile', ['id' => $info['uuid']]);
 
                     return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -103,7 +103,7 @@ $grid->column('user_id', __('receiver'))->display(function () {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
 
-        $grid->column('usd', __('Usd'));
+        $grid->column('usd', __('usd'));
 
         $grid->disableCreateButton();
 
