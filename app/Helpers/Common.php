@@ -677,8 +677,10 @@ class Common
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
-
-            if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
+            $data = collect($data)->map(function ($value) {
+                return is_array($value) || is_object($value) ? json_encode($value) : (string) $value;
+            })->toArray();
+            // if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
             //make group and get token
             // $token = self::makeGroup($tokens, $key,  $api_access_key);
             dispatch(new SendFirebaseNotificationJob(
