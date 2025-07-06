@@ -81,7 +81,6 @@ class SendFirebaseNotificationJob implements ShouldQueue
             );
     
             \Log::info('FCM Response: ', [
-                'token' => $token,
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
