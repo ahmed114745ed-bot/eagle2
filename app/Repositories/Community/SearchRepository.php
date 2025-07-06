@@ -8,6 +8,7 @@ use App\Models\OfficialMessage;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,7 @@ class SearchRepository implements SearchRepositoryInterface
         }
     }
 
-    public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|Collection
+    public function searchRooms(int $userId, string $keywords, int $page = 1): array|Collection
     {
         // $user = User::searchByUuid($keywords)->first();
         $user = Auth::user();
