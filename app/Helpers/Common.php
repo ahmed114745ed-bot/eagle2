@@ -795,10 +795,8 @@ class Common
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-        $topicName = 'group_' . time();
-        // ✅ إنشاء topic ثابت مثلاً لكل إشعارات النظام
+        $topicName = 'system_test_topic';
     
-        // ✅ اشترك جميع التوكنات في التوبيك (مرة واحدة تكفي)
         self::subscribeToTopic($tokens, $topicName);
     
         $userData = [];
@@ -839,7 +837,8 @@ class Common
             'Authorization' => 'Bearer ' . $api_access_key,
             'Content-Type' => 'application/json',
         ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-    
+        self::unsubscribeFromTopic($tokens, $topicName);
+
         $status = $response->status();
         $body = $response->body();
     
@@ -856,6 +855,24 @@ class Common
         $accessToken = self::getGoogleAccessToken();
 
         $url = "https://iid.googleapis.com/iid/v1:batchAdd";
+        $headers = [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type'  => 'application/json',
+        ];
+
+        $body = [
+            'to' => "/topics/{$topic}",
+            'registration_tokens' => $registrationTokens,
+        ];
+
+        Http::withHeaders($headers)->post($url, $body);
+    }
+
+    public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
+    {
+        $accessToken = self::getGoogleAccessToken();
+
+        $url = "https://iid.googleapis.com/iid/v1:batchRemove";
         $headers = [
             'Authorization' => 'Bearer ' . $accessToken,
             'Content-Type'  => 'application/json',
