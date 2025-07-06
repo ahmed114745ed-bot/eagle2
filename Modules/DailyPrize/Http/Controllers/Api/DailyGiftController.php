@@ -58,7 +58,7 @@ class DailyGiftController extends Controller
         for ($day = 1; $day <= 7; $day++) {
             $gifts[] = [
                 'day' => $day,
-                'gift' => $this->getGift($day),
+                'gift' => $this->getGift($day) ?? '',
             ];
         }
 
