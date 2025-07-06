@@ -140,7 +140,7 @@ class RoleControllerNew extends MainController
      *
      * @return Form
      */
-    
+
     public function form($id = null)
     {
         $permissionModel = config('admin.database.permissions_model');
@@ -148,6 +148,7 @@ class RoleControllerNew extends MainController
         $roleModel = config('admin.database.roles_model');
 
         $form = new Form(new $roleModel());
+        $this->disableFormTools($form);
 
         // $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
 

@@ -118,6 +118,7 @@ class SilverController extends MainController
     protected function form()
     {
         $form = new Form(new Silver);
+        $this->disableFormTools($form);
 
         $form->display('ID');
         $form->number('coin', __('coin'));

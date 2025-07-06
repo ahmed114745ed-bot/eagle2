@@ -681,6 +681,7 @@ HTML);
     protected function form()
     {
         $form = new Form(new Room);
+        $this->disableFormTools($form);
 
         $form->display(__('ID'));
         $form->text('numid', __('numid'));

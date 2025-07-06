@@ -67,13 +67,13 @@ class VipPrivilegeController extends MainController
         $grid = new Grid(new VipPrivilege);
 
         $grid->id(__('admin.ID'));
-//        $grid->column('name', __('name'));
-//        $grid->column('en_name', __('en_name'));
+        //        $grid->column('name', __('name'));
+        //        $grid->column('en_name', __('en_name'));
         $grid->column('name', __('name'))
             ->display(function () {
                 return \App::isLocale('en') ? $this->en_name : $this->name;
             });
-//        $grid->column('title', __('title'));
+        //        $grid->column('title', __('title'));
         $grid->column('title', __('title'))
             ->display(function () {
                 return \App::isLocale('en') ? $this->en_title : $this->title;
@@ -117,6 +117,8 @@ class VipPrivilegeController extends MainController
     protected function form()
     {
         $form = new Form(new VipPrivilege);
+        $this->disableFormTools($form);
+
 
         // $form->display(__('admin.ID'));
         $form->text('name', __('name'));
@@ -131,7 +133,7 @@ class VipPrivilegeController extends MainController
                 5 => trans('Bubble Frame'),
                 6 => trans('Vehicle'),
                 // 7=>trans ('Microphone Aperture'),============
-               // 8 => trans('Badge'), // ask
+                // 8 => trans('Badge'), // ask
                 9 => trans('NoKick'),
                 10 => trans('Icon'),
                 // 11=>trans ('intro animation'),======

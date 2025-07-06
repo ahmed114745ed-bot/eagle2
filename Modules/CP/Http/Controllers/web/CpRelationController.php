@@ -30,7 +30,7 @@ class CpRelationController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('cp-relations'))
             ->body($this->detail($id)));
     }
@@ -44,7 +44,7 @@ class CpRelationController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('cp-relations'))
             ->body($this->form()->edit($id)));
     }
@@ -122,6 +122,8 @@ class CpRelationController extends MainController
     protected function form()
     {
         $form = new Form(new CpRelation());
+        $this->disableFormTools($form);
+
         $form->text('title', __('title'));
         $form->textarea('description', __('description'));
         $form->image('image', __('Img'));

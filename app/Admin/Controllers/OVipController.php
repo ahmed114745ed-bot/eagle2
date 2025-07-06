@@ -189,6 +189,8 @@ class OVipController extends MainController
         //        }
 
         $form = new Form(new OVip);
+        $this->disableFormTools($form);
+
         if (Session::has('show_alert_vip')) {
             $form->html('<script>
              $(document).ready(function () {
@@ -211,7 +213,7 @@ class OVipController extends MainController
 
             $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
         }
-        
+
         if (Admin::user()->can('*')) {
             $form->number('expire', __('expire'))->rules('required|numeric|gt:0');
         } else {
@@ -237,20 +239,20 @@ class OVipController extends MainController
                     if (!$type_preveleg) continue;
 
                     $type = $type_preveleg->type;
-             
+
                     if (in_array($type, $types)) {
-                    
-                        admin_error('خـطأ', 'لا يمكن اختيار أكثر من امتياز من نفس النوع: ' );
+
+                        admin_error('خـطأ', 'لا يمكن اختيار أكثر من امتياز من نفس النوع: ');
                         return back();
                     }
-            
+
                     $types[] = $type;
 
                     if (isset($type_preveleg->type)) {
 
                         $updateActive = Ware::where('type', $type_preveleg->type)->where('level', $level)->update([
                             'is_active_for_vip' => true
-                    ]);
+                        ]);
                         // if (!$updateActive) {
                         //     session()->flash('show_alert_vip', 'Your alert message');
                         //     return redirect()->back();

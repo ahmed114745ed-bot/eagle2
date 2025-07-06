@@ -22,37 +22,14 @@
                 ->whereHas('user', function ($q) {
                     $q->where('agency_id', '!=', 0);
                 })
-                ->select(DB::raw('sum(sallary) as totalTarget2'), DB::raw('sum(sallary - cut_amount) as totalSalary2'))
+                ->select(DB::raw('sum(sallary) as totalTarget2'), DB::raw('sum(achieved_diamond) as diamonds'))
                 ->first();
-            $userCutAmoubt = \App\Models\UserSallary::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
-                $query->where('user_id', @$user->id);
-            })
-                ->when(request()->has('agency_id') && request('agency_id') != null, function ($query) {
-                    $query->where('user_agency_id', request('agency_id'));
-                })
-                ->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
-                })
-                ->whereHas('user', function ($q) {
-                    $q->where('agency_id', '!=', 0);
-                })
-                ->select(DB::raw('sum(cut_amount) as totalPayments'))
-                ->first();
-            $totalDiamonds = \App\Models\UserTarget::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
-                $query->where('user_id', @$user->id);
-            })
-                // ->when(request()->has('agency_id') && request('agency_id') != null, function ($query) {
-                //     $query->where('agency_id', request('agency_id'));
-                // })
-                // ->where(function ($query) use ($year, $month) {
-                //     $query->where(DB::raw('concat(add_year,"-", add_month)'), '<=', $year . '-' . $month);
-                // })
-                ->sum(DB::raw('user_diamonds'));
+           
+            
             // @dump(request('agency_id'));
-            $diamons = $totalDiamonds ?? 0;
+            $diamons = $userSalaries->diamonds ?? 0;
             $targe = $userSalaries->totalTarget2 ?? 0;
-            $salary = $userSalaries->totalSalary2 ?? 0;
-            $payments = $userCutAmoubt->totalPayments ?? 0;
+           
 
         @endphp
         <div class="col my-1 form-Roles">
@@ -82,13 +59,22 @@
         @php
             $year = request('year');
             $month =request('month');
-            $agencySallary = \App\Models\AgencySallary::where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
-            })
-                ->when(request()->has('id') && request('id') != null, function ($query) {
-                    $query->where('agency_id', request('id'));
+            $agency = request('agency_or_uuid');
+            $agencySallary =  \App\Models\AgencySallary::
+           when(isset($month)&&isset($year),function ($query) use ($year, $month) {
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
                 })
-                ->select(DB::raw('sum(sallary) as totalTarget'), DB::raw('sum(cut_amount) as totalPayments'), DB::raw('sum(sallary - cut_amount) as totalSallary'))
+                ->when(isset($agency), function ($query) use ($agency) {
+                    $query->where('agency_id', $agency) // Match directly on agency_id
+                        ->orWhereHas('agency.owner', function ($subQuery) use ($agency) {
+                            $subQuery->where('uuid', $agency); // Match on related owner UUID
+                        });
+                })
+                ->select([
+                    DB::raw('SUM(sallary) as totalTarget'),
+                    DB::raw('SUM(cut_amount) as totalPayments'),
+                    DB::raw('SUM(sallary - cut_amount) as totalSallary')
+                ])
                 ->first();
             $targe = $agencySallary->totalTarget ?? 0;
             $salary = $agencySallary->totalSallary ?? 0;
@@ -97,7 +83,7 @@
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.total') }}</label>
 
-            <input type="text" class="form-control " id="target" name="target" value="{{ $targe }}" readonly>
+            <input type="text" class="form-control " id="target" name="target" value="{{truncateAndTrim( $targe) }}" readonly>
         </div>
 {{--        <br>--}}
 {{--        <div class=" col  my-1 form-Roles">--}}

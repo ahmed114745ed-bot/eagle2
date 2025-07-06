@@ -1194,7 +1194,7 @@ class User extends Authenticatable
                 ->orderByDesc('id')
                 ->sum(DB::raw('cut_amount'));
 
-            return floor($userSallary ?? 0);
+            return truncateAndTrim($userSallary ??0);
         }
 
         return 0;
@@ -1213,7 +1213,7 @@ class User extends Authenticatable
                 ->orderByDesc('id')
                 ->sum(DB::raw('sallary'));
 
-            return floor($userSallary ?? 0);
+            return truncateAndTrim($userSallary ?? 0);
         }
 
         return 0;
@@ -1232,7 +1232,7 @@ class User extends Authenticatable
                 ->orderByDesc('id')
                 ->sum(DB::raw('sallary - cut_amount'));
 
-            return floor($userSallary ?? 0);
+            return truncateAndTrim($userSallary);
         }
 
         return 0;

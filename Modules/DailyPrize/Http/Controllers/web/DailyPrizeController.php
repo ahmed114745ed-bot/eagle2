@@ -41,7 +41,7 @@ class DailyPrizeController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('daily login gift'))
             ->body($this->detail($id)));
     }
@@ -60,7 +60,7 @@ class DailyPrizeController extends MainController
 
         $form = $this->form()->edit($id);
 
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('daily login gift'))
             ->body($form));
     }
@@ -156,6 +156,8 @@ class DailyPrizeController extends MainController
     protected function form()
     {
         $form = new Form(new DailyGift());
+        $this->disableFormTools($form);
+
         $typeId = request()->route('type');
         $orderId = request()->route('id');
         $form->hidden('type')->value(request('type'));

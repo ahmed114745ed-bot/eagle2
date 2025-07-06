@@ -2,15 +2,16 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Models\Question;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
 
-class QuestionController extends AdminController
+
+class QuestionController extends MainController
 {
     public $permission_name = 'questions';
     public function index(Content $content)
@@ -29,7 +30,7 @@ class QuestionController extends AdminController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('questions'))
             ->body($this->detail($id)));
     }
@@ -43,7 +44,7 @@ class QuestionController extends AdminController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('questions'))
             ->body($this->form()->edit($id)));
     }
@@ -62,7 +63,7 @@ class QuestionController extends AdminController
         $grid->column('id', __('Id'));
         $grid->column('question', __('question'));
         $grid->column('answer', __('answer'));
-        $grid->column('status', __('status'))->switch (Common::getSwitchStates ());
+        $grid->column('status', __('status'))->switch(Common::getSwitchStates());
         $this->extendGrid($grid);
         return $grid;
     }
@@ -78,14 +79,16 @@ class QuestionController extends AdminController
         return $show;
     }
 
-   
+
     protected function form()
     {
         $form = new Form(new Question());
+        $this->disableFormTools($form);
+
 
         $form->text('question', __('question'))->required();
         $form->textarea('answer', __('answer'))->required();
-        $form->switch('status', __('status'))->states (Common::getSwitchStates ());
+        $form->switch('status', __('status'))->states(Common::getSwitchStates());
 
         return $form;
     }

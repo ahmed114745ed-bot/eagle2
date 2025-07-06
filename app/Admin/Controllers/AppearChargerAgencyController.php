@@ -333,6 +333,7 @@ class AppearChargerAgencyController extends MainController
     protected function form()
     {
         $form = new Form(new ShippingAgency());
+        $this->disableFormTools($form);
 
         // --- الحقول المشتركة ---
         $form->display('ID');

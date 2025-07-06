@@ -27,7 +27,7 @@ class WeeklyCpController extends MainController
     // {
     //     (new AppFeatureService)->validateStatusEnable("weekly_cp");
     // }
-    public function index ( Content $content )
+    public function index(Content $content)
     {
         return $content
             ->title(__($this->title))
@@ -39,7 +39,7 @@ class WeeklyCpController extends MainController
             });
     }
 
-    
+
     /**
      * Show interface.
      *
@@ -49,7 +49,7 @@ class WeeklyCpController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('weekly-cp'))
             ->body($this->detail($id)));
     }
@@ -63,7 +63,7 @@ class WeeklyCpController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('weekly-cp'))
             ->body($this->form()->edit($id)));
     }
@@ -96,15 +96,15 @@ class WeeklyCpController extends MainController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        $grid->column( 'Actions')->display(function () {
+        $grid->column('Actions')->display(function () {
             // توليد الروابط
-            $url1 = url('admin/weekly-cp-gift/'.$this->id);
+            $url1 = url('admin/weekly-cp-gift/' . $this->id);
 
             // إنشاء أزرار HTML
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية الفائز </a>";
 
             // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1 ;
+            return $button1;
         });
 
 
@@ -124,26 +124,28 @@ class WeeklyCpController extends MainController
         $form = new Form(new WeeklyStar);
         $form->display(__('admin.ID'));
         $form = new Form(new WeeklyStar());
-        $form->hidden('type','Type')->default('weekly_cp');
-        $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type",'weekly_cp')->max('start_date');
+        $this->disableFormTools($form);
+
+        $form->hidden('type', 'Type')->default('weekly_cp');
+        $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_cp')->max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        $form->date('start_date', __('Start Date'))->default($minStartDate??date("Y-m-d"))
-         ->rules(function ($form) {
+        $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
+            ->rules(function ($form) {
 
-             $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type",'weekly_cp')->max('start_date');
+                $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_cp')->max('start_date');
 
-             $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
-           if ($minStartDate) {
-                if (!$id = $form->model()->id) {
-                    return 'required|after:'.$minStartDate;
+                $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
+                if ($minStartDate) {
+                    if (!$id = $form->model()->id) {
+                        return 'required|after:' . $minStartDate;
+                    } else {
+                        return 'required';
+                    }
                 } else {
-                    return 'required';
+                    return 'required|date';
                 }
-           }else {
-               return 'required|date';
-           }
-        });
+            });
         $form->belongsToMany('gifts', Gifts::class)
             ->rules('required|array|size:3', [
                 'size' => __('choose only 3 gifts.'),

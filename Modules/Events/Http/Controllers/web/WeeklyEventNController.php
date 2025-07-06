@@ -35,18 +35,19 @@ class WeeklyEventNController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(__('weekly-events-new'))
-            ->row(function (Row $row) {
+        return parent::index(
+            $content
+                ->title(__('weekly-events-new'))
+                ->row(function (Row $row) {
 
-//                $row->column(3, view('event_settings'));
+                    //                $row->column(3, view('event_settings'));
 
-                $row->column(12, function (Column $column) {
-                    $column->row(view('event_taps'));
-                    $column->row($this->grid2());
-                    $column->row($this->grid());
-                });
-            })
+                    $row->column(12, function (Column $column) {
+                        $column->row(view('event_taps'));
+                        $column->row($this->grid2());
+                        $column->row($this->grid());
+                    });
+                })
         );
     }
     public function edit($id, Content $content)
@@ -104,6 +105,8 @@ class WeeklyEventNController extends MainController
     protected function form()
     {
         $form = new Form(new WeeklyStar);
+        $this->disableFormTools($form);
+
         $form->display(__('admin.ID'));
         $form = new Form(new WeeklyStar());
         $form->hidden('type', 'Type')->default('weekly_star');

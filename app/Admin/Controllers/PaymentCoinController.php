@@ -174,6 +174,7 @@ class PaymentCoinController extends MainController
     protected function form()
     {
         $form = new Form(new PaymentCoin());
+        $this->disableFormTools($form);
 
         $form->text('title', __('Title'))
             ->creationRules(['required', "unique:payment_coins,title,{{id}}"])
@@ -181,24 +182,24 @@ class PaymentCoinController extends MainController
 
         $form->image('photo', __('Photo'));
 
-//        $form->hasMany('settings', 'Fields', function ($form) {
-//            $form->text('key', 'Input Name')
-//                ->rules(function ($form) {
-//                    $itemId = request()->route('items');
-//                    $id = $form->model ? $form->model->id : null;
-//
-//                    return [
-//                        'required',
-//                        "unique:settings,key,$id,id,item_id,$itemId"
-//                    ];
-//                });
-//            $form->text('value', 'Input Value')->required();
-//            $form->select('input_type', 'Input Type')->options([
-//                'input' => 'Input',
-//                'file' => 'File',
-//            ])->required();
-//            $form->hidden('type')->default('payment');
-//        });
+        //        $form->hasMany('settings', 'Fields', function ($form) {
+        //            $form->text('key', 'Input Name')
+        //                ->rules(function ($form) {
+        //                    $itemId = request()->route('items');
+        //                    $id = $form->model ? $form->model->id : null;
+        //
+        //                    return [
+        //                        'required',
+        //                        "unique:settings,key,$id,id,item_id,$itemId"
+        //                    ];
+        //                });
+        //            $form->text('value', 'Input Value')->required();
+        //            $form->select('input_type', 'Input Type')->options([
+        //                'input' => 'Input',
+        //                'file' => 'File',
+        //            ])->required();
+        //            $form->hidden('type')->default('payment');
+        //        });
 
         $status = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
