@@ -263,6 +263,7 @@ class ReportRealsController extends MainController
     protected function form()
     {
         $form = new Form(new ReportReals());
+        $this->disableFormTools($form);
 
         $form->number('real_id', __('Real id'));
         $form->number('Reporter_id', __('Reporter id'));

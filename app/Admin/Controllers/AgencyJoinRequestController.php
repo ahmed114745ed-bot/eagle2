@@ -104,13 +104,11 @@ class AgencyJoinRequestController extends MainController
             }, __('uuid'), 'text')->placeholder('ادخل UUID')->default('');
 
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('status', __( 'status'))->select([0 => __('pending'), 1 => __('accepted'), 2 => __('denied')]);
+                $filter->equal('status', __('status'))->select([0 => __('pending'), 1 => __('accepted'), 2 => __('denied')]);
             });
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency.id', __('agency id'));
             });
-
-       
         });
 
         $grid->id(__('ID'));
@@ -150,7 +148,7 @@ class AgencyJoinRequestController extends MainController
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = $this->agency ?url("admin/agencies/profile/{$this->agency->id}") : '#';
+                $showUrl = $this->agency ? url("admin/agencies/profile/{$this->agency->id}") : '#';
 
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -160,20 +158,20 @@ class AgencyJoinRequestController extends MainController
                 </div>
             ";
             });
-            $grid->column('user.phone', __('whatsapp'))->display(function ($number) {
-                if (!$number) return '-';
+        $grid->column('user.phone', __('whatsapp'))->display(function ($number) {
+            if (!$number) return '-';
 
-                $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
+            $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
 
-                // Return an image with a WhatsApp link
-                return "<div style='display: flex; align-items: center; '>
+            // Return an image with a WhatsApp link
+            return "<div style='display: flex; align-items: center; '>
 
                 <span>{$number} </span>
 
                   <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
             </div>";
-            });
-            $grid->column('status', __('status'))->display(function ($status) {
+        });
+        $grid->column('status', __('status'))->display(function ($status) {
             $statuses = [
                 0 => ['label' => __('pending'), 'color' => 'orange'],
                 1 => ['label' => __('accepted'), 'color' => 'green'],
@@ -188,28 +186,28 @@ class AgencyJoinRequestController extends MainController
                     </span>";
         });
         $grid->column('change_status_admin_id', __('Change Status Admin'))
-    ->display(function () {
-        $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
+            ->display(function () {
+                $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
 
-        if (!$admin) {
-            return '-';
-        }
+                if (!$admin) {
+                    return '-';
+                }
 
-        $name = $admin->name ?? 'Unknown';
-        $uid = $admin->uuid ?? 'N/A';
-        $path = @$admin->profile?->avatar ?? @$admin->avatar;
-        $defaultImage = asset("images/businessman-icon.jpg");
-        $url = getImagePath($path) ?? $defaultImage;
+                $name = $admin->name ?? 'Unknown';
+                $uid = $admin->uuid ?? 'N/A';
+                $path = @$admin->profile?->avatar ?? @$admin->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-        // Check if the image exists
-        if (!isImageExists($url)) {
-            $url = $defaultImage;
-        }
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-        $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-        $type = userType(@$admin?->type_user ?? '') ?? 'Unknown Type';
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $type = userType(@$admin?->type_user ?? '') ?? 'Unknown Type';
 
-        return "
+                return "
         <div style='display: flex; align-items: center; gap: 10px;'>
             $image
             <div>
@@ -218,7 +216,7 @@ class AgencyJoinRequestController extends MainController
             </div>
         </div>
         ";
-    });
+            });
 
         $grid->column('created_at', trans('time'))->diffForHumans();
         // $grid->column('created_at', __('Created at'))->display(function ($date) {
@@ -264,6 +262,8 @@ class AgencyJoinRequestController extends MainController
     {
 
         $form = new Form(new AgencyJoinRequest);
+        $this->disableFormTools($form);
+
         $form->display(__('ID'));
         $form->text('user_id', __('user id'));
         $form->text('agency_id', __('agency id'));
@@ -305,13 +305,13 @@ class AgencyJoinRequestController extends MainController
                         'agency_id' => $form->model()->agency_id,
                         'type' => 2,
                         'join_date' => now(),
-                        'status' =>'Joined'
+                        'status' => 'Joined'
                     ]);
                 }
 
                 $update = DB::table('users')
                     ->where('id', $user_id)
-                    ->update(['type_user' => 1,'monthly_diamond_received' => 0]);
+                    ->update(['type_user' => 1, 'monthly_diamond_received' => 0]);
 
                 if (!$update) {
                     $error = new MessageBag([

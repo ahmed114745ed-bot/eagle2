@@ -49,7 +49,7 @@ class TargetEventController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('Charging Events'))
             ->body($this->detail($id)));
     }
@@ -63,7 +63,7 @@ class TargetEventController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Charging Events'))
             ->body($this->form()->edit($id)));
     }
@@ -132,6 +132,8 @@ class TargetEventController extends MainController
     protected function form()
     {
         $form = new Form(new ChargeTargetEvent());
+        $this->disableFormTools($form);
+
         $form->number('value', __('value'));
         $form->saved(function (Form $form) {
             return redirect()->to('admin/target-events-gift/' . $form->model()->id);

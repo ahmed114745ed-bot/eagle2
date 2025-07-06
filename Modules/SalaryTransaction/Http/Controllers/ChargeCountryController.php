@@ -111,6 +111,7 @@ class ChargeCountryController extends MainController
     protected function form()
     {
         $form = new Form(new ChargeCountry);
+        $this->disableFormTools($form);
 
         $form->display(__('admin.ID'));
         $form->select('country_id', __('country'))->options (function (){

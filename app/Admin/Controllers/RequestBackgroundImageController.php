@@ -269,6 +269,7 @@ class RequestBackgroundImageController extends MainController
     protected function form()
     {
         $form = new Form(new RequestBackgroundImage);
+        $this->disableFormTools($form);
         $form->display(__('ID'));
         // $form->display('owner_room_id', 'owner_room_id');
         $form->select('owner_room_id', __('owner room id'))->options(function () {

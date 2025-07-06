@@ -591,12 +591,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::get('/public-test', function () {
+               
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
-
-                Notification::send(User::all(), new PublicTestNotification($title, $body));
-
-                return '✅ Test notification broadcasted to all users.';
+            
+                $tokens = User::whereNotNull('notification_id')
+                    ->pluck('notification_id')
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->toArray();
+            
+                return Common::send_firebase_notification($tokens, $title, $body);
             });
 
         }

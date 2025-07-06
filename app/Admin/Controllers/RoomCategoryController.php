@@ -33,7 +33,7 @@ class RoomCategoryController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('categories'))
             ->body($this->detail($id)));
     }
@@ -47,7 +47,7 @@ class RoomCategoryController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('categories'))
             ->body($this->form()->edit($id)));
     }
@@ -69,10 +69,10 @@ class RoomCategoryController extends MainController
     {
         $grid = new Grid(new RoomCategory);
 
-        $grid->id(__ ('ID'));
+        $grid->id(__('ID'));
         $grid->name(trans('name'));
-        $grid->column('name_en',trans ('name_en'));
-        $grid->column('img',trans ('img'))->display(function ($img) {
+        $grid->column('name_en', trans('name_en'));
+        $grid->column('img', trans('img'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img);
             if (!isImageExists(@$path)) {
@@ -110,9 +110,9 @@ class RoomCategoryController extends MainController
                     </script>
                 ";
         });
-        $grid->column('type',trans ('type'));
-        $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ());
-        $this->extendGrid ($grid);
+        $grid->column('type', trans('type'));
+        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
+        $this->extendGrid($grid);
         $grid->disableExport();
 
         return $grid;
@@ -128,13 +128,13 @@ class RoomCategoryController extends MainController
     {
         $show = new Show(RoomCategory::findOrFail($id));
 
-//        $show->id('ID');
-//        $show->parent_id('parent_id');
-//        $show->name('name');
-//        $show->img('img');
-//        $show->enable('enable');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
+        //        $show->id('ID');
+        //        $show->parent_id('parent_id');
+        //        $show->name('name');
+        //        $show->img('img');
+        //        $show->enable('enable');
+        //        $show->created_at(trans('admin.created_at'));
+        //        $show->updated_at(trans('admin.updated_at'));
 
         return $show;
     }
@@ -147,23 +147,25 @@ class RoomCategoryController extends MainController
     protected function form()
     {
         $form = new Form(new RoomCategory);
+        $this->disableFormTools($form);
 
-        $form->display(__ ('ID'));
-        $form->select ('parent_id',trans ('parent'))->options (function (){
-            $options = [0=>trans ('root')];
-            $cats = RoomCategory::query ()->where ('id','!=',$this->id)->where ('enable',1)->where ('parent_id',0)->get ();
-            foreach ($cats as $cat){
+
+        $form->display(__('ID'));
+        $form->select('parent_id', trans('parent'))->options(function () {
+            $options = [0 => trans('root')];
+            $cats = RoomCategory::query()->where('id', '!=', $this->id)->where('enable', 1)->where('parent_id', 0)->get();
+            foreach ($cats as $cat) {
                 $options[$cat->id] = $cat->name;
             }
             return $options;
         });
-        $form->text('name', trans('name'))->rules ('required');
-        $form->text('name_en', trans('name_en'))->rules ('required');
+        $form->text('name', trans('name'))->rules('required');
+        $form->text('name_en', trans('name_en'))->rules('required');
         $form->select('type', trans('type'))->options([
             'party' => trans('party')
         ]);
         $form->image('img', trans('img'));
-        $form->switch('enable', trans('enable'))->states (Common::getSwitchStates ());
+        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
 
         return $form;
     }

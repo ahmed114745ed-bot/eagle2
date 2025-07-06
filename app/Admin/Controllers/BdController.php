@@ -250,6 +250,8 @@ class BdController extends MainController
     protected function form()
     {
         $form = new Form(new Bd());
+        $this->disableFormTools($form);
+
 
         $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
         $form->password('password', __('Password'))->rules('required');

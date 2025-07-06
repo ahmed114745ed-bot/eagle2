@@ -2,10 +2,6 @@
 
 namespace App\Bd\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\ShippingAgency;
-use Encore\Admin\Auth\Permission;
-use Illuminate\Http\Request as req;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -20,23 +16,28 @@ use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
+use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
 use App\Facades\CustomNotification;
 use App\Services\AppFeatureService;
+use Illuminate\Http\Request as req;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
+use App\Admin\Controllers\MainController;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class AgencyController extends Controller
+class AgencyController extends MainController
 {
     use HasResourceActions;
 
@@ -668,9 +669,13 @@ class AgencyController extends Controller
                 }
             });
         } else {
-
+            $form->tools(function (Form\Tools $tools) {
+                $tools->disableDelete(); // ✅ disable delete button
+                // $tools->disableView(); // optional: disable view
+                // $tools->disableList(); // optional: disable list
+            });
             $form->row(function ($row) {
-               
+
 
                 // if (request()->route('form')->isEditing()) {
                 //     $row->hidden('agency_manger_id', __('app manger id'));
@@ -855,7 +860,7 @@ class AgencyController extends Controller
                     'agency_id' => $form->model()->id,
                     'type' => 1,
                     'join_date' => now(),
-                    'status' =>'Joined'
+                    'status' => 'Joined'
                 ]);
             }
         });
@@ -1125,7 +1130,7 @@ class AgencyController extends Controller
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
-                'status' =>'Joined'
+                'status' => 'Joined'
             ];
             UsersJoinedAgency::create($joinAgencyData);
         }

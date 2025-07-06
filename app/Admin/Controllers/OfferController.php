@@ -114,6 +114,8 @@ class OfferController extends MainController
     protected function form()
     {
         $form = new Form(new Offer());
+        $this->disableFormTools($form);
+
 
         $form->textarea('title', __('title'));
         $form->textarea('body', __('body'));

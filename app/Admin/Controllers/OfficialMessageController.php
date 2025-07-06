@@ -198,6 +198,7 @@ class OfficialMessageController extends MainController
     protected function form()
     {
         $form = new Form(new OfficialMessageAdmin);
+        $this->disableFormTools($form);
 
         $form->display('ID');
         $form->text('title', __ ('title'))->rules('nullable|max:255');;

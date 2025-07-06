@@ -32,8 +32,8 @@ class WeeklyEventGiftNController extends MainController
     }
     public function index(Content $content)
     {
-        if (!\Encore\Admin\Facades\Admin::user()->can('*')){
-            Permission::check('browse-'.$this->permission_name);
+        if (!\Encore\Admin\Facades\Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_name);
         }
 
         $url = url('/admin/weekly-events-new'); // Define your button URL
@@ -88,18 +88,18 @@ class WeeklyEventGiftNController extends MainController
     //         ->body($this->detail($id)));
     // }
 
-    public function show( $id, Content $content)
+    public function show($id, Content $content)
     {
         $type = $id; // Using the second parameter as type
-        
+
         $content = $content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
             ->breadcrumb(['text' => trans('admin.eventGift')]);
-        
+
         // Create a row to hold our grid
         $row = new \Encore\Admin\Layout\Row();
-        
+
         switch ($type) {
             case 1:
                 $row->column(12, $this->grid1());
@@ -116,10 +116,10 @@ class WeeklyEventGiftNController extends MainController
                 $row->column(12, $this->grid2());
                 $row->column(12, $this->grid3());
         }
-        
+
         return $content->body($row);
     }
-    
+
     protected function grid1()
     {
         $type = 1;
@@ -321,6 +321,8 @@ class WeeklyEventGiftNController extends MainController
     protected function form()
     {
         $form = new Form(new Reward());
+        $this->disableFormTools($form);
+
         $form->hidden('weekly_star_id')->value(request('weekly_event_id'));
         $form->hidden('level')->value(request('level'));
 

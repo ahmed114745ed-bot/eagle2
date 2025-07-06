@@ -734,45 +734,93 @@ class Common
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
     {
-        $url = 'https://fcm.googleapis.com/fcm/notification';
-        $senderId = config("app.senderId");
+        $topic = 'global_broadcast'; // تأكد أن المستخدمين مشتركين فيه من التطبيق
 
-        if ($registrationIds == null) return;
-        $headers = [
-            'Content-Type: application/json',
-            'access_token_auth: true',
-            'Authorization: Bearer ' . $accessToken,
-            'project_id: ' . $senderId,
+        $title = 'رسالة جماعية';
+        $body = 'هذا إشعار تم إرساله عبر topic';
+
+        // بيانات إضافية - تأكد أنها كلها نصوص فقط
+        $data = [
+            'custom_key_1' => 'value1',
+            'custom_key_2' => 'value2',
         ];
+
+        $messageType = 'group_notification';
+
+        $accessToken = self::getGoogleAccessToken();
+        $projectId = config("app.senderId");
 
         $payload = [
-            'operation' => $operation,
-            'notification_key_name' => $notificationKeyName,
-            'registration_ids' => $registrationIds,
+            'message' => [
+                'topic' => $topic, // ✅ لا تستخدم "token" مع topic
+                'notification' => [
+                    'title' => $title,
+                    'body' => $body,
+                ],
+              'data' => [
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    'msg_type' => 'group_notification',
+                    'custom_key_1' => 'value1',
+                ],
+            ],
         ];
 
-        $ch = curl_init();
+        $headers = [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ];
 
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = Http::withHeaders($headers)
+            ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
+         
+            
+            dd([
+                'status' => $response->status(),
+                'success' => $response->successful(),
+                'response' => $response->json(),
+            ]);
+        return $response->json();
 
-        $response = curl_exec($ch);
+    
+        // $url = 'https://fcm.googleapis.com/fcm/notification';
+        // $senderId = config("app.senderId");
 
-        curl_close($ch);
-        if (!curl_errno($ch)) {
+        // if ($registrationIds == null) return;
+        // $headers = [
+        //     'Content-Type: application/json',
+        //     'access_token_auth: true',
+        //     'Authorization: Bearer ' . $accessToken,
+        //     'project_id: ' . $senderId,
+        // ];
 
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if ($httpCode == 200) {
-                $response = json_decode($response);
-                return $response->notification_key;
-            }
-        }
+        // $payload = [
+        //     'operation' => $operation,
+        //     'notification_key_name' => $notificationKeyName,
+        //     'registration_ids' => $registrationIds,
+        // ];
+
+        // $ch = curl_init();
+
+        // curl_setopt($ch, CURLOPT_URL, $url);
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // $response = curl_exec($ch);
+
+        // curl_close($ch);
+        // if (!curl_errno($ch)) {
+
+        //     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        //     if ($httpCode == 200) {
+        //         $response = json_decode($response);
+        //         return $response->notification_key;
+        //     }
+        // }
 
 
-        return null;
+        // return null;
     }
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
