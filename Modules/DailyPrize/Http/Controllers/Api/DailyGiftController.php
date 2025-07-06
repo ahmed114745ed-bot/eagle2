@@ -45,12 +45,25 @@ class DailyGiftController extends Controller
         $check_received=DailyGiftCount::query()->where('user_id',$user->id)->where("day_count",$currentDay)->first();
         $data=[
             'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
-            'gift'          => $this->getGift($currentDay) ??null,
+            'gift'          => $this->getWeekGifts(),
             'is_received'   => $check_received != null ? true : false,
         ];
         return Common::apiResponse(1, '', $data);
     }
 
+    public function getWeekGifts()
+    {
+        $gifts = [];
+
+        for ($day = 1; $day <= 7; $day++) {
+            $gifts[] = [
+                'day' => $day,
+                'gift' => $this->getGift($day) ?? '',
+            ];
+        }
+
+        return $gifts;
+    }
     public function receive_daily_prize()
     {
         $user = Auth::user();
