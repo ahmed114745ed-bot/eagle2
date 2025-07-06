@@ -117,7 +117,7 @@ if (!function_exists('convertArabicToEnglishNumbers')) {
     function convertArabicToEnglishNumbers($input)
     {
         $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-        $english = ['0', '1', '2', '3', '4', '5', '6', '6', '8', '9'];
+        $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
         return str_replace($arabic, $english, $input);
     }
@@ -678,6 +678,6 @@ if (!function_exists('bd_url')) {
 
         $secure = $secure ?? (config('bd.https') || config('bd.secure'));
 
-        return secure_url($base . '/' . trim($path, '/'), $parameters, $secure);
+        return url($base . '/' . trim($path, '/'), $parameters, $secure);
     }
 }
