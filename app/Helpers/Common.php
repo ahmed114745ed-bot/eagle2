@@ -623,7 +623,23 @@ class Common
 
 
     // }
+    public static function getPublicGoogleAccessToken()
+    {
+        $credentialsFilePath = base_path(config("app.fileName"));
 
+        // التحقق من وجود الملف
+        if (!file_exists($credentialsFilePath)) {
+            return;
+        }
+
+        $client = new \Google_Client();
+        $client->setAuthConfig($credentialsFilePath);
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+        $client->refreshTokenWithAssertion();
+        $token = $client->getAccessToken();
+
+        return $token['access_token'];
+    }
     private static function getGoogleAccessToken()
     {
         $credentialsFilePath = base_path(config("app.fileName"));
@@ -665,11 +681,10 @@ class Common
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
             //make group and get token
             // $token = self::makeGroup($tokens, $key,  $api_access_key);
-            foreach ($tokens as $t) {
-                dispatch(new SendFirebaseNotificationJob(
-                    $t, $title, $body, $data, $messageType, $user, $action, $type, $id, $notification_type
-                ));
-            }
+            dispatch(new SendFirebaseNotificationJob(
+                $tokens, $title, $body, $data, $messageType, $user, $action, $type, $id, $notification_type
+            ));
+            $token = 'DISPATCHED_IN_JOB';
             $isGroup = true;
         }
 
