@@ -62,7 +62,7 @@ class RoomSearchResource extends JsonResource
             "room_pass" => $this->room_pass ?? '',
             "uid" => $this->uid ?? 0,
             'owner_id' =>  $this->uid ?? 0,
-            'owner_uuid' => $this->uuid ?? '',
+            'owner_uuid' => $this->owner?->uuid ?? '',
             "name" => $this->name ?? '',
 
             "nickname" => $this->nickname ?? '',
