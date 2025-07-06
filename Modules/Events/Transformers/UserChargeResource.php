@@ -25,7 +25,6 @@ class UserChargeResource extends JsonResource
         $currentDate = Carbon::now();
         $endOfMonth = $currentDate->copy()->endOfMonth();
 
-        // احسب الفرق
         $timeDifference = $currentDate->diff($endOfMonth);
 
         $timeComponents = [
