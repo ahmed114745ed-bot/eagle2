@@ -742,21 +742,20 @@ class Common
         $data = []; // بيانات إضافية إن أردت
         $messageType = null; // يمكن تخصيصه لاحقاً
 
-        // الحصول على Access Token (إجباري)
         $accessToken = self::getGoogleAccessToken();
         $projectId = config("app.senderId");
 
         $payload = [
             'message' => [
-                'topic' => $topic, // لا تستخدم "token"
+                'topic' => $topic,
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
                 ],
                 'data' => [
                     'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    'message-type' => json_encode($messageType ?? ''),
-                    'data' => !empty($data) ? json_encode($data) : "",
+                    'message_type' => $messageType ?? '',
+                    'custom_key' => 'custom_value'
                 ],
             ],
         ];
