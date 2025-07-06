@@ -681,11 +681,9 @@ class Common
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
             //make group and get token
             // $token = self::makeGroup($tokens, $key,  $api_access_key);
-            foreach ($tokens as $t) {
-                dispatch(new SendFirebaseNotificationJob(
-                    $t, $title, $body, $data, $messageType, $user, $action, $type, $id, $notification_type
-                ));
-            }
+            dispatch(new SendFirebaseNotificationJob(
+                $tokens, $title, $body, $data, $messageType, $user, $action, $type, $id, $notification_type
+            ));
             $token = 'DISPATCHED_IN_JOB';
             $isGroup = true;
         }
