@@ -481,17 +481,13 @@ class ChargeReportController extends MainController
 
         $grid->header(function ($query) {
 
-            $total = (clone $query)->where('status', 1)->sum('paid_usd');
+            $total = (clone $query)
+                ->where('status', 1)
+                ->sum('paid_usd');
 
-            $box = new InfoBox(
-                __('Total success charges'),
-                '',
-                'success',
-                null,
-                '$ ' . number_format($total, 2)
-            );
-
-            return $box->render();
+            return view('admin.grid.common.report.charge-summary', [
+                'total' => $total,
+            ])->render();
         });
 
         $grid->column('id', __('transaction id'));
