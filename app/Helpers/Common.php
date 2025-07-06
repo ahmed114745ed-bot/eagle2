@@ -771,7 +771,14 @@ class Common
 
         $response = Http::withHeaders($headers)
             ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-
+         
+            
+            // أو يمكنك طباعتها مؤقتاً على الشاشة أثناء التطوير
+            dd([
+                'status' => $response->status(),
+                'success' => $response->successful(),
+                'response' => $response->json(),
+            ]);
         return $response->json();
 
     
