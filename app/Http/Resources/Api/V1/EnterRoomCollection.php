@@ -74,6 +74,7 @@ class EnterRoomCollection extends JsonResource
             'ban_users'           => $this->getBans($this->room_speak ?? ''),
             'owner_name'          => @$owner->name ?? '',
             'owner_special_id'          => @$owner?->specialId?->ware?->show_img ?? "",
+            'owner_image_color'          => @$owner?->color_image ?? "",
             'owner_avatar'        => @$owner->profile->avatar ?? '',
             'owner_vip_level'     => (int) ($owner->UserVip->level ?? 0),
             'owner_vip_img'     => $vip_level_img  ,
