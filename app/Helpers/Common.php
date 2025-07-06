@@ -736,42 +736,49 @@ class Common
     {
         $topic = 'global_broadcast'; // تأكد أن المستخدمين مشتركين فيه من التطبيق
 
-        // بيانات الإشعار - يمكنك تعديلها حسب الاستخدام
         $title = 'رسالة جماعية';
         $body = 'هذا إشعار تم إرساله عبر topic';
-        $data = []; // بيانات إضافية إن أردت
-        $messageType = null; // يمكن تخصيصه لاحقاً
 
-        // الحصول على Access Token (إجباري)
+        // بيانات إضافية - تأكد أنها كلها نصوص فقط
+        $data = [
+            'custom_key_1' => 'value1',
+            'custom_key_2' => 'value2',
+        ];
+
+        $messageType = 'group_notification';
+
         $accessToken = self::getGoogleAccessToken();
         $projectId = config("app.senderId");
 
         $payload = [
             'message' => [
-                'topic' => $topic, // لا تستخدم "token"
+                'topic' => $topic, // ✅ لا تستخدم "token" مع topic
                 'notification' => [
                     'title' => $title,
                     'body' => $body,
                 ],
-                'data' => [
+              'data' => [
                     'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    'message-type' => json_encode($messageType ?? ''),
-                    'data' => !empty($data) ? json_encode($data) : "",
+                    'msg_type' => 'group_notification',
+                    'custom_key_1' => 'value1',
                 ],
             ],
         ];
-        
 
-        // رؤوس الطلب
         $headers = [
             'Authorization' => 'Bearer ' . $accessToken,
             'Content-Type' => 'application/json',
         ];
 
-        // إرسال الطلب إلى FCM
         $response = Http::withHeaders($headers)
             ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-
+         
+            
+            dd([
+                'status' => $response->status(),
+                'success' => $response->successful(),
+                'response' => $response->json(),
+            ]);
         return $response->json();
 
     
