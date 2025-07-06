@@ -34,9 +34,9 @@ class AppEarnedController extends MainController
             $lose2 = $lose2 ;
             $lose = $lose1 + $lose2;
             $first_earned_charge = Charge::where("charger_type","dash")->whereBetween('created_at',[ $start_date, $end_date ])->sum("usd");
-            $second_earned_charge = CoinLog::whereIn('method',['huawei_pay','google_pay','apple_pay' ])->whereBetween('created_at',[ $start_date, $end_date ])->sum("paid_usd");
+            $second_earned_charge = CoinLog::whereIn('method',['huawei_pay','google_pay','apple_pay' ])->whereBetween('created_at',[ $start_date, $end_date ])->where('status', 1)->sum("paid_usd");
             $first_earned = Charge::where("charger_type","dash")->sum("usd");
-            $second_earned = CoinLog::whereIn('method',['huawei_pay','google_pay','apple_pay' ])->sum("paid_usd");
+            $second_earned = CoinLog::whereIn('method',['huawei_pay','google_pay','apple_pay' ])->where('status', 1)->sum("paid_usd");
             $earned = $first_earned + $second_earned;
             $earned_charge = $first_earned_charge + $second_earned_charge;
             $app_earned_charge = $earned_charge - $lose ;

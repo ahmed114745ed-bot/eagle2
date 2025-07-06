@@ -61,15 +61,16 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
                 'diamonds' => (string) ($user->getTotalDiamond($month, $year) ?? 0) . ' 💎',
                 'days' => $salary->achieved_days ?? '0/0',
                 'hours' => $salary->achieved_hours ?? '0/0',
-                'moment' => $this->formatExtras($moment),
-                'reel' => $this->formatExtras($reel),
                 'target' => ($salary->target ?? 0) ,
                 'withdrawn' => $salary->expenses ?? 0,
                 'salary' => round($salary?->salary ?? 0, 2). '💲',
+                'year' => $year,
+                'month' => $month,
+                'moment' => $this->formatExtras($moment),
+                'reel' => $this->formatExtras($reel),
                 'agency' => @$user?->agency?->name ?? '-',
                 'agency_id' => $user->agency?->id ?? '-',
-                'month' => $month,
-                'year' => $year,
+           
             ];
         }
 
@@ -89,15 +90,16 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             __('diamonds', [], 'ar'),
             __('days', [], 'ar'),
             __('hours', [], 'ar'),
+            __('target', [], 'ar'),
+            __('expenses', [], 'ar'),
+            __('salary', [], 'ar'),
+            __('year', [], 'ar'),
+            __('month', [], 'ar'),
             __('moment', [], 'ar'),
             __('reels', [], 'ar'),
-            __('target', [], 'ar'),
-            __('withdrawn', [], 'ar'),
-            __('salary', [], 'ar'),
             __('agency', [], 'ar'),
             __('agency_id', [], 'ar'),
-            __('month', [], 'ar'),
-            __('year', [], 'ar'),
+           
         ];
     }
 

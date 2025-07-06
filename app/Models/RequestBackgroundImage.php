@@ -38,15 +38,15 @@ class RequestBackgroundImage extends Model
                 }
             }
             UserCoinLogHelper::log(
-                $model->user_id,
+                $model->owner_room_id,
                 'background',
                 'request_background_images',
-                $model->app_profit_coins
+                $model->price
             );
-            
+
         });
 
-    
+
     }
 
     public function owner()

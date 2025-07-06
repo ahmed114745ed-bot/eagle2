@@ -2,15 +2,16 @@
 
 namespace App\Admin\Actions;
 
+use App\Models\User;
 use App\Models\Charge;
 use App\Models\Setting;
-use App\Models\User;
+use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Facades\Admin;
 use Illuminate\Validation\ValidationException;
 
 class UsersChargeAction extends Action
@@ -19,14 +20,15 @@ class UsersChargeAction extends Action
     protected $selector = '.charge_action';
     protected $userId;
 
-    public function setUserId($userId ): static
+    public function setUserId($userId): static
     {
         $this->userId = $userId ?? request()->input('userId');
         return $this;
     }
 
     public function handle(Request $request)
-    {    $userId = $this->userId ?? $request->input('userId');
+    {
+        $userId = $this->userId ?? $request->input('userId');
         $user = $this->getUser($userId);
         // if (!$user) {
         //     return $this->response()->error(__('api_responses.agency'))->refresh();
@@ -74,6 +76,7 @@ class UsersChargeAction extends Action
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
                 if ($user->owner) CustomNotification::chargeAction($user, $request, $admin);
+                UserCommon::addChargeLevel($user->id, $amount);
             }
         });
 

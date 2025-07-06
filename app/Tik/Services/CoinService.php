@@ -81,6 +81,7 @@ class CoinService
                 }
                 $strip = new \App\Classes\PaymentGateways\Stripe();
                 $res = $strip->make($data);
+
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($paymentMethod == 'fawry') {
                 $Active = config('is_fawry_active');

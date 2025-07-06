@@ -38,9 +38,32 @@ class ChargeController extends AdminController
     {
         $grid = new Grid(new Charge());
 
+
         $grid->model()->where('charger_type','bd')
                       ->with('receiverUser','receiveragency')
                       ->where('charger_id', Auth::user()->app_id);
+
+
+
+                      $grid->filter(function (Grid\Filter $filter) {
+                        $filter->expand();
+                        $filter->where(function ($query) {
+                            $uuid = $this->input;
+                            $query->where(function ($q) use ($uuid) {
+                                $q->whereHas('receiverUser', function ($subQuery) use ($uuid) {
+                                    $subQuery->where('uuid', 'like', "%{$uuid}%");
+                                })->orWhereHas('receiveragency', function ($subQuery) use ($uuid) {
+                                    $subQuery->where('id', 'like', "%{$uuid}%");
+                                });
+                            });
+                        }, __('UUID'))->placeholder(__('ابحث في مستلم التحويل'));
+                    
+                        // فلتر التاريخ (من-إلى)
+                        $filter->between('created_at', __('تاريخ الإنشاء'))->datetime();
+                    });
+
+
+
 
         // $grid->column('id', __('Id'));
         $grid->column('amount', __('Amount'));
@@ -50,6 +73,9 @@ $grid->column('user_id', __('receiver'))->display(function () {
     $info = \App\Helpers\Common::getReceiverInfo($this);
 
     if ($info['type'] === 'agency') {
+        if (request()->filled('_export_')) {
+            return $info['name'];
+        }
         $cacheKey = "agency_image_{$info['uuid']}";
         $image = \Cache::remember($cacheKey, 3600, function () use ($info) {
             $path = $info['image'];
@@ -59,7 +85,7 @@ $grid->column('user_id', __('receiver'))->display(function () {
             return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
         });
 
-        $profileUrl = route('admin.agency.profile', ['id' => $info['uuid']]);
+        $profileUrl = route('bd.agency.profile', ['id' => $info['uuid']]);
 
                     return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -75,6 +101,9 @@ $grid->column('user_id', __('receiver'))->display(function () {
                 }
 
                 if ($info['type'] === 'user') {
+                    if (request()->filled('_export_')) {
+                        return $info['name'];
+                    }
                     $defaultImage = asset("images/businessman-icon.jpg");
                     $url = getImagePath($info['image']) ?? $defaultImage;
                     if (!isImageExists($url)) $url = $defaultImage;
@@ -103,7 +132,7 @@ $grid->column('user_id', __('receiver'))->display(function () {
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
 
-        $grid->column('usd', __('Usd'));
+        $grid->column('usd', __('usd'));
 
         $grid->disableCreateButton();
 
@@ -152,16 +181,16 @@ $grid->column('user_id', __('receiver'))->display(function () {
     {
         $form = new Form(new Charge());
 
-        $form->number('charger_id', __('Charger id'));
+        // $form->number('charger_id', __('Charger id'));
         $form->text('charger_type', __('Charger type'));
         $form->text('user_charger_type', __('User charger type'));
-        $form->number('user_id', __('User id'));
-        $form->text('user_type', __('User type'));
-        $form->decimal('amount', __('Amount'))->default(0.00);
+        $form->number('user_id', __('user id'));
+        // $form->text('user_type', __('User type'));
+        // $form->decimal('amount', __('Amount'))->default(0.00);
         $form->switch('amount_type', __('Amount type'))->default(1);
-        $form->decimal('balance_before', __('Balance before'));
+        // $form->decimal('balance_before', __('Balance before'));
         $form->switch('is_used_transferred', __('Is used transferred'));
-        $form->decimal('usd', __('Usd'));
+        $form->decimal('usd', __('usd'));
         $form->number('agency_id', __('Agency id'));
 
         return $form;

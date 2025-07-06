@@ -302,6 +302,7 @@ class ChargeController extends Controller
                 (new UserAchievementService())->insertCharging($receiver, $amount);
             }
             UserCommon::UserEarnedInvitation($receiver->id, $amount);
+            UserCommon::addChargeLevel($receiver->id, $amount);
             $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
             return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {

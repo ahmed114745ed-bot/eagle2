@@ -8,6 +8,7 @@ use App\Services\UserCounterServices;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\UserResource as V1UserResource;
 use App\Http\Resources\Api\V1\UserVisitorResource;
+use App\Models\Profile;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\Facades\Storage;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
@@ -31,18 +32,18 @@ class ProfileService
         $data = $request->only(['name', 'email', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id']);
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
-        $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country','image']);
-        
-        if ($profileData) $profile = $this->profileRepo->updateProfile($user->profile, $profileData, $user->id);
+        $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country', 'image']);
 
+        if ($profileData) $profile = $this->profileRepo->updateProfile($user->profile, $profileData, $user->id);
+        $profile = Profile::where('user_id', $request->user()->id)->first();
         if ($request->hasFile('image')) {
-            
+
             $img = $request->file('image');
             $imageType = $img->getClientOriginalExtension();
             if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
-                throw new \Exception( __('api_responses.gifImage'));
+                throw new \Exception(__('api_responses.gifImage'));
             }
-           
+
             $user->profile_count += 1;
             $user->save();
             $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);

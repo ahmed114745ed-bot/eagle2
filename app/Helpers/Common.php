@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Jobs\SendFirebaseNotificationJob;
 use App\Models\Pk;
 use App\Models\Vip;
 use App\Models\Pack;
@@ -622,7 +623,23 @@ class Common
 
 
     // }
+    public static function getPublicGoogleAccessToken()
+    {
+        $credentialsFilePath = base_path(config("app.fileName"));
 
+        // التحقق من وجود الملف
+        if (!file_exists($credentialsFilePath)) {
+            return;
+        }
+
+        $client = new \Google_Client();
+        $client->setAuthConfig($credentialsFilePath);
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+        $client->refreshTokenWithAssertion();
+        $token = $client->getAccessToken();
+
+        return $token['access_token'];
+    }
     private static function getGoogleAccessToken()
     {
         $credentialsFilePath = base_path(config("app.fileName"));
@@ -640,8 +657,7 @@ class Common
 
         return $token['access_token'];
     }
-
-    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    public static function send_firebase_notification0($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
@@ -661,11 +677,12 @@ class Common
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
-
+           
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
             //make group and get token
-            $token = self::makeGroup($tokens, $key,  $api_access_key);
 
+            $token = self::makeGroup($tokens, $key,  $api_access_key);
+           
             $isGroup = true;
         }
 
@@ -720,10 +737,6 @@ class Common
 
         $result = json_decode($result);
 
-        if ($messageType === 'system-msg'){
-            \Log::info('Response for system-msg : ' .PHP_EOL .json_encode($result));
-        }
-
 
         //remove group with $key if is group
         if ($result  && $isGroup) {
@@ -734,93 +747,143 @@ class Common
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
     {
-        $topic = 'global_broadcast'; // تأكد أن المستخدمين مشتركين فيه من التطبيق
+        $url = 'https://fcm.googleapis.com/fcm/notification';
+        $senderId = config("app.senderId");
 
-        $title = 'رسالة جماعية';
-        $body = 'هذا إشعار تم إرساله عبر topic';
-
-        // بيانات إضافية - تأكد أنها كلها نصوص فقط
-        $data = [
-            'custom_key_1' => 'value1',
-            'custom_key_2' => 'value2',
+        if ($registrationIds == null) return;
+        $headers = [
+            'Content-Type: application/json',
+            'access_token_auth: true',
+            'Authorization: Bearer ' . $accessToken,
+            'project_id: ' . $senderId,
         ];
-
-        $messageType = 'group_notification';
-
-        $accessToken = self::getGoogleAccessToken();
-        $projectId = config("app.senderId");
 
         $payload = [
+            'operation' => $operation,
+            'notification_key_name' => $notificationKeyName,
+            'registration_ids' => $registrationIds,
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+
+        curl_close($ch);
+        if (!curl_errno($ch)) {
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($httpCode == 200) {
+                $response = json_decode($response);
+                return $response->notification_key;
+            }
+        }
+
+
+        return null;
+    }
+
+    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    {
+        if (empty($tokens)) return;
+    
+        if (!is_array($tokens)) {
+            $tokens = [$tokens];
+        }
+        $topicName = 'system_test_topic';
+    
+        self::subscribeToTopic($tokens, $topicName);
+    
+        $userData = [];
+        if ($user) {
+            $userData = [
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'uuid' => $user->uuid,
+                'has_color_name' => self::hasInPack($user->id, 18, true),
+                'image' => $user->profile->avatar,
+            ];
+        }
+    
+        $api_access_key = self::getGoogleAccessToken();
+        $projectId = env('FIREBASE_PROJECT_NAME');
+    
+        $payload = [
             'message' => [
-                'topic' => $topic, // ✅ لا تستخدم "token" مع topic
+                'topic' => $topicName,
                 'notification' => [
                     'title' => $title,
-                    'body' => $body,
+                    'body'  => $body,
                 ],
-              'data' => [
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                    'msg_type' => 'group_notification',
-                    'custom_key_1' => 'value1',
-                ],
-            ],
+                'data' => [
+                    'click_action'       => 'FLUTTER_NOTIFICATION_CLICK',
+                    'message-type'       => (string) ($messageType ?? ''),
+                    'action'             => $action,
+                    'type'               => $type,
+                    'id'                 => $id,
+                    'notification_type'  => $notification_type,
+                    'data'               => !empty($data) ? json_encode($data) : "",
+                    'user'               => json_encode($userData),
+                ]
+            ]
         ];
+    
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $api_access_key,
+            'Content-Type' => 'application/json',
+        ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
+        self::unsubscribeFromTopic($tokens, $topicName);
 
+        $status = $response->status();
+        $body = $response->body();
+    
+        logger()->info('FCM Response', [
+            'status' => $status,
+            'response' => $body
+        ]);
+        return json_decode($response->body());
+    }
+    
+
+    public static function subscribeToTopic(array $registrationTokens, string $topic)
+    {
+        $accessToken = self::getGoogleAccessToken();
+
+        $url = "https://iid.googleapis.com/iid/v1:batchAdd";
         $headers = [
             'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type' => 'application/json',
+            'Content-Type'  => 'application/json',
         ];
 
-        $response = Http::withHeaders($headers)
-            ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-         
-            
-            dd([
-                'status' => $response->status(),
-                'success' => $response->successful(),
-                'response' => $response->json(),
-            ]);
-        return $response->json();
+        $body = [
+            'to' => "/topics/{$topic}",
+            'registration_tokens' => $registrationTokens,
+        ];
 
-    
-        // $url = 'https://fcm.googleapis.com/fcm/notification';
-        // $senderId = config("app.senderId");
+        Http::withHeaders($headers)->post($url, $body);
+    }
 
-        // if ($registrationIds == null) return;
-        // $headers = [
-        //     'Content-Type: application/json',
-        //     'access_token_auth: true',
-        //     'Authorization: Bearer ' . $accessToken,
-        //     'project_id: ' . $senderId,
-        // ];
+    public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
+    {
+        $accessToken = self::getGoogleAccessToken();
 
-        // $payload = [
-        //     'operation' => $operation,
-        //     'notification_key_name' => $notificationKeyName,
-        //     'registration_ids' => $registrationIds,
-        // ];
+        $url = "https://iid.googleapis.com/iid/v1:batchRemove";
+        $headers = [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type'  => 'application/json',
+        ];
 
-        // $ch = curl_init();
+        $body = [
+            'to' => "/topics/{$topic}",
+            'registration_tokens' => $registrationTokens,
+        ];
 
-        // curl_setopt($ch, CURLOPT_URL, $url);
-        // curl_setopt($ch, CURLOPT_POST, true);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        // $response = curl_exec($ch);
-
-        // curl_close($ch);
-        // if (!curl_errno($ch)) {
-
-        //     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        //     if ($httpCode == 200) {
-        //         $response = json_decode($response);
-        //         return $response->notification_key;
-        //     }
-        // }
-
-
-        // return null;
+        Http::withHeaders($headers)->post($url, $body);
     }
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
