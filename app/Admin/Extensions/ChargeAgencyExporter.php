@@ -16,31 +16,28 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class ChargeAgencyExporter implements FromCollection, WithHeadings
 {
-    public $agency_id;
-    public $month;
-    public $year;
-    public $search;
+    public $id;
 
-    public function __construct($agency_id = null, $month = null, $year = null, $search = null)
+    public $uiid;
+
+    public function __construct($id = null,  $uuid = null)
     {
-        $this->agency_id = $agency_id;
-        $this->month = $month;
-        $this->year = $year;
-        $this->search = $search;
+        $this->id = $id;
+
+        $this->uuid = $uuid;
     }
 
     public function collection()
     {
-        $agencies = ShippingAgency::with(['owner.profile'])
-            ->when($this->agency_id, function ($query) {
-                $query->where('id', $this->agency_id);
+       
+                $agencies = ShippingAgency::with(['owner.profile'])
+            ->when($this->id, function ($query) {
+                $query->where('id', $this->id);
             })
-            ->when($this->search, function ($query) {
-                $search = $this->search;
+            ->when($this->uuid, function ($query) {
+                $search = $this->uuid;
                 $query->whereHas('owner', function ($q) use ($search) {
-                    $q->where('name', 'like', "%$search%")
-                      ->orWhere('uuid', 'like', "%$search%")
-                      ->orWhere('phone', 'like', "%$search%");
+                    $q->Where('uuid', 'like', "%$search%");
                 });
             })
             ->get();

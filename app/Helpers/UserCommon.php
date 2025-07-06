@@ -274,7 +274,7 @@ class UserCommon
                     'total' => 0
                 ]
             );
-            Common::handelVip($vip, $user,null, userVip: $userVip);
+            Common::handelVip($vip, $user, null, userVip: $userVip);
         }
     }
 
@@ -425,10 +425,11 @@ class UserCommon
     }
 
     public static function addChargeLevel($userId, $amount)
-    {
+    { 
         $user = User::where("id", $userId)->first();
         $user->total_charge_coins += $amount;
-
+        $user->save();
+        
         $chargeUserExp = $user->total_charge_coins + $user->sub_charger_level;
         $level = Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->orderByDesc("exp")->first();
         if ($level) {
