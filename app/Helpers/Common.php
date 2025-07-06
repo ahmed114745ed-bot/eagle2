@@ -795,7 +795,7 @@ class Common
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-        $topicName = time();
+        $topicName = 'group_' . time();
         // ✅ إنشاء topic ثابت مثلاً لكل إشعارات النظام
     
         // ✅ اشترك جميع التوكنات في التوبيك (مرة واحدة تكفي)
