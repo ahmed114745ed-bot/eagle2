@@ -677,17 +677,69 @@ class Common
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
-            $data = collect($data)->map(function ($value) {
-                return is_array($value) || is_object($value) ? json_encode($value) : (string) $value;
-            })->toArray();
+           
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
             //make group and get token
-            // $token = self::makeGroup($tokens, $key,  $api_access_key);
-            dispatch(new SendFirebaseNotificationJob(
-                $tokens, $title, $body, $data, $messageType, $user, $action, $type, $id, $notification_type
-            ));
-            $token = 'DISPATCHED_IN_JOB';
+            foreach (collect($tokens)->chunk(100) as $chunk) {
+                foreach ($chunk as $tokenItem) {
+                    $userData = [];
+                    if ($user) {
+                        $userData = [
+                            'user_id' => $user->id,
+                            'name' => $user->name,
+                            'uuid' => $user->uuid,
+                            'has_color_name' => self::hasInPack($user->id, 18, true),
+                            'image' => $user->profile->avatar ?? '',
+                        ];
+                    }
+        
+                    $payload = [
+                        'token' => $tokenItem,
+                        'notification' => $notification,
+                        'data' => [
+                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                            'message-type' => json_encode($messageType ?? ''),
+                            'data' => !empty($data) ? json_encode($data) : "",
+                        ],
+                    ];
+        
+                    if (!empty($userData)) {
+                        $payload['data']['user'] = json_encode($userData);
+                    }
+        
+                    if (isset($data['image']) && !empty($data['image'])) {
+                        $payload['notification']['image'] = $data['image'];
+                    }
+        
+                    $headers = [
+                        'Authorization' => 'Bearer ' . $api_access_key,
+                        'Content-Type' => 'application/json',
+                    ];
+        
+                    $projectId = env('FIREBASE_PROJECT_NAME');
+        
+                    $response = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+                        'message' => $payload
+                    ]);
+        
+                    \Log::info('FCM Response', [
+                        'token' => $tokenItem,
+                        'status' => $response->status(),
+                        'body' => $response->body(),
+                    ]);
+                }
+            }
+        
+            $token = 'SENT_WITH_CHUNK';
             $isGroup = true;
+
+
+            // $token = self::makeGroup($tokens, $key,  $api_access_key);
+            // dispatch(new SendFirebaseNotificationJob(
+            //     $tokens, $title, $body, $data, $messageType, $user, $action, $type, $id, $notification_type
+            // ));
+            // $token = 'DISPATCHED_IN_JOB';
+            // $isGroup = true;
         }
 
         if ($user) {
