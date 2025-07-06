@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Widgets\InfoBox;
 use Carbon\Carbon;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -438,19 +439,60 @@ class ChargeReportController extends MainController
                 $filter->equal('user.uuid', __('charger'));
 
                 $filter->where(function ($query) {
-                    if ($this->input != null) {
+                    if ($this->input !== '') {
                         $query->where('method', $this->input);
                     }
-                }, __('Select type'), 'name_for_url_shortcut')->radio([
-                    '' => __('All'),
-                    'oPay' => __('oPay'),
-                    'stripe' => __('stripe'),
-                    'fawry' => __('fawry'),
-                    'sky_pay' => __('sky pay')
-                ]);
+                }, __('Select type'), 'method')
+                ->select(
+                    ['' => __('All')] +
+                    PaymentCoin::orderBy('type')
+                        ->pluck('title', 'type')
+                        ->toArray()
+                );
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        request('from_date');
+
+                        $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+                        $query->whereDate('created_at', '>=', $start);
+
+                    }, __('From Date'), 'from_date')->date();
+                });
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        request('to_date');
+
+                        $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+                        $query->whereDate('created_at', '<=', $end);
+                    }, __('To Date'), 'to_date')->date();
+                });
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->equal('status', __('Status'))->select([
+                        '' => __('All'),
+                        1  => __('success'),
+                        0  => __('failed'),
+                    ]);
+                });
             });
         });
 
+        $grid->header(function ($query) {
+
+            $total = (clone $query)->where('status', 1)->sum('paid_usd');
+
+            $box = new InfoBox(
+                __('Total success charges'),
+                '',
+                'success',
+                null,
+                '$ ' . number_format($total, 2)
+            );
+
+            return $box->render();
+        });
 
         $grid->column('id', __('transaction id'));
         $grid->column('user_id', __('charger'))->display(function ($recever) {
