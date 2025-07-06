@@ -245,7 +245,10 @@ class AppearChargerAgencyController extends MainController
             // التأكد من أن الـ owner موجود قبل استدعاء دالة `handleShowImageWithTypes`
             $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
 
+            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+
             return "
+                <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
@@ -287,9 +290,9 @@ class AppearChargerAgencyController extends MainController
         $grid->disableExport();
         $grid->tools(function (Grid\Tools $tools) {
             $query = request()->query(); // يحصل على كل الفلاتر المفعّلة في الصفحة
-            
+
             $exportUrl = route('charge-agency-export-report') . '?' . http_build_query($query);
-           
+
             $tools->append('<a href="' . $exportUrl . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
 
