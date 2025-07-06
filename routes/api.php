@@ -7,15 +7,11 @@ use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\PaytabsController;
 use App\Models\Room;
 use App\Models\User;
-use App\Enums\UserType;
 use App\Helpers\Common;
-use App\Notifications\PublicTestNotification;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Admin\Controllers\WareController;
 use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
@@ -51,7 +47,6 @@ use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\CoinReportController;
-use App\Http\Controllers\Api\V1\MusicStoreController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\ChargeLevelController;
@@ -593,17 +588,17 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/public-test', function () {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
-            
+
                 $tokens = User::whereNotNull('notification_id')
                     ->pluck('notification_id')
                     ->filter()
                     ->unique()
                     ->values()
                     ->toArray();
-            
+
                 return Common::send_firebase_notification($tokens, $title, $body);
             });
-            
+
 
         }
     );
