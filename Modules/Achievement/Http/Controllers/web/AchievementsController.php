@@ -160,6 +160,7 @@ class AchievementsController extends MainController
     protected function form()
     {
         $form = new Form(new Achievement());
+        $this->disableFormTools($form);
 
 
         $form->select('type', __('Type'))->options(function () {

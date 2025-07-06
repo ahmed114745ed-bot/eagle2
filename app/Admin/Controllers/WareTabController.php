@@ -250,6 +250,8 @@ class WareTabController extends MainController
     protected function form($id = null)
     {
         $form = new Form(new Ware());
+        $this->disableFormTools($form);
+
         $form->display('ID');
 
         $ware = Ware::find($id);

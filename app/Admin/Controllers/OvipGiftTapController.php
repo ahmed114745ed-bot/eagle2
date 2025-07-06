@@ -276,6 +276,7 @@ class OvipGiftTapController extends MainController
     protected function form()
     {
         $form = new Form(new Ware());
+        $this->disableFormTools($form);
 
         $form->hidden('level')->value(request('level'));
         $form->hidden('type')->value(request('type'));

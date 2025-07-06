@@ -36,7 +36,7 @@ class LevelIntervalController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('Level Gifts'))
             ->body($this->detail($id)));
     }
@@ -50,7 +50,7 @@ class LevelIntervalController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Level Gifts'))
             ->body($this->form()->edit($id)));
     }
@@ -85,7 +85,7 @@ class LevelIntervalController extends MainController
                 $url1 = url('admin/reward_level_interval/' . $this->id);
                 $gifts = __('Gifts');
                 // إنشاء أزرار HTML
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". $gifts ." </a>";
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . $gifts . " </a>";
 
                 // دمج الأزرار في سلسلة واحدة وإرجاعها
                 return $button1;
@@ -122,6 +122,7 @@ class LevelIntervalController extends MainController
     protected function form()
     {
         $form = new Form(new LevelInterval());
+        $this->disableFormTools($form);
 
         $form->text('name', __('name'));
         $form->select('type', trans('type'))->options(

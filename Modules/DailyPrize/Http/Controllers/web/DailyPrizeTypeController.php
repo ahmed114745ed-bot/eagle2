@@ -119,6 +119,7 @@ class DailyPrizeTypeController extends MainController
     protected function form()
     {
         $form = new Form(new DailyGiftType());
+        $this->disableFormTools($form);
 
         // $form->select('type', __('type'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4]);
         $form->select('type', __('type'))->options([

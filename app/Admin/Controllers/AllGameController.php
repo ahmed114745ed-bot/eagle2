@@ -163,7 +163,7 @@ class AllGameController extends MainController
     protected function form()
     {
         $form = new Form(new AllGame());
-
+        $this->disableFormTools($form);
         $form->text('custom_id', __('custom_id'));
         $form->textarea('name', __('name_ar'))->required();
         $form->textarea('name_en', __('name_en'))->required();

@@ -15,6 +15,7 @@ use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Request;
 use PDF;
+
 class TargetController extends MainController
 {
     use HasResourceActions;
@@ -89,7 +90,7 @@ class TargetController extends MainController
 
         //     return  $TargetCount + 1;
         // });
-         $grid->column(('level'), __('target no'));
+        $grid->column(('level'), __('target no'));
 
         $grid->diamonds(__('diamonds'))
             ->display(function ($value) use ($coins) {
@@ -240,7 +241,7 @@ class TargetController extends MainController
                     </form>
                   </div>
                 </div>'
-            );
+        );
 
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -280,6 +281,8 @@ class TargetController extends MainController
     protected function form()
     {
         $form = new Form(new Target);
+        $this->disableFormTools($form);
+
         $coins = Common::getMaxCoins();
 
 
@@ -606,10 +609,10 @@ class TargetController extends MainController
                 $target->moment_parts = array_map('trim', explode(',', $target->moment));
                 return $target;
             });
-//            $targets = Target::orderBy('diamonds')->get();
+            //            $targets = Target::orderBy('diamonds')->get();
             //$pdf = Pdf::loadView('target_pdf', compact('targets'));
-//            $pdf = PDF::loadView('target_pdf', compact('targets'));
-//            return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
+            //            $pdf = PDF::loadView('target_pdf', compact('targets'));
+            //            return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
 
             $pdf = PDF::loadView('target_pdf', [
                 'targets' => $targets,
