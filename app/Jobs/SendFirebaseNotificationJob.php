@@ -28,6 +28,8 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
     public function handle()
     {
+       
+       
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
     
