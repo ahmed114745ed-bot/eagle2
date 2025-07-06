@@ -32,6 +32,8 @@ class RoomResource extends JsonResource
 //            'owner_uuid' => $this->owner?->uuid ?: 0,
             'owner_uuid' => $this->owner?->uuid_v2 ?: 0,
             'room_id' => (string)($this->id ?: 0),
+            'owner_special_id'          => @$owner?->specialId?->ware?->show_img ?? "",
+            'owner_image_color'          => @$owner?->color_image,
             'name' => $this->room_name ?: '',
             "mode" => $this->mode,
 //            'visitors_count' => $this->count_room_socket,
