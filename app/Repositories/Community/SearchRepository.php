@@ -8,6 +8,7 @@ use App\Models\OfficialMessage;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +30,7 @@ class SearchRepository implements SearchRepositoryInterface
         }
     }
 
-    public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|array
+    public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|Collection
     {
         // $user = User::searchByUuid($keywords)->first();
         $user = Auth::user();
@@ -74,8 +75,7 @@ class SearchRepository implements SearchRepositoryInterface
 
         $keywords = $user->id;
 
-
-        $rooms = Room::with('owner')
+        return Room::with('owner')
             ->whereHas('owner', function ($query) {
                 $query->where('status', 1);
             })
@@ -84,8 +84,6 @@ class SearchRepository implements SearchRepositoryInterface
             ->orderBy('hot', 'desc')
             ->take(2)
             ->get();
-//dd( $rooms);
-        return $rooms;
     }
 
     public function userSearchHand(int $userId, string $keywords, int $page = 1)
