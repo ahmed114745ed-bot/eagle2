@@ -14,7 +14,7 @@ class UserChargeEvent extends Model
 
     public function winner()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function event()
