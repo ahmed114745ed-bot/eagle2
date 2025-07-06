@@ -796,13 +796,12 @@ class Common
             $tokens = [$tokens];
         }
     
-        // 1. إنشاء topic مؤقت أو ثابت حسب احتياجك
-        $topicName = 'custom_group_topic'; // أو اجعله dynamic مثل: 'group_' . md5(implode(',', $tokens))
+        // ✅ إنشاء topic ثابت مثلاً لكل إشعارات النظام
+        $topicName = 'system_users_group';
     
-        // 2. اشترك المستخدمين في الـ topic
+        // ✅ اشترك جميع التوكنات في التوبيك (مرة واحدة تكفي)
         self::subscribeToTopic($tokens, $topicName);
     
-        // 3. إعداد بيانات المستخدم
         $userData = [];
         if ($user) {
             $userData = [
@@ -817,14 +816,12 @@ class Common
         $api_access_key = self::getGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
     
-        // 4. إنشاء الرسالة
         $payload = [
             'message' => [
-                'topic' => $topicName, // ✅ هذا هو الهدف
+                'topic' => $topicName,
                 'notification' => [
                     'title' => $title,
                     'body'  => $body,
-                    // 'image' => $data['image'] ?? null
                 ],
                 'data' => [
                     'click_action'       => 'FLUTTER_NOTIFICATION_CLICK',
@@ -839,36 +836,33 @@ class Common
             ]
         ];
     
-        // 5. إرسال إلى FCM HTTP v1
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $api_access_key,
-            'Content-Type'  => 'application/json',
+            'Content-Type' => 'application/json',
         ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
     
         return json_decode($response->body());
     }
     
 
-        // $senderId = config("app.senderId");
-        public static function subscribeToTopic(array $registrationTokens, string $topic)
-        {
-            $accessToken = self::getGoogleAccessToken();
-        
-            $url = "https://iid.googleapis.com/iid/v1:batchAdd";
-            $headers = [
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Content-Type'  => 'application/json',
-            ];
-        
-            $body = [
-                'to' => "/topics/{$topic}",
-                'registration_tokens' => $registrationTokens,
-            ];
-        
-            Http::withHeaders($headers)->post($url, $body);
-        }
-        
-        
+    public static function subscribeToTopic(array $registrationTokens, string $topic)
+    {
+        $accessToken = self::getGoogleAccessToken();
+
+        $url = "https://iid.googleapis.com/iid/v1:batchAdd";
+        $headers = [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type'  => 'application/json',
+        ];
+
+        $body = [
+            'to' => "/topics/{$topic}",
+            'registration_tokens' => $registrationTokens,
+        ];
+
+        Http::withHeaders($headers)->post($url, $body);
+    }
+
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
     {
         $url = 'https://fcm.googleapis.com/fcm/notification';
