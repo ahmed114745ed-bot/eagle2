@@ -130,7 +130,7 @@ class BdSalariesController extends AdminController
                 return handleShowImageWithTypes($agency->id, $url, 40, 40);
             });
     
-            $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
+            $profileUrl = route('bd.agency.profile', ['id' => $agency->id]);
     
             return "
                 <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
