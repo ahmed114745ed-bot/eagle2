@@ -591,7 +591,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::get('/public-test', function () {
-               
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
             
@@ -604,6 +603,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             
                 return Common::send_firebase_notification($tokens, $title, $body);
             });
+            
 
         }
     );
