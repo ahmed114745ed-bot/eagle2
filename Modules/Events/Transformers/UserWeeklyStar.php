@@ -27,11 +27,18 @@ class UserWeeklyStar extends JsonResource
     public function toArray($request)
     {
         return [
-            'totalGiftNum' => strval(intval(@$this->data->totalGiftNum)) ?? "0",
-            'user_id'   => $this->id,
-            'uuid'      => $this->uuid ?? 0,
-            'name'      => $this->name ?? '',
-            'avatar'    => $this->profile->avatar ?? '',
+            // 'totalGiftNum' => strval(intval(@$this->data->totalGiftNum)) ?? "0",
+            // 'user_id'   => $this->id,
+            // 'uuid'      => $this->uuid ?? 0,
+            // 'name'      => $this->name ?? '',
+            // 'avatar'    => $this->profile->avatar ?? '',
+          
+                'totalGiftNum' => strval(intval(@$this->data->totalGiftNum) ?? 0),
+                'user_id'      => $this->id,
+                'uuid'         => $this->uuid ?? 0,
+                'name'         => $this->name ?? '',
+                'avatar'       => $this->profile->avatar ?? '',
+           
         ];
     }
 }

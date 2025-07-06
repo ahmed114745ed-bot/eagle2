@@ -61,15 +61,20 @@ class WeeklyStarController extends Controller
             GiftLog::whereIn('giftId', $giftIds)->with('sender')->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
                    ->groupBy('sender_id')->whereBetween('created_at', [
                     $weeklyEvent->start_date, $weeklyEvent->end_date
-                ])->orWhere(fn($q) => $q->where('sender_id', $authenticatedUserId->id)->whereBetween('created_at', [
-                    $weeklyEvent->start_date, $weeklyEvent->end_date
-                ]))
+                ])
+                // ->orWhere(fn($q) => $q->where('sender_id', $authenticatedUserId->id)->whereBetween('created_at', [
+                //     $weeklyEvent->start_date, $weeklyEvent->end_date
+                // ]))
                    ->orderByDesc('totalGiftNum')->get();
         $firstTenQueries     = $data->take(10);
         $existsInArray       = $firstTenQueries->contains('sender_id', $authenticatedUserId->id);
+        $authenticatedUserGift = $data->firstWhere('sender_id', $authenticatedUserId->id);
+
         $data                = [
             'top'  => TopWeeklyStarUsersResource::collection($firstTenQueries),
-            'user' => $existsInArray == true ? null : new UserWeeklyStar($authenticatedUserId, $data->where('sender_id', $request->user()->id)->first()),
+            // 'user' => $existsInArray == true ? null : new UserWeeklyStar($authenticatedUserId, $data->where('sender_id', $request->user()->id)->first()),
+            'user' => new UserWeeklyStar($authenticatedUserId, $authenticatedUserGift),
+
         ];
         return Common::apiResponse(1, '', $data);
     }
