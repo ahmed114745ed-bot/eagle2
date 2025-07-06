@@ -50,18 +50,21 @@ class SendFirebaseNotificationJob implements ShouldQueue
     
             $dataPayload = [
                 'click_action'       => 'FLUTTER_NOTIFICATION_CLICK',
-                'message-type'       => $this->messageType ?? '',
-                'data' => array_map(fn($v) => is_array($v) ? json_encode($v) : (string) $v, $this->data),
+                'message-type'       => (string) ($this->messageType ?? ''),
                 'action'             => $this->action,
                 'type'               => $this->type,
                 'id'                 => $this->id,
                 'notification_type'  => $this->notification_type,
             ];
-    
-            if (!empty($userData)) {
-                $dataPayload['user'] = $userData;
+            
+            foreach ($this->data as $key => $value) {
+                $dataPayload[$key] = is_array($value) ? json_encode($value) : (string) $value;
             }
-    
+            
+            if (!empty($userData)) {
+                $dataPayload['user'] = json_encode($userData); // ✅ user أيضاً لازم يكون نص
+            }
+            
             $payload = [
                 'token'        => $token,
                 'notification' => $notification,
