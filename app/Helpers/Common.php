@@ -840,6 +840,13 @@ class Common
             'Content-Type' => 'application/json',
         ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
     
+        $status = $response->status();
+        $body = $response->body();
+    
+        logger()->info('FCM Response', [
+            'status' => $status,
+            'response' => $body
+        ]);
         return json_decode($response->body());
     }
     
