@@ -55,7 +55,7 @@ class ChargeEventController extends Controller
                     $query->select('user_id', \DB::raw('SUM(obtained_coins) as coin_logs_sum_obtained_coins'))
                         ->from('coin_logs')
                         //   ->whereBetween('created_at',[$fromDate,$tillDate])
-                        ->whereBetween('coin_logs.created_at', [$fromDate . ' 00:00:00', $tillDate . ' 23:59:59'])
+                        ->whereBetween('coin_logs.created_at', [$fromDate . ' 00:00:00', $tillDate . ' 23:59:59'])->where('coin_logs.status', 1)
                         ->groupBy('user_id');
                 },
                 'coin_logs',
