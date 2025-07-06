@@ -905,8 +905,8 @@ class UserController extends MainController
             $query->whereDate('join_date', $joinDate);
         })->paginate(10, ['*'], 'user_agency_page');
 
-        $usersCoins = UserCoinLog::where('user_id',$id)->orderByDesc('id')->paginate(10, ['*'], 'coins_page');;
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip','usersCoins');
+        $usersCoins = UserCoinLog::where('user_id', $id)->orderByDesc('id')->paginate(10, ['*'], 'coins_page');;
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
@@ -946,7 +946,7 @@ class UserController extends MainController
     {
         $form = new Form(new User());
         $this->disableFormTools($form);
-        
+
         if ($form->isEditing()) {
             $userId           = request()->route('user');
             $user             = User::findOrFail($userId);
@@ -994,22 +994,23 @@ class UserController extends MainController
         $form->text('original_uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
+
         $form->image('photo', __('image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
 
         $form->image('profile.image_id', __('image Id'));
-
-        Admin::script(
-            <<<'JS'
-                $(function() {
-                    // For every file/image input (fileinput plugin)
-                    $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
-                    $('.fileinput-upload').hide(); // Hide upload buttons if present
-                    $('input[type="file"]').prop('disabled', true); // Prevent any file selection
-                });
-            JS
-        );
+        // stop upload image
+        // Admin::script(
+        //     <<<'JS'
+        //         $(function() {
+        //             // For every file/image input (fileinput plugin)
+        //             $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
+        //             $('.fileinput-upload').hide(); // Hide upload buttons if present
+        //             $('input[type="file"]').prop('disabled', true); // Prevent any file selection
+        //         });
+        //     JS
+        // );
 
         if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
             Admin::script(
@@ -1024,9 +1025,9 @@ class UserController extends MainController
 
         $form->hasMany('images', __('Profile Images'), function ($form) {
             $form->image('img', __('Image'));
-        })->useTable()->disableCreate()->disableDelete();;
+        })->useTable()->disableCreate()->disableDelete();
 
-        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
+        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name) && !Admin::user()->can('*')) {
             Admin::script(
                 <<<JS
         $(document).ready(function() {
@@ -1055,15 +1056,7 @@ class UserController extends MainController
         //            );
         //        }
 
-        $state = [
-            'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
-            'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
-        ];
 
-        //        $form->switch('charge_status', __("charge status"))->states($state);
-        //        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
-        //        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
-        //        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
             $countries = Country::all();
@@ -1072,48 +1065,12 @@ class UserController extends MainController
             }
             return $ops;
         });
-        //        $states = [
-        //            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
-        //            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
-        //            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
-        //        ];
-        //        if ($form->isCreating()) {
-        //            $form->switch('can_play', __('canPlay'))->default(0)->states($states);
-        //        } elseif ($form->isEditing()) {
-        //            $form->switch('can_play', __('canPlay'))->value(function ($can_play) {
-        //                $can_play = UserHandling::chickLevelToPlay($this);
-        //                return $can_play ? 'on' : 'off';
-        //            })->states($states);
-        //        }
 
-        //        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-        //            if ($form->isEditing()) {
-        //                $form->number('di', __('Coins'))->default(0)
-        //                    ->disable($form->isEditing());
-        //            } else {
-        //                $form->number('di', __('Coins'))->default(0);
-        //            }
-        //            $form->number('user_diamond', __('Diamonds'))->default(0);
-        //            $form->number('total_sender_level', __('Sender Level'))->default(0);
-        //            $form->number('total_received_level', __('Received Level'))->default(0);
-        //            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
-        //            $form->number('salary', __('salary'))->disable();
-        //        }
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
-        //        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
-        //        $form->select('type_user', trans('User Type'))->options([
-        //            $form->model()->type_user => $form->model()->type_user,
-        //            0                         => 'مستخدم',
-        //            1                         => 'مضيف',
-        //            2                         => 'وكيل مضيفين',
-        //            3                         => 'وكيل شحن',
-        //            4                         => ' وكيل مصيفين ووكيل شحن',
-        //            5                         => 'اداري',
-        //
-        //        ])->default(0);
+
 
         if (Session::has('show_alert')) {
             $form->html('<script>
