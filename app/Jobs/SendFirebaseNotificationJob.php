@@ -28,7 +28,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
     public function handle()
     {
-        $api_access_key = Common::getGoogleAccessToken();
+        $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
 
         $notification = [
@@ -73,9 +73,17 @@ class SendFirebaseNotificationJob implements ShouldQueue
             'Authorization' => 'Bearer ' . $api_access_key,
             'Content-Type'  => 'application/json',
         ];
-
-        Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+        $response = Http::withHeaders($headers)
+        ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
+
+         // ✅ طباعة النتيجة في ملف log
+    \Log::info('Firebase Notification Response:', [
+        'token' => $this->token,
+        'status' => $response->status(),
+        'body' => $response->body(),
+        'payload' => $payload,
+    ]);
     }
 }

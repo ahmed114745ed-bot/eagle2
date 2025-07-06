@@ -623,7 +623,23 @@ class Common
 
 
     // }
+    public static function getPublicGoogleAccessToken()
+    {
+        $credentialsFilePath = base_path(config("app.fileName"));
 
+        // التحقق من وجود الملف
+        if (!file_exists($credentialsFilePath)) {
+            return;
+        }
+
+        $client = new \Google_Client();
+        $client->setAuthConfig($credentialsFilePath);
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+        $client->refreshTokenWithAssertion();
+        $token = $client->getAccessToken();
+
+        return $token['access_token'];
+    }
     private static function getGoogleAccessToken()
     {
         $credentialsFilePath = base_path(config("app.fileName"));
@@ -670,6 +686,7 @@ class Common
                     $t, $title, $body, $data, $messageType, $user, $action, $type, $id, $notification_type
                 ));
             }
+            $token = 'DISPATCHED_IN_JOB';
             $isGroup = true;
         }
 
