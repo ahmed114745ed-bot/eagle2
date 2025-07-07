@@ -1242,7 +1242,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            {{-- <th>{{ __('admin') }}</th> --}}
+                            <th>{{ __('admin') }}</th>
                             <th>{{ __('get type') }}</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
@@ -1260,24 +1260,23 @@
 
                                    $admin = null;
 
-                                    if ($pack->vip_user_id && optional($pack->userVip)->admin) {
+                                    if ($pack->vip_user_id && $pack->userVip && $pack->userVip->admin && is_object($pack->userVip->admin)) {
                                         $admin = $pack->userVip->admin;
-                                    } elseif ($pack->dash_user_id && optional($pack)->admin) {
+                                    } elseif ($pack->dash_user_id && $pack->admin && is_object($pack->admin)) {
                                         $admin = $pack->admin;
                                     }
 
-                                    $image = optional($admin)->avatar ?? '';
+                                    $image = is_string(optional($admin)->avatar) ? getImagePath($admin->avatar) : '';
                                     $defaultImage = asset("images/businessman-icon.jpg");
-                                    $imagePath = getImagePath($image);
-                                    $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
+                                    $image = isImageExists($image) ? $image : $defaultImage;
 
-                                    $name = optional($admin)->name ?? '';
-                                    $uid = optional($admin)->id ?? 0;
-                                    $url = $admin ? url("admin/auth/users/" . $uid) : '#';
+                                    $name = is_string(optional($admin)->name) ? $admin->name : '';
+                                    $uid = is_numeric(optional($admin)->id) ? $admin->id : 0;
+                                    $url = is_numeric($uid) ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
-                                    {{-- <td>
+                                    <td>
                                         @if ($admin)
                                             <a href="{{ $url ?? '#' }}" target="_blank"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
@@ -1289,7 +1288,7 @@
                                             
                                         @endif
                                     
-                                </td> --}}
+                                </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getType() }}</td>
