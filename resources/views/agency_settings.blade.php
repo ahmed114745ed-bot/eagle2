@@ -13,7 +13,7 @@
         width: 250px;
         background: #222;
         min-height: 400px;
-
+        align-self: flex-start;
         padding: 20px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     }
