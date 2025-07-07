@@ -3,14 +3,15 @@
 namespace App\Bd\Controllers;
 
 use App\Models\Charge;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Auth;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class ChargeController extends AdminController
+class ChargeController extends MainController
 {
     /**
      * Title for current resource.
