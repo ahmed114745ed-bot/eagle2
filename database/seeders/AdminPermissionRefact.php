@@ -228,7 +228,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 16,
                 'permissions' => [
                     ['key' => 'appear-charger-agency', 'except' => ['delete', 'show'], 'additional' => ['delete-switch']],
-                    ['key' => 'charge-agency', 'except' => [], 'additional' => []],
+                    ['key' => 'charge-agency', 'except' => [], 'additional' => ['actions-switch']],
                     ['key' => 'payment-gat-way', 'except' => [], 'additional' => []],
                     ['key' => 'agency-manger-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'Payment-methods-for-shipping-agencies', 'except' => ['browse', 'show'], 'additional' => []],
