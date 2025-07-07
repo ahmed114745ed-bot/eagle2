@@ -3336,7 +3336,8 @@
 "kicked By": "تم الطرد بواسطة",
     "Total success charges": "مجموع العمليات الناجحة",
 "kicked By status": "طريقة الطرد",
-"it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة"
+"it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة",
+"cant it owner" :"لا تستطيع نقل مالك الوكالة"
 
 
 
