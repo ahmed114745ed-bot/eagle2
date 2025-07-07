@@ -570,7 +570,7 @@ class UserController extends MainController
         });
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
-
+        $grid->disableRowSelector();
 
         return $grid;
     }
@@ -602,7 +602,7 @@ class UserController extends MainController
         }
     }
 
-    
+
 
     public function showAdditionalInfo($id, Content $content)
     {
@@ -685,7 +685,7 @@ class UserController extends MainController
             $query->whereDate('join_date', $joinDate);
         })->paginate(10, ['*'], 'user_agency_page');
 
-        $packs = Pack::where('user_id', $id)->where('type', $type)->whereHas('ware')->with(['ware' => function ($q) {
+        $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');

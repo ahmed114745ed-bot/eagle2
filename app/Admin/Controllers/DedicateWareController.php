@@ -71,12 +71,12 @@ class DedicateWareController extends MainController
     protected function grid()
     {
         $typeSpecial = false;
-       
+
         $grid = new Grid(new Ware);
         $grid->model()->orderByDesc('created_at');
-        
-            $grid->model()->where('get_type', 4)->where('type', '!=', 25);
-    
+
+        $grid->model()->where('get_type', 4)->where('type', '!=', 25);
+
         $grid->id('ID');
         $grid->column('name', __('name'));
         $grid->column('price', __('price'))->currency();
@@ -146,6 +146,8 @@ class DedicateWareController extends MainController
             // $actions->add(new DedicateAction());
         });
         $grid->disableCreateButton();
+        $grid->disableRowSelector();
+
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');

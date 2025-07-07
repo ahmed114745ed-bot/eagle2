@@ -49,6 +49,8 @@ class SallariesController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
+        $grid->disableRowSelector();
+
         $model =
             //$grid->model()->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
             $grid->model()->where('agency_id', '!=', 0);
@@ -143,6 +145,8 @@ class SallariesController extends MainController
     protected function agencies()
     {
         $grid = new Grid(new Agency());
+        $grid->disableRowSelector();
+
 
         // $model = $grid->model()
         //     ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
@@ -163,7 +167,7 @@ class SallariesController extends MainController
                     ->orWhereHas('owner', function ($subQuery) {
                         $subQuery->where('uuid', $this->input); // Match on related owner UUID
                     });
-            }, __('UUID'),'agency_or_uuid')->placeholder(__('search for agency or host by UUID'));
+            }, __('UUID'), 'agency_or_uuid')->placeholder(__('search for agency or host by UUID'));
 
             $filter->column(1 / 2, function ($filter) {
 
@@ -240,11 +244,11 @@ class SallariesController extends MainController
 
         $grid->tools(function (Grid\Tools $tools) {
             //  $tools->append('<a href="' . url('admin/wallet-export-agency?id=' . request('2f787fe5f965209024c8597149cbb43e')) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
-           $tools->append('<a href="' . url('admin/wallet-export-agency') . '?' . http_build_query([
-    'id' => request('agency_or_uuid'),
-    'month' => request('month'),
-    'year' => request('year'),
-]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . url('admin/wallet-export-agency') . '?' . http_build_query([
+                'id' => request('agency_or_uuid'),
+                'month' => request('month'),
+                'year' => request('year'),
+            ]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
             $tools->append('<a href="' . url('/admin/sallaries_history?type=1') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
 
