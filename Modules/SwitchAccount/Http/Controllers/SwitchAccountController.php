@@ -95,7 +95,13 @@ class SwitchAccountController extends Controller
     {
         if (empty($deviceToken)) return [];
 
-        $accounts = UserAccount::where('device_token', $deviceToken)->get();
+        $accounts = UserAccount::query()
+            ->where('device_token', $deviceToken)
+            ->where(function ($query) use ($userId){
+                $query->where('parent_user_id', $userId)
+                    ->orWhere('child_user_id', $userId);
+            })
+            ->get();
 
         $userIds = $accounts->flatMap(function ($account) {
             return [$account->parent_user_id, $account->child_user_id];
@@ -155,7 +161,17 @@ class SwitchAccountController extends Controller
         $user_account = UserAccount::query()->where("key", $request->key)->first();
         if (!$user_account) return Common::apiResponse(0, 'missing params', null, 422);
 
-        $validToken = $this->isTokenFromLastTwoWeeks($request->token);
+        $currentUserId = $user->id;
+        if ($user_account->parent_user_id !== $currentUserId &&
+            $user_account->child_user_id !== $currentUserId) {
+            return Common::apiResponse(0, __('forbidden'), null, 403);
+        }
+
+        $otherUser = $user_account->parent_user_id === $currentUserId
+            ? $user_account->childUser
+            : $user_account->parentUser;
+
+        $validToken = $this->isTokenFromLastTwoWeeks($otherUser, $request->token);
         if (!$validToken) return Common::apiResponse(0, 'token not valid', null, 422);
 
         $new_account = User::find($request->id);
@@ -170,11 +186,12 @@ class SwitchAccountController extends Controller
         return Common::apiResponse(1, 'success', $data, 200);
     }
 
-    public function isTokenFromLastTwoWeeks($tokenString)
+    public function isTokenFromLastTwoWeeks($otherUser, $tokenString): bool
     {
         [$id, $plainToken] = explode('|', $tokenString);
 
-        $token = PersonalAccessToken::find($id);
+        $token = $otherUser->tokens()->find($id);
+//        $token = PersonalAccessToken::find($id);
         if (
             $token &&
             hash_equals($token->token, hash('sha256', $plainToken)) &&
