@@ -1242,7 +1242,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>{{ __('admin') }}</th>
+                            <th>{{ __('Admin') }}</th>
                             <th>{{ __('get type') }}</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
@@ -1265,7 +1265,7 @@
                                     } elseif ($pack->dash_user_id && $pack->admin && is_object($pack->admin)) {
                                         $admin = $pack->admin;
                                     }
-                                   dd( $admin);
+                                   
                                     $image = is_string(optional($admin)->avatar) ? getImagePath($admin->avatar) : '';
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                     $image = isImageExists($image) ? $image : $defaultImage;
