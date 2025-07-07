@@ -1271,7 +1271,7 @@
                                     $imagePath = getImagePath($image);
                                     $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
 
-                                    $name = optional($admin)->name ?? '';
+                                  //  $name = optional($admin)->name ?? '';
                                     $uid = optional($admin)->id ?? 0;
                                     $url = $admin ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
@@ -1283,7 +1283,7 @@
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ $image }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span>{{ $name }} ({{ $uid }})</span>
+                                        <span> ({{ $uid }})</span>
                                     </a>
                                         @else
                                             
