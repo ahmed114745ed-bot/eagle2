@@ -1964,4 +1964,27 @@ class Common
 
         return $extras[$type];
     }
+
+
+    public static function isReliableTransferEnabled(): bool
+    {
+        return Cache::get('transfer_salary_reliable_shipping_agency', 0) == 1;
+    }
+    
+    public static function canTransferToAgency($agency): bool
+    {
+        if (!self::isReliableTransferEnabled()) {
+            return true;
+        }
+        $agency = is_numeric($agency) ? ShippingAgency::find($agency) : $agency;
+    
+        $ownerId = $agency->app_owner_id ?? null;
+        if (!$ownerId) {
+            return false;
+        }
+        return User::where('id', $ownerId)
+                   ->where('appear_charger_agency', 1)
+                   ->exists();
+    }
+    
 }

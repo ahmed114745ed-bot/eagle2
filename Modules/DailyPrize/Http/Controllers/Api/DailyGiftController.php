@@ -28,7 +28,7 @@ use Modules\Achievement\Transformers\AchievementOneLevelsResource;
 class DailyGiftController extends Controller
 {
 
-    public function __construct(private DailyPrizeService $dailyPrizeService) { }
+    public function __construct(private DailyPrizeService $dailyPrizeService) {}
 
     public function current_day()
     {
@@ -38,12 +38,12 @@ class DailyGiftController extends Controller
 
         (new DailyPrizeService())->reset(Carbon::createFromTimestamp($user->real_online_time), $user->id);
 
-        $currentDay= $this->getCurrentDay();
+        $currentDay = $this->getCurrentDay();
 
-        $result=DailyGiftCount::query()->where('user_id',$user->id)->first();
+        $result = DailyGiftCount::query()->where('user_id', $user->id)->first();
 
-        $check_received=DailyGiftCount::query()->where('user_id',$user->id)->where("day_count",$currentDay)->first();
-        $data=[
+        $check_received = DailyGiftCount::query()->where('user_id', $user->id)->where("day_count", $currentDay)->first();
+        $data = [
             'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
             'gift'          => $this->getWeekGifts(),
             'is_received'   => $check_received != null ? true : false,
@@ -58,7 +58,7 @@ class DailyGiftController extends Controller
         for ($day = 1; $day <= 7; $day++) {
             $gifts[] = [
                 'day' => $day,
-                'gift' => $this->getGift($day) ?? '',
+                'gift' => $this->getGift($day) ?? (object)[],
             ];
         }
 
@@ -67,13 +67,13 @@ class DailyGiftController extends Controller
     public function receive_daily_prize()
     {
         $user = Auth::user();
-        $currentDay= $this->getCurrentDay();
+        $currentDay = $this->getCurrentDay();
 
-        $dailyGift=$this->dailyPrizeService->getDayGift($currentDay);
+        $dailyGift = $this->dailyPrizeService->getDayGift($currentDay);
         if (!$dailyGift) {
             return Common::apiResponse(0, '  لا يوجد هديه اليوم ', []);
         }
-        $result=DailyGiftCount::query()->where('user_id',$user->id)->orderByDesc('id')->first();
+        $result = DailyGiftCount::query()->where('user_id', $user->id)->orderByDesc('id')->first();
         if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
             return Common::apiResponse(0, 'لم يمر 24 ساعه لاستلام الهديه التاليه', []);
         }
@@ -84,14 +84,15 @@ class DailyGiftController extends Controller
         DailyGiftCount::query()->updateOrCreate([
             'user_id' => $user->id,
 
-        ], ['last_active' => now(),
+        ], [
+            'last_active' => now(),
             'day_count' => $currentDay,
 
-            ]);
+        ]);
         DailyUserGift::create([
             'user_id'   => $user->id,
-            'gift_type' =>$type,
-            'target'    =>$target,
+            'gift_type' => $type,
+            'target'    => $target,
         ]);
         $this->assignGiftToUser($type, $user, $target, $expire);
         return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', []);
@@ -100,11 +101,11 @@ class DailyGiftController extends Controller
     public function getCurrentDay()
     {
         $user = Auth::user();
-        $result=DailyGiftCount::query()->where('user_id',$user->id)->first();
+        $result = DailyGiftCount::query()->where('user_id', $user->id)->first();
         $currentDay = 1;
         if ($result != null) {
             $currentDay = $result->day_count;
-            if ($this->dailyPrizeService->isNewDay($user->id)){
+            if ($this->dailyPrizeService->isNewDay($user->id)) {
                 $currentDay += 1;
             }
         }
@@ -140,7 +141,7 @@ class DailyGiftController extends Controller
         $now = new \DateTime();
         $diff = $now->diff($specificDateTime);
         $hoursDifference = ($diff->days * 24) + $diff->h + ($diff->i / 60) + ($diff->s / 3600);
-        if ($hoursDifference > 24){
+        if ($hoursDifference > 24) {
             return false;
         }
         return true;
@@ -149,7 +150,7 @@ class DailyGiftController extends Controller
     public function getGift($currentDay)
     {
 
-        $data=$this->dailyPrizeService->getDayGift($currentDay);
-        return  $data!=null? new WeeklyStarGift($data) :null;
+        $data = $this->dailyPrizeService->getDayGift($currentDay);
+        return  $data != null ? new WeeklyStarGift($data) : null;
     }
 }

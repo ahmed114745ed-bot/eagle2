@@ -133,6 +133,8 @@ class ReportRealsController extends MainController
 
         $grid->disableCreateButton();
         $grid->disableExport();
+        $grid->disableRowSelector();
+
         $permission_name = $this->permission_name;
 
         $grid->actions(function ($actions)  use ($permission_name) {

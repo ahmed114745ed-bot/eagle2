@@ -12,6 +12,7 @@ use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 
 class ChangeUsersAgencyAction extends RowAction
@@ -40,9 +41,19 @@ class ChangeUsersAgencyAction extends RowAction
     $users = User::where('agency_id', $request->old_agency_id)
         // ->where('type_user', 1)
         ->when($ownerId, function ($query) use ($ownerId) {
-            $query->where('id', '!=', $ownerId);
+            $query->where('id', '=', $ownerId);
         })
         ->get();
+      
+        if ($users->count() === 1 && $users->pluck('id')->first() == $ownerId) {
+            $error = new MessageBag([
+                'title'   => __('error_title_div'),
+                'message' => __('cant it owner'),
+            ]);
+    
+            session()->flash('error', $error);
+            throw new \Exception(__('cant it owner'));
+        }
    
     $checkAgencyUser = UsersJoinedAgency::where([
 

@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Throwable;
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
 use App\Models\CoinLog;
-use App\Models\GameChargeHistory;
 use App\Models\GameWallet;
-use App\Models\PaymentMethodHistory;
+use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use App\Models\GameChargeHistory;
 use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Throwable;
+use App\Http\Controllers\Controller;
+use App\Models\PaymentMethodHistory;
+
 
 class PaymentMethodController extends Controller
 {
@@ -88,7 +89,7 @@ class PaymentMethodController extends Controller
             $order->pid = $fawryRefNumber;
             $paymentMethod->status = 'paid';
             $order->save();
-
+            
             return response()->json(['status' => 'success', 'message' => 'Payment successful.']);
         }
         if ($orderStatus === 'UNPAID') {
@@ -134,11 +135,11 @@ class PaymentMethodController extends Controller
                     'message' => 'Transaction not found.',
                 ]);
             }
-            \Log::info('this response '.json_encode([
-                    'status' => $query['statusCode'] == 200,
-                    'trx' => $purchaseProduct->trx,
-                    'message' => $query['statusDescription'] ?? 'No description provided.',
-                ]));
+            \Log::info('this response ' . json_encode([
+                'status' => $query['statusCode'] == 200,
+                'trx' => $purchaseProduct->trx,
+                'message' => $query['statusDescription'] ?? 'No description provided.',
+            ]));
             return response()->json([
                 'status' => $query['statusCode'] == 200,
                 'trx' => $purchaseProduct->trx,
@@ -148,7 +149,7 @@ class PaymentMethodController extends Controller
             return response()->json([
                 'status' => false,
                 'trx' => null,
-                'message' => 'An error occurred: '.$e->getMessage(),
+                'message' => 'An error occurred: ' . $e->getMessage(),
             ]);
         }
     }
