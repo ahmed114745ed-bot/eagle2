@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Throwable;
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
 use App\Models\CoinLog;
-use App\Models\GameChargeHistory;
 use App\Models\GameWallet;
-use App\Models\PaymentMethodHistory;
+use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use App\Models\GameChargeHistory;
 use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Throwable;
+use App\Http\Controllers\Controller;
+use App\Models\PaymentMethodHistory;
+
 
 class PaymentMethodController extends Controller
 {
@@ -86,10 +87,9 @@ class PaymentMethodController extends Controller
         if ($orderStatus === 'PAID') {
             $this->webhookPayment($order->id);
             $order->pid = $fawryRefNumber;
-            $order->status = 1;
             $paymentMethod->status = 'paid';
             $order->save();
-
+            
             return response()->json(['status' => 'success', 'message' => 'Payment successful.']);
         }
         if ($orderStatus === 'UNPAID') {

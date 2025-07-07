@@ -2,11 +2,12 @@
 
 namespace App\Traits\User;
 
-use App\Helpers\UserCommon;
 use App\Models\Coin;
-use App\Models\CoinLog;
 use App\Models\User;
+use App\Models\CoinLog;
+use App\Helpers\UserCommon;
 use Illuminate\Http\JsonResponse;
+use Modules\Achievement\Http\Services\UserAchievementService;
 
 
 trait PaymentTrait
@@ -64,6 +65,9 @@ trait PaymentTrait
             $user->di += $coinLog->obtained_coins;
             $user->save();
             UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
+            if ($user instanceof User) {
+                (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
+            }
         } else {
             return response()->json(['status' => 'failed', 'reason' => 'User not found']);
         }
