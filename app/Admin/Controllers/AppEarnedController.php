@@ -27,16 +27,24 @@ class AppEarnedController extends MainController
 
     public function index(Content $content)
     {
-        $start_date = request('start_date') != null ? Carbon::createFromFormat('Y-m-d', request('start_date'))->startOfDay() : Carbon::now()->startOfMonth()->startOfDay();
-        $end_date = request('end_date') != null ? Carbon::createFromFormat('Y-m-d', request('end_date'))->endOfDay() : Carbon::now()->endOfMonth()->endOfDay();
-        $lose1 = UsdTransfer::whereBetween('created_at', [$start_date, $end_date])->sum("value");
-        $lose2 = RequestTakeSalary::where("status", 1)->whereBetween('created_at', [$start_date, $end_date])->sum("amount");
+        $start_date = request('start_date') ? Carbon::createFromFormat('Y-m-d', request('start_date'))->startOfDay() : null;
+        $end_date = request('end_date') ? Carbon::createFromFormat('Y-m-d', request('end_date'))->endOfDay() : null;
+        $lose1 = UsdTransfer::when(isset($start_date) && isset($end_date), function ($query) use ($start_date,  $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        })->sum("value");
+        $lose2 = RequestTakeSalary::where("status", 1)->when(isset($start_date) && isset($end_date), function ($query) use ($start_date,  $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        })->sum("amount");
         $lose2 = $lose2;
         $lose = $lose1 + $lose2;
-        $first_earned_charge = Charge::where("charger_type", "dash")->whereBetween('created_at', [$start_date, $end_date])->sum("usd");
-        $second_earned_charge = CoinLog::whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])->whereBetween('created_at', [$start_date, $end_date])->where('status', 1)->sum("paid_usd");
+        $first_earned_charge = Charge::where("charger_type", "dash")->when(isset($start_date) && isset($end_date), function ($query) use ($start_date,  $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        })->sum("usd");
+        $second_earned_charge = CoinLog::where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay')->when(isset($start_date) && isset($end_date), function ($query) use ($start_date,  $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        })->where('status', 1)->sum("paid_usd");
         $first_earned = Charge::where("charger_type", "dash")->sum("usd");
-        $second_earned = CoinLog::whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])->where('status', 1)->sum("paid_usd");
+        $second_earned = CoinLog::where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay')->where('status', 1)->sum("paid_usd");
         $earned = $first_earned + $second_earned;
         $earned_charge = $first_earned_charge + $second_earned_charge;
         $app_earned_charge = $earned_charge - $lose;
