@@ -140,19 +140,19 @@ class GiftController extends MainController
 
         $grid->id(__('ID'));
         $grid->name(__('Name'));
+        if ($filterType == 9) {
+            $grid->column('level', trans('vip'))->display(function () {
 
-        $grid->column('level', trans('vip'))->display(function () {
-
-            $path = $this?->vip?->img;
-            $defaultImage = asset("images/image.png");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
-        $grid->column('vip_level', __('level_num'));
-
+                $path = $this?->vip?->img;
+                $defaultImage = asset("images/image.png");
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+            $grid->column('vip_level', __('level_num'));
+        }
 
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
             $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
