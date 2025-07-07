@@ -1258,25 +1258,25 @@
                                @php
                                     $path = @$pack->ware?->show_img ?? '';
 
-                                    if ($pack->vip_user_id) {
-                                        $admin = $pack->userVip->admin;
-                                    } else {
-                                        $admin = $pack->admin;
-                                    }
+                                    // if ($pack->vip_user_id) {
+                                    //     $admin = $pack->userVip->admin;
+                                    // } else {
+                                    //     $admin = $pack->admin;
+                                    // }
   
-                                    $image = $admin->avatar??'';
-                                    $defaultImage = asset("images/businessman-icon.jpg");
-                                            $image = getImagePath($image);
-                                            if (!isImageExists($image)) {
-                                                $image = $defaultImage;
-                                            }
-                                    $name = $admin->name ?? '';
-                                    $uid = $admin->id ?? 0;
-                                    $url = $admin ? "admin/auth/users/" . $admin->id : '#';
+                                    // $image = $admin->avatar??'';
+                                    // $defaultImage = asset("images/businessman-icon.jpg");
+                                    //         $image = getImagePath($image);
+                                    //         if (!isImageExists($image)) {
+                                    //             $image = $defaultImage;
+                                    //         }
+                                    // $name = $admin->name ?? '';
+                                    // $uid = $admin->id ?? 0;
+                                    // $url = $admin ? "admin/auth/users/" . $admin->id : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
-                                    <td>
+                                    {{-- <td>
                                         @if ($admin)
                                             <a href="{{ $url ?? '#' }}" target="_blank"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
@@ -1288,7 +1288,7 @@
                                             
                                         @endif
                                     
-                                </td>
+                                </td> --}}
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getType() }}</td>
