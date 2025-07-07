@@ -86,6 +86,7 @@ class PaymentMethodController extends Controller
         if ($orderStatus === 'PAID') {
             $this->webhookPayment($order->id);
             $order->pid = $fawryRefNumber;
+            $order->status = 1;
             $paymentMethod->status = 'paid';
             $order->save();
 
@@ -134,11 +135,11 @@ class PaymentMethodController extends Controller
                     'message' => 'Transaction not found.',
                 ]);
             }
-            \Log::info('this response '.json_encode([
-                    'status' => $query['statusCode'] == 200,
-                    'trx' => $purchaseProduct->trx,
-                    'message' => $query['statusDescription'] ?? 'No description provided.',
-                ]));
+            \Log::info('this response ' . json_encode([
+                'status' => $query['statusCode'] == 200,
+                'trx' => $purchaseProduct->trx,
+                'message' => $query['statusDescription'] ?? 'No description provided.',
+            ]));
             return response()->json([
                 'status' => $query['statusCode'] == 200,
                 'trx' => $purchaseProduct->trx,
@@ -148,7 +149,7 @@ class PaymentMethodController extends Controller
             return response()->json([
                 'status' => false,
                 'trx' => null,
-                'message' => 'An error occurred: '.$e->getMessage(),
+                'message' => 'An error occurred: ' . $e->getMessage(),
             ]);
         }
     }
