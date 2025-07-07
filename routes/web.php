@@ -1,6 +1,5 @@
 <?php
 
-use App\Admin\Controllers\ExportController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -11,12 +10,14 @@ use App\Models\DeleteAccount;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomSettings;
 use App\Admin\Controllers\UserController;
+use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
+use App\Admin\Controllers\AppearChargerAgencyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -238,6 +239,7 @@ Route::group(
 
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
+        Route::post("transfer-salary-reliable-shipping-agency", [AppearChargerAgencyController::class, "transferSalary"]);
 
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
