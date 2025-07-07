@@ -1058,6 +1058,7 @@
   "applepay": "Apple Pay",
   "paytabs": "PayTabs",
   "paypal": "PayPal",
+  "unreliable_agency" : "Cannot transfer to this agency because it is not marked as reliable .",
   "utdFawry": "UTD Fawry",
   "increase": "Increase",
   "decrease": "Decrease",

@@ -164,6 +164,9 @@ class ChargeController extends Controller
         if ($to->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
+        if (!Common::canTransferToAgency($to)) {
+            return Common::apiResponse(0, __('unreliable_agency'), 403);
+        }
 
         $usd = $request->usd;
 
@@ -334,8 +337,11 @@ class ChargeController extends Controller
         }
         $receiver = Common::searchAgency($userUuid);
         if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
-        if ($receiver->is_frozen == 1) {
+        if ($receiver->is_frozen == 1 ) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
+        }
+        if (!Common::canTransferToAgency($receiver)) {
+            return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
 
         try {
