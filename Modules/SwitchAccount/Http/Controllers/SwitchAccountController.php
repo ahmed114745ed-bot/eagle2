@@ -162,6 +162,9 @@ class SwitchAccountController extends Controller
         if (!$user_account) return Common::apiResponse(0, 'missing params', null, 422);
 
         $currentUserId = $user->id;
+        info('current user'.$currentUserId);
+        info('parent id'.$user_account->parent_user_id);
+        info('child id'.$user_account->child_user_id);
         if ($user_account->parent_user_id != $currentUserId &&
             $user_account->child_user_id != $currentUserId) {
             return Common::apiResponse(0, __('forbidden'), null, 403);
