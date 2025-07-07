@@ -37,7 +37,7 @@ class ChargeController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Charge());
-        $grid->disableRowSelector();
+
 
 
         $grid->model()->where('charger_type', 'bd')
@@ -142,6 +142,7 @@ class ChargeController extends AdminController
             $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
             $tools->append($button);
         });
+        $grid->disableRowSelector();
         return $grid;
     }
 
