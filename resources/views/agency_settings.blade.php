@@ -615,7 +615,7 @@
                     </div>
                     <div class="switch-container mt-4">
                         <div class="switch-item">
-                            <label for="stopGiftCheckbox" class="switch-label">ايقاف ارسال الهدايا للجميع</label>
+                            <label for="stopGiftCheckbox" class="switch-label">{{__('Stop sending gifts to everyone')}}</label>
                             <label class="switch">
                                 <input type="checkbox" id="stopGiftCheckbox" {{ $make_gift_top == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>
