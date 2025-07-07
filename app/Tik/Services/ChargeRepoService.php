@@ -406,6 +406,7 @@ class ChargeRepoService
                     if (! $authAgency->status) {
                         throw new Exception(__('api.notCharge'));
                     }
+                 
                     if ($authAgency->app_owner_id !== $auth->id) {
                         throw new Exception(__('api.yorSelf'));
                     }
@@ -481,6 +482,9 @@ class ChargeRepoService
         }
         if ($chargeAgency->is_frozen) {
             throw new Exception(__('api_responses.frozenMass'));
+        }
+        if (!Common::canTransferToAgency($chargeAgency)) {
+            return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
