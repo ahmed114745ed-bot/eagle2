@@ -1258,21 +1258,21 @@
                                @php
                                     $path = @$pack->ware?->show_img ?? '';
 
-                                   $admin = null;
-
-                                    if ($pack->vip_user_id && $pack->userVip && $pack->userVip->admin && is_object($pack->userVip->admin)) {
+                                    if ($pack->vip_user_id) {
                                         $admin = $pack->userVip->admin;
-                                    } elseif ($pack->dash_user_id && $pack->admin && is_object($pack->admin)) {
+                                    } elseif ($pack->dash_user_id) {
                                         $admin = $pack->admin;
-                                    }
-                                   
-                                    $image = is_string(optional($admin)->avatar) ? getImagePath($admin->avatar) : '';
+                                    } 
+  
+                                    $image = $admin->avatar??'';
                                     $defaultImage = asset("images/businessman-icon.jpg");
-                                    $image = isImageExists($image) ? $image : $defaultImage;
-
-                                    $name = is_string(optional($admin)->name) ? $admin->name : '';
-                                    $uid = is_numeric(optional($admin)->id) ? $admin->id : 0;
-                                    $url = is_numeric($uid) ? url("admin/auth/users/" . $uid) : '#';
+                                            $image = getImagePath($image);
+                                            if (!isImageExists($image)) {
+                                                $image = $defaultImage;
+                                            }
+                                    $name = $admin->name ?? '';
+                                    $uid = $admin->id ?? 0;
+                                    $url = $admin ? "admin/auth/users/" . $admin->id : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
