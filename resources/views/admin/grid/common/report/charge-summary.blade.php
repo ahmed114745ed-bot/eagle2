@@ -4,7 +4,7 @@
             {{ __('Total success charges') }}
         </div>
         <div class="diamond-count">
-            <span>{{ number_format((float) @$total) }}</span>
+            <span>{{ number_format( @$total,2) }}</span>
             <div class="diamond-icon-container">
                 <img src="{{ asset('images/dollar.jpg') }}" alt="Diamond" class="diamond-icon">
             </div>

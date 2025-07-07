@@ -97,121 +97,93 @@ class GiftController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Gift);
-        $grid->model()->orderBy("use_count", "desc");
 
-        $filterType = request('filter', 'all');
+    $filterType = request('filter', 'all');
 
-        $grid->header(function () use ($filterType) {
-            $tabs = translate(TYPE_GIFT);
-            $tabs = ['all' => __('All')] + $tabs;
+    $grid->model()
+        ->with('vip')
+        ->where('type', '!=', 8)
+        ->when($filterType !== 'all', fn($q) => $q->where('type', $filterType))
+        ->orderBy('use_count', 'desc')
+        ->orderBy('type')
+        ->orderByRaw('ISNULL(`sort`), `sort`')
+        ->orderBy('price');
 
-            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-            foreach ($tabs as $key => $label) {
-                $active = $filterType === (string)$key ? 'active' : '';
-                $url = request()->fullUrlWithQuery(['filter' => $key]);
-                $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
-            }
-            $html .= '</ul></div>';
+    $grid->paginate(20); 
 
-            $html .= <<<HTML
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const tabLinks = document.querySelectorAll('.tab-link');
-
-                    tabLinks.forEach(function (tab) {
-                        tab.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            tabLinks.forEach(t => t.style.pointerEvents = 'none');
-                            setTimeout(() => {
-                                window.location.href = tab.getAttribute('href');
-                            }, 300);
-                        });
-                    });
-                });
-            </script>
-        HTML;
-
-            return $html;
-        });
-
-        if ($filterType !== 'all') {
-            $grid->model()->where('type', $filterType);
+    
+    $grid->header(function () use ($filterType) {
+        $tabs = ['all' => __('All')] + translate(TYPE_GIFT);
+        $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+        foreach ($tabs as $key => $label) {
+            $active = $filterType === (string)$key ? 'active' : '';
+            $url = request()->fullUrlWithQuery(['filter' => $key]);
+            $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
         }
+        $html .= '</ul></div>';
+        return $html;
+    });
 
-        $grid->id(__('ID'));
-        $grid->name(__('Name'));
+    $grid->id(__('ID'));
+    $grid->name(__('Name'));
 
+    if ($filterType == 9) {
         $grid->column('level', trans('vip'))->display(function () {
-
-            $path = $this?->vip?->img;
             $defaultImage = asset("images/image.png");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+            $path = getImagePath($this?->vip?->img);
+            $url = $path ?: $defaultImage;
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('vip_level', __('level_num'));
+    }
 
+    if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
+        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
+    }
 
-        if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
-            $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
-        }
-        $grid->column('price', __('price'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+    $grid->column('price', __('price'))->display(function ($coin) {
+        $icon = asset('images/coin.jpg');
+        return "
+            <div style='display: flex; align-items: center; gap: 5px;'>
+                <span>" . number_format($coin) . "</span>
+                <img src='{$icon}' alt='Coin' width='20' height='20'>
+            </div>
+        ";
+    });
 
-                </div>
-            ";
-        });
-        $grid->column('img', trans('image'))->display(function ($path) {
-            /** @var Gift $this */
-            $imgPath = getImagePath($path);
-            $defaultImage = asset("images/image.png");
+    $grid->column('img', trans('image'))->display(function ($path) {
+        $imgPath = getImagePath($path) ?: asset("images/image.png");
+        $musicIcon = $this->music_gift == 1
+            ? "<img src='" . asset('images/music.jpg') . "' 
+                style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
+                background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>"
+            : '';
 
-            if (!isImageExists($imgPath)) {
-                $imgPath = $defaultImage;
-            }
+        return "<div style='position: relative; display: inline-block;'>
+                    <img src='{$imgPath}' style='width: 70px; height: 70px;' class='img img-thumbnail' />
+                    {$musicIcon}
+                </div>";
+    });
 
-            $musicIcon = '';
-            if ($this->music_gift == 1) {
-                $musicIcon = "<img src='" . asset('images/music.jpg') . "' 
-                    style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
-                    background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>";
-            }
+    $grid->column('show_img', trans('show_img'))->display(function ($path) {
+        $url = getImagePath($path) ?: asset('images/image.png');
+        return handleShowImageWithTypes($this->id, $url, 50, 50);
+    });
 
-            return "<div style='position: relative; display: inline-block;'>
-                        <img src='" . $imgPath . "' style='width: 70px; height: 70px;' class='img img-thumbnail' />
-                        $musicIcon
-                    </div>";
-        });
+    $grid->column("use_count", __('use count'));
 
-        $grid->column('show_img', trans('show_img'))->display(function ($path) {
-            /** @var Gift $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
-        $grid->column("use_count", __('use count'));
-        // $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
-        // $grid->vip_level(__('vip_level'));
-        //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
+                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    $this->extendGrid($grid);
 
-        $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
-        //        $grid->column('international_gift',trans ('international_gift'))->switch (Common::getSwitchStatesGiftINtrnahional());
+    $grid->disableExport();
 
-
-
-        $this->extendGrid($grid);
-        $grid->disableExport();
-        Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+    Admin::script("
+        if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
-            }
-        ");
-        return $grid;
+        }
+    ");
+
+    return $grid;
     }
 
     /**
