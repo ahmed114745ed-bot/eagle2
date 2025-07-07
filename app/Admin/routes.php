@@ -289,13 +289,7 @@ Route::group(
         Route::resource('offers', OfferController::class);
         Route::resource('payment-gateways', PaymentGetWayController::class);
         Route::resource('payment-coins', PaymentCoinController::class);
-        Route::resource('charges', 'ChargeController', [
-
-            'names' => [
-                'index' => 'charges',
-                'show' => 'charges.show'
-            ]
-        ]);
+        Route::resource('charges', 'ChargeController');
         Route::resource('charges-details', 'ChargesDetailsController', [
 
             'names' => [

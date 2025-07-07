@@ -48,7 +48,7 @@ class BanController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('bans'))
             ->body($this->detail($id)));
     }
@@ -62,7 +62,7 @@ class BanController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('bans'))
             ->body($this->form()->edit($id)));
     }
@@ -90,6 +90,8 @@ class BanController extends MainController
     {
         $now = now();
         $grid = new Grid(new Ban);
+        $grid->disableRowSelector();
+
         $grid->model()->whereHas('user')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->select('uid', 'duration', 'type', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')

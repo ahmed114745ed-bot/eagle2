@@ -95,8 +95,8 @@ class UserChargeReportController extends MainController
 
         $grid = new Grid(new Charge());
         $grid->model()
-        ->where('user_id', '=', request('id'))
-        ->orderByDesc('created_at')->with(['sender', 'receiver']);
+            ->where('user_id', '=', request('id'))
+            ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
             $grid->model()->where('charger_type', "dash");
@@ -141,7 +141,7 @@ class UserChargeReportController extends MainController
             $uuid = $sender['uuid'];
             $path = $sender['image'];
             $showUrl = $sender['url'];
-           
+
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = $path ?? $defaultImage;
 
@@ -223,7 +223,7 @@ class UserChargeReportController extends MainController
             // });
         }
         if ($charger_type == "dash") {
-       
+
 
             // $grid->column('balance_before', __('balance_before') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
             //     ->display(function ($coin) {
@@ -235,16 +235,16 @@ class UserChargeReportController extends MainController
             //             </div>";
             //     });
 
-                // $grid->column('usd', __('amount') . ' ' . "")
-                //    ->display(function ($coin) {
-                //     $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+            // $grid->column('usd', __('amount') . ' ' . "")
+            //    ->display(function ($coin) {
+            //     $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
 
-                //     return "<div style='display: flex; align-items: center; gap: 5px;'>
-                //             <span>{$coin}</span>
-                //         </div>";
-                // });
+            //     return "<div style='display: flex; align-items: center; gap: 5px;'>
+            //             <span>{$coin}</span>
+            //         </div>";
+            // });
 
-             
+
         } elseif ((request("name") == "host") || (request("name") == "app")) {
             // $grid->column('amount', __('amount'))->display(function ($coin) {
             //     $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -297,26 +297,28 @@ class UserChargeReportController extends MainController
 
         $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
             ->display(function ($coin) {
-            $image = asset('images/coin.png'); 
+                $image = asset('images/coin.png');
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <span>{$coin}</span>
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
-                });
+            });
 
-                $grid->column('change_type', __('change_type'))
-                    ->display(function () {
-                        if ($this->amount > 0) {
-                            return "<span style='color:green; font-weight:bold;'>" . __('increase') . "</span>";
-                        } elseif ($this->amount < 0) {
-                            return "<span style='color:red; font-weight:bold;'>" . __('decrease') . "</span>";
-                        } else {
-                            return "<span style='color:gray;'>" . __('no_change') . "</span>"; 
-                        }
-                    });
+        $grid->column('change_type', __('change_type'))
+            ->display(function () {
+                if ($this->amount > 0) {
+                    return "<span style='color:green; font-weight:bold;'>" . __('increase') . "</span>";
+                } elseif ($this->amount < 0) {
+                    return "<span style='color:red; font-weight:bold;'>" . __('decrease') . "</span>";
+                } else {
+                    return "<span style='color:gray;'>" . __('no_change') . "</span>";
+                }
+            });
 
         $grid->column('created_at', __('shipping date'));
+        $grid->disableRowSelector();
+
 
         return $grid;
     }
@@ -326,8 +328,8 @@ class UserChargeReportController extends MainController
 
     private function tabsComponent()
     {
-        $user=User::find(request('id'));
-        return view('admin.grid.common.report.usersCharge',compact('user') )->render();
+        $user = User::find(request('id'));
+        return view('admin.grid.common.report.usersCharge', compact('user'))->render();
 
         $content = new Row();
 
@@ -482,9 +484,9 @@ class UserChargeReportController extends MainController
 
         $grid->column('amount', __('Amount'));
         $grid->column('amount', __('Amount'));
-        if ($scope === 'not_dash' ) {
-           // dd(123);
-            $grid->column('amount_type', __('status'))->display(function () use($agency_id){
+        if ($scope === 'not_dash') {
+            // dd(123);
+            $grid->column('amount_type', __('status'))->display(function () use ($agency_id) {
                 return $this->user_id == $agency_id  ?  __('increment') : __('decrement');
             });
         } else {
@@ -498,6 +500,8 @@ class UserChargeReportController extends MainController
         $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableActions();
+        $grid->disableRowSelector();
+
 
         return $grid;
     }
