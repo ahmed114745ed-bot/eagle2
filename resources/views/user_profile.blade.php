@@ -1264,7 +1264,7 @@
                                         $admin = $pack->admin;
                                     }
   
-                                    $image = $admin->avatar;
+                                    $image = $admin->avatar??'';
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                             $image = getImagePath($image);
                                             if (!isImageExists($image)) {
