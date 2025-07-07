@@ -55,7 +55,7 @@ class ChargeEventController extends Controller
                     $query->select('user_id', \DB::raw('SUM(obtained_coins) as coin_logs_sum_obtained_coins'))
                         ->from('coin_logs')
                         //   ->whereBetween('created_at',[$fromDate,$tillDate])
-                        ->whereBetween('coin_logs.created_at', [$fromDate . ' 00:00:00', $tillDate . ' 23:59:59'])
+                        ->whereBetween('coin_logs.created_at', [$fromDate . ' 00:00:00', $tillDate . ' 23:59:59'])->where('coin_logs.status', 1)
                         ->groupBy('user_id');
                 },
                 'coin_logs',
@@ -100,12 +100,13 @@ class ChargeEventController extends Controller
 
     public function received_rewards(Request $request)
     {
+        // return Common::apiResponse(0, __('معطل لبعض الوقت'));
         $currentMonth = now()->month;
 
         $user = User::query()->withSum(['charges' => function ($query) use ($currentMonth) {
             $query->whereMonth('created_at', $currentMonth);
         }], 'amount')->withSum(['coinLogs' => function ($query) use ($currentMonth) {
-            $query->whereMonth('created_at', $currentMonth);
+            $query->whereMonth('created_at', $currentMonth)->where('status', 1);
         }], 'obtained_coins')->find(auth()->user()->id);
         if ($user->type_user == 3) {
             return Common::apiResponse(0, __('api_responses.notAllowed'));

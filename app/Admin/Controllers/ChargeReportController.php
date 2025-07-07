@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Widgets\InfoBox;
 use Carbon\Carbon;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -403,7 +404,7 @@ class ChargeReportController extends MainController
                 }
             });
         }
-            //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
+        //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
         //            $balance_after = $this->amount + $this->balance_before;
         //            $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
         //
@@ -442,17 +443,52 @@ class ChargeReportController extends MainController
                 $filter->equal('user.uuid', __('charger'));
 
                 $filter->where(function ($query) {
-                    if ($this->input != null) {
+                    if ($this->input !== '') {
                         $query->where('method', $this->input);
                     }
-                }, __('Select type'), 'name_for_url_shortcut')->radio([
-                    '' => __('All'),
-                    'oPay' => __('oPay'),
-                    'stripe' => __('stripe'),
-                    'fawry' => __('fawry'),
-                    'sky_pay' => __('sky pay')
-                ]);
+                }, __('Select type'), 'method')
+                    ->select(
+                        ['' => __('All')] +
+                            PaymentCoin::orderBy('type')
+                            ->pluck('title', 'type')
+                            ->toArray()
+                    );
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        request('from_date');
+
+                        $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+                        $query->whereDate('created_at', '>=', $start);
+                    }, __('From Date'), 'from_date')->date();
+                });
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        request('to_date');
+
+                        $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+                        $query->whereDate('created_at', '<=', $end);
+                    }, __('To Date'), 'to_date')->date();
+                });
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->equal('status', __('Status'))->select([
+                        '' => __('All'),
+                        1  => __('success'),
+                        0  => __('failed'),
+                    ]);
+                });
             });
+        });
+
+        $grid->header(function () {
+            $query =  CoinLog::where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay'); // Get the actual Eloquent builder
+            $total = $query->where('status', 1)->sum('paid_usd'); // Execute and cast
+
+            return view('admin.grid.common.report.charge-summary', [
+                'total' => $total,
+            ])->render();
         });
 
 
@@ -755,9 +791,9 @@ class ChargeReportController extends MainController
         $grid->model()->where('agency_id', $agency_id);
 
         // Add tabs to the header
-   $grid->header(function () {
-    $scope = request('scope', 'dash');
-    return '
+        $grid->header(function () {
+            $scope = request('scope', 'dash');
+            return '
     <style>
         .tab-buttons .tab-button {
             color: black !important;
@@ -768,7 +804,7 @@ class ChargeReportController extends MainController
         <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
     </div>
     ';
-});
+        });
 
         // Apply scope based on query parameter
         $scope = request('scope');
@@ -815,7 +851,7 @@ class ChargeReportController extends MainController
                     $showUrl = url("admin/auth/users/{$this->admin->id}");
                 }
 
-               return "
+                return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                         $image
@@ -848,7 +884,7 @@ class ChargeReportController extends MainController
                                                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
                                                 </a>
                                             " : "<span style='color: gray;'>No Agency</span>";
-                     $image = "<img src='{$url}' style='width: 60px; height: 40px; object-fit: cover;'>";
+                    $image = "<img src='{$url}' style='width: 60px; height: 40px; object-fit: cover;'>";
                     return "
                                 <div style='display: flex; align-items: center; gap: 10px;'>
                                     $image
@@ -865,7 +901,7 @@ class ChargeReportController extends MainController
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
-                     $showUrl = $this->user ? url("admin/users/{$this->user->id}") : '#';
+                    $showUrl = $this->user ? url("admin/users/{$this->user->id}") : '#';
                     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
                     return "

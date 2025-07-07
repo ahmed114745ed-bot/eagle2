@@ -31,7 +31,7 @@ trait PaymentTrait
 
             $user->di += $coins->coin;
             $user->save();
-            UserCommon::addChargeLevel($user->id,$coins->coin);
+            UserCommon::addChargeLevel($user->id, $coins->coin);
             $data = CoinLog::create([
                 "obtained_coins" => $coins?->coin,
                 "user_id"        => $userId,
@@ -63,6 +63,7 @@ trait PaymentTrait
         if ($user) {
             $user->di += $coinLog->obtained_coins;
             $user->save();
+            UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
         } else {
             return response()->json(['status' => 'failed', 'reason' => 'User not found']);
         }

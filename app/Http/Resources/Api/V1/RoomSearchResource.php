@@ -18,20 +18,19 @@ class RoomSearchResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
-    {   
+    {
         $pks = !is_null(@$this?->room_id) ? $this->getRoomTwoLastPk(@$this?->room_id) : null;
-        $room = Room::find(@$this->id);
         $achievement_images = [];
-        if (@$room->owner?->medals) {
-            foreach (@$room->owner?->medals as $medal) {
+        if (@$this->owner?->medals) {
+            foreach (@$this->owner?->medals as $medal) {
                 if ($medal->achievementLevel && $medal->achievementLevel->achievement && $medal->achievementLevel->achievement->type?->value == 'room_target') {
                     $achievement_images[] = $medal->achievementLevel->valid_image;
                 }
             }
         }
-        $isHideCountry = $room?->owner->getPackWithType(13);
-        $country = $room?->country
-            ? new CountryResource($room?->country)
+        $isHideCountry = $this?->owner?->getPackWithType(13);
+        $country = $this?->country
+            ? new CountryResource($this?->country)
             : [
                 'id' => 0,
                 'name' => '',
@@ -39,7 +38,7 @@ class RoomSearchResource extends JsonResource
                 'lang' => '',
                 'phone_code' => ''
             ];
-        $endCountry = !$isHideCountry  ?  $country: (object)[]; 
+        $endCountry = !$isHideCountry  ?  $country: (object)[];
 
         return [
             'id' => $this->id ?? 0,
@@ -47,29 +46,29 @@ class RoomSearchResource extends JsonResource
             "room_name" => $this->room_name ?? '',
             "numid" => $this->numid ?? 0,
             "hot" => $this->hot ?? '',
-            "room_cover" => $room->room_cover ?? '',
-            "cover" => $room->room_cover ?? '',
+            "room_cover" => $this->room_cover ?? '',
+            "cover" => $this->room_cover ?? '',
             "room_intro" => $this->room_intro ?? '',
-            "room_background" => @$room->final_room_image ?? '',
+            "room_background" => @$this->final_room_image ?? '',
             "room_welcome" => $this->room_welcome ?? '',
             "mode" => @$this->mode ?? 0,
             'giftPrice' => @$this->session_string ?? "0",
             "show_pk"             => @$this->is_show_pk ?? 0,
             'password_status'     => !(@$this->room_pass == ""),
             'type-number'                => @$this->room_type ?? 0,
-            'type' => @$room->myType ?: new \stdClass(),
+            'type' => @$this->myType ?: new \stdClass(),
             "is_pk"               => (bool)((@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0),
 
             "room_pass" => $this->room_pass ?? '',
             "uid" => $this->uid ?? 0,
             'owner_id' =>  $this->uid ?? 0,
-            'owner_uuid' => $this->uuid ?? '',
+            'owner_uuid' => $this->owner?->uuid ?? '',
             "name" => $this->name ?? '',
 
             "nickname" => $this->nickname ?? '',
             'country' =>$endCountry ,
             'achievement_images' => $achievement_images,
-            'medals'               => @$room->owner?->medals()?->where('is_enable', true)->get() ?? [],
+            'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
 
 
         ];

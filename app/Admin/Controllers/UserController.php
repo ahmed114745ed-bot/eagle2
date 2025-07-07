@@ -602,159 +602,7 @@ class UserController extends MainController
         }
     }
 
-    // public function show($id, Content $content)
-    // {
-    //     return $content->row(
-    //         function ($row) use ($id) {
-    //             $user = User::withTrashed()->find($id);
-    //             if ($user) {
-    //                 $user->flowers = 0;
-    //                 $user->save();
-    //             }
-
-    //             $type = $user->type_user;
-    //             switch ($type) {
-    //                 case 0:
-    //                     $userType = __("User");
-    //                     break;
-    //                 case 1:
-    //                     $userType = __("Host");
-    //                     break;
-    //                 case 2:
-    //                     $userType = __("Host Agent");
-    //                     break;
-    //                 case 3:
-    //                     $userType = __("Shipping Agent");
-    //                     break;
-    //                 case 4:
-    //                     $userType = __("Resort & Shipping Agent");
-    //                     break;
-    //                 case 5:
-    //                     $userType = __("Admin");
-    //                     break;
-    //                 default:
-    //                     $userType = $type; // Keep the original value if no match is found
-    //                     break;
-    //             }
-    //             $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
-    //             $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
-    //             $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
-    //             $row->column(2, new InfoBox($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
-    //             $row->column(2, new InfoBox($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
-    //             $row->column(2, new InfoBox($userType ?? '', '', 'green', '?type=balance_details', __('type')));
-    //         }
-    //     )->row("<h3>" . __('pack') . "</h3>")->row(function ($row) use ($id) {
-    //         $row->column(12, $this->packList($id));
-    //     })
-    //         ->row("<h3>" . __('vips') . "</h3>")->row(function ($row) use ($id) {
-    //             $row->column(12, $this->vipList($id));
-    //         });
-    // }
-
-    protected function packList($id)
-    {
-        Pack::query()
-            ->where('expire', '!=', 0)
-            ->where('expire', '<', time())
-            ->delete();
-
-        $grid = new Grid(new Pack);
-        $grid->model()
-            ->where('user_id', $id)
-            ->with(['ware' => function ($q) {
-                $q->select('id', 'show_img');
-            }]);
-
-        $grid->id('ID');
-        $grid->column('user_id', __('user id'));
-        $grid->column('get_type', __('get type'))->using([
-            1 => __('vip level automatic acquisition'),
-            2 => __('activities'),
-            3 => __('treasure box'),
-            4 => __('purchase'),
-            5 => __('background addition'),
-        ]);
-
-        $grid->column('type', __('type'))->using([
-            1 => trans('Gemstone'),
-            3 => trans('Card Scroll'),
-            4 => trans('Avatar Frame'),
-            5 => trans('Bubble Frame'),
-            6 => trans('Entering Special Effects'),
-            7 => trans('Microphone Aperture'),
-            8 => trans('Badge'),
-            9 => trans('NoKick'),
-            10 => trans('Icon'),
-            11 => trans('intro animation'),
-            12 => trans('wapel'),
-            13 => trans('hide country'),
-            14 => trans('vip gifts'),
-            15 => trans('no pan'),
-            16 => trans('hidden room'),
-            17 => trans('anonymous man'),
-            18 => trans('colored name'),
-            19 => trans('profile visitors hide in'),
-            20 => trans('hide last active'),
-            21 => trans('sound effect'),
-            22 => trans('upload GIF image'),
-        ]);
-
-        $grid->column('target_id', __('img'))->display(function () {
-            return $this->ware ? "<img width='30' src='" . getDriverUrl() . '/' . (@$this->ware?->show_img  ?? '') . "'>" : '';
-        });
-
-        $grid->column('expire', __('expire'))->display(function ($row) {
-            return $this->expire ? Carbon::createFromTimestamp($this->expire)->format('Y-m-d H:i:s') : __('no time');
-        });
-
-        $grid->actions(function ($actions) {
-            $actions->disableDelete();
-            $actions->disableEdit();
-            $actions->disableView();
-            $actions->add(new DeletePackAction());
-            $actions->add(new EditPackExpireAction());
-        });
-
-        $grid->disablePagination();
-        $grid->disableCreateButton();
-        $grid->disableFilter();
-        $grid->disableRowSelector();
-        $grid->disableExport();
-
-        return $grid;
-    }
-
-    protected function vipList($id)
-    {
-        $grid = new Grid(new UserVip());
-        $grid->model()
-            ->where('user_id', $id)
-            ->select(['id', 'user_id', 'level', 'expire', 'qty', 'total']);
-
-        $grid->id('ID');
-        $grid->column('user_id', __('user id'));
-        $grid->column('level', __('level'));
-        $grid->column('expire', __('expire'))->display(function ($row) {
-            return $this->expire ? Carbon::createFromTimestamp($this->expire)->format('Y-m-d H:i:s') : __('no time');
-        });
-        $grid->column('qty', __('qty'));
-        $grid->column('total', __('total Price'));
-
-        $grid->actions(function ($actions) {
-            $actions->disableDelete();
-            $actions->disableEdit();
-            $actions->disableView();
-            $actions->add(new DeleteUserVipAction());
-        });
-
-        $grid->disablePagination();
-        $grid->disableCreateButton();
-        $grid->disableFilter();
-        $grid->disableRowSelector();
-        $grid->disableExport();
-
-        return $grid;
-    }
+    
 
     public function showAdditionalInfo($id, Content $content)
     {
@@ -905,8 +753,8 @@ class UserController extends MainController
             $query->whereDate('join_date', $joinDate);
         })->paginate(10, ['*'], 'user_agency_page');
 
-        $usersCoins = UserCoinLog::where('user_id',$id)->orderByDesc('id')->paginate(10, ['*'], 'coins_page');;
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip','usersCoins');
+        $usersCoins = UserCoinLog::where('user_id', $id)->orderByDesc('id')->paginate(10, ['*'], 'coins_page');;
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
@@ -946,7 +794,7 @@ class UserController extends MainController
     {
         $form = new Form(new User());
         $this->disableFormTools($form);
-        
+
         if ($form->isEditing()) {
             $userId           = request()->route('user');
             $user             = User::findOrFail($userId);
@@ -994,22 +842,23 @@ class UserController extends MainController
         $form->text('original_uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
+
         $form->image('photo', __('image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
 
         $form->image('profile.image_id', __('image Id'));
-
-        Admin::script(
-            <<<'JS'
-                $(function() {
-                    // For every file/image input (fileinput plugin)
-                    $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
-                    $('.fileinput-upload').hide(); // Hide upload buttons if present
-                    $('input[type="file"]').prop('disabled', true); // Prevent any file selection
-                });
-            JS
-        );
+        // stop upload image
+        // Admin::script(
+        //     <<<'JS'
+        //         $(function() {
+        //             // For every file/image input (fileinput plugin)
+        //             $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
+        //             $('.fileinput-upload').hide(); // Hide upload buttons if present
+        //             $('input[type="file"]').prop('disabled', true); // Prevent any file selection
+        //         });
+        //     JS
+        // );
 
         if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
             Admin::script(
@@ -1024,9 +873,9 @@ class UserController extends MainController
 
         $form->hasMany('images', __('Profile Images'), function ($form) {
             $form->image('img', __('Image'));
-        })->useTable()->disableCreate()->disableDelete();;
+        })->useTable()->disableCreate()->disableDelete();
 
-        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name)) {
+        if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name) && !Admin::user()->can('*')) {
             Admin::script(
                 <<<JS
         $(document).ready(function() {
@@ -1055,15 +904,7 @@ class UserController extends MainController
         //            );
         //        }
 
-        $state = [
-            'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
-            'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
-        ];
 
-        //        $form->switch('charge_status', __("charge status"))->states($state);
-        //        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
-        //        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
-        //        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
             $countries = Country::all();
@@ -1072,48 +913,12 @@ class UserController extends MainController
             }
             return $ops;
         });
-        //        $states = [
-        //            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
-        //            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
-        //            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
-        //        ];
-        //        if ($form->isCreating()) {
-        //            $form->switch('can_play', __('canPlay'))->default(0)->states($states);
-        //        } elseif ($form->isEditing()) {
-        //            $form->switch('can_play', __('canPlay'))->value(function ($can_play) {
-        //                $can_play = UserHandling::chickLevelToPlay($this);
-        //                return $can_play ? 'on' : 'off';
-        //            })->states($states);
-        //        }
 
-        //        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-        //            if ($form->isEditing()) {
-        //                $form->number('di', __('Coins'))->default(0)
-        //                    ->disable($form->isEditing());
-        //            } else {
-        //                $form->number('di', __('Coins'))->default(0);
-        //            }
-        //            $form->number('user_diamond', __('Diamonds'))->default(0);
-        //            $form->number('total_sender_level', __('Sender Level'))->default(0);
-        //            $form->number('total_received_level', __('Received Level'))->default(0);
-        //            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
-        //            $form->number('salary', __('salary'))->disable();
-        //        }
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
-        //        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
-        //        $form->select('type_user', trans('User Type'))->options([
-        //            $form->model()->type_user => $form->model()->type_user,
-        //            0                         => 'مستخدم',
-        //            1                         => 'مضيف',
-        //            2                         => 'وكيل مضيفين',
-        //            3                         => 'وكيل شحن',
-        //            4                         => ' وكيل مصيفين ووكيل شحن',
-        //            5                         => 'اداري',
-        //
-        //        ])->default(0);
+
 
         if (Session::has('show_alert')) {
             $form->html('<script>

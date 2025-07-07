@@ -423,7 +423,7 @@ class WalletController extends MainController
         $to = ShippingAgency::find($toId);
     
         if (!$to || $to->is_frozen == 1) {
-            throw new \Exception(__('api_responses.freez_charge'));
+            throw new \Exception(__('api_responses.it_agency_freez_charge'));
 
         }
 

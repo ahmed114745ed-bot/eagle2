@@ -1434,12 +1434,12 @@ class User extends Authenticatable
         $lang = app()->getLocale() ?? 'en';
 
         $types = [
-            1 => 'agency_owner',
-            2 => 'host',
+            1 => 'host',
+            2 => 'agency_owner',
             3 => 'shipping',
             4 => 'bd',
         ];
-
+        
         $applicableTypes = [];
 
         if ($this->type_user >= 1) {
