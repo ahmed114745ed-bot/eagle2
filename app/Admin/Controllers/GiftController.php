@@ -124,7 +124,6 @@ class GiftController extends MainController
         return $html;
     });
 
-    // الأعمدة
     $grid->id(__('ID'));
     $grid->name(__('Name'));
 
