@@ -570,7 +570,7 @@ class UserController extends MainController
         });
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
-
+        $grid->disableRowSelector();
 
         return $grid;
     }
@@ -602,7 +602,7 @@ class UserController extends MainController
         }
     }
 
-    
+
 
     public function showAdditionalInfo($id, Content $content)
     {
