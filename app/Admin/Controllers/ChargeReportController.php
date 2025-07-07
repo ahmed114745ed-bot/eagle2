@@ -99,6 +99,7 @@ class ChargeReportController extends MainController
         }
 
         $grid = new Grid(new Charge());
+        $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
