@@ -99,6 +99,7 @@ class ChargeReportController extends MainController
         }
 
         $grid = new Grid(new Charge());
+        $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
@@ -436,6 +437,7 @@ class ChargeReportController extends MainController
     protected function stripe()
     {
         $grid = new Grid(new CoinLog());
+        $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -571,6 +573,7 @@ class ChargeReportController extends MainController
         // dd(request('uuid'));
 
         $grid = new Grid(new CoinLog());
+        $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -673,6 +676,7 @@ class ChargeReportController extends MainController
 
 
         $grid = new Grid(new ExchangeLog());
+        $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->where('status', 1);
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -788,6 +792,7 @@ class ChargeReportController extends MainController
     protected function customGrid($agency_id)
     {
         $grid = new Grid(new Charge());
+        $grid->disableRowSelector();
         $grid->model()->where('agency_id', $agency_id);
 
         // Add tabs to the header

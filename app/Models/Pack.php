@@ -29,6 +29,16 @@ class Pack extends Model
         return $this->belongTo(User::class, 'sender_id');
     }
 
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'dash_user_id');
+    }
+
+    public function userVip()
+    {
+        return $this->belongsTo(UserVip::class, 'vip_user_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where(function ($q) {

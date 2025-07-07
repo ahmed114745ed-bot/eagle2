@@ -179,6 +179,7 @@ class UsersChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new User());
+        $grid->disableRowSelector();
 
         $grid->filter(function (Grid\Filter $filter) {
 
@@ -193,15 +194,14 @@ class UsersChargeController extends MainController
 
             $filter->where(function ($query) {
 
-                    $query->where('uuid', 'like', "%{$this->input}%");
-
+                $query->where('uuid', 'like', "%{$this->input}%");
             }, __('uuid'));
         });
 
         $grid->model()
-        ->select('id','name','uuid','coins','di')
-        ->with('profile')
-        ->orderByDesc('id');
+            ->select('id', 'name', 'uuid', 'coins', 'di')
+            ->with('profile')
+            ->orderByDesc('id');
 
         $grid->id(__('ID'));
 

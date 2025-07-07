@@ -239,19 +239,19 @@ class GiftController extends MainController
                 $probabilityTimes3 = \Cache::get('probability_times_3', []);
 
                 $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
-                    ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('percentage_chash_back') .  '</span>')
+                    ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('scope for multiplies') .  '</span>')
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
 
                 $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
-                    ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . ' ]- ' . __('percentage_chash_back') .  '</span>')
+                    ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . ' ]- ' . __('scope for multiplies') .  '</span>')
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
 
                 $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
-                    ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('percentage_chash_back') .  '</span>')
+                    ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('scope for multiplies') .  '</span>')
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();

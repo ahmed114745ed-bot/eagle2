@@ -35,6 +35,8 @@ class ChargesDetailsController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Charge());
+        $grid->disableRowSelector();
+
         $grid->model()->orderByDesc('created_at')->with(['sender', 'receiver']);
 
 
@@ -59,7 +61,6 @@ class ChargesDetailsController extends MainController
 
                 $query->whereDate('created_at', '<=', $datt);
             }, __('to_date'), 'to_date')->date();
-
         });
         $grid->column('id', __('id'));
         // $grid->column('charger_id', __("sender"))->display(function () {
@@ -78,8 +79,8 @@ class ChargesDetailsController extends MainController
             return \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
                 ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
         });
-        $grid->disableActions ();
-        $grid->disableCreateButton ();
+        $grid->disableActions();
+        $grid->disableCreateButton();
         return $grid;
     }
 }

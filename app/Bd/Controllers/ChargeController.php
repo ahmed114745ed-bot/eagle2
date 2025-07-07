@@ -3,14 +3,15 @@
 namespace App\Bd\Controllers;
 
 use App\Models\Charge;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Auth;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class ChargeController extends AdminController
+class ChargeController extends MainController
 {
     /**
      * Title for current resource.
@@ -26,41 +27,42 @@ class ChargeController extends AdminController
      */
 
 
-     public function index(Content $content)
-     {
+    public function index(Content $content)
+    {
         return $content
-        ->header(trans('Charges'))
-        ->row(function ($row) {
-            $row->column(12, $this->grid());
-        });
-     }
+            ->header(trans('Charges'))
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            });
+    }
     protected function grid()
     {
         $grid = new Grid(new Charge());
 
 
-        $grid->model()->where('charger_type','bd')
-                      ->with('receiverUser','receiveragency')
-                      ->where('charger_id', Auth::user()->app_id);
+
+        $grid->model()->where('charger_type', 'bd')
+            ->with('receiverUser', 'receiveragency')
+            ->where('charger_id', Auth::user()->app_id);
 
 
 
-                      $grid->filter(function (Grid\Filter $filter) {
-                        $filter->expand();
-                        $filter->where(function ($query) {
-                            $uuid = $this->input;
-                            $query->where(function ($q) use ($uuid) {
-                                $q->whereHas('receiverUser', function ($subQuery) use ($uuid) {
-                                    $subQuery->where('uuid', 'like', "%{$uuid}%");
-                                })->orWhereHas('receiveragency', function ($subQuery) use ($uuid) {
-                                    $subQuery->where('id', 'like', "%{$uuid}%");
-                                });
-                            });
-                        }, __('UUID'))->placeholder(__('ابحث في مستلم التحويل'));
-                    
-                        // فلتر التاريخ (من-إلى)
-                        $filter->between('created_at', __('تاريخ الإنشاء'))->datetime();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->where(function ($query) {
+                $uuid = $this->input;
+                $query->where(function ($q) use ($uuid) {
+                    $q->whereHas('receiverUser', function ($subQuery) use ($uuid) {
+                        $subQuery->where('uuid', 'like', "%{$uuid}%");
+                    })->orWhereHas('receiveragency', function ($subQuery) use ($uuid) {
+                        $subQuery->where('id', 'like', "%{$uuid}%");
                     });
+                });
+            }, __('UUID'))->placeholder(__('ابحث في مستلم التحويل'));
+
+            // فلتر التاريخ (من-إلى)
+            $filter->between('created_at', __('تاريخ الإنشاء'))->datetime();
+        });
 
 
 
@@ -69,25 +71,25 @@ class ChargeController extends AdminController
         $grid->column('amount', __('Amount'));
         // $grid->column('amount_type', __('Amount type'));
 
-$grid->column('user_id', __('receiver'))->display(function () {
-    $info = \App\Helpers\Common::getReceiverInfo($this);
+        $grid->column('user_id', __('receiver'))->display(function () {
+            $info = \App\Helpers\Common::getReceiverInfo($this);
 
-    if ($info['type'] === 'agency') {
-        if (request()->filled('_export_')) {
-            return $info['name'];
-        }
-        $cacheKey = "agency_image_{$info['uuid']}";
-        $image = \Cache::remember($cacheKey, 3600, function () use ($info) {
-            $path = $info['image'];
-            $defaultImage = asset("images/icon-agency.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) $url = $defaultImage;
-            return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-        });
+            if ($info['type'] === 'agency') {
+                if (request()->filled('_export_')) {
+                    return $info['name'];
+                }
+                $cacheKey = "agency_image_{$info['uuid']}";
+                $image = \Cache::remember($cacheKey, 3600, function () use ($info) {
+                    $path = $info['image'];
+                    $defaultImage = asset("images/icon-agency.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
+                    if (!isImageExists($url)) $url = $defaultImage;
+                    return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+                });
 
-        $profileUrl = route('bd.agency.profile', ['id' => $info['uuid']]);
+                $profileUrl = route('bd.agency.profile', ['id' => $info['uuid']]);
 
-                    return "
+                return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>
                                 {$image}
@@ -98,20 +100,20 @@ $grid->column('user_id', __('receiver'))->display(function () {
                             </div>
                         </a>
                     ";
+            }
+
+            if ($info['type'] === 'user') {
+                if (request()->filled('_export_')) {
+                    return $info['name'];
                 }
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($info['image']) ?? $defaultImage;
+                if (!isImageExists($url)) $url = $defaultImage;
 
-                if ($info['type'] === 'user') {
-                    if (request()->filled('_export_')) {
-                        return $info['name'];
-                    }
-                    $defaultImage = asset("images/businessman-icon.jpg");
-                    $url = getImagePath($info['image']) ?? $defaultImage;
-                    if (!isImageExists($url)) $url = $defaultImage;
+                $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
+                $showUrl = url("admin/users/{$info['uuid']}");
 
-                    $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                    $showUrl = url("admin/users/{$info['uuid']}");
-
-                    return "
+                return "
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>
                                 {$image}
@@ -122,10 +124,10 @@ $grid->column('user_id', __('receiver'))->display(function () {
                             </div>
                         </a>
                     ";
-                }
+            }
 
-                return "<span class='text-danger'>".__('لا يوجد مستلم')."</span>";
-            });
+            return "<span class='text-danger'>" . __('لا يوجد مستلم') . "</span>";
+        });
 
 
         $grid->column('created_at', __('تاريخ الإنشاء'))->display(function ($value) {
@@ -141,6 +143,7 @@ $grid->column('user_id', __('receiver'))->display(function () {
             $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
             $tools->append($button);
         });
+        $grid->disableRowSelector();
         return $grid;
     }
 
