@@ -1242,7 +1242,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>{{ __('admin') }}</th>
+                            {{-- <th>{{ __('admin') }}</th> --}}
                             <th>{{ __('get type') }}</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
