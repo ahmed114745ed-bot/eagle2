@@ -105,10 +105,11 @@ class SwitchAccountController extends Controller
 
         $userIds = $accounts->flatMap(function ($account) {
             return [$account->parent_user_id, $account->child_user_id];
-        })->unique()->filter(function ($id, $userId) {
-            return $id !== $userId;
+        })->unique()->filter(function ($id) use ($userId) {
+            return $id != $userId;
         })->values();
 
+//        info($userIds);
         return User::whereIn('id', $userIds)->get();
         // if (empty($deviceToken))  return  [];
 
@@ -162,9 +163,9 @@ class SwitchAccountController extends Controller
         if (!$user_account) return Common::apiResponse(0, 'missing params', null, 422);
 
         $currentUserId = $user->id;
-        info('current user'.$currentUserId);
-        info('parent id'.$user_account->parent_user_id);
-        info('child id'.$user_account->child_user_id);
+//        info('current user'.$currentUserId);
+//        info('parent id'.$user_account->parent_user_id);
+//        info('child id'.$user_account->child_user_id);
         if ($user_account->parent_user_id != $currentUserId &&
             $user_account->child_user_id != $currentUserId) {
             return Common::apiResponse(0, __('forbidden'), null, 403);
@@ -194,19 +195,19 @@ class SwitchAccountController extends Controller
         [$id, $plainToken] = explode('|', $tokenString);
 
         $token = $otherUser->tokens()->find($id);
-        info('id'.$token);
-        if (! $token){
-            info('no token');
-            return false;
-        }
-        if (! hash_equals($token->token, hash('sha256', $plainToken))){
-            info('no hash equals');
-            return false;
-        }
-        if (! $token->created_at >= Carbon::now()->subDays(14) ){
-            info('its less than 14 days');
-            return false;
-        }
+//        info('id'.$token);
+//        if (! $token){
+//            info('no token');
+//            return false;
+//        }
+//        if (! hash_equals($token->token, hash('sha256', $plainToken))){
+//            info('no hash equals');
+//            return false;
+//        }
+//        if (! $token->created_at >= Carbon::now()->subDays(14) ){
+//            info('its less than 14 days');
+//            return false;
+//        }
 //        $token = PersonalAccessToken::find($id);
         if (
             $token &&
@@ -231,7 +232,7 @@ class SwitchAccountController extends Controller
             $q->where("parent_user_id", $user->id)->orWhere("child_user_id", $user->id);
         })->first();
         $data = [
-            'current'       => [
+            'current'           => [
                 'image'         =>  $currentUser->profile->avatar,
                 'name'          =>  $currentUser->name,
                 'uuid'          => $currentUser->uuid,
