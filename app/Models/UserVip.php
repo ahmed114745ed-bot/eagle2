@@ -23,6 +23,10 @@ class UserVip extends Model
     {
         return $this->hasMany(Pack::class, 'vip_user_id');
     }
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'dash_user_id');
+    }
     protected static function booted()
     {
         static::created(function ($userVip) {

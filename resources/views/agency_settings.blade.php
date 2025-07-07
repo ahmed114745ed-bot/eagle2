@@ -13,7 +13,7 @@
         width: 250px;
         background: #222;
         min-height: 400px;
-
+        align-self: flex-start;
         padding: 20px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     }
@@ -615,7 +615,7 @@
                     </div>
                     <div class="switch-container mt-4">
                         <div class="switch-item">
-                            <label for="stopGiftCheckbox" class="switch-label">ايقاف ارسال الهدايا للجميع</label>
+                            <label for="stopGiftCheckbox" class="switch-label">{{__('Stop sending gifts to everyone')}}</label>
                             <label class="switch">
                                 <input type="checkbox" id="stopGiftCheckbox" {{ $make_gift_top == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>

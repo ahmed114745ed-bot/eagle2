@@ -1242,6 +1242,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
+                            <th>{{ __('Admin') }}</th>
                             <th>{{ __('get type') }}</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
@@ -1254,12 +1255,44 @@
 
                             <tbody style="color: rgb(208, 115, 43);">
                             @foreach($packs as $index => $pack)
-                                @php
+                               @php
                                     $path = @$pack->ware?->show_img ?? '';
 
+                                    $admin = null;
+
+                                    if ($pack->vip_user_id && optional($pack->userVip)->admin) {
+                                        $admin = $pack->userVip->admin;
+                                    } elseif ($pack->dash_user_id && optional($pack)->admin) {
+                                        $admin = $pack->admin;
+                                    }
+
+                                    $image = optional($admin)->avatar ?? '';
+                                    $defaultImage = asset("images/businessman-icon.jpg");
+                                    $imagePath = getImagePath($image);
+                                    $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
+
+                                    $nameRaw = optional($admin)->name;
+                                    $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
+
+                                    $uid = optional($admin)->id ?? 0;
+                                    $url = $admin ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
+                                    <td>
+                                        @if ($admin)
+                                            <a href="{{ $url ?? '#' }}" target="_blank"
+                                       style="display: inline-flex; align-items: center; text-decoration: none;">
+                                        <img src="{{ $image }}" width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $name }} ({{ $uid }})</span>
+                                    </a>
+                                        @else
+                                            
+                                        @endif
+                                    
+                                </td>
+                                    <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getType() }}</td>
                                     <td>

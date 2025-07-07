@@ -59,6 +59,7 @@ class ReportController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
+        $grid->disableRowSelector();
         $grid->model()
             ->where('agency_id', '!=', 0)
             ->where('agency_id', '!=', '')
@@ -245,6 +246,7 @@ class ReportController extends MainController
     protected function agencies(): Grid
     {
         $grid = new Grid(new Agency());
+        $grid->disableRowSelector();
 
         $grid->model()
             ->withCount(['users'])
@@ -366,6 +368,7 @@ class ReportController extends MainController
     protected function agencies_manger()
     {
         $grid = new Grid(new AdminUser());
+        $grid->disableRowSelector();
         $grid->model()
             ->where('app_id', '!=', 0);
         

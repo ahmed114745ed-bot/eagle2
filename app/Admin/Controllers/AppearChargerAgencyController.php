@@ -15,9 +15,10 @@ use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
-use App\Models\UsersJoinedAgency;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\DeleteShippingAgencyAction;
@@ -29,9 +30,41 @@ class AppearChargerAgencyController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(trans('appear-charger-agency'))
-            ->body($this->grid()));
+        $content = $content->title(trans('appear-charger-agency'));
+
+
+        if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
+
+            $content = $content->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            });
+        }
+
+
+        // Add the second row unconditionally
+        $content = $content->row(function ($row) {
+            $row->column(12, $this->grid());
+        });
+        return parent::index($content);
+    }
+
+    protected function grid2()
+    {
+        $transfer_salary = settings()->get('transfer_salary_reliable_shipping_agency');
+
+        return (new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.reliable_shipping_agency', compact(['transfer_salary'])),
+        ));
+    }
+
+    public function transferSalary(Request $request)
+    {
+        if ($request->transfer_salary_reliable_shipping_agency === "true") {
+            settings()->set("transfer_salary_reliable_shipping_agency", "1");
+        } else {
+            settings()->set("transfer_salary_reliable_shipping_agency", "0");
+        }
     }
 
     /**
@@ -193,7 +226,6 @@ class AppearChargerAgencyController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->like('owner.uuid', __('UUID'))->placeholder(__('Search by UUID'));
-
         });
 
 

@@ -27,9 +27,9 @@ class ReportFromUsersController extends AdminController
         return $content
             ->header(trans('User_Report'))
             // ->description(trans('admin.User_Report'))
-            ->row(function($row) {
+            ->row(function ($row) {
                 $row->column(10, $this->grid());
-               // $row->column(2, view('admin.grid.users.ban'));
+                // $row->column(2, view('admin.grid.users.ban'));
             });
     }
     /**
@@ -72,6 +72,8 @@ class ReportFromUsersController extends AdminController
 
         $grid->disableExport();
         $grid->disableCreateButton();
+        $grid->disableRowSelector();
+
 
 
 
@@ -80,7 +82,7 @@ class ReportFromUsersController extends AdminController
 
         // $grid->disableExport ();
         // $grid->disableRowSelector ();
-        $grid->disableActions ();
+        $grid->disableActions();
         // $grid->disableFilter();
         // $grid->applyColumnFilter();
 

@@ -10,6 +10,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Modules\Events\Entities\RewardTarget;
 use Modules\Events\Entities\UserChargeEvent;
 use Modules\Events\Entities\ChargeTargetEvent;
@@ -70,16 +71,14 @@ class ChargeEventController extends Controller
 
     public function chargeEventRole(Request $request)
     {
-        // $start =  Carbon::now()->startOfMonth();
-        // $end = Carbon::now()->endOfMonth();
-        $start = Carbon::now()->subMonth()->startOfMonth();
-        $end = Carbon::now()->subMonth()->endOfMonth();
-        $user = User::where('id', $request->user()->id)->with(['charges' => function ($query) use ($start, $end) {
-            $query->whereBetween('created_at', [$start, $end]);
-        }, 'coinLogs' => function ($query) use ($start, $end) {
-            $query->whereBetween('created_at', [$start, $end])->where('status', 1);
-        }])->first();
-
+        $start = now()->startOfMonth();
+        $end = now()->endOfMonth();
+    
+        $user = Auth::user()->load([
+            'charges' => fn ($q) => $q->whereBetween('created_at', [$start, $end]),
+            'coinLogs' => fn ($q) => $q->whereBetween('created_at', [$start, $end])->where('status', 1),
+        ]);
+    
         return Common::apiResponse(1, '', new UserChargeResource($user));
     }
     public function targets()

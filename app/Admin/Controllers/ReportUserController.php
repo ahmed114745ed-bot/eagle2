@@ -79,6 +79,7 @@ class ReportUserController extends MainController
     protected function grid()
     {
         $grid = new Grid(new User());
+        $grid->disableRowSelector();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();

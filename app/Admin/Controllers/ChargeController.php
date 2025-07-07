@@ -181,6 +181,7 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
+        $grid->disableRowSelector();
 
         $grid->filter(function (Grid\Filter $filter) {
 

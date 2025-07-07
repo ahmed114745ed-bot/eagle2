@@ -127,6 +127,8 @@ class DedicateVipController extends MainController
         }
         $grid->disableCreateButton();
         $grid->disableActions();
+        $grid->disableRowSelector();
+
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();

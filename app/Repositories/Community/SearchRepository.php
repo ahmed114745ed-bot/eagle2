@@ -6,7 +6,10 @@ use App\Http\Resources\Api\V1\CommunityResource;
 use App\Models\BlackList;
 use App\Models\OfficialMessage;
 use App\Models\Pack;
+use App\Models\Room;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +31,7 @@ class SearchRepository implements SearchRepositoryInterface
         }
     }
 
-    public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|array
+    public function searchRooms(int $userId, string $keywords, int $page = 1): array|Collection
     {
         // $user = User::searchByUuid($keywords)->first();
         $user = Auth::user();
@@ -65,40 +68,23 @@ class SearchRepository implements SearchRepositoryInterface
         ])
         ->orderByDesc('matching_percentage')
         ->first();
-      
+
         if (!$user || $user?->packs->isNotEmpty()) {
             return [];
         }
-        
+
 
         $keywords = $user->id;
- 
 
-        $rooms = DB::table('rooms')
-            ->join('users', 'rooms.uid', '=', 'users.id')
-            ->where('rooms.uid', 'like', '%' . $keywords . '%')
-            ->where('users.status', 1)
-            ->whereNotIn('rooms.uid', $blockedUserIds)
-            ->select([
-                'rooms.*',
-                'rooms.id as room_id',
-                'rooms.room_name',
-                'rooms.uid',
-                'rooms.numid',
-                'rooms.hot',
-                'rooms.room_cover',
-                'rooms.room_intro',
-                'rooms.room_welcome',
-                'rooms.room_pass',
-                'users.nickname',
-                'users.name',
-                'users.uuid'
-            ])
-            ->orderBy('rooms.hot', 'desc')
+        return Room::with('owner')
+            ->whereHas('owner', function ($query) {
+                $query->where('status', 1);
+            })
+            ->where('uid', 'like', '%' . $keywords . '%')
+            ->whereNotIn('uid', $blockedUserIds)
+            ->orderBy('hot', 'desc')
             ->take(2)
             ->get();
-//dd( $rooms);
-        return $rooms->toArray();
     }
 
     public function userSearchHand(int $userId, string $keywords, int $page = 1)
@@ -106,7 +92,7 @@ class SearchRepository implements SearchRepositoryInterface
         if (!$userId || !$keywords) {
             return [];
         }
-   
+
         $whereOr = ['uuid' => $keywords];
 
         $user = Auth::user();
@@ -155,7 +141,7 @@ class SearchRepository implements SearchRepositoryInterface
 
     public function getUserFriends(int $userId, string $keywords = null, int $perPage = 10, int $currentPage = 1): \Illuminate\Pagination\LengthAwarePaginator
     {
-     
+
         $usersQuery = User::query()
             ->whereHas('followers', fn($q) => $q->where('user_id', $userId))
             ->whereHas('followeds', fn($q) => $q->where('followed_user_id', $userId));

@@ -90,7 +90,7 @@ class BanRoomsController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BanRoom());
-
+        $grid->disableRowSelector();
         $grid->model()->whereHas('room')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [now()])
             // ->select('id','room_id', 'duration', 'staff_id',  
@@ -188,7 +188,7 @@ class BanRoomsController extends MainController
 
         $grid->disableExport();
         $grid->disableRowSelector();
-         $grid->disableActions();
+        $grid->disableActions();
         $grid->disableCreateButton();
         // $grid->actions(function ($actions) {
         //     $actions->disableEdit();
