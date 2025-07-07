@@ -191,6 +191,16 @@ class SwitchAccountController extends Controller
         [$id, $plainToken] = explode('|', $tokenString);
 
         $token = $otherUser->tokens()->find($id);
+        info('id'.$token);
+        if (! $token){
+            info('no token');
+        }
+        if (! hash_equals($token->token, hash('sha256', $plainToken))){
+            info('no hash equals');
+        }
+        if (! $token->created_at >= Carbon::now()->subDays(14) ){
+            info('its less than 14 days');
+        }
 //        $token = PersonalAccessToken::find($id);
         if (
             $token &&
