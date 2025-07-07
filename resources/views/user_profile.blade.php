@@ -1242,7 +1242,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>{{ __('admin') }}</th>
+                            {{-- <th>{{ __('admin') }}</th> --}}
                             <th>{{ __('get type') }}</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
@@ -1271,25 +1271,25 @@
                                     $imagePath = getImagePath($image);
                                     $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
 
-                                  //  $name = optional($admin)->name ?? '';
+                                    $name = optional($admin)->name ?? '';
                                     $uid = optional($admin)->id ?? 0;
                                     $url = $admin ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
-                                    <td>
+                                    {{-- <td>
                                         @if ($admin)
                                             <a href="{{ $url ?? '#' }}" target="_blank"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ $image }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span> ({{ $uid }})</span>
+                                        <span>{{ $name }} ({{ $uid }})</span>
                                     </a>
                                         @else
                                             
                                         @endif
                                     
-                                </td>
+                                </td> --}}
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getType() }}</td>
