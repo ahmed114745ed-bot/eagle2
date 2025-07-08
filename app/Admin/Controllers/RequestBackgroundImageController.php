@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Room;
 use Carbon\Carbon;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -100,7 +101,7 @@ class RequestBackgroundImageController extends MainController
             $owner = $this->owner ?? null;
             $ownerRoom = $owner->ownerRoom ?? null;
 
-            $name = $this->name ?? '';
+            $name = $ownerRoom->room_name ?? '';
             $uuid = $owner->uuid ?? '';
             $path = $ownerRoom->room_cover ?? null;
             $defaultImage = asset("images/room.jpg");
@@ -291,27 +292,53 @@ class RequestBackgroundImageController extends MainController
                 1 => __('accepted'),
                 2 => __('denied')
             ]
-        )->help(__('⚠️ If you deny this background, the user will receive a refund of its cost.'))->default(1);
+        )->default(1);
 
-        $form->number(__('expair'))->default(30);
+
+        $form->number(__('expair'))->default(30)->value();
         $form->hidden('type')->default("admin");
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
 
-        $form->saving(function (Form $form) {
+        if ($form->isEditing()) {
+            $form->fields()->each(function ($field) {
+                if ($field->column() === 'status') {
+                    $field->help('⚠️ If you deny this background, the user will receive a refund of its cost.');
+                }
+            });
+        }
 
+        $form->saving(function (Form $form) {
             $model = $form->model();
-            $status = $model->status;
             $user = User::find($model->owner_room_id);
-            if (($status == 2) && $user) {
-                $costRequestBackGround = Common::getConfig('cost_request_background') ?: 2000;
-                $user->di += $costRequestBackGround;
-                $user->save();
-                CustomNotification::BackgroudRequest($user, 1);
-            } elseif (($status == 1) && $user) {
-                CustomNotification::BackgroudRequest($user, 0);
+            $status = $model->status;
+
+            // Convert expair (number of days) to a future date
+            if ($form->isEditing() && $form->expair) {
+                $model->expair = \Carbon\Carbon::now()->addDays($form->expair);
+            }
+
+            // Only proceed if user exists
+            if (! $user) {
+                return;
+            }
+
+            // If denied and editing, refund if not created by admin
+            if ($form->isEditing() && $status == 2) {
+                if ($model->created_by_type !== \Encore\Admin\Auth\Database\Administrator::class) {
+                    $cost = Common::getConfig('cost_request_background') ?: 2000;
+                    $user->di += $cost;
+                    $user->save();
+                }
+                CustomNotification::BackgroudRequest($user, 1); // Notify denied
+            }
+
+            // If accepted, notify
+            if ($status == 1) {
+                CustomNotification::BackgroudRequest($user, 0); // Notify accepted
             }
         });
+
 
         return $form;
     }
