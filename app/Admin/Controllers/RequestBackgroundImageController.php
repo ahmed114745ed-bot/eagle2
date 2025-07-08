@@ -301,11 +301,15 @@ class RequestBackgroundImageController extends MainController
         $form->display(trans('admin.updated_at'));
 
         if ($form->isEditing()) {
-            $form->fields()->each(function ($field) {
-                if ($field->column() === 'status') {
-                    $field->help('⚠️ If you deny this background, the user will receive a refund of its cost.');
-                }
-            });
+            $model = $form->model();
+
+            if ($model->created_by_type !== \App\Models\Admin::class) {
+                $form->fields()->each(function ($field) {
+                    if ($field->column() === 'status') {
+                        $field->help('⚠️ If you deny this background, the user will receive a refund of its cost.');
+                    }
+                });
+            }
         }
 
         $form->saving(function (Form $form) {
@@ -325,7 +329,7 @@ class RequestBackgroundImageController extends MainController
 
             // If denied and editing, refund if not created by admin
             if ($form->isEditing() && $status == 2) {
-                if ($model->created_by_type !== \Encore\Admin\Auth\Database\Administrator::class) {
+                if ($model->created_by_type !== \App\Models\Admin::class) {
                     $cost = Common::getConfig('cost_request_background') ?: 2000;
                     $user->di += $cost;
                     $user->save();
