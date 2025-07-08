@@ -1472,6 +1472,7 @@ class User extends Authenticatable
             $configKeys[] = "{$lang}_{$type}";
             $configKeys[] = "en_{$type}";
         }
+        Log::info('test badge configKeys',$configKeys);
 
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
 
@@ -1479,6 +1480,7 @@ class User extends Authenticatable
         foreach ($applicableTypes as $typeName) {
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
+            Log::info('test badge fallbackKey',$fallbackKey);
 
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
