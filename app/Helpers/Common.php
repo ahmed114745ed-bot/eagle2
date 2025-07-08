@@ -677,12 +677,12 @@ class Common
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
-           
+
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
             //make group and get token
 
             $token = self::makeGroup($tokens, $key,  $api_access_key);
-           
+
             $isGroup = true;
         }
 
@@ -791,14 +791,14 @@ class Common
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if (empty($tokens)) return;
-    
+
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
         $topicName = 'system_test_topic';
-    
+
         self::subscribeToTopic($tokens, $topicName);
-    
+
         $userData = [];
         if ($user) {
             $userData = [
@@ -809,10 +809,10 @@ class Common
                 'image' => $user->profile->avatar,
             ];
         }
-    
+
         $api_access_key = self::getGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
-    
+
         $payload = [
             'message' => [
                 'topic' => $topicName,
@@ -832,7 +832,7 @@ class Common
                 ]
             ]
         ];
-    
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $api_access_key,
             'Content-Type' => 'application/json',
@@ -841,14 +841,14 @@ class Common
 
         $status = $response->status();
         $body = $response->body();
-    
+
         logger()->info('FCM Response', [
             'status' => $status,
             'response' => $body
         ]);
         return json_decode($response->body());
     }
-    
+
 
     public static function subscribeToTopic(array $registrationTokens, string $topic)
     {
@@ -1844,6 +1844,8 @@ class Common
                     'id' => $resource->admin->id ?? '',
                     'type' => 'dash',
                     'url' => $resource->admin ? url("admin/auth/users/{$resource->admin->id}") : '#',
+                    'image_color'          => null,
+                    'id_image'             =>  '',
                 ];
             case 'agency':
                 return [
@@ -1853,6 +1855,8 @@ class Common
                     'id' => $resource->senderShippingAgency->id ?? '',
                     'type' => 'agency',
                     'url' => $resource->senderShippingAgency ? url("admin/shipping-agencies/profile/{$resource->senderShippingAgency->id}") : '#',
+                    'image_color'          => @$resource->senderShippingAgency->owner->color_image,
+                    'id_image'             => @$resource->senderShippingAgency->owner->specialId?->ware?->show_img ?? '',
                 ];
             case 'host_agency':
                 return [
@@ -1862,6 +1866,8 @@ class Common
                     'id' => $resource->senderAgency->id ?? '',
                     'type' => 'host_agency',
                     'url' => $resource->senderAgency ? url("admin/agencies/profile/{$resource->senderAgency->id}") : '#',
+                    'image_color'          => @$resource->senderAgency->owner->color_image,
+                    'id_image'             => @$resource->senderAgency->owner->specialId?->ware?->show_img ?? '',
 
                 ];
             case 'user':
@@ -1872,6 +1878,8 @@ class Common
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
                     'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
+                    'image_color'          => $resource->senderUser->color_image,
+                    'id_image'             => $resource->senderUser->specialId?->ware?->show_img ?? '',
                 ];
             case 'bd':
                 return [
@@ -1881,6 +1889,8 @@ class Common
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
                     'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
+                    'image_color'          => $resource->senderUser->color_image,
+                    'id_image'             => $resource->senderUser->specialId?->ware?->show_img ?? '',
                 ];
             default:
                 return [
@@ -1891,6 +1901,8 @@ class Common
                     'type' => '',
                     'type_name' => '',
                     'url' => '#',
+                    'image_color'          => null,
+                    'id_image'             => '',
                 ];
         }
     }
@@ -1906,6 +1918,8 @@ class Common
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
+                    'image_color'          => $resource->receiveragency->owner->color_image,
+                    'id_image'             => $resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                 ];
             case 'user':
                 return [
@@ -1915,6 +1929,8 @@ class Common
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
                     'url' => $resource->receiverUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
+                    'image_color'          => $resource->receiverUser->color_image,
+                    'id_image'             => $resource->receiverUser->specialId?->ware?->show_img ?? '',
                 ];
             default:
                 return [
@@ -1924,6 +1940,8 @@ class Common
                     'id' => '',
                     'type' => '',
                     'url' => '#',
+                    'image_color'          => null,
+                    'id_image'             => '',
                 ];
         }
     }
@@ -1970,21 +1988,21 @@ class Common
     {
         return settings()->get('transfer_salary_reliable_shipping_agency') == 1;
     }
-    
+
     public static function canTransferToAgency($agency): bool
     {
         if (!self::isReliableTransferEnabled()) {
             return true;
         }
         $agency = is_numeric($agency) ? ShippingAgency::find($agency) : $agency;
-    
+
         $ownerId = $agency->app_owner_id ?? null;
         if (!$ownerId) {
             return false;
         }
         return User::where('id', $ownerId)
-                   ->where('appear_charger_agency', 1)
-                   ->exists();
+            ->where('appear_charger_agency', 1)
+            ->exists();
     }
 
     public static function getEffectiveJoinPeriod($userId, $agencyId, $fromDate)

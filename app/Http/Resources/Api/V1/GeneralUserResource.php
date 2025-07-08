@@ -21,6 +21,8 @@ class GeneralUserResource extends JsonResource
             'uuid' => @$this->uuid,
             'name' => @$this->name ?: '',
             'image' => @$this->profile->avatar ?? '',
+            'image_color'          => @$this->color_image,
+            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'level' => Common::level_center(@$this),
 
 
