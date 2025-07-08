@@ -3343,8 +3343,28 @@
   "Total success charges": "مجموع العمليات الناجحة",
 "kicked By status": "طريقة الطرد",
 "cant it owner" :"لا تستطيع نقل مالك الوكالة",
-    "forbidden": "غير مسموح",
+"forbidden": "غير مسموح",
+"From Wallet": "من المحفظة",
+"To Wallet": "إلى المحفظة",
+"Amount": "المبلغ",
+"By": "بواسطة",
+"Transfer Time": "وقت التحويل",
+"Transfer":"تحويل",
+"Not Found": "غير موجودة",
+"Unknown": "غير معروف",
+"CoreWalletTransaction":"سجل المعاملات",
+"coreWalletTransaction":"سجل المعاملات",
+"Core-wallet-transactions":"سجل المعاملات",
+"core-wallet-transactions":"سجل المعاملات",
 "it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة"
+
+
+
+
+
+
+
+
 
 
 
