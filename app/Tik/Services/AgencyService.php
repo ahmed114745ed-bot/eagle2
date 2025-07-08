@@ -666,8 +666,6 @@ class AgencyService
         if (!$joinRecord) {
             $joinRecord =  null;
         }
-        \Log::info('test joinRecord',['1'=>$joinRecord]);
-
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
 
@@ -700,8 +698,6 @@ class AgencyService
 
         $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth)) ? $joinedDate : $startOfMonth;
         $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
-        \Log::info('test startDate',['1'=>$startDate]);
-
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
