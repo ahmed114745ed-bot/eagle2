@@ -1449,6 +1449,8 @@ class User extends Authenticatable
         if ($this->type_user >= 2) {
             $applicableTypes[2] = $types[2];
         }
+        Log::info('test badge',$applicableTypes);
+
 
         if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
             $applicableTypes[3] = $types[3];
@@ -1457,13 +1459,14 @@ class User extends Authenticatable
         if ($this->is_bd) {
             $applicableTypes[4] = $types[4];
         }
+        Log::info('test badge',$applicableTypes);
 
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
         }
 
         ksort($applicableTypes);
-
+         Log::info('test badge',$applicableTypes);
         $configKeys = [];
         foreach ($applicableTypes as $type) {
             $configKeys[] = "{$lang}_{$type}";
