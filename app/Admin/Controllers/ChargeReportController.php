@@ -789,7 +789,7 @@ class ChargeReportController extends MainController
     {
         $grid = new Grid(new Charge());
         $grid->disableRowSelector();
-        $grid->model()->where('agency_id', $agency_id);
+        $grid->model()->where('user_id', $agency_id)->where('user_type','agency');
 
         // Add tabs to the header
         $grid->header(function () {
