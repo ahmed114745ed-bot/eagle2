@@ -1201,6 +1201,7 @@
                         <th>{{__("id")}}</th>
                             <th>{{ __('receiver') }}</th>
                             <th>{{ __('Amount') }}</th>
+                            <th>{{ __('coins') }}</th>
                             <th>{{ __('Date') }}</th>
                         </tr>
                     </thead>
@@ -1235,6 +1236,7 @@
                                             </div>
                                         </div>
                                 </td>
+                                <td>{{ '$' .$charge->usd ?? '-' }}</td>
                                 <td>{{ $charge->amount ?? '-' }}</td>
                                 <td>{{ $charge->created_at }}</td>
                             </tr>
@@ -1264,6 +1266,7 @@
                             <th>{{__("id")}}</th>
                             <th>{{ __('Sender') }}</th>
                             <th>{{ __('Amount') }}</th>
+                            <th>{{ __('coins') }}</th>
                             <th>{{ __('Date') }}</th>
                         </tr>
                     </thead>
@@ -1297,6 +1300,7 @@
                                             </div>
                                         </div>
                                 </td>
+                                <td>{{ '$' .$res->usd ?? '-' }}</td>
                                 <td>{{ $res->amount ?? '-' }}</td>
                                 <td>{{ $res->created_at }}</td>
                             </tr>

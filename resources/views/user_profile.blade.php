@@ -1242,7 +1242,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>{{ __('admin') }}</th>
+                            <th>{{ __('Admin') }}</th>
                             <th>{{ __('get type') }}</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
@@ -1258,21 +1258,24 @@
                                @php
                                     $path = @$pack->ware?->show_img ?? '';
 
-                                    if ($pack->vip_user_id) {
+                                    $admin = null;
+
+                                    if ($pack->vip_user_id && optional($pack->userVip)->admin) {
                                         $admin = $pack->userVip->admin;
-                                    } else {
+                                    } elseif ($pack->dash_user_id && optional($pack)->admin) {
                                         $admin = $pack->admin;
                                     }
-  
-                                    $image = $admin->avatar??'';
+
+                                    $image = optional($admin)->avatar ?? '';
                                     $defaultImage = asset("images/businessman-icon.jpg");
-                                            $image = getImagePath($image);
-                                            if (!isImageExists($image)) {
-                                                $image = $defaultImage;
-                                            }
-                                    $name = $admin->name ?? '';
-                                    $uid = $admin->id ?? 0;
-                                    $url = $admin ? "admin/auth/users/" . $admin->id : '#';
+                                    $imagePath = getImagePath($image);
+                                    $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
+
+                                    $nameRaw = optional($admin)->name;
+                                    $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
+
+                                    $uid = optional($admin)->id ?? 0;
+                                    $url = $admin ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
@@ -2042,6 +2045,7 @@
 
                                 $roomName = @$giftSLog->room->room_name ?? '-';
                                 $path = @$giftSLog->room->room_cover;
+                                $ownerRoom = @$giftSLog->room->uid ?? 0;
                                 $url = getImagePath($path) ?? $defaultImage;
                                 if (!isImageExists($url)) {
                                     $url = $defaultImage;
@@ -2066,7 +2070,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="#" target="_blank"
+                                    <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $url }}"
                                              width="30" height="30"
