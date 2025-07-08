@@ -1480,7 +1480,7 @@ class User extends Authenticatable
         foreach ($applicableTypes as $typeName) {
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
-            Log::info('test badge fallbackKey',$fallbackKey);
+            Log::info('test badge fallbackKey',['1'=>$fallbackKey]);
 
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
