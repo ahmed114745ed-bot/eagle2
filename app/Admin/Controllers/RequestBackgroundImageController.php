@@ -295,14 +295,16 @@ class RequestBackgroundImageController extends MainController
         )->default(1);
 
 
-        $form->number(__('expair'))->default(30)->value();
+        if ($form->isCreating()) {
+            $form->number('expair', __('expair'))->default(30);
+        }
         $form->hidden('type')->default("admin");
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
 
         $form->editing(function (Form $form) {
             $model = $form->model();
-            
+
             if ($model->created_by_type !== \App\Models\Admin::class) {
                 $form->fields()->each(function ($field) {
                     if ($field->column() === 'status') {
@@ -317,14 +319,12 @@ class RequestBackgroundImageController extends MainController
             $user = User::find($model->owner_room_id);
             $status = $model->status;
 
-            // Convert expair (number of days) to a future date
             if ($form->isCreating() && $form->expair) {
-                $model->expair = \Carbon\Carbon::now()->addDays($form->expair);
+                $form->expair = \Carbon\Carbon::now()->addDays($form->expair)->timestamp;
             }
 
-            // Only proceed if user exists
             if (! $user) {
-                return;
+                return ;
             }
 
             // If denied and editing, refund if not created by admin
@@ -342,6 +342,7 @@ class RequestBackgroundImageController extends MainController
                 CustomNotification::BackgroudRequest($user, 0); // Notify accepted
             }
         });
+
 
 
         return $form;
