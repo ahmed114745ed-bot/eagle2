@@ -669,7 +669,6 @@ class AgencyService
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
 
-        \Log::info('test startOfMonth',['1'=>$startOfMonth]);
 
 
         if ($joinRecord) {
