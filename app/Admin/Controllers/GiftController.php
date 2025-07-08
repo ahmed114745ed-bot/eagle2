@@ -288,7 +288,7 @@ class GiftController extends MainController
                             function checkBeforeSubmit(e) {
                                 const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
                                 if (Math.round(total) !== 100) {
-                                    alert('❌ مجموع النسب يجب أن يكون 100% بالضبط. الحالي: ' + total.toFixed(2) + '%');
+                                    alert(__('❌ The total percentages must be exactly 100%. Current:') + total.toFixed(2) + '%');
                                     e.preventDefault();
                                     return false;
                                 }
