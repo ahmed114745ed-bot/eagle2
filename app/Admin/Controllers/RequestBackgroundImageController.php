@@ -96,11 +96,11 @@ class RequestBackgroundImageController extends MainController
             });
         });
         $grid->id(__('ID'));
-        $grid->owner_room_id(__('owner room id'))->display(function () {
+        $grid->owner_room_id(__('Room'))->display(function () {
             $owner = $this->owner ?? null;
             $ownerRoom = $owner->ownerRoom ?? null;
 
-            $name = $owner->name ?? '';
+            $name = $this->name ?? '';
             $uuid = $owner->uuid ?? '';
             $path = $ownerRoom->room_cover ?? null;
             $defaultImage = asset("images/room.jpg");
@@ -110,7 +110,7 @@ class RequestBackgroundImageController extends MainController
                 $url = $defaultImage;
             }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40, borderRadius: 0);
             $showUrl = $ownerRoom ? url("admin/rooms/{$ownerRoom->id}") : '#';
 
             $escapedName = json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
@@ -211,6 +211,7 @@ class RequestBackgroundImageController extends MainController
                 0 => ['label' => __('pending'), 'color' => 'orange'],
                 1 => ['label' => __('accepted'), 'color' => 'green'],
                 2 => ['label' => __('denied'), 'color' => 'red'],
+                3 => ['label' => __('Stoped'), 'color' => 'grey'],
             ];
 
             $badgeColor = $statuses[$status]['color'] ?? 'orange';
@@ -283,13 +284,15 @@ class RequestBackgroundImageController extends MainController
         // $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
 
         $form->image('img', __('img'))->creationRules('required');
+
         $form->select('status', __('status'))->options(
             [
                 0 => __('pending'),
                 1 => __('accepted'),
                 2 => __('denied')
             ]
-        )->default(1);
+        )->help(__('⚠️ If you deny this background, the user will receive a refund of its cost.'))->default(1);
+
         $form->number(__('expair'))->default(30);
         $form->hidden('type')->default("admin");
         $form->display(trans('admin.created_at'));
