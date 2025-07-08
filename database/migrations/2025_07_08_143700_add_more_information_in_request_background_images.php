@@ -21,7 +21,7 @@ return new class extends Migration
             }
 
             if (!Schema::hasColumn('request_background_images', 'room_id')) {
-                $table->unsignedBigInteger('room_id')->nullable()->after('owner_room_id');
+                $table->unsignedInteger('room_id')->nullable()->after('owner_room_id');
 
                 $table->foreign('room_id')
                     ->references('id')

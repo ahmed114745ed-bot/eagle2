@@ -36,10 +36,10 @@ class ChargeAgentResource extends JsonResource
             'countries' => $this->Countries ?? [],
             'frame' => $frame ?? '',
             'frame_id' => $frame != '' ? @$user->dress_1 : 0, // both
-            'level' => $user->total_sender_level ?? 0, // both
+            'level' => $user?->total_sender_level ?? 0, // both
             'vip' => @$user->UserVip->level ?? 0, // both
             'charge_count' => $this->salary_requests_count ?? 0,
-            'image_color'          => $user->color_image,
+            'image_color'          => $user?->color_image ,
             'id_image'             => $user->specialId?->ware?->show_img ?? '',
 
             // 'charge_count' => $userDetails->charges_count ?? 0,
