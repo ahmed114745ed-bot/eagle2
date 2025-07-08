@@ -17,6 +17,8 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
     {
         $month = request('month', now()->month);
         $year = request('year', now()->year);
+        $id = request('id');
+     
 
         // Step 1: Query users and eager load agency
         $users = User::query()
@@ -24,8 +26,8 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             ->whereNotNull('agency_id')
             ->where('agency_id', '!=', 0)
             ->when(request('agency_id'), fn($q) => $q->where('agency_id', request('agency_id')))
+            ->when(request('id'), fn($q) => $q->where('id', request('id')))
             ->get();
-
         // Step 2: Query salaries in one shot and map by user_id
         $salaries = UserSallary::query()
             ->select([
