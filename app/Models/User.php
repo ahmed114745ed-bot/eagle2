@@ -525,6 +525,18 @@ class User extends Authenticatable
         return $this->hasMany(LiveTime::class, 'uid');
     }
 
+    public function getLiveTimeThisMonth()
+    {
+        $fromDate = now()->startOfMonth()->toDateString();
+    
+        $period = Common::getEffectiveJoinPeriod($this->id, $this->agency_id, $fromDate);
+    
+        return LiveTime::where('uid', $this->id)
+            ->whereBetween('created_at', [$period['start_date'], $period['end_date']])
+            ->sum('hours');
+    }
+    
+
     public function UserliveTime()
     {
         return $this->hasMany(LiveTime::class);
@@ -802,6 +814,16 @@ class User extends Authenticatable
     {
         $userSallary = UserSallary::query()
             ->where('user_id', $this->id)
+            ->sum(DB::raw('sallary'));
+
+        return round($userSallary, 2);
+    }
+
+    public function getSalaryWithoutCutAmountAttributeByAgency()
+    {
+        $userSallary = UserSallary::query()
+            ->where('user_id', $this->id)
+            ->where('user_agency_id', $this->agency_id)
             ->sum(DB::raw('sallary'));
 
         return round($userSallary, 2);
@@ -1434,8 +1456,8 @@ class User extends Authenticatable
         $lang = app()->getLocale() ?? 'en';
 
         $types = [
-            1 => 'host',
-            2 => 'agency_owner',
+            1 => 'agency_owner',
+            2 => 'host',
             3 => 'shipping',
             4 => 'bd',
         ];
@@ -1449,7 +1471,6 @@ class User extends Authenticatable
         if ($this->type_user >= 2) {
             $applicableTypes[2] = $types[2];
         }
-        Log::info('test badge',$applicableTypes);
 
 
         if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
@@ -1459,30 +1480,25 @@ class User extends Authenticatable
         if ($this->is_bd) {
             $applicableTypes[4] = $types[4];
         }
-        Log::info('test badge',$applicableTypes);
 
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
         }
 
         ksort($applicableTypes);
-         Log::info('test badge',$applicableTypes);
         $configKeys = [];
         foreach ($applicableTypes as $type) {
             $configKeys[] = "{$lang}_{$type}";
             $configKeys[] = "en_{$type}";
         }
-        Log::info('test badge configKeys',$configKeys);
 
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
 
         $html = '<div class="user-type-badges">';
         foreach ($applicableTypes as $typeName) {
-            Log::info('test badge typeName',['1'=>$typeName]);
 
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
-            Log::info('test badge fallbackKey',['1'=>$fallbackKey]);
 
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
@@ -1492,7 +1508,6 @@ class User extends Authenticatable
         }
 
         $html .= '</div>';
-        Log::info('test badge fallbackKey',['1'=>$html]);
 
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
