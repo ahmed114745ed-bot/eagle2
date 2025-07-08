@@ -3330,7 +3330,7 @@
 "weekly-cp": "تقرير CP الأسبوعي",
 "cp reports": "تقارير CP",
 "cp relations": "علاقات CP",
-"unreliable_agency" : "لا يمكن التحويل إلى هذه الوكالة لأنها غير موثوقة .",
+"unreliable_agency" : "تم إلغاء العملية لأن هذه الوكالة غير موثوقة",
 "Charge To User": "الشحن للمستخدم",
 "Browse charge to user": "تصفح الشحن للمستخدم",
 "Add switch charge to user": "اضافة الشحن للمستخدم",
