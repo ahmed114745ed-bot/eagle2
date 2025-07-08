@@ -223,7 +223,24 @@ class RequestBackgroundImageController extends MainController
                     </span>";
         });
 
-        $grid->column('expair', __('expire'));
+        $grid->column('expair', __('Expire'))->display(function ($value) {
+            if (!$value) {
+                return '—';
+            }
+
+            $expairDate = Carbon::parse($value);
+            $diffInDays = now()->diffInDays($expairDate, false); // false = allow negative
+
+            if ($diffInDays > 0) {
+                return "$diffInDays";
+            } elseif ($diffInDays === 0) {
+                return __("today");
+            } else {
+                return abs($diffInDays)." " . __("days ago");
+            }
+        });
+
+
         $grid->column('updated_at', __('admin.updated_at'))->display(function ($date) {
             return Carbon::parse($date)->format('Y-m-d H:i:s');
         });
