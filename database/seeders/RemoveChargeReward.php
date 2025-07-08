@@ -24,7 +24,7 @@ class RemoveChargeReward extends Seeder
      */
     public function run()
     {
-        $winnerCharges = UserChargeEvent::with('event', 'user')->get();
+        $winnerCharges = UserChargeEvent::with('event', 'user')->whereNotNull("user_id")->get();
 
         foreach ($winnerCharges as $winnerCharge) {
             $user = User::query()

@@ -26,6 +26,8 @@ class AdminsAgencyResource extends JsonResource
             'uuid' => $this->user->uuid ?? '',
             'image' => @$this->user->profile->avatar ?? '',
             'exp'   => '0' ,
+             'image_color'          => @$this->user->color_image,
+            'id_image'             => @$this->user->specialId?->ware?->show_img ?? '',
         ];
     }
 }

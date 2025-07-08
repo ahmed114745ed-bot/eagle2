@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -482,7 +483,9 @@ Route::group(
         Route::get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         Route::resource('agency-manger-users', AgencyMangerUsers::class);
-        Route::resource('core-wallets', CoreWalletsController::class);
+        Route::resource('core-wallets', CoreWalletsController::class);    
+        Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);    
+        Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
         Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class);

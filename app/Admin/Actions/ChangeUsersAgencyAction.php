@@ -63,11 +63,12 @@ class ChangeUsersAgencyAction extends RowAction
         foreach($users as $user)
         {
             $user->agency_id = $request->new_agency_id;
+            $user->monthly_diamond_received = 0;
             $user->save();
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $user->id,
                 'agency_id' => $request->old_agency_id,
-                'type' => 2,
+                // 'type' => 2,
             ])->where('leave_date', null)->exists();
             if (!$checkAgencyUser) {
                 UsersJoinedAgency::create([
