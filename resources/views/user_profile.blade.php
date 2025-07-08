@@ -2045,6 +2045,7 @@
 
                                 $roomName = @$giftSLog->room->room_name ?? '-';
                                 $path = @$giftSLog->room->room_cover;
+                                $ownerRoom = @$giftSLog->room->uid ?? 0;
                                 $url = getImagePath($path) ?? $defaultImage;
                                 if (!isImageExists($url)) {
                                     $url = $defaultImage;
@@ -2069,7 +2070,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="#" target="_blank"
+                                    <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $url }}"
                                              width="30" height="30"
