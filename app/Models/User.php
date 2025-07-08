@@ -1449,7 +1449,6 @@ class User extends Authenticatable
         if ($this->type_user >= 2) {
             $applicableTypes[2] = $types[2];
         }
-        Log::info('test badge',$applicableTypes);
 
 
         if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
@@ -1459,30 +1458,25 @@ class User extends Authenticatable
         if ($this->is_bd) {
             $applicableTypes[4] = $types[4];
         }
-        Log::info('test badge',$applicableTypes);
 
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
         }
 
         ksort($applicableTypes);
-         Log::info('test badge',$applicableTypes);
         $configKeys = [];
         foreach ($applicableTypes as $type) {
             $configKeys[] = "{$lang}_{$type}";
             $configKeys[] = "en_{$type}";
         }
-        Log::info('test badge configKeys',$configKeys);
 
         $configs = ConfigModel::whereIn('name', $configKeys)->get()->keyBy('name');
 
         $html = '<div class="user-type-badges">';
         foreach ($applicableTypes as $typeName) {
-            Log::info('test badge typeName',['1'=>$typeName]);
 
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
-            Log::info('test badge fallbackKey',['1'=>$fallbackKey]);
 
             $url = $configs[$localizedKey]->value ?? $configs[$fallbackKey]->value ?? null;
             $url = getImagePath($url);
@@ -1492,7 +1486,6 @@ class User extends Authenticatable
         }
 
         $html .= '</div>';
-        Log::info('test badge fallbackKey',['1'=>$html]);
 
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
