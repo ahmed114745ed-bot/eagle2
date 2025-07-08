@@ -1478,6 +1478,8 @@ class User extends Authenticatable
 
         $html = '<div class="user-type-badges">';
         foreach ($applicableTypes as $typeName) {
+            Log::info('test badge typeName',['1'=>$typeName]);
+
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
             Log::info('test badge fallbackKey',['1'=>$fallbackKey]);
