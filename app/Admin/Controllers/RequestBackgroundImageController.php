@@ -290,7 +290,7 @@ class RequestBackgroundImageController extends MainController
                 2 => __('denied')
             ]
         )->default(1);
-        $form->number(__('expiry'))->default(30);
+        $form->number(__('expair'))->default(30);
         $form->hidden('type')->default("admin");
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));

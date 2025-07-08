@@ -1968,7 +1968,7 @@ class Common
 
     public static function isReliableTransferEnabled(): bool
     {
-        return Cache::get('transfer_salary_reliable_shipping_agency', 0) == 1;
+        return settings()->get('transfer_salary_reliable_shipping_agency') == 1;
     }
     
     public static function canTransferToAgency($agency): bool

@@ -18,6 +18,7 @@ return [
     'new'                   => 'جديد',
     'create'                => 'انشاء',
     'delete'                => 'مسح',
+    'percent_total_error' => '❌ يجب أن يكون مجموع النسب 100٪ بالضبط. الحالي: :total٪',
     'remove'                => 'حذف',
     'edit'                  => 'تعديل',
     'view'                  => 'عرض',

@@ -1434,8 +1434,8 @@ class User extends Authenticatable
         $lang = app()->getLocale() ?? 'en';
 
         $types = [
-            1 => 'host',
-            2 => 'agency_owner',
+            1 => 'agency_owner',
+            2 => 'host',
             3 => 'shipping',
             4 => 'bd',
         ];
@@ -1450,6 +1450,7 @@ class User extends Authenticatable
             $applicableTypes[2] = $types[2];
         }
 
+
         if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
             $applicableTypes[3] = $types[3];
         }
@@ -1463,7 +1464,6 @@ class User extends Authenticatable
         }
 
         ksort($applicableTypes);
-
         $configKeys = [];
         foreach ($applicableTypes as $type) {
             $configKeys[] = "{$lang}_{$type}";
@@ -1474,6 +1474,7 @@ class User extends Authenticatable
 
         $html = '<div class="user-type-badges">';
         foreach ($applicableTypes as $typeName) {
+
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
 
@@ -1485,6 +1486,7 @@ class User extends Authenticatable
         }
 
         $html .= '</div>';
+
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
