@@ -218,9 +218,11 @@ class GiftController extends MainController
      * @return Form
      */
     protected function form()
-    {
+    { 
+
         $form = new TabsFrom(new Gift);
         $this->disableFormTools($form);
+        $type = old('type', $form->model()->type ?? null);
 
         $form->display(__('ID'));
         $form->text('name', __('name'));
@@ -229,6 +231,8 @@ class GiftController extends MainController
             translate(TYPE_GIFT)
         )
             ->when(6, function () use ($form) {
+             
+                $type = old('type', $form->model()->type ?? null);
                 $form->number('luckyGift.win_probability', __('win probability'))
                     ->min(10)->max(100)
                     ->placeholder(__('Enter win probability'))
@@ -255,9 +259,11 @@ class GiftController extends MainController
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
+            if ($type == 6 || !$form->isEditing()) {
 
                 $form->html(<<<'HTML'
                     <script>
+                        
                         (function () {
                             const fields = ['min_percentag', 'mid_percentag', 'max_percentag'];
 
@@ -315,6 +321,7 @@ class GiftController extends MainController
                         </script>
 
                     HTML);
+                    }
             })
             ->when(9, function () use ($form) {
                 $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
