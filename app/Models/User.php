@@ -1490,6 +1490,8 @@ class User extends Authenticatable
         }
 
         $html .= '</div>';
+        Log::info('test badge fallbackKey',['1'=>$html]);
+
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
