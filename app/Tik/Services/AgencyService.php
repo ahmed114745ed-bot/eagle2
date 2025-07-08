@@ -150,6 +150,8 @@ class AgencyService
                     'days'    => $user->getTotalDays(),
                     'type'    => $user->type_user,
                     'minutes' => $minutes,
+                    'image_color'          => @$user->color_image,
+                    'id_image'             => @$user->specialId?->ware?->show_img ?? '',
                 ],
 
                 'target' => floor($target),
@@ -234,7 +236,7 @@ class AgencyService
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
-                'status' =>'Joined'
+                'status' => 'Joined'
             ];
             $this->usersJoinedAgencyRepository->create($joinAgencyData);
             // }
@@ -712,7 +714,7 @@ class AgencyService
         $totalDays = $user->getTotalDaysJoinedAgency($startDate);
 
         $saMonth = ltrim($month, '0');
-        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year,$agencyId);
+        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year, $agencyId);
 
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
