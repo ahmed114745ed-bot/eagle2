@@ -300,9 +300,9 @@ class RequestBackgroundImageController extends MainController
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
 
-        if ($form->isEditing()) {
+        $form->editing(function (Form $form) {
             $model = $form->model();
-
+            
             if ($model->created_by_type !== \App\Models\Admin::class) {
                 $form->fields()->each(function ($field) {
                     if ($field->column() === 'status') {
@@ -310,7 +310,7 @@ class RequestBackgroundImageController extends MainController
                     }
                 });
             }
-        }
+        });
 
         $form->saving(function (Form $form) {
             $model = $form->model();
@@ -318,7 +318,7 @@ class RequestBackgroundImageController extends MainController
             $status = $model->status;
 
             // Convert expair (number of days) to a future date
-            if ($form->isEditing() && $form->expair) {
+            if ($form->isCreating() && $form->expair) {
                 $model->expair = \Carbon\Carbon::now()->addDays($form->expair);
             }
 
@@ -328,7 +328,7 @@ class RequestBackgroundImageController extends MainController
             }
 
             // If denied and editing, refund if not created by admin
-            if ($form->isEditing() && $status == 2) {
+            if ($form->isEditing() && $model->getOriginal('status') == 1 && $status == 2) {
                 if ($model->created_by_type !== \App\Models\Admin::class) {
                     $cost = Common::getConfig('cost_request_background') ?: 2000;
                     $user->di += $cost;
