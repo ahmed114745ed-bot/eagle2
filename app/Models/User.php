@@ -525,6 +525,18 @@ class User extends Authenticatable
         return $this->hasMany(LiveTime::class, 'uid');
     }
 
+    public function getLiveTimeThisMonth()
+    {
+        $fromDate = now()->startOfMonth()->toDateString();
+    
+        $period = Common::getEffectiveJoinPeriod($this->id, $this->agency_id, $fromDate);
+    
+        return LiveTime::where('uid', $this->id)
+            ->whereBetween('created_at', [$period['start_date'], $period['end_date']])
+            ->sum('hours');
+    }
+    
+
     public function UserliveTime()
     {
         return $this->hasMany(LiveTime::class);
@@ -802,6 +814,16 @@ class User extends Authenticatable
     {
         $userSallary = UserSallary::query()
             ->where('user_id', $this->id)
+            ->sum(DB::raw('sallary'));
+
+        return round($userSallary, 2);
+    }
+
+    public function getSalaryWithoutCutAmountAttributeByAgency()
+    {
+        $userSallary = UserSallary::query()
+            ->where('user_id', $this->id)
+            ->where('user_agency_id', $this->agency_id)
             ->sum(DB::raw('sallary'));
 
         return round($userSallary, 2);

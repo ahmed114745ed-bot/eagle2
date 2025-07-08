@@ -1944,13 +1944,13 @@ class Common
     }
 
 
-    public static function getUserMediaStats($userId, $type)
+    public static function getUserMediaStats($userId, $type,$agencyId)
     {
         if (!in_array($type, ['moment', 'reel'])) {
             return null;
         }
 
-        $record = UserSallary::where('user_id', $userId)->latest()->first();
+        $record = UserSallary::where('user_agency_id',$agencyId)->where('user_id', $userId)->latest()->first();
 
         if (! $record || empty($record->extras)) {
             return null;
@@ -1985,6 +1985,28 @@ class Common
         return User::where('id', $ownerId)
                    ->where('appear_charger_agency', 1)
                    ->exists();
+    }
+
+    public static function getEffectiveJoinPeriod($userId, $agencyId, $fromDate)
+    {
+        $from = Carbon::parse($fromDate)->startOfDay();
+
+        $latestJoin = UsersJoinedAgency::where('user_id', $userId)
+            ->where('agency_id', $agencyId)
+            ->where('type', 2)
+            ->orderByDesc('join_date')
+            ->value('join_date');
+
+        $startDate = $latestJoin && Carbon::parse($latestJoin)->gt($from)
+            ? Carbon::parse($latestJoin)->startOfDay()
+            : $from;
+
+        $endDate = $from->copy()->endOfMonth();
+
+        return [
+            'start_date' => $startDate->toDateString(),
+            'end_date' => $endDate->toDateString(),
+        ];
     }
     
 }
