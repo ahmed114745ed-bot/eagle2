@@ -355,7 +355,7 @@ class GiftController extends MainController
 
 
 
-            if ($form->model()->type == "6" || request()->type == 6) {
+            if ($form->model()->type == 6 || request()->type == 6) {
                 $type = $form->input('type');
                 $win_probability = $form->input('luckyGift.win_probability');
                 $min_percentag = $form->input('luckyGift.min_percentag');
