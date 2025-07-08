@@ -15,6 +15,7 @@ return [
     'user_setting'          => 'User setting',
     'avatar'                => 'Avatar',
     'list'                  => 'List',
+    'percent_total_error' => '❌ The total percentages must be exactly 100%. Current: :total%',
     'new'                   => 'New',
     "apple_team_id" => 'Team ID',
     "apple_client_id" => 'Client ID',

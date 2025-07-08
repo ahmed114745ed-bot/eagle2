@@ -285,6 +285,7 @@
 "This microphone is closed and cannot be accessed":"هذا المايك مغلق ولا يمكن الصعود عليه",
 "Stop sending gifts to everyone":"ايقاف ارسال الهدايا للجميع",
 "❌ The total percentages must be exactly 100%. Current:":"❌ مجموع النسب يجب أن يكون 100% بالضبط. الحالي:",
+"The sum of percentages must be equal to 100.":"يجب أن يكون مجموع النسب مساوياً لـ 100.",
 "change agency by admin": "تغيير الوكالة بواسطة المشرف",
     "to many send": "الكثير من الطلبات",
     "code is sent to your phone": "تم إرسال الرمز إلى هاتفك",
