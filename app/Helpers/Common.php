@@ -869,36 +869,39 @@ class Common
         Http::withHeaders($headers)->post($url, $body);
     }
 
-    public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
-    {
-        $accessToken = self::getGoogleAccessToken();
-    
-        $url = "https://iid.googleapis.com/v1:batchRemove";
-        $body = [
-            'to' => "/topics/{$topic}",
-            'registration_tokens' => $registrationTokens,
-        ];
-    
-        // 🟡 طباعة البيانات قبل الإرسال
-        Log::info('UnsubscribeFromTopic - URL: ' . $url);
-        Log::info('UnsubscribeFromTopic - Topic: ' . $topic);
-        Log::info('UnsubscribeFromTopic - Tokens:', $registrationTokens);
-        Log::info('UnsubscribeFromTopic - Access Token: ' . $accessToken);
-    
-        try {
-            $response = Http::withToken($accessToken)
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post($url, $body);
-    
-            Log::info('UnsubscribeFromTopic - Response Status: ' . $response->status());
-            Log::info('UnsubscribeFromTopic - Response Body:', $response->json());
-    
-        } catch (\Exception $e) {
-            // ❌ طباعة الخطأ إن حدث
-            Log::error('UnsubscribeFromTopic - Exception: ' . $e->getMessage());
-            Log::error('UnsubscribeFromTopic - Trace: ' . $e->getTraceAsString());
-        }
+   
+public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
+{
+    $accessToken = self::getGoogleAccessToken();
+
+    $url = "https://iid.googleapis.com/v1:batchRemove";
+    $body = [
+        'to' => "/topics/{$topic}",
+        'registration_tokens' => $registrationTokens,
+    ];
+
+    // طباعة قبل الإرسال
+    Log::info('UnsubscribeFromTopic - URL: ' . $url);
+    Log::info('UnsubscribeFromTopic - Topic: ' . $topic);
+    Log::info('UnsubscribeFromTopic - Tokens:', $registrationTokens);
+    Log::info('UnsubscribeFromTopic - Access Token: ' . $accessToken);
+
+    try {
+        $response = Http::withToken($accessToken)
+            ->withHeaders(['Content-Type' => 'application/json'])
+            ->post($url, $body);
+
+        $responseData = $response->json() ?? [];
+
+        Log::info('UnsubscribeFromTopic - Response Status: ' . $response->status());
+        Log::info('UnsubscribeFromTopic - Response Body:', is_array($responseData) ? $responseData : ['raw' => $response->body()]);
+
+    } catch (\Exception $e) {
+        Log::error('UnsubscribeFromTopic - Exception: ' . $e->getMessage());
+        Log::error('UnsubscribeFromTopic - Trace: ' . $e->getTraceAsString());
     }
+}
+
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
     {
