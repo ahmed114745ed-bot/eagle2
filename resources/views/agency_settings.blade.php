@@ -444,11 +444,8 @@
                 <div class="form">
                     <label>{{ __('Hours:') }} </label>
                     <input type="number" name="hours_days" value="{{ $hoursDays }}" class="form-control">
-
                     <button type="submit">{{ __('Save') }}</button>
-
                 </div>
-
             </form>
             </div>
 
