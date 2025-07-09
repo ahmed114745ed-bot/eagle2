@@ -39,8 +39,8 @@ class ChargeAgentResource extends JsonResource
             'level' => $user?->total_sender_level ?? 0, // both
             'vip' => @$user->UserVip->level ?? 0, // both
             'charge_count' => $this->salary_requests_count ?? 0,
-            'image_color'          => $user->color_image ?? null,
-            'id_image'             => $user->specialId?->ware?->show_img ?? '',
+            'image_color'          => @$user->color_image ?? null,
+            'id_image'             => @$user->specialId?->ware?->show_img ?? '',
 
             // 'charge_count' => $userDetails->charges_count ?? 0,
         ];

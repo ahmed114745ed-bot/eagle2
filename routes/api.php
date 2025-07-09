@@ -585,18 +585,22 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
 
-            Route::get('/public-test', function () {
+            Route::get('/public-test/{id}', function ($id) {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
-
+             
                 $tokens = User::whereNotNull('notification_id')
-                    ->where('id', '!=', 1073)
+                    ->where('id', $id)
                     ->pluck('notification_id')
                     ->filter()
                     ->unique()
                     ->values()
                     ->toArray();
-
+                    logger()->info('Kreait - Successfully unsubscribed tokens from topic.', [
+                        'tokens'         => $tokens,
+                        'id'        => $id,
+                    ]);  
+            
                 return Common::send_firebase_notification_top($tokens, $title, $body);
             });
 

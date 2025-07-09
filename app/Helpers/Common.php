@@ -24,6 +24,7 @@ use App\Models\UserVip;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserSallary;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
@@ -657,6 +658,33 @@ class Common
 
         return $token['access_token'];
     }
+    private static function getUnsubscribeGoogleAccessToken(): ?string
+    {
+        $credentialsFilePath = base_path(config("app.fileName"));
+
+        if (!file_exists($credentialsFilePath)) {
+            Log::error('Firebase credentials file not found: ' . $credentialsFilePath);
+            return null;
+        }
+
+        try {
+            $client = new \Google_Client();
+            $client->setAuthConfig($credentialsFilePath);
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+            $client->useApplicationDefaultCredentials();
+            $token = $client->fetchAccessTokenWithAssertion();
+
+            if (!isset($token['access_token'])) {
+                Log::error('Access token is missing from Google Client.');
+                return null;
+            }
+
+            return $token['access_token'];
+        } catch (\Throwable $e) {
+            Log::error('Error fetching Firebase access token: ' . $e->getMessage());
+            return null;
+        }
+    }
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if ($tokens == null) return;
@@ -870,21 +898,31 @@ class Common
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
     {
-        $accessToken = self::getGoogleAccessToken();
+        try {
+            $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
+            $messaging = $factory->createMessaging();
+    
+            $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
+    
+        
 
-        $url = "https://iid.googleapis.com/iid/v1:batchRemove";
-        $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type'  => 'application/json',
-        ];
+        logger()->info('Kreait - Successfully unsubscribed tokens from topic.', [
+            'topic'         => $topic,
+            'tokens'        => $registrationTokens,
+            'response'      => $response, // <-- هنا تظهر successCount و failureCount
+        ]);   
+        
+        } catch (\Throwable $e) {
+           
+            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
+              
+                'response' => $e->getMessage(), // ✅ تمت إضافته بشكل صحيح
+            ]);  
+        }
 
-        $body = [
-            'to' => "/topics/{$topic}",
-            'registration_tokens' => $registrationTokens,
-        ];
-
-        Http::withHeaders($headers)->post($url, $body);
     }
+    
+
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
     {
