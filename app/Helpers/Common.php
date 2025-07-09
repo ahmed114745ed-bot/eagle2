@@ -657,7 +657,7 @@ class Common
 
         return $token['access_token'];
     }
-    public static function send_firebase_notification0($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
@@ -788,7 +788,7 @@ class Common
         return null;
     }
 
-    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    public static function send_firebase_notification_top($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if (empty($tokens)) return;
 
