@@ -841,6 +841,7 @@ class Common
 
         $status = $response->status();
         $body = $response->body();
+        info($body);
 
         logger()->info('FCM Response', [
             'status' => $status,
@@ -2026,5 +2027,5 @@ class Common
             'end_date' => $endDate->toDateString(),
         ];
     }
-    
+
 }

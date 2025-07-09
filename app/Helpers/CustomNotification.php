@@ -554,11 +554,8 @@ class CustomNotification
         $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['image'] = getImagePath($image);
         $icon = $data['image'];
-        info('before notification');
         Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'ware-vip');
-        info('after fire base');
         Common::sendOfficialMessage($user->id, $body_en, '', titleAr: $body_ar);
-        info('after official message');
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
