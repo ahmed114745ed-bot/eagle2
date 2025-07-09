@@ -902,25 +902,9 @@ class Common
             $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
             $messaging = $factory->createMessaging();
     
-            $response = $messaging->unsubscribeFromTopic( $topic ,$registrationTokens);
+            $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
     
-            // طباعة الحالة العامة
-            Log::info("Kreait - UnsubscribeFromTopic: Success Count: {$response->successes()->count()}, Failures: {$response->failures()->count()}");
-    
-            foreach ($response->successes()->values() as $success) {
-                Log::info('Unsubscribed successfully:', [
-                    'token' => $success->registrationToken(),
-                ]);
-            }
-    
-            // عرض كل فشل
-            foreach ($response->failures()->values() as $failure) {
-                Log::error('Failed to unsubscribe:', [
-                    'token' => $failure->registrationToken(),
-                    'error' => $failure->error()->getMessage(),
-                ]);
-            }
-    
+            Log::info("Kreait - UnsubscribeFromTopic: " . json_encode($response));
         } catch (\Throwable $e) {
             Log::error('Kreait - Error unsubscribing from topic: ' . $e->getMessage(), [
                 'topic' => $topic,
