@@ -842,7 +842,6 @@ class Common
 
         $status = $response->status();
         $body = $response->body();
-        info($body);
 
         logger()->info('FCM Response', [
             'status' => $status,

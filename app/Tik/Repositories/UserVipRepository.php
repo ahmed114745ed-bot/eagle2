@@ -91,7 +91,7 @@ class UserVipRepository extends AbstractRepository
 
         return true;
     }
-    
+
     public function updateIsUsedForUser($userId)
     {
         $this->model->where('user_id', $userId)->update(['is_used' => 0]);
@@ -103,7 +103,7 @@ class UserVipRepository extends AbstractRepository
     }
     public function updateTrueIsUsedForUser($userId)
     {
-        $oldPacks = Pack::where('users_id', $userId)->update(['is_used' => 0]);
+        $oldPacks = Pack::where('user_id', $userId)->update(['is_used' => 0]);
         $vips = $this->model->where('user_id', $userId)->get();
 
         foreach ($vips as $vip) {
