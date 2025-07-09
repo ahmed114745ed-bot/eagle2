@@ -904,8 +904,11 @@ class Common
     
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
     
-            Log::info("Kreait - UnsubscribeFromTopic: " . json_encode($response));
-        } catch (\Throwable $e) {
+            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
+                'topic' => $topic,
+                'tokens' => $registrationTokens,
+                'response' => $response, // ✅ تمت إضافته بشكل صحيح
+            ]);        } catch (\Throwable $e) {
             Log::error('Kreait - Error unsubscribing from topic: ' . $e->getMessage(), [
                 'topic' => $topic,
                 'tokens' => $registrationTokens,
