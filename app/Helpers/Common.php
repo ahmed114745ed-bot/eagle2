@@ -904,10 +904,13 @@ class Common
     
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
     
-            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
-                'topic' => $topic,
-                'response' => $response, // ✅ تمت إضافته بشكل صحيح
-            ]);      
+            $status = $response->status();
+        $body = $response->body();
+
+        logger()->info('FCM Response', [
+            'status' => $status,
+            'response' => $body
+        ]);    
         
         } catch (\Throwable $e) {
            
