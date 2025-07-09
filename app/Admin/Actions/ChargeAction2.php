@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Admin as Script;
 use Illuminate\Validation\ValidationException;
 
 class ChargeAction2 extends Action
@@ -27,8 +28,8 @@ class ChargeAction2 extends Action
 
     public function handle(Request $request)
     {
-        if (!Admin::user()->can('add-switch-' .'coin-recharge') && !Admin::user()->can('*')) {
-             return $this->response()->error(__('you dont have permission'))->refresh();
+        if (!Admin::user()->can('add-switch-' . 'coin-recharge') && !Admin::user()->can('*')) {
+            return $this->response()->error(__('you dont have permission'))->refresh();
         }
         $agency = $this->getAgency($request->agency_id);
         if (!$agency) {
@@ -97,18 +98,82 @@ class ChargeAction2 extends Action
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before =  $agency->coins  - $amount;
+        $charge->reason_en = $request->reason_en;
+        $charge->reason_ar = $request->reason_ar;
+        $charge->invoice = $request->invoice;
         $charge->save();
     }
 
-    function form()
+    // function form()
+    // {
+    //     $this->name = __('Charge');
+    //     $this->hidden('agency_id')->attribute('id', 'vid');
+    //     $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
+    //     $this->text('amount', __('Amount'))
+    //         ->addElementClass('price-input')
+    //         ->help(__('Enter amount in dollars'));
+    //     $this->text('reason_en', __('reason en'));
+    //     $this->text('reason_ar', __('reason ar'));
+    //     $this->select('form', __('add'))
+    //         ->options([
+    //             0 => __('no'),
+    //             1 => __('yes'),
+    //         ])
+    //         ->attribute(['id' => 'form-select']);
+
+    //     $this->image('invoice', __('Invoice'))
+    //         ->attribute(['id' => 'invoice-field']);
+
+    //     $this->hidden('amount_type')->value(1);
+    // }
+
+    public function form()
     {
-        $this->name = __('Charge');
-        $this->hidden('agency_id')->attribute('id', 'vid');
-        $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
+        $this->hidden('agency_id')->attribute(['id' => 'vid']);
+
+        $this->select('charge_type', __('Charge Type'))
+            ->options([
+                'increment' => __('increment'),
+                'decrement' => __('decrement'),
+            ])
+            ->default('increment');
+
         $this->text('amount', __('Amount'))
             ->addElementClass('price-input')
             ->help(__('Enter amount in dollars'));
+
+        $this->text('reason_en', __('reason en'));
+        $this->text('reason_ar', __('reason ar'));
+
+        $this->select('form', __('add invoice'))
+            ->options([
+                0 => __('no'),
+                1 => __('yes'),
+            ])
+            ->attribute(['id' => 'form-select']);
+
+        $this->image('invoice', __('invoice'))
+            ->attribute([
+                'id' => 'invoice-field',
+
+            ]);
+
         $this->hidden('amount_type')->value(1);
+
+        // ✅ JS to toggle invoice field inside modal
+        Admin::script(<<<'SCRIPT'
+            function toggleInvoiceField() {
+                var selected = $('#form-select').val();
+                if (selected === '1') {
+                    $('#invoice-field').closest('.form-group').show();
+                } else {
+                    $('#invoice-field').closest('.form-group').hide();
+                }
+            }
+
+            $(document).off('change', '#form-select').on('change', '#form-select', toggleInvoiceField);
+            toggleInvoiceField();
+        SCRIPT);
     }
 
 
@@ -121,13 +186,13 @@ class ChargeAction2 extends Action
         $html = '';
 
         //if (Admin::user()->can('add-switch-' .'coin-recharge') || Admin::user()->can('*')) {
-            $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->agencyId . ')" class="charge_action btn btn-sm text-white" style="background-color: #28a745; border-color: #28a745; color: white;">'
-                . htmlspecialchars($title) .
-                '</a>';
-       // }
+        $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->agencyId . ')" class="charge_action btn btn-sm text-white" style="background-color: #28a745; border-color: #28a745; color: white;">'
+            . htmlspecialchars($title) .
+            '</a>';
+        // }
 
-        if (Admin::user()->can('charge-report-switch-' .'coin-recharge') || Admin::user()->can('*')) {
-            
+        if (Admin::user()->can('charge-report-switch-' . 'coin-recharge') || Admin::user()->can('*')) {
+
             $html .= '<a href="' . htmlspecialchars($url) . '" class="shipping_report btn btn-sm text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">'
                 . htmlspecialchars($shippingReports) .
                 '</a>';

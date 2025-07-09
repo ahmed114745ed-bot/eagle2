@@ -707,11 +707,13 @@ class Common
         } else {
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-            //make group and get token
+            
+            $result= self::send_firebase_notification_top(
+                $tokens, $title, $body, $icon, $data,
+                $messageType, $user, $action, $type, $id, $notification_type
+            );
+            return $result;
 
-            $token = self::makeGroup($tokens, $key,  $api_access_key);
-
-            $isGroup = true;
         }
 
         if ($user) {
@@ -736,9 +738,9 @@ class Common
             ],
         ];
 
-        //        if (!empty($icon)) {
-        //            $payload['notification']['icon'] = $icon;
-        //        }
+       if (!empty($icon)) {
+                   $payload['notification']['icon'] = $icon;
+               }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
@@ -746,7 +748,7 @@ class Common
         if (isset($data['image']) && !empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
         } else {
-            // $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+            $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
         }
 
         $headers = [
@@ -755,16 +757,13 @@ class Common
         ];
 
 
-
         $projectId = env('FIREBASE_PROJECT_NAME');
 
         $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
 
-
         $result = json_decode($result);
-
 
         //remove group with $key if is group
         if ($result  && $isGroup) {
@@ -823,7 +822,7 @@ class Common
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-        $topicName = 'system_test_topic';
+        $topicName = 'system_notifications_topic';
 
         self::subscribeToTopic($tokens, $topicName);
 
@@ -893,7 +892,8 @@ class Common
             'registration_tokens' => $registrationTokens,
         ];
 
-        Http::withHeaders($headers)->post($url, $body);
+        $response = Http::withHeaders($headers)->post($url, $body);
+
     }
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
@@ -901,27 +901,36 @@ class Common
         try {
             $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
             $messaging = $factory->createMessaging();
-    
+
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
-    
-        
 
-        logger()->info('Kreait - Successfully unsubscribed tokens from topic.', [
-            'topic'         => $topic,
-            'tokens'        => $registrationTokens,
-            'response'      => $response, // <-- هنا تظهر successCount و failureCount
-        ]);   
-        
+            $result = $response[$topic] ?? [];
+            $successCount = 0;
+            $failureCount = 0;
+
+            foreach ($result as $token => $status) {
+                if ($status === 'OK') {
+                    $successCount++;
+                } else {
+                    $failureCount++;
+                }
+            }
+
+            return [
+                'success' => true,
+                'successCount' => $successCount,
+                'failureCount' => $failureCount,
+                'details' => $result
+            ];
         } catch (\Throwable $e) {
-           
-            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
-              
-                'response' => $e->getMessage(), // ✅ تمت إضافته بشكل صحيح
-            ]);  
+          
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
         }
-
     }
-    
+
 
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
