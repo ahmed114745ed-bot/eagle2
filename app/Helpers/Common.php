@@ -893,12 +893,7 @@ class Common
             'registration_tokens' => $registrationTokens,
         ];
 
-        $response = Http::withHeaders($headers)->post($url, $body);
-
-        Log::info('SubscribeToTopic - FCM response', [
-            'status' => $response->status(),
-            'body' => $response->json()
-        ]);
+        Http::withHeaders($headers)->post($url, $body);
     }
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
@@ -906,66 +901,26 @@ class Common
         try {
             $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
             $messaging = $factory->createMessaging();
-
+    
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
+    
+        
 
-            $result = $response[$topic] ?? [];
-            $successCount = 0;
-            $failureCount = 0;
-
-            foreach ($result as $token => $status) {
-                if ($status === 'OK') {
-                    $successCount++;
-                } else {
-                    $failureCount++;
-                }
-            }
-
-            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
-                'topic'         => $topic,
-                'tokens'        => $registrationTokens,
-                'successCount'  => $successCount,
-                'failureCount'  => $failureCount,
-                'details'       => $result,
-            ]);
-
-            return [
-                'success' => true,
-                'successCount' => $successCount,
-                'failureCount' => $failureCount,
-                'details' => $result
-            ];
+        logger()->info('Kreait - Successfully unsubscribed tokens from topic.', [
+            'topic'         => $topic,
+            'tokens'        => $registrationTokens,
+            'response'      => $response, // <-- هنا تظهر successCount و failureCount
+        ]);   
+        
         } catch (\Throwable $e) {
-            Log::error('Kreait - Error unsubscribing from topic.', [
-                'topic' => $topic,
-                'tokens' => $registrationTokens,
-                'error' => $e->getMessage()
-            ]);
-
-            return [
-                'success' => false,
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-
-    private static function getGoogleAccessToken()
-    {
-        $credentialsFilePath = base_path(config("app.fileName"));
-
-        if (!file_exists($credentialsFilePath)) {
-            throw new \Exception("Firebase credentials file not found");
+           
+            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
+              
+                'response' => $e->getMessage(), // ✅ تمت إضافته بشكل صحيح
+            ]);  
         }
 
-        $client = new \Google_Client();
-        $client->setAuthConfig($credentialsFilePath);
-        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
-        $client->refreshTokenWithAssertion();
-        $token = $client->getAccessToken();
-
-        return $token['access_token'] ?? null;
     }
-
     
 
 
