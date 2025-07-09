@@ -714,8 +714,6 @@ class Common
             );
             return $result;
 
-            // $token = self::makeGroup($tokens, $key,  $api_access_key);
-            // $isGroup = true;
         }
 
         if ($user) {
