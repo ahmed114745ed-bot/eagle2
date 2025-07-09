@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
 use App\Models\Admin;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -51,7 +52,10 @@ class ChargeResourceforAgencyCharge extends JsonResource
         // 'charger' => Common::getChargerInfo($this),
         // 'receiver' => Common::getReceiverInfo($this)
         $sender = Common::getChargerInfo($this);
-        $is_sender = $sender['id'] == Auth::user()->agency_id;
+        $is_sender = ShippingAgency::where('id', $sender['id'])
+        ->where('app_owner_id', Auth::user()->id)
+        ->exists();
+
         return [
             'id'   => $this->id ?: 0,
             // 'sender' => $sender_data,
@@ -63,7 +67,6 @@ class ChargeResourceforAgencyCharge extends JsonResource
             'coins' =>  (int)$this->amount ?? 0,
             'usd' => $this->usd ?? 0,
             'is_sender' => $is_sender ?? 0,
-            'Auth::user()->agency_id' =>Auth::user()->agency_id ,
             
             
         ];
