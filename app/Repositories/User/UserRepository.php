@@ -18,7 +18,8 @@ class UserRepository extends Repository
         return User::query()->where(function ($query) use ($key) {
             $query->where('name', 'like', '%' . $key . '%')
                 ->orWhere('uuid', 'like', '%' . $key . '%')
-                ->orWhere('id', 'like', '%' . $key . '%');
+                ->orWhere('id', 'like', '%' . $key . '%')
+                ->orWhere('special_id', 'like', '%' . $key . '%');
         })->when(isset($family), function ($query) {
             $query->where(function ($query) {
                 $query->where('family_id', null)->orWhere('family_id', 0);

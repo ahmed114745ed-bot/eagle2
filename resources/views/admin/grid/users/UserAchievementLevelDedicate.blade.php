@@ -13,7 +13,7 @@
         border-radius: 10px;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     }
-    
+
     .form-label {
         font-weight: 600;
        /* // color: #495057; */
@@ -21,22 +21,22 @@
     font-size: 1.25rem; /* 20px equivalent */
         margin-bottom: 0.5rem;
     }
-    
+
     .select2-container--default .select2-selection--single {
         height: 42px;
         border: 1px solid #ced4da;
         border-radius: 4px;
          color: #000;
     }
-    
+
     .select2-container--default .select2-selection--single .select2-selection__rendered {
         line-height: 42px;
     }
-    
+
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 40px;
     }
-    
+
     .image-option {
         display: inline-block;
         margin-right: 10px;
@@ -45,48 +45,48 @@
         border: 2px solid transparent;
         border-radius: 5px;
     }
-    
+
     .image-option:hover {
         transform: scale(1.05);
     }
-    
+
     .image-option.selected {
         border-color: #0d6efd;
         box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
     }
-    
+
     .image-scroll-container {
         display: flex;
         overflow-x: auto;
         padding: 10px 0;
         gap: 15px;
     }
-    
+
     .image-scroll-container::-webkit-scrollbar {
         height: 8px;
     }
-    
+
     .image-scroll-container::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 10px;
     }
-    
+
     .image-scroll-container::-webkit-scrollbar-thumb {
         background: #888;
         border-radius: 10px;
     }
-    
+
     .image-scroll-container::-webkit-scrollbar-thumb:hover {
         background: #555;
     }
-    
+
     .submit-btn {
         width: 100%;
         padding: 10px;
         font-weight: 600;
         letter-spacing: 0.5px;
     }
-    
+
     .form-section {
         margin-bottom: 1.5rem;
         padding: 1.5rem;
@@ -94,17 +94,17 @@
         border-radius: 8px;
         transition: all 0.3s ease;
     }
-    
+
     .form-section.active {
         /* background: #e7f1ff; */
         /* border-left: 4px solid #0d6efd; */
     }
-    
+
     .file-upload-wrapper {
         position: relative;
         margin-top: 10px;
     }
-    
+
     .file-upload-label {
         display: block;
         padding: 10px 15px;
@@ -115,11 +115,11 @@
         cursor: pointer;
         transition: all 0.3s;
     }
-    
+
     .file-upload-label:hover {
         background: #dee2e6;
     }
-    
+
     .file-upload-input {
         position: absolute;
         left: 0;
@@ -129,7 +129,7 @@
         height: 100%;
         cursor: pointer;
     }
-    
+
     @media (max-width: 768px) {
         .achievement-container {
             padding: 1rem;
@@ -140,7 +140,7 @@
 
 <div class="achievement-container">
     <h3 class="text-center mb-4">{{ __('assign achievement') }}</h3>
-    
+
     @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="fas fa-exclamation-circle me-2"></i>
@@ -156,7 +156,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-    
+
     <form method="POST" action="{{ route('admin.store-user-achievement') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
         @csrf
 <br>
@@ -167,7 +167,7 @@
                 <select name="user_id" id="user_id" class="form-control select2" required>
                     <option value="">{{ __('admin.selectUser') }}</option>
                 </select>
-                
+
             </div>
         </div>
 
@@ -255,8 +255,8 @@
                     params.page = params.page || 1;
                     return {
                         results: data.data.map(function(user) {
-                            return { 
-                                id: user.id, 
+                            return {
+                                id: user.id,
                                 text: user.name || '',
                                 image: user.profile_image ? '{{ asset('') }}' + user.profile_image : '{{ asset('images/default-user.png') }}'
                             };
@@ -276,7 +276,7 @@
 
         function formatUser(user) {
             if (!user.id) return user.text;
-            
+
             var $container = $(
                 '<div class="d-flex align-items-center">' +
                 '<img src="' + user.image + '" class="rounded-circle me-2" width="30" height="30">' +
@@ -288,7 +288,7 @@
 
         function formatUserSelection(user) {
             if (!user.id) return user.text;
-            
+
             return $(
                 '<div class="d-flex align-items-center">' +
                 '<img src="' + user.image + '" class="rounded-circle me-2" width="20" height="20">' +
@@ -334,7 +334,7 @@
         // Toggle between file and image upload
         $('#file_image_select').change(function() {
             var selectedValue = $(this).val();
-            
+
             if (selectedValue == 'file') {
                 $('#file_input').fadeIn();
                 $('#imageDiv').hide();
@@ -357,7 +357,7 @@
         (function() {
             'use strict';
             var forms = document.querySelectorAll('.needs-validation');
-            
+
             Array.prototype.slice.call(forms)
                 .forEach(function(form) {
                     form.addEventListener('submit', function(event) {
@@ -365,7 +365,7 @@
                             event.preventDefault();
                             event.stopPropagation();
                         }
-                        
+
                         form.classList.add('was-validated');
                     }, false);
                 });
