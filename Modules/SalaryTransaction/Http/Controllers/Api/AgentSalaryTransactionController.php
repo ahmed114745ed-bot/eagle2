@@ -69,7 +69,6 @@ class AgentSalaryTransactionController extends Controller
         if (!$agency) {
             return Common::apiResponse(0, __("api_responses.agency"));
         }
-
         $data = Charge::query();
                         //  where('is_used_transferred', false)
                         // ->where("charger_type", 'agency')
@@ -90,10 +89,6 @@ class AgentSalaryTransactionController extends Controller
             ->with('senderUser','senderShippingAgency','senderAgency','admin');
 
         })->orderByDesc('id')->paginate();
-
-
-
-
 
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }

@@ -1871,6 +1871,7 @@ class Common
                     'id_image'             => @$resource->senderAgency->owner->specialId?->ware?->show_img ?? '',
 
                 ];
+            case 'bd':
             case 'user':
                 return [
                     'name' => $resource->senderUser->name ?? '',
@@ -1879,19 +1880,8 @@ class Common
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
                     'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => $resource->senderUser->color_image,
-                    'id_image'             => $resource->senderUser->specialId?->ware?->show_img ?? '',
-                ];
-            case 'bd':
-                return [
-                    'name' => $resource->senderUser->name ?? '',
-                    'image' => $resource->senderUser->profile->avatar ?? '',
-                    'uuid' => $resource->senderUser->uuid ?? '',
-                    'id' => $resource->senderUser->id ?? '',
-                    'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => $resource->senderUser->color_image,
-                    'id_image'             => $resource->senderUser->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->senderUser->color_image,
+                    'id_image'             => @$resource->senderUser->specialId?->ware?->show_img ?? '',
                 ];
             default:
                 return [
@@ -1919,8 +1909,8 @@ class Common
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
-                    'image_color'          => $resource->receiveragency->owner->color_image,
-                    'id_image'             => $resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->receiveragency->owner->color_image,
+                    'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                 ];
             case 'user':
                 return [
@@ -1930,8 +1920,8 @@ class Common
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
                     'url' => $resource->receiverUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
-                    'image_color'          => $resource->receiverUser->color_image,
-                    'id_image'             => $resource->receiverUser->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->receiverUser->color_image,
+                    'id_image'             => @$resource->receiverUser->specialId?->ware?->show_img ?? '',
                 ];
             default:
                 return [
