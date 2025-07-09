@@ -51,7 +51,7 @@ class ChargeResourceforAgencyCharge extends JsonResource
         // 'charger' => Common::getChargerInfo($this),
         // 'receiver' => Common::getReceiverInfo($this)
         $sender = Common::getChargerInfo($this);
-        $is_sender = $sender['id'] == Auth::user()->id;
+        $is_sender = $sender['id'] == Auth::user()->agency_id;
         return [
             'id'   => $this->id ?: 0,
             // 'sender' => $sender_data,
