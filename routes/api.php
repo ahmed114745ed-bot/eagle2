@@ -596,7 +596,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->values()
                     ->toArray();
 
-                return Common::send_firebase_notification($tokens, $title, $body);
+                return Common::send_firebase_notification_top($tokens, $title, $body);
             });
 
 
