@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Room;
 use Carbon\Carbon;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -100,7 +101,7 @@ class RequestBackgroundImageController extends MainController
             $owner = $this->owner ?? null;
             $ownerRoom = $owner->ownerRoom ?? null;
 
-            $name = $this->name ?? '';
+            $name = $ownerRoom->room_name ?? '';
             $uuid = $owner->uuid ?? '';
             $path = $ownerRoom->room_cover ?? null;
             $defaultImage = asset("images/room.jpg");
@@ -222,7 +223,24 @@ class RequestBackgroundImageController extends MainController
                     </span>";
         });
 
-        $grid->column('expair', __('expire'));
+        $grid->column('expair', __('Expire'))->display(function ($value) {
+            if (!$value) {
+                return '—';
+            }
+
+            $expairDate = Carbon::parse($value);
+            $diffInDays = now()->diffInDays($expairDate, false); // false = allow negative
+
+            if ($diffInDays > 0) {
+                return "$diffInDays";
+            } elseif ($diffInDays === 0) {
+                return __("today");
+            } else {
+                return abs($diffInDays)." " . __("days ago");
+            }
+        });
+
+
         $grid->column('updated_at', __('admin.updated_at'))->display(function ($date) {
             return Carbon::parse($date)->format('Y-m-d H:i:s');
         });
@@ -291,27 +309,58 @@ class RequestBackgroundImageController extends MainController
                 1 => __('accepted'),
                 2 => __('denied')
             ]
-        )->help(__('⚠️ If you deny this background, the user will receive a refund of its cost.'))->default(1);
+        )->default(1);
 
-        $form->number(__('expair'))->default(30);
+
+        if ($form->isCreating()) {
+            $form->number('expair', __('expair'))->default(30);
+        }
         $form->hidden('type')->default("admin");
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
 
-        $form->saving(function (Form $form) {
-
+        $form->editing(function (Form $form) {
             $model = $form->model();
-            $status = $model->status;
-            $user = User::find($model->owner_room_id);
-            if (($status == 2) && $user) {
-                $costRequestBackGround = Common::getConfig('cost_request_background') ?: 2000;
-                $user->di += $costRequestBackGround;
-                $user->save();
-                CustomNotification::BackgroudRequest($user, 1);
-            } elseif (($status == 1) && $user) {
-                CustomNotification::BackgroudRequest($user, 0);
+
+            if ($model->created_by_type !== \App\Models\Admin::class) {
+                $form->fields()->each(function ($field) {
+                    if ($field->column() === 'status') {
+                        $field->help('⚠️ If you deny this background, the user will receive a refund of its cost.');
+                    }
+                });
             }
         });
+
+        $form->saving(function (Form $form) {
+            $model = $form->model();
+            $user = User::find($model->owner_room_id);
+            $status = $model->status;
+
+            if ($form->isCreating() && $form->expair) {
+                $form->expair = \Carbon\Carbon::now()->addDays($form->expair)->timestamp;
+            }
+
+            if (! $user) {
+                return ;
+            }
+
+            // If denied and editing, refund if not created by admin
+            if ($form->isEditing() && $model->getOriginal('status') == 1 && $status == 2) {
+                if ($model->created_by_type !== \App\Models\Admin::class) {
+                    $cost = Common::getConfig('cost_request_background') ?: 2000;
+                    $user->di += $cost;
+                    $user->save();
+                }
+                CustomNotification::BackgroudRequest($user, 1); // Notify denied
+            }
+
+            // If accepted, notify
+            if ($status == 1) {
+                CustomNotification::BackgroudRequest($user, 0); // Notify accepted
+            }
+        });
+
+
 
         return $form;
     }
