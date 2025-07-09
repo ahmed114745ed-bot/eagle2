@@ -24,6 +24,7 @@ use App\Models\UserVip;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserSallary;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
@@ -657,7 +658,34 @@ class Common
 
         return $token['access_token'];
     }
-    public static function send_firebase_notification0($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    private static function getUnsubscribeGoogleAccessToken(): ?string
+    {
+        $credentialsFilePath = base_path(config("app.fileName"));
+
+        if (!file_exists($credentialsFilePath)) {
+            Log::error('Firebase credentials file not found: ' . $credentialsFilePath);
+            return null;
+        }
+
+        try {
+            $client = new \Google_Client();
+            $client->setAuthConfig($credentialsFilePath);
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+            $client->useApplicationDefaultCredentials();
+            $token = $client->fetchAccessTokenWithAssertion();
+
+            if (!isset($token['access_token'])) {
+                Log::error('Access token is missing from Google Client.');
+                return null;
+            }
+
+            return $token['access_token'];
+        } catch (\Throwable $e) {
+            Log::error('Error fetching Firebase access token: ' . $e->getMessage());
+            return null;
+        }
+    }
+    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
@@ -788,7 +816,7 @@ class Common
         return null;
     }
 
-    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    public static function send_firebase_notification_top($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if (empty($tokens)) return;
 
@@ -865,26 +893,64 @@ class Common
             'registration_tokens' => $registrationTokens,
         ];
 
-        Http::withHeaders($headers)->post($url, $body);
+        $response = Http::withHeaders($headers)->post($url, $body);
+
+        Log::info('SubscribeToTopic - FCM response', [
+            'status' => $response->status(),
+            'body' => $response->json()
+        ]);
     }
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
     {
-        $accessToken = self::getGoogleAccessToken();
+        try {
+            $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
+            $messaging = $factory->createMessaging();
 
-        $url = "https://iid.googleapis.com/iid/v1:batchRemove";
-        $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type'  => 'application/json',
-        ];
+            $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-        $body = [
-            'to' => "/topics/{$topic}",
-            'registration_tokens' => $registrationTokens,
-        ];
+            // حساب النجاح والفشل
+            $result = $response[$topic] ?? [];
+            $successCount = 0;
+            $failureCount = 0;
 
-        Http::withHeaders($headers)->post($url, $body);
+            foreach ($result as $token => $status) {
+                if ($status === 'OK') {
+                    $successCount++;
+                } else {
+                    $failureCount++;
+                }
+            }
+
+            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
+                'topic'         => $topic,
+                'tokens'        => $registrationTokens,
+                'successCount'  => $successCount,
+                'failureCount'  => $failureCount,
+                'details'       => $result,
+            ]);
+
+            return [
+                'success' => true,
+                'successCount' => $successCount,
+                'failureCount' => $failureCount,
+                'details' => $result
+            ];
+        } catch (\Throwable $e) {
+            Log::error('Kreait - Error unsubscribing from topic.', [
+                'topic' => $topic,
+                'tokens' => $registrationTokens,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
     }
+
+
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
     {
@@ -1870,6 +1936,7 @@ class Common
                     'id_image'             => @$resource->senderAgency->owner->specialId?->ware?->show_img ?? '',
 
                 ];
+            case 'bd':
             case 'user':
                 return [
                     'name' => $resource->senderUser->name ?? '',
@@ -1878,19 +1945,8 @@ class Common
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
                     'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => $resource->senderUser->color_image,
-                    'id_image'             => $resource->senderUser->specialId?->ware?->show_img ?? '',
-                ];
-            case 'bd':
-                return [
-                    'name' => $resource->senderUser->name ?? '',
-                    'image' => $resource->senderUser->profile->avatar ?? '',
-                    'uuid' => $resource->senderUser->uuid ?? '',
-                    'id' => $resource->senderUser->id ?? '',
-                    'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => $resource->senderUser->color_image,
-                    'id_image'             => $resource->senderUser->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->senderUser->color_image,
+                    'id_image'             => @$resource->senderUser->specialId?->ware?->show_img ?? '',
                 ];
             default:
                 return [
@@ -1918,8 +1974,8 @@ class Common
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
-                    'image_color'          => $resource->receiveragency->owner->color_image,
-                    'id_image'             => $resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->receiveragency->owner->color_image,
+                    'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                 ];
             case 'user':
                 return [
@@ -1929,8 +1985,8 @@ class Common
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
                     'url' => $resource->receiverUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
-                    'image_color'          => $resource->receiverUser->color_image,
-                    'id_image'             => $resource->receiverUser->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->receiverUser->color_image,
+                    'id_image'             => @$resource->receiverUser->specialId?->ware?->show_img ?? '',
                 ];
             default:
                 return [
@@ -2026,5 +2082,5 @@ class Common
             'end_date' => $endDate->toDateString(),
         ];
     }
-    
+
 }

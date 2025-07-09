@@ -3,6 +3,7 @@
 namespace App\Tik\Repositories;
 
 use App\Models\RequestBackgroundImage;
+use Carbon\Carbon;
 
 class RequestBackgroundImageRepository extends AbstractRepository
 {
@@ -26,7 +27,7 @@ class RequestBackgroundImageRepository extends AbstractRepository
 
     public function findByUserId($userId)
     {
-        return $this->model->query()->where('owner_room_id', $userId)->whereIn('status', [1, 3])->select('id', 'img','expair')->get();
+        return $this->model->query()->where('owner_room_id', $userId)->where('expair', '>=', now()->timestamp)->whereIn('status', [1, 3])->select('id', 'img','expair')->get();
     }
 
     public function all($id, $perPage, $page)

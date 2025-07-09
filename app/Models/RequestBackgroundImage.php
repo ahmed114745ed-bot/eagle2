@@ -20,8 +20,8 @@ class RequestBackgroundImage extends Model
         parent::boot();
 
         self::creating(function ($model) {
+            $room = Room::where('uid', $model->owner_room_id)->first();
             if ($model->status === 1) {
-                $room = Room::where('uid', $model->owner_room_id)->first();
                 if (! empty($room)) {
                     $data = [
                         'messageContent' => [
@@ -37,12 +37,22 @@ class RequestBackgroundImage extends Model
                     $res = Common::sendToZego('SendCustomCommand', $room?->id, $model->owner_room_id, $json);
                 }
             }
-            UserCoinLogHelper::log(
-                $model->owner_room_id,
-                'background',
-                'request_background_images',
-                $model->price
-            );
+
+
+            $model->created_by = \Auth::id();
+            $model->created_by_type = get_class(\Auth::user());
+            $model->room_id = $room->id;
+
+            if ($model->created_by_type === User::class){
+                UserCoinLogHelper::log(
+                    $model->owner_room_id,
+                    'background',
+                    'request_background_images',
+                    $model->price
+                );
+
+            }
+
 
         });
 
@@ -52,5 +62,10 @@ class RequestBackgroundImage extends Model
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_room_id');
+    }
+
+    public function creator()
+    {
+        return $this->morphTo(null, 'created_by_type', 'created_by');
     }
 }
