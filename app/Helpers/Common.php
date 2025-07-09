@@ -898,31 +898,21 @@ class Common
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
     {
-        $accessToken = self::getUnsubscribeGoogleAccessToken();
-    
-        if (!$accessToken) {
-            Log::error('UnsubscribeFromTopic - No access token');
-            return;
-        }
-    
-        $url = "https://iid.googleapis.com/iid/v1:batchRemove";
-        $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type'  => 'application/json',
-        ];
-    
-        $body = [
-            'to' => "/topics/{$topic}",
-            'registration_tokens' => $registrationTokens,
-        ];
-    
         try {
-            $response = Http::withHeaders($headers)->post($url, $body);
+            $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
+            $messaging = $factory->createMessaging();
     
-            Log::info('UnsubscribeFromTopic - Response Status: ' . $response->status());
-            Log::info('UnsubscribeFromTopic - Response Body:', ['raw' => $response->body()]);
-        } catch (\Exception $e) {
-            Log::error('UnsubscribeFromTopic - Exception: ' . $e->getMessage());
+            $messaging->unsubscribeFromTopic($topic,$registrationTokens);
+    
+            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
+                'topic' => $topic,
+                'tokens' => $registrationTokens,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Kreait - Error unsubscribing from topic: ' . $e->getMessage(), [
+                'topic' => $topic,
+                'tokens' => $registrationTokens,
+            ]);
         }
     }
     
