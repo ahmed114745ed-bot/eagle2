@@ -18,7 +18,7 @@ class DollarChargeAgencyResource extends JsonResource
     {
         $receiver=   Common::getReceiverInfo($this);
    
-   dd($receiver);
+   dd($this);
 
         $sender=   Common::getChargerInfo($this);
         $is_sender = $sender['id'] == Auth::user()->id;
