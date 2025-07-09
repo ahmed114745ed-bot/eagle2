@@ -17,6 +17,9 @@ class DollarChargeAgencyResource extends JsonResource
     public function toArray(Request $request): array
     {
         $receiver=   Common::getReceiverInfo($this);
+   
+   dd($receiver);
+
         $sender=   Common::getChargerInfo($this);
         $is_sender = $sender['id'] == Auth::user()->id;
         
