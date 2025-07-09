@@ -5,10 +5,8 @@ namespace Modules\SalaryTransaction\Http\Controllers\Api;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Http\Resources\Api\V1\ChargeAgentResource;
-use App\Models\PaymentGateway;
 use App\Models\ShippingAgency;
 use App\Tik\Repositories\UserRepository;
-use Modules\SalaryTransaction\Helpers\TransactionCustomNotification;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
 use App\Models\Agency;
@@ -16,24 +14,15 @@ use App\Models\AgencySallary;
 use App\Models\Charge;
 use App\Models\Config;
 use App\Models\User;
-use App\Models\UserSallary;
-use Auth;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Modules\SalaryTransaction\Entities\AdminCheck;
 use Modules\SalaryTransaction\Entities\AgencyTransferSalary;
 use Modules\SalaryTransaction\Entities\AgentSalaryRequest;
 use Modules\SalaryTransaction\Entities\ChargeCountry;
-use Modules\SalaryTransaction\Transformers\RequestsResource;
-use Modules\SalaryTransaction\Entities\PendingSalaryRequest;
-use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Transformers\ChargeAgentResource as TransformersChargeAgentResource;
 use Modules\SalaryTransaction\Transformers\ChargeCountryResource;
-use Modules\SalaryTransaction\Transformers\HostRequestsResource;
 
 class AgentSalaryTransactionController extends Controller
 {
@@ -122,7 +111,7 @@ class AgentSalaryTransactionController extends Controller
         }
 
         $data = Charge::query();
-                    
+
         $data = $data->when($type == 'sent', function ($q) use ($search, $agency) {
             $q->where("charger_id", $agency->id)
               ->where('charger_type',  'host_agency')
