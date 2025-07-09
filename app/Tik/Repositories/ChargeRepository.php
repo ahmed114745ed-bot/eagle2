@@ -80,8 +80,8 @@ class ChargeRepository extends AbstractRepository
             ->where('charger_type', 'user')
             ->where('user_type', 'agency')
             ->whereNotNull('user_id')
-            // ->with('agency:id,name,img')
-            ->with(Common::chargerRelationsQuery())
+            ->with('receiverUser','receiverUser.profile','receiveragency')
+            // ->with(Common::chargerRelationsQuery())
             ->select('id', 'agency_id', 'amount', 'usd', 'created_at','charger_type','user_type')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
