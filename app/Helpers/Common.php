@@ -874,13 +874,17 @@ public static function unsubscribeFromTopic(array $registrationTokens, string $t
 {
     $accessToken = self::getGoogleAccessToken();
 
+    if (!$accessToken) {
+        Log::error('UnsubscribeFromTopic - No valid access token provided.');
+        return;
+    }
+
     $url = "https://iid.googleapis.com/iid/v1:batchRemove";
     $body = [
         'to' => "/topics/{$topic}",
         'registration_tokens' => $registrationTokens,
     ];
 
-    // طباعة قبل الإرسال
     Log::info('UnsubscribeFromTopic - URL: ' . $url);
     Log::info('UnsubscribeFromTopic - Topic: ' . $topic);
     Log::info('UnsubscribeFromTopic - Tokens:', $registrationTokens);
