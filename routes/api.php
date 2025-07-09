@@ -585,19 +585,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
 
-            Route::get('/public-test/{id}', function () {
+            Route::get('/public-test/{id}', function ($id) {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
-
-                $tokens = User::whereNotNull('notification_id')
-                ->where('id', '=', request('id') ) 
-                ->pluck('notification_id')
-                ->filter()
-                ->unique()
-                ->values()
-                ->toArray();
             
-
+                $tokens = User::whereNotNull('notification_id')
+                    ->where('id', $id)
+                    ->pluck('notification_id')
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->toArray();
+            
                 return Common::send_firebase_notification_top($tokens, $title, $body);
             });
 
