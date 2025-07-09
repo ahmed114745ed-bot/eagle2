@@ -24,6 +24,7 @@ use App\Models\UserVip;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserSallary;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
@@ -872,19 +873,32 @@ class Common
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
     {
         $accessToken = self::getGoogleAccessToken();
-
-        $url = "https://iid.googleapis.com/iid/v1:batchRemove";
-        $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type'  => 'application/json',
-        ];
-
+    
+        $url = "https://iid.googleapis.com/v1:batchRemove";
         $body = [
             'to' => "/topics/{$topic}",
             'registration_tokens' => $registrationTokens,
         ];
-
-        Http::withHeaders($headers)->post($url, $body);
+    
+        // 🟡 طباعة البيانات قبل الإرسال
+        Log::info('UnsubscribeFromTopic - URL: ' . $url);
+        Log::info('UnsubscribeFromTopic - Topic: ' . $topic);
+        Log::info('UnsubscribeFromTopic - Tokens:', $registrationTokens);
+        Log::info('UnsubscribeFromTopic - Access Token: ' . $accessToken);
+    
+        try {
+            $response = Http::withToken($accessToken)
+                ->withHeaders(['Content-Type' => 'application/json'])
+                ->post($url, $body);
+    
+            Log::info('UnsubscribeFromTopic - Response Status: ' . $response->status());
+            Log::info('UnsubscribeFromTopic - Response Body:', $response->json());
+    
+        } catch (\Exception $e) {
+            // ❌ طباعة الخطأ إن حدث
+            Log::error('UnsubscribeFromTopic - Exception: ' . $e->getMessage());
+            Log::error('UnsubscribeFromTopic - Trace: ' . $e->getTraceAsString());
+        }
     }
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)

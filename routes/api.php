@@ -590,12 +590,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 $body  = 'This is only a test.';
 
                 $tokens = User::whereNotNull('notification_id')
-                    ->where('id', '!=', 1073)
-                    ->pluck('notification_id')
-                    ->filter()
-                    ->unique()
-                    ->values()
-                    ->toArray();
+                ->where('id', '!=', 1073) 
+                ->pluck('notification_id')
+                ->filter()
+                ->unique()
+                ->values()
+                ->toArray();
+            
 
                 return Common::send_firebase_notification_top($tokens, $title, $body);
             });
