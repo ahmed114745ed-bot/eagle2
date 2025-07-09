@@ -588,7 +588,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/public-test/{id}', function ($id) {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
-            
+             
                 $tokens = User::whereNotNull('notification_id')
                     ->where('id', $id)
                     ->pluck('notification_id')
@@ -596,6 +596,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->unique()
                     ->values()
                     ->toArray();
+                    logger()->info('Kreait - Successfully unsubscribed tokens from topic.', [
+                        'tokens'         => $tokens,
+                        'id'        => $id,
+                    ]);  
             
                 return Common::send_firebase_notification_top($tokens, $title, $body);
             });
