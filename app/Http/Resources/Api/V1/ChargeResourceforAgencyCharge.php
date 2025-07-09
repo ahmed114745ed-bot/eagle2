@@ -20,37 +20,6 @@ class ChargeResourceforAgencyCharge extends JsonResource
      */
     public function toArray($request)
     {
-        // $sender = $this->senderAll;
-        // $receiver = $this->receiverAll  ;
-      
-        // if ($this->charger_type == 'dash' && $this->user_type == 'dash') {
-        //     $sender_data = [
-        //         'id'  => $this->admin?->id ?: 0,
-        //         'uuid' =>  '',
-        //         'name' => $this->admin?->name ?: "",
-        //         'img' => $this->admin?->avatar ?? "",
-        //         'type' => $this->user_type
-        //     ];
-        // } else {
-        //     $sender_data   = [
-        //         'id'  => @$sender->id ?: 0,
-        //         'uuid' => @$sender->uuid ?: '',
-        //         'name' => @$sender->name ?: "",
-        //         'img' => @$sender->profile?->avatar ?? "",
-        //         'type' => @$this->charger_type
-        //     ];
-        // }
-
-        // $receiver_data = [
-        //     'id'  => $receiver?->id ?: 0,
-        //     'uuid' => @$receiver?->uuid ?: '',
-        //     'name' => $receiver?->name ?: "",
-        //     'img' => $receiver?->profile?->avatar ?? "",
-        //     'type' => $this->user_type
-        // ];
-
-        // 'charger' => Common::getChargerInfo($this),
-        // 'receiver' => Common::getReceiverInfo($this)
         $sender = Common::getChargerInfo($this);
         $is_sender = ShippingAgency::where('id', $sender['id'])
         ->where('app_owner_id', Auth::user()->id)
@@ -58,8 +27,6 @@ class ChargeResourceforAgencyCharge extends JsonResource
 
         return [
             'id'   => $this->id ?: 0,
-            // 'sender' => $sender_data,
-            // 'receiver' => $receiver_data,
             'sender' => $sender,
             'receiver' =>  Common::getReceiverInfo($this),
             'value' => (int) $this->amount,
