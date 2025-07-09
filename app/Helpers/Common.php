@@ -874,7 +874,7 @@ public static function unsubscribeFromTopic(array $registrationTokens, string $t
 {
     $accessToken = self::getGoogleAccessToken();
 
-    $url = "https://iid.googleapis.com/v1:batchRemove";
+    $url = "https://iid.googleapis.com/iid/v1:batchRemove";
     $body = [
         'to' => "/topics/{$topic}",
         'registration_tokens' => $registrationTokens,
