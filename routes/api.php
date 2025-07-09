@@ -585,12 +585,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
 
-            Route::get('/public-test', function () {
+            Route::get('/public-test/{id}', function () {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
 
                 $tokens = User::whereNotNull('notification_id')
-                ->where('id', '=', 1073) 
+                ->where('id', '=', request('id') ) 
                 ->pluck('notification_id')
                 ->filter()
                 ->unique()
