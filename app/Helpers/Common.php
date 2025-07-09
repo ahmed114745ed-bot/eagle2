@@ -823,7 +823,7 @@ class Common
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-        $topicName = 'system_test_topic';
+        $topicName = 'system_notifications_topic';
 
         self::subscribeToTopic($tokens, $topicName);
 
