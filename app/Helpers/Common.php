@@ -908,11 +908,15 @@ class Common
                 'topic' => $topic,
                 'tokens' => $registrationTokens,
                 'response' => $response, // ✅ تمت إضافته بشكل صحيح
-            ]);        } catch (\Throwable $e) {
-            Log::error('Kreait - Error unsubscribing from topic: ' . $e->getMessage(), [
+            ]);      
+        
+        } catch (\Throwable $e) {
+           
+            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
                 'topic' => $topic,
                 'tokens' => $registrationTokens,
-            ]);
+                'response' => $e->getMessage(), // ✅ تمت إضافته بشكل صحيح
+            ]);  
         }
 
     }
