@@ -63,6 +63,7 @@ class ChargeResourceforAgencyCharge extends JsonResource
             'coins' =>  (int)$this->amount ?? 0,
             'usd' => $this->usd ?? 0,
             'is_sender' => $is_sender ?? 0,
+            'Auth::user()->agency_id' =>Auth::user()->agency_id ,
             
             
         ];
