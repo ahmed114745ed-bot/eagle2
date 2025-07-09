@@ -658,6 +658,33 @@ class Common
 
         return $token['access_token'];
     }
+    private static function getUnsubscribeGoogleAccessToken(): ?string
+    {
+        $credentialsFilePath = base_path(config("app.fileName"));
+
+        if (!file_exists($credentialsFilePath)) {
+            Log::error('Firebase credentials file not found: ' . $credentialsFilePath);
+            return null;
+        }
+
+        try {
+            $client = new \Google_Client();
+            $client->setAuthConfig($credentialsFilePath);
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+            $client->useApplicationDefaultCredentials();
+            $token = $client->fetchAccessTokenWithAssertion();
+
+            if (!isset($token['access_token'])) {
+                Log::error('Access token is missing from Google Client.');
+                return null;
+            }
+
+            return $token['access_token'];
+        } catch (\Throwable $e) {
+            Log::error('Error fetching Firebase access token: ' . $e->getMessage());
+            return null;
+        }
+    }
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if ($tokens == null) return;
@@ -871,9 +898,14 @@ class Common
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
     {
-        $accessToken = self::getGoogleAccessToken();
+        $accessToken = self::getUnsubscribeGoogleAccessToken();
     
-        $url = "https://iid.googleapis.com/iid/v1:batchRemove"; // 👈 الفرق هنا فقط
+        if (!$accessToken) {
+            Log::error('UnsubscribeFromTopic - No access token');
+            return;
+        }
+    
+        $url = "https://iid.googleapis.com/iid/v1:batchRemove";
         $headers = [
             'Authorization' => 'Bearer ' . $accessToken,
             'Content-Type'  => 'application/json',
@@ -884,11 +916,16 @@ class Common
             'registration_tokens' => $registrationTokens,
         ];
     
-       $response = Http::withHeaders($headers)->post($url, $body);
-        Log::info('UnsubscribeFromTopic - Response Status: ' . $response->status());
-        Log::info('UnsubscribeFromTopic - Response Body:',  ['raw' => $response->body()]);
-
+        try {
+            $response = Http::withHeaders($headers)->post($url, $body);
+    
+            Log::info('UnsubscribeFromTopic - Response Status: ' . $response->status());
+            Log::info('UnsubscribeFromTopic - Response Body:', ['raw' => $response->body()]);
+        } catch (\Exception $e) {
+            Log::error('UnsubscribeFromTopic - Exception: ' . $e->getMessage());
+        }
     }
+    
 
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
