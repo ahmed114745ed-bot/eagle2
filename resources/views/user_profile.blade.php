@@ -1678,6 +1678,15 @@
                             @if($userJoinAgencies && $userJoinAgencies->count())
                                 @foreach($userJoinAgencies as $index => $userJoinAgency)
                                     @php
+                                        $kickedBy = null;
+                                        $kickedByName = '';
+                                        $kickedByUuid = '';
+                                        $kickedByImage = '';
+                                        $kickedByUrl = '';
+                                        $status = '';
+                                    @endphp
+
+                                    @php
                                         $agency = $userJoinAgency->agency;
                                         $name = $agency->name ?? '';
                                         $path = @$agency->img;
