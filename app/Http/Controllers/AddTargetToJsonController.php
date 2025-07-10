@@ -37,8 +37,9 @@ class AddTargetToJsonController extends Controller
         foreach ($request->all() as $key => $value) {
             if (!is_null($value)) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-                // Cache::put($key, $value);
+                
                 Cache::forget($key);
+                Cache::forever($key, $value);
             }
         }
 

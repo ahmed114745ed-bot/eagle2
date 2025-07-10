@@ -1288,9 +1288,9 @@
                                         <span>{{ $name }} ({{ $uid }})</span>
                                     </a>
                                         @else
-                                            
+
                                         @endif
-                                    
+
                                 </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getTypeGet() }}</td>
@@ -1711,7 +1711,7 @@
                                             $kickedBy = $userJoinAgency['kickedByAdmin'];
                                             $kickedByName = $kickedBy->name ?? '';
                                             $kickedByUuid = $kickedBy->uuid ?? '';
-                                            $kickedByPath = @$kickedBy->profile?->avatar;
+                                            $kickedByPath = @$kickedBy?->avatar;
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
                                             if (!isImageExists($url)) {

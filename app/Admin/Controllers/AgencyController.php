@@ -78,7 +78,7 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
-   
+
     public function show($id, Content $content)
     {
         return $this->profile($id, request(), $content);
@@ -1138,7 +1138,7 @@ class AgencyController extends MainController
                 'message' => __('Cannot remove the owner of the agency'),
             ], 403);
         }
-        UserHandling::kickUserFromAgency($user);
+        UserHandling::kickUserFromAgency($user, 0);
         $user->agency_id = 0;
         $user->save();
 
