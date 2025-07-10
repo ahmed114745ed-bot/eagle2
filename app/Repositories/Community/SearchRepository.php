@@ -157,11 +157,11 @@ class SearchRepository implements SearchRepositoryInterface
                 DB::raw("
             CASE
                 WHEN special_id = '{$keywords}' THEN 100
-                WHEN uuid = '{$keywords}' THEN 95
                 WHEN special_id LIKE '{$keywords}%' THEN 90
-                WHEN uuid LIKE '{$keywords}%' THEN 85
-                WHEN special_id LIKE '%{$keywords}%' THEN 80
-                WHEN uuid LIKE '%{$keywords}%' THEN 75
+                WHEN uuid = '{$keywords}' THEN 80
+                WHEN uuid LIKE '{$keywords}%' THEN 70
+                WHEN special_id LIKE '%{$keywords}%' THEN 60
+                WHEN uuid LIKE '%{$keywords}%' THEN 50
                 ELSE 0
             END AS match_score
         "),
@@ -169,13 +169,13 @@ class SearchRepository implements SearchRepositoryInterface
             CASE
                 WHEN special_id LIKE '{$keywords}%' THEN LENGTH(special_id)
                 ELSE 999
-            END AS special_id_length_score
+            END AS special_priority_length
         "),
                 DB::raw("
             CASE
                 WHEN uuid LIKE '{$keywords}%' THEN LENGTH(uuid)
                 ELSE 999
-            END AS uuid_length_score
+            END AS uuid_priority_length
         ")
             ])
             ->where(function ($query) use ($keywords, $whereOr) {
@@ -188,10 +188,11 @@ class SearchRepository implements SearchRepositoryInterface
             ->whereNotIn('id', $blockedUserIds)
             ->where('status', 1)
             ->with(['followedByAuthUser', 'country'])
-            ->orderByDesc('match_score')                 // strong scoring control
-            ->orderBy('special_id_length_score')         // shorter = more specific
-            ->orderBy('uuid_length_score')               // same here
+            ->orderByDesc('match_score')             // Highest match rank first
+            ->orderBy('special_priority_length')     // Shorter special_id first
+            ->orderBy('uuid_priority_length')        // Shorter uuid next
             ->paginate(10, ['*'], 'page', $page);
+
 
 
 
