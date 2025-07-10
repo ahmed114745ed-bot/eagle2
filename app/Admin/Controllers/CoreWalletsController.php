@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\CoreWallets;
 use App\Models\CoreWalletTransaction;
+use Dotenv\Exception\ValidationException;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -12,6 +13,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\HtmlString;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Validation\ValidationException as ValidationValidationException;
+use Throwable;
+
+use function Laravel\Prompts\error;
 
 class CoreWalletsController extends MainController
 {
@@ -171,6 +176,12 @@ class CoreWalletsController extends MainController
 
         $adminId = auth()->id();
         $fromWallet = CoreWallets::find($request->from_wallet_id);
+        if ($fromWallet->coins < $request->amount) {
+             return response()->json([
+                'status' => 0,
+                'message' => 'plz check coins wallet',
+            ]);
+        }
         $fromWallet->coins -= $request->amount;
         $fromWallet->save();
         $ToWallet = CoreWallets::find($request->to_wallet_id);
