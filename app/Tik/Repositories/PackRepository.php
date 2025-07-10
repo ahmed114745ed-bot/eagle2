@@ -95,6 +95,12 @@ class PackRepository extends AbstractRepository
         $this->model->query()->where('expire', '!=', 0)->where('expire', '<=', Carbon::now()->timestamp)->delete();
         return true;
     }
+    
+    public function unUseOldPack($userId)
+    {
+        $this->model->where('user_id', $userId)->update(['is_used' => 0]);
+    }
+    
 
 //    public function packsJoinWithGift($userId, $type): \Illuminate\Support\Collection
 //    {
