@@ -118,7 +118,8 @@ class SearchRepository implements SearchRepositoryInterface
         $users = User::query()
         ->select([
             '*',
-            DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")
+            DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage"),
+             DB::raw("((LENGTH(users.special_id) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.special_id)) * 100 AS matching_percentage_special_id")
         ])
         ->where(function ($query) use ($keywords, $whereOr) {
             $query->where(function ($subQuery) use ($keywords) {
@@ -130,7 +131,7 @@ class SearchRepository implements SearchRepositoryInterface
         ->whereNotIn('id', $blockedUserIds)
         ->where('status', 1)
         ->with(['followedByAuthUser', 'country'])
-        ->orderBy('special_id', 'desc')
+        ->orderBy('matching_percentage_special_id', 'desc')
         ->paginate(10, ['*'], 'page', $page);
 
 
