@@ -51,10 +51,11 @@ class SearchRepository implements SearchRepositoryInterface
         //             });
         //     }])->first();
         $user = User::query()
-            ->where(function ($q) use ($keywords) {
-                $q->where('uuid', 'like', "%{$keywords}%")
-                    ->orWhere('special_id', 'like', "%{$keywords}%");
-            })
+            ->fitterByUuid($keywords)
+            // ->where(function ($q) use ($keywords) {
+            //     $q->where('uuid', 'like', "%{$keywords}%")
+            //     ->orWhere('special_id', 'like', "%{$keywords}%");
+            // })
             ->with(['packs' => function ($q) {
                 $q->where('type', 16)
                     ->where('is_used', 1)
@@ -84,7 +85,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->where('uid', 'like',  $keywords . '%')
             ->whereNotIn('uid', $blockedUserIds)
             ->orderBy('hot', 'desc')
-            // ->take(2)
+            ->take(2)
             ->get();
     }
 
@@ -102,26 +103,20 @@ class SearchRepository implements SearchRepositoryInterface
 
         $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));
 
-
         // $users = User::query()
-        // ->select([
-        //     '*',
-        //     DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage"),
-        //      DB::raw("((LENGTH(users.special_id) - LENGTH(REPLACE(users.special_id, '{$keywords}', ''))) / CHAR_LENGTH(users.special_id)) * 100 AS matching_percentage_special_id")
-        // ])
-        // ->where(function ($query) use ($keywords, $whereOr) {
-        //     $query->where(function ($subQuery) use ($keywords) {
-        //         $subQuery->where('uuid', 'like', $keywords . '%')
-        //                  ->orWhere('special_id', 'like',  $keywords . '%');
+        //     ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])
+        //     ->where(function ($query) use ($keywords) {
+        //         $query->where('uuid', 'like', '%' . $keywords . '%')
+        //               ->orWhere('special_id', 'like', '%' . $keywords . '%');
         //     })
-        //     ->orWhere($whereOr);
-        // })
-        // ->whereNotIn('id', $blockedUserIds)
-        // ->where('status', 1)
-        // ->with(['followedByAuthUser', 'country'])
-        // ->orderBy('matching_percentage_special_id', 'desc')
-        // ->paginate(10, ['*'], 'page', $page);
-
+        //     ->whereNotIn('id', $blockedUserIds)
+        //     ->where('status', 1)
+        //     ->with(['followedByAuthUser' , 'country']  )
+        //     ->orWhere(function ($query) use ($whereOr) {
+        //         $query->where($whereOr);
+        //     })
+        //     ->orderBy('matching_percentage', 'desc')
+        //     ->paginate();
         $users = User::query()
             ->select([
                 '*',
@@ -147,6 +142,8 @@ class SearchRepository implements SearchRepositoryInterface
             ->with(['followedByAuthUser', 'country'])
             ->orderByDesc('total_score')
             ->paginate(10, ['*'], 'page', $page);
+
+
 
         return $users;
     }
