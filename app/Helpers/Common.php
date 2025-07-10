@@ -915,7 +915,13 @@ class Common
                     $failureCount++;
                 }
             }
-
+            logger()->info('✅ Unsubscribe from FCM topic result', [
+                'topic'          => $topic,
+                'tokensCount'    => count($registrationTokens),
+                'successCount'   => $successCount,
+                'failureCount'   => $failureCount,
+                'details'        => $result,
+            ]);
             return [
                 'success' => true,
                 'successCount' => $successCount,
