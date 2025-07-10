@@ -138,8 +138,8 @@ class SearchRepository implements SearchRepositoryInterface
             ])
             ->where(function ($query) use ($keywords, $whereOr) {
                 $query->where(function ($subQuery) use ($keywords) {
-                    $subQuery->where('uuid', 'like', "%{$keywords}%")
-                        ->orWhere('special_id', 'like', "%{$keywords}%");
+                    $subQuery->where('uuid', 'like', "{$keywords}%")
+                        ->orWhere('special_id', 'like', "{$keywords}%");
                 })
                     ->orWhere($whereOr);
             })
