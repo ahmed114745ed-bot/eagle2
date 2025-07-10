@@ -624,7 +624,7 @@ Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController
 
 
 
-Route::get('/public-test/{ids}', function ($ids) {
+Route::get('/public-official-test/{ids}', function ($ids) {
     $title    = 'System‑wide Test';
     $body_en  = 'This is only a test.';
     $body_ar  = 'هذا مجرد اختبار.';
