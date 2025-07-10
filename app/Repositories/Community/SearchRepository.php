@@ -119,7 +119,7 @@ class SearchRepository implements SearchRepositoryInterface
         ->select([
             '*',
             DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage"),
-             DB::raw("((LENGTH(users.special_id) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.special_id)) * 100 AS matching_percentage_special_id")
+             DB::raw("((LENGTH(users.special_id) - LENGTH(REPLACE(users.special_id, '{$keywords}', ''))) / CHAR_LENGTH(users.special_id)) * 100 AS matching_percentage_special_id")
         ])
         ->where(function ($query) use ($keywords, $whereOr) {
             $query->where(function ($subQuery) use ($keywords) {
