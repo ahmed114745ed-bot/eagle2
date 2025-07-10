@@ -70,7 +70,7 @@ class AllowPacks
 
     public function initialize(): void
     {
-        $userVipLevel = $this->UserVip->level ?? 0;
+        $userVipLevel = $this->user->UserVip->level ?? 0;
 
         // Load valid packs for the user
         $this->packs = $this->user->packs()
