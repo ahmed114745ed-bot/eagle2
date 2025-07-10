@@ -80,7 +80,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->whereHas('owner', function ($query) {
                 $query->where('status', 1);
             })
-            ->where('uid', 'like', '%' . $keywords . '%')
+            ->where('uid', 'like',  $keywords . '%')
             ->whereNotIn('uid', $blockedUserIds)
             ->orderBy('hot', 'desc')
             ->take(2)
@@ -122,8 +122,8 @@ class SearchRepository implements SearchRepositoryInterface
         ])
         ->where(function ($query) use ($keywords, $whereOr) {
             $query->where(function ($subQuery) use ($keywords) {
-                $subQuery->where('uuid', 'like', '%' . $keywords . '%')
-                         ->orWhere('special_id', 'like', '%' . $keywords . '%');
+                $subQuery->where('uuid', 'like', $keywords . '%')
+                         ->orWhere('special_id', 'like',  $keywords . '%');
             })
             ->orWhere($whereOr);
         })
