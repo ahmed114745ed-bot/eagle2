@@ -598,7 +598,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->values()
                     ->toArray();
             
-                logger()->info('Kreait - Successfully unsubscribed tokens from topic.', [
+                logger()->info('Kreait - Successfully  tokens from topic.', [
                     'tokens' => $tokens,
                     'ids'    => $idArray,
                 ]);  
