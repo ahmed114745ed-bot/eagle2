@@ -131,8 +131,7 @@ class SearchRepository implements SearchRepositoryInterface
                 WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
                 WHEN uuid = '{$keywords}' THEN 800
                 WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
-                WHEN special_id LIKE '%{$keywords}%' THEN 600
-                WHEN uuid LIKE '%{$keywords}%' THEN 500
+               
                 ELSE 0
             END AS total_score
         ")
