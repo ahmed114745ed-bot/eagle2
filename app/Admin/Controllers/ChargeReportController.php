@@ -552,7 +552,7 @@ class ChargeReportController extends MainController
             if (!$paymentCoin) return '';
 //            $options = PaymentType::getTranslatedOptions();
 
-            return $paymentCoin->method;
+            return __($paymentCoin->title);
 //            return $options[$paymentCoin->title] ?? '';
         });
         $grid->column('status', __('Status'))->display(function () {
