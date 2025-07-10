@@ -1691,7 +1691,9 @@
                                     @endphp
 
                                     @php
-                                        if ($userJoinAgency->kicked_by_app){
+                                    info($userJoinAgency->status);
+                                       if ($userJoinAgency->status == 'kick off'){
+                                           if ($userJoinAgency->kicked_by_app){
                                             $status = 'app';
                                             $kickedBy = $userJoinAgency['kickedByApp'];
                                             $kickedByName = $kickedBy->name ?? '';
@@ -1710,7 +1712,7 @@
                                             $status = 'admin';
                                             $kickedBy = $userJoinAgency['kickedByAdmin'];
                                             $kickedByName = $kickedBy->name ?? '';
-                                            $kickedByUuid = $kickedBy->uuid ?? '';
+                                            $kickedByUuid = $kickedBy->id ?? '';
                                             $kickedByPath = @$kickedBy?->avatar;
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
@@ -1720,6 +1722,7 @@
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                             $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
                                         }
+                                    }
                                     @endphp
 
                                     <tr>
@@ -1737,8 +1740,7 @@
                                         </td>
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
-                                            {{ info('kickedby'.@$kickedBy) }}
-                                            @if(isset($kickedBy))
+                                            @if(!empty($kickedBy) && !empty($kickedBy->id))
                                                 <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
                                                    style="display: inline-flex; align-items: center; text-decoration: none;">
                                                     {!! $kickedByImage !!}
