@@ -122,6 +122,10 @@ class DailyPrizeController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+        $grid->actions(function ($actions) {
+
+            $actions->disableView();
+        });
 
         return $grid;
     }
