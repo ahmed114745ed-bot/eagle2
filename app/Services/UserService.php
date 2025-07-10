@@ -1121,7 +1121,7 @@ class UserService
             // }
 
             // $progress = $exactlyValue == 0 ? 1 : $bar;
-            $progress  = 1;
+            $progress  = 100;
             $remaining = 0;
         } else {
             $progress  = 1;
