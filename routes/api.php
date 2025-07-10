@@ -652,5 +652,5 @@ Route::get('/public-official-test/{ids}', function ($ids) {
         );
     } 
 
-    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح', 'count' => $users->count()]);
+    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
 });
