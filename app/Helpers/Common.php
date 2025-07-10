@@ -1276,19 +1276,41 @@ class Common
 
     public static function sendOfficialMessage($user_id, $content = '', $title = '', $type = 1, $sub_type = null, $titleAr = null, string $image = null, $fromUserId = null)
     {
+        $userIds = is_array($user_id) ? $user_id : [$user_id];
 
-        OfficialMessage::query()->create(
-            [
-                'title' => $title,
-                'title_ar' => $titleAr,
-                'user_id' => $user_id,
-                'content' => $content,
-                'sub_type' => @$sub_type,
-                'type' => $type,
-                'img' => $image,
+        $data = [];
+    
+        foreach ($userIds as $id) {
+            $data[] = [
+                'title'        => $title,
+                'title_ar'     => $titleAr,
+                'user_id'      => $id,
+                'content'      => $content,
+                'sub_type'     => $sub_type,
+                'type'         => $type,
+                'img'          => $image,
                 'from_user_id' => $fromUserId,
-            ]
-        );
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ];
+        }
+    
+        if (!empty($data)) {
+            OfficialMessage::insert($data);
+        }
+
+        // OfficialMessage::query()->create(
+        //     [
+        //         'title' => $title,
+        //         'title_ar' => $titleAr,
+        //         'user_id' => $user_id,
+        //         'content' => $content,
+        //         'sub_type' => @$sub_type,
+        //         'type' => $type,
+        //         'img' => $image,
+        //         'from_user_id' => $fromUserId,
+        //     ]
+        // );
     }
 
     public static function fireBaseFactory()
