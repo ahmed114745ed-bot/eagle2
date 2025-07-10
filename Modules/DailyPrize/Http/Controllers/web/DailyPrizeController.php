@@ -98,23 +98,25 @@ class DailyPrizeController extends MainController
             });
 
         $grid->column('gift_type', __('gifts'));
-        $grid->column('image', __('image'))->display(function ($path) {
-            if ($this->gift_type == 'ware') {
-                $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware?->show_img;
-            } elseif ($this->gift_type == 'vip') {
-                $vips = OVip::find($this->target);
-                $path = $vips?->img;
-            } elseif ($this->gift_type == 'achievement') {
-                $path = $this->target;
-            } else {
-                $path = 'coin.png';
-            }
+        if (!request()->filled('_export_')) {
+            $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->gift_type == 'ware') {
+                    $ware = Ware::find($this->target);
+                    $path = $ware->img2 ?? $ware?->show_img;
+                } elseif ($this->gift_type == 'vip') {
+                    $vips = OVip::find($this->target);
+                    $path = $vips?->img;
+                } elseif ($this->gift_type == 'achievement') {
+                    $path = $this->target;
+                } else {
+                    $path = 'coin.png';
+                }
 
-            /** @var Gift $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
 
         $grid->column('expir', __('expire'));
         Admin::script("
