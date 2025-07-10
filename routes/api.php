@@ -620,3 +620,39 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
 Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
+
+
+
+
+
+Route::get('/public-official-test/{ids}', function ($ids) {
+    $title    = 'System‑wide Test';
+    $body_en  = 'This is only a test.';
+    $body_ar  = 'هذا مجرد اختبار.';
+    $image    = null; // يمكنك وضع رابط صورة إذا أردت
+    $data     = [];   // بيانات إضافية إذا أردت تمريرها
+
+    $idArray = explode(',', $ids);
+
+    $users = User::whereIn('id', $idArray)
+        ->whereNotNull('notification_id')
+        ->get();
+
+    foreach ($users as $user) {
+        Common::sendOfficialMessage(
+            $user->id,
+             $body_en,
+              $title,
+              $body_ar,
+                 $image,
+                  $data
+        );
+    }
+
+    logger()->info('✅ Sent official messages to users.', [
+        'user_ids' => $users->pluck('id')->toArray(),
+        'count'    => $users->count(),
+    ]);
+
+    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح', 'count' => $users->count()]);
+});
