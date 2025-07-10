@@ -136,7 +136,6 @@ class SearchRepository implements SearchRepositoryInterface
                 $query->where('special_id', 'like', "%{$keywords}%")
                     ->orWhere('uuid', 'like', "%{$keywords}%");
             })
-            //  -> fitterByUuid($keywords)
             ->whereNotIn('id', $blockedUserIds)
             ->where('status', 1)
             ->having('total_score', '>', 0) // ✅ Exclude non-matching users
