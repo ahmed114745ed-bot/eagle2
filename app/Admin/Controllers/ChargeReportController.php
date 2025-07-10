@@ -440,6 +440,8 @@ class ChargeReportController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
 
+                $filter->equal('trx', __('trx_no'));
+
                 $filter->where(function ($query) {
                     if ($this->input !== '') {
                         $query->where('method', $this->input);
@@ -548,9 +550,10 @@ class ChargeReportController extends MainController
         $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
             $paymentCoin = PaymentCoin::find($value);
             if (!$paymentCoin) return '';
-            $options = PaymentType::getTranslatedOptions();
+//            $options = PaymentType::getTranslatedOptions();
 
-            return $options[$paymentCoin->title] ?? '';
+            return $paymentCoin->method;
+//            return $options[$paymentCoin->title] ?? '';
         });
         $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
