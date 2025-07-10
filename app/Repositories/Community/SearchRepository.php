@@ -132,11 +132,11 @@ class SearchRepository implements SearchRepositoryInterface
             END AS total_score
         ")
             ])
-            // ->where(function ($query) use ($keywords) {
-            //     $query->where('special_id', 'like', "%{$keywords}%")
-            //         ->orWhere('uuid', 'like', "%{$keywords}%");
-            // })
-           -> fitterByUuid($keywords)
+            ->where(function ($query) use ($keywords) {
+                $query->where('special_id', 'like', "%{$keywords}%")
+                    ->orWhere('uuid', 'like', "%{$keywords}%");
+            })
+         //  -> fitterByUuid($keywords)
             ->whereNotIn('id', $blockedUserIds)
             ->where('status', 1)
             ->having('total_score', '>', 0) // ✅ Exclude non-matching users
