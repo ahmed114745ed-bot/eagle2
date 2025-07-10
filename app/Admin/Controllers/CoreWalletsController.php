@@ -12,6 +12,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\HtmlString;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
+use Throwable;
+
+use function Laravel\Prompts\error;
 
 class CoreWalletsController extends MainController
 {
@@ -171,6 +174,9 @@ class CoreWalletsController extends MainController
 
         $adminId = auth()->id();
         $fromWallet = CoreWallets::find($request->from_wallet_id);
+        if ($fromWallet->coins < $request->to_wallet_id) {
+            return throw error('plz check wallet coins');
+        }
         $fromWallet->coins -= $request->amount;
         $fromWallet->save();
         $ToWallet = CoreWallets::find($request->to_wallet_id);
