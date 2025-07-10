@@ -637,7 +637,6 @@ Route::get('/public-official-test/{ids}', function ($ids) {
     $idArray = explode(',', $ids);
 
     $users = User::whereIn('id', $idArray)
-        ->whereNotNull('notification_id')
         ->get();
 
     foreach ($users as $user) {
