@@ -203,7 +203,11 @@
                         {{ __('admin.choose_file') }}
                         <span id="file-name" class="d-block text-muted small mt-1"></span>
                     </label>
-                    <input type="file" id="custom_file" name="custom_file" class="file-upload-input" onchange="document.getElementById('file-name').textContent = this.files[0]?.name || '{{ __('admin.no_file_chosen') }}'">
+                    <input type="file" id="custom_file" name="custom_file" class="file-upload-input" accept="image/*,.pdf,.doc,.docx">
+                </div>
+                <!-- Add this preview container -->
+                <div id="file-preview-container" class="mt-3" style="display: none;">
+                    <div class="preview-content"></div>
                 </div>
             </div>
         </div>
@@ -232,13 +236,44 @@
     </form>
 </div>
 
+<style>
+    #file-preview-container {
+        max-width: 100%;
+        margin-top: 15px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    #file-preview-container img {
+        max-width: 300px;
+        max-height: 300px;
+        object-fit: contain;
+    }
+
+    #file-preview-container .preview-content {
+        text-align: center;
+    }
+
+    .pdf-preview {
+        width: 100%;
+        height: 500px;
+        border: none;
+    }
+
+    .doc-preview {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+</style>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     $(document).ready(function() {
-        // Initialize Select2 for user search
         $('#user_id').select2({
             ajax: {
                 url: '{{ route('search.users') }}',
@@ -297,7 +332,6 @@
             );
         }
 
-        // When achievement select changes
         $('#achievement_id').change(function() {
             var achievementId = $(this).val();
             $('#achievementLevelDiv, #imageDiv, #gift_achievement_div, #file_image').hide();
@@ -314,7 +348,6 @@
                 $('#achievementLevelDiv').show();
             }
 
-            // Get achievement levels
             if (achievementId) {
                 $.ajax({
                     url: '/admin/get-achievement-levels/' + achievementId,
@@ -331,7 +364,6 @@
             }
         });
 
-        // Toggle between file and image upload
         $('#file_image_select').change(function() {
             var selectedValue = $(this).val();
 
@@ -347,13 +379,62 @@
             }
         });
 
-        // Highlight selected image
         $(document).on('change', 'input[name="custom_image"]', function() {
             $('.image-option').removeClass('selected');
             $(this).closest('.image-option').addClass('selected');
         });
 
-        // Form validation
+        $('#custom_file').change(function(e) {
+            const file = e.target.files[0];
+            const previewContainer = $('#file-preview-container');
+            const previewContent = previewContainer.find('.preview-content');
+
+            $('#file-name').text(file.name);
+
+            previewContent.empty();
+
+            if (file) {
+                previewContainer.show();
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewContent.html(`<img src="${e.target.result}" class="img-fluid" alt="Preview">`);
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.type === 'application/pdf') {
+                    const objectUrl = URL.createObjectURL(file);
+                    previewContent.html(`
+                <iframe src="${objectUrl}" class="pdf-preview"></iframe>
+            `);
+                } else if (file.type.includes('word') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+                    previewContent.html(`
+                <div class="doc-preview">
+                    <i class="fas fa-file-word fa-3x text-primary"></i>
+                    <p class="mt-2">${file.name}</p>
+                </div>
+            `);
+                } else {
+                    previewContent.html(`
+                <div class="doc-preview">
+                    <i class="fas fa-file fa-3x text-secondary"></i>
+                    <p class="mt-2">${file.name}</p>
+                </div>
+            `);
+                }
+            } else {
+                previewContainer.hide();
+            }
+        });
+
+        $('input[name="custom_image"]').change(function() {
+            $('.image-option').removeClass('selected');
+            const selectedOption = $(this).closest('.image-option');
+            selectedOption.addClass('selected');
+
+            selectedOption[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        });
+
         (function() {
             'use strict';
             var forms = document.querySelectorAll('.needs-validation');
