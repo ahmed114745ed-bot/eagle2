@@ -196,7 +196,7 @@
 
         <div class="form-section" id="file_input" style="display: none;">
             <div class="form-group mb-3">
-                <label class="form-label">{{ __('admin.select_file') }}</label>
+                <label class="form-label">{{ __('admin.select_file') }}</label> 
                 <div class="file-upload-wrapper">
                     <label for="custom_file" class="file-upload-label">
                         <i class="fas fa-cloud-upload-alt me-2"></i>
