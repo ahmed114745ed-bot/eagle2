@@ -83,7 +83,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->where('uid', 'like',  $keywords . '%')
             ->whereNotIn('uid', $blockedUserIds)
             ->orderBy('hot', 'desc')
-            ->take(2)
+           // ->take(2)
             ->get();
     }
 
