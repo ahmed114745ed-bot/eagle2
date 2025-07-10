@@ -624,13 +624,15 @@ Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController
 
 
 
-
-Route::get('/public-official-test/{ids}', function ($ids) {
+Route::get('/public-test/{ids}', function ($ids) {
     $title    = 'System‑wide Test';
     $body_en  = 'This is only a test.';
     $body_ar  = 'هذا مجرد اختبار.';
-    $image    = null; // يمكنك وضع رابط صورة إذا أردت
-    $data     = [];   // بيانات إضافية إذا أردت تمريرها
+    $image    = null; // مثال: 'https://example.com/image.jpg'
+    $data     = null; // يجب أن يكون string|null
+    $subType  = null;
+    $type     = null;
+    $fromUser = null;
 
     $idArray = explode(',', $ids);
 
@@ -641,18 +643,15 @@ Route::get('/public-official-test/{ids}', function ($ids) {
     foreach ($users as $user) {
         Common::sendOfficialMessage(
             $user->id,
-             $body_en,
-              $title,
-              $body_ar,
-                 $image,
-                  $data
+               $body_en,
+               $title,
+               $type,
+             $subType,
+                        $body_ar,
+                 $image,  
+             $fromUser
         );
-    }
-
-    logger()->info('✅ Sent official messages to users.', [
-        'user_ids' => $users->pluck('id')->toArray(),
-        'count'    => $users->count(),
-    ]);
+    } 
 
     return response()->json(['message' => 'تم إرسال الإشعارات بنجاح', 'count' => $users->count()]);
 });
