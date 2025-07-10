@@ -201,16 +201,16 @@ class Room extends Model
     {
         $validVisitors = $this->roomVisitors;
 
-        $packCount = $validVisitors
-            /*->flatMap(fn ($validVisitor) => $validVisitor?->user?->packs)
+        /*$packCount = $validVisitors
+            ->flatMap(fn ($validVisitor) => $validVisitor?->user?->packs)
             ->filter(
                 fn ($pack) => $pack->is_used === 1 &&
                     $pack->type === 17 &&
                     ($pack->expire === 0 || $pack->expire >= time())
-            )*/
-            ->count();
+            )
+            ->count();*/
 
-        return $validVisitors->count() - $packCount;
+        return $validVisitors->count() ;
     }
 
     public function roomVisitors(): HasMany
