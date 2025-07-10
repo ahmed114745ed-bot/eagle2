@@ -156,7 +156,7 @@ class Room extends Model
     public function getMicrophoneOnlyUsersAttribute()
     {
         return  $this->attributes['microphone'] ?? '';
-        
+
     }
     public function getAllMicrophoneAttribute()
     {
@@ -202,12 +202,12 @@ class Room extends Model
         $validVisitors = $this->roomVisitors;
 
         $packCount = $validVisitors
-            ->flatMap(fn ($validVisitor) => $validVisitor?->user?->packs)
+            /*->flatMap(fn ($validVisitor) => $validVisitor?->user?->packs)
             ->filter(
                 fn ($pack) => $pack->is_used === 1 &&
                     $pack->type === 17 &&
                     ($pack->expire === 0 || $pack->expire >= time())
-            )
+            )*/
             ->count();
 
         return $validVisitors->count() - $packCount;
