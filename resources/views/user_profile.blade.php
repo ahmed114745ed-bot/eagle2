@@ -1691,7 +1691,8 @@
                                     @endphp
 
                                     @php
-                                        if ($userJoinAgency->kicked_by_app){
+                                       if ($userJoinAgency->status == 'kick off'){
+                                           if ($userJoinAgency->kicked_by_app){
                                             $status = 'app';
                                             $kickedBy = $userJoinAgency['kickedByApp'];
                                             $kickedByName = $kickedBy->name ?? '';
@@ -1720,6 +1721,7 @@
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                             $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
                                         }
+                                    }
                                     @endphp
 
                                     <tr>
