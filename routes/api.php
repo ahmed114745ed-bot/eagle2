@@ -631,11 +631,13 @@ Route::get('/public-official-test/{ids}', function ($ids) {
     $image    = null; // مثال: 'https://example.com/image.jpg'
     $data     = null; // يجب أن يكون string|null
     $subType  = null;
-    $type     = null;
+    $type     = 2;
     $fromUser = null;
 
     $idArray = explode(',', $ids);
-
+    logger()->info('[sendOfficialMessage] Bulk insert idArray', [
+        'idArray' => $idArray,
+    ]);
     $users = User::whereIn('id', $idArray)
         ->get();
 
@@ -652,5 +654,5 @@ Route::get('/public-official-test/{ids}', function ($ids) {
         );
     } 
 
-    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح', 'count' => $users->count()]);
+    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
 });

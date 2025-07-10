@@ -1294,14 +1294,13 @@ class Common
                 'updated_at'   => now(),
             ];
             logger()->info('[sendOfficialMessage] Bulk insert success', [
-                'id' => count($id),
+                'id' => $id,
             ]);
         }
     
         if (!empty($data)) {
             OfficialMessage::insert($data);
             logger()->info('[sendOfficialMessage] Bulk insert success', [
-                'count' => count($data),
                 'user_ids' => $userIds,
             ]);
         }
