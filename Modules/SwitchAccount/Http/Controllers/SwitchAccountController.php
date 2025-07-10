@@ -97,7 +97,7 @@ class SwitchAccountController extends Controller
 
         $accounts = UserAccount::query()
             ->where('device_token', $deviceToken)
-            ->where(function ($query) use ($userId){
+            ->where(function ($query) use ($userId) {
                 $query->where('parent_user_id', $userId)
                     ->orWhere('child_user_id', $userId);
             })
@@ -109,7 +109,7 @@ class SwitchAccountController extends Controller
             return $id != $userId;
         })->values();
 
-//        info($userIds);
+        //        info($userIds);
         return User::whereIn('id', $userIds)->get();
         // if (empty($deviceToken))  return  [];
 
@@ -163,11 +163,13 @@ class SwitchAccountController extends Controller
         if (!$user_account) return Common::apiResponse(0, 'missing params', null, 422);
 
         $currentUserId = $user->id;
-//        info('current user'.$currentUserId);
-//        info('parent id'.$user_account->parent_user_id);
-//        info('child id'.$user_account->child_user_id);
-        if ($user_account->parent_user_id != $currentUserId &&
-            $user_account->child_user_id != $currentUserId) {
+        //        info('current user'.$currentUserId);
+        //        info('parent id'.$user_account->parent_user_id);
+        //        info('child id'.$user_account->child_user_id);
+        if (
+            $user_account->parent_user_id != $currentUserId &&
+            $user_account->child_user_id != $currentUserId
+        ) {
             return Common::apiResponse(0, __('forbidden'), null, 403);
         }
 
@@ -195,20 +197,20 @@ class SwitchAccountController extends Controller
         [$id, $plainToken] = explode('|', $tokenString);
 
         $token = $otherUser->tokens()->find($id);
-//        info('id'.$token);
-//        if (! $token){
-//            info('no token');
-//            return false;
-//        }
-//        if (! hash_equals($token->token, hash('sha256', $plainToken))){
-//            info('no hash equals');
-//            return false;
-//        }
-//        if (! $token->created_at >= Carbon::now()->subDays(14) ){
-//            info('its less than 14 days');
-//            return false;
-//        }
-//        $token = PersonalAccessToken::find($id);
+        //        info('id'.$token);
+        //        if (! $token){
+        //            info('no token');
+        //            return false;
+        //        }
+        //        if (! hash_equals($token->token, hash('sha256', $plainToken))){
+        //            info('no hash equals');
+        //            return false;
+        //        }
+        //        if (! $token->created_at >= Carbon::now()->subDays(14) ){
+        //            info('its less than 14 days');
+        //            return false;
+        //        }
+        //        $token = PersonalAccessToken::find($id);
         if (
             $token &&
             hash_equals($token->token, hash('sha256', $plainToken)) &&
@@ -242,7 +244,21 @@ class SwitchAccountController extends Controller
                 'unread_messages'  => $total_unread_message ?? 0,
                 'key'           =>  $user_acount?->key,
                 'expire'        =>  $user_acount?->expire,
-                'can_switch'    =>  false
+                'can_switch'    =>  false,
+                'vip' => Common::ovip_center($currentUser),
+                'special_color'    => @$currentUser->color_id ?? '',
+                'special_id'          =>  @$currentUser->specialId?->ware?->id ?? 0,
+                'special_id_image'          =>  @$currentUser->specialId?->ware?->show_img ?? "",
+                'image_color'          => @$currentUser->color_image,
+                'country' => @$currentUser->country ? [
+                    'id' => @$currentUser->country->id,
+                    'name' => @$currentUser->country->name ?? '',
+                    'flag' => @$currentUser->country->flag ?? '',
+                    'language' => @$currentUser->country->language ?? '',
+                    'e_name' => @$currentUser->country->e_name ?? '',
+                    'phone_code' => @$currentUser->country->phone_code ?? '',
+                    'iso' => substr(@$currentUser->country->iso, 0, 2),
+                ] : null,
             ],
             'other'         => AccountResource::collection($accounts)
         ];
