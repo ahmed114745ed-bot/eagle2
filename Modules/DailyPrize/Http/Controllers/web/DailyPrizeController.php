@@ -83,7 +83,7 @@ class DailyPrizeController extends MainController
         $grid = new Grid(new DailyGift());
         $grid->model()->where('type', $type);
         // $grid->column('order', __('Order'))->editable();
-        $grid->column('order', __('Order'))
+        $grid->column('order', __('days'))
             ->display(function ($order) {
                 $days = [
                     1 => __('first_day'),
@@ -98,6 +98,30 @@ class DailyPrizeController extends MainController
             });
 
         $grid->column('gift_type', __('gifts'));
+        if (request()->filled('_export_')) {
+            $grid->column('details', __('gift details'))->display(function () {
+                switch ($this->gift_type) {
+                    case 'ware':
+                        $ware = \App\Models\Ware::find($this->target);
+                        return $ware
+                            ? __('name') . ': ' . $ware->name . ', ' . __('id') . ': ' . $ware->id
+                            : __('Not Found');
+
+                    case 'vip':
+                        $vip = \App\Models\OVip::find($this->target);
+                        return $vip
+                            ? __('name') . ': ' . $vip->name . ', ' . __('id') . ': ' . $vip->id
+                            : __('Not Found');
+
+                    case 'achievement':
+                        return __('Achievement');
+
+                    default:
+                        return $this->target;
+                }
+            });
+        }
+
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->gift_type == 'ware') {
