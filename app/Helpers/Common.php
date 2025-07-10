@@ -1752,8 +1752,11 @@ class Common
         return $value;
     }
 
-    public  static function getSettingsValue($key)
+    public static function getSettingsValue($key, $forceRefresh = true)
     {
+        if ($forceRefresh) {
+            Cache::forget($key);
+        }
         $value = Cache::rememberForever($key, function () use ($key) {
             return Setting::where('key', $key)->value('value');
         });
