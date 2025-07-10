@@ -1691,7 +1691,7 @@
                                     @endphp
 
                                     @php
-                                        if (!empty($userJoinAgency->kicked_by_app)){
+                                        if ($userJoinAgency->kicked_by_app){
                                             $status = 'app';
                                             $kickedBy = $userJoinAgency['kickedByApp'];
                                             $kickedByName = $kickedBy->name ?? '';
@@ -1706,7 +1706,7 @@
                                             $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
                                         }
 
-                                        if (!empty($userJoinAgency->kicked_by_admin)){
+                                        if ($userJoinAgency->kicked_by_admin){
                                             $status = 'admin';
                                             $kickedBy = $userJoinAgency['kickedByAdmin'];
                                             $kickedByName = $kickedBy->name ?? '';
@@ -1737,7 +1737,7 @@
                                         </td>
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
-                                            @if(isset($kickedBy))
+                                            @if(!empty($kickedBy) && !empty($kickedBy->id))
                                                 <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
                                                    style="display: inline-flex; align-items: center; text-decoration: none;">
                                                     {!! $kickedByImage !!}
