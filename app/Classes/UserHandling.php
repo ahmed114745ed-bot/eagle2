@@ -132,22 +132,33 @@ class UserHandling
         $user->monthly_days = 0;
         $user->save();
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
-        $agencyUserJoined = UsersJoinedAgency::where([
-            'user_id' => $user->id,
-            'agency_id' =>  $agencyId,
-            'type' => 2,
-        ])->whereNull('leave_date')->first();
+//        $agencyUserJoined = UsersJoinedAgency::where([
+//            'user_id' => $user->id,
+//            'agency_id' =>  $agencyId,
+//            'type' => 2,
+//        ])->whereNull('leave_date')->first();
 
-        if ($agencyUserJoined) {
-            $agencyUserJoined->leave_date = now();
-            $agencyUserJoined->status = 'kick off';
-            if ($isApp){
-                $agencyUserJoined->kicked_by_app = auth()->id();
-            }else{
-                $agencyUserJoined->kicked_by_admin = auth()->id();
-            }
-            $agencyUserJoined->save();
-        }
+        UsersJoinedAgency::create([
+            'user_id' => $user->id,
+            'agency_id' => $agencyId,
+            'type' => 2,
+            'status' => 'kick off',
+            'join_date' => now(),
+            'leave_date' => now(),
+            'kicked_by_app' => $isApp ? auth()->id() : null,
+            'kicked_by_admin' => $isApp ? null : auth()->id(),
+        ]);
+
+//        if ($agencyUserJoined) {
+//            $agencyUserJoined->leave_date = now();
+//            $agencyUserJoined->status = 'kick off';
+//            if ($isApp){
+//                $agencyUserJoined->kicked_by_app = auth()->id();
+//            }else{
+//                $agencyUserJoined->kicked_by_admin = auth()->id();
+//            }
+//            $agencyUserJoined->save();
+//        }
     }
 
     public function kickOfAllUsersFromAgency(\App\Models\Agency $agency)
