@@ -983,8 +983,17 @@ class Common
 
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
-        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->update(['is_used' => 0]);
-
+        if ($userVip->is_used) {
+            $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
+        
+            Pack::query()
+                ->where('get_type', 1)
+                ->where('user_id', $user->id)
+                ->whereIn('type', $vipTypes)
+                ->where('vip_user_id', '!=', $userVip->id)
+                ->update(['is_used' => 0]);
+        }
+        
         $type = $vip->privilegs()->pluck('type')->toArray();
         if (!empty($type)) {
             foreach ($type as $wareType) {
@@ -1104,7 +1113,7 @@ class Common
         if ($uvip) {
             $user->update(['vip' => $uvip->id]);
         }
-
+        self::syncUserDressesFromVip($user, $type);
         /* $users_vips = UserVip::with('OVip')->where('user_id',$user->id)->first();
         $preveliage = $users_vips->OVip->preveliage;
         $wareIds = Ware::where('type', $preveliage)->where('get_type',1)->where('is_active_for_vip', 1)->pluck('id')->toArray();
@@ -1112,6 +1121,51 @@ class Common
         $exception_packs = $packs->pluck('id')->toArray();
         Pack::where('user_id', $user->id)->whereNotIn('id', $exception_packs)->update(['is_used'=> 0]);
         Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
+    }
+
+    public static function syncUserDressesFromVip(User $user, array $types)
+    {
+        $dressMap = [
+            4  => 'dress_1',
+            5  => 'dress_2',
+            11 => 'dress_3',
+        ];
+    
+        $targetTypes = array_intersect(array_keys($dressMap), $types);
+    
+        if (empty($targetTypes)) {
+            return;
+        }
+    
+        $vipPacks = Pack::where('user_id', $user->id)
+            ->whereIn('type', $targetTypes)
+            ->where('get_type', 1)
+            ->where(function ($q) {
+                $q->where('expire', '>=', now()->timestamp)
+                  ->orWhere('expire', 0);
+            })
+            ->get();
+    
+        $updateData = [];
+    
+        foreach ($vipPacks as $pack) {
+            $column = $dressMap[$pack->type] ?? null;
+    
+            if ($column) {
+                $updateData[$column] = '1';
+                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
+            }
+        }
+    
+        if (!empty($updateData)) {
+            $success = $user->update($updateData);
+    
+            logger()->info('✅ تم تحديث الحقول:', [
+                'user_id' => $user->id,
+                'success' => $success,
+                'updated_fields' => $updateData
+            ]);
+        }
     }
 
 
