@@ -132,6 +132,7 @@ class SearchRepository implements SearchRepositoryInterface
         ->where('status', 1)
         ->with(['followedByAuthUser', 'country'])
         ->orderBy('matching_percentage_special_id', 'desc')
+        ->orderBy('matching_percentage', 'desc')
         ->paginate(10, ['*'], 'page', $page);
 
 
