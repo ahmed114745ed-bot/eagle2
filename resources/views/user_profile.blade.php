@@ -1288,9 +1288,9 @@
                                         <span>{{ $name }} ({{ $uid }})</span>
                                     </a>
                                         @else
-                                            
+
                                         @endif
-                                    
+
                                 </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getTypeGet() }}</td>
@@ -1711,7 +1711,7 @@
                                             $kickedBy = $userJoinAgency['kickedByAdmin'];
                                             $kickedByName = $kickedBy->name ?? '';
                                             $kickedByUuid = $kickedBy->uuid ?? '';
-                                            $kickedByPath = @$kickedBy->profile?->avatar;
+                                            $kickedByPath = @$kickedBy?->avatar;
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
                                             if (!isImageExists($url)) {
@@ -1737,12 +1737,13 @@
                                         </td>
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
-                                            <a href="{{ @$kickedByUrl ?? '#' }}" target="_blank"
-                                               style="display: inline-flex; align-items: center; text-decoration: none;">
-                                                <img src="{{ getImagePath( @$kickedByImage) }}" width="30" height="30"
-                                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                <span>{{ @$kickedByName }} ({{ @$kickedByUuid }})</span>
-                                            </a>
+                                            @if(isset($kickedBy) && $kickedByName)
+                                                <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
+                                                   style="display: inline-flex; align-items: center; text-decoration: none;">
+                                                    {!! $kickedByImage !!}
+                                                    <span>{{ $kickedByName }} ({{ $kickedByUuid }})</span>
+                                                </a>
+                                            @endif
                                         </td>
                                         <td>{{ @$status }}</td>
                                         <td>{{ $userJoinAgency->join_date }}</td>
