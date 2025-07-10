@@ -547,14 +547,14 @@ class ChargeReportController extends MainController
             ";
         });
         $grid->column('trx', __('trx'));
-        $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
-            $paymentCoin = PaymentCoin::find($value);
-            if (!$paymentCoin) return '';
+        $grid->column('method', __('type'));
+//        $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
+//            $paymentCoin = PaymentCoin::find($value);
+//            if (!$paymentCoin) return '';
 //            $options = PaymentType::getTranslatedOptions();
-
-            return $paymentCoin->method;
+//
 //            return $options[$paymentCoin->title] ?? '';
-        });
+//        });
         $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
                 return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
