@@ -4,14 +4,15 @@ namespace App\Admin\Actions;
 
 use App\Models\Charge;
 use App\Models\Setting;
-use App\Models\ShippingAgency;
 use Illuminate\Http\Request;
+use App\Models\ChargeInvoice;
+use App\Models\ShippingAgency;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
+use Encore\Admin\Admin as Script;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Admin as Script;
 use Illuminate\Validation\ValidationException;
 
 class ChargeAction2 extends Action
@@ -98,10 +99,17 @@ class ChargeAction2 extends Action
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before =  $agency->coins  - $amount;
-        $charge->reason_en = $request->reason_en;
-        $charge->reason_ar = $request->reason_ar;
-        $charge->invoice = $request->invoice;
+
         $charge->save();
+
+        ChargeInvoice::create([
+            'charge_id' => $charge->id,
+            'user_id' => $agency->id,
+            'reason_en' => $request->reason_en,
+            'reason_ar' => $request->reason_ar,
+            'invoice' => $request->invoice,
+            'type' => 'agency',
+        ]);
     }
 
     // function form()

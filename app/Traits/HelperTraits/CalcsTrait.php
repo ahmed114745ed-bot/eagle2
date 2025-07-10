@@ -523,11 +523,17 @@ trait CalcsTrait
         } else {
             $data['receiver_per'] = (float)0.00;
         }
+        if ($data['receiver_level'] == $data['next_receiver_level']) {
+            $data['receiver_per'] = (float)1.00;
+        }
 
         if ($st > 0 && ($sc / $st) < 1 && ($sc / $st) > 0) {
             $data['sender_per'] = (float)($sc / $st);
         } else {
             $data['sender_per'] = (float)0.00;
+        }
+        if ($data['sender_level'] == $data['next_sender_level']) {
+            $data['sender_per'] = (float)1.00;
         }
 
         return $data;
@@ -536,8 +542,8 @@ trait CalcsTrait
 
     public static function searchVipByLevelAndType($vips, $level, $type)
     {
-        foreach ($vips as $vip){
-            if ($vip->level == $level && $vip->type == $type){
+        foreach ($vips as $vip) {
+            if ($vip->level == $level && $vip->type == $type) {
                 return $vip;
             }
         }
@@ -564,11 +570,11 @@ trait CalcsTrait
 
 
         // $current_star_num       = self::getCurrentLevel(1, $star_level, 'exp');
-//        $vipsData = DB::table('vips')->get();
+        //        $vipsData = DB::table('vips')->get();
         $vipsData = Vip::collectionBuilder()->get();
 
         $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
-//        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
+        //        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
 
         $star_level_img = !is_null($firstVip_type1) ? $firstVip_type1->img : '';
 
@@ -576,11 +582,11 @@ trait CalcsTrait
         $gold_level             = $user->total_sender_level;
 
         $firstVip_type2 = self::searchVipByLevelAndType($vipsData, $gold_level, 2);
-//        $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
+        //        $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
 
 
         $vipsData = $vipsData->groupBy('type');
-//        Vip::where('level', $level)->where('type', $type)->first();
+        //        Vip::where('level', $level)->where('type', $type)->first();
 
         // تعريف المتغيرات المطلوبة من المصفوفة المجمعة
         $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
@@ -835,7 +841,7 @@ trait CalcsTrait
         $vip_upload_gif = $vip->privilegs->contains(function ($priv) {
             return $priv->type == 22;
         });
-        
+
         return [
             'id'        => 1,
             'level'     => $vip->level ?? 0,
@@ -868,7 +874,7 @@ trait CalcsTrait
 
         $cacheKey = "ware_{$vip->level}_{10}";
         $vipIcon = Common::getCachedWares($cacheKey, $vip, 10);
-//        $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
+        //        $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
         $hasColor = Common::hasInPackV2($user->packs, 18, true);
         return [
             'id'        => 1,

@@ -3,6 +3,7 @@
 namespace Modules\SwitchAccount\Transformers;
 
 use App\Models\User;
+use App\Helpers\Common;
 use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\SwitchAccount\Entities\UserAccount;
@@ -24,8 +25,8 @@ class AccountResource extends JsonResource
         })
             ->first();
 
-        $chats_id = ChatRoom::where('user_id', $this->id)->orWhere('user_id2',$this->id)->pluck('id')->toArray();
-        $total_unread_message=  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id','not Like',$this->id)->where('status','not Like','seen')->count();
+        $chats_id = ChatRoom::where('user_id', $this->id)->orWhere('user_id2', $this->id)->pluck('id')->toArray();
+        $total_unread_message =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id', 'not Like', $this->id)->where('status', 'not Like', 'seen')->count();
         return [
             'id'            =>  $this->id,
             'image'         =>  $this->profile->avatar,
@@ -38,6 +39,20 @@ class AccountResource extends JsonResource
             'key'           =>  $userAccount->key,
             'expire'        =>  $userAccount->expire,
             'can_switch'    => ($this->id == $authId ? false : true),
+            'vip' => Common::ovip_center(@$this),
+            'special_color'    => @$this->color_id ?? '',
+            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+            'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
+            'image_color'          => @$this->color_image,
+            'country' => @$this->country ? [
+                'id' => @$this->country->id,
+                'name' => @$this->country->name ?? '',
+                'flag' => @$this->country->flag ?? '',
+                'language' => @$this->country->language ?? '',
+                'e_name' => @$this->country->e_name ?? '',
+                'phone_code' => @$this->country->phone_code ?? '',
+                'iso' => substr(@$this->country->iso, 0, 2),
+            ] : null,
         ];
     }
 }

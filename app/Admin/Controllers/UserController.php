@@ -751,7 +751,7 @@ class UserController extends MainController
         })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
         $userJoinAgencies = UsersJoinedAgency::with(['kickedByApp', 'kickedByAdmin'])->where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
             $query->whereDate('join_date', $joinDate);
-        })->paginate(10, ['*'], 'user_agency_page');
+        })->orderByDesc('id')->paginate(10, ['*'], 'user_agency_page');
 
         $usersCoins = UserCoinLog::where('user_id', $id)->orderByDesc('id')->paginate(10, ['*'], 'coins_page');;
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins');
