@@ -1737,7 +1737,7 @@
                                         </td>
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
-                                            @if(isset($kickedBy) && $kickedByName)
+                                            @if($kickedBy)
                                                 <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
                                                    style="display: inline-flex; align-items: center; text-decoration: none;">
                                                     {!! $kickedByImage !!}
