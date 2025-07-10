@@ -635,7 +635,9 @@ Route::get('/public-official-test/{ids}', function ($ids) {
     $fromUser = null;
 
     $idArray = explode(',', $ids);
-
+    logger()->info('[sendOfficialMessage] Bulk insert idArray', [
+        'idArray' => $idArray,
+    ]);
     $users = User::whereIn('id', $idArray)
         ->get();
 
@@ -652,5 +654,5 @@ Route::get('/public-official-test/{ids}', function ($ids) {
         );
     } 
 
-    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح', 'count' => $users->count()]);
+    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
 });
