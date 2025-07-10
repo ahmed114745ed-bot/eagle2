@@ -1288,9 +1288,9 @@
                                         <span>{{ $name }} ({{ $uid }})</span>
                                     </a>
                                         @else
-                                            
+
                                         @endif
-                                    
+
                                 </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getTypeGet() }}</td>
@@ -1678,6 +1678,15 @@
                             @if($userJoinAgencies && $userJoinAgencies->count())
                                 @foreach($userJoinAgencies as $index => $userJoinAgency)
                                     @php
+                                        $kickedBy = null;
+                                        $kickedByName = '';
+                                        $kickedByUuid = '';
+                                        $kickedByImage = '';
+                                        $kickedByUrl = '';
+                                        $status = '';
+                                    @endphp
+
+                                    @php
                                         $agency = $userJoinAgency->agency;
                                         $name = $agency->name ?? '';
                                         $path = @$agency->img;
@@ -1691,7 +1700,10 @@
                                     @endphp
 
                                     @php
-                                        if ($userJoinAgency->kicked_by_app){
+                                    info($userJoinAgency->status);
+                                    info($userJoinAgency->id);
+                                       if ($userJoinAgency->status == 'kick off'){
+                                           if ($userJoinAgency->kicked_by_app){
                                             $status = 'app';
                                             $kickedBy = $userJoinAgency['kickedByApp'];
                                             $kickedByName = $kickedBy->name ?? '';
@@ -1710,8 +1722,8 @@
                                             $status = 'admin';
                                             $kickedBy = $userJoinAgency['kickedByAdmin'];
                                             $kickedByName = $kickedBy->name ?? '';
-                                            $kickedByUuid = $kickedBy->uuid ?? '';
-                                            $kickedByPath = @$kickedBy->profile?->avatar;
+                                            $kickedByUuid = $kickedBy->id ?? '';
+                                            $kickedByPath = @$kickedBy?->avatar;
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
                                             if (!isImageExists($url)) {
@@ -1720,6 +1732,7 @@
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                             $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
                                         }
+                                    }
                                     @endphp
 
                                     <tr>
@@ -1737,12 +1750,13 @@
                                         </td>
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
-                                            <a href="{{ @$kickedByUrl ?? '#' }}" target="_blank"
-                                               style="display: inline-flex; align-items: center; text-decoration: none;">
-                                                <img src="{{ getImagePath( @$kickedByImage) }}" width="30" height="30"
-                                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                <span>{{ @$kickedByName }} ({{ @$kickedByUuid }})</span>
-                                            </a>
+                                            @if(!empty($kickedBy) && !empty($kickedBy->id))
+                                                <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
+                                                   style="display: inline-flex; align-items: center; text-decoration: none;">
+                                                    {!! $kickedByImage !!}
+                                                    <span>{{ $kickedByName }} ({{ $kickedByUuid }})</span>
+                                                </a>
+                                            @endif
                                         </td>
                                         <td>{{ @$status }}</td>
                                         <td>{{ $userJoinAgency->join_date }}</td>

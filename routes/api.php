@@ -584,18 +584,25 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
-
-            Route::get('/public-test', function () {
+            Route::get('/public-test/{ids}', function ($ids) {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
-
+            
+                $idArray = explode(',', $ids);
+            
                 $tokens = User::whereNotNull('notification_id')
+                    ->whereIn('id', $idArray)
                     ->pluck('notification_id')
                     ->filter()
                     ->unique()
                     ->values()
                     ->toArray();
-
+            
+                logger()->info('Kreait - Successfully  tokens from topic.', [
+                    'tokens' => $tokens,
+                    'ids'    => $idArray,
+                ]);  
+            
                 return Common::send_firebase_notification($tokens, $title, $body);
             });
 
@@ -613,3 +620,39 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
 Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
+
+
+
+
+Route::get('/public-official-test/{ids}', function ($ids) {
+    $title    = 'System‑wide Test';
+    $body_en  = 'This is only a test.';
+    $body_ar  = 'هذا مجرد اختبار.';
+    $image    = null; // مثال: 'https://example.com/image.jpg'
+    $data     = null; // يجب أن يكون string|null
+    $subType  = null;
+    $type     = 2;
+    $fromUser = null;
+
+    $idArray = explode(',', $ids);
+    logger()->info('[sendOfficialMessage] Bulk insert idArray', [
+        'idArray' => $idArray,
+    ]);
+    $users = User::whereIn('id', $idArray)
+        ->get();
+
+    foreach ($users as $user) {
+        Common::sendOfficialMessage(
+            $user->id,
+               $body_en,
+               $title,
+               $type,
+             $subType,
+                        $body_ar,
+                 $image,  
+             $fromUser
+        );
+    } 
+
+    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
+});

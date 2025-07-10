@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class DollarChargeLogResource extends JsonResource
 {
@@ -17,6 +18,8 @@ class DollarChargeLogResource extends JsonResource
     {
 
         $receiver=   Common::getReceiverInfo($this);
+        $sender=   Common::getChargerInfo($this);
+        $is_sender = $sender['id'] == Auth::user()->id;
       
         return [
             'id'        => $receiver['id'] ?? 0,
@@ -26,6 +29,7 @@ class DollarChargeLogResource extends JsonResource
             'date'       => $this->created_at ?? '',
             'totalUsed'  => (int) ($this->usd ?? 0),
             'coins'      => $this->amount ?? 0,
+            'is_sender'      => $is_sender ?? 0,
             
         ];
     }

@@ -295,7 +295,7 @@ Route::get('/delete_reward_target', function () {
 });
 
 Route::get('/test-fcm/{userid}', function ($userId) {
-    $testToken = 'fTFfWXoaQUqjCqFRqMqqGG:APA91bGw6rmXbrGm8XwPwwZ6sJOlcxeXrGNffGbpfXWBzIBK463WyoDFArkJJnYDRzvjDOP23Q2xqh6_c95vsdk08ww7v_R4GJeTOSxSDuWGTXVOLxpxzxE';
+    $testToken = 'eLG5n60VSDupE3pAEzjmXo:APA91bEupCIDwqtaS8vwNUyZ-FvOicTqIwZo15INz-cAXFunxijCw2AxqTUSu9UDMB_xrBcTUcFg9NWXgB2n173aZmMqMetdmBO7YSccMSf64JCpJihjeNc';
 
     $language = 'ar'; // أو 'en'
     $userLevel = 5; // مستوى افتراضي للاختبار

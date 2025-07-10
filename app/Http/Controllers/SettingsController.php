@@ -91,8 +91,6 @@ class SettingsController extends Controller
         }
         $data = $request->except('_token', 'super_admin_coins');
 
-
-
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
             ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||
@@ -175,7 +173,6 @@ class SettingsController extends Controller
 
         // Process and save settings
         foreach ($data as $key => $value) {
-
 
             if (Str::contains($key, ['color']) && (common::getSettingValue('app_primary_color') != $request->app_primary_color || common::getSettingValue('app_second_color') != $request->app_second_color || common::getSettingValue('app_white_color') != $request->app_white_color || common::getSettingValue('app_black_color') != $request->app_black_color || common::getSettingValue('app_grey_color') != $request->app_grey_color || common::getSettingValue('app_yellow_color') != $request->app_yellow_color)) {
                 $cacheKey = 'colors_updated_at';

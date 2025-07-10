@@ -22,6 +22,7 @@ class DataUserResource extends JsonResource
         if ($family) {
 
             $f = [
+                'id' => $family->id,
                 'owner_id' => $family->user_id,
                 'family_name' => $family->name ?? '',
                 'max_num' => $family->num ?? 0,

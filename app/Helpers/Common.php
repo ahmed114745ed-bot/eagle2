@@ -24,6 +24,7 @@ use App\Models\UserVip;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserSallary;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
@@ -657,7 +658,34 @@ class Common
 
         return $token['access_token'];
     }
-    public static function send_firebase_notification0($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    private static function getUnsubscribeGoogleAccessToken(): ?string
+    {
+        $credentialsFilePath = base_path(config("app.fileName"));
+
+        if (!file_exists($credentialsFilePath)) {
+            Log::error('Firebase credentials file not found: ' . $credentialsFilePath);
+            return null;
+        }
+
+        try {
+            $client = new \Google_Client();
+            $client->setAuthConfig($credentialsFilePath);
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+            $client->useApplicationDefaultCredentials();
+            $token = $client->fetchAccessTokenWithAssertion();
+
+            if (!isset($token['access_token'])) {
+                Log::error('Access token is missing from Google Client.');
+                return null;
+            }
+
+            return $token['access_token'];
+        } catch (\Throwable $e) {
+            Log::error('Error fetching Firebase access token: ' . $e->getMessage());
+            return null;
+        }
+    }
+    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
@@ -679,11 +707,13 @@ class Common
         } else {
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-            //make group and get token
 
-            $token = self::makeGroup($tokens, $key,  $api_access_key);
+            $result= self::send_firebase_notification_top(
+                $tokens, $title, $body, $icon, $data,
+                $messageType, $user, $action, $type, $id, $notification_type
+            );
+            return $result;
 
-            $isGroup = true;
         }
 
         if ($user) {
@@ -708,9 +738,9 @@ class Common
             ],
         ];
 
-        //        if (!empty($icon)) {
-        //            $payload['notification']['icon'] = $icon;
-        //        }
+       if (!empty($icon)) {
+                   $payload['notification']['icon'] = $icon;
+               }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
@@ -718,7 +748,7 @@ class Common
         if (isset($data['image']) && !empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
         } else {
-            // $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+            $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
         }
 
         $headers = [
@@ -727,16 +757,13 @@ class Common
         ];
 
 
-
         $projectId = env('FIREBASE_PROJECT_NAME');
 
         $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
 
-
         $result = json_decode($result);
-
 
         //remove group with $key if is group
         if ($result  && $isGroup) {
@@ -788,14 +815,14 @@ class Common
         return null;
     }
 
-    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    public static function send_firebase_notification_top($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if (empty($tokens)) return;
 
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-        $topicName = 'system_test_topic';
+        $topicName = 'system_notifications_topic';
 
         self::subscribeToTopic($tokens, $topicName);
 
@@ -865,26 +892,52 @@ class Common
             'registration_tokens' => $registrationTokens,
         ];
 
-        Http::withHeaders($headers)->post($url, $body);
+        $response = Http::withHeaders($headers)->post($url, $body);
+
     }
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
     {
-        $accessToken = self::getGoogleAccessToken();
+        try {
+            $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
+            $messaging = $factory->createMessaging();
 
-        $url = "https://iid.googleapis.com/iid/v1:batchRemove";
-        $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type'  => 'application/json',
-        ];
+            $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-        $body = [
-            'to' => "/topics/{$topic}",
-            'registration_tokens' => $registrationTokens,
-        ];
+            $result = $response[$topic] ?? [];
+            $successCount = 0;
+            $failureCount = 0;
 
-        Http::withHeaders($headers)->post($url, $body);
+            foreach ($result as $token => $status) {
+                if ($status === 'OK') {
+                    $successCount++;
+                } else {
+                    $failureCount++;
+                }
+            }
+            logger()->info('✅ Unsubscribe from FCM topic result', [
+                'topic'          => $topic,
+                'tokensCount'    => count($registrationTokens),
+                'successCount'   => $successCount,
+                'failureCount'   => $failureCount,
+                'details'        => $result,
+            ]);
+            return [
+                'success' => true,
+                'successCount' => $successCount,
+                'failureCount' => $failureCount,
+                'details' => $result
+            ];
+        } catch (\Throwable $e) {
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
     }
+
+
 
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
     {
@@ -930,7 +983,16 @@ class Common
 
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
-        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->update(['is_used' => 0]);
+        if ($userVip->is_used) {
+            $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
+
+            Pack::query()
+                ->where('get_type', 1)
+                ->where('user_id', $user->id)
+                ->whereIn('type', $vipTypes)
+                ->where('vip_user_id', '!=', $userVip->id)
+                ->update(['is_used' => 0]);
+        }
 
         $type = $vip->privilegs()->pluck('type')->toArray();
         if (!empty($type)) {
@@ -1051,7 +1113,7 @@ class Common
         if ($uvip) {
             $user->update(['vip' => $uvip->id]);
         }
-
+//        self::syncUserDressesFromVip($user, $type);
         /* $users_vips = UserVip::with('OVip')->where('user_id',$user->id)->first();
         $preveliage = $users_vips->OVip->preveliage;
         $wareIds = Ware::where('type', $preveliage)->where('get_type',1)->where('is_active_for_vip', 1)->pluck('id')->toArray();
@@ -1059,6 +1121,51 @@ class Common
         $exception_packs = $packs->pluck('id')->toArray();
         Pack::where('user_id', $user->id)->whereNotIn('id', $exception_packs)->update(['is_used'=> 0]);
         Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
+    }
+
+    public static function syncUserDressesFromVip(User $user, array $types)
+    {
+        $dressMap = [
+            4  => 'dress_1',
+            5  => 'dress_2',
+            11 => 'dress_3',
+        ];
+
+        $targetTypes = array_intersect(array_keys($dressMap), $types);
+
+        if (empty($targetTypes)) {
+            return;
+        }
+
+        $vipPacks = Pack::where('user_id', $user->id)
+            ->whereIn('type', $targetTypes)
+            ->where('get_type', 1)
+            ->where(function ($q) {
+                $q->where('expire', '>=', now()->timestamp)
+                  ->orWhere('expire', 0);
+            })
+            ->get();
+
+        $updateData = [];
+
+        foreach ($vipPacks as $pack) {
+            $column = $dressMap[$pack->type] ?? null;
+
+            if ($column) {
+                $updateData[$column] = '1';
+                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
+            }
+        }
+
+        if (!empty($updateData)) {
+            $success = $user->update($updateData);
+
+            logger()->info('✅ تم تحديث الحقول:', [
+                'user_id' => $user->id,
+                'success' => $success,
+                'updated_fields' => $updateData
+            ]);
+        }
     }
 
 
@@ -1223,19 +1330,50 @@ class Common
 
     public static function sendOfficialMessage($user_id, $content = '', $title = '', $type = 1, $sub_type = null, $titleAr = null, string $image = null, $fromUserId = null)
     {
+        $userIds = is_array($user_id) ? $user_id : [$user_id];
 
-        OfficialMessage::query()->create(
-            [
-                'title' => $title,
-                'title_ar' => $titleAr,
-                'user_id' => $user_id,
-                'content' => $content,
-                'sub_type' => @$sub_type,
-                'type' => $type,
-                'img' => $image,
+        $data = [];
+
+        foreach ($userIds as $id) {
+            $data[] = [
+                'title'        => $title,
+                'title_ar'     => $titleAr,
+                'user_id'      => $id,
+                'content'      => $content,
+                'sub_type'     => $sub_type,
+                'type'         => $type,
+                'img'          => $image,
                 'from_user_id' => $fromUserId,
-            ]
-        );
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ];
+            logger()->info('[sendOfficialMessage] Bulk insert success', [
+                'id' => $id,
+            ]);
+        }
+
+        if (!empty($data)) {
+            OfficialMessage::insert($data);
+            logger()->info('[sendOfficialMessage] Bulk insert success', [
+                'user_ids' => $userIds,
+            ]);
+        }
+
+        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
+
+
+        // OfficialMessage::query()->create(
+        //     [
+        //         'title' => $title,
+        //         'title_ar' => $titleAr,
+        //         'user_id' => $user_id,
+        //         'content' => $content,
+        //         'sub_type' => @$sub_type,
+        //         'type' => $type,
+        //         'img' => $image,
+        //         'from_user_id' => $fromUserId,
+        //     ]
+        // );
     }
 
     public static function fireBaseFactory()
@@ -1699,8 +1837,11 @@ class Common
         return $value;
     }
 
-    public  static function getSettingsValue($key)
+    public static function getSettingsValue($key, $forceRefresh = true)
     {
+        if ($forceRefresh) {
+            Cache::forget($key);
+        }
         $value = Cache::rememberForever($key, function () use ($key) {
             return Setting::where('key', $key)->value('value');
         });
@@ -1870,6 +2011,7 @@ class Common
                     'id_image'             => @$resource->senderAgency->owner->specialId?->ware?->show_img ?? '',
 
                 ];
+            case 'bd':
             case 'user':
                 return [
                     'name' => $resource->senderUser->name ?? '',
@@ -1878,19 +2020,8 @@ class Common
                     'id' => $resource->senderUser->id ?? '',
                     'type' => 'user',
                     'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => $resource->senderUser->color_image,
-                    'id_image'             => $resource->senderUser->specialId?->ware?->show_img ?? '',
-                ];
-            case 'bd':
-                return [
-                    'name' => $resource->senderUser->name ?? '',
-                    'image' => $resource->senderUser->profile->avatar ?? '',
-                    'uuid' => $resource->senderUser->uuid ?? '',
-                    'id' => $resource->senderUser->id ?? '',
-                    'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => $resource->senderUser->color_image,
-                    'id_image'             => $resource->senderUser->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->senderUser->color_image,
+                    'id_image'             => @$resource->senderUser->specialId?->ware?->show_img ?? '',
                 ];
             default:
                 return [
@@ -1918,8 +2049,8 @@ class Common
                     'id' => $resource->receiveragency->id ?? '',
                     'type' => 'agency',
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
-                    'image_color'          => $resource->receiveragency->owner->color_image,
-                    'id_image'             => $resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->receiveragency->owner->color_image,
+                    'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
                 ];
             case 'user':
                 return [
@@ -1929,8 +2060,8 @@ class Common
                     'uuid' => $resource->receiverUser->uuid ?? '',
                     'type' => 'user',
                     'url' => $resource->receiverUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
-                    'image_color'          => $resource->receiverUser->color_image,
-                    'id_image'             => $resource->receiverUser->specialId?->ware?->show_img ?? '',
+                    'image_color'          => @$resource->receiverUser->color_image,
+                    'id_image'             => @$resource->receiverUser->specialId?->ware?->show_img ?? '',
                 ];
             default:
                 return [
@@ -2026,5 +2157,5 @@ class Common
             'end_date' => $endDate->toDateString(),
         ];
     }
-    
+
 }
