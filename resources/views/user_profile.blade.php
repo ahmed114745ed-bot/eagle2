@@ -1691,6 +1691,7 @@
                                     @endphp
 
                                     @php
+                                    info($userJoinAgency->status);
                                        if ($userJoinAgency->status == 'kick off'){
                                            if ($userJoinAgency->kicked_by_app){
                                             $status = 'app';
