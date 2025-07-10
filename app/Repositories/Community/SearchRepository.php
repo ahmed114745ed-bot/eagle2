@@ -120,21 +120,29 @@ class SearchRepository implements SearchRepositoryInterface
         $users = User::query()
             ->select([
                 '*',
-                DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keywords}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")
+                DB::raw("
+            CASE
+                WHEN special_id = '{$keywords}' THEN 1000
+                WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
+                WHEN uuid = '{$keywords}' THEN 800
+                WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
+                WHEN special_id LIKE '%{$keywords}%' THEN 600
+                WHEN uuid LIKE '%{$keywords}%' THEN 500
+                ELSE 0
+            END AS total_score
+        ")
             ])
-            ->where(function ($query) use ($keywords, $whereOr) {
-                $query->where(function ($subQuery) use ($keywords) {
-                    $subQuery->where('uuid', 'like', $keywords . '%')
-                        ->orWhere('special_id', 'like',  $keywords . '%');
-                })
-                    ->orWhere($whereOr);
-            })
+            // ->where(function ($query) use ($keywords) {
+            //     $query->where('special_id', 'like', "%{$keywords}%")
+            //         ->orWhere('uuid', 'like', "%{$keywords}%");
+            // })
+           -> fitterByUuid($keywords)
             ->whereNotIn('id', $blockedUserIds)
             ->where('status', 1)
+            ->having('total_score', '>', 0) // ✅ Exclude non-matching users
             ->with(['followedByAuthUser', 'country'])
-            ->orderBy('matching_percentage', 'desc')
+            ->orderByDesc('total_score')
             ->paginate(10, ['*'], 'page', $page);
-
 
 
 
