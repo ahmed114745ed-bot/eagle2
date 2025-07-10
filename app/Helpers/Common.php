@@ -707,11 +707,13 @@ class Common
         } else {
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-            //make group and get token
+            
+            $result= self::send_firebase_notification_top(
+                $tokens, $title, $body, $icon, $data,
+                $messageType, $user, $action, $type, $id, $notification_type
+            );
+            return $result;
 
-            $token = self::makeGroup($tokens, $key,  $api_access_key);
-
-            $isGroup = true;
         }
 
         if ($user) {
@@ -736,9 +738,9 @@ class Common
             ],
         ];
 
-        //        if (!empty($icon)) {
-        //            $payload['notification']['icon'] = $icon;
-        //        }
+       if (!empty($icon)) {
+                   $payload['notification']['icon'] = $icon;
+               }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
@@ -746,7 +748,7 @@ class Common
         if (isset($data['image']) && !empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
         } else {
-            // $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+            $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
         }
 
         $headers = [
@@ -755,16 +757,13 @@ class Common
         ];
 
 
-
         $projectId = env('FIREBASE_PROJECT_NAME');
 
         $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
 
-
         $result = json_decode($result);
-
 
         //remove group with $key if is group
         if ($result  && $isGroup) {
@@ -895,10 +894,6 @@ class Common
 
         $response = Http::withHeaders($headers)->post($url, $body);
 
-        Log::info('SubscribeToTopic - FCM response', [
-            'status' => $response->status(),
-            'body' => $response->json()
-        ]);
     }
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
@@ -909,7 +904,6 @@ class Common
 
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-            // حساب النجاح والفشل
             $result = $response[$topic] ?? [];
             $successCount = 0;
             $failureCount = 0;
@@ -921,15 +915,13 @@ class Common
                     $failureCount++;
                 }
             }
-
-            Log::info('Kreait - Successfully unsubscribed tokens from topic.', [
-                'topic'         => $topic,
-                'tokens'        => $registrationTokens,
-                'successCount'  => $successCount,
-                'failureCount'  => $failureCount,
-                'details'       => $result,
+            logger()->info('✅ Unsubscribe from FCM topic result', [
+                'topic'          => $topic,
+                'tokensCount'    => count($registrationTokens),
+                'successCount'   => $successCount,
+                'failureCount'   => $failureCount,
+                'details'        => $result,
             ]);
-
             return [
                 'success' => true,
                 'successCount' => $successCount,
@@ -937,12 +929,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-            Log::error('Kreait - Error unsubscribing from topic.', [
-                'topic' => $topic,
-                'tokens' => $registrationTokens,
-                'error' => $e->getMessage()
-            ]);
-
+          
             return [
                 'success' => false,
                 'error' => $e->getMessage()

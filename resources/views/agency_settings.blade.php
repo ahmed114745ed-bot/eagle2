@@ -785,7 +785,7 @@
                     stopCharge:         ['/admin/send-request-stop-charge',  'stop_charge'],
                     stopInviteCode:     ['/admin/send-request-invite-code',        'stop_invite_code'],
                     stopTransferSalary: ['/admin/send-request-transfer-salary','transfer_salary'],
-                    stopGiftCheckbox:   ['/admin/close-open-gift',           'make_rooms_top'],
+                    stopGiftCheckbox:   ['/admin/close-open-gift',           'close_open_gifts'],
                 };
 
                 const [url, key] = map[id];

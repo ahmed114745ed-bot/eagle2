@@ -32,9 +32,10 @@ class MyStoreResource extends JsonResource
         $salary       =round( $this->salary,2);
         $sallary      = $salary; //
         $userSalary   = $sallary;
+
         if (($this->type_user == 2 || $this->type_user == 4)) {
             $userSalary = $salary; //
-            $hostSalary = round($agency_owner?->salary ?? 0, 2);
+            $hostSalary = (float) ($agencySallary ?? $agency_owner?->salary ?? 0);
             $sallary = $hostSalary;
         }
 

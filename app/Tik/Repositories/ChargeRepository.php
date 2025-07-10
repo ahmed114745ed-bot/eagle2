@@ -65,7 +65,7 @@ class ChargeRepository extends AbstractRepository
             //     'receiver.profile:id,user_id,avatar'
             // ])
             ->with(Common::chargerRelationsQuery())
-            ->select('id', 'user_id', 'amount', 'usd', 'created_at','charger_type','user_type')
+            ->select('id', 'user_id', 'amount', 'usd', 'created_at','charger_type','user_type','charger_id')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
@@ -79,10 +79,10 @@ class ChargeRepository extends AbstractRepository
             ->where('charger_id', Auth::user()->id)
             ->where('charger_type', 'user')
             ->where('user_type', 'agency')
-            ->whereNotNull('agency_id')
-            ->with('agency:id,name,img')
+            ->whereNotNull('user_id')
+            // ->with('receiverUser','receiverUser.profile','receiveragency')
             ->with(Common::chargerRelationsQuery())
-            ->select('id', 'agency_id', 'amount', 'usd', 'created_at','charger_type','user_type')
+            ->select('id', 'agency_id', 'amount', 'usd', 'created_at','charger_type','user_type','user_id','charger_id')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }

@@ -61,7 +61,7 @@
             <input type="hidden" name="from_wallet_id" id="from_wallet_id">
             <div class="modal-content" style="background: white; color: black; padding: 20px;">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="transferModalLabel">تحويل من <span id="walletName"></span></h5>
+                    <h5 class="modal-title" id="transferModalLabel">{{__('transfer from')}}  <span id="walletName"></span></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="إغلاق">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -69,7 +69,7 @@
 
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="to_wallet_id" class="form-label">إلى المحفظة</label>
+                        <label for="to_wallet_id" class="form-label">{{__('to wallet')}} </label>
                         <select class="form-control" name="to_wallet_id" id="to_wallet_id" required>
                             @foreach ($coreWallets as $wallet)
                                 <option value="{{ $wallet->id }}">
@@ -80,14 +80,14 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="amount" class="form-label">المبلغ</label>
+                        <label for="amount" class="form-label">{{__('amount')}}</label>
                         <input type="number" name="amount" class="form-control" min="1" required>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">تنفيذ التحويل</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-success"> {{__('execute transfer')}}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('cancel')}}</button>
                 </div>
             </div>
         </form>
@@ -139,6 +139,9 @@
                 showToast(data.message || 'تم التحويل بنجاح ✅', 'success');
                 $('#transferModal').modal('hide'); // أغلق المودال
                 form.reset(); // نظف النموذج
+                 setTimeout(() => {
+                location.reload();
+            }, 1000); // wait 1 second before reloading (optional)
             } else {
                 showToast(data.message || 'فشل في التحويل ❌', 'danger');
             }

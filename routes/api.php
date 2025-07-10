@@ -584,24 +584,26 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
-
-            Route::get('/public-test/{id}', function ($id) {
+            Route::get('/public-test/{ids}', function ($ids) {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
-             
+            
+                $idArray = explode(',', $ids);
+            
                 $tokens = User::whereNotNull('notification_id')
-                    ->where('id', $id)
+                    ->whereIn('id', $idArray)
                     ->pluck('notification_id')
                     ->filter()
                     ->unique()
                     ->values()
                     ->toArray();
-                    logger()->info('Kreait - Successfully unsubscribed tokens from topic.', [
-                        'tokens'         => $tokens,
-                        'id'        => $id,
-                    ]);  
             
-                return Common::send_firebase_notification_top($tokens, $title, $body);
+                logger()->info('Kreait - Successfully  tokens from topic.', [
+                    'tokens' => $tokens,
+                    'ids'    => $idArray,
+                ]);  
+            
+                return Common::send_firebase_notification($tokens, $title, $body);
             });
 
 
