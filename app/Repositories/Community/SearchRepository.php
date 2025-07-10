@@ -122,60 +122,19 @@ class SearchRepository implements SearchRepositoryInterface
         // ->orderBy('matching_percentage_special_id', 'desc')
         // ->paginate(10, ['*'], 'page', $page);
 
-
-        // $users = User::query()
-        //     ->select([
-        //         '*',
-        //         DB::raw("
-        //     CASE
-        //         WHEN uuid = '{$keywords}' THEN 100
-        //         WHEN special_id = '{$keywords}' THEN 100
-        //         WHEN uuid LIKE '{$keywords}%' THEN 90
-        //         WHEN special_id LIKE '{$keywords}%' THEN 90
-        //         WHEN uuid LIKE '%{$keywords}%' THEN 80
-        //         WHEN special_id LIKE '%{$keywords}%' THEN 80
-        //         ELSE 0
-        //     END AS relevance_score
-        // ")
-        //     ])
-        //     ->where(function ($query) use ($keywords, $whereOr) {
-        //         $query->where(function ($subQuery) use ($keywords) {
-        //             $subQuery->where('uuid', 'like', "%{$keywords}%")
-        //                 ->orWhere('special_id', 'like', "%{$keywords}%");
-        //         })
-        //             ->orWhere($whereOr);
-        //     })
-        //     ->whereNotIn('id', $blockedUserIds)
-        //     ->where('status', 1)
-        //     ->with(['followedByAuthUser', 'country'])
-        //     ->orderByDesc('relevance_score')
-        //     ->paginate(10, ['*'], 'page', $page);
-
         $users = User::query()
             ->select([
                 '*',
                 DB::raw("
             CASE
-                WHEN special_id = '{$keywords}' THEN 100
-                WHEN special_id LIKE '{$keywords}%' THEN 90
-                WHEN uuid = '{$keywords}' THEN 80
-                WHEN uuid LIKE '{$keywords}%' THEN 70
-                WHEN special_id LIKE '%{$keywords}%' THEN 60
-                WHEN uuid LIKE '%{$keywords}%' THEN 50
+                WHEN special_id = '{$keywords}' THEN 1000
+                WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
+                WHEN uuid = '{$keywords}' THEN 800
+                WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
+                WHEN special_id LIKE '%{$keywords}%' THEN 600
+                WHEN uuid LIKE '%{$keywords}%' THEN 500
                 ELSE 0
-            END AS match_score
-        "),
-                DB::raw("
-            CASE
-                WHEN special_id LIKE '{$keywords}%' THEN LENGTH(special_id)
-                ELSE 999
-            END AS special_priority_length
-        "),
-                DB::raw("
-            CASE
-                WHEN uuid LIKE '{$keywords}%' THEN LENGTH(uuid)
-                ELSE 999
-            END AS uuid_priority_length
+            END AS total_score
         ")
             ])
             ->where(function ($query) use ($keywords, $whereOr) {
@@ -188,12 +147,8 @@ class SearchRepository implements SearchRepositoryInterface
             ->whereNotIn('id', $blockedUserIds)
             ->where('status', 1)
             ->with(['followedByAuthUser', 'country'])
-            ->orderByDesc('match_score')             // Highest match rank first
-            ->orderBy('special_priority_length')     // Shorter special_id first
-            ->orderBy('uuid_priority_length')        // Shorter uuid next
+            ->orderByDesc('total_score') // Single solid score
             ->paginate(10, ['*'], 'page', $page);
-
-
 
 
         return $users;
