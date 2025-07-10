@@ -915,7 +915,13 @@ class Common
                     $failureCount++;
                 }
             }
-
+            logger()->info('✅ Unsubscribe from FCM topic result', [
+                'topic'          => $topic,
+                'tokensCount'    => count($registrationTokens),
+                'successCount'   => $successCount,
+                'failureCount'   => $failureCount,
+                'details'        => $result,
+            ]);
             return [
                 'success' => true,
                 'successCount' => $successCount,
@@ -1746,8 +1752,11 @@ class Common
         return $value;
     }
 
-    public  static function getSettingsValue($key)
+    public static function getSettingsValue($key, $forceRefresh = true)
     {
+        if ($forceRefresh) {
+            Cache::forget($key);
+        }
         $value = Cache::rememberForever($key, function () use ($key) {
             return Setting::where('key', $key)->value('value');
         });

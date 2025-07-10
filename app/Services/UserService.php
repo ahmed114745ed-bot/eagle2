@@ -485,7 +485,7 @@ class UserService
     public function myStore($user, $request)
     {
         $cacheKey = 'cache-data-mystore-' . $user->id;
-         if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
+        if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
 
             $app_feature = Cache::get('host_agency');
             if ($app_feature) {
@@ -496,7 +496,7 @@ class UserService
                 $roomTarget = new RoomGameServices();
                 $roomTarget->CalculateRoomSalaries($user->ownerRoom);
             }
-         }
+        }
 
         if ($user->device_token  != $request->header('X-Device-Token')) {
             $user->enableSaving = true;
@@ -542,13 +542,13 @@ class UserService
     {
         $user = $this->userRepository->findOrFail($userId, ['packs' /* => function ($q) {
             $q->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5])->where('is_used', 1)->with('ware');
-        } */, 'profile','myroom', 'room.backgroundImage','room.background', 'family', 'UserVip.OVip', 'userVips', 'eligiblePacks.ware']);
+        } */, 'profile', 'myroom', 'room.backgroundImage', 'room.background', 'family', 'UserVip.OVip', 'userVips', 'eligiblePacks.ware']);
         if (!$user) throw new \Exception('not found');
         if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
         $request['user_id'] = $userId;
 
         if ($auth->id != $user->id && $isVisit == true) {
-//            if (!Common::checkPackPrev($auth->id, 19)) {
+            //            if (!Common::checkPackPrev($auth->id, 19)) {
             if (Common::checkUserPacks($user['packs'], 19)->isEmpty()) {
                 $previousVisit = $this->ProfileVisitorRepository->checkVisit($auth->id, $user->id);
                 $user->profileVisits()->syncWithoutDetaching(
@@ -1108,18 +1108,20 @@ class UserService
             }
             $progress = $exactlyValue == 0 ? 1 : $bar;
         } elseif ($currentLevel != null) {
-            $remaining       = $secondLevel?->exp == null ? 0 : $secondLevel?->exp - $user?->total_charge_coins;
+            // $remaining       = $secondLevel?->exp == null ? 0 : $secondLevel?->exp - $user?->total_charge_coins;
             $exactlyValue    = $secondLevel?->exp ?? 0;
             $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
             $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
-            $prog = ($progressCurrent / $progressNext);
-            if ($prog >= 1) {
-                $bar = 1;
-            } else {
-                $bar = round($prog, 1);
-            }
-            // $progress = $exactlyValue == 0 ? 1 : ($expLevel / $exactlyValue);
-            $progress = $exactlyValue == 0 ? 1 : $bar;
+            // $prog = ($progressCurrent / $progressNext);
+            // if ($prog >= 1) {
+            //     $bar = 1;
+            // } else {
+            //     $bar = round($prog, 1);
+            // }
+
+            // $progress = $exactlyValue == 0 ? 1 : $bar;
+            $progress  = 1;
+            $remaining = 0;
         } else {
             $progress  = 1;
             $remaining = 0;
@@ -1129,9 +1131,9 @@ class UserService
             'current_level' => $currentLevel->level ?? 0,
             'current_exp'   => $currentLevel->exp ?? 0,
             'current_img'   => $currentLevel->img ?? '',
-            'next_level'    => @$secondLevel->level ?? 0,
-            'next_exp'      => @$secondLevel->exp ?? 0,
-            'next_img'      => @$secondLevel->img ?? '',
+            'next_level'    => @$secondLevel ? @$secondLevel->level : ($currentLevel->level ?? 0),
+            'next_exp'      => @$secondLevel ?  @$secondLevel->exp ?? 0 : ($currentLevel->exp ?? 0),
+            'next_img'      => @$secondLevel ? @$secondLevel->img ?? '' : $currentLevel->img ?? '',
             'remaining'     => @$remaining ?? 0,
             'progress'      => @$progress ?? 0,
             'exp_charge' =>  $expPercentages['exp_charge_percentage'] ?? 1,
@@ -1145,6 +1147,6 @@ class UserService
 
     public function dataUser($userId)
     {
-        return  $this->userRepository->findOrFail($userId, ['family','medals']);
+        return  $this->userRepository->findOrFail($userId, ['family', 'medals']);
     }
 }
