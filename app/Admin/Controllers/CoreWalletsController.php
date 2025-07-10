@@ -177,8 +177,10 @@ class CoreWalletsController extends MainController
         $adminId = auth()->id();
         $fromWallet = CoreWallets::find($request->from_wallet_id);
         if ($fromWallet->coins < $request->amount) {
-            admin_error('Invalid coins');
-            return back();
+             return response()->json([
+                'status' => 0,
+                'message' => 'plz check coins wallet',
+            ]);
         }
         $fromWallet->coins -= $request->amount;
         $fromWallet->save();
