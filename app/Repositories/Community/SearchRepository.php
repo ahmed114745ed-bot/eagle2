@@ -194,6 +194,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->paginate(10, ['*'], 'page', $page);
 
 
+
         return $users;
     }
 
