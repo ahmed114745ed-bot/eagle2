@@ -130,7 +130,7 @@ class SearchRepository implements SearchRepositoryInterface
         ->whereNotIn('id', $blockedUserIds)
         ->where('status', 1)
         ->with(['followedByAuthUser', 'country'])
-        ->orderBy('matching_percentage', 'desc')
+        ->orderBy('special_id', 'desc')
         ->paginate(10, ['*'], 'page', $page);
 
 
