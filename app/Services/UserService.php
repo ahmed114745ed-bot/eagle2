@@ -1108,7 +1108,6 @@ class UserService
             }
             $progress = $exactlyValue == 0 ? 1 : $bar;
         } elseif ($currentLevel != null) {
-          
             // $remaining       = $secondLevel?->exp == null ? 0 : $secondLevel?->exp - $user?->total_charge_coins;
             $exactlyValue    = $secondLevel?->exp ?? 0;
             $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
@@ -1121,7 +1120,7 @@ class UserService
             // }
 
             // $progress = $exactlyValue == 0 ? 1 : $bar;
-            $progress  = 0;
+            $progress  = 1;
             $remaining = 0;
         } else {
             $progress  = 1;

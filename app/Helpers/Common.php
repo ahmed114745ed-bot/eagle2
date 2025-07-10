@@ -1293,11 +1293,20 @@ class Common
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
+            logger()->info('[sendOfficialMessage] Bulk insert success', [
+                'id' => count($id),
+            ]);
         }
     
         if (!empty($data)) {
             OfficialMessage::insert($data);
+            logger()->info('[sendOfficialMessage] Bulk insert success', [
+                'user_ids' => $userIds,
+            ]);
         }
+
+        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
+
 
         // OfficialMessage::query()->create(
         //     [
