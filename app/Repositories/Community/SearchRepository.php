@@ -156,40 +156,42 @@ class SearchRepository implements SearchRepositoryInterface
                 '*',
                 DB::raw("
             CASE
-                WHEN uuid LIKE '{$keywords}%' THEN 1
-                WHEN special_id LIKE '{$keywords}%' THEN 1
+                WHEN special_id = '{$keywords}' THEN 100
+                WHEN uuid = '{$keywords}' THEN 90
+                WHEN special_id LIKE '{$keywords}%' THEN 80
+                WHEN uuid LIKE '{$keywords}%' THEN 70
+                WHEN special_id LIKE '%{$keywords}%' THEN 60
+                WHEN uuid LIKE '%{$keywords}%' THEN 50
                 ELSE 0
-            END AS starts_with_keyword
+            END AS match_score
         "),
                 DB::raw("
             CASE
-                WHEN uuid LIKE '{$keywords}%' THEN LENGTH(uuid)
-                ELSE 999
-            END AS uuid_length_score
-        "),
-                DB::raw("
-            CASE
-                WHEN special_id LIKE '{$keywords}%' THEN LENGTH(special_id)
+                WHEN special_id LIKE '%{$keywords}%' THEN LENGTH(special_id)
                 ELSE 999
             END AS special_id_length_score
+        "),
+                DB::raw("
+            CASE
+                WHEN uuid LIKE '%{$keywords}%' THEN LENGTH(uuid)
+                ELSE 999
+            END AS uuid_length_score
         ")
             ])
             ->where(function ($query) use ($keywords, $whereOr) {
                 $query->where(function ($subQuery) use ($keywords) {
-                    $subQuery->where('uuid', 'like', "{$keywords}%")
-                        ->orWhere('special_id', 'like', "{$keywords}%");
+                    $subQuery->where('uuid', 'like', "%{$keywords}%")
+                        ->orWhere('special_id', 'like', "%{$keywords}%");
                 })
                     ->orWhere($whereOr);
             })
             ->whereNotIn('id', $blockedUserIds)
             ->where('status', 1)
             ->with(['followedByAuthUser', 'country'])
-            ->orderByDesc('starts_with_keyword')  // prioritize starts with
-            ->orderBy('uuid_length_score')        // shorter uuid first
-            ->orderBy('special_id_length_score')  // shorter special_id if needed
+            ->orderByDesc('match_score')                 // best match first
+            ->orderBy('special_id_length_score')         // shorter special_id preferred
+            ->orderBy('uuid_length_score')               // shorter uuid next
             ->paginate(10, ['*'], 'page', $page);
-
-
 
         return $users;
     }
