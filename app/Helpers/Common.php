@@ -1294,7 +1294,7 @@ class Common
                 'updated_at'   => now(),
             ];
             logger()->info('[sendOfficialMessage] Bulk insert success', [
-                'id' => count($id),
+                'id' => $id,
             ]);
         }
     
