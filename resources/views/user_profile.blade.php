@@ -1691,7 +1691,7 @@
                                     @endphp
 
                                     @php
-                                        if ($userJoinAgency->kicked_by_app){
+                                        if (!empty($userJoinAgency->kicked_by_app)){
                                             $status = 'app';
                                             $kickedBy = $userJoinAgency['kickedByApp'];
                                             $kickedByName = $kickedBy->name ?? '';
@@ -1706,11 +1706,11 @@
                                             $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
                                         }
 
-                                        if ($userJoinAgency->kicked_by_admin){
+                                        if (!empty($userJoinAgency->kicked_by_admin)){
                                             $status = 'admin';
                                             $kickedBy = $userJoinAgency['kickedByAdmin'];
                                             $kickedByName = $kickedBy->name ?? '';
-                                            $kickedByUuid = $kickedBy->uuid ?? '';
+                                            $kickedByUuid = $kickedBy->id ?? '';
                                             $kickedByPath = @$kickedBy?->avatar;
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
@@ -1737,7 +1737,6 @@
                                         </td>
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
-                                            {{ info('kickedby'.@$kickedBy) }}
                                             @if(isset($kickedBy))
                                                 <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
                                                    style="display: inline-flex; align-items: center; text-decoration: none;">
