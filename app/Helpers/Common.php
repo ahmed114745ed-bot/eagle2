@@ -1301,7 +1301,6 @@ class Common
         if (!empty($data)) {
             OfficialMessage::insert($data);
             logger()->info('[sendOfficialMessage] Bulk insert success', [
-                'count' => count($data),
                 'user_ids' => $userIds,
             ]);
         }
