@@ -707,7 +707,7 @@ class Common
         } else {
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-            
+
             $result= self::send_firebase_notification_top(
                 $tokens, $title, $body, $icon, $data,
                 $messageType, $user, $action, $type, $id, $notification_type
@@ -929,7 +929,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-          
+
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -985,7 +985,7 @@ class Common
     {
         if ($userVip->is_used) {
             $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
-        
+
             Pack::query()
                 ->where('get_type', 1)
                 ->where('user_id', $user->id)
@@ -993,7 +993,7 @@ class Common
                 ->where('vip_user_id', '!=', $userVip->id)
                 ->update(['is_used' => 0]);
         }
-        
+
         $type = $vip->privilegs()->pluck('type')->toArray();
         if (!empty($type)) {
             foreach ($type as $wareType) {
@@ -1113,7 +1113,7 @@ class Common
         if ($uvip) {
             $user->update(['vip' => $uvip->id]);
         }
-        self::syncUserDressesFromVip($user, $type);
+//        self::syncUserDressesFromVip($user, $type);
         /* $users_vips = UserVip::with('OVip')->where('user_id',$user->id)->first();
         $preveliage = $users_vips->OVip->preveliage;
         $wareIds = Ware::where('type', $preveliage)->where('get_type',1)->where('is_active_for_vip', 1)->pluck('id')->toArray();
@@ -1130,13 +1130,13 @@ class Common
             5  => 'dress_2',
             11 => 'dress_3',
         ];
-    
+
         $targetTypes = array_intersect(array_keys($dressMap), $types);
-    
+
         if (empty($targetTypes)) {
             return;
         }
-    
+
         $vipPacks = Pack::where('user_id', $user->id)
             ->whereIn('type', $targetTypes)
             ->where('get_type', 1)
@@ -1145,21 +1145,21 @@ class Common
                   ->orWhere('expire', 0);
             })
             ->get();
-    
+
         $updateData = [];
-    
+
         foreach ($vipPacks as $pack) {
             $column = $dressMap[$pack->type] ?? null;
-    
+
             if ($column) {
                 $updateData[$column] = '1';
                 logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
             }
         }
-    
+
         if (!empty($updateData)) {
             $success = $user->update($updateData);
-    
+
             logger()->info('✅ تم تحديث الحقول:', [
                 'user_id' => $user->id,
                 'success' => $success,
@@ -1333,7 +1333,7 @@ class Common
         $userIds = is_array($user_id) ? $user_id : [$user_id];
 
         $data = [];
-    
+
         foreach ($userIds as $id) {
             $data[] = [
                 'title'        => $title,
@@ -1351,7 +1351,7 @@ class Common
                 'id' => $id,
             ]);
         }
-    
+
         if (!empty($data)) {
             OfficialMessage::insert($data);
             logger()->info('[sendOfficialMessage] Bulk insert success', [
