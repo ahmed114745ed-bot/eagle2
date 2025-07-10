@@ -1293,8 +1293,9 @@ class Common
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
-            logger()->info('[sendOfficialMessage] Prepared message for user:', $messageData);
-
+            logger()->info('[sendOfficialMessage] Bulk insert success', [
+                'id' => count($id),
+            ]);
         }
     
         if (!empty($data)) {
