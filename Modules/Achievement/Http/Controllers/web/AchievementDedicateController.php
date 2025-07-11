@@ -2,24 +2,12 @@
 
 namespace Modules\Achievement\Http\Controllers\web;
 
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Auth;
-
-
 use App\Models\AchievementValidImage;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
-use App\Admin\Actions\AchievementDedicate;
-use Modules\Achievement\Entities\Achievement;
-use App\Admin\Actions\AchievementDedicateAction;
-use Modules\Achievement\Entities\AchievementLevel;
 use Modules\Achievement\Entities\UserAchievementLevel;
-
-
 
 class AchievementDedicateController extends MainController
 {
@@ -42,7 +30,7 @@ class AchievementDedicateController extends MainController
         $achievementValidImage = AchievementValidImage::get();
         return parent::create($content
             ->title(trans('user-achievement-levels'))
-            ->body(view('admin.grid.users.UserAchievementLevelDedicate', compact('achievementValidImage'))));
+            ->body(view('admin.grid.users.UserAchievementLevelDedicate', compact('achievementValidImage')))); 
     }
 
     /**

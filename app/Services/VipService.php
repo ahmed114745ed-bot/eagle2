@@ -93,6 +93,7 @@ class VipService
         }
         $this->userRepository->decrementUserCoins($from, $total);
         $this->packRepository->deleteExpirePack();
+        $this->packRepository->unUseOldPack($user_id);
 
 
         $data = [

@@ -125,47 +125,46 @@ class HomeService
         return  $tkt;
     }
 
-    public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
+    public function changePackMode(string $type, array $privilegeArr, User $user, bool $isAvailable): bool
     {
-
-        if (key_exists($type, $privilegeArr)) {
-
-
-            $privilegeId = $privilegeArr[$type];
-
-
-            if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
-                throw new \Exception('not found ');
-            } else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->exists()) {
-                throw new \Exception(__('api.notWare'));
-            }
-            $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->first();
-
-            $data = [
-                'is_used' => $isAvailable,
-                'using' => 1,
-            ];
-            Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update($data);
-            if ($pack && is_null($pack->expire) && !is_null($pack->days)) {
-                $data['expire'] = $pack->days != 0
-                    ? now()->addDays($pack->days)->timestamp
-                    : 0;
-                $pack->update($data);
-            }
-
-
-            switch ($type) {
-                case 'country':
-                    /*if ($isAvailable) {
-                        $user->country_id = null;
-                        $user->save();
-                    }*/
-                    break;
-                case 'room':
-                    // Room::query()->where('uid', $user->id)->update(['room_status' => $isAvailable ? 2 : 1]);
-                    break;
-            }
+        if (!array_key_exists($type, $privilegeArr)) {
+            return false;
         }
+
+        $privilegeId = $privilegeArr[$type];
+
+        // Check if the ware exists when enabling the privilege
+        if ($isAvailable && !Ware::where('type', $privilegeId)->exists()) {
+            throw new \Exception('not found');
+        }
+
+        // Ensure the user has the pack before updating
+        $packQuery = Pack::where('user_id', $user->id)
+            ->where('type', $privilegeId);
+
+        if (!$packQuery->exists()) {
+            throw new \Exception(__('api.notWare'));
+        }
+
+        // Fetch the specific pack with VIP level and expiration check
+        $pack = $packQuery
+            ->whereHas('ware', fn($q) => $q->where('level', $user->UserVip->level ?? 0))
+            ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+            ->first();
+
+        if (!$pack) {
+            throw new \Exception(__('api.notWare'));
+        }
+
+        // Update pack status
+        $pack->update([
+            'is_used' => $isAvailable,
+            'using' => 1,
+        ]);
+
+
+
         return true;
     }
+
 }

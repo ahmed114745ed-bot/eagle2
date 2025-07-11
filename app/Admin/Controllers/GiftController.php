@@ -98,92 +98,92 @@ class GiftController extends MainController
     {
         $grid = new Grid(new Gift);
 
-    $filterType = request('filter', 'all');
+        $filterType = request('filter', 'all');
 
-    $grid->model()
-        ->with('vip')
-        ->where('type', '!=', 8)
-        ->when($filterType !== 'all', fn($q) => $q->where('type', $filterType))
-        ->orderBy('use_count', 'desc')
-        ->orderBy('type')
-        ->orderByRaw('ISNULL(`sort`), `sort`')
-        ->orderBy('price');
+        $grid->model()
+            ->with('vip')
+            ->where('type', '!=', 8)
+            ->when($filterType !== 'all', fn($q) => $q->where('type', $filterType))
+            ->orderBy('use_count', 'desc')
+            ->orderBy('type')
+            ->orderByRaw('ISNULL(`sort`), `sort`')
+            ->orderBy('price');
 
-    $grid->paginate(20); 
+        $grid->paginate(20);
 
-    
-    $grid->header(function () use ($filterType) {
-        $tabs = ['all' => __('All')] + translate(TYPE_GIFT);
-        $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-        foreach ($tabs as $key => $label) {
-            $active = $filterType === (string)$key ? 'active' : '';
-            $url = request()->fullUrlWithQuery(['filter' => $key]);
-            $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
-        }
-        $html .= '</ul></div>';
-        return $html;
-    });
 
-    $grid->id(__('ID'));
-    $grid->name(__('Name'));
-
-    if ($filterType == 9) {
-        $grid->column('level', trans('vip'))->display(function () {
-            $defaultImage = asset("images/image.png");
-            $path = getImagePath($this?->vip?->img);
-            $url = $path ?: $defaultImage;
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        $grid->header(function () use ($filterType) {
+            $tabs = ['all' => __('All')] + translate(TYPE_GIFT);
+            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+            foreach ($tabs as $key => $label) {
+                $active = $filterType === (string)$key ? 'active' : '';
+                $url = request()->fullUrlWithQuery(['filter' => $key]);
+                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+            }
+            $html .= '</ul></div>';
+            return $html;
         });
-        $grid->column('vip_level', __('level_num'));
-    }
 
-    if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
-        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
-    }
+        $grid->id(__('ID'));
+        $grid->name(__('Name'));
 
-    $grid->column('price', __('price'))->display(function ($coin) {
-        $icon = asset('images/coin.jpg');
-        return "
+        if ($filterType == 9) {
+            $grid->column('level', trans('vip'))->display(function () {
+                $defaultImage = asset("images/image.png");
+                $path = getImagePath($this?->vip?->img);
+                $url = $path ?: $defaultImage;
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+            $grid->column('vip_level', __('level_num'));
+        }
+
+        if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
+            $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
+        }
+
+        $grid->column('price', __('price'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg');
+            return "
             <div style='display: flex; align-items: center; gap: 5px;'>
                 <span>" . number_format($coin) . "</span>
                 <img src='{$icon}' alt='Coin' width='20' height='20'>
             </div>
         ";
-    });
+        });
 
-    $grid->column('img', trans('image'))->display(function ($path) {
-        $imgPath = getImagePath($path) ?: asset("images/image.png");
-        $musicIcon = $this->music_gift == 1
-            ? "<img src='" . asset('images/music.jpg') . "' 
+        $grid->column('img', trans('image'))->display(function ($path) {
+            $imgPath = getImagePath($path) ?: asset("images/image.png");
+            $musicIcon = $this->music_gift == 1
+                ? "<img src='" . asset('images/music.jpg') . "' 
                 style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
                 background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>"
-            : '';
+                : '';
 
-        return "<div style='position: relative; display: inline-block;'>
+            return "<div style='position: relative; display: inline-block;'>
                     <img src='{$imgPath}' style='width: 70px; height: 70px;' class='img img-thumbnail' />
                     {$musicIcon}
                 </div>";
-    });
+        });
 
-    $grid->column('show_img', trans('show_img'))->display(function ($path) {
-        $url = getImagePath($path) ?: asset('images/image.png');
-        return handleShowImageWithTypes($this->id, $url, 50, 50);
-    });
+        $grid->column('show_img', trans('show_img'))->display(function ($path) {
+            $url = getImagePath($path) ?: asset('images/image.png');
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
 
-    $grid->column("use_count", __('use count'));
+        $grid->column("use_count", __('use count'));
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                 
-    $this->extendGrid($grid);
 
-    $grid->disableExport();
+        $this->extendGrid($grid);
 
-    Admin::script("
+        $grid->disableExport();
+
+        Admin::script("
         if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
         }
     ");
 
-    return $grid;
+        return $grid;
     }
 
     /**
@@ -218,9 +218,11 @@ class GiftController extends MainController
      * @return Form
      */
     protected function form()
-    {
+    { 
+
         $form = new TabsFrom(new Gift);
         $this->disableFormTools($form);
+        $type = old('type', $form->model()->type ?? null);
 
         $form->display(__('ID'));
         $form->text('name', __('name'));
@@ -229,6 +231,8 @@ class GiftController extends MainController
             translate(TYPE_GIFT)
         )
             ->when(6, function () use ($form) {
+             
+                $type = old('type', $form->model()->type ?? null);
                 $form->number('luckyGift.win_probability', __('win probability'))
                     ->min(10)->max(100)
                     ->placeholder(__('Enter win probability'))
@@ -255,9 +259,11 @@ class GiftController extends MainController
                     ->rules('min:0|max:100')
                     ->default(0)
                     ->required();
+            if ($type == 6 || !$form->isEditing()) {
 
                 $form->html(<<<'HTML'
                     <script>
+                        
                         (function () {
                             const fields = ['min_percentag', 'mid_percentag', 'max_percentag'];
 
@@ -284,11 +290,12 @@ class GiftController extends MainController
                                     setVal(changed, current - overflow);
                                 }
                             }
+                            window.percent_error_message = ' . json_encode(trans('admin.percent_error')) . ';
 
                             function checkBeforeSubmit(e) {
                                 const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
                                 if (Math.round(total) !== 100) {
-                                    alert('❌ مجموع النسب يجب أن يكون 100% بالضبط. الحالي: ' + total.toFixed(2) + '%');
+                                    alert(window.percent_error_message + total.toFixed(2) + '%');
                                     e.preventDefault();
                                     return false;
                                 }
@@ -314,6 +321,7 @@ class GiftController extends MainController
                         </script>
 
                     HTML);
+                    }
             })
             ->when(9, function () use ($form) {
                 $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
@@ -345,33 +353,22 @@ class GiftController extends MainController
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
         $form->saving(function (Form $form) {
 
-            if ($form->model()->type != "6") {
+
+
+            if ($form->model()->type == 6 || request()->type == 6) {
                 $type = $form->input('type');
                 $win_probability = $form->input('luckyGift.win_probability');
                 $min_percentag = $form->input('luckyGift.min_percentag');
                 $mid_percentage = $form->input('luckyGift.mid_percentag');
                 $max_percentage = $form->input('luckyGift.max_percentag');
+                $total = $min_percentag + $mid_percentage + $max_percentage;
                 if (($min_percentag + $mid_percentage + $max_percentage) != 100) {
                     $error = new \Illuminate\Support\MessageBag([
                         'title' => 'Error',
-                        'message' => 'The sum of percentages must be equal to 100.',
+                        'message' => trans('admin.percent_total_error', ['total' => $total]),
                     ]);
-                }
 
-                if ($form->model()->type == "6" || request()->type == 6) {
-                    $type = $form->input('type');
-                    $win_probability = $form->input('luckyGift.win_probability');
-                    $min_percentag = $form->input('luckyGift.min_percentag');
-                    $mid_percentage = $form->input('luckyGift.mid_percentag');
-                    $max_percentage = $form->input('luckyGift.max_percentag');
-                    if (($min_percentag + $mid_percentage + $max_percentage) != 100) {
-                        $error = new \Illuminate\Support\MessageBag([
-                            'title' => 'Error',
-                            'message' => 'The sum of percentages must be equal to 100.',
-                        ]);
-
-                        return back()->with(compact('error'))->withInput();
-                    }
+                    return back()->with(compact('error'))->withInput();
                 }
             }
         });

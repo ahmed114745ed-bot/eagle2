@@ -37,6 +37,7 @@ class AchievementLevelsModuleController extends Controller
             $attributes = [
                 'user_id'       => $userId,
                 'custom_image' => $customImage,
+                'file' => $customImage,
                 'achievement_id' => $request->input('achievement_id'),
                 'admin_id' =>  $adminId,
             ];
@@ -52,6 +53,7 @@ class AchievementLevelsModuleController extends Controller
             $attributes = [
                 'user_id'       => $userId,
                 'file' => $custom_file,
+                'custom_image' => $custom_file,
                 'achievement_id' => $request->input('achievement_id'),
                 'admin_id' =>  $adminId,
             ];
@@ -67,6 +69,7 @@ class AchievementLevelsModuleController extends Controller
             $attributes = [
                 'user_id'       => $userId,
                 'custom_image' => $customImagepath,
+                'file' => $customImagepath,
                 'achievement_id' => $request->input('achievement_id'),
                 'admin_id' =>  $adminId,
             ];

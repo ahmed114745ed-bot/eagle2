@@ -4,9 +4,11 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
 use App\Models\Admin;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class ChargeResourceforAgencyCharge extends JsonResource
 {
@@ -18,48 +20,22 @@ class ChargeResourceforAgencyCharge extends JsonResource
      */
     public function toArray($request)
     {
-        // $sender = $this->senderAll;
-        // $receiver = $this->receiverAll  ;
-      
-        // if ($this->charger_type == 'dash' && $this->user_type == 'dash') {
-        //     $sender_data = [
-        //         'id'  => $this->admin?->id ?: 0,
-        //         'uuid' =>  '',
-        //         'name' => $this->admin?->name ?: "",
-        //         'img' => $this->admin?->avatar ?? "",
-        //         'type' => $this->user_type
-        //     ];
-        // } else {
-        //     $sender_data   = [
-        //         'id'  => @$sender->id ?: 0,
-        //         'uuid' => @$sender->uuid ?: '',
-        //         'name' => @$sender->name ?: "",
-        //         'img' => @$sender->profile?->avatar ?? "",
-        //         'type' => @$this->charger_type
-        //     ];
-        // }
-
-        // $receiver_data = [
-        //     'id'  => $receiver?->id ?: 0,
-        //     'uuid' => @$receiver?->uuid ?: '',
-        //     'name' => $receiver?->name ?: "",
-        //     'img' => $receiver?->profile?->avatar ?? "",
-        //     'type' => $this->user_type
-        // ];
-
-        // 'charger' => Common::getChargerInfo($this),
-        // 'receiver' => Common::getReceiverInfo($this)
+        $sender = Common::getChargerInfo($this);
+        $is_sender = ShippingAgency::where('id', $sender['id'])
+        ->where('app_owner_id', Auth::user()->id)
+        ->exists();
 
         return [
             'id'   => $this->id ?: 0,
-            // 'sender' => $sender_data,
-            // 'receiver' => $receiver_data,
-            'sender' => Common::getChargerInfo($this),
+            'sender' => $sender,
             'receiver' =>  Common::getReceiverInfo($this),
             'value' => (int) $this->amount,
             'time' => ($this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d h:i:s A') : null),
             'coins' =>  (int)$this->amount ?? 0,
             'usd' => $this->usd ?? 0,
+            'is_sender' => $is_sender ?? 0,
+            
+            
         ];
     }
 }

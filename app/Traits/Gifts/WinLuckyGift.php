@@ -25,9 +25,9 @@ trait WinLuckyGift
                 'gImg' => $zigoData['gift_image'],
                 'ownerId' => $zigoData['owner_id'],
                 'uName' => $zigoData['user_name'],
-                'per'   => $zigoData['percentage'],
+                'per'   => $zigoData['cache_value'],
                 'isPass' => $zigoData['is_room_pass'],
-                'gNum' => $zigoData['gift_price'],
+                'gNum' => $zigoData['percentage']/*$zigoData['gift_price']*/,
             ]
         ];
         $json  = json_encode($d);

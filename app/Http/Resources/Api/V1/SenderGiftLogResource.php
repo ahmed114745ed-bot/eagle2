@@ -22,10 +22,12 @@ class SenderGiftLogResource extends JsonResource
             'uuid' => @$this->sender->uuid ?? '', // both
             'name' => @$this->sender->name ?: '', // both
             'image' => $this->sender->profile->avatar ?? '',
+            'image_color'          => @$this->sender->color_image,
+            'id_image'             => @$this->sender->specialId?->ware?->show_img ?? '',
             'exp'   => $this->exp ?? '',
-            'level'=> Common::level_center_min (@$this->sender->id),
+            'level' => Common::level_center_min(@$this->sender->id),
 
-            ];
+        ];
 
         return $data;
     }

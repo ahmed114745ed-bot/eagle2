@@ -25,7 +25,7 @@ class UsersJoinedAgency extends Model
 
     public function kickedByAdmin(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'kicked_by_admin');
+        return $this->belongsTo(Admin::class, 'kicked_by_admin');
     }
 
     public function kickedByApp(): BelongsTo

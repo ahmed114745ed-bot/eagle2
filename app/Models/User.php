@@ -525,6 +525,18 @@ class User extends Authenticatable
         return $this->hasMany(LiveTime::class, 'uid');
     }
 
+    public function getLiveTimeThisMonth()
+    {
+        $fromDate = now()->startOfMonth()->toDateString();
+    
+        $period = Common::getEffectiveJoinPeriod($this->id, $this->agency_id, $fromDate);
+    
+        return LiveTime::where('uid', $this->id)
+            ->whereBetween('created_at', [$period['start_date'], $period['end_date']])
+            ->sum('hours');
+    }
+    
+
     public function UserliveTime()
     {
         return $this->hasMany(LiveTime::class);
@@ -802,6 +814,16 @@ class User extends Authenticatable
     {
         $userSallary = UserSallary::query()
             ->where('user_id', $this->id)
+            ->sum(DB::raw('sallary'));
+
+        return round($userSallary, 2);
+    }
+
+    public function getSalaryWithoutCutAmountAttributeByAgency()
+    {
+        $userSallary = UserSallary::query()
+            ->where('user_id', $this->id)
+            ->where('user_agency_id', $this->agency_id)
             ->sum(DB::raw('sallary'));
 
         return round($userSallary, 2);
@@ -1434,8 +1456,8 @@ class User extends Authenticatable
         $lang = app()->getLocale() ?? 'en';
 
         $types = [
-            1 => 'host',
-            2 => 'agency_owner',
+            1 => 'agency_owner',
+            2 => 'host',
             3 => 'shipping',
             4 => 'bd',
         ];
@@ -1450,6 +1472,7 @@ class User extends Authenticatable
             $applicableTypes[2] = $types[2];
         }
 
+
         if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
             $applicableTypes[3] = $types[3];
         }
@@ -1463,7 +1486,6 @@ class User extends Authenticatable
         }
 
         ksort($applicableTypes);
-
         $configKeys = [];
         foreach ($applicableTypes as $type) {
             $configKeys[] = "{$lang}_{$type}";
@@ -1474,6 +1496,7 @@ class User extends Authenticatable
 
         $html = '<div class="user-type-badges">';
         foreach ($applicableTypes as $typeName) {
+
             $localizedKey = "{$lang}_{$typeName}";
             $fallbackKey = "en_{$typeName}";
 
@@ -1485,6 +1508,7 @@ class User extends Authenticatable
         }
 
         $html .= '</div>';
+
 
         return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }

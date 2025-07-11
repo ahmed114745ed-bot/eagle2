@@ -1170,8 +1170,8 @@
                                                 ->where('id', $member->agency_id)
                                                 ->exists();
                                             $showUrl = $member ? url("admin/users/{$member->id}") : "#";
-                                             $moment = App\Helpers\Common::getUserMediaStats($member->id, 'moment') ?? [];
-                                                        $reel = App\Helpers\Common::getUserMediaStats($member->id, 'reel') ?? [];
+                                            $moment = App\Helpers\Common::getUserMediaStats($member->id, 'moment',$member->agency_id) ?? [];
+                                            $reel = App\Helpers\Common::getUserMediaStats($member->id, 'reel',$member->agency_id) ?? [];
 
                                                         $momentUpload = $moment['upload'] ?? '0/0';
                                                         $momentLikes = $moment['likes'] ?? '0/0';
@@ -1214,9 +1214,9 @@
                                                                 </ul>
                                                             </div>
                                                         </td>
-                                            <td>{{ $member->liveTime->sum("hours") }}</td>
+                                            <td>{{ $member->getLiveTimeThisMonth() }}</td>
                                             <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                            <td>{{ $member->salary_without_cut_amount ?? 0 }}</td>
+                                            <td>{{ $member->salary?? 0 }}</td>
                                             <td>
                                                 @if($isOwner)
                                                     <span class="role-badge owner">{{ __('Owner') }}</span>

@@ -86,7 +86,7 @@
            
 
             <div class="switch-item">
-                <label for="stopTransferSalary" class="switch-label">{{ __("Salary transferred to an unreliable shipping agency") }}</label>
+                <label for="stopTransferSalary" class="switch-label">{{ __("Salary transferred to an verified agencies") }}</label>
                 <label class="switch">
                     <input type="checkbox" id="stopTransferSalary" {{ $transfer_salary == 1 ? 'checked' : '' }}>
                     <span class="slider round"></span>

@@ -734,7 +734,7 @@
      "Real Time Setting": "Real Time Setting",
      "Real Time system Setting": "Real Time system Setting",
      "Payment Credential Settings": "Payment Credential Settings",
-     "Charge-agency":"Charge Agency",
+     "Charge-agency":"verified agency",
      "Pinned": "Pinned",
      "Unpinned": "Unpinned",
      "Unpin": "Unpin",
@@ -1058,7 +1058,7 @@
   "applepay": "Apple Pay",
   "paytabs": "PayTabs",
   "paypal": "PayPal",
-  "unreliable_agency" : "Cannot transfer to this agency because it is not marked as reliable .",
+  "unreliable_agency" : "Transaction canceled cause this agency is not verified",
   "utdFawry": "UTD Fawry",
   "increase": "Increase",
   "decrease": "Decrease",
@@ -1075,7 +1075,14 @@
   "weekly cp": "Weekly CP",
   "percentage_chash_back": "The cashback percentage   ",
   "it_agency_freez_charge" : "The wallet of this agency has been frozen.",
-  
+  "From Wallet": "From Wallet",
+  "To Wallet": "To Wallet",
+  "Amount": "Amount",
+  "By": "By",
+  "Transfer Time": "Transfer Time",
+  "Not Found": "Not Found",
+  "Unknown": "Unknown",
+  "Transfer":"Transfer",
 "cant it owner": "You cannot transfer the agency owner"
 
 
