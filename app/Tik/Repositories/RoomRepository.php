@@ -114,6 +114,7 @@ class RoomRepository extends AbstractRepository
 
         // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
         $result
+            ->orderByDesc('pin')
             ->orderByDesc('room_visitors_count')
             ->orderByDesc('hour_hot');
 
@@ -218,9 +219,6 @@ class RoomRepository extends AbstractRepository
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);
         }
-
-        $result
-            ->orderByDesc('pin');
 
         // تصفية حسب نوع الغرفة
         return $result->when($roomType != 'live', function ($q) use ($roomType) {
