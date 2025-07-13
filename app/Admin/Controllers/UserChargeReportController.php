@@ -168,7 +168,7 @@ class UserChargeReportController extends MainController
         });
 
         $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
-            $reason = $this->reason;
+             $reason = $model->reason;;
 
             $invoicePath = $reason?->invoice ?? '';
             $imgUrl = getDriverUrl() . '/' . $invoicePath;
