@@ -207,6 +207,11 @@ class RoomRepository extends AbstractRepository
                 )
                 ->join('users as owner', 'rooms.uid', '=', 'owner.id')
                 ->orderBy('distance');
+            default:
+                $result->model()
+                    ->orderByDesc('pin')
+                    ->orderByDesc('hour_hot');
+
                 break;
         }
 
@@ -222,10 +227,10 @@ class RoomRepository extends AbstractRepository
             $q->whereIn('type', ['single_live', 'multi_live']);
         });
 
-        // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
-        $result
-            ->orderByDesc('pin')
-            ->orderByDesc('hour_hot');
+//        // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
+//        $result
+//            ->orderByDesc('pin')
+//            ->orderByDesc('hour_hot');
 
         return $result->paginate(10);
     }
