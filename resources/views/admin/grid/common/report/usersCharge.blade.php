@@ -21,7 +21,7 @@
                 $url = $defaultImage;
             }
             $showUrl = url('admin/users/' . $user->id);
-            $image = handleShowImageWithTypes($user->id ?? 0, $url, 40, 40);
+              $image = "<img src='{$url}' style='width: 80px; height: 70px; object-fit: cover; border-radius: 0;'>";
         @endphp
                  <a href="{{$showUrl}}" style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
 
