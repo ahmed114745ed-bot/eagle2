@@ -726,7 +726,7 @@ class Common
                 )
             )->onQueue('notification_heavy');
 
-            return  true;
+            return  [];
 
         }
 
@@ -2180,7 +2180,10 @@ class Common
     public static function send_firebase_notification_direct(array $tokens, string $title, string $body, string $icon = '', array $data = [], ?string $messageType = null, $user = null, string $action = '', string $type = '', string $id = '', string $notification_type = 'user_notification')
     {
         if (empty($tokens)) return;
-
+        logger()->info('📬 FCM Direct Notification Log', [
+            'tokens_count' => count($tokens),
+           
+        ]);
         $api_access_key = self::getGoogleAccessToken(); // تأكد أن لديك هذه الدالة
         $projectId = env('FIREBASE_PROJECT_NAME');
 
