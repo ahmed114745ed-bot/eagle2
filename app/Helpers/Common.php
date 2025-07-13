@@ -838,7 +838,7 @@ class Common
             $tokens = [$tokens];
         }
         $topicName = 'temp_topic_' . uniqid();
-        
+
         self::subscribeToTopic($tokens, $topicName);
 
         $userData = [];
@@ -874,18 +874,22 @@ class Common
                 ]
             ]
         ];
+        sleep(5);
+        // $response = Http::withHeaders([
+        //     'Authorization' => 'Bearer ' . $api_access_key,
+        //     'Content-Type' => 'application/json',
+        // ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
+        $messaging = app('firebase.messaging');
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $api_access_key,
-            'Content-Type' => 'application/json',
-        ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-        self::unsubscribeFromTopic($tokens, $topicName);
+        $messaging = (new Factory)->withServiceAccount(base_path(config("app.fileName")))->createMessaging();
 
-        $status = $response->status();
-        $body = $response->body();
+        $messaging->subscribeToTopic($topicName,$tokens );
+
+        // $status = $response->status();
+        // $body = $response->body();
 
      
-        return json_decode($response->body());
+        // return json_decode($response->body());
     }
 
 
