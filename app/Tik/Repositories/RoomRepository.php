@@ -126,9 +126,6 @@ class RoomRepository extends AbstractRepository
             });
         }
 
-        $queryClone = clone $result;
-        info(vsprintf(str_replace('?', '%s', $queryClone->toSql()), $queryClone->getBindings()));
-
         // تصفية حسب البلد إذا تم توفيره
         if (!is_null($req->country_id)) {
             $result->whereHas('owner', function ($q) use ($req) {
