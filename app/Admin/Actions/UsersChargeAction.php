@@ -8,6 +8,7 @@ use App\Models\Charge;
 use App\Models\Setting;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
+use App\Models\ChargeInvoice;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
@@ -115,6 +116,14 @@ class UsersChargeAction extends Action
         $charge->usd = $usdAmount;
         $charge->balance_before =  $user->di  - $coins;
         $charge->save();
+         ChargeInvoice::create([
+            'charge_id' => $charge->id,
+            'user_id' =>$user->id,
+            'reason_en' => $request->reason_en,
+            'reason_ar' => $request->reason_ar,
+            'invoice' => $request->invoice,
+            'type' => 'user',
+        ]);
     }
 
     public function form()
@@ -125,7 +134,36 @@ class UsersChargeAction extends Action
         $this->text('amount', __('Amount'))
             ->addElementClass('price-input')
             ->help(__('Enter amount in dollars'));
+            $this->text('reason_en', __('reason en'));
+        $this->text('reason_ar', __('reason ar'));
+
+        $this->select('form', __('add invoice'))
+            ->options([
+                0 => __('no'),
+                1 => __('yes'),
+            ])
+            ->attribute(['id' => 'form-select']);
+
+        $this->image('invoice', __('invoice'))
+            ->attribute([
+                'id' => 'invoice-field',
+
+            ]);
+
         $this->hidden('amount_type')->value(1);
+         Admin::script(<<<'SCRIPT'
+            function toggleInvoiceField() {
+                var selected = $('#form-select').val();
+                if (selected === '1') {
+                    $('#invoice-field').closest('.form-group').show();
+                } else {
+                    $('#invoice-field').closest('.form-group').hide();
+                }
+            }
+
+            $(document).off('change', '#form-select').on('change', '#form-select', toggleInvoiceField);
+            toggleInvoiceField();
+        SCRIPT);
     }
 
     public function html()

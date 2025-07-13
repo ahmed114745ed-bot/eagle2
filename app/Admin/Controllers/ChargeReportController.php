@@ -10,7 +10,7 @@ use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\CoinLog;
 use Encore\Admin\Admin;
-use App\Enums\PaymentType;
+use Encore\Admin\Widgets\Table;
 use App\Helpers\UserCommon;
 use App\Models\ExchangeLog;
 use App\Models\PaymentCoin;
@@ -550,10 +550,10 @@ class ChargeReportController extends MainController
         $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
             $paymentCoin = PaymentCoin::find($value);
             if (!$paymentCoin) return '';
-//            $options = PaymentType::getTranslatedOptions();
+            //            $options = PaymentType::getTranslatedOptions();
 
             return __($paymentCoin->title);
-//            return $options[$paymentCoin->title] ?? '';
+            //            return $options[$paymentCoin->title] ?? '';
         });
         $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
@@ -792,7 +792,7 @@ class ChargeReportController extends MainController
     {
         $grid = new Grid(new Charge());
         $grid->disableRowSelector();
-        $grid->model()->where('user_id', $agency_id)->where('user_type','agency');
+        $grid->model()->where('user_id', $agency_id)->where('user_type', 'agency');
 
         // Add tabs to the header
         $grid->header(function () {
@@ -837,7 +837,7 @@ class ChargeReportController extends MainController
         // Define columns
         $grid->column('id', __('ID'));
         if ($scope === 'dash') {
-            $grid->column('admin.name', __('sender'))->display(function () {
+            $grid->column('admin.name', __('created by'))->display(function () {
                 $name = $this->admin->name ?? '';
                 $path = $this->admin->avatar ?? null;
                 $id =  $this->admin->id ?? 0;
@@ -874,6 +874,7 @@ class ChargeReportController extends MainController
                 if ($this->charger_type == 'agency') {
                     $name = $this->agency->name ?? 'No Agency';
                     $path = $this->agency->img ?? null;
+                    $id = $this->agency->id ?? 0;
                     $defaultImage = asset("images/icon-agency.jpg");
                     $url = getImagePath($path) ?? $defaultImage;
 
@@ -884,11 +885,13 @@ class ChargeReportController extends MainController
 
                     $showUrl = $this->agency ? url("admin/agencies/{$this->agency->id}") : '#';
                     $link = $this->agency ? "
-                                                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                                                </a>
-                                            " : "<span style='color: gray;'>No Agency</span>";
-                    $image = "<img src='{$url}' style='width: 60px; height: 40px; object-fit: cover;'>";
+                                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;'>
+                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                                    <small style='color: #666;'>ID: {$id}</small>
+                                </a>
+                            " : "<span style='color: gray;'>No Agency</span>";
+                    $image = "<img src='{$url}' style='width: 80px; height: 50px; object-fit: cover; border-radius: 0;'>";
+
                     return "
                                 <div style='display: flex; align-items: center; gap: 10px;'>
                                     $image
@@ -923,27 +926,80 @@ class ChargeReportController extends MainController
             });
         }
 
-        $grid->column('amount', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+
+        $grid->column('amount_and_usd', __('coins & USD'))->display(function () {
+            $coin = number_format($this->amount); // Assuming 'amount' is the coin value
+            $usd = $this->usd;
+
+            $coinIcon = asset('images/coin.jpg');
+            $usdIcon = asset('images/dollar.jpg');
+
             return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
+                    <div style='display: flex; flex-direction: column; gap: 5px;'>
+                        <div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$coin}</span>
+                            <img src='{$coinIcon}' alt='Coin' width='20' height='20'>
+                        </div>
+                        <div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$usd}</span>
+                            <img src='{$usdIcon}' alt='USD' width='20' height='20'>
+                        </div>
+                    </div>
+                ";
         });
-        $grid->column('usd', __('usd'))->display(function ($coin) {
+        if ($scope == 'dash') {
+            $grid->column('balance_before', __("amount before"))->display(function ($coin) {
+                $balance_after = $this->balance_before;
+                $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
 
-            $icon = asset('images/dollar.jpg');
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . $coin . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
+                   <span>
+                   " . number_format($balance_after) . "</span>
+                   <img src='{$icon}' alt='USD' width='20' height='20'>
+                   </div>";
+            });
 
-                </div>
-            ";
-        });
+            $grid->column('balance_after', __("amount after"))->display(function () {
+
+                $balance_after = $this->amount + $this->balance_before;
+                $icon = asset('images/arrows.png'); // أيقونة صعود أو نزول حسب المبلغ
+
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
+            <span>
+            " . number_format($balance_after) . "</span>
+            <img src='{$icon}' alt='USD' width='20' height='20'>
+            </div>";
+            });
+
+            $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
+                $reason = ChargeInvoice::where('charge_id', $this->id)->first(); // get the first model from collection
+
+                if (!$reason) {
+                    return new \Encore\Admin\Widgets\Table(
+                        [__('Field Name'), __('Value')],
+                        [[__('No reasons available'), '-']]
+                    );
+                }
+
+                $invoicePath = $reason->invoice ?? '';
+                $imgUrl = $invoicePath ? getDriverUrl() . '/' . $invoicePath : '';
+                $imgTag = $imgUrl
+                    ? "<img src='" . e($imgUrl) . "' style='width:50px; height:50px;' class='img img-thumbnail' />"
+                    : '-';
+
+                $results = [
+                    __('Reason') => app()->getLocale() === 'en'
+                        ? ($reason->reason_en ?? $reason->reason_ar)
+                        : ($reason->reason_ar ?? $reason->reason_en),
+                    __('Invoice') => $imgTag,
+                ];
+
+                return new \Encore\Admin\Widgets\Table(
+                    [__('Field Name'), __('Value')],
+                    collect($results)->map(fn($v, $k) => [$k, $v])->values()->all()
+                );
+            });
+        }
         if ($scope === 'not_dash') {
             // dd(123);
             $grid->column('amount_type', __('status'))->display(function () use ($agency_id) {
