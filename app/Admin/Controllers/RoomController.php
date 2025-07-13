@@ -168,9 +168,6 @@ class RoomController extends MainController
             ->orderByDesc('status_priority')
         ;
 
-        $grid->model()
-            ->orderByDesc('pin');
-
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
         if ($topRooms) {
             $grid->model()->orderByDesc('room_visitors_count');
