@@ -93,8 +93,8 @@ class UsersChargeAction extends Action
             : __('Coins Deducted');
 
         $body = $typeCharge === 'increment'
-            ? __("You have received $coins coins.")
-            : __("$coins coins were deducted from your account.");
+            ? __('You have received :coins coins.', ['coins' => $coins])
+            : __(':coins coins were deducted from your account.', ['coins' => $coins]);
 
         Common::send_firebase_notification($notificationToken, $title, $body);
 
