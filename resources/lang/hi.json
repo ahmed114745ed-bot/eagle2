@@ -2690,6 +2690,11 @@
     "Total success charges": "सफल लेन-देन की कुल राशि",
     "forbidden": "अनुमति नहीं है",
 
+    "Coins Added": "सिक्के जोड़े गए",
+    "Coins Deducted": "सिक्के घटाए गए",
+    "You have received :coins coins.": "आपको :coins सिक्के प्राप्त हुए हैं।",
+    ":coins coins were deducted from your account.": "आपके खाते से :coins सिक्के घटा दिए गए हैं।",
+
 "Reel Comments": "रील्स टिप्पणियाँ"
 
 

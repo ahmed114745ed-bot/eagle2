@@ -169,7 +169,7 @@ class UserChargeReportController extends MainController
         });
 
         $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
-            $reason = ChargeInvoice::where('charge_id',$this->id)->first(); // get the first model from collection
+            $reason = ChargeInvoice::where('charge_id', $this->id)->first(); // get the first model from collection
 
             if (!$reason) {
                 return new \Encore\Admin\Widgets\Table(
@@ -178,17 +178,16 @@ class UserChargeReportController extends MainController
                 );
             }
 
-            $invoicePath = $reason->invoice ?? '';
-            $imgUrl = $invoicePath ? getDriverUrl() . '/' . $invoicePath : '';
-            $imgTag = $imgUrl
-                ? "<img src='" . e($imgUrl) . "' style='width:50px; height:50px;' class='img img-thumbnail' />"
-                : '-';
+
+            $img = getDriverUrl() . '/' . $reason->invoice;
+            $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
+
 
             $results = [
                 __('Reason') => app()->getLocale() === 'en'
                     ? ($reason->reason_en ?? $reason->reason_ar)
                     : ($reason->reason_ar ?? $reason->reason_en),
-                __('Invoice') => $imgTag,
+                __('Invoice') =>$img,
             ];
 
             return new \Encore\Admin\Widgets\Table(
