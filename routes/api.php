@@ -604,7 +604,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     'ids'    => $idArray,
                 ]);  
             
-                return Common::send_firebase_notification_direct($tokens, $title, $body);
+                return Common::send_firebase_notification($tokens, $title, $body);
             });
 
             Route::get('/unsubscribe-all-from-topic/{topic}', function ($topic) {
