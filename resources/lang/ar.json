@@ -3298,6 +3298,11 @@
   "cut amount": "السحب",
   "User Net Salary": "صافي الراتب",
 
+    "Coins Added": "تم إضافة العملات",
+    "Coins Deducted": "تم خصم العملات",
+    "You have received :coins coins.": "تمت إضافة :coins عملة إلى حسابك.",
+    ":coins coins were deducted from your account.": "تم خصم :coins عملة من حسابك.",
+
 "Browse user setting": "تصفح إعدادات المستخدم",
 "sky pay": "سكاي باي",
 "google pay": "جوجل باي",
