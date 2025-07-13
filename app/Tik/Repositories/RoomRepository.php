@@ -102,15 +102,16 @@ class RoomRepository extends AbstractRepository
         ])
         ->withCount('roomVisitors')
         ->whereHas('owner')
-//        ->whereDoesntHave('owner.packs', function ($q) {
-//            $q->where('type', 16)
-//                ->where('is_used', 1)
-//                ->where(function ($q) {
-//                    $q->where('expire', 0)
-//                        ->orWhere('expire', '>=', now()->timestamp);
-//                });
-//        })
-        ->where('room_status', 1);
+        ->whereDoesntHave('owner.packs', function ($q) {
+            $q->where('type', 16)
+                ->where('is_used', 1)
+                ->where(function ($q) {
+                    $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                });
+        })
+            ->orderByDesc('status_priority')
+            ->where('room_status', 1);
 
         // الترتيب الأساسي: عدد الزوار أولاً ثم الدبوس ثم الساعة الساخنة
         $result->orderByDesc('room_visitors_count')
