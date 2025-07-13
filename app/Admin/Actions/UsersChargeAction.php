@@ -2,6 +2,7 @@
 
 namespace App\Admin\Actions;
 
+use App\Helpers\Common;
 use App\Models\User;
 use App\Models\Charge;
 use App\Models\Setting;
@@ -45,9 +46,13 @@ class UsersChargeAction extends Action
         return User::where('id', $userId)->first();
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function handleUserCharge(Request $request, User $user)
     {
         $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
+        $typeCharge = $request->charge_type;
 
         if ($amount < 0 && $user->di < abs($amount)) {
             return $this->response()->error(__('Insufficient user balance'))->refresh();
@@ -56,13 +61,14 @@ class UsersChargeAction extends Action
             $setting =   Setting::where('key', 'user_coins')->first();
             return $setting?->value;
         });
+
+        $coins = $amount * $userCoins;
+
         if (! $userCoins || $userCoins == 0) {
             return $this->response()->error(__('please set user coins in configs'))->refresh();
         }
 
-        DB::transaction(function () use ($request, $user,  $amount, $userCoins) {
-            $coins = $amount * $userCoins;
-
+        DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
             $user->di += $coins;
             if ($user->di < 0) {
                 throw ValidationException::withMessages([
@@ -73,12 +79,23 @@ class UsersChargeAction extends Action
 
             $this->createChargeRecord($request,  $user, $amount, $coins, $request->amount);
 
-            if ($request->charge_type == "increment") {
+            if ($typeCharge == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
                 if ($user->owner) CustomNotification::chargeAction($user, $request, $admin);
                 UserCommon::addChargeLevel($user->id, $amount);
             }
         });
+
+        $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $title = $typeCharge == 'increment'
+            ? __('Coins Added')
+            : __('Coins Deducted');
+
+        $body = $typeCharge === 'increment'
+            ? __("You have received $coins coins.")
+            : __("$coins coins were deducted from your account.");
+
+        Common::send_firebase_notification($notificationToken, $title, $body);
 
         return $this->response()->success('Success')->refresh();
     }
