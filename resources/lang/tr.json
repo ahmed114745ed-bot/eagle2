@@ -3109,12 +3109,12 @@
 
     "forbidden": "İzin verilmiyor",
 
-    "Coins Added From Admin": "Yönetici tarafından jetonlar eklendi",
-    "Coins Deducted From Admin": "Yönetici tarafından jetonlar eksiltildi",
-    "You have received :coins coins.": ":coins jeton hesabınıza eklendi.",
-    ":coins coins were deducted from your account.": "Hesabınızdan :coins jeton eksiltildi.",
-    "VIP Assigned": "VIP üyelik atandı",
-    "You have received VIP access for :days days.": ":days günlük VIP erişimi kazandınız.",
+    "Coins Added": "Jeton Eklendi",
+    "Coins Deducted": "Jeton Eksildi",
+    "You have received :coins coins from admin.": "Yöneticiden :coins jeton aldınız.",
+    ":coins coins were deducted from your account by admin.": "Hesabınızdan :coins jeton yönetici tarafından düşüldü.",
+    "VIP Assigned": "VIP Atandı",
+    "You have received VIP access for :days days from admin.": "Yönetici tarafından size :days gün VIP erişimi verildi.",
 
     "Reel Comments": "Video Yorumları"
 

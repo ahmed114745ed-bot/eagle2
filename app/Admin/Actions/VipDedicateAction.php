@@ -92,7 +92,7 @@ class VipDedicateAction extends Action
             $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
 
             $title = __('VIP Assigned');
-            $body = __('You have received VIP access for :days days.', ['days' => $request->days]);
+            $body = __('You have received VIP access for :days days from admin.', ['days' => $request->days]);
 
             Common::send_firebase_notification($notificationToken, $title, $body);
 

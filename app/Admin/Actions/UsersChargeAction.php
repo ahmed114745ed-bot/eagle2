@@ -89,12 +89,12 @@ class UsersChargeAction extends Action
 
         $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $title = $typeCharge == 'increment'
-            ? __('Coins Added From Admin')
-            : __('Coins Deducted From Admin');
+            ? __('Coins Added')
+            : __('Coins Deducted');
 
         $body = $typeCharge === 'increment'
-            ? __('You have received :coins coins.', ['coins' => $coins])
-            : __(':coins coins were deducted from your account.', ['coins' => $coins]);
+            ? __('You have received :coins coins from admin.', ['coins' => $coins])
+            : __(':coins coins were deducted from your account by admin.', ['coins' => $coins]);
 
         Common::send_firebase_notification($notificationToken, $title, $body);
 
