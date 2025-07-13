@@ -15,6 +15,7 @@ use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Follow;
 use App\Models\Target;
+use App\Tik\DTO\NotificationPayload;
 use Encore\Admin\Show;
 use GuzzleHttp\Client;
 use App\Models\Country;
@@ -710,16 +711,19 @@ class Common
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
 
             SendFirebaseTopicNotificationJob::dispatch(
-                tokens: $tokens,
-                title: $title,
-                body: $body,
-                data: $data,
-                messageType: $messageType,
-                user: $user,
-                action: $action,
-                type: $type,
-                id: $id,
-                notification_type: $notification_type
+                new NotificationPayload(
+                    tokens: $tokens,
+                    title: $title,
+                    body: $body,
+                    data: $data,
+                    messageType: $messageType,
+                    user: $user,
+                    action: $action,
+                    type: $type,
+                    id: $id,
+                    notificationType: $notification_type,
+                    icon: $icon,
+                )
             )->onQueue('notification_heavy');
 
             return  true;
@@ -879,7 +883,7 @@ class Common
         $status = $response->status();
         $body = $response->body();
 
-     
+
         return json_decode($response->body());
     }
 
