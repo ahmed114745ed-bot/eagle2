@@ -118,13 +118,13 @@ class RoomRepository extends AbstractRepository
             ->orderByDesc('hour_hot');
 
         // إذا كان make_rooms_top صحيحاً، نضيف شروط إضافية
-        if ($topRooms) {
-            $result->where(function ($query) {
-                $query->where(fn($q) => $q->has("roomVisitors"))
-                    ->orWhere(fn($q) => $q->where('pin', 1))
-                    ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
-            });
-        }
+//        if ($topRooms) {
+//            $result->where(function ($query) {
+//                $query->where(fn($q) => $q->has("roomVisitors"))
+//                    ->orWhere(fn($q) => $q->where('pin', 1))
+//                    ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
+//            });
+//        }
 
         // تصفية حسب البلد إذا تم توفيره
         if (!is_null($req->country_id)) {
