@@ -33,6 +33,7 @@ class BoxService
     public function sendBox($request, $user, $box, $room, $timezone, $label)
     {
         $boxCoin = $this->calculationSendBox($box);
+        dd( $boxCoin);
         DB::beginTransaction();
         if ($box->type == 0) {
             $boxU = $this->sendNormalBox($box, $request, $boxCoin, $label, $room, $user->id, $timezone);
