@@ -3,6 +3,7 @@
 namespace App\Admin\Actions;
 
 use App\Models\Charge;
+use App\Helpers\Common;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Models\ChargeInvoice;
@@ -101,13 +102,15 @@ class ChargeAction2 extends Action
         $charge->balance_before =  $agency->coins  - $amount;
 
         $charge->save();
-
+        if ($request->hasFile('invoice')) {
+            $imagePath = Common::upload('profile', $request->file('invoice'));
+        }
         ChargeInvoice::create([
             'charge_id' => $charge->id,
             'user_id' => $agency->id,
             'reason_en' => $request->reason_en,
             'reason_ar' => $request->reason_ar,
-            'invoice' => $request->invoice,
+            'invoice' => $imagePath ?? '',
             'type' => 'agency',
         ]);
     }
