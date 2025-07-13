@@ -34,6 +34,12 @@ class FfmpegService
 
     public function extractByFrame($videoPath, $id): void
     {
+        $tempDir = storage_path('app/temp_frames');
+
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+        
         $imagePath = storage_path("app/temp_frames/{$id}.jpg"); // Adjust path as needed
         $ffprobe = FFProbe::create();
 
