@@ -709,7 +709,7 @@ class Common
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
 
-            $result= SendFirebaseTopicNotificationJob::dispatch(
+            SendFirebaseTopicNotificationJob::dispatch(
                 tokens: $tokens,
                 title: $title,
                 body: $body,
