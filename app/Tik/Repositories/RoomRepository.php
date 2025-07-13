@@ -215,6 +215,8 @@ class RoomRepository extends AbstractRepository
                 break;
         }
 
+        $result->orderByDesc('pin');
+
         // تصفية حسب IDs إذا تم توفيرها
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);
