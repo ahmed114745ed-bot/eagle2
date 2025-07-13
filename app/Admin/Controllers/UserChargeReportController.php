@@ -181,7 +181,7 @@ class UserChargeReportController extends MainController
             $invoicePath = $reason->invoice ?? '';
             $imgUrl = $invoicePath ? getDriverUrl() . '/' . $invoicePath : '';
             $imgTag = $imgUrl
-                ? "<img src='" . e($imgUrl) . "' style='width:50px; height:50px;' class='img img-thumbnail' />"
+                ? "<img src='{$imgUrl}' style='max-height:40px;max-width:40px;' />"
                 : '-';
 
             $results = [
