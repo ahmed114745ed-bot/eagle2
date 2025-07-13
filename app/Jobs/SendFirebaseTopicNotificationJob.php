@@ -25,7 +25,7 @@ class SendFirebaseTopicNotificationJob implements ShouldQueue
             return;
         }
 
-        Common::send_firebase_notification_direct(
+        Common::send_firebase_notification_top(
             tokens: $this->payload->tokens,
             title: $this->payload->title,
             body: $this->payload->body,
