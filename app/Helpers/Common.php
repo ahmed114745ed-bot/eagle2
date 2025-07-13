@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Jobs\SendFirebaseNotificationJob;
+use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Pk;
 use App\Models\Vip;
 use App\Models\Pack;
@@ -708,11 +709,19 @@ class Common
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
 
-            $result= self::send_firebase_notification_top(
-                $tokens, $title, $body, $icon, $data,
-                $messageType, $user, $action, $type, $id, $notification_type
+            $result= SendFirebaseTopicNotificationJob::dispatch(
+                tokens: $tokens,
+                title: $title,
+                body: $body,
+                data: $data,
+                messageType: $messageType,
+                user: $user,
+                action: $action,
+                type: $type,
+                id: $id,
+                notification_type: $notification_type
             );
-            return $result;
+            return  true;
 
         }
 
@@ -869,10 +878,7 @@ class Common
         $status = $response->status();
         $body = $response->body();
 
-        logger()->info('FCM Response', [
-            'status' => $status,
-            'response' => $body
-        ]);
+     
         return json_decode($response->body());
     }
 
@@ -915,13 +921,7 @@ class Common
                     $failureCount++;
                 }
             }
-            logger()->info('✅ Unsubscribe from FCM topic result', [
-                'topic'          => $topic,
-                'tokensCount'    => count($registrationTokens),
-                'successCount'   => $successCount,
-                'failureCount'   => $failureCount,
-                'details'        => $result,
-            ]);
+          
             return [
                 'success' => true,
                 'successCount' => $successCount,
