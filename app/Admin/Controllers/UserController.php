@@ -740,17 +740,7 @@ class UserController extends MainController
             ]);
         })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
 
-        $diamonds = GiftLog::when($giftType == 'receiver', function ($q) use ($id) {
-            $q->where('receiver_id', $id);
-        })->when($giftType == 'sender', function ($q) use ($id) {
-            $q->where('sender_id', $id);
-        })->when(isset($start) && isset($end), function ($query) use ($start, $end) {
-            $query->whereBetween('created_at', [
-                Carbon::parse($start)->startOfDay(),
-                Carbon::parse($end)->endOfDay()
-            ]);
-        })->selectRaw('SUM(giftNum) AS total')->value('total');
-        dd($diamonds);
+        $diamonds = GiftLog::where('receiver_id', $id)->selectRaw('SUM(giftNum) AS total')->value('total');
 
         $userJoinAgencies = UsersJoinedAgency::with(['kickedByApp', 'kickedByAdmin'])->where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
             $query->whereDate('join_date', $joinDate);
