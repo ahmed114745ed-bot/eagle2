@@ -174,7 +174,7 @@ class BoxService
         $walletCoins = ($box->coins * $app_percentage) / 100;
 
         $boxCoin = $box->coins - $walletCoins;
-        dd( $boxCoin);
+        dd( $boxCoin, 123);
 
         $walletApp = CoreWallet::where('name', 'lucky_box')->first();
         $newWalletCoins = $walletApp->coins + $walletCoins;
