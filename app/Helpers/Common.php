@@ -2176,4 +2176,60 @@ class Common
         ];
     }
 
+
+    public static function send_firebase_notification_direct(array $tokens, string $title, string $body, string $icon = '', array $data = [], ?string $messageType = null, $user = null, string $action = '', string $type = '', string $id = '', string $notification_type = 'user_notification')
+    {
+        if (empty($tokens)) return;
+
+        $api_access_key = self::getGoogleAccessToken(); // تأكد أن لديك هذه الدالة
+        $projectId = env('FIREBASE_PROJECT_NAME');
+
+        $userData = [];
+        if ($user) {
+            $userData = [
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'uuid' => $user->uuid,
+                'has_color_name' => self::hasInPack($user->id, 18, true),
+                'image' => $user->profile->avatar,
+            ];
+        }
+
+        $payload = [
+            'message' => [
+                'token' => null, // سيتم تجاوزه لأننا نستخدم `registration_ids` مع endpoint مختلف
+            ],
+            'registration_ids' => $tokens, // أهم نقطة
+            'notification' => [
+                'title' => $title,
+                'body'  => $body,
+            ],
+            'data' => [
+                'click_action'       => 'FLUTTER_NOTIFICATION_CLICK',
+                'message-type'       => (string) ($messageType ?? ''),
+                'action'             => $action,
+                'type'               => $type,
+                'id'                 => $id,
+                'notification_type'  => $notification_type,
+                'data'               => !empty($data) ? json_encode($data) : "",
+                'user'               => json_encode($userData),
+            ]
+        ];
+
+        $url = "https://fcm.googleapis.com/fcm/send";
+
+        $response = Http::withHeaders([
+            'Authorization' => 'key=' . $api_access_key, // ملاحظة: نستخدم مفتاح السيرفر هنا، وليس bearer token
+            'Content-Type' => 'application/json',
+        ])->post($url, $payload);
+
+        logger()->info('📬 FCM Direct Notification Log', [
+            'tokens_count' => count($tokens),
+            'response_status' => $response->status(),
+            'response' => $response->body(),
+        ]);
+
+        return $response->json();
+    }
+
 }
