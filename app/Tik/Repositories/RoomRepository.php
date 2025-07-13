@@ -83,7 +83,7 @@ class RoomRepository extends AbstractRepository
     {
         $roomType = $req->room_type ?? 'audio';
         $user = $req?->user();
-        $topRooms = (settings()->get('make_rooms_top') == 0) ?? false;
+        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
 
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
@@ -112,9 +112,10 @@ class RoomRepository extends AbstractRepository
         })
         ->where('room_status', 1);
 
+        $result->orderByDesc('pin');
+
         // الترتيب الأساسي: عدد الزوار أولاً ثم الدبوس ثم الساعة الساخنة
         $result->orderByDesc('room_visitors_count')
-            ->orderByDesc('pin')
             ->orderByDesc('hour_hot');
 
         // إذا كان make_rooms_top صحيحاً، نضيف شروط إضافية
