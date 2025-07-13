@@ -83,7 +83,7 @@ class RoomRepository extends AbstractRepository
     {
         $roomType = $req->room_type ?? 'audio';
         $user = $req?->user();
-        $topRooms = (settings()->get('make_rooms_top') == 0) ?? false;
+        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
 
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
@@ -118,13 +118,13 @@ class RoomRepository extends AbstractRepository
             ->orderByDesc('hour_hot');
 
         // إذا كان make_rooms_top صحيحاً، نضيف شروط إضافية
-//        if ($topRooms) {
-//            $result->where(function ($query) {
-//                $query->where(fn($q) => $q->has("roomVisitors"))
-//                    ->orWhere(fn($q) => $q->where('pin', 1))
-//                    ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
-//            });
-//        }
+        if ($topRooms) {
+            $result->where(function ($query) {
+                $query->where(fn($q) => $q->has("roomVisitors"))
+                    ->orWhere(fn($q) => $q->where('pin', 1))
+                    ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
+            });
+        }
 
         // تصفية حسب البلد إذا تم توفيره
         if (!is_null($req->country_id)) {
