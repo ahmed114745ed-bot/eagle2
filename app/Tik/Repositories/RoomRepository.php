@@ -215,17 +215,19 @@ class RoomRepository extends AbstractRepository
             $result = $result->whereIn('uid', $ids);
         }
 
+        // تصفية حسب نوع الغرفة
+        $result->when($roomType != 'live', function ($q) use ($roomType) {
+            $q->where('type', $roomType);
+        })->when($roomType == 'live', function ($q) use ($roomType) {
+            $q->whereIn('type', ['single_live', 'multi_live']);
+        });
+
         // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
         $result
             ->orderByDesc('pin')
             ->orderByDesc('hour_hot');
 
-        // تصفية حسب نوع الغرفة
-        return $result->when($roomType != 'live', function ($q) use ($roomType) {
-            $q->where('type', $roomType);
-        })->when($roomType == 'live', function ($q) use ($roomType) {
-            $q->whereIn('type', ['single_live', 'multi_live']);
-        })->paginate(10);
+        return $result->paginate(10);
     }
 
     public function getRoomsByGameId($gameId = null, array $with = [])
