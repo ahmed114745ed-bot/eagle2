@@ -115,8 +115,7 @@ class RoomRepository extends AbstractRepository
         $result->orderByDesc('pin');
 
         // الترتيب الأساسي: عدد الزوار أولاً ثم الدبوس ثم الساعة الساخنة
-        $result->orderByDesc('room_visitors_count')
-            ->orderByDesc('hour_hot');
+//            ->orderByDesc('hour_hot');
 
         // إذا كان make_rooms_top صحيحاً، نضيف شروط إضافية
         if ($topRooms) {
@@ -125,6 +124,7 @@ class RoomRepository extends AbstractRepository
                     ->orWhere(fn($q) => $q->where('pin', 1))
                     ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
             });
+            $result->orderByDesc('room_visitors_count');
         }
 
         // تصفية حسب البلد إذا تم توفيره
