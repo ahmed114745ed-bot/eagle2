@@ -261,7 +261,7 @@ class AgencyController extends MainController
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
-        })->selectRaw('SUM(giftNum) AS total')->value('total');
+        })->selectRaw('SUM(giftPrice) AS total')->value('total');
         $diamondsHosts = UserSallary::where('user_agency_id',$id)->sum('achieved_diamond');
         return $content
             ->title(__('agency profile'))
