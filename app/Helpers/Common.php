@@ -2219,7 +2219,7 @@ class Common
             ]
         ];
 
-        $url = "https://fcm.googleapis.com/fcm/send";
+        $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
 
         $response = Http::withHeaders([
             'Authorization' => 'key=' . $api_access_key, // ملاحظة: نستخدم مفتاح السيرفر هنا، وليس bearer token
