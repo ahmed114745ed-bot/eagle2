@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Pk;
 use App\Models\Vip;
