@@ -3298,10 +3298,12 @@
   "cut amount": "السحب",
   "User Net Salary": "صافي الراتب",
 
-    "Coins Added": "تم إضافة العملات",
+    "Coins Added": "تمت إضافة العملات",
     "Coins Deducted": "تم خصم العملات",
-    "You have received :coins coins.": "تمت إضافة :coins عملة إلى حسابك.",
-    ":coins coins were deducted from your account.": "تم خصم :coins عملة من حسابك.",
+    "You have received :coins coins from admin.": "لقد استلمت :coins عملة من المسؤول.",
+    ":coins coins were deducted from your account by admin.": "تم خصم :coins عملة من حسابك بواسطة المسؤول.",
+    "VIP Assigned": "تم منح العضوية المميزة",
+    "You have received VIP access for :days days from admin.": "لقد حصلت على وصول VIP لمدة :days يوم من المسؤول.",
 
 "Browse user setting": "تصفح إعدادات المستخدم",
 "sky pay": "سكاي باي",
