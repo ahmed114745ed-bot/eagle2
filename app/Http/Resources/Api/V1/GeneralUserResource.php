@@ -15,6 +15,7 @@ class GeneralUserResource extends JsonResource
      */
     public function toArray($request)
     {
+        $hasColor = Common::hasInPack(@$this->id, 18, true);
 
         $data = [
             'id'   => @$this->id,
@@ -25,6 +26,7 @@ class GeneralUserResource extends JsonResource
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'level' => Common::level_center(@$this),
 
+            'colored_name' => $hasColor ? common::wareUserVip(@$this->id, 18, 'color') ?? '' : '',
 
         ];
         return $data;
