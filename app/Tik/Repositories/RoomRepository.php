@@ -112,7 +112,7 @@ class RoomRepository extends AbstractRepository
         })
         ->where('room_status', 1);
 
-        // الترتيب الأساسي: عدد الزوار أولاً ثم الدبوس ثم الساعة الساخنة
+        // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
         $result->orderByDesc('pin');
 
 
