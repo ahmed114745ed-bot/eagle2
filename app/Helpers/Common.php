@@ -832,7 +832,9 @@ class Common
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-        $topicName = 'system_notifications_topic';
+        // $topicName = 'system_notifications_topic';
+        $topicName = 'temp_topic_' . uniqid();
+
 
         self::subscribeToTopic($tokens, $topicName);
 
