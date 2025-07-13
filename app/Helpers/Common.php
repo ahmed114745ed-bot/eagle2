@@ -836,7 +836,6 @@ class Common
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-        // $topicName = 'system_notifications_topic';
         $topicName = 'temp_topic_' . uniqid();
 
 
@@ -880,7 +879,7 @@ class Common
             'Authorization' => 'Bearer ' . $api_access_key,
             'Content-Type' => 'application/json',
         ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-        self::unsubscribeFromTopic($tokens, $topicName);
+        // self::unsubscribeFromTopic($tokens, $topicName);
 
         $status = $response->status();
         $body = $response->body();
