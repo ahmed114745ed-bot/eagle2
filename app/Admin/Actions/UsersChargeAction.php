@@ -116,12 +116,15 @@ class UsersChargeAction extends Action
         $charge->usd = $usdAmount;
         $charge->balance_before =  $user->di  - $coins;
         $charge->save();
-         ChargeInvoice::create([
+        if ($request->hasFile('invoice')) {
+            $imagePath = Common::upload('profile', $request->file('invoice'));
+        }
+        ChargeInvoice::create([
             'charge_id' => $charge->id,
-            'user_id' =>$user->id,
+            'user_id' => $user->id,
             'reason_en' => $request->reason_en,
             'reason_ar' => $request->reason_ar,
-            'invoice' => $request->invoice,
+            'invoice' => $imagePath ?? '',
             'type' => 'user',
         ]);
     }
@@ -134,7 +137,7 @@ class UsersChargeAction extends Action
         $this->text('amount', __('Amount'))
             ->addElementClass('price-input')
             ->help(__('Enter amount in dollars'));
-            $this->text('reason_en', __('reason en'));
+        $this->text('reason_en', __('reason en'));
         $this->text('reason_ar', __('reason ar'));
 
         $this->select('form', __('add invoice'))
@@ -151,7 +154,7 @@ class UsersChargeAction extends Action
             ]);
 
         $this->hidden('amount_type')->value(1);
-         Admin::script(<<<'SCRIPT'
+        Admin::script(<<<'SCRIPT'
             function toggleInvoiceField() {
                 var selected = $('#form-select').val();
                 if (selected === '1') {
