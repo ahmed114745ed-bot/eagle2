@@ -584,7 +584,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
-            
+
             Route::get('/public-test/{ids}', function ($ids) {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
@@ -604,7 +604,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     'ids'    => $idArray,
                 ]);  
             
-                return Common::send_firebase_notification($tokens, $title, $body);
+                return Common::send_firebase_notification_direct($tokens, $title, $body);
             });
 
             Route::get('/unsubscribe-all-from-topic/{topic}', function ($topic) {
@@ -614,9 +614,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->unique()
                     ->values()
                     ->toArray();
-                $result = Common::unsubscribeFromTopic($tokens, $topic);
+                // $result = Common::unsubscribeFromTopic($tokens, $topic);
             
-                return response()->json($result);
+                // return response()->json($result);
             });
             
 
