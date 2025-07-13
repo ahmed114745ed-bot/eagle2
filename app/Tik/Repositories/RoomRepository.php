@@ -112,6 +112,11 @@ class RoomRepository extends AbstractRepository
         })
         ->where('room_status', 1);
 
+        // الترتيب الأساسي: عدد الزوار أولاً ثم الدبوس ثم الساعة الساخنة
+        $result->orderByDesc('room_visitors_count')
+            ->orderByDesc('pin')
+            ->orderByDesc('hour_hot');
+
         // إذا كان make_rooms_top صحيحاً، نضيف شروط إضافية
         if ($topRooms) {
             $result->where(function ($query) {
@@ -119,7 +124,6 @@ class RoomRepository extends AbstractRepository
                     ->orWhere(fn($q) => $q->where('pin', 1))
                     ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
             });
-            $result->orderByDesc('room_visitors_count');
         }
 
         // تصفية حسب البلد إذا تم توفيره
@@ -207,11 +211,6 @@ class RoomRepository extends AbstractRepository
                 )
                 ->join('users as owner', 'rooms.uid', '=', 'owner.id')
                 ->orderBy('distance');
-            default:
-                $result
-                    ->orderByDesc('pin')
-                    ->orderByDesc('hour_hot');
-
                 break;
         }
 
@@ -221,18 +220,11 @@ class RoomRepository extends AbstractRepository
         }
 
         // تصفية حسب نوع الغرفة
-        $result->when($roomType != 'live', function ($q) use ($roomType) {
+        return $result->when($roomType != 'live', function ($q) use ($roomType) {
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
             $q->whereIn('type', ['single_live', 'multi_live']);
-        });
-
-        // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
-        $result
-            ->orderByDesc('pin')
-            ->orderByDesc('hour_hot');
-
-        return $result->paginate(10);
+        })->paginate(10);
     }
 
     public function getRoomsByGameId($gameId = null, array $with = [])
