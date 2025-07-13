@@ -227,7 +227,7 @@ class AgencyService
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
-            $this->userRepository->update(['agency_id' => $agency->id], $user->id);
+            $this->userRepository->update(['agency_id' => $agency->id ,'monthly_diamond_received' => 0], $user->id);
             $this->userRepository->updateTypeUser($user);
             // $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
             // if (!$checkAgencyUser) {

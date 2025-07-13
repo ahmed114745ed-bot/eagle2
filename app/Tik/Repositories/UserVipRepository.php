@@ -103,11 +103,52 @@ class UserVipRepository extends AbstractRepository
     }
     public function updateTrueIsUsedForUser($userId)
     {
-        $oldPacks = Pack::where('user_id', $userId)->update(['is_used' => 0]);
-        $vips = $this->model->where('user_id', $userId)->get();
+        $userPacks = Pack::where('user_id', $userId)->get();
+
+        $vips = $this->model->where('user_id', $userId)->with('OVip.privilegs')->get();
+
+        if ($vips->isEmpty()) {
+            return;
+        }
+        $vipFeatureTypes = collect();
+        $vipPackIds = collect(); 
 
         foreach ($vips as $vip) {
-            $vip->packs()->update(['is_used' => 1]);
+            $vipModel = $vip->OVip;
+
+            if ($vipModel && $vipModel->privilegs) {
+                foreach ($vipModel->privilegs as $privilege) {
+                    if (!is_null($privilege->type)) {
+                        $vipFeatureTypes->push($privilege->type);
+
+                        $matchingPack = Pack::where('user_id', $userId)
+                            ->where('type', $privilege->type)
+                            ->orderByDesc('created_at') 
+                            ->first();
+
+                        if ($matchingPack) {
+                            $vipPackIds->push($matchingPack->id);
+                        }
+                    }
+                }
+            }
+        }
+
+        $vipFeatureTypes = $vipFeatureTypes->unique();
+
+        foreach ($userPacks as $pack) {
+            $isSameTypeAsVip = $vipFeatureTypes->containsStrict($pack->type);
+            $isVipPack        = $vipPackIds->contains($pack->id);
+
+            if ($isSameTypeAsVip && !$isVipPack) {
+                $pack->update(['is_used' => 0]);
+        
+            }
+
+            if ($isVipPack) {
+                $pack->update(['is_used' => 1]);
+        
+            }
         }
     }
     public function updateIsUsed($userVip, $isUsed)

@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Jobs\SendFirebaseNotificationJob;
+use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Pk;
 use App\Models\Vip;
 use App\Models\Pack;
@@ -14,6 +15,7 @@ use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Follow;
 use App\Models\Target;
+use App\Tik\DTO\NotificationPayload;
 use Encore\Admin\Show;
 use GuzzleHttp\Client;
 use App\Models\Country;
@@ -707,12 +709,24 @@ class Common
         } else {
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-            
-            $result= self::send_firebase_notification_top(
-                $tokens, $title, $body, $icon, $data,
-                $messageType, $user, $action, $type, $id, $notification_type
-            );
-            return $result;
+
+            SendFirebaseTopicNotificationJob::dispatch(
+                new NotificationPayload(
+                    tokens: $tokens,
+                    title: $title,
+                    body: $body,
+                    data: $data,
+                    messageType: $messageType,
+                    user: $user,
+                    action: $action,
+                    type: $type,
+                    id: $id,
+                    notificationType: $notification_type,
+                    icon: $icon,
+                )
+            )->onQueue('notification_heavy');
+
+            return  true;
 
         }
 
@@ -822,7 +836,8 @@ class Common
         if (!is_array($tokens)) {
             $tokens = [$tokens];
         }
-        $topicName = 'system_notifications_topic';
+        $topicName = 'temp_topic_' . uniqid();
+
 
         self::subscribeToTopic($tokens, $topicName);
 
@@ -864,15 +879,18 @@ class Common
             'Authorization' => 'Bearer ' . $api_access_key,
             'Content-Type' => 'application/json',
         ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-        self::unsubscribeFromTopic($tokens, $topicName);
+        // self::unsubscribeFromTopic($tokens, $topicName);
 
         $status = $response->status();
         $body = $response->body();
 
-        logger()->info('FCM Response', [
-            'status' => $status,
-            'response' => $body
+        logger()->info('📬 FCM Request Log', [
+            'status'      => $status,
+            'response'    => $body,
+            'payload_sent'=> $payload,
         ]);
+
+
         return json_decode($response->body());
     }
 
@@ -929,7 +947,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-          
+
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -983,7 +1001,16 @@ class Common
 
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
-        if ($userVip->is_used) Pack::query()->where('get_type', 1)->where('user_id', $user->id)->where('vip_user_id', "!=", $userVip->id)->update(['is_used' => 0]);
+        if ($userVip->is_used) {
+            $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
+
+            Pack::query()
+                ->where('get_type', 1)
+                ->where('user_id', $user->id)
+                ->whereIn('type', $vipTypes)
+                ->where('vip_user_id', '!=', $userVip->id)
+                ->update(['is_used' => 0]);
+        }
 
         $type = $vip->privilegs()->pluck('type')->toArray();
         if (!empty($type)) {
@@ -1104,7 +1131,7 @@ class Common
         if ($uvip) {
             $user->update(['vip' => $uvip->id]);
         }
-
+//        self::syncUserDressesFromVip($user, $type);
         /* $users_vips = UserVip::with('OVip')->where('user_id',$user->id)->first();
         $preveliage = $users_vips->OVip->preveliage;
         $wareIds = Ware::where('type', $preveliage)->where('get_type',1)->where('is_active_for_vip', 1)->pluck('id')->toArray();
@@ -1112,6 +1139,51 @@ class Common
         $exception_packs = $packs->pluck('id')->toArray();
         Pack::where('user_id', $user->id)->whereNotIn('id', $exception_packs)->update(['is_used'=> 0]);
         Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
+    }
+
+    public static function syncUserDressesFromVip(User $user, array $types)
+    {
+        $dressMap = [
+            4  => 'dress_1',
+            5  => 'dress_2',
+            11 => 'dress_3',
+        ];
+
+        $targetTypes = array_intersect(array_keys($dressMap), $types);
+
+        if (empty($targetTypes)) {
+            return;
+        }
+
+        $vipPacks = Pack::where('user_id', $user->id)
+            ->whereIn('type', $targetTypes)
+            ->where('get_type', 1)
+            ->where(function ($q) {
+                $q->where('expire', '>=', now()->timestamp)
+                  ->orWhere('expire', 0);
+            })
+            ->get();
+
+        $updateData = [];
+
+        foreach ($vipPacks as $pack) {
+            $column = $dressMap[$pack->type] ?? null;
+
+            if ($column) {
+                $updateData[$column] = '1';
+                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
+            }
+        }
+
+        if (!empty($updateData)) {
+            $success = $user->update($updateData);
+
+            logger()->info('✅ تم تحديث الحقول:', [
+                'user_id' => $user->id,
+                'success' => $success,
+                'updated_fields' => $updateData
+            ]);
+        }
     }
 
 
@@ -1279,7 +1351,7 @@ class Common
         $userIds = is_array($user_id) ? $user_id : [$user_id];
 
         $data = [];
-    
+
         foreach ($userIds as $id) {
             $data[] = [
                 'title'        => $title,
@@ -1297,7 +1369,7 @@ class Common
                 'id' => $id,
             ]);
         }
-    
+
         if (!empty($data)) {
             OfficialMessage::insert($data);
             logger()->info('[sendOfficialMessage] Bulk insert success', [

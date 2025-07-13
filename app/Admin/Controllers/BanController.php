@@ -92,10 +92,12 @@ class BanController extends MainController
         $grid = new Grid(new Ban);
         $grid->disableRowSelector();
 
+        $reason = app()->getLocale() == 'ar' ? 'description_ar' : 'description_en';
+
         $grid->model()->whereHas('user')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
-            ->select('uid', 'duration', 'type', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
-            ->groupBy(['uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id'])->orderByDesc('created_at');
+            ->select($reason, 'uid', 'duration', 'type', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
+            ->groupBy([$reason, 'uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id'])->orderByDesc('created_at');
         //    $grid->id(__ ('ID'));
         // $grid->uid(__('uuid'));
         //        $grid->user_type(__('user_type'));
@@ -138,7 +140,7 @@ class BanController extends MainController
         });
 
         // $grid->column('description_ar', __('reason'));
-        $grid->column('description_ar', __('reason'))->display(function ($description) {
+        $grid->column($reason, __('reason'))->display(function ($description) {
             $limitedDescription = mb_substr($description, 0, 40) . (mb_strlen($description) > 40 ? '...' : '');
             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
