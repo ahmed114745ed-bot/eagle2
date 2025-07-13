@@ -875,21 +875,17 @@ class Common
             ]
         ];
         sleep(5);
-        // $response = Http::withHeaders([
-        //     'Authorization' => 'Bearer ' . $api_access_key,
-        //     'Content-Type' => 'application/json',
-        // ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-        $messaging = app('firebase.messaging');
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $api_access_key,
+            'Content-Type' => 'application/json',
+        ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
+     
 
-        $messaging = (new Factory)->withServiceAccount(base_path(config("app.fileName")))->createMessaging();
-
-        $messaging->subscribeToTopic($topicName,$tokens );
-
-        // $status = $response->status();
-        // $body = $response->body();
+        $status = $response->status();
+        $body = $response->body();
 
      
-        // return json_decode($response->body());
+        return json_decode($response->body());
     }
 
 
