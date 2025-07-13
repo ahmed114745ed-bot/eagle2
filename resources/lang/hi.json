@@ -2696,6 +2696,8 @@
     ":coins coins were deducted from your account by admin.": "आपके खाते से :coins सिक्के एडमिन द्वारा काटे गए हैं।",
     "VIP Assigned": "वीआईपी प्रदान किया गया",
     "You have received VIP access for :days days from admin.": "आपको एडमिन से :days दिनों के लिए वीआईपी एक्सेस मिला है।",
+    "Coins Received": "सिक्के प्राप्त हुए",
+    "You have received :coins coins (equivalent to :usd USD) from :sender.": "आपको :sender से :coins सिक्के (जो :usd USD के बराबर हैं) प्राप्त हुए हैं।",
 
 "Reel Comments": "रील्स टिप्पणियाँ"
 
