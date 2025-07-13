@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 class SendFirebaseTopicNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    public $queue = 'notification_heavy';
 
     public function __construct(
         public array|Collection $tokens,
