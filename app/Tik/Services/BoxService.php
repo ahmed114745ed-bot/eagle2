@@ -172,7 +172,7 @@ class BoxService
     {
         $app_percentage = Config::query()->where('name', 'app_wallet_lucky_box')->first()?->value ?? 2;
         $walletCoins = ($box->coins * $app_percentage) / 100;
-dd( $walletCoins);
+
         $boxCoin = $box->coins - $walletCoins;
 
         $walletApp = CoreWallet::where('name', 'lucky_box')->first();
