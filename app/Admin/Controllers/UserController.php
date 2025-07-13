@@ -748,7 +748,7 @@ class UserController extends MainController
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
-        })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
+        })->selectRaw('SUM(giftNum) AS total')->value('total');
         $userJoinAgencies = UsersJoinedAgency::with(['kickedByApp', 'kickedByAdmin'])->where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
             $query->whereDate('join_date', $joinDate);
         })->orderByDesc('id')->paginate(10, ['*'], 'user_agency_page');

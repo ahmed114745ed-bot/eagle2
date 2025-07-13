@@ -112,28 +112,6 @@ class ChargeAction2 extends Action
         ]);
     }
 
-    // function form()
-    // {
-    //     $this->name = __('Charge');
-    //     $this->hidden('agency_id')->attribute('id', 'vid');
-    //     $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-    //     $this->text('amount', __('Amount'))
-    //         ->addElementClass('price-input')
-    //         ->help(__('Enter amount in dollars'));
-    //     $this->text('reason_en', __('reason en'));
-    //     $this->text('reason_ar', __('reason ar'));
-    //     $this->select('form', __('add'))
-    //         ->options([
-    //             0 => __('no'),
-    //             1 => __('yes'),
-    //         ])
-    //         ->attribute(['id' => 'form-select']);
-
-    //     $this->image('invoice', __('Invoice'))
-    //         ->attribute(['id' => 'invoice-field']);
-
-    //     $this->hidden('amount_type')->value(1);
-    // }
 
     public function form()
     {
