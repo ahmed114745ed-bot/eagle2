@@ -89,8 +89,8 @@ class UsersChargeAction extends Action
 
         $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $title = $typeCharge == 'increment'
-            ? __('Coins Added')
-            : __('Coins Deducted');
+            ? __('Coins Added From Admin')
+            : __('Coins Deducted From Admin');
 
         $body = $typeCharge === 'increment'
             ? __('You have received :coins coins.', ['coins' => $coins])

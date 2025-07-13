@@ -89,6 +89,13 @@ class VipDedicateAction extends Action
 
             CustomNotification::vips($user, $request->days, $vip->img);
 
+            $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+
+            $title = __('VIP Assigned');
+            $body = __('You have received VIP access for :days days.', ['days' => $request->days]);
+
+            Common::send_firebase_notification($notificationToken, $title, $body);
+
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
             DB::rollBack();
