@@ -124,7 +124,7 @@ class UsersChargeAction extends Action
             'user_id' => $user->id,
             'reason_en' => $request->reason_en,
             'reason_ar' => $request->reason_ar,
-            'invoice' => $$imagePath ?? '',
+            'invoice' => $imagePath ?? '',
             'type' => 'user',
         ]);
     }
