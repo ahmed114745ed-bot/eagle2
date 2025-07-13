@@ -83,7 +83,7 @@ class RoomRepository extends AbstractRepository
     {
         $roomType = $req->room_type ?? 'audio';
         $user = $req?->user();
-        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+        $topRooms = (settings()->get('make_rooms_top') == 0z) ?? false;
 
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
