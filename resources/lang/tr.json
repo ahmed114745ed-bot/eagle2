@@ -3115,6 +3115,8 @@
     ":coins coins were deducted from your account by admin.": "Hesabınızdan :coins jeton yönetici tarafından düşüldü.",
     "VIP Assigned": "VIP Atandı",
     "You have received VIP access for :days days from admin.": "Yönetici tarafından size :days gün VIP erişimi verildi.",
+    "Coins Received": "Jeton Alındı",
+    "You have received :coins coins (equivalent to :usd USD) from :sender.": ":sender tarafından size :coins jeton (:usd USD değerinde) gönderildi.",
 
     "Reel Comments": "Video Yorumları"
 
