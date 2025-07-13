@@ -883,6 +883,12 @@ class Common
         $status = $response->status();
         $body = $response->body();
 
+        logger()->info('📬 FCM Request Log', [
+            'status'      => $status,
+            'response'    => $body,
+            'payload_sent'=> $payload,
+        ]);
+
 
         return json_decode($response->body());
     }
