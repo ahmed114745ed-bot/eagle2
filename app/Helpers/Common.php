@@ -720,7 +720,8 @@ class Common
                 type: $type,
                 id: $id,
                 notification_type: $notification_type
-            );
+            )->onQueue('notification_heavy');
+
             return  true;
 
         }
