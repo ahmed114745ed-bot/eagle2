@@ -9,6 +9,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\ChargeInvoice;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
@@ -88,7 +89,7 @@ class UserChargeReportController extends MainController
 
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("created by"))->display(function () use ($charger_type) {
-            
+
             $sender = Common::getChargerInfo($this);
             $name = $sender['name'];
             $uuid = $sender['uuid'];
@@ -168,22 +169,34 @@ class UserChargeReportController extends MainController
         });
 
         $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
-             $reason = $model->reason;;
+            $reason = ChargeInvoice::where('charge_id',$this->id)->first(); // get the first model from collection
 
-            $invoicePath = $reason?->invoice ?? '';
-            $imgUrl = getDriverUrl() . '/' . $invoicePath;
+            if (!$reason) {
+                return new \Encore\Admin\Widgets\Table(
+                    [__('Field Name'), __('Value')],
+                    [[__('No reasons available'), '-']]
+                );
+            }
 
-            $imgTag = "<img src='" . e($imgUrl) . "' style='width:50px; height:50px;' class='img img-thumbnail' />";
+            $invoicePath = $reason->invoice ?? '';
+            $imgUrl = $invoicePath ? getDriverUrl() . '/' . $invoicePath : '';
+            $imgTag = $imgUrl
+                ? "<img src='" . e($imgUrl) . "' style='width:50px; height:50px;' class='img img-thumbnail' />"
+                : '-';
 
             $results = [
-                __('reason') => app()->getLocale() === 'en'
-                    ? (@$reason->reason_en ?? @$reason->reason_ar)
-                    : (@$reason->reason_ar ?? @$reason->reason_en),
-                __('invoice') => $imgTag,
+                __('Reason') => app()->getLocale() === 'en'
+                    ? ($reason->reason_en ?? $reason->reason_ar)
+                    : ($reason->reason_ar ?? $reason->reason_en),
+                __('Invoice') => $imgTag,
             ];
 
-            return new Table([__('Field Name'), __('Value')], $results);
+            return new \Encore\Admin\Widgets\Table(
+                [__('Field Name'), __('Value')],
+                collect($results)->map(fn($v, $k) => [$k, $v])->values()->all()
+            );
         });
+
         $grid->column('created_at', __('shipping date'));
         $grid->disableRowSelector();
 

@@ -53,7 +53,7 @@ class Charge extends Model
 
     public function reason()
     {
-        return $this->belongsTo(ChargeInvoice::class, 'charge_id');
+        return $this->hasMany(ChargeInvoice::class, 'charge_id');
     }
 
     public function receiver()

@@ -972,21 +972,32 @@ class ChargeReportController extends MainController
             });
 
             $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
-                $reason = $this->reason;
+                $reason = ChargeInvoice::where('charge_id', $this->id)->first(); // get the first model from collection
 
-                $invoicePath = $reason?->invoice ?? '';
-                $imgUrl = getDriverUrl() . '/' . $invoicePath;
+                if (!$reason) {
+                    return new \Encore\Admin\Widgets\Table(
+                        [__('Field Name'), __('Value')],
+                        [[__('No reasons available'), '-']]
+                    );
+                }
 
-                $imgTag = "<img src='" . e($imgUrl) . "' style='width:50px; height:50px;' class='img img-thumbnail' />";
+                $invoicePath = $reason->invoice ?? '';
+                $imgUrl = $invoicePath ? getDriverUrl() . '/' . $invoicePath : '';
+                $imgTag = $imgUrl
+                    ? "<img src='" . e($imgUrl) . "' style='width:50px; height:50px;' class='img img-thumbnail' />"
+                    : '-';
 
                 $results = [
-                    __('reason') => app()->getLocale() === 'en'
-                        ? (@$reason->reason_en ?? @$reason->reason_ar)
-                        : (@$reason->reason_ar ?? @$reason->reason_en),
-                    __('invoice') => $imgTag,
+                    __('Reason') => app()->getLocale() === 'en'
+                        ? ($reason->reason_en ?? $reason->reason_ar)
+                        : ($reason->reason_ar ?? $reason->reason_en),
+                    __('Invoice') => $imgTag,
                 ];
 
-                return new Table([__('Field Name'), __('Value')], $results);
+                return new \Encore\Admin\Widgets\Table(
+                    [__('Field Name'), __('Value')],
+                    collect($results)->map(fn($v, $k) => [$k, $v])->values()->all()
+                );
             });
         }
         if ($scope === 'not_dash') {
