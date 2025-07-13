@@ -630,7 +630,6 @@ class Common
     {
         $credentialsFilePath = base_path(config("app.fileName"));
 
-        // التحقق من وجود الملف
         if (!file_exists($credentialsFilePath)) {
             return;
         }
@@ -712,19 +711,16 @@ class Common
        
             
             SendFirebaseNotificationJob::dispatch(
-                new NotificationPayload(
-                    tokens: $tokens,
-                    title: $title,
-                    body: $body,
-                    data: $data,
-                    messageType: $messageType,
-                    user: $user,
-                    action: $action,
-                    type: $type,
-                    id: $id,
-                    notificationType: $notification_type,
-                    icon: $icon,
-                )
+                tokens: $tokens,
+                title: $title,
+                body: $body,
+                data: $data,
+                messageType: $messageType,
+                user: $user,
+                action: $action,
+                type: $type,
+                id: $id,
+                notification_type: $notification_type,
             )->onQueue('notification_heavy');
 
             return  true;
