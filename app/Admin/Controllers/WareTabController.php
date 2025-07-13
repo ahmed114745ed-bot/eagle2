@@ -448,7 +448,7 @@ class WareTabController extends MainController
                         $responseData = $response->json();
 
                         if ($response->successful() && isset($responseData['data']['video_type'])) {
-                            $ext = strtolower(str_split('-', $responseData['data']['video_type'])[0]);
+                            $ext = strtolower(explode('-', $responseData['data']['video_type'])[0]);
                         }
                     }
 
