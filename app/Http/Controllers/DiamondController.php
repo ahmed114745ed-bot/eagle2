@@ -19,7 +19,7 @@ class DiamondController extends Controller
 
 public function calculateMonthlyDiamondReceived()
 {
-    $timezone = Common::timeZone(); 
+    $timezone = Common::timeZone();
     $now = Carbon::now($timezone);
     $startOfMonth = $now->copy()->startOfMonth();
 
@@ -27,7 +27,7 @@ public function calculateMonthlyDiamondReceived()
         ->select('id', 'agency_id')
         ->whereNotNull('agency_id')
         ->where('agency_id', '>', 0)
-        ->whereIn('type_user', [1,2]) 
+        ->whereIn('type_user', [1,2])
         ->get();
 
     foreach ($users as $user) {
@@ -45,6 +45,7 @@ public function calculateMonthlyDiamondReceived()
         $totalReceived = DB::table('gift_logs')
         ->where('receiver_id', $user->id)
         ->where('created_at', '>=', $startDate)
+            ->where('agency_id', $user->agency_id)
         ->selectRaw('SUM(giftPrice) as total')
         ->value('total');
 
@@ -76,7 +77,7 @@ public function calculateSalary()
                         $targetService = new FixedTargetV2Service($user, month: $month, year: $year);
                         $targetService->calculateTarget();
                     } catch (\Throwable $e) {
-                        
+
                         $this->error("Failed user ID {$user->id}");
                     }
                 }
