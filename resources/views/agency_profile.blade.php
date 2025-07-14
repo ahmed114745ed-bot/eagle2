@@ -1100,7 +1100,7 @@
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
            @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-               <a href="?tab=members" class="tab-btn" {{ $activeTab == 'members' ? 'active' : '' }}{{--data-target="members-tab"--}}>{{ __('Members') }}</a>
+               <a href="?tab=members" class="tab-btn {{ $activeTab == 'members' ? 'active' : '' }}" data-target="members-tab">{{ __('Members') }}</a>
             @endif
            @if (\Encore\Admin\Facades\Admin::user()->can('charge-history-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
              <a href="?tab=charges" class="tab-btn" data-target="charges-tab">{{ __('Charge History') }}</a>
