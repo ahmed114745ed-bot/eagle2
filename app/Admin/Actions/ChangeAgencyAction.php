@@ -58,12 +58,13 @@ class ChangeAgencyAction extends RowAction
         }
         $user->monthly_diamond_received = 0;
         $user->agency_id = $request->agency_id;
+        $user->type_user = 1;
         $user->save();
-        $userSalary = UserSallary::where('user_id',$user->id)->where('month',now()->month)->where('year',now()->year)->first();
-        if($userSalary){
-            $userSalary->user_agency_id = $request->agency_id;
-            $userSalary->save();
-        }
+        // $userSalary = UserSallary::where('user_id',$user->id)->where('month',now()->month)->where('year',now()->year)->first();
+        // if($userSalary){
+        //     $userSalary->user_agency_id = $request->agency_id;
+        //     $userSalary->save();
+        // }
         return $this->response()->success('success')->refresh();
     }
 

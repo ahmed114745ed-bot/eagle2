@@ -59,7 +59,7 @@ class PackService
         $userId = $request->user_id ?:  $request->user()->id;
         $this->unlock_dress($userId);
         $type = $request->type;
-        if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 25, 22])) throw new \Exception('type not found');
+        if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 25, 22, 28])) throw new \Exception('type not found');
         if ($type == 2) {
             $data = $this->packRepository->packsJoinWithGift($userId, $type, ['ware']);
         } elseif ($type == 22) {
