@@ -3306,8 +3306,8 @@
     "You have received VIP access for :days days from admin.": "لقد حصلت على وصول VIP لمدة :days يوم من المسؤول.",
     "Coins Received": "تم استلام عملات",
     "You have received :coins coins (equivalent to :usd USD) from :sender.": "لقد استلمت :coins عملة (ما يعادل :usd دولار) من :sender.",
-    "Balance Recharged": "تم إعادة شحن الرصيد",
-    "Your balance has been recharged with :usd USD by :name.": "تمت إعادة شحن رصيدك بمقدار :usd دولار بواسطة :name.",
+    "Balance Recharged": "تم شحن الرصيد",
+    "Your balance has been recharged with :usd coins by :name.": "تم شحن رصيدك بمقدار :usd عملة بواسطة :name.",
 
 "Browse user setting": "تصفح إعدادات المستخدم",
 "sky pay": "سكاي باي",
