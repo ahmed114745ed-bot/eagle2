@@ -55,6 +55,7 @@ class MyPacksResource extends JsonResource
             '6' => 'entry effects',
             '7' => 'mic on the aperture',
             '8' => 'badges',
+            '28' => 'profile frame',
             '25' => 'special id'
         ];
         $get_types   = [
