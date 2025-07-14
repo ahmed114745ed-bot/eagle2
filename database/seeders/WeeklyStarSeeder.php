@@ -48,15 +48,16 @@ class WeeklyStarSeeder extends Seeder
                     'weekly_star_id' => $weeklyStar->id
                 ]);
 
-
+                $price = rand(100, 1000);
                 GiftLog::create([
                     'giftId' => $gift->id,
                     'roomowner_id' => $room_owner,
                     'giftName' => fake()->name(),
                     'giftNum' => 2,
-                    'giftPrice' => rand(100, 1000),
+                    'giftPrice' =>$price,
                     'sender_id' =>$sender,
                     'receiver_id' => $receiver,
+                    'app_profit_coins' => $price
                 ]);
             }
 

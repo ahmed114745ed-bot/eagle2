@@ -41,7 +41,7 @@ class AchievementsLevelsController extends MainController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
             ->body($this->form()->edit($id)));
@@ -125,6 +125,8 @@ class AchievementsLevelsController extends MainController
     protected function form()
     {
         $form = new Form(new AchievementLevel());
+        $this->disableFormTools($form);
+
         $form->hidden('achievement_id')->value(request('achievement_id'));
         $form->number('target', __('Target'))->rules('required');
         $form->select('target_type', __('Target type'))->options(function ($value) {
@@ -140,11 +142,11 @@ class AchievementsLevelsController extends MainController
         $form->textarea('en_description', __('en_description'));
         $form->saving(function (Form $form) {
             if (request()->hasFile('valid_image')) {
-                $file = request()->file('valid_image'); 
-                $validImagePath = Common::upload('achievementValidImages', $file); 
-                $form->model()->valid_image = $validImagePath; 
+                $file = request()->file('valid_image');
+                $validImagePath = Common::upload('achievementValidImages', $file);
+                $form->model()->valid_image = $validImagePath;
             }
-        
+
             // if ($form->model()->valid_image) {
             //     AchievementValidImage::create([
             //         'image' => $form->model()->valid_image, //  
@@ -152,7 +154,7 @@ class AchievementsLevelsController extends MainController
             // }
             if ($form->model()->valid_image) {
                 $existingImage = AchievementValidImage::where('image', $form->model()->valid_image)->first();
-                
+
                 if (!$existingImage) {
                     AchievementValidImage::create([
                         'image' => $form->model()->valid_image,

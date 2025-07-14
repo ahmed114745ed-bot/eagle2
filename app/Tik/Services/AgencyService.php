@@ -150,6 +150,8 @@ class AgencyService
                     'days'    => $user->getTotalDays(),
                     'type'    => $user->type_user,
                     'minutes' => $minutes,
+                    'image_color'          => @$user->color_image,
+                    'id_image'             => @$user->specialId?->ware?->show_img ?? '',
                 ],
 
                 'target' => floor($target),
@@ -225,7 +227,7 @@ class AgencyService
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
-            $this->userRepository->update(['agency_id' => $agency->id], $user->id);
+            $this->userRepository->update(['agency_id' => $agency->id, 'monthly_diamond_received' => 0], $user->id);
             $this->userRepository->updateTypeUser($user);
             // $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
             // if (!$checkAgencyUser) {
@@ -234,6 +236,7 @@ class AgencyService
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
+                'status' => 'Joined'
             ];
             $this->usersJoinedAgencyRepository->create($joinAgencyData);
             // }
@@ -631,9 +634,9 @@ class AgencyService
     public function kickAgency($auth, $userId)
     {
         $user_kicked = $this->userRepository->findById($userId);
-
-        if ($user_kicked->agency_id != $auth->ownAgency->id || $user_kicked->id == $auth->ownAgency->app_owner_id) throw new Exception('لا يمكنك ازاله هذا المستخدم!');
-        UserHandling::kickUserFromAgency($user_kicked);
+        if (!$user_kicked) throw new Exception('user not found');
+        if ($user_kicked->agency_id != $auth->ownAgency->id && $user_kicked->id == $auth->ownAgency->app_owner_id) throw new Exception('لا يمكنك ازاله هذا المستخدم!');
+        UserHandling::kickUserFromAgency($user_kicked, 1);
         $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
         if ($joinedAgency) UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
         return true;
@@ -711,7 +714,7 @@ class AgencyService
         $totalDays = $user->getTotalDaysJoinedAgency($startDate);
 
         $saMonth = ltrim($month, '0');
-        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year,$agencyId);
+        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year, $agencyId);
 
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;

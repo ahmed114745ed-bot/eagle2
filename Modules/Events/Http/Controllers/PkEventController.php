@@ -19,68 +19,72 @@ class PkEventController extends Controller
 {
     public function topUsersPKEvent(Request $request)
     {
-        $nowDate = Carbon::now();
         $pkEvent = PkEvent::currentEvent()->first();
-        if (!$pkEvent) return Common::apiResponse(0, __('there is no event now'), null, 422);
 
-        $columnRelations = [
-            1 => 'sender',
-            3 => 'receiver',
-            2 => 'roomOwner',
+        if (!$pkEvent) {
+            return Common::apiResponse(0, __('there is no event now'), null, 422);
+        }
+
+        $user = $request->user();
+        $userId = $user->id;
+        $type = (int) $request->input('type', 1);
+
+        // Determine column and relation based on type
+        $typeMap = [
+            1 => ['column' => 'sender_id', 'relation' => 'sender'],
+            2 => ['column' => 'roomowner_id', 'relation' => 'roomOwner.ownerRoom'],
+            3 => ['column' => 'receiver_id', 'relation' => 'receiver'],
         ];
 
-        $relation = $columnRelations[$request['type']] ?? 'sender';
-        $startDay = $pkEvent->start_date;
-        $endDay   = $pkEvent->end_date;
-        if ($request->type == 1) {
+        $columnInfo = $typeMap[$type] ?? $typeMap[1];
+        $groupColumn = $columnInfo['column'];
+        $relation = $columnInfo['relation'];
 
-            $data = GiftLog::with('sender')->select([DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id'])
-                ->groupBy('sender_id')->where('pk', 1)->whereBetween('created_at', [$startDay, $endDay])
-                ->orderByDesc('totalGiftNum')->get();
-        } elseif ($request->type == 3) {
-            $data = GiftLog::with('receiver')->select([DB::raw('sum(giftPrice) as totalGiftNum'), 'receiver_id'])
-                ->groupBy('receiver_id')->where('pk', 1)->whereBetween('created_at', [$startDay, $endDay])
-                ->orderByDesc('totalGiftNum')->get();
-        } elseif ($request->type == 2) {
-            $data =
-                GiftLog::where('roomowner_id', '!=', 0)->with(['roomOwner.ownerRoom:id,uid,room_name,room_cover'])->select([DB::raw('sum(giftPrice) as totalGiftNum'), 'roomowner_id'])
-                ->groupBy('roomowner_id')->where('pk', 1)->whereBetween('created_at', [$startDay, $endDay])
-                ->orderByDesc('totalGiftNum')->get();
-        }
-        $firstTwentyQueries  = $data->take(20);
-        $authenticatedUserId = Auth::user();
+        // Base query
+        $query = GiftLog::query()
+            ->selectRaw("SUM(giftPrice) as totalGiftNum, {$groupColumn}")
+            ->where('pk', 1)
+            ->whereBetween('created_at', [$pkEvent->start_date, $pkEvent->end_date])
+            ->groupBy($groupColumn)
+            ->orderByDesc('totalGiftNum');
 
-
-        switch ($request['type']) {
-            case 1:
-                $existsInArray = $firstTwentyQueries->contains('sender_id', $authenticatedUserId->id);
-                $dataUser      = $data->where('sender_id', $request->user()->id)->first();
-                break;
-
-            case 3:
-                $existsInArray = $firstTwentyQueries->contains('receiver_id', $authenticatedUserId->id);
-                $dataUser      = $data->where('receiver_id', $request->user()->id)->first();
-                break;
-
-            case 2:
-                $existsInArray = $firstTwentyQueries->contains('roomowner_id', $authenticatedUserId->id);
-                $dataUser      = $data->where('roomowner_id', $request->user()->id)->first();
-                break;
+        // Eager load relation based on type
+        if ($type === 2) {
+            $query->with(['roomOwner.ownerRoom:id,uid,room_name,room_cover']);
+        } else {
+            $query->with([$relation => function ($q) {
+                $q->select('id', 'name', 'avatar');
+            }]);
         }
 
+        $topEntries = $query->get();
 
-        $firstTwentyQueries->transform(function ($gift_log) use ($relation) {
-            $gift_log->setRelation('user', $gift_log->{$relation});
-            $gift_log->unsetRelation($relation);
-            return $gift_log;
+        // First 20 top entries
+        $top20 = $topEntries->take(20);
+
+        // Check if user exists in top list
+        $userExists = $top20->pluck($groupColumn)->contains($userId);
+
+        // Get user's data only if not already in top
+        $userData = null;
+        if (!$userExists) {
+            $userData = $topEntries->firstWhere($groupColumn, $userId);
+        }
+
+        // Standardize relation to "user" for resource collection
+        $top20->each(function ($item) use ($relation) {
+            $item->setRelation('user', data_get($item, $relation));
+            foreach (explode('.', $relation) as $rel) {
+                $item->unsetRelation($rel);
+            }
         });
 
-        $data = [
-            'top'  => PkEventTopResource::collection($firstTwentyQueries),
-            'user' => $existsInArray == true ? null : new UserWeeklyStar($authenticatedUserId, $dataUser),
-        ];
-        return Common::apiResponse(1, '', $data);
+        return Common::apiResponse(1, '', [
+            'top' => PkEventTopResource::collection($top20),
+            'user' => $userExists ? null : new UserWeeklyStar($user, $userData),
+        ]);
     }
+
 
     public function topDetails()
     {

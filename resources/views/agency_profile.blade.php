@@ -652,7 +652,72 @@
             cursor: pointer;
             transition: background 0.3s;
         }
+           .diamond-summary-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+        }
 
+        .diamond-summary-box {
+            max-width: 600px;
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin: 0 auto; /* This also helps with centering */
+        }
+
+        .diamond-summary-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .diamond-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .diamond-count {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .diamond-count span {
+            margin-right: 10px;
+        }
+
+        .diamond-icon-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            padding: 8px;
+            display: inline-flex;
+        }
+
+        .diamond-icon {
+            width: 32px;
+            height: 32px;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+        }
+
+        .gift-log-form {
+            background-color: transparent !important;
+            filter: none !important;
+        }
+        .rtl .gift-log-form {
+            padding-right: 13%;
+        }
+        .ltr .gift-log-form {
+            padding-left: 13%;
+        }
         .btn-action:hover {
             background: #2980b9;
         }
@@ -886,13 +951,14 @@
                     </div>
                 </div>
                 <div class="agency-stats">
+
                     <div class="stat-card">
-                        <div class="stat-value">{{ number_format(@$agency->coins) ?? 0 }}</div>
-                        <div class="stat-label">{{__("coins")}}</div>
+                        <div class="stat-value">{{ truncateAndTrim(@$agency->salary ?? 0) }}</div>
+                        <div class="stat-label">{{__("salary")}}</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
-                        <div class="stat-label">{{__("salary")}}</div>
+                        <div class="stat-value">{{ truncateAndTrim(@$diamondsHosts ?? 0) }}</div>
+                        <div class="stat-label">{{__("diamonds")}}</div>
                     </div>
 
                 </div>
@@ -1034,7 +1100,7 @@
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
            @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-               <a href="?tab=members" class="tab-btn" data-target="members-tab">{{ __('Members') }}</a>
+               <a href="?tab=members" class="tab-btn {{ $activeTab == 'members' ? 'active' : '' }}" data-target="members-tab">{{ __('Members') }}</a>
             @endif
            @if (\Encore\Admin\Facades\Admin::user()->can('charge-history-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
              <a href="?tab=charges" class="tab-btn" data-target="charges-tab">{{ __('Charge History') }}</a>
@@ -1049,6 +1115,8 @@
             @if (\Encore\Admin\Facades\Admin::user()->can('target-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
              <a href="?tab=targets" class="tab-btn" data-target="targets-tab">{{ __('Targets') }}</a>
             @endif
+            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
+           data-target="gift-log-tab">{{ __('gifts') }}</a>
         </div>
         <div id="tab-loading" style="
             display: none;
@@ -1070,20 +1138,61 @@
         @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
             <div class="tab-content active" id="members-tab">
+                
                 <div class="card">
                     <div class="card-header">
                         <h3>{{ __('Agency Members') }}</h3>
                         <span class="badge count-badge">{{ optional($members)->total() ?? 0 }}</span>
                     </div>
+                    <div class="card">
+                    <div class="card-body">
+                        <form action="{{ url('admin/agencies/' . $agency->id) }}" class="form-horizontal member-form" method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="members">
+                            <input type="hidden" name="members_page" value="{{ request()->get('members_page', 1) }}">
 
+                            <div class="row mb-4" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-4">
+                                    <div class="card shadow-sm border">
+                                        <div class="card-body p-3">
+                                            <label for="from_date" class="form-label fw-bold">
+                                                <i class="fa fa-calendar me-1"></i> {{ __('UUID') }}
+                                            </label>
+                                            <input type="text"
+                                                class="form-control"
+                                                id="from_date"
+                                                name="uuid"
+                                                value="{{ request('uuid') }}"
+                                                placeholder="{{ __('Enter UUID') }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                               
+                                <!-- Buttons -->
+                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                    <a href="{{ url('admin/agencies/' . $agency->id. '?'.'tab=members' ) }}" class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                     @if($members && $members->count())
                         <div class="table-responsive">
+                           
+                        
                             <table class="data-table">
                                 <thead>
                                     <tr>
                                         <th>#</th>
                                         <th>{{ __('Member') }}</th>
                                         <th>{{ __('Reals') }}</th>
+                                        <th>{{ __('Moments') }}</th>
                                         <th>{{ __('Live Hours') }}</th>
                                         <th>{{ __('Monthly DI') }}</th>
                                         <th>{{ __('Salary') }}</th>
@@ -1101,6 +1210,17 @@
                                                 ->where('id', $member->agency_id)
                                                 ->exists();
                                             $showUrl = $member ? url("admin/users/{$member->id}") : "#";
+                                            $moment = App\Helpers\Common::getUserMediaStats($member->id, 'moment',$member->agency_id) ?? [];
+                                            $reel = App\Helpers\Common::getUserMediaStats($member->id, 'reel',$member->agency_id) ?? [];
+
+                                                        $momentUpload = $moment['upload'] ?? '0/0';
+                                                        $momentLikes = $moment['likes'] ?? '0/0';
+                                                        $momentComments = $moment['comments'] ?? '0/0';
+
+                                                        $reelUpload = $reel['upload'] ?? '0/0';
+                                                        $reelLikes = $reel['likes'] ?? '0/0';
+                                                        $reelComments = $reel['comments'] ?? '0/0';
+
                                         @endphp
 
                                         <tr>
@@ -1116,10 +1236,27 @@
                                                     <small>UID: {{ @$member->uuid ?? '' }}</small>
                                                 </div>
                                             </td>
-                                            <td>{{ count($member->reals) ?? 0 }}</td>
-                                            <td>{{ $member->liveTime->sum("hours") }}</td>
+                                                        <td>
+                                                            <div style="line-height: 1.6;">
+                                                                <ul style="margin-left: 8px; width: 141px;">
+                                                                    <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
+                                                                    <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
+                                                                    <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div style="line-height: 1.6;">
+                                                                <ul style="margin-left: 8px; width: 141px;">
+                                                                    <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
+                                                                    <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
+                                                                    <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                            <td>{{ $member->getLiveTimeThisMonth() }}</td>
                                             <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                            <td>{{ $member->salary_without_cut_amount ?? 0 }}</td>
+                                            <td>{{ $member->salary_by_agency ?? 0 }}</td>
                                             <td>
                                                 @if($isOwner)
                                                     <span class="role-badge owner">{{ __('Owner') }}</span>
@@ -1260,7 +1397,9 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>{{ __('salary') }}</th>
+                                    <th>{{ __('net salary') }}</th>
+                                     <th>{{ __('salary') }}</th>
+                                     <th>{{ __('withdrawal') }}</th>
                                     <th>{{ __('Target') }}</th>
                                     <th>{{ __('month') }}</th>
                                     <th>{{ __('year') }}</th>
@@ -1273,7 +1412,9 @@
                                     @foreach($salaries as $index => $salary)
                                         <tr>
                                             <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
-                                            <td>{{ @$salary->sallary - $salary->cut_amount }}</td>
+                                            <td>{{ truncateAndTrim(@$salary->sallary - $salary->cut_amount) }}</td>
+                                             <td>{{ truncateAndTrim(@$salary->sallary) }}</td>
+                                              <td>{{ truncateAndTrim(@$salary->cut_amount) }}</td>
                                             <td>{{ @$sumTargets }}</td>
                                             <td>{{ @$salary->month ?? '' }}</td>
                                             <td>{{ @$salary->year ?? '' }}</td>
@@ -1408,6 +1549,192 @@
             </div>
         </div>
 
+        @if($activeTab == 'gift-log')
+    <div class="tab-content active" id="gift-log-tab">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">{{ __('gift Reports') }}</h4>
+            </div>
+
+            <div class="box-body p-3">
+                
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('admin/agencies/' . $agency->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="gift-log">
+                            <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
+
+                            <div class="row mb-3" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('From Date') }}</span>
+                                        <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
+                                    </div>
+                                </div>
+                                <!-- To Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('To Date') }}</span>
+                                        <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
+                                    </div>
+                                </div>
+                                <!-- Buttons -->
+                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                    <a href="{{ url('admin/agencies/' . $agency->id. '?'.'tab=gift-log' ) }}" class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- Summary Box -->
+                <div class="diamond-summary-container">
+                    <div class="diamond-summary-box">
+                        <div class="diamond-title">
+                            {{ __('total diamonds')  }}
+                        </div>
+                        <div class="diamond-count">
+                            <span>{{ number_format(@$diamonds) }}</span>
+                            <div class="diamond-icon-container">
+                                <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>{{   __('Sender')  }}</th>
+                            <th>{{  __('Receiver') }}</th>
+                            <th>{{ __('room') }}</th>
+                            <th>{{ __('gift') }}</th>
+                            <th>{{ __('quantity') }}</th>
+                            <th>{{ __('price') }}</th>
+                            <th>{{ __('Created at') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($giftSLogs as $index => $giftSLog)
+                            @php
+                                $userImageDefault = asset('images/businessman-icon.jpg');
+                                $defaultImage = asset("images/background_room.jpg");
+
+                                $userSender =  $giftSLog->sender;
+                                $name = @$userSender->name ?? '';
+                                $uid = @$userSender->uuid ?? '';
+                                $id = @$userSender->id ?? 0;
+                               $receiver = $giftSLog->receiver;
+                                $receiverName = @$receiver->name ?? '';
+                                $receiverUid = @$receiver->uuid ?? '';
+                                $receiverId = @$receiver->id ?? 0;
+
+                                $avatar = @$userSender->profile->avatar;
+                                $image = getImagePath($avatar) ?? $userImageDefault;
+                                $receiverAvatar = @$receiver->profile->avatar;
+                                
+                                $receiverImage = getImagePath($receiverAvatar) ?? $userImageDefault;
+                                if (!isImageExists($receiverImage)) {
+                                    $receiverImage = $userImageDefault;
+                                }
+                                if (!isImageExists($image)) {
+                                    $image = $userImageDefault;
+                                }
+
+                                $roomName = @$giftSLog->room->room_name ?? '-';
+                                $path = @$giftSLog->room->room_cover;
+                                $url = getImagePath($path) ?? $defaultImage;
+                                if (!isImageExists($url)) {
+                                    $url = $defaultImage;
+                                }
+
+                                $giftName = app()->getLocale() == 'ar'
+                                    ? (@$giftSLog->gift->name ?? '')
+                                    : (@$giftSLog->gift->e_name ?? '');
+                            @endphp
+
+                            <tr>
+                                <td>{{ $giftSLog->id }}</td>
+                                <td>
+                                    <a href="{{ url('admin/users/' . $id) }}" target="_blank"
+                                       class="d-flex align-items-center text-decoration-none">
+                                        <img src="{{ $image }}" width="40" height="40"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <div>
+                                            <strong style="font-size: 14px;">{{ $name }}</strong><br>
+                                            <small class="text-muted">UUID: {{ $uid }}</small>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ url('admin/users/' .$receiverId) }}" target="_blank"
+                                       class="d-flex align-items-center text-decoration-none">
+                                        <img src="{{ $receiverImage }}" width="40" height="40"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <div>
+                                            <strong style="font-size: 14px;">{{ $receiverName }}</strong><br>
+                                            <small class="text-muted">UUID: {{ $receiverUid }}</small>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#" target="_blank"
+                                       class="d-flex align-items-center text-decoration-none">
+                                        <img src="{{ $url }}"
+                                             width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <div>
+                                            <span>{{ $roomName }}</span><br>
+                                            <small class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#" target="_blank"
+                                       class="d-flex align-items-center text-decoration-none">
+                                        <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
+                                             width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $giftName  }}</span>
+                                    </a>
+                                </td>
+                                <td>{{ $giftSLog->giftNum }}</td>
+                                <td>{{  $giftSLog->giftPrice}}</td>
+                                <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->format('Y-m-d H:i') }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                {{-- Pagination --}}
+                @if($giftSLogs instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $giftSLogs->appends([
+                            'tab' => 'gift-log',
+                            'start_at' => request('start_at'),
+                            'end_at' => request('end_at'),
+                            'gift_page' => $giftSLogs->currentPage()
+                        ])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+@endif
+
         <div class="tab-content" id="targets-tab">
             <div class="agency-card">
                 <div class="card-header with-border">
@@ -1482,7 +1809,7 @@
                                         <i class="fas fa-bullseye"></i>
                                     </div>
                                     <div class="stat-info">
-                                        <div class="stat-value">{{ $agencyTarget }}</div>
+                                        <div class="stat-value">{{truncateAndTrim($agencyTarget) }}</div>
                                         <div class="stat-label">{{ __('Target') }}</div>
                                     </div>
                                 </div>
@@ -1633,8 +1960,9 @@
 
                     <div class="tab-content active" id="members-tab">
 
-
+                         
                         <div class="table-section card">
+                            
                             <div class="table-responsive">
                                 <table class="data-table">
                                     <thead>
@@ -1717,8 +2045,9 @@
                                                             {{ $target->next_diamond ?? 0 }}
                                                         </span>
                                                     </td>
-                                                    <td>{{ $target->user_hours ?? 0 }}</td>
-                                                    <td>{{ $target->user_days ?? 0 }}</td>
+                                                   
+                                                    <td>{{ ($target->user_days ?? 0) . '/' . ($target->target_days ?? 0) }}</td>
+                                                    <td>{{ ($target->user_hours ?? 0) . '/' . ($target->target_hours ?? 0) }}</td>
                                                     <td>
                                                             <div style="line-height: 1.6;">
                                                                 <ul style="margin-left: 8px; width: 141px;">

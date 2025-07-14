@@ -22,6 +22,7 @@ class DataUserResource extends JsonResource
         if ($family) {
 
             $f = [
+                'id' => $family->id,
                 'owner_id' => $family->user_id,
                 'family_name' => $family->name ?? '',
                 'max_num' => $family->num ?? 0,
@@ -72,7 +73,9 @@ class DataUserResource extends JsonResource
             'gifts' =>  GiftLogResource::collection($gifts),
             'cp' => $mainCp ? new CpListResource($mainCp) : null,
             'is_followed' => $this->isFollowedBy(auth()->id()),
-            'colored_name' => $this->color_image
+            'colored_name' => $this->color_image,
+            'image_color'          => @$this->color_image,
+            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
         ];
     }
 }

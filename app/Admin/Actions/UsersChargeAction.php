@@ -2,15 +2,18 @@
 
 namespace App\Admin\Actions;
 
+use App\Helpers\Common;
+use App\Models\User;
 use App\Models\Charge;
 use App\Models\Setting;
-use App\Models\User;
+use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
+use App\Models\ChargeInvoice;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Facades\Admin;
 use Illuminate\Validation\ValidationException;
 
 class UsersChargeAction extends Action
@@ -19,14 +22,15 @@ class UsersChargeAction extends Action
     protected $selector = '.charge_action';
     protected $userId;
 
-    public function setUserId($userId ): static
+    public function setUserId($userId): static
     {
         $this->userId = $userId ?? request()->input('userId');
         return $this;
     }
 
     public function handle(Request $request)
-    {    $userId = $this->userId ?? $request->input('userId');
+    {
+        $userId = $this->userId ?? $request->input('userId');
         $user = $this->getUser($userId);
         // if (!$user) {
         //     return $this->response()->error(__('api_responses.agency'))->refresh();
@@ -43,9 +47,13 @@ class UsersChargeAction extends Action
         return User::where('id', $userId)->first();
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function handleUserCharge(Request $request, User $user)
     {
         $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
+        $typeCharge = $request->charge_type;
 
         if ($amount < 0 && $user->di < abs($amount)) {
             return $this->response()->error(__('Insufficient user balance'))->refresh();
@@ -54,13 +62,14 @@ class UsersChargeAction extends Action
             $setting =   Setting::where('key', 'user_coins')->first();
             return $setting?->value;
         });
+
+        $coins = $amount * $userCoins;
+
         if (! $userCoins || $userCoins == 0) {
             return $this->response()->error(__('please set user coins in configs'))->refresh();
         }
 
-        DB::transaction(function () use ($request, $user,  $amount, $userCoins) {
-            $coins = $amount * $userCoins;
-
+        DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
             $user->di += $coins;
             if ($user->di < 0) {
                 throw ValidationException::withMessages([
@@ -71,11 +80,23 @@ class UsersChargeAction extends Action
 
             $this->createChargeRecord($request,  $user, $amount, $coins, $request->amount);
 
-            if ($request->charge_type == "increment") {
+            if ($typeCharge == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
                 if ($user->owner) CustomNotification::chargeAction($user, $request, $admin);
+                UserCommon::addChargeLevel($user->id, $amount);
             }
         });
+
+        $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $title = $typeCharge == 'increment'
+            ? __('Coins Added')
+            : __('Coins Deducted');
+
+        $body = $typeCharge === 'increment'
+            ? __('You have received :coins coins from admin.', ['coins' => $coins])
+            : __(':coins coins were deducted from your account by admin.', ['coins' => $coins]);
+
+        Common::send_firebase_notification($notificationToken, $title, $body);
 
         return $this->response()->success('Success')->refresh();
     }
@@ -95,6 +116,17 @@ class UsersChargeAction extends Action
         $charge->usd = $usdAmount;
         $charge->balance_before =  $user->di  - $coins;
         $charge->save();
+        if ($request->hasFile('invoice')) {
+            $imagePath = Common::upload('profile', $request->file('invoice'));
+        }
+        ChargeInvoice::create([
+            'charge_id' => $charge->id,
+            'user_id' => $user->id,
+            'reason_en' => $request->reason_en,
+            'reason_ar' => $request->reason_ar,
+            'invoice' => $imagePath ?? '',
+            'type' => 'user',
+        ]);
     }
 
     public function form()
@@ -105,7 +137,36 @@ class UsersChargeAction extends Action
         $this->text('amount', __('Amount'))
             ->addElementClass('price-input')
             ->help(__('Enter amount in dollars'));
+        $this->text('reason_en', __('reason en'));
+        $this->text('reason_ar', __('reason ar'));
+
+        $this->select('form', __('add invoice'))
+            ->options([
+                0 => __('no'),
+                1 => __('yes'),
+            ])
+            ->attribute(['id' => 'form-select']);
+
+        $this->image('invoice', __('invoice'))
+            ->attribute([
+                'id' => 'invoice-field',
+
+            ]);
+
         $this->hidden('amount_type')->value(1);
+        Admin::script(<<<'SCRIPT'
+            function toggleInvoiceField() {
+                var selected = $('#form-select').val();
+                if (selected === '1') {
+                    $('#invoice-field').closest('.form-group').show();
+                } else {
+                    $('#invoice-field').closest('.form-group').hide();
+                }
+            }
+
+            $(document).off('change', '#form-select').on('change', '#form-select', toggleInvoiceField);
+            toggleInvoiceField();
+        SCRIPT);
     }
 
     public function html()
@@ -116,13 +177,13 @@ class UsersChargeAction extends Action
 
         $html = '';
 
-        if (Admin::user()->can('add-switch-' .'coin-recharge') || Admin::user()->can('*')) {
+        if (Admin::user()->can('add-switch-charge-to-user') || Admin::user()->can('*')) {
             $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->userId . ')" class="charge_action btn btn-sm text-white" style="background-color: #28a745; border-color: #28a745; color: white;">'
                 . htmlspecialchars($title) .
                 '</a>';
         }
 
-        if (Admin::user()->can('charge-report-switch-' .'coin-recharge') || Admin::user()->can('*')) {
+        if (Admin::user()->can('history-switch-charge-to-user') || Admin::user()->can('*')) {
             $html .= '<a href="' . htmlspecialchars($url) . '" class="shipping_report btn btn-sm text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">'
                 . htmlspecialchars($shippingReports) .
                 '</a>';

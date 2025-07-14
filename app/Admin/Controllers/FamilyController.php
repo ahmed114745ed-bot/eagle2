@@ -160,6 +160,7 @@ class FamilyController extends MainController
     protected function form()
     {
         $form = new Form(new Family);
+        $this->disableFormTools($form);
 
         $form->display('ID');
         $form->text('name', __('name'))->rules('required');

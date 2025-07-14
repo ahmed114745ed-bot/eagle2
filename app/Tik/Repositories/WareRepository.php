@@ -113,7 +113,7 @@ class WareRepository extends AbstractRepository
     }
     public function profile_frame_wares($page, $perPage)
     {
-        return $this->model->where('get_type', 1)->where('type', 28)->orderByDesc('is_active_for_vip')->select('id', 'img2', 'level', 'image_type', 'half_image_profile')->paginate($perPage, ['*'], 'page', $page);
+        return $this->model->where('type', 28)->orderByDesc('is_active_for_vip')->select(['id', 'img2', 'level', 'image_type', 'half_image_profile'])->get();
     }
     public function giftOVip($level, $type)
     {
@@ -124,5 +124,10 @@ class WareRepository extends AbstractRepository
     public function getFromType(int $type, int $pagination = 10)
     {
         return $this->model->where('type', $type)->paginate($pagination);
+    }
+
+    public function getAllFromType(int $type)
+    {
+        return $this->model->where('type', $type)->get();
     }
 }

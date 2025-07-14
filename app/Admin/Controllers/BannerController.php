@@ -133,6 +133,7 @@ class BannerController extends MainController
     {
 
         $form = new Form(new Banner());
+        $this->disableFormTools($form);
 
         $form->image('image_url', __('Image url'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();

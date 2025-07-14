@@ -35,12 +35,13 @@ class GroupChatController extends MainController
             }));
     }
 
-    public function chat_settings(Content $content){
-        if (!Admin::user()->can('*')){
-            Permission::check('browse-'.$this->permission_setting);
+    public function chat_settings(Content $content)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_setting);
         }
         return $content
-        ->view('chat_settings');
+            ->view('chat_settings');
     }
 
     /**
@@ -66,7 +67,7 @@ class GroupChatController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title("group Chat")
             ->body($this->detail($id)));
     }
@@ -80,7 +81,7 @@ class GroupChatController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title("group Chat")
             ->body($this->form()->edit($id)));
     }
@@ -122,20 +123,20 @@ class GroupChatController extends MainController
             });
         });
         $grid->id(__('ID'));
-        $grid->column ('user.name',__ ('name'))->display (function ($recever){
+        $grid->column('user.name', __('name'))->display(function ($recever) {
             $name =  $this->user?->name ?? '';
-             $uid = @$this->user?->uuid ?? 0;
-             $path = @$this->user?->profile?->avatar;
-             $defaultImage = asset("images/businessman-icon.jpg");
-             $url = getImagePath($path) ?? $defaultImage;
+            $uid = @$this->user?->uuid ?? 0;
+            $path = @$this->user?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-             // Check if the image exists
-             if (!isImageExists($url)) {
-                 $url = $defaultImage;
-             }
-             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-             return "
+            return "
              <div style='display: flex; align-items: center; gap: 10px;'>
                  $image
                  <div>
@@ -144,8 +145,7 @@ class GroupChatController extends MainController
                  </div>
              </div>
          ";
-
-         });
+        });
         $grid->text(__('text'));
 
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
@@ -181,6 +181,8 @@ class GroupChatController extends MainController
     protected function form()
     {
         $form = new Form(new GroupChat);
+        $this->disableFormTools($form);
+
 
         $form->display('ID');
         $form->text('text', __('text'));

@@ -16,6 +16,7 @@ class ReceiverGiftLogResource extends JsonResource
      */
     public function toArray($request)
     {
+        $hasColor = Common::hasInPack(@$this->receiver->id, 18, true);
 
         $data = [
             'id' => @$this->receiver->id ?? 0, // both
@@ -23,7 +24,10 @@ class ReceiverGiftLogResource extends JsonResource
             'name' => @$this->receiver->name ?: '', // both
             'image' => $this->receiver->profile->avatar ?: '',
             'exp'   => $this->exp ?? '',
-            'level'=> Common::level_center_min (@$this->receiver->id), // refactor
+            'image_color'          => @$this->receiver->color_image,
+            'id_image'             => @$this->receiver->specialId?->ware?->show_img ?? '',
+            'level' => Common::level_center_min(@$this->receiver->id), // refactor
+            'colored_name' => $hasColor ? common::wareUserVip(@$this->receiver->id, 18, 'color') ?? '' : '',
 
         ];
 

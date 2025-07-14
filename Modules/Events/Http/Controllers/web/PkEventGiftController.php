@@ -323,6 +323,8 @@ class PkEventGiftController extends MainController
     protected function form()
     {
         $form = new Form(new PkReward());
+        $this->disableFormTools($form);
+
         $form->hidden('pk_event_id')->value(request('pk_event_id'));
         $form->hidden('pk_type')->value(request('pk_type'));
 

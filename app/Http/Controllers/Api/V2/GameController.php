@@ -86,7 +86,11 @@ class GameController extends Controller
 
         $user->di += $data['coins'];
         $user->update();
-        CoinGameUser::create(['user_id' =>  $user->id, 'coins' => $data['coins'], 'type' => ($data['coins'] < 0 ? 0 : 1)]);
+        CoinGameUser::create([
+            'user_id' =>  $user->id, 
+            'coins' => $data['coins'],
+            'app_profit_coins' => $data['coins'],
+             'type' => ($data['coins'] < 0 ? 0 : 1)]);
 
         $user = [
             'id'    => $user->id,

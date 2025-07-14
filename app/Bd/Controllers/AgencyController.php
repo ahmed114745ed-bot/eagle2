@@ -2,10 +2,6 @@
 
 namespace App\Bd\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\ShippingAgency;
-use Encore\Admin\Auth\Permission;
-use Illuminate\Http\Request as req;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -20,23 +16,29 @@ use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
+use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
 use App\Facades\CustomNotification;
 use App\Services\AppFeatureService;
+use Illuminate\Http\Request as req;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
+use App\Admin\Controllers\MainController;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Support\MessageBag;
 
-class AgencyController extends Controller
+class AgencyController extends MainController
 {
     use HasResourceActions;
 
@@ -75,75 +77,6 @@ class AgencyController extends Controller
             ->body($this->form());
     }
 
-    // public function profile($id, Request $request, Content $content)
-    // {
-    //     $year = $request->year ?? Carbon::now()->year;
-    //     $month = $request->month ?? Carbon::now()->month;
-    //     $tab = request('tab') ?? null;
-
-    //     $cacheKey = "agency_profile_{$id}";
-    //     $agency = Agency::with([
-    //         'admins',
-    //         'charges' => function ($query) {
-    //             $query->select('id', 'agency_id', 'amount', 'created_at')
-    //                 ->latest()
-    //                 ->take(10);
-    //         },
-    //         'mempers' => function ($query) {
-    //             $query->select('id', 'agency_id', 'name', 'created_at')
-    //                 ->latest()
-    //                 ->take(10);
-    //         },
-    //         'owner' => function ($query) {
-    //             $query->select('id', 'name', 'uuid');
-    //         }
-    //     ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
-    //         ->findOrFail($id);
-
-    //     $path = @$agency->img;
-    //     $defaultImage = asset("images/icon-agency.jpg");
-    //     $imageUrl = getImagePath($path) ?? $defaultImage;
-
-    //     if (!isImageExists($imageUrl)) {
-    //         $imageUrl = $defaultImage;
-    //     }
-
-    //     $agency->display_image = $imageUrl;
-    //     $agencyId = $agency->id;
-    //     $members = $agency->mempers()
-    //         ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')->with('country', 'agencyUserJob')
-    //         ->paginate(10, ['*'], 'members_page');
-
-    //     $charges = $agency->charges()
-    //         ->select('id', 'amount', 'created_at')
-    //         ->paginate(10, ['*'], 'charges_page');
-
-    //     $salaries = AgencySallary::where('agency_id', $id)
-    //         ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
-    //         ->orderByDesc('id')
-    //         ->paginate(10, ['*'], 'salary_page');
-
-    //     $agencyJoinRequests = AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
-    //         ->with('user')
-    //         ->whereHas('user')->orderByDesc('id')
-    //         ->paginate(10, ['*'], 'join_page');
-
-    //     $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
-    //         ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
-    //     $memberTargets = $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
-    //         $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
-    //     }])->paginate(10, ['*'], 'target_page');
-    //     [$agencyTarget, $rate] =    $this->rateAgency($agencyId, $month, $year);
-
-    //     $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
-    //     $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
-    //     $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
-
-    //     return $content->title(__('agency profile'))
-    //         ->view('agency_profile', $data);
-
-    // }
-
     public function profile($id, req $request, Content $content)
     {
         // if (! Admin::user()->can('*')) {
@@ -153,22 +86,37 @@ class AgencyController extends Controller
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab', 'members');
+        $user = Auth::user();
 
-        $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+        $agency = Cache::remember("agency_{$id}", 600, function () use ($id,$user) {
             return Agency::query()
+                ->where('bd_id' ,$user->app_id )
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->find($id);
         });
 
         if (!$agency) {
-            $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+            $agency = Cache::remember("agency_{$id}", 600, function () use ($id ,$user) {
                 return ShippingAgency::query()
+                    ->where('bd_id' ,$user->app_id )
                     ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                     ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                     ->find($id);
             });
         }
+
+        if (!$agency) {
+            $error = new MessageBag([
+                'title'   => __('error_title_div'),
+                'message' => __('Agency not found'),
+            ]);
+    
+            session()->flash('error', $error);
+            throw new \Exception(__('Agency not found'));
+        }
+
+
 
         $path = $agency?->img;
         $defaultImage = asset("images/icon-agency.jpg");
@@ -484,7 +432,7 @@ class AgencyController extends Controller
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
@@ -495,16 +443,17 @@ class AgencyController extends Controller
             $model = $actions->row;
             $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
-            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+            // if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
 
-                $actions->add(new DeleteAgencyAction());
-            }
-            if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
+            //     $actions->add(new DeleteAgencyAction());
+            // }
+            // if (Admin::user()->can('change-users-agency-switch-' . $permission) || Admin::user()->can('*')) {
 
-                $actions->add(new ChangeUsersAgencyAction($model->id));
-            }
+            //     $actions->add(new ChangeUsersAgencyAction($model->id));
+            // }
         });
         $grid->disableExport();
+        $grid->disableRowSelector();
 
         //        $this->extendGrid($grid);
 
@@ -667,15 +616,13 @@ class AgencyController extends Controller
                 }
             });
         } else {
-
+            $form->tools(function (Form\Tools $tools) {
+                $tools->disableDelete(); // ✅ disable delete button
+                // $tools->disableView(); // optional: disable view
+                // $tools->disableList(); // optional: disable list
+            });
             $form->row(function ($row) {
-                $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                    $ops2 = [];
-                    foreach (User::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                    }
-                    return $ops2;
-                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
+
 
                 // if (request()->route('form')->isEditing()) {
                 //     $row->hidden('agency_manger_id', __('app manger id'));
@@ -771,10 +718,10 @@ class AgencyController extends Controller
             $newOwnerId = $form->model()->app_owner_id;
             // Create admin dashboard for agency when accept it
             $modelExists = $form->model()->exists;
-            if (!$modelExists)  Common::createUserAdmin($appOwnerId);
+         //   if (!$modelExists)  Common::createUserAdmin($appOwnerId);
 
             if ($modelExists && $appOwnerId != $originalOwnerId) {
-                Common::createUserAdmin($appOwnerId);
+           //     Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $appOwnerId, $agencyId);
@@ -860,7 +807,7 @@ class AgencyController extends Controller
                     'agency_id' => $form->model()->id,
                     'type' => 1,
                     'join_date' => now(),
-                    'status' =>'Joined'
+                    'status' => 'Joined'
                 ]);
             }
         });
@@ -1130,7 +1077,7 @@ class AgencyController extends Controller
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
-                'status' =>'Joined'
+                'status' => 'Joined'
             ];
             UsersJoinedAgency::create($joinAgencyData);
         }

@@ -16,7 +16,7 @@ use Carbon\Carbon;
 class ReportController extends MainController
 {
     public $permission_name = 'reports';
-   
+
     public function index(Content $content)
     {
         checkAgencyFeature();
@@ -29,7 +29,7 @@ class ReportController extends MainController
             'agencies_manger'  => __('admin.manger'),
             default     => __('Host reports'),
         };
-    
+
         return parent::index($content
             ->title($title)
             ->description(__(request('desc', 'users')))
@@ -59,6 +59,7 @@ class ReportController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
+        $grid->disableRowSelector();
         $grid->model()
             ->where('agency_id', '!=', 0)
             ->where('agency_id', '!=', '')
@@ -71,7 +72,7 @@ class ReportController extends MainController
             });
 
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
+                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
                 $filter->where(function ($query) {
                     $year = request('year');
                     if (!empty($year)) {
@@ -145,47 +146,47 @@ class ReportController extends MainController
         $grid->column('sallary_year', __('Year'))->display(function () {
             $year = request('year') ?? now()->year;
             $month = request('month') ?? now()->month;
-        
+
             $sallary = $this->userSallary()
                 ->where('month', $month)
                 ->where('year', $year)
                 ->latest()
                 ->first();
-        
+
             return $sallary?->year ?? '-';
         });
-        
+
         $grid->column('sallary_month', __('Month'))->display(function () {
             $month = request('month') ?? now()->month;
             $monthName = Carbon::create()->month($month)->translatedFormat('F'); // اسم الشهر حسب اللغة
-        
+
             $sallary = $this->userSallary()
                 ->where('month', $month)
                 ->where('year', request('year', now()->year))
                 ->first();
-        
+
             return $sallary ? $monthName : '-';
         });
-        
+
         $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
             $month = request('month') ?? now()->month;
             $year = request('year') ?? now()->year;
-        
+
             $sallary = $this->userSallary()
                 ->where('month', $month)
                 ->where('year', $year)
                 ->first();
-        
+
             if (!$sallary || !$sallary->extras) {
                 return '<span style="color: #aaa;">No Data</span>';
             }
-        
+
             $extras = json_decode($sallary->extras, true);
-        
+
             $momentUpload = $extras['moment']['upload'] ?? '-';
             $momentLikes = $extras['moment']['likes'] ?? '-';
             $momentComments = $extras['moment']['comments'] ?? '-';
-        
+
             $reelUpload = $extras['reel']['upload'] ?? '-';
             $reelLikes = $extras['reel']['likes'] ?? '-';
             $reelComments = $extras['reel']['comments'] ?? '-';
@@ -195,7 +196,7 @@ class ReportController extends MainController
             $labelUploads = __('Uploads:');
             $labelLikes = __('Likes:');
             $labelComments = __('Comments:');
-        
+
             return <<<HTML
                 <div style="line-height: 1.6;">
                     <div><b>{$labelMoments}</b></div>
@@ -218,7 +219,7 @@ class ReportController extends MainController
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-            $showUrl = $this->agency ? url("admin/agencies/profile/{$this->agency->id }") : 0;
+            $showUrl = $this->agency ? url("admin/agencies/profile/{$this->agency->id}") : 0;
 
             if (!isImageExists($url)) {
                 $url = $defaultImage;
@@ -236,7 +237,7 @@ class ReportController extends MainController
         });
 
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('custom-export-users', ['month' => request('month'), 'year' => request('year'), 'agency_id' => request('agency_id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . route('custom-export-users', ['month' => request('month'), 'year' => request('year'), 'agency_id' => request('agency_id'), 'id' => request('id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
         });
 
         return $grid;
@@ -245,6 +246,7 @@ class ReportController extends MainController
     protected function agencies(): Grid
     {
         $grid = new Grid(new Agency());
+        $grid->disableRowSelector();
 
         $grid->model()
             ->withCount(['users'])
@@ -308,7 +310,7 @@ class ReportController extends MainController
             return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
         });
 
-        
+
         $grid->column('total', __('salary'))->display(function () {
             $salary = $this->getSalaryWithOutCutAmountAgency(request('month'), request('year')) ?? 0;
             $image = asset('images/dollar.jpg');
@@ -355,10 +357,10 @@ class ReportController extends MainController
                 'month' => request('month'),
                 'year' => request('year'),
             ]);
-        
+
             $tools->append('<a href="' . route('agency-export-report') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
-        
+
 
         return $grid;
     }
@@ -366,11 +368,16 @@ class ReportController extends MainController
     protected function agencies_manger()
     {
         $grid = new Grid(new AdminUser());
+        $grid->disableRowSelector();
         $grid->model()
             ->where('app_id', '!=', 0);
-         
+
         $grid->column('user.id', __('Id'));
 
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+            $filter->equal('user.id', 'User ID');
+        });
         $grid->column('user.name', __('name'))->display(function ($name) {
             $uid = @$this->user->uuid;
             $path = @$this?->user->profile?->avatar;
@@ -412,7 +419,9 @@ class ReportController extends MainController
         });
 
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('admin.agency-manger-export', ['month' => request('month'), 'year' => request()->year]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . route('admin.agency-manger-export', [
+                'user_id' => request('user.id') ?? request('filters.user.id') ?? null
+            ]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
         $grid->disableExport();
 

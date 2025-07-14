@@ -30,9 +30,13 @@ class BoxService
 {
     public function __construct() {}
 
+    /**
+     * @throws \Throwable
+     */
     public function sendBox($request, $user, $box, $room, $timezone, $label)
     {
-        $boxCoin = $this->calculationSendBox($box);
+        $boxCoin = $box->type == 0 ?  $box->coins : $this->calculationSendBox($box);
+
         DB::beginTransaction();
         if ($box->type == 0) {
             $boxU = $this->sendNormalBox($box, $request, $boxCoin, $label, $room, $user->id, $timezone);
@@ -58,7 +62,7 @@ class BoxService
                     "numOfBoxes" => (int)$c,
                     "ownerBoxImage" => $user->avatar,
                     "ownerBoxUId"  => $user->uuid,
-                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->toDateTimeString(),
+                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
                     //'usersNum' => $request->users_num ?: $box->users,
                     //'rem_time' => $rem_time,
                     //'is_closed' => $box->is_closed,
@@ -138,7 +142,7 @@ class BoxService
                 "message" => "bannerSuperBox",
                 'coins' => $request->coins ?: $box->coins,
                 "boxUId" => $boxUser->id,
-                "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->toDateTimeString(),
+                "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
                 "room" => [
                     "id" => $room->id,
                     "uuid" => $room->owner->uuid,
@@ -169,9 +173,11 @@ class BoxService
 
     public function calculationSendBox($box)
     {
-        $app_percentage = Config::query()->where('name', 'app_wallet_lucky_box')->first()?->value ?? 2;
+        $app_percentage = Common::getConfig('lucky_box_percentage') ?? 20;
         $walletCoins = ($box->coins * $app_percentage) / 100;
+
         $boxCoin = $box->coins - $walletCoins;
+
         $walletApp = CoreWallet::where('name', 'lucky_box')->first();
         $newWalletCoins = $walletApp->coins + $walletCoins;
         $walletApp->update([

@@ -257,6 +257,7 @@ class MomentController extends MainController
     protected function form()
     {
         $form = new Form(new Moment());
+        $this->disableFormTools($form);
 
         $form->number('user_id', __('User id'));
         $form->text('description', __('Description'));

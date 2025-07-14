@@ -44,7 +44,7 @@ class ImageColorController extends MainController
 
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('image-color'))
             ->body($this->detail($id)));
     }
@@ -58,7 +58,7 @@ class ImageColorController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('image-color'))
             ->body($this->form()->edit($id)));
     }
@@ -115,6 +115,7 @@ class ImageColorController extends MainController
     protected function form()
     {
         $form = new Form(new ImageColor);
+        $this->disableFormTools($form);
 
         $form->display('id');
         $form->text('name', __('name'));

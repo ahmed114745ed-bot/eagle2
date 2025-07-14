@@ -17,7 +17,7 @@ class RoomVipController extends MainController
      *
      * @var string
      */
-   
+
 
     public $permission_name = 'room-vip';
     public function index(Content $content)
@@ -36,7 +36,7 @@ class RoomVipController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('room-vips'))
             ->body($this->detail($id)));
     }
@@ -50,7 +50,7 @@ class RoomVipController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('room-vips'))
             ->body($this->form()->edit($id)));
     }
@@ -70,20 +70,20 @@ class RoomVipController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Vip());
-        $grid->model()->where('type',4)->orderBy('exp');
+        $grid->model()->where('type', 4)->orderBy('exp');
 
-        $grid->quickSearch ();
+        $grid->quickSearch();
         $grid->column('id', __('Id'));
         $grid->column('name_ar', __('name_ar'));
-        $grid->column('level', __('Level'))->editable ();
-        $grid->column('exp', __('Exp'))->display(function($column, Grid\Column $value) {
-        $value = $value->getOriginal();
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
             return number_format($value);
         })->editable();
-//        $grid->column('di', __('Diamonds'));
-//        $grid->column('co', __('Coins'));
-        $grid->column('img', __('Image'))->image ('','30');
-        $this->extendGrid ($grid);
+        //        $grid->column('di', __('Diamonds'));
+        //        $grid->column('co', __('Coins'));
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
         $grid->disableExport();
         return $grid;
     }
@@ -99,15 +99,15 @@ class RoomVipController extends MainController
         $show = new Show(Vip::findOrFail($id));
 
         $show->field('id', __('Id'));
-        $show->field('type', __('Type'))->number ();
-        $show->field('level', __('Level'))->number ();
-        $show->field('exp', __('Exp'))->number ();
-//        $show->field('di', __('Diamonds'))->number ();
-//        $show->field('co', __('Coins'))->number ();
-        $show->field('img', __('Image'))->image ();
-//        $show->field('created_at', __('Created at'));
-//        $show->field('updated_at', __('Updated at'));
-        $this->extendShow ($show);
+        $show->field('type', __('Type'))->number();
+        $show->field('level', __('Level'))->number();
+        $show->field('exp', __('Exp'))->number();
+        //        $show->field('di', __('Diamonds'))->number ();
+        //        $show->field('co', __('Coins'))->number ();
+        $show->field('img', __('Image'))->image();
+        //        $show->field('created_at', __('Created at'));
+        //        $show->field('updated_at', __('Updated at'));
+        $this->extendShow($show);
         return $show;
     }
 
@@ -119,16 +119,18 @@ class RoomVipController extends MainController
     protected function form()
     {
         $form = new Form(new Vip());
+        $this->disableFormTools($form);
+
 
         $form->hidden('type')->value(4);
         $form->number('level', __('Level'))->required();
-        $form->number('exp', __('Exp'))->help (__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
+        $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         $form->textarea('name_ar', __('name_ar'));
         $form->textarea('name_en', __('name_en'));
-//        $form->number('di', __('Diamonds'));
-//        $form->number('co', __('Coins'));
-        $form->image ('img',__('Image'))->name(function ($file) {
-            return now()->timestamp.rand(0,999).'.'.$file->guessExtension();
+        //        $form->number('di', __('Diamonds'));
+        //        $form->number('co', __('Coins'));
+        $form->image('img', __('Image'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
 
         return $form;

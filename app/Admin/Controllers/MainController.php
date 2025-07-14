@@ -7,6 +7,7 @@ use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Form;
 
 class MainController extends AdminController
 {
@@ -85,6 +86,7 @@ class MainController extends AdminController
 
     public function extendGrid($grid)
     {
+        $grid->disableRowSelector();
         $permission_name = $this->permission_name;
 
         if (!Admin::user()->can('*')) {
@@ -150,6 +152,15 @@ class MainController extends AdminController
                         $tools->disableDelete();
                     }
                 );
+        }
+    }
+
+    protected function disableFormTools(Form $form)
+    {
+        if (request()->is('*edit*')) {
+            $form->tools(function (Form\Tools $tools) {
+                $tools->disableDelete();
+            });
         }
     }
 }

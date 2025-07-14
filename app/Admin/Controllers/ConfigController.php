@@ -182,6 +182,7 @@ class ConfigController extends MainController
     protected function form()
     {
         $form = new Form(new Config);
+        $this->disableFormTools($form);
 
         $form->display('ID');
         $form->text('name', trans('name'));

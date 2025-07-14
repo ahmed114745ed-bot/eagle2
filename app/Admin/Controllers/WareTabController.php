@@ -250,6 +250,8 @@ class WareTabController extends MainController
     protected function form($id = null)
     {
         $form = new Form(new Ware());
+        $this->disableFormTools($form);
+
         $form->display('ID');
 
         $ware = Ware::find($id);
@@ -433,7 +435,7 @@ class WareTabController extends MainController
 
                         $wareId = $form->model()->id;
 
-                        (new FfmpegService())->extractByDuration($videoPath, $wareId);
+                        (new FfmpegService())->extractByFrame($videoPath, $wareId);
 
                         $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
 
@@ -446,7 +448,7 @@ class WareTabController extends MainController
                         $responseData = $response->json();
 
                         if ($response->successful() && isset($responseData['data']['video_type'])) {
-                            $ext = strtolower($responseData['data']['video_type']);
+                            $ext = strtolower(explode('-', $responseData['data']['video_type'])[0]);
                         }
                     }
 

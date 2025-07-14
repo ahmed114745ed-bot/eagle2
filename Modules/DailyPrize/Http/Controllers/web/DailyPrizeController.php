@@ -41,7 +41,7 @@ class DailyPrizeController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('daily login gift'))
             ->body($this->detail($id)));
     }
@@ -60,7 +60,7 @@ class DailyPrizeController extends MainController
 
         $form = $this->form()->edit($id);
 
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('daily login gift'))
             ->body($form));
     }
@@ -83,7 +83,7 @@ class DailyPrizeController extends MainController
         $grid = new Grid(new DailyGift());
         $grid->model()->where('type', $type);
         // $grid->column('order', __('Order'))->editable();
-        $grid->column('order', __('Order'))
+        $grid->column('order', __('days'))
             ->display(function ($order) {
                 $days = [
                     1 => __('first_day'),
@@ -98,23 +98,49 @@ class DailyPrizeController extends MainController
             });
 
         $grid->column('gift_type', __('gifts'));
-        $grid->column('image', __('image'))->display(function ($path) {
-            if ($this->gift_type == 'ware') {
-                $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware?->show_img;
-            } elseif ($this->gift_type == 'vip') {
-                $vips = OVip::find($this->target);
-                $path = $vips?->img;
-            } elseif ($this->gift_type == 'achievement') {
-                $path = $this->target;
-            } else {
-                $path = 'coin.png';
-            }
+        if (request()->filled('_export_')) {
+            $grid->column('details', __('gift details'))->display(function () {
+                switch ($this->gift_type) {
+                    case 'ware':
+                        $ware = \App\Models\Ware::find($this->target);
+                        return $ware
+                            ? __('name') . ': ' . $ware->name . ', ' . __('id') . ': ' . $ware->id
+                            : __('Not Found');
 
-            /** @var Gift $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+                    case 'vip':
+                        $vip = \App\Models\OVip::find($this->target);
+                        return $vip
+                            ? __('name') . ': ' . $vip->name . ', ' . __('id') . ': ' . $vip->id
+                            : __('Not Found');
+
+                    case 'achievement':
+                        return __('Achievement');
+
+                    default:
+                        return $this->target;
+                }
+            });
+        }
+
+        if (!request()->filled('_export_')) {
+            $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->gift_type == 'ware') {
+                    $ware = Ware::find($this->target);
+                    $path = $ware->img2 ?? $ware?->show_img;
+                } elseif ($this->gift_type == 'vip') {
+                    $vips = OVip::find($this->target);
+                    $path = $vips?->img;
+                } elseif ($this->gift_type == 'achievement') {
+                    $path = $this->target;
+                } else {
+                    $path = 'coin.png';
+                }
+
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
 
         $grid->column('expir', __('expire'));
         Admin::script("
@@ -122,6 +148,10 @@ class DailyPrizeController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+        $grid->actions(function ($actions) {
+
+            $actions->disableView();
+        });
 
         return $grid;
     }
@@ -156,6 +186,8 @@ class DailyPrizeController extends MainController
     protected function form()
     {
         $form = new Form(new DailyGift());
+        $this->disableFormTools($form);
+
         $typeId = request()->route('type');
         $orderId = request()->route('id');
         $form->hidden('type')->value(request('type'));

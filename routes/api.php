@@ -1,19 +1,17 @@
 <?php
 
 use App\Admin\Controllers\AgencySettingsController;
+use App\Events\PublicTestEvent;
 use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\PaytabsController;
 use App\Models\Room;
 use App\Models\User;
-use App\Enums\UserType;
 use App\Helpers\Common;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Admin\Controllers\WareController;
 use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
@@ -49,7 +47,6 @@ use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\CoinReportController;
-use App\Http\Controllers\Api\V1\MusicStoreController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\ChargeLevelController;
@@ -589,6 +586,43 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
+
+            Route::get('/public-test/{ids}', function ($ids) {
+                $title = 'System‑wide Test';
+                $body  = 'This is only a test.';
+            
+                $idArray = explode(',', $ids);
+            
+                $tokens = User::whereNotNull('notification_id')
+                    ->whereIn('id', $idArray)
+                    ->pluck('notification_id')
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->toArray();
+            
+                logger()->info('Kreait - Successfully  tokens from topic.', [
+                    'tokens' => $tokens,
+                    'ids'    => $idArray,
+                ]);  
+            
+                return Common::send_firebase_notification($tokens, $title, $body);
+            });
+
+            Route::get('/unsubscribe-all-from-topic/{topic}', function ($topic) {
+                $tokens = User::whereNotNull('notification_id')
+                    ->pluck('notification_id')
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->toArray();
+                // $result = Common::unsubscribeFromTopic($tokens, $topic);
+            
+                // return response()->json($result);
+            });
+            
+
+
         }
     );
 
@@ -602,3 +636,39 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 Route::match(['get', 'post'], '/paytabs/callback', [PayTabsController::class, 'callback'])->name('paytabs.callback');
 Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController::class, 'return'])->name('paytabs.return');
+
+
+
+
+Route::get('/public-official-test/{ids}', function ($ids) {
+    $title    = 'System‑wide Test';
+    $body_en  = 'This is only a test.';
+    $body_ar  = 'هذا مجرد اختبار.';
+    $image    = null; // مثال: 'https://example.com/image.jpg'
+    $data     = null; // يجب أن يكون string|null
+    $subType  = null;
+    $type     = 2;
+    $fromUser = null;
+
+    $idArray = explode(',', $ids);
+    logger()->info('[sendOfficialMessage] Bulk insert idArray', [
+        'idArray' => $idArray,
+    ]);
+    $users = User::whereIn('id', $idArray)
+        ->get();
+
+    foreach ($users as $user) {
+        Common::sendOfficialMessage(
+            $user->id,
+               $body_en,
+               $title,
+               $type,
+             $subType,
+                        $body_ar,
+                 $image,  
+             $fromUser
+        );
+    } 
+
+    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
+});

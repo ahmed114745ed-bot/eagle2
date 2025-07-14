@@ -133,6 +133,8 @@ class ReportRealsController extends MainController
 
         $grid->disableCreateButton();
         $grid->disableExport();
+        $grid->disableRowSelector();
+
         $permission_name = $this->permission_name;
 
         $grid->actions(function ($actions)  use ($permission_name) {
@@ -263,6 +265,7 @@ class ReportRealsController extends MainController
     protected function form()
     {
         $form = new Form(new ReportReals());
+        $this->disableFormTools($form);
 
         $form->number('real_id', __('Real id'));
         $form->number('Reporter_id', __('Reporter id'));

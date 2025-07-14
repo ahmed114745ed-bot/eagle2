@@ -82,9 +82,9 @@ class RoomRepository extends AbstractRepository
     public function all($req, $ids = [])
     {
         $roomType = $req->room_type ?? 'audio';
-
         $user = $req?->user();
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
@@ -100,35 +100,42 @@ class RoomRepository extends AbstractRepository
             'owner.eligiblePacks.ware',
             'owner.medals.achievementLevel.achievement'
         ])
-            ->orderByDesc('pin')
-            ->withCount('roomVisitors')
-            ->whereHas('owner')
-            ->whereDoesntHave('owner.packs', function ($q) {
-                $q->where('type', 16)
-                    ->where('is_used', 1)
-                    ->where(function ($q) {
-                        $q->where('expire', 0)
-                            ->orWhere('expire', '>=', now()->timestamp);
-                    });
-            })
-            ->when($topRooms, function ($query) {
-                $query->orderByDesc('room_visitors_count');
-                //                $query->where(function ($query) {
-                //                    $query->where(fn($q) => $q->has("roomVisitors"))
-                //                        ->orWhere(fn($q) => $q->where('pin', 1));
-                // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
-                //                });
-            })
-            // ->where('uid','!=', Auth::id())
-            ->where('room_status', 1);
-        // Filter by country if provided
+        ->withCount('roomVisitors')
+        ->whereHas('owner')
+        ->whereDoesntHave('owner.packs', function ($q) {
+            $q->where('type', 16)
+                ->where('is_used', 1)
+                ->where(function ($q) {
+                    $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                });
+        })
+        ->where('room_status', 1);
+
+        // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
+        $result->orderByDesc('pin');
+
+
+        // إذا كان make_rooms_top صحيحاً، نضيف شروط إضافية
+        if ($topRooms) {
+//            $result->where(function ($query) {
+//                $query->where(fn($q) => $q->has("roomVisitors"))
+//                    ->orWhere(fn($q) => $q->where('pin', 1))
+//                    ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
+//            });
+            $result->orderByDesc('room_visitors_count');
+        }
+
+        $result->orderByDesc('hour_hot');
+
+        // تصفية حسب البلد إذا تم توفيره
         if (!is_null($req->country_id)) {
             $result->whereHas('owner', function ($q) use ($req) {
                 $q->where('country_id', $req->country_id);
             });
         }
 
-        // Apply filters based on 'filter' parameter
+        // تطبيق الفلاتر بناءً على معامل 'filter'
         switch ($req->filter) {
             case 'boss':
                 $roomIds = EnteredRoom::query()
@@ -141,99 +148,86 @@ class RoomRepository extends AbstractRepository
 
             case 'trend':
                 $result->orderBy('top_room', 'DESC')
-                    ->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session');
                 break;
 
             case 'popular':
-                $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc');
+                $result->orderByDesc('top_room');
                 break;
+
             case 'last_create':
-                //  dd(Carbon::now()->subDay());
-                $result->whereDate('created_at', '>=', Carbon::now()->subDays(3))->orderByDesc('id');
+                $result->whereDate('created_at', '>=', Carbon::now()->subDays(3))
+                    ->orderByDesc('id');
                 break;
+
             case 'pk':
-                // $result->where('is_show_pk', 1)->orderByDesc('room_visitors_count');
                 $result->has('lastPk');
                 break;
+
             case 'party':
                 $result->whereHas('roomCategory', function ($query) {
                     $query->where('type', 'party');
-                })->get();
+                });
                 break;
+
             case 'recently':
             case 'festival':
-                $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
-                    ->orderByDesc('session')
-                ;
+                $result->orderByDesc('top_room')
+                    ->orderByDesc('session');
                 break;
-            case 'interested':
 
+            case 'interested':
                 $roomTypes = EnteredRoom::query()
-                    ->where('uid',  $user->id)
+                    ->where('uid', $user->id)
                     ->where('entered_at', '>=', Carbon::now()->subDay())
                     ->with('room')
                     ->get()
                     ->pluck('room.room_type')
                     ->unique();
 
-                $result->whereIn("room_type", $roomTypes)->orderByDesc('top_room')
-                    ->orderByDesc('session')
-                ;
-                break;
-            case 'following':
-                //    $result->whereIn('uid', function ($query) use ($user) {
-                //         /* @var Builder $query*/
-                //         $query->select('followed_user_id')
-                //             ->from('follows')
-                //             ->where('user_id', $user->id);
-                //     })
-                $result->whereIn('uid', $user->followeds_ids())
-
-                    ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
+                $result->whereIn("room_type", $roomTypes)
+                    ->orderByDesc('top_room')
                     ->orderByDesc('session');
+                break;
 
+            case 'following':
+                $result->whereIn('uid', $user->followeds_ids())
+                    ->orderByDesc('top_room')
+                    ->orderByDesc('session');
                 break;
 
             case 'friends':
-
-
                 $result->whereIn('uid', $user->friends_ids())
-                    ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
+                    ->orderByDesc('top_room')
                     ->orderByDesc('session');
                 break;
 
             case 'nearby':
-                $userLat  = $user->lat;
+                $userLat = $user->lat;
                 $userLong = $user->long;
 
-                // Use lat/long from the related `owner` (User) model
                 $result->selectRaw(
                     'rooms.*,
-                        ( 6371 * acos( cos( radians(?) ) * cos( radians( owner.lat ) ) * cos( radians( owner.long ) - radians(?) ) + sin( radians(?) ) * sin( radians( owner.lat ) ) ) ) AS distance',
+                    ( 6371 * acos( cos( radians(?) ) * cos( radians( owner.lat ) ) * cos( radians( owner.long ) - radians(?) ) + sin( radians(?) ) * sin( radians( owner.lat ) ) ) ) AS distance',
                     [$userLat, $userLong, $userLat]
                 )
-                    ->join('users as owner', 'rooms.uid', '=', 'owner.id')
-                    ->orderBy('distance');
-                break;
-
-            default:
-
-                $result->orderByDesc('hour_hot');
+                ->join('users as owner', 'rooms.uid', '=', 'owner.id')
+                ->orderBy('distance');
                 break;
         }
 
-        // Paginate the results with 10 items per page
+        // تصفية حسب IDs إذا تم توفيرها
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);
         }
+
+        // تصفية حسب نوع الغرفة
         return $result->when($roomType != 'live', function ($q) use ($roomType) {
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
             $q->whereIn('type', ['single_live', 'multi_live']);
         })->paginate(10);
     }
-
 
     public function getRoomsByGameId($gameId = null, array $with = [])
     {

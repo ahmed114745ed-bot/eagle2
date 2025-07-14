@@ -1135,7 +1135,7 @@
                         <span class="meta-label">{{ __('diamonds') }}:</span>
                         @php
 
-                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->getTotalDiamond() ;
+                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->monthly_diamond_received;
 
                         @endphp
                         <span class="meta-value">{{ @$user_diamonds }}</span>
@@ -1165,13 +1165,14 @@
 
 
     @php
-        $activeTab = @$tab ;
+           $activeTab = request('tab', 'salary');
+
     @endphp
         <!-- Navigation Tabs -->
     <div class="agency-tabs">
-       
+
           <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
-      
+
         <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
@@ -1186,7 +1187,7 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-
+           <a href="?tab=user-coins" class="tab-btn" data-target="user-coins-tab">{{ __('User Coins') }}</a>
 
 
 
@@ -1211,7 +1212,7 @@
 
 
     <!-- packs Section -->
-    
+
     <div class="tab-content active" id="packs-tab">
         <div class="card">
             <div class="card-header">
@@ -1241,6 +1242,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
+                            <th>{{ __('Admin') }}</th>
                             <th>{{ __('get type') }}</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
@@ -1253,12 +1255,44 @@
 
                             <tbody style="color: rgb(208, 115, 43);">
                             @foreach($packs as $index => $pack)
-                                @php
+                               @php
                                     $path = @$pack->ware?->show_img ?? '';
 
+                                    $admin = null;
+
+                                    if ($pack->vip_user_id && optional($pack->userVip)->admin) {
+                                        $admin = $pack->userVip->admin;
+                                    } elseif ($pack->dash_user_id && optional($pack)->admin) {
+                                        $admin = $pack->admin;
+                                    }
+
+                                    $image = optional($admin)->avatar ?? '';
+                                    $defaultImage = asset("images/businessman-icon.jpg");
+                                    $imagePath = getImagePath($image);
+                                    $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
+
+                                    $nameRaw = optional($admin)->name;
+                                    $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
+
+                                    $uid = optional($admin)->id ?? 0;
+                                    $url = $admin ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
+                                    <td>
+                                        @if ($admin)
+                                            <a href="{{ $url ?? '#' }}" target="_blank"
+                                       style="display: inline-flex; align-items: center; text-decoration: none;">
+                                        <img src="{{ $image }}" width="30" height="30"
+                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <span>{{ $name }} ({{ $uid }})</span>
+                                    </a>
+                                        @else
+
+                                        @endif
+
+                                </td>
+                                    <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getTypeGet() }}</td>
                                     <td>{{ $pack->getType() }}</td>
                                     <td>
@@ -1266,14 +1300,14 @@
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
                                     </td>
-                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :(empty($pack->expire)? '':'∞') }}</td>
+                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :'∞' }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
-                                                    data-id="{{ $pack->id }}">
+                                                    data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
                                             </button>
-                                            <button class="btn btn-danger delete-btn" data-id="{{ $pack->id }}">
+                                            <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
@@ -1299,7 +1333,7 @@
         </div>
 
     </div>
-  
+
 
     <!-- vips Section -->
     <div class="tab-content" id="vips-tab">
@@ -1334,7 +1368,7 @@
                                     <td>
                                         <div class="d-flex">
 
-                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ $userVip->id }}">
+                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
@@ -1588,123 +1622,6 @@
         </div>
     </div>
 
-    {{-- <div class="tab-content" id="user-agency-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">{{ __('Agency join logs') }}</h4>
-            </div>
-            <div class="box-body p-3">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
-                            <input type="hidden" name="tab" value="user-agency">
-
-                            <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
-
-                            <div class="row mb-3" style="align-items: flex-end;">
-                                <!-- From Date -->
-                                <div class="col-md-4">
-                                    <div class="date-flex-row">
-                                        <i class="fa fa-calendar"></i>
-                                        <span>{{ __('Join date') }}</span>
-                                        <input type="date" class="form-control" id="from_date" name="join_date" value="{{ request('join_date') }}">
-                                    </div>
-                                </div>
-
-                                <!-- Buttons -->
-                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
-                                    <button type="submit" class="btn btn-info btn-sm me-2">
-                                        <i class="fa fa-search"></i> {{__('Search')}}
-                                    </button>
-                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
-                                        <i class="fa fa-undo"></i> {{__('Reset')}}
-                                    </a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="table-responsive">
-                    <div class="box-body ">
-                        <table class="table table-bordered table-hover align-middle data-table" id="user-agency">
-                            <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('agency') }}</th>
-                                <th>{{ __('status') }}</th>
-                                <th>{{ __('Join date') }}</th>
-                                <th>{{ __('Leave date') }}</th>
-
-
-                            </tr>
-                            </thead>
-                            @if($userJoinAgencies && $userJoinAgencies->count())
-                                <tbody style="color: rgb(208, 115, 43);">
-                                @foreach($userJoinAgencies as $index => $userJoinAgency)
-
-                                    @php
-                                        $agency = $userJoinAgency->agency;
-                                        $name = $agency->name ?? '';
-
-                                        $path = @$agency->img;
-                                        $defaultImage = asset("images/icon-agency.jpg");
-                                        $url = getImagePath($path) ?? $defaultImage;
-
-                                        if (!isImageExists($url)) {
-                                            $url = $defaultImage;
-                                        }
-
-                                        $image = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>"; // ← rectangle with slightly rounded corners
-
-                                        $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
-
-
-                                    @endphp
-
-                                    <tr>
-                                        <td>{{ $index + 1 + (($userJoinAgencies->currentPage() - 1) * $userJoinAgencies->perPage()) }}</td>
-                                        <td>
-                                            <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
-                                                <div style="display: flex; align-items: center; gap: 10px;">
-                                                    {!! $image !!}
-                                                    <div style="display: flex; flex-direction: column;">
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </td>
-
-
-                                        <td>{{$userJoinAgency->status}}</td>
-                                        <td>{{ $userJoinAgency->join_date}}</td>
-                                        <td>{{ $userJoinAgency->leave_date }}</td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            @endif
-                        </table>
-
-                        @if($userJoinAgencies)
-                            <div class="pagination-container">
-                                {{ $userJoinAgencies->appends([
-                                    'pack_page' => $packs?->currentPage(),
-                                    'vip_page' => $userVips?->currentPage(),
-                                    'gift_page' => $giftSLogs?->currentPage(),
-                                    'user_agency_page' => $userJoinAgencies?->currentPage(),
-
-                                ])->links('vendor.pagination.bootstrap-4') }}
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div> --}}
-
 
 <div class="tab-content" id="user-agency-tab" style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
     <div class="card">
@@ -1751,6 +1668,8 @@
                             <th>#</th>
                             <th>{{ __('agency') }}</th>
                             <th>{{ __('status') }}</th>
+                            <th>{{ __('kicked By') }}</th>
+                            <th>{{ __('kicked By status') }}</th>
                             <th>{{ __('Join date') }}</th>
                             <th>{{ __('Leave date') }}</th>
                         </tr>
@@ -1758,6 +1677,15 @@
                         <tbody>
                             @if($userJoinAgencies && $userJoinAgencies->count())
                                 @foreach($userJoinAgencies as $index => $userJoinAgency)
+                                    @php
+                                        $kickedBy = null;
+                                        $kickedByName = '';
+                                        $kickedByUuid = '';
+                                        $kickedByImage = '';
+                                        $kickedByUrl = '';
+                                        $status = '';
+                                    @endphp
+
                                     @php
                                         $agency = $userJoinAgency->agency;
                                         $name = $agency->name ?? '';
@@ -1769,6 +1697,42 @@
                                         }
                                         $image = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                         $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+                                    @endphp
+
+                                    @php
+                                    info($userJoinAgency->status);
+                                    info($userJoinAgency->id);
+                                       if ($userJoinAgency->status == 'kick off'){
+                                           if ($userJoinAgency->kicked_by_app){
+                                            $status = 'app';
+                                            $kickedBy = $userJoinAgency['kickedByApp'];
+                                            $kickedByName = $kickedBy->name ?? '';
+                                            $kickedByUuid = $kickedBy->uuid ?? '';
+                                            $kickedByPath = @$kickedBy->profile?->avatar;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = getImagePath($kickedByPath) ?? $defaultImage;
+                                            if (!isImageExists($url)) {
+                                                $url = $defaultImage;
+                                            }
+                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                            $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
+                                        }
+
+                                        if ($userJoinAgency->kicked_by_admin){
+                                            $status = 'admin';
+                                            $kickedBy = $userJoinAgency['kickedByAdmin'];
+                                            $kickedByName = $kickedBy->name ?? '';
+                                            $kickedByUuid = $kickedBy->id ?? '';
+                                            $kickedByPath = @$kickedBy?->avatar;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = getImagePath($kickedByPath) ?? $defaultImage;
+                                            if (!isImageExists($url)) {
+                                                $url = $defaultImage;
+                                            }
+                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                            $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
+                                        }
+                                    }
                                     @endphp
 
                                     <tr>
@@ -1784,8 +1748,18 @@
                                                 </div>
                                             </a>
                                         </td>
-                                        <td>{{__($userJoinAgency->status)}}</td>
-                                        <td>{{ $userJoinAgency->join_date}}</td>
+                                        <td>{{ $userJoinAgency->status }}</td>
+                                        <td>
+                                            @if(!empty($kickedBy) && !empty($kickedBy->id))
+                                                <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
+                                                   style="display: inline-flex; align-items: center; text-decoration: none;">
+                                                    {!! $kickedByImage !!}
+                                                    <span>{{ $kickedByName }} ({{ $kickedByUuid }})</span>
+                                                </a>
+                                            @endif
+                                        </td>
+                                        <td>{{ @$status }}</td>
+                                        <td>{{ $userJoinAgency->join_date }}</td>
                                         <td>{{ $userJoinAgency->leave_date }}</td>
                                     </tr>
                                 @endforeach
@@ -1811,6 +1785,65 @@
     </div>
 </div>
 </div>
+
+@if($activeTab == 'user-coins')
+
+<div class="tab-content" id="user-coins-tab" style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title" style="text-align: left;">{{ __('') }}</h4>
+        </div>
+        <div class="table-responsive">
+            <div class="box-body ">
+                <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('type') }}</th>
+                            <th>{{ __('sub type') }}</th>
+                            <th>{{ __('amount') }}</th>
+                            <th>{{ __('from date') }}</th>
+                            <th>{{ __('to date') }}</th>
+                        </tr>
+                    </thead>
+                    @if($usersCoins && $usersCoins->count())
+                        <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($usersCoins as $index => $coin)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $coin->type }}</td>
+                                    <td>{{ @$coin->sub_type ?? 0 }}</td>
+                                    <td>{{ @$coin->amount ?? 0 }}</td>
+                                    <td>{{ @$coin->from_date ?? 0 }}</td>
+                                    <td>{{ @$coin->to_date ?? 0 }}</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$coin->id }}">
+                                                {{ __('dashboard.delete') }}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    @endif
+                </table>
+
+                @if($usersCoins)
+                    <div class="pagination-container">
+                        {{ $usersCoins->appends([
+                            'pack_page' => $packs?->currentPage(),
+                            'salary_page' => $salaries?->currentPage(),
+                            'gift_page' => $giftSLogs?->currentPage(),
+                        ])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 @if($activeTab == 'charge')
     <div class="tab-content active" id="charge-tab">
@@ -1873,7 +1906,7 @@
                                   $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
                             @endphp
                             <tr>
-                                <td>{{ $charge->id }}</td>
+                                <td>{{ @$charge->id ?? 0 }}</td>
                                 <td>
                                     <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
@@ -1991,6 +2024,8 @@
                     </div>
                 </div>
 
+
+
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle">
@@ -2024,6 +2059,7 @@
 
                                 $roomName = @$giftSLog->room->room_name ?? '-';
                                 $path = @$giftSLog->room->room_cover;
+                                $ownerRoom = @$giftSLog->room->uid ?? 0;
                                 $url = getImagePath($path) ?? $defaultImage;
                                 if (!isImageExists($url)) {
                                     $url = $defaultImage;
@@ -2035,7 +2071,7 @@
                             @endphp
 
                             <tr>
-                                <td>{{ $giftSLog->id }}</td>
+                                <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
                                     <a href="{{ url('admin/users/' . $id) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
@@ -2048,7 +2084,7 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="#" target="_blank"
+                                    <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $url }}"
                                              width="30" height="30"

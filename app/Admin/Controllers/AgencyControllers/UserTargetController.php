@@ -42,11 +42,15 @@ class UserTargetController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('uuid'));
             });
-             $filter->column(1 / 2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->equal('add_month', __('month'));
             });
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('add_year', __('year'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('agency.id', __('agency id'));
             });
         });
         $grid->model()->ofAgency()->where('agency_obtain', '>', 0);
@@ -81,7 +85,7 @@ class UserTargetController extends MainController
             ";
         });
         $grid->column('agency_id', __('agency'))->display(function () {
-             if (request()->filled('_export_')) {
+            if (request()->filled('_export_')) {
                 return $name ?? '';
             }
             if (!@$this->agency) {
@@ -174,6 +178,7 @@ class UserTargetController extends MainController
             HTML;
         });
         $grid->column('user_obtain', __('salary'))->display(function ($usd) {
+            $usd =  truncateAndTrim($usd);
             if (request()->filled('_export_')) {
                 return $usd ?? 0;
             }
@@ -192,6 +197,7 @@ class UserTargetController extends MainController
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)
                 ->value('cut_amount') ?? 0;
+            $userSalary =  truncateAndTrim($userSalary);
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
@@ -213,6 +219,7 @@ class UserTargetController extends MainController
                 ->where('user_agency_id', $this->agency_id)
                 ->selectRaw('sallary - cut_amount AS net_salary')
                 ->value('net_salary') ?? 0;
+            $userSalary =  truncateAndTrim($userSalary);
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
@@ -223,6 +230,7 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('agency_obtain', __('agency salary'))->display(function ($usd) {
+            $usd =truncateAndTrim($usd);
             if (request()->filled('_export_')) {
                 return $usd ?? 0;
             }

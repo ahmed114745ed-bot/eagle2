@@ -1,6 +1,5 @@
 <?php
 
-use App\Admin\Controllers\ExportController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -8,21 +7,17 @@ use App\Models\RoomVisitor;
 use App\Models\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
-use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoomSettings;
-use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\UserController;
-use App\Http\Controllers\PaytabsController;
+use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\SettingsController;
-use Encore\Admin\Controllers\AdminController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
-use App\Admin\Controllers\ConfigController as ControllersConfigController;
-
+use App\Admin\Controllers\AppearChargerAgencyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +121,16 @@ Route::get('/clear', function () {
 
     return "Cleared!";
 });
+
+Route::get('/clear-config', function () {
+
+    Artisan::call('config:clear');
+    Artisan::call('config:cache');
+
+
+    return "Cleared!";
+});
+
 Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
     return Excel::download(new AgencyCharge($agencyId), 'shipping_agency.xlsx');
 });
@@ -234,6 +239,7 @@ Route::group(
 
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
+        Route::post("transfer-salary-reliable-shipping-agency", [AppearChargerAgencyController::class, "transferSalary"]);
 
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
@@ -289,7 +295,7 @@ Route::get('/delete_reward_target', function () {
 });
 
 Route::get('/test-fcm/{userid}', function ($userId) {
-    $testToken = 'fTFfWXoaQUqjCqFRqMqqGG:APA91bGw6rmXbrGm8XwPwwZ6sJOlcxeXrGNffGbpfXWBzIBK463WyoDFArkJJnYDRzvjDOP23Q2xqh6_c95vsdk08ww7v_R4GJeTOSxSDuWGTXVOLxpxzxE';
+    $testToken = 'eLG5n60VSDupE3pAEzjmXo:APA91bEupCIDwqtaS8vwNUyZ-FvOicTqIwZo15INz-cAXFunxijCw2AxqTUSu9UDMB_xrBcTUcFg9NWXgB2n173aZmMqMetdmBO7YSccMSf64JCpJihjeNc';
 
     $language = 'ar'; // أو 'en'
     $userLevel = 5; // مستوى افتراضي للاختبار

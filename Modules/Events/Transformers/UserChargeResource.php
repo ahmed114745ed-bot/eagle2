@@ -23,14 +23,13 @@ class UserChargeResource extends JsonResource
     {
 
         $currentDate = Carbon::now();
-
         $endOfMonth = $currentDate->copy()->endOfMonth();
 
-        // Calculate the difference between the end of the month and the current date
-        $timeDifference = $endOfMonth->diff($currentDate);
+        $timeDifference = $currentDate->diff($endOfMonth);
+
         $timeComponents = [
-            'day' => $timeDifference->days,
-            'hour' => $timeDifference->h,
+            'day'    => $timeDifference->d,
+            'hour'   => $timeDifference->h,
             'minute' => $timeDifference->i,
             'second' => $timeDifference->s,
         ];

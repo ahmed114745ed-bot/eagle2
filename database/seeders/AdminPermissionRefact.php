@@ -121,6 +121,11 @@ class AdminPermissionRefact extends Seeder
                         'except' => ['create', 'edit', 'delete', 'show'],
                         'additional' => ['add-switch', 'charge-report-switch'],
                     ],
+                    [
+                        'key' => 'charge-to-user',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['add-switch', 'history-switch'],
+                    ],
                 ],
             ],
             [
@@ -130,7 +135,7 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'deleted-accounts', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['delete-user-account-switch', 'restore-user-account-switch']],
                     ['key' => 'users', 'except' => [], 'additional' => ['level-switch', 'chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch', 'salary-switch', 'delete-profile-switch']],
                     ['key' => 'complaints', 'except' => [], 'additional' => []],
-                     ['key' => 'user-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
+                    ['key' => 'user-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
 
                 ],
             ],
@@ -223,7 +228,7 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 16,
                 'permissions' => [
                     ['key' => 'appear-charger-agency', 'except' => ['delete', 'show'], 'additional' => ['delete-switch']],
-                    ['key' => 'charge-agency', 'except' => [], 'additional' => []],
+                    ['key' => 'charge-agency', 'except' => [], 'additional' => ['actions-switch']],
                     ['key' => 'payment-gat-way', 'except' => [], 'additional' => []],
                     ['key' => 'agency-manger-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                     ['key' => 'Payment-methods-for-shipping-agencies', 'except' => ['browse', 'show'], 'additional' => []],
@@ -276,6 +281,7 @@ class AdminPermissionRefact extends Seeder
                 'permissions' => [
                     ['key' => 'boxes', 'except' => [], 'additional' => []],
                     ['key' => 'box-use', 'except' => ['create'], 'additional' => []],
+                    ['key' => 'box-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
             [

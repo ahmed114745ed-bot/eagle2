@@ -48,7 +48,7 @@ use Illuminate\Support\Facades\URL;
 
 use Encore\Admin\Form;
 use App\Admin\Fields\Image;
-
+use App\Services\Gifts\LuckyGiftService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -197,5 +197,12 @@ class AppServiceProvider extends ServiceProvider
         Agency::observe(AgencyObserver::class);
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
         Vip::observe(VipObserver::class);
+
+
+        $luckyGiftService = app(LuckyGiftService::class);
+        $probabilityTimes = $luckyGiftService->getProbabilityTimes(); // مجموعة 3 مصفوفات
+        Cache::put('probability_times_1', $probabilityTimes[0], now()->addMinutes(60));
+        Cache::put('probability_times_2', $probabilityTimes[1], now()->addMinutes(60));
+        Cache::put('probability_times_3', $probabilityTimes[2], now()->addMinutes(60));
     }
 }

@@ -13,7 +13,7 @@
         width: 250px;
         background: #222;
         min-height: 400px;
-
+        align-self: flex-start;
         padding: 20px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     }
@@ -351,6 +351,32 @@
         transform: translateX(26px);
     }
 
+    .grid-per-pager .input, select{
+        width: auto !important;
+    }
+
+    .exportPdfForm {
+        background: transparent !important;
+    }
+
+    .modal-body input,
+    .modal-body select {
+        width: auto !important;
+    }
+
+    .close {
+        right: 0 !important;
+        top: 0 !important;
+        font-size: 30px !important;
+    }
+
+    button.close {
+        width: auto !important;
+    }
+
+    .btn-sm {
+        margin: 0 !important;
+    }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -366,6 +392,8 @@
                 <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
                 <button onclick="showSection('user_days')">{{ __('user days') }}</button>
                 <button onclick="showSection('agency_settings')">{{ __('Agency Settings') }}</button>
+
+                <button onclick="showSection('targets_table')">{{ __('Targets') }}</button>
             </div>
         </div>
 
@@ -415,12 +443,9 @@
                 @endif
                 <div class="form">
                     <label>{{ __('Hours:') }} </label>
-                    <input type="number" name="hours_days" value="{{ Cache::get('hours_days') }}" class="form-control">
-
+                    <input type="number" name="hours_days" value="{{ $hoursDays }}" class="form-control">
                     <button type="submit">{{ __('Save') }}</button>
-
                 </div>
-
             </form>
             </div>
 
@@ -587,7 +612,7 @@
                     </div>
                     <div class="switch-container mt-4">
                         <div class="switch-item">
-                            <label for="stopGiftCheckbox" class="switch-label">ايقاف ارسال الهدايا للجميع</label>
+                            <label for="stopGiftCheckbox" class="switch-label">{{__('Stop sending gifts to everyone')}}</label>
                             <label class="switch">
                                 <input type="checkbox" id="stopGiftCheckbox" {{ $make_gift_top == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>
@@ -596,6 +621,12 @@
                     </div>
                 </form>
 
+            </div>
+
+            <div id="targets_table" class="settings-section">
+                <h3>{{ __('Targets table') }}</h3>
+
+                {!! $targetGrid !!}
             </div>
 
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
@@ -754,7 +785,7 @@
                     stopCharge:         ['/admin/send-request-stop-charge',  'stop_charge'],
                     stopInviteCode:     ['/admin/send-request-invite-code',        'stop_invite_code'],
                     stopTransferSalary: ['/admin/send-request-transfer-salary','transfer_salary'],
-                    stopGiftCheckbox:   ['/admin/close-open-gift',           'make_rooms_top'],
+                    stopGiftCheckbox:   ['/admin/close-open-gift',           'close_open_gifts'],
                 };
 
                 const [url, key] = map[id];

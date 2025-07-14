@@ -75,7 +75,11 @@ class BaishunGameController extends Controller
         $userDi += (int) $request->currency_diff;
         $gameId = User::withoutAppends()->where('id', $id)->value('game_id');
         dispatch(new GameWalletJop($request->currency_diff));
-        CoinGameUser::create(['user_id' => $id, 'coins' => abs($request->currency_diff), 'type' => $type, 'game_id' => @$gameId]);
+        CoinGameUser::create(['user_id' => $id,
+         'coins' => abs($request->currency_diff),
+         'app_profit_coins' => abs($request->currency_diff),
+         'type' => $type, 'game_id' => @$gameId
+        ]);
         $responseArray = [
             'code' => 0,
             'message' => 'succeed',

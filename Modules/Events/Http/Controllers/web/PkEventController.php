@@ -153,6 +153,8 @@ class PkEventController extends MainController
     protected function form()
     {
         $form = new Form(new PkEvent());
+        $this->disableFormTools($form);
+
         $form->display(__('admin.ID'));
         $form = new Form(new PkEvent());
         $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');

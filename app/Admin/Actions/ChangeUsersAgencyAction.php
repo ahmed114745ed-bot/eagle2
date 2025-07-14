@@ -12,6 +12,7 @@ use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 
 class ChangeUsersAgencyAction extends RowAction
@@ -38,42 +39,53 @@ class ChangeUsersAgencyAction extends RowAction
     $ownerId = Agency::where('id', $request->old_agency_id)->value('app_owner_id');
 
     $users = User::where('agency_id', $request->old_agency_id)
-        ->where('type_user', 1)
+        // ->where('type_user', 1)
         ->when($ownerId, function ($query) use ($ownerId) {
-            $query->where('id', '!=', $ownerId);
+            $query->where('id', '=', $ownerId);
         })
         ->get();
+      
+        if ($users->count() === 1 && $users->pluck('id')->first() == $ownerId) {
+            $error = new MessageBag([
+                'title'   => __('error_title_div'),
+                'message' => __('cant it owner'),
+            ]);
+    
+            session()->flash('error', $error);
+            throw new \Exception(__('cant it owner'));
+        }
    
     $checkAgencyUser = UsersJoinedAgency::where([
 
         'agency_id' => $request->old_agency_id,
         'type' => 2,
-    ])->where('leave_date', null)->update(['leave_date'=> now(),'status' => 'from admin']);
+    ])->where('leave_date', null)->update(['leave_date'=> now(),'status' => 'change agency by admin']);
         foreach($users as $user)
         {
             $user->agency_id = $request->new_agency_id;
+            $user->monthly_diamond_received = 0;
             $user->save();
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $user->id,
                 'agency_id' => $request->old_agency_id,
-                'type' => 2,
+                // 'type' => 2,
             ])->where('leave_date', null)->exists();
             if (!$checkAgencyUser) {
                 UsersJoinedAgency::create([
                     'user_id' => $user->id,
-                    'agency_id' => $request->old_agency_id,
+                    'agency_id' =>$request->new_agency_id,
                     'type' => 2,
                     'join_date' => now(),
                     'status' =>'Joined'
                 ]);
             }
         }
-        $usersSalary = UserSallary::where('user_agency_id',$request->old_agency_id)->where('month',now()->month)->where('year',now()->year)->get();
-        foreach($usersSalary as $userSalary)
-        {
-            $userSalary->user_agency_id = $request->new_agency_id;
-            $userSalary->save();
-        }
+        // $usersSalary = UserSallary::where('user_agency_id',$request->old_agency_id)->where('month',now()->month)->where('year',now()->year)->get();
+        // foreach($usersSalary as $userSalary)
+        // {
+        //     $userSalary->user_agency_id = $request->new_agency_id;
+        //     $userSalary->save();
+        // }
 
         return $this->response()->success('success')->refresh();
     }

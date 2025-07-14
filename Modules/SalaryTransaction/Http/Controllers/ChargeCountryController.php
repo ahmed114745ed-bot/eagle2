@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Country;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -81,9 +82,16 @@ class ChargeCountryController extends MainController
         $grid->column('country.e_name',trans('english name'));
         $grid->column('country.phone_code',trans('phone code'));
         $grid->column('country.language',trans ('language'));
-        $grid->column ('country.flag',trans ('flag'))->image ('',30);
+        $grid->column('country.flag', __('flag'))
+            ->display(function ($value) {
+                if (request()->filled('_export_')) {
+                    return '=IMAGE("' . getImagePath($value) . '","flag",1)';
+                }
 
-        $this->extendGrid ($grid);
+                $url = getImagePath($value);
+                return "<img src=\"{$url}\" style=\"max-height:30px\" class=\"img img-thumbnail\" />";
+            });
+        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -111,6 +119,7 @@ class ChargeCountryController extends MainController
     protected function form()
     {
         $form = new Form(new ChargeCountry);
+        $this->disableFormTools($form);
 
         $form->display(__('admin.ID'));
         $form->select('country_id', __('country'))->options (function (){
@@ -126,6 +135,15 @@ class ChargeCountryController extends MainController
             }
 
         });
+
+        Admin::script(<<<'JS'
+            $(document).on('pjax:start', function () {
+                $('.select2-container--open').each(function () {
+                    $(this).remove();
+                });
+            });
+        JS);
+
         return $form;
     }
 }

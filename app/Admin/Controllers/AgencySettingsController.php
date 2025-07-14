@@ -39,6 +39,7 @@ class AgencySettingsController extends MainController
         $moments =  Common::getSettingValue('moments') ?? 0;
         $reels = Common::getSettingValue('reels') ?? 0;
         $diamonds = Common::getSettingValue('diamonds');
+        $hoursDays = Common::getSettingValue('hours_days');
         $transfer_salary = settings()->get('transfer_salary');
         $stop_invite_code = settings()->get('stop_invite_code');
         $stop_charge = settings()->get('stop_charge');
@@ -46,21 +47,26 @@ class AgencySettingsController extends MainController
         $make_gift_top = settings()->get('close_open_gifts');
         $languages = Language::all();
         $configAll = Config::all();
-        return parent::index($content
-            ->view('agency_settings', compact(
-                'hours',
-                'days',
-                'moments',
-                'reels',
-                'diamonds',
-                'languages',
-                'configAll',
-                'transfer_salary',
-                'stop_invite_code',
-                'stop_charge',
-                'make_rooms_top',
-                'make_gift_top',
-            )));
+
+        $vars = compact(
+            'hours', 'days', 'moments', 'reels', 'diamonds', 'transfer_salary',
+            'stop_invite_code', 'stop_charge', 'make_rooms_top', 'make_gift_top', 'languages', 'configAll',
+            'hoursDays'
+        );
+
+        $targetGrid = app(TargetController::class)
+            ->gridInstance();
+
+        $targetGrid->resource('targets');
+
+        $targetGridHtml = $targetGrid->render();
+
+           return parent::index(
+               $content->title(__('Agency settings'))
+                   ->view('agency_settings', array_merge($vars, [
+                       'targetGrid' => $targetGridHtml
+                   ]))
+           );
     }
 
     public function badges()

@@ -113,6 +113,7 @@ class UserGiftAchController extends MainController
     protected function form()
     {
         $form = new Form(new GiftAchievement());
+        $this->disableFormTools($form);
 
         $form->number('achievement_id', __('Achievement id'));
         $form->number('gift_id', __('Gift id'));

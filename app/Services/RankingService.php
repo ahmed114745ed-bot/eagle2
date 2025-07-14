@@ -121,7 +121,7 @@ class RankingService
             $this->transformDataV2($data, $class, 'user_id', 'user');
             return $this->prepareResponseV2($data, $user, $type, 'user_id', $user->id, $class, $limit);
         } elseif ($class == 6) {
-            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            $data = $this->rankingRepo->getUserGameCoinsV2($type, $limit);
             return $this->prepareResponse2($data, $user, $type, $user->id, $class);
             return \App\Http\Resources\RankingResource::collection($data);
         }

@@ -57,7 +57,7 @@ class ChatMessageResource extends JsonResource
 
     function create_at($timeZone = null)
     {
-        $createdAt = Carbon::parse($this->created_at)->setTimezone($timeZone);
+        $createdAt = Carbon::parse($this->created_at);//->setTimezone($timeZone);
 
         if ($createdAt->isCurrentHour() || $createdAt->isCurrentDay()) {
             if (app()->getLocale() == 'ar') {

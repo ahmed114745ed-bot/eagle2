@@ -23,12 +23,17 @@
     }
 
     .rtl label {
-        margin: 0 0 0 10px !important;
+        margin: 0 !important;
     }
 
     .ltr label {
-        margin: 0 70px 0 0 !important;
+        margin: 0 !important;
     }
+
+    .pagination {
+        padding-left: revert !important;
+    }
+
     .fileinput-remove{
         display: none;
 

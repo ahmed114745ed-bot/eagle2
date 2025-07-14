@@ -9,80 +9,80 @@ use Illuminate\Support\Facades\DB;
 
 class LogAppProfitCoinsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'log:app-profit-coins';
-
-    protected $description = 'Log all app_profit_coins from cron-based tables every 10 minutes';
-
-    public function handle()
-    {
-        $this->info("Start scanning profit tables...");
-        $this->info("Start scanning profit tables...");
-
-        $now = Carbon::now();
-        $from = $now->copy()->subMinutes(10)->toDateTimeString();
-        $to = $now->toDateTimeString();
     
-        // 🧩 جدول gift_logs
-        $giftLogs = DB::table('gift_logs')
-            ->where('app_profit_coins', '!=', 0)
-            ->get();
+        protected $signature = 'log:app-profit-coins';
+        protected $description = 'Log all app_profit_coins from cron-based tables every 10 minutes';
     
-        foreach ($giftLogs as $log) {
-            UserCoinLog::create([
-                'user_id' => $log->sender_id ?? null,
-                'type' => 'gift',
-                'sub_type' => 'gift_logs',
-                'amount' => $log->app_profit_coins,
-                'from_date' => $from,
-                'to_date' => $to,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            DB::table('gift_logs')->where('id', $log->id)->update(['app_profit_coins' => 0]);
+        public function handle()
+        {
+            $this->info("Start scanning profit tables...");
+    
+            $tables = [
+                [
+                    'table' => 'gift_logs',
+                    'user_column' => 'sender_id',
+                    'type' => 'gift',
+                    'sub_type' => 'gift_logs'
+                ],
+                [
+                    'table' => 'coin_game_users',
+                    'user_column' => 'user_id',
+                    'type' => 'game',
+                    'sub_type' => 'coin_game_users'
+                ],
+                [
+                    'table' => 'user_lucky_gifts',
+                    'user_column' => 'user_id',
+                    'type' => 'lucky',
+                    'sub_type' => 'user_lucky_gifts'
+                ]
+            ];
+    
+            foreach ($tables as $config) {
+                $this->processTable(
+                    $config['table'],
+                    $config['user_column'],
+                    $config['type'],
+                    $config['sub_type']
+                );
+            }
+    
+            $this->info("Profit logs completed ✅");
         }
     
-        $games = DB::table('coin_game_users')
-            ->where('app_profit_coins', '!=', 0)
-            ->get();
+        protected function processTable(string $table, string $userColumn, string $type, string $subType): void
+        {
+            $rows = DB::table($table)
+                ->select('id', $userColumn, 'app_profit_coins', 'created_at')
+                ->where('app_profit_coins', '!=', 0)
+                ->get();
     
-        foreach ($games as $game) {
-            UserCoinLog::create([
-                'user_id' => $game->user_id,
-                'type' => 'game',
-                'sub_type' => 'coin_game_users',
-                'amount' => $game->app_profit_coins,
-                'from_date' => $from,
-                'to_date' => $to,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            DB::table('coin_game_users')->where('id', $game->id)->update(['app_profit_coins' => 0]);
+            if ($rows->isEmpty()) return;
+    
+            $from = $rows->min('created_at');
+            $to = $rows->max('created_at');
+    
+            $now = now();
+            $logs = [];
+    
+            foreach ($rows as $row) {
+                $logs[] = [
+                    'user_id' => $row->{$userColumn},
+                    'type' => $type,
+                    'sub_type' => $subType,
+                    'amount' => $row->app_profit_coins,
+                    'from_date' => $from,
+                    'to_date' => $to,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+    
+            UserCoinLog::insert($logs);
+    
+            DB::table($table)
+                ->whereIn('id', collect($rows)->pluck('id'))
+                ->update(['app_profit_coins' => 0]);
         }
     
-        // 🧩 جدول user_lucky_gifts
-        $luckyGifts = DB::table('user_lucky_gifts')
-            ->where('app_profit_coins', '!=', 0)
-            ->get();
-    
-        foreach ($luckyGifts as $gift) {
-            UserCoinLog::create([
-                'user_id' => $gift->user_id,
-                'type' => 'lucky',
-                'sub_type' => 'user_lucky_gifts',
-                'amount' => $gift->app_profit_coins,
-                'from_date' => $from,
-                'to_date' => $to,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            DB::table('user_lucky_gifts')->where('id', $gift->id)->update(['app_profit_coins' => 0]);
-        }
-    
-        $this->info("Profit logs completed ✅");
-    }
 }

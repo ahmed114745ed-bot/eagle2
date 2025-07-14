@@ -197,6 +197,7 @@ class RequestProblemController extends MainController
     protected function form()
     {
         $form = new Form(new Emoji);
+        $this->disableFormTools($form);
 
         $form->display(__('admin.ID'));
         $form->select('pid', __('pid'))->options(function () {

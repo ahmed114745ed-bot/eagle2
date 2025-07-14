@@ -17,6 +17,8 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
     {
         $month = request('month', now()->month);
         $year = request('year', now()->year);
+        $id = request('id');
+     
 
         // Step 1: Query users and eager load agency
         $users = User::query()
@@ -24,8 +26,8 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             ->whereNotNull('agency_id')
             ->where('agency_id', '!=', 0)
             ->when(request('agency_id'), fn($q) => $q->where('agency_id', request('agency_id')))
+            ->when(request('id'), fn($q) => $q->where('id', request('id')))
             ->get();
-
         // Step 2: Query salaries in one shot and map by user_id
         $salaries = UserSallary::query()
             ->select([
@@ -61,15 +63,16 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
                 'diamonds' => (string) ($user->getTotalDiamond($month, $year) ?? 0) . ' 💎',
                 'days' => $salary->achieved_days ?? '0/0',
                 'hours' => $salary->achieved_hours ?? '0/0',
-                'moment' => $this->formatExtras($moment),
-                'reel' => $this->formatExtras($reel),
                 'target' => ($salary->target ?? 0) ,
                 'withdrawn' => $salary->expenses ?? 0,
                 'salary' => round($salary?->salary ?? 0, 2). '💲',
+                'year' => $year,
+                'month' => $month,
+                'moment' => $this->formatExtras($moment),
+                'reel' => $this->formatExtras($reel),
                 'agency' => @$user?->agency?->name ?? '-',
                 'agency_id' => $user->agency?->id ?? '-',
-                'month' => $month,
-                'year' => $year,
+           
             ];
         }
 
@@ -89,15 +92,16 @@ class UserExporter implements FromCollection, WithColumnWidths, WithHeadings
             __('diamonds', [], 'ar'),
             __('days', [], 'ar'),
             __('hours', [], 'ar'),
+            __('target', [], 'ar'),
+            __('expenses', [], 'ar'),
+            __('salary', [], 'ar'),
+            __('year', [], 'ar'),
+            __('month', [], 'ar'),
             __('moment', [], 'ar'),
             __('reels', [], 'ar'),
-            __('target', [], 'ar'),
-            __('withdrawn', [], 'ar'),
-            __('salary', [], 'ar'),
             __('agency', [], 'ar'),
             __('agency_id', [], 'ar'),
-            __('month', [], 'ar'),
-            __('year', [], 'ar'),
+           
         ];
     }
 

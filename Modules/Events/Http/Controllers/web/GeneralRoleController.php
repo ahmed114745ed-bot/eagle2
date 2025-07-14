@@ -99,6 +99,7 @@ class GeneralRoleController extends MainController
     protected function form()
     {
         $form = new Form(new GeneralRole);
+        $this->disableFormTools($form);
 
         $form->display('ID');
         $form->select('type', __('type'))->options(

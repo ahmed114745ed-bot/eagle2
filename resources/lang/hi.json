@@ -2677,6 +2677,29 @@
 "Reel Likes": "रील्स पसंद",
 "Sent Transactions": "भेजे गए लेन-देन",
   "Received Transactions": "प्राप्त किए गए लेन-देन",
+
+    "Charge To User": "उपयोगकर्ता को चार्ज",
+    "Browse charge to user": "उपयोगकर्ता को चार्ज ब्राउज़ करें",
+    "Add switch charge to user": "उपयोगकर्ता को चार्ज जोड़ें",
+    "History switch charge to user": "उपयोगकर्ता को चार्ज का इतिहास",
+    "Total Gift Price:": "कुल उपहार मूल्य:",
+
+    "kicked By": "किसके द्वारा निकाला गया",
+    "kicked By status": "निकाले जाने का तरीका",
+    "Total success charges": "सफल लेन-देन की कुल राशि",
+    "forbidden": "अनुमति नहीं है",
+
+    "Coins Added": "सिक्के जोड़े गए",
+    "Coins Deducted": "सिक्के काटे गए",
+    "You have received :coins coins from admin.": "आपको एडमिन से :coins सिक्के प्राप्त हुए हैं।",
+    ":coins coins were deducted from your account by admin.": "आपके खाते से :coins सिक्के एडमिन द्वारा काटे गए हैं।",
+    "VIP Assigned": "वीआईपी प्रदान किया गया",
+    "You have received VIP access for :days days from admin.": "आपको एडमिन से :days दिनों के लिए वीआईपी एक्सेस मिला है।",
+    "Coins Received": "सिक्के प्राप्त हुए",
+    "You have received :coins coins (equivalent to :usd USD) from :sender.": "आपको :sender से :coins सिक्के (जो :usd USD के बराबर हैं) प्राप्त हुए हैं।",
+    "Balance Recharged": "बैलेंस रिचार्ज किया गया",
+    "Your balance has been recharged with :usd coins by :name.": ":name द्वारा आपके बैलेंस में :usd कॉइन जोड़े गए हैं।",
+
 "Reel Comments": "रील्स टिप्पणियाँ"
 
 

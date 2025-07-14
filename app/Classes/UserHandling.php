@@ -84,7 +84,7 @@ class UserHandling
             Common::handelVip($vip, $user, null, userVip: $userVip);
         }
     }
-    public function kickUserFromAgency(User &$user)
+    public function kickUserFromAgency(User &$user, $isApp = 0): void
     {
         // decrement total diamond with monthly diamond when user not in agency
         $user->total_diamond_received -= $user->monthly_diamond_received;
@@ -99,9 +99,10 @@ class UserHandling
 
         // set user salary this month to zero
         $values = [
-            'sallary'        => 0,
-            'cut_amount'     => 0,
+            // 'sallary'        => 0,
+            // 'cut_amount'     => 0,
             // 'agency_sallary' => 0
+            'is_finished' => true
         ];
 
         $user_sallaries = UserSallary::query()
@@ -111,7 +112,6 @@ class UserHandling
             ->orderBy('id', 'desc')
             ->take(2)
             ->get();
-
         if ($user_sallaries->isNotEmpty()) {
             if ($user_sallaries[0]->month == now()->month && $user_sallaries[0]->year == now()->year && count($user_sallaries) >= 2) {
                 $user_salary_this_month = $user_sallaries[0];
@@ -140,7 +140,12 @@ class UserHandling
 
         if ($agencyUserJoined) {
             $agencyUserJoined->leave_date = now();
-            $agencyUserJoined->status = 'from admin';
+            $agencyUserJoined->status = 'kick off';
+            if ($isApp){
+                $agencyUserJoined->kicked_by_app = auth()->id();
+            }else{
+                $agencyUserJoined->kicked_by_admin = auth()->id();
+            }
             $agencyUserJoined->save();
         }
     }
@@ -154,8 +159,9 @@ class UserHandling
         foreach ($usersIds as $user_id) {
             // set user salary this month to zero
             $values = [
-                'sallary'        => 0,
-                'cut_amount'     => 0,
+                // 'sallary'        => 0,
+                // 'cut_amount'     => 0,
+                'is_finished' => true,
 
             ];
 

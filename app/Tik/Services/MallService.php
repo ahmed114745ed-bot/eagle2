@@ -161,7 +161,7 @@ class MallService
 
     public function getWabbles()
     {
-        return $this->wareRepository->getFromType(12);
+        return $this->wareRepository->getAllFromType(12);
     }
 
     public function warePadding($id)

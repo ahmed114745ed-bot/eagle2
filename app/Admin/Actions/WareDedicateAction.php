@@ -58,7 +58,7 @@ class WareDedicateAction extends Action
                     DB::beginTransaction();
                     try {
                         $pack->using == 1 ? $pack->expire += (($request->days ?? $ware->expire) * 86400) : $pack->days += $request->days ?? $ware->expire;
-                        //$pack->expire += (($request->days ?? $ware->expire) * 86400);
+                        $pack->dash_user_id = auth()->id();
                         $pack->save();
                         if ($ware->type == 25) {
                             $user->special_id = $ware->value;
@@ -105,7 +105,7 @@ class WareDedicateAction extends Action
 
             $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
             // $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;
-
+            $arr['dash_user_id']  = auth()->id();
 
             Pack::query()->create($arr);
             if ($ware->type == 25) {

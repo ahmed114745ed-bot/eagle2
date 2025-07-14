@@ -133,7 +133,18 @@ class ChargeController extends Controller
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
 
             DB::commit();
-            // return $data;
+
+            $notificationToken[] = DB::table('users')->where('id', $to->id)->value('notification_id');
+
+            $title = __('Coins Received');
+            $body = __('You have received :coins coins (equivalent to :usd USD) from :sender.', [
+                'coins' => $coins,
+                'usd' => $usd,
+                'sender' => $from->name
+            ]);
+
+            Common::send_firebase_notification($notificationToken, $title, $body);
+
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
             DB::rollBack();
@@ -163,6 +174,9 @@ class ChargeController extends Controller
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
         if ($to->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
+        }
+        if (!Common::canTransferToAgency($to)) {
+            return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
 
         $usd = $request->usd;
@@ -302,7 +316,19 @@ class ChargeController extends Controller
                 (new UserAchievementService())->insertCharging($receiver, $amount);
             }
             UserCommon::UserEarnedInvitation($receiver->id, $amount);
+            UserCommon::addChargeLevel($receiver->id, $amount);
             $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
+
+            $notificationToken[] = DB::table('users')->where('id', $receiver->id)->value('notification_id');
+
+            $title = __('Balance Recharged');
+            $body = __('Your balance has been recharged with :usd coins by :name.', [
+                'usd' => $amount,
+                'name' => $user->name,
+            ]);
+
+            Common::send_firebase_notification($notificationToken, $title, $body);
+
             return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {
 
@@ -333,8 +359,11 @@ class ChargeController extends Controller
         }
         $receiver = Common::searchAgency($userUuid);
         if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
-        if ($receiver->is_frozen == 1) {
+        if ($receiver->is_frozen == 1 ) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
+        }
+        if (!Common::canTransferToAgency($receiver)) {
+            return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
 
         try {

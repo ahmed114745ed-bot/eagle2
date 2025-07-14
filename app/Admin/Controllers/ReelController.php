@@ -209,6 +209,7 @@ class ReelController extends MainController
     protected function form()
     {
         $form = new Form(new Real());
+        $this->disableFormTools($form);
 
         $form->number('user_id', __('User id'));
         $form->text('description', __('Description'));

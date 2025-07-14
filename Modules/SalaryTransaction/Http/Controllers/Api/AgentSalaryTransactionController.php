@@ -5,10 +5,8 @@ namespace Modules\SalaryTransaction\Http\Controllers\Api;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Http\Resources\Api\V1\ChargeAgentResource;
-use App\Models\PaymentGateway;
 use App\Models\ShippingAgency;
 use App\Tik\Repositories\UserRepository;
-use Modules\SalaryTransaction\Helpers\TransactionCustomNotification;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
 use App\Models\Agency;
@@ -16,24 +14,15 @@ use App\Models\AgencySallary;
 use App\Models\Charge;
 use App\Models\Config;
 use App\Models\User;
-use App\Models\UserSallary;
-use Auth;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Modules\SalaryTransaction\Entities\AdminCheck;
 use Modules\SalaryTransaction\Entities\AgencyTransferSalary;
 use Modules\SalaryTransaction\Entities\AgentSalaryRequest;
 use Modules\SalaryTransaction\Entities\ChargeCountry;
-use Modules\SalaryTransaction\Transformers\RequestsResource;
-use Modules\SalaryTransaction\Entities\PendingSalaryRequest;
-use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Transformers\ChargeAgentResource as TransformersChargeAgentResource;
 use Modules\SalaryTransaction\Transformers\ChargeCountryResource;
-use Modules\SalaryTransaction\Transformers\HostRequestsResource;
 
 class AgentSalaryTransactionController extends Controller
 {
@@ -80,7 +69,6 @@ class AgentSalaryTransactionController extends Controller
         if (!$agency) {
             return Common::apiResponse(0, __("api_responses.agency"));
         }
-
         $data = Charge::query();
                         //  where('is_used_transferred', false)
                         // ->where("charger_type", 'agency')
@@ -99,6 +87,37 @@ class AgentSalaryTransactionController extends Controller
             //       $q2->fitterByUuid($search);
             //   });
             ->with('senderUser','senderShippingAgency','senderAgency','admin');
+
+        })->orderByDesc('id')->paginate();
+
+        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
+    }
+    public function chargeDollarForUserHistory(Request $request)
+    {
+        $usrAuth = $request->user();
+        $agency = $usrAuth->agency;
+        $search = $request->search;
+        $type = $request->type ?? null;
+        if (!$type) {
+            return Common::apiResponse(0, __("type not found"));
+        }
+        if (!$agency) {
+            return Common::apiResponse(0, __("api_responses.agency"));
+        }
+
+        $data = Charge::query();
+
+        $data = $data->when($type == 'sent', function ($q) use ($search, $agency) {
+            $q->where("charger_id", $agency->id)
+              ->where('charger_type',  'host_agency')
+              ->with(Common::chargerRelationsQuery());
+            //   ->with('receiverUser','receiveragency');
+
+        })
+        ->when($type == 'received', function ($q) use ($search, $agency) {
+            $q->where('user_id', $agency->id)->where('user_type','agency')
+            ->with(Common::chargerRelationsQuery());
+            // ->with('senderUser','senderShippingAgency','senderAgency','admin');
 
         })->orderByDesc('id')->paginate();
 
@@ -202,9 +221,7 @@ class AgentSalaryTransactionController extends Controller
         $countryId = $request->country_id;
         $paymentId = $request->payment_id;
 
-        $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")->withCount(['salaryRequests' => function ($query) {
-            $query->where('status', 3);
-        }])->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))->with('owner')
+        $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")->withCount('charges')->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))->with('owner')
             ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
             ->when($paymentId, fn($q) => $q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
             ->paginate(15);

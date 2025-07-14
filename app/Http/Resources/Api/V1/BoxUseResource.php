@@ -51,7 +51,7 @@ class BoxUseResource extends JsonResource
             //            'image'=>$this->image,
             //            'rem_time'=>$this->type == 1 ? $rem_time : 0
             // 'rem_time' => $rem_time,
-            "end_time" => Carbon::createFromTimestamp($this->end_at)->toDateTimeString(),
+            "end_time" => Carbon::createFromTimestamp($this->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
         ];
     }
 }

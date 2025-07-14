@@ -3,13 +3,20 @@
 namespace App\Admin\Controllers;
 
 use App\Models\CoreWallets;
+use App\Models\CoreWalletTransaction;
+use Dotenv\Exception\ValidationException;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Row;
+use Illuminate\Http\Request;
 use Illuminate\Support\HtmlString;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Validation\ValidationException as ValidationValidationException;
+use Throwable;
+
+use function Laravel\Prompts\error;
 
 class CoreWalletsController extends MainController
 {
@@ -37,7 +44,6 @@ class CoreWalletsController extends MainController
 
     public function index(Content $content)
     {
-        $coreWallets = CoreWallets::get();
         $icons = [
             'app_wallet' => 'fa-solid fa-coins',
             'owner_wallet' => 'fa-solid fa-user-tie',
@@ -55,80 +61,12 @@ class CoreWalletsController extends MainController
             'ads' => 'fa-solid fa-rectangle-ad'
         ];
 
-        $form = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">';
-
-        $form .= '<div class="container mt-4">';
-        $form .= '<div class="row justify-content-center g-4 wallet_div">';
-
-        foreach ($coreWallets as $index => $wallet) {
-            $icon = $icons[$wallet->name] ?? 'fa-solid fa-wallet';
-
-            $form .= '<div class="col-md-5 col-lg-5 mb-4 px-3 wallet_posation">'; // Added padding for space
-            $form .= '<div class="card shadow-lg position-relative border-0"
-          style="
-              padding-top: 39px;
-          border-radius: 15px; overflow: hidden; background: linear-gradient(135deg,rgb(211, 211, 183),rgb(202, 211, 193)); transition: transform 0.3s ease-in-out; margin-bottom: 20px;">';
-
-
-            // Card hover effect
-            $form .= '<style>
-    .card:hover { transform: scale(1.05); }
-  </style>';
-
-            // Edit Button - Circle taking all card edges
-    //         $form .= '<a href="' . admin_url('core-wallets/' . $wallet->id . '/edit') . '"
-    //     class="btn position-absolute top-0 start-0 w-100 h-100 rounded-circle shadow-lg d-flex align-items-center justify-content-center"
-    //     style="
-    //         background: rgba(255, 255, 255, 0.8);
-    //         color: #333;
-    //         transition: transform 0.2s ease-in-out, background 0.2s ease-in-out;
-    //         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    //         border: 2px solid #fff;
-    //         border-radius: 50%;
-    //     "
-    //     data-bs-toggle="tooltip"
-    //     data-bs-placement="top"
-    //     title="' . __('Edit') . '">
-    //     <i class="fas fa-pen"></i>
-    // </a>';
-
-            // Add hover effect with CSS
-            $form .= '<style>
-        .btn:hover {
-            transform: scale(1.1);
-            background: rgba(255, 255, 255, 1);
-        }
-    </style>';
-
-            // Card Body
-            $form .= '<div class="card-body text-center p-4">';
-
-            // Icon at the top - Fixed icon display
-            $form .= '<div class="mb-3">';
-            $form .= '<i class="' . $icon . ' text-primary" style="font-size: 2.5rem;"></i>';
-            $form .= '</div>';
-
-            // Wallet Name & Coins
-            $form .= '<h5 class="fw-bold mb-2" style="color: #000000;">' . ucfirst(str_replace('_', ' ', $wallet->name)) . '</h5>';
-            $form .= '<p class="fs-5 fw-semibold" style="color: #000000;">' . __('Coins') . ' : ' . number_format($wallet->coins) . '</p>';
-
-            $form .= '</div>'; // End card-body
-
-            // Last Updated in Bottom-Left Corner
-            $form .= '<div class="position-absolute bottom-0 start-0 p-6 m-5">';
-            $form .= '<h5 class="text-muted" style="padding-right: 5px;">' . $wallet->update_for_human . '</h5>';
-            $form .= '</div>';
-
-            $form .= '</div>'; // End card
-            $form .= '</div>'; // End col
-        }
-
-        $form .= '</div>'; // End row
-        $form .= '</div>'; // End container
-
         return parent::index($content
-            ->title(trans('Application wallet'))
-            ->body(new HtmlString($form)));
+            ->title(__('Application wallet'))
+            ->body(view('admin.core_wallets.index', [
+                'coreWallets' => CoreWallets::get(),
+                'icons' => $icons
+            ])));
     }
 
 
@@ -226,5 +164,39 @@ class CoreWalletsController extends MainController
         $form->number('coins', __('Coins'));
 
         return $form;
+    }
+
+    protected function submitTransfer(Request $request)
+    {
+        $request->validate([
+            'from_wallet_id' => 'required',
+            'to_wallet_id' => 'required',
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        $adminId = auth()->id();
+        $fromWallet = CoreWallets::find($request->from_wallet_id);
+        if ($fromWallet->coins < $request->amount) {
+             return response()->json([
+                'status' => 0,
+                'message' => 'plz check coins wallet',
+            ]);
+        }
+        $fromWallet->coins -= $request->amount;
+        $fromWallet->save();
+        $ToWallet = CoreWallets::find($request->to_wallet_id);
+        $ToWallet->coins += $request->amount;
+        $ToWallet->save();
+
+        CoreWalletTransaction::create([
+            'from_wallet' => $request->from_wallet_id,
+            'to_wallet' => $request->to_wallet_id,
+            'amount' => $request->amount,
+            'admin_id' => $adminId,
+        ]);
+        return response()->json([
+            'status' => 1,
+            'message' => 'Done',
+        ]);
     }
 }

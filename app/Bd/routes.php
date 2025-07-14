@@ -1,5 +1,8 @@
 <?php
 
+use App\Bd\Controllers\BdSalariesController;
+use App\Bd\Controllers\ChargeController;
+use App\Bd\Controllers\MultiLanguageController;
 use Illuminate\Support\Facades\Route;
 use App\Bd\Controllers\HomeController;
 use App\Bd\Controllers\WalletController;
@@ -58,14 +61,16 @@ Route::group(
     ],
     function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
-        Route::get('/charges', [\App\Bd\Controllers\ChargeController::class, 'index'])->name('charges');
+        Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
         Route::resource('/agencies', AgencyController::class);
-        Route::resource('/salaries', \App\Bd\Controllers\BdSalariesController::class);
-        Route::resource('/charges', \App\Bd\Controllers\ChargeController::class);
+        Route::resource('/salaries', BdSalariesController::class);
+        Route::resource('/charges', ChargeController::class);
         // Route::resource('/wallet', 'WalletController');
         Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
         Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
+
+        Route::post('/locale', MultiLanguageController::class . '@locale');
 
         Route::resource('/request-agencies', RequestAgencyController::class);
     }

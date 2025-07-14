@@ -223,6 +223,8 @@ class BdController extends MainController
                 $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
             });
         }
+        $grid->disableRowSelector();
+
         $this->extendGrid($grid);
         return $grid;
     }
@@ -248,6 +250,8 @@ class BdController extends MainController
     protected function form()
     {
         $form = new Form(new Bd());
+        $this->disableFormTools($form);
+
 
         $form->text('username', __('username'))->creationRules(['required', "unique:admin_users,username,{{id}}"])->updateRules(['required', "unique:admin_users,username,{{id}}"]);;
         $form->password('password', __('Password'))->rules('required');
@@ -264,7 +268,7 @@ class BdController extends MainController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users-bd', 'id', 'name')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
+            })->ajax('/api/search/users-bd', 'id', 'name')->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.')->rules('required');
         } else {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -272,7 +276,7 @@ class BdController extends MainController
                     $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 }
                 return $ops2;
-            })->ajax('/api/search/users-bd', 'id', 'name');
+            })->ajax('/api/search/users-bd', 'id', 'name')->rules('required');
 
             $form->switch('default', __('set_as_default'))
                 ->help(__('make_bd_default'));

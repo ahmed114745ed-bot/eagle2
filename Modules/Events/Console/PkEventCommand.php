@@ -16,31 +16,31 @@ class PkEventCommand extends Command
 
     public function handle()
     {
-        $pkEvent = PkEvent::latest()->first();
-        //endToday()
+        $pkEvent = PkEvent::endToday()->first();
+
 
         if (!$pkEvent) {
             return '';
         }
         $timezone = Common::timeZone();
-        if (Carbon::parse($pkEvent->end_date, $timezone)->endOfDay() == now($timezone) || $pkEvent->end_date == Carbon::yesterday($timezone)->toDateString()) {
+//        if (Carbon::parse($pkEvent->end_date, $timezone)->endOfDay() == now($timezone) || $pkEvent->end_date == Carbon::yesterday($timezone)->toDateString()) {
 
-            $lastEndDate = PkEvent::max('end_date');
-            $newStartDate = Carbon::parse($lastEndDate)->toDateString();
-            $newEndDate = Carbon::parse($lastEndDate)->addWeek()->toDateString();
+        $lastEndDate = PkEvent::max('end_date');
+        $newStartDate = Carbon::parse($lastEndDate)->toDateString();
+        $newEndDate = Carbon::parse($lastEndDate)->addWeek()->toDateString();
 
-            $newPkEvent = new PkEvent([
-                'admin_id' => $pkEvent->admin_id,
-                'start_date' => $newStartDate,
-                'end_date' => $newEndDate,
-                'editor_id' => $pkEvent->editor_id,
-            ]);
-            $newPkEvent->save();
+        $newPkEvent = new PkEvent([
+            'admin_id' => $pkEvent->admin_id,
+            'start_date' => $newStartDate,
+            'end_date' => $newEndDate,
+            'editor_id' => $pkEvent->editor_id,
+        ]);
+        $newPkEvent->save();
 
-            $this->repeatRewards($pkEvent, $newPkEvent->id);
+        $this->repeatRewards($pkEvent, $newPkEvent->id);
 
-            $this->info(now()->toDateTimeString() . ' ' . $this->signature . ' Run successful...');
-        }
+        $this->info(now()->toDateTimeString() . ' ' . $this->signature . ' Run successful...');
+
     }
 
 

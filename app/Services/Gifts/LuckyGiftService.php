@@ -121,7 +121,7 @@ class LuckyGiftService
                 //send to zigo this data to show in all rooms if cashback percentage > 20
                 $isPopular = $this->isPopular($cashback_percentage);
                 if ($isPopular) {
-                    $this->sendPopularToZego($userId, $user, $gift, $ownerId, $room, $cashback_percentage);
+                    $this->sendPopularToZego($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                 }
             } else {
                 $cashback_percentage = 0;
@@ -195,9 +195,9 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-        
 
-        
+
+
         /***********************************************/
         $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
         $cpIds = [];
@@ -209,14 +209,14 @@ class LuckyGiftService
             }
         }
         $sendGiftServices = new SendGiftService();
-      
+
         $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds  );
         /***********************************************/
 
         return  $responseData;
     }
 
- 
+
 
     public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
@@ -520,7 +520,7 @@ class LuckyGiftService
      * @param mixed $cashback_percentage
      * @return void
      */
-    public function sendPopularToZego(mixed $userId, User $user, Gift $gift, mixed $ownerId, Room $room, mixed $cashback_percentage): void
+    public function sendPopularToZego(mixed $userId, User $user, Gift $gift, mixed $ownerId, Room $room, mixed $cashback_percentage, $cashbackValue = 0): void
     {
         $zigoData = [
             'user_id'      => $userId,
@@ -531,7 +531,8 @@ class LuckyGiftService
             'room_id'      => $room->id,
             'percentage'   => $cashback_percentage,
             'is_room_pass' => ($room->room_pass != null && $room->room_pass != ''),
-            'gift_price'   => $gift->price
+            'gift_price'   => $gift->price,
+            'cache_value'  => ceil($cashbackValue ?? 0.0)
 
         ];
         $this->sendToZegoLuckyGift($zigoData);

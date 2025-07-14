@@ -1,4 +1,4 @@
-<?php 
+<?php
 // ملف: app/Helpers/UserCoinLogHelper.php
 namespace App\Helpers;
 
@@ -22,7 +22,7 @@ class UserCoinLogHelper
         ?int $userId,
         string $type,
         string $subType,
-        int $amount,
+        ?int $amount,
         ?string $fromDate = null,
         ?string $toDate = null
     ): UserCoinLog {
@@ -30,7 +30,7 @@ class UserCoinLogHelper
             'user_id'    => $userId,
             'type'       => $type,
             'sub_type'   => $subType,
-            'amount'     => $amount,
+            'amount'     => $amount ?? 0,
             'from_date'  => $fromDate ?? Carbon::now()->toDateString(),
             'to_date'    => $toDate ?? Carbon::now()->toDateString(),
         ]);

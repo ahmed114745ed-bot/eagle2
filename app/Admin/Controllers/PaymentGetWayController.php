@@ -107,6 +107,7 @@ class PaymentGetWayController extends MainController
     protected function form()
     {
         $form = new Form(new PaymentGateway());
+        $this->disableFormTools($form);
 
         $form->text('title', __('Title'));
         $form->image('photo', __('Photo'));
