@@ -110,7 +110,10 @@ class ChargeReportController extends MainController
 
             $grid->model()->where('charger_type', 'host_agency');
         } else {
-            $grid->model()->where('charger_type', 'agency')->orWhere('user_type', 'agency');
+            $grid->model()->where(function($query) {
+                $query->where('charger_type', 'agency')
+                    ->orWhere('user_type', 'agency');
+            });
         }
         if ($charger_type == "shipping-agency-activity") {
             $grid->filter(function (Grid\Filter $filter) {

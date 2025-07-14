@@ -143,17 +143,16 @@ class BoxController extends Controller
     {
         $user = $request->user();
         $userId = $user->id;
-        $timestamp = Carbon::now()->timestamp;
+        $timezone = Common::timeZone();
+        $timestamp = Carbon::now($timezone)->timestamp;
 
         if (!$request->bid) return Common::apiResponse(0, 'missing params', null, 422);
 
         $keyBoxUse  = 'BoxUse_' . $request->bid;
         $box_use = RedisService::getUnSerialize($keyBoxUse);
-
         if (!$box_use) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
-
         if ($box_use['end_at'] < $timestamp) {
             return Common::apiResponse(0, __("box closed"), null, 404);
         }
