@@ -30,9 +30,12 @@ class BoxService
 {
     public function __construct() {}
 
+    /**
+     * @throws \Throwable
+     */
     public function sendBox($request, $user, $box, $room, $timezone, $label)
     {
-        $boxCoin = $this->calculationSendBox($box);
+        $boxCoin = $box->type == 0 ?  $box->coins : $this->calculationSendBox($box);
 
         DB::beginTransaction();
         if ($box->type == 0) {
