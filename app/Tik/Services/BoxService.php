@@ -62,7 +62,7 @@ class BoxService
                     "numOfBoxes" => (int)$c,
                     "ownerBoxImage" => $user->avatar,
                     "ownerBoxUId"  => $user->uuid,
-                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->toDateTimeString(),
+                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
                     //'usersNum' => $request->users_num ?: $box->users,
                     //'rem_time' => $rem_time,
                     //'is_closed' => $box->is_closed,
