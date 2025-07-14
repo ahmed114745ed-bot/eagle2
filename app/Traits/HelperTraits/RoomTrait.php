@@ -188,8 +188,8 @@ trait RoomTrait
         $room      = Room::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
         $microphone = $room->microphone;
         $mainMicrophone = $room->main_microphone;
-        // $baseMic = $room->microphone_only_users;
-        $baseMic = $room->getOriginal('microphone');
+        $baseMic = $room->all_microphone;
+        // $baseMic = $room->getOriginal('microphone');
         logger('baseMic:', [$baseMic]);
 
 
