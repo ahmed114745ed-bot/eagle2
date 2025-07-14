@@ -49,7 +49,7 @@ class VersionController extends Controller
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
         $data = [
             'is_auth'         => $isAuth && !$isBan,
-            'is_last_version' => $currentVersion <= (int)$version && (int)$version <= 40,
+            'is_last_version' => $currentVersion <= (int)$version ,
             'is_force'        => $this->isForce($version, $request->OS),
             'is_show_shipping_agencies' => true,
             'badges-agency' =>  $agencyBadges,
@@ -119,7 +119,7 @@ class VersionController extends Controller
      * @return bool
      */
     public function isUpdated($key, $time): bool
-    {  
+    {
         if ($time) {
             $time /= 1000;
         }
@@ -127,9 +127,9 @@ class VersionController extends Controller
         $isGiftUpdated     = true;
         // if ($settingGiftUpdate == null && $time != null) {
         //     $isGiftUpdated = false;
-          
+
         // } elseif ($time) {
-        //     $isGiftUpdated = $settingGiftUpdate > $time;  
+        //     $isGiftUpdated = $settingGiftUpdate > $time;
         // }
 
         if ($settingGiftUpdate === null && $time !== null) {
