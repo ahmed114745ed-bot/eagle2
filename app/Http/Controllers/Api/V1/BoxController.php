@@ -58,7 +58,7 @@ class BoxController extends Controller
         if ($user->di < $box->coins)  return Common::apiResponse(0, 'low balance', null, 407);
 
         $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
-        if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
+        // if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
         $label = '';
 
         if ($request->label && $box->type == 1 && $box->has_label == 1) {
