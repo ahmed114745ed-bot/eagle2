@@ -71,17 +71,18 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/weekly-star-update.log'))
             ->runInBackground();
 
+        $schedule->command('pk-event-winner')
+            ->dailyAt('00:00')
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/pk-event-winner.log'))
+            ->runInBackground();
+
         $schedule->command('pk-event-update')
             ->dailyAt('00:00')
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/pk-event-update.log'))
             ->runInBackground();
 
-        $schedule->command('pk-event-winner')
-            ->dailyAt('00:00')
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/pk-event-winner.log'))
-            ->runInBackground();
 
         $schedule->command('app:update-game-wallet')
             ->monthlyOn(1, '00:00')
@@ -94,7 +95,8 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/update-user-salaries.log'))
             ->runInBackground();
-        $schedule->command('log:app-profit-coins')->everyTenMinutes();
+
+//        $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }
 
