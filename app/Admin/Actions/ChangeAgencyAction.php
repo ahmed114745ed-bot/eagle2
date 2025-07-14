@@ -58,6 +58,7 @@ class ChangeAgencyAction extends RowAction
         }
         $user->monthly_diamond_received = 0;
         $user->agency_id = $request->agency_id;
+        $user->type_user = 1;
         $user->save();
         $userSalary = UserSallary::where('user_id',$user->id)->where('month',now()->month)->where('year',now()->year)->first();
         if($userSalary){
