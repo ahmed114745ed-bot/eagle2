@@ -254,6 +254,7 @@ class SwitchAccountController extends Controller
                     'receiver_img' => $currentUser->getImageReceiverOrSender('receiver_id', 1)->img ?? '',
                     'sender_img' => $currentUser->getImageReceiverOrSender('sender_id', 2)->img ??'',
                 ],
+                'user_types' => $currentUser->user_types,
                 'country' => @$currentUser->country ? [
                     'id' => @$currentUser->country->id,
                     'name' => @$currentUser->country->name ?? '',

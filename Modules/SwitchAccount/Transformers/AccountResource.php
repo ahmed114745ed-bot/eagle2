@@ -48,6 +48,7 @@ class AccountResource extends JsonResource
                 'receiver_img' => $this->getImageReceiverOrSender('receiver_id',1)->img ??'',
                 'sender_img' => $this->getImageReceiverOrSender('sender_id',2)->img ??'',
             ],
+            'user_types' => $this->user_types,
             'country' => @$this->country ? [
                 'id' => @$this->country->id,
                 'name' => @$this->country->name ?? '',
