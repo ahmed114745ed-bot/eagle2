@@ -95,7 +95,7 @@ class AgencyController extends MainController
         $giftType = request()->get('gift_type', 'receiver');
         $start = request('start_at');
         $end = request('end_at');
-
+        $uuid = $request->uuid;
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
@@ -130,7 +130,9 @@ class AgencyController extends MainController
                 $members =
                     // Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
                     // return
-                    $agency->mempers()
+                    $agency->mempers()->when(isset($uuid), function ($query) use ($uuid) {
+                        $query->where('uuid', $uuid);
+                    })
                     ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
                     ->paginate(10, ['*'], 'members_page');
@@ -233,8 +235,7 @@ class AgencyController extends MainController
 
         $memberIds = $agency->mempers()->pluck('id');
 
-        $sumTargets = GiftLog::
-              where('agency_id', $agencyId)
+        $sumTargets = GiftLog::where('agency_id', $agencyId)
             ->whereBetween('created_at', [
                 Carbon::now()->startOfMonth(),
                 Carbon::now()->endOfMonth(),
@@ -262,7 +263,7 @@ class AgencyController extends MainController
                 Carbon::parse($end)->endOfDay()
             ]);
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
-        $diamondsHosts = UserSallary::where('user_agency_id',$id)->sum('achieved_diamond');
+        $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
@@ -446,7 +447,7 @@ class AgencyController extends MainController
         </div>";
         });
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
-            $coin = truncateAndTrim($this->salary??0);
+            $coin = truncateAndTrim($this->salary ?? 0);
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>
