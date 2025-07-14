@@ -153,7 +153,6 @@ class BoxController extends Controller
         if (!$box_use) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
-dd($box_use['end_at'],$timestamp);
         if ($box_use['end_at'] < $timestamp) {
             return Common::apiResponse(0, __("box closed"), null, 404);
         }
