@@ -377,6 +377,7 @@ class MicService
 
         // $microphone = $room->getOriginal('microphone');
         $microphone = $room->all_microphone;
+        logger('microphone:', [$microphone]);
 
         $microphone = $this->micType($type, $microphone, $position);
         $this->updateMic($room, $microphone);
@@ -408,6 +409,7 @@ class MicService
 
         $microphone = explode(',', $microphone);
         $current = $microphone[$position] ?? '0';
+        logger(' explode microphone:', [$microphone]);
 
         $user = '0';
         $status = '0';
@@ -435,6 +437,8 @@ class MicService
         } else {
             $microphone[$position] = $status;
         }
+        logger('implode microphone:', [implode(',', $microphone)]);
+
         return implode(',', $microphone);
         // $microphone = explode(',', $microphone);
         // if ($type == 'mute') {
