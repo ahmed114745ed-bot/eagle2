@@ -93,10 +93,13 @@ trait EventModel
 
     public function scopeEndToday(Builder $query)
     {
-        //$timezone = config('app.owner_timezone');
-        $timezone = Common::timeZone();
-        $nowDate     = Carbon::now()->copy()->toDateString();
-        return $query->whereDate('end_date', $nowDate);
-       // whereRaw("date(CONVERT_TZ(end_date, '+00:00', ?)) = ?", [$timezone, $nowDate]);
+        $timezone = getTimezone(); // e.g., "Africa/Cairo"
+        $nowDate  = Carbon::now($timezone)->toDateString(); // e.g., "2025-07-13"
+
+        return $query->whereRaw(
+            "DATE(CONVERT_TZ(end_date, '+00:00', ?)) = ?",
+            [$timezone, $nowDate]
+        );
     }
+
 }

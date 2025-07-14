@@ -33,6 +33,7 @@ class BoxService
     public function sendBox($request, $user, $box, $room, $timezone, $label)
     {
         $boxCoin = $this->calculationSendBox($box);
+
         DB::beginTransaction();
         if ($box->type == 0) {
             $boxU = $this->sendNormalBox($box, $request, $boxCoin, $label, $room, $user->id, $timezone);
@@ -171,7 +172,9 @@ class BoxService
     {
         $app_percentage = Config::query()->where('name', 'app_wallet_lucky_box')->first()?->value ?? 2;
         $walletCoins = ($box->coins * $app_percentage) / 100;
+
         $boxCoin = $box->coins - $walletCoins;
+
         $walletApp = CoreWallet::where('name', 'lucky_box')->first();
         $newWalletCoins = $walletApp->coins + $walletCoins;
         $walletApp->update([
