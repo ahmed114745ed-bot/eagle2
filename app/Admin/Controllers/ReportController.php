@@ -68,7 +68,7 @@ class ReportController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                // $filter->equal('uuid', __('uuid'));
+                 $filter->equal('uuid', __('uuid'));
             });
 
             $filter->column(1 / 2, function ($filter) {
