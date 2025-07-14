@@ -29,19 +29,45 @@ class WeeklyStarController extends Controller
         if (!$weeklyEvent) return Common::apiResponse(0, __('no weekly star '), null, 422);
         $giftIds             = $weeklyEvent->gifts->pluck('id')->toArray();
         $authenticatedUserId = Auth::user();
-        $data                =
-            GiftLog::whereIn('giftId', $giftIds)->with('sender')->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
-            ->groupBy('sender_id')->whereBetween('created_at', [
-                $weeklyEvent->start_date, $weeklyEvent->end_date
-            ])->orWhere(fn ($q) => $q->where('sender_id', $authenticatedUserId->id)->whereBetween('created_at', [
-                $weeklyEvent->start_date, $weeklyEvent->end_date
-            ]))
-            ->orderByDesc('totalGiftNum')->get();
-        $firstTenQueries     = $data->take(10);
+        // $data                =
+        //     GiftLog::whereIn('giftId', $giftIds)->with('sender')->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
+        //     ->groupBy('sender_id')->whereBetween('created_at', [
+        //         $weeklyEvent->start_date, $weeklyEvent->end_date
+        //     ])->orWhere(fn ($q) => $q->where('sender_id', $authenticatedUserId->id)->whereBetween('created_at', [
+        //         $weeklyEvent->start_date, $weeklyEvent->end_date
+        //     ]))
+        //     ->orderByDesc('totalGiftNum')->get();
+
+        $topSenders = GiftLog::whereIn('giftId', $giftIds)
+            ->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
+            ->with('sender')
+            ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
+            ->groupBy('sender_id')
+            ->orderByDesc('totalGiftNum')
+            ->take(10)
+            ->get();
+
+        $userExists = $topSenders->pluck('sender_id')->contains($authenticatedUserId->id);
+
+        if (!$userExists) {
+            $currentUserData = GiftLog::where('sender_id', $authenticatedUserId->id)
+                ->whereIn('giftId', $giftIds)
+                ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
+                ->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
+                ->with('sender')
+                ->groupBy('sender_id')
+                ->first();
+
+            if ($currentUserData) {
+                $topSenders->push($currentUserData);
+            }
+        }
+
+        $firstTenQueries     = $topSenders->take(10);
         $existsInArray       = $firstTenQueries->contains('sender_id', $authenticatedUserId->id);
         $data                = [
             'top'  => TopWeeklyStarUsersResource::collection($firstTenQueries),
-            'user' => $existsInArray == true ? (object) []  : new UserWeeklyStar($authenticatedUserId, $data->where('sender_id', $request->user()->id)->first()),
+            'user' => $existsInArray == true ? (object) []  : new UserWeeklyStar($authenticatedUserId, $topSenders->where('sender_id', $request->user()->id)->first()),
         ];
         return Common::apiResponse(1, '', $data);
     }
