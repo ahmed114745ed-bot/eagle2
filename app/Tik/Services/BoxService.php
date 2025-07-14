@@ -142,7 +142,7 @@ class BoxService
                 "message" => "bannerSuperBox",
                 'coins' => $request->coins ?: $box->coins,
                 "boxUId" => $boxUser->id,
-                "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->toDateTimeString(),
+                "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
                 "room" => [
                     "id" => $room->id,
                     "uuid" => $room->owner->uuid,
