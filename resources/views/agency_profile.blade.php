@@ -1100,7 +1100,7 @@
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
            @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-               <a href="?tab=members" class="tab-btn" {{ $activeTab == 'members' ? 'active' : '' }}{{--data-target="members-tab"--}}>{{ __('Members') }}</a>
+               <a href="?tab=members" class="tab-btn {{ $activeTab == 'members' ? 'active' : '' }}" data-target="members-tab">{{ __('Members') }}</a>
             @endif
            @if (\Encore\Admin\Facades\Admin::user()->can('charge-history-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
              <a href="?tab=charges" class="tab-btn" data-target="charges-tab">{{ __('Charge History') }}</a>
@@ -1146,19 +1146,28 @@
                     </div>
                     <div class="card">
                     <div class="card-body">
-                        <form action="{{ url('admin/agencies/' . $agency->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
+                        <form action="{{ url('admin/agencies/' . $agency->id) }}" class="form-horizontal member-form" method="GET" pjax-container>
                             <input type="hidden" name="tab" value="members">
                             <input type="hidden" name="members_page" value="{{ request()->get('members_page', 1) }}">
 
                             <div class="row mb-4" style="align-items: flex-end;">
                                 <!-- From Date -->
                                 <div class="col-md-4">
-                                    <div class="date-flex-row">
-                                        <i class="fa fa-calendar"></i>
-                                        <span>{{ __('uuid') }}</span>
-                                        <input type="text" class="form-control" id="from_date" name="uuid" value="{{ request('uuid') }}">
+                                    <div class="card shadow-sm border">
+                                        <div class="card-body p-3">
+                                            <label for="from_date" class="form-label fw-bold">
+                                                <i class="fa fa-calendar me-1"></i> {{ __('UUID') }}
+                                            </label>
+                                            <input type="text"
+                                                class="form-control"
+                                                id="from_date"
+                                                name="uuid"
+                                                value="{{ request('uuid') }}"
+                                                placeholder="{{ __('Enter UUID') }}">
+                                        </div>
                                     </div>
                                 </div>
+
                                
                                 <!-- Buttons -->
                                 <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
