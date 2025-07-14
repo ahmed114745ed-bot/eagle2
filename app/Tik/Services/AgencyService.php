@@ -227,7 +227,7 @@ class AgencyService
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
-            $this->userRepository->update(['agency_id' => $agency->id ,'monthly_diamond_received' => 0], $user->id);
+            $this->userRepository->update(['agency_id' => $agency->id, 'monthly_diamond_received' => 0], $user->id);
             $this->userRepository->updateTypeUser($user);
             // $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
             // if (!$checkAgencyUser) {
@@ -634,7 +634,7 @@ class AgencyService
     public function kickAgency($auth, $userId)
     {
         $user_kicked = $this->userRepository->findById($userId);
-
+        if (!$user_kicked) throw new Exception('user not found');
         if ($user_kicked->agency_id != $auth->ownAgency->id || $user_kicked->id == $auth->ownAgency->app_owner_id) throw new Exception('لا يمكنك ازاله هذا المستخدم!');
         UserHandling::kickUserFromAgency($user_kicked, 1);
         $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
