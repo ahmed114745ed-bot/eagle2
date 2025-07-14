@@ -189,6 +189,17 @@
                             <span class="help-block">{{ __('duration in seconds') }}</span>
                         </div>
 
+                        <div class="form-group">
+                            <label for="lucky_box_percentage">{{ __('lucky box percentage') }}</label>
+                            <input type="number" 
+                                id="lucky_box_percentage" 
+                                name="lucky_box_percentage" 
+                                min="1" 
+                                value="{{ $config['lucky_box_percentage'] ?? 20 }}" 
+                                class="form-control" 
+                                placeholder="{{ __('Enter lucky box percentage') }}" />
+                        </div>
+
                         <!-- Submit Button -->
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>

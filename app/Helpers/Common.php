@@ -630,7 +630,6 @@ class Common
     {
         $credentialsFilePath = base_path(config("app.fileName"));
 
-        // التحقق من وجود الملف
         if (!file_exists($credentialsFilePath)) {
             return;
         }
@@ -709,21 +708,19 @@ class Common
         } else {
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-
-            SendFirebaseTopicNotificationJob::dispatch(
-                new NotificationPayload(
-                    tokens: $tokens,
-                    title: $title,
-                    body: $body,
-                    data: $data,
-                    messageType: $messageType,
-                    user: $user,
-                    action: $action,
-                    type: $type,
-                    id: $id,
-                    notificationType: $notification_type,
-                    icon: $icon,
-                )
+       
+            
+            SendFirebaseNotificationJob::dispatch(
+                tokens: $tokens,
+                title: $title,
+                body: $body,
+                data: $data,
+                messageType: $messageType,
+                user: $user,
+                action: $action,
+                type: $type,
+                id: $id,
+                notification_type: $notification_type,
             )->onQueue('notification_heavy');
 
             return  true;
@@ -838,7 +835,6 @@ class Common
         }
         $topicName = 'temp_topic_' . uniqid();
 
-
         self::subscribeToTopic($tokens, $topicName);
 
         $userData = [];
@@ -874,44 +870,35 @@ class Common
                 ]
             ]
         ];
-
+        sleep(5);
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $api_access_key,
             'Content-Type' => 'application/json',
         ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-        // self::unsubscribeFromTopic($tokens, $topicName);
+     
 
         $status = $response->status();
         $body = $response->body();
 
-        logger()->info('📬 FCM Request Log', [
-            'status'      => $status,
-            'response'    => $body,
-            'payload_sent'=> $payload,
-        ]);
-
-
+     
         return json_decode($response->body());
     }
 
 
     public static function subscribeToTopic(array $registrationTokens, string $topic)
     {
-        $accessToken = self::getGoogleAccessToken();
-
-        $url = "https://iid.googleapis.com/iid/v1:batchAdd";
-        $headers = [
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type'  => 'application/json',
-        ];
-
-        $body = [
-            'to' => "/topics/{$topic}",
-            'registration_tokens' => $registrationTokens,
-        ];
-
-        $response = Http::withHeaders($headers)->post($url, $body);
-
+        $factory = (new Factory)->withServiceAccount(base_path(config('app.fileName')));
+        $messaging = $factory->createMessaging();
+    
+    
+        $result = $messaging->subscribeToTopic($topic, $registrationTokens);
+    
+        logger()->info('✅ Kreait Topic Subscribe', [
+            'topic' => $topic,
+            'result' => $result,
+        ]);
+    
+        return $result;
     }
 
     public static function unsubscribeFromTopic(array $registrationTokens, string $topic)
@@ -919,13 +906,21 @@ class Common
         try {
             $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
             $messaging = $factory->createMessaging();
-
+    
+    
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
-
-            $result = $response[$topic] ?? [];
+    
+            logger()->info('✅ Unsubscribe from FCM topic result', [
+                'topic'          => $topic,
+                'tokensCount'    => count($registrationTokens),
+                'response'       => $response,
+            ]);
+    
+            // تحليل النتائج (اختياري)
+            $result = $response[$topic->value()] ?? [];
             $successCount = 0;
             $failureCount = 0;
-
+    
             foreach ($result as $token => $status) {
                 if ($status === 'OK') {
                     $successCount++;
@@ -933,13 +928,7 @@ class Common
                     $failureCount++;
                 }
             }
-            logger()->info('✅ Unsubscribe from FCM topic result', [
-                'topic'          => $topic,
-                'tokensCount'    => count($registrationTokens),
-                'successCount'   => $successCount,
-                'failureCount'   => $failureCount,
-                'details'        => $result,
-            ]);
+    
             return [
                 'success' => true,
                 'successCount' => $successCount,
@@ -947,7 +936,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-
+            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
             return [
                 'success' => false,
                 'error' => $e->getMessage()
