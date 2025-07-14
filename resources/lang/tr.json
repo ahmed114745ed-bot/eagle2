@@ -3118,7 +3118,7 @@
     "Coins Received": "Jeton Alındı",
     "You have received :coins coins (equivalent to :usd USD) from :sender.": ":sender tarafından size :coins jeton (:usd USD değerinde) gönderildi.",
     "Balance Recharged": "Bakiye Yüklendi",
-    "Your balance has been recharged with :usd USD by :name.": "Bakiyeniz :name tarafından :usd USD olarak yüklendi.",
+    "Your balance has been recharged with :usd coins by :name.": "Bakiyenize :name tarafından :usd coin yüklendi.",
 
     "Reel Comments": "Video Yorumları"
 

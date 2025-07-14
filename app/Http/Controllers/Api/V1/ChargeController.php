@@ -322,7 +322,7 @@ class ChargeController extends Controller
             $notificationToken[] = DB::table('users')->where('id', $receiver->id)->value('notification_id');
 
             $title = __('Balance Recharged');
-            $body = __('Your balance has been recharged with :usd USD by :name.', [
+            $body = __('Your balance has been recharged with :usd coins by :name.', [
                 'usd' => $amount,
                 'name' => $user->name,
             ]);
