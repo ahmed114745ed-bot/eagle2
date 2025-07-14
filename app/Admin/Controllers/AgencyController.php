@@ -233,8 +233,8 @@ class AgencyController extends MainController
 
         $memberIds = $agency->mempers()->pluck('id');
 
-        $sumTargets = GiftLog::whereIn('receiver_id', $memberIds)
-            ->where('agency_id', $agencyId)
+        $sumTargets = GiftLog::
+              where('agency_id', $agencyId)
             ->whereBetween('created_at', [
                 Carbon::now()->startOfMonth(),
                 Carbon::now()->endOfMonth(),
