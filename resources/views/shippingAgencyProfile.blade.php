@@ -836,6 +836,10 @@
     margin: 20px 20px 20px 20px;
 }
 
+.select2-container {
+    width: 100% !important;
+}
+
     </style>
 
 
@@ -860,13 +864,13 @@
                    @php
                     $image =getImagePath($agency->img);
                     $defaultImage =asset("images/icon-agency.jpg");
-                        
+
 
                     if (!isImageExists($image)) {
                         $image = $defaultImage;
                     }
 
-                    
+
                 @endphp
             <img src="{{ $image }}" alt="Agency Logo" class="logo-img" style="
                 width: 100%;
@@ -899,16 +903,16 @@
                               @php
                                 $image =getImagePath($agency?->owner?->profile->avatar);
                                 $defaultImage =asset("images/businessman-icon.jpg");
-                                    
+
 
                                 if (!isImageExists($image)) {
                                     $image = $defaultImage;
                                 }
 
-                    
+
                           @endphp
-                            <img src="{{ $image }}" 
-                                alt="Owner" 
+                            <img src="{{ $image }}"
+                                alt="Owner"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
 
@@ -920,10 +924,10 @@
                                  <br>
                             <span class="meta-uuid">(UUID: {{ $agency->owner->uuid ?? 'N/A' }})</span>
                             @else
-                               
+
                             @endif
                         </span>
-            
+
                     </div>
                 </div>
                 <div class="agency-stats">
@@ -944,7 +948,7 @@
                 {{ __('Go Back') }} <i class="fas fa-arrow-left"></i>
             </button>
 
-           
+
         </div>
 
         <div class="card">
@@ -982,7 +986,7 @@
                             <!-- Decorative elements -->
                             <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
                             <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
-                            
+
                             <!-- Left Content -->
                             <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
                                 <div>
@@ -999,7 +1003,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
                                 <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
@@ -1040,7 +1044,7 @@
                             <!-- Decorative elements -->
                             <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
                             <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
-                            
+
                             <!-- Left Content -->
                             <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
                                 <div>
@@ -1057,7 +1061,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
                                 <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
@@ -1098,7 +1102,7 @@
                             <!-- Decorative elements -->
                             <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
                             <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
-                            
+
                             <!-- Left Content -->
                             <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
                                 <div>
@@ -1115,7 +1119,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
                                 <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
@@ -1143,16 +1147,16 @@
                         <!-- Card 1 -->
                         <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{ __('Sent Balance') }}</div>
-                        
+
                         <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$totalSend)}}
                             <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
                         </div>
                         </div>
-                        
+
                         <!-- Card 2 -->
                         <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{__("Received Balance")}}</div>
-                        
+
                         <div style="margin-top: 10px; font-size: 16px;">{{ numToString(@$totalReceive) }}
                             <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
                         </div>
@@ -1160,7 +1164,7 @@
                     </div>
                     </div>
                 </div>
-                               
+
 @php
     $activeTab = request('tab', 'charges');
 @endphp
@@ -1188,10 +1192,27 @@
 ">
     {{ __('Loading...') }}
 </div>
+
+<!-- Add this before your charges table -->
+<div class="filter-controls mb-3">
+    <div class="row">
+        <div class="col-md-4">
+            <select class="form-control" id="filterType">
+                <option value="">All</option>
+                <option value="user">Users</option>
+                <option value="agency">Agencies</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <select class="form-control" id="entitySelect"></select>
+        </div>
+    </div>
+</div>
+
 <!-- Charges Tab Content -->
 <div id="charges-tab" style="display: {{ ($activeTab == 'charges') ? 'block' : 'none' }}">
     <div class="performers-card">
-    
+
         @if($charges && $charges->count())
             <div class="table-responsive">
                 <table class="table table-bordered">
@@ -1209,7 +1230,7 @@
                         @foreach($charges as $index => $charge)
                                  @php
                                     $sender = \App\Helpers\Common::getChargerInfo($charge);
-                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge); 
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge);
                                     $url = $receiver['url'];
                                     $image = getImagePath($receiver['image']);
                                     $defaultImage = $charge->user_type == 'agency'?  asset("images/icon-agency.jpg") :asset('images/businessman-icon.jpg');
@@ -1221,7 +1242,7 @@
                                 <td>{{$index + 1}}</td>
                                 <td>{{ $charge->id}}</td>
                                 <td>
-                                    
+
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                            <img src="{{ $image }}" alt="user"
                                                 width="{{ $charge->user_type == 'agency' ? '50' : '40' }}"
@@ -1286,7 +1307,7 @@
                                 <td>{{$index + 1}}</td>
                                 <td>{{ $res->id }}</td>
                                 <td>
-                                   
+
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                             <img src="{{ $image }}" alt="user"
                                                 width="{{ $res->charger_type == 'agency' ? '50' : '40' }}"
@@ -1318,7 +1339,134 @@
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+            <script>
+                $(document).ready(function() {
+                    $('#entitySelect').select2({
+                        placeholder: 'Search by name, UUID or ID...',
+                        allowClear: true,
+                        minimumInputLength: 1,
+                        ajax: {
+                            url: function() {
+                                return $('#filterType').val() === 'user'
+                                    ? '{{ route("search.users") }}'
+                                    : '{{ route("search.users5") }}';
+                            },
+                            dataType: 'json',
+                            delay: 250,
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    q: params.term,
+                                    page: params.page || 1
+                                };
+                            },
+                            processResults: function(data, params) {
+                                console.log('Search results:', data); // Debug log
+                                let items = data.data || data;
+                                return {
+                                    results: items.map(item => ({
+                                        id: item.id,
+                                        text: item.name
+                                    })),
+                                    pagination: {
+                                        more: (params.page * 10) < (data.total || 0)
+                                    }
+                                };
+                            },
+                            cache: true
+                        }
+                    });
+
+                    // Handle filter type change
+                    $('#filterType').on('change', function() {
+                        const selectedType = $(this).val();
+                        if (selectedType) {
+                            $('#entitySelect').prop('disabled', false)
+                                .val(null)
+                                .trigger('change');
+                        } else {
+                            $('#entitySelect').prop('disabled', true)
+                                .val(null)
+                                .trigger('change');
+                            reloadOriginalData();
+                        }
+                    });
+
+                    // Handle entity selection
+                    $('#entitySelect').on('select2:select', function(e) {
+                        console.log('Selected data:', e.params.data); // Debug log
+                        filterData(e.params.data);
+                    });
+
+                    function filterData(selectedData) {
+                        const filterType = $('#filterType').val();
+                        const tableBody = $('.table tbody');
+                        const loadingRow = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+                        tableBody.html(loadingRow);
+
+                        // Log the request parameters
+                        console.log('Filter request:', {
+                            filter_by: filterType,
+                            filter_id: selectedData.id,
+                            tab: '{{ $activeTab }}'
+                        });
+
+                        $.ajax({
+                            url: window.location.pathname,
+                            method: 'GET',
+                            data: {
+                                filter_by: filterType,
+                                filter_id: selectedData.id,
+                                tab: '{{ $activeTab }}'
+                            },
+                            success: function(response) {
+                                console.log('Filter response:', response); // Debug log
+                                const newContent = $(response).find('#{{ $activeTab }}-tab').html();
+                                $('#{{ $activeTab }}-tab').html(newContent);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Filter failed:', {
+                                    status: status,
+                                    error: error,
+                                    response: xhr.responseText
+                                });
+                                tableBody.html('<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>');
+                            }
+                        });
+                    }
+
+                    function reloadOriginalData() {
+                        const tableBody = $('.table tbody');
+                        const loadingRow = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+                        tableBody.html(loadingRow);
+
+                        $.ajax({
+                            url: window.location.pathname,
+                            method: 'GET',
+                            data: {
+                                tab: '{{ $activeTab }}'
+                            },
+                            success: function(response) {
+                                const newContent = $(response).find('#{{ $activeTab }}-tab').html();
+                                $('#{{ $activeTab }}-tab').html(newContent);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Reload failed:', {
+                                    status: status,
+                                    error: error,
+                                    response: xhr.responseText
+                                });
+                                tableBody.html('<tr><td colspan="6" class="text-center text-danger">Error reloading data</td></tr>');
+                            }
+                        });
+                    }
+                });
+            </script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
