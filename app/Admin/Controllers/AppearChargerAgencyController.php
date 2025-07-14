@@ -492,7 +492,49 @@ class AppearChargerAgencyController extends MainController
         return $form;
     }
 
+    public function filterCharges(Request $request)
+    {
+        $filterType = $request->get('filter_type');
+        $entityId = $request->get('entity_id');
+        $agencyId = $request->route('id');
 
+        $query = Charge::where('charger_type', 'agency')
+            ->where('charger_id', $agencyId);
+
+        if ($filterType && $entityId) {
+            $query->where('user_type', $filterType === 'user' ? 'user' : 'agency')
+                ->where('user_id', $entityId);
+        }
+
+        $charges = $query->with(['receiverUser', 'receiverAgency'])
+            ->latest()
+            ->paginate(10);
+
+        $formattedData = $charges->map(function($charge) {
+            $receiver = \App\Helpers\Common::getReceiverInfo($charge);
+            return [
+                'id' => $charge->id,
+                'name' => $receiver['name'],
+                'uuid' => $receiver['uuid'],
+                'image' => getImagePath($receiver['image']),
+                'url' => $receiver['url'],
+                'user_type' => $charge->user_type,
+                'usd' => $charge->usd,
+                'amount' => $charge->amount,
+                'created_at' => $charge->created_at
+            ];
+        });
+
+        return response()->json([
+            'data' => $formattedData,
+            'pagination' => [
+                'current_page' => $charges->currentPage(),
+                'last_page' => $charges->lastPage(),
+                'per_page' => $charges->perPage(),
+                'total' => $charges->total()
+            ]
+        ]);
+    }
 
     public function shippingProfile($id, Request $request, Content $content)
     {
@@ -500,14 +542,13 @@ class AppearChargerAgencyController extends MainController
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab') ?? 'charges';
         $filter_by = request('filter_by') ?? null;
-
+        $filter_id = request('filter_id') ?? null;
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->findOrFail($id);
         });
-
 
         $path = $agency->img;
         $defaultImage = asset("images/icon-agency.jpg");
@@ -518,46 +559,59 @@ class AppearChargerAgencyController extends MainController
         $agency->display_image = $imageUrl;
 
         $agencyId = $agency->id;
-
-        $resived = $charges =  null;
-
-        $filterBy = $request->filter_by ?? null;
-        $filterId = $request->filter_id  ?? null;
         $charges = $resiveds = null;
+
         switch ($tab) {
             case 'charges':
-                $charges = Charge::where('charger_type', 'agency')
+                $query = Charge::where('charger_type', 'agency')
                     ->where('charger_id', $agencyId);
 
-                $relations = [];
-
-                $charges->when($filter_by === 'user', function ($query) use (&$relations) {
-                    $query->where('user_type', 'user');
-                    $relations[] = 'receiverUser';
-                });
-
-                $charges->when($filter_by === 'agency', function ($query) use (&$relations) {
-                    $query->where('user_type', 'agency');
-                    $relations[] = 'receiverAgency';
-                });
-
-                if (!empty($relations)) {
-                    $charges->with($relations);
+                info('sen'.$filter_id);
+                if ($filter_by && $filter_id) {
+                    if ($filter_by === 'user') {
+                        $query->where('user_type', 'user')
+                            ->where('user_id', $filter_id)
+                            ->with('receiverUser');
+                    } elseif ($filter_by === 'agency') {
+                        $query->where('user_type', 'agency')
+                            ->where('user_id', $filter_id)
+                            ->with('receiverAgency');
+                    }
                 }
 
-                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
+                $charges = $query->latest()->paginate(10, ['*'], 'charges_page');
                 break;
 
             case 'resived':
-                $resiveds = Charge::with(['sender'])
-                    ->where('user_id', $agencyId)
-                    ->where('user_type', 'agency')
+                $query = Charge::where('user_id', $agencyId)
+                    ->where('user_type', 'agency');
+                info('res'.$filter_id);
+                info('filter_by'.$filter_by);
+
+                if ($filter_by && $filter_id) {
+                    if ($filter_by === 'user') {
+                        $query->where('charger_type', 'user')
+                            ->where('charger_id', $filter_id);
+                    } elseif ($filter_by === 'agency') {
+                        $query->where('charger_type', 'agency')
+                            ->where('charger_id', $filter_id);
+                    }
+                }
+
+                $resiveds = $query->with(['sender'])
                     ->latest()
                     ->paginate(10, ['*'], 'resived_page');
                 break;
         }
-        $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
-        $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');
+
+        $totalReceive = Charge::where('user_id', $agencyId)
+            ->where('user_type', 'agency')
+            ->sum('amount');
+
+        $totalSend = Charge::where('charger_type', 'agency')
+            ->where('charger_id', $agencyId)
+            ->sum('amount');
+
         return $content->title(__('agency profile'))
             ->view('shippingAgencyProfile', compact(
                 'agency',
