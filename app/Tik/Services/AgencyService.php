@@ -635,7 +635,7 @@ class AgencyService
     {
         $user_kicked = $this->userRepository->findById($userId);
         if (!$user_kicked) throw new Exception('user not found');
-        if ($user_kicked->agency_id != $auth->ownAgency->id || $user_kicked->id == $auth->ownAgency->app_owner_id) throw new Exception('لا يمكنك ازاله هذا المستخدم!');
+        if ($user_kicked->agency_id != $auth->ownAgency->id && $user_kicked->id == $auth->ownAgency->app_owner_id) throw new Exception('لا يمكنك ازاله هذا المستخدم!');
         UserHandling::kickUserFromAgency($user_kicked, 1);
         $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
         if ($joinedAgency) UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
