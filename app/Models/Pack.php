@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\TimestampsWithTimezone;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -117,4 +118,87 @@ class Pack extends Model
                 return '-';
         }
     }
+
+
+
+    public function getTypeNameAttribute()
+    {
+        $types = [
+            1 => 'gem',
+            2 => 'gifts',
+            3 => 'coupons',
+            4 => 'avatar frames',
+            5 => 'bubble boxes',
+            6 => 'entry effects',
+            7 => 'mic on the aperture',
+            8 => 'badges',
+            28 => 'profile frame',
+            25 => 'special id',
+        ];
+        return __($types[$this->type] ?? '');
+    }
+
+    public function getGetTypeNameAttribute()
+    {
+        $getTypes = [
+            1 => 'vip level automatic acquisition',
+            2 => 'activities',
+            3 => 'treasure box',
+            4 => 'purchase',
+            5 => 'background addition',
+            6 => 'limited time purchase'
+        ];
+        return __($getTypes[$this->get_type] ?? '');
+    }
+
+    public function getFormattedExpireAttribute()
+    {
+        return $this->expire ? date('Y-m-d H:i:s', $this->expire) : 0;
+    }
+
+    public function getIsDressAttribute()
+    {
+        $map = [
+            4 => 'dress_1',
+            5 => 'dress_2',
+            6 => 'dress_3',
+            7 => 'dress_4',
+        ];
+
+        if (!in_array($this->type, array_keys($map))) {
+            return 0;
+        }
+
+        $column = $map[$this->type];
+        $userDressId = $this->user?->$column;
+
+        return $userDressId == $this->target_id ? 1 : 0;
+    }
+
+    public function getTitleTextAttribute()
+    {
+        if (in_array($this->type, [4, 5, 6, 7])) {
+            return $this->expire
+                ? date('Y-m-d H:i:s', $this->expire) . ' expire'
+                : 'permanent';
+        }
+
+        if ($this->type == 2) {
+            return "have {$this->num} value " . ($this->num * $this->price) . " diamond";
+        }
+
+        return "have {$this->num} individual {$this->title}";
+    }
+
+    public function getResolvedColorAttribute()
+    {
+        return $this->color ?? '';
+    }
+
+    public function getCreatedAtFormattedAttribute()
+    {
+        $tz = request()->header('tz')[0] ?? 'UTC';
+        return Carbon::parse($this->created_at)->setTimezone($tz)->format('Y-m-d H:i:s');
+    }
+
 }
