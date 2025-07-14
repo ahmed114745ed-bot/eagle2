@@ -382,30 +382,30 @@ Route::group(
         // Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
-        Route::resource('ovip', 'OVipController');
-        Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
+        // Route::resource('ovip', 'OVipController');
+        // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
-        Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
+        // Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
         Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
         Route::prefix('ware-gift')->group(function () {
 
-            Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
-            Route::post('/{level}', [OvipGiftTapController::class, 'store']);
+            // Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
+            // Route::post('/{level}', [OvipGiftTapController::class, 'store']);
             // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
             // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
             // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
         });
-        Route::resource('ware-gifts', 'OvipGiftTapController');
-        Route::prefix('ware-gifts')->group(function () {
+        // Route::resource('ware-gifts', 'OvipGiftTapController');
+        // Route::prefix('ware-gifts')->group(function () {
 
 
-            Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-            Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-            Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-        });
-        Route::resource('vip_privilege', 'VipPrivilegeController');
+            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        // });
+        // Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');

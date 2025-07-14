@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Vip\Http\Controllers\web;
 
+use Illuminate\Validation\Rule;
+use App\Admin\Controllers\MainController;
 use App\Models\Config;
 use App\Models\OVip;
 use App\Models\Ware;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Str;
+use Modules\Vip\Services\VipService;
 
 
 class OVipController extends MainController
@@ -32,17 +35,17 @@ class OVipController extends MainController
     public $hiddenColumns = [];
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("vips");
+        $this->middleware(\Modules\Vip\Http\Middleware\CheckVipFeatureEnabled::class);
     }
 
-    public function vip_settings(Content $content)
+    public function vipSettings(Content $content)
     {
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . $this->permission_setting);
         }
 
         $config = Config::pluck('value', 'name')->toArray();
-        $config['enable_vip_auto'] = true; // make default is true
+        $config['enable_vip_auto'] = true; 
         return $content->view('vip_settings', compact('config'));
     }
 
@@ -87,24 +90,14 @@ class OVipController extends MainController
      *
      * @return Grid
      */
-    // protected function grid2()
-    // {
-    //     $form = new Box();
-    //     $form->view('admin.grid.common.ovip');
-
-    //     return $form;
-    // }
+ 
 
 
     protected function grid()
     {
-        //        $arr = [];
-        //        $privs = VipPrivilege::all ();
-        //        foreach ($privs as $priv){
-        //            $arr[$priv->id]=$priv->name;
-        //        }
+ 
         $grid = new Grid(new OVip);
-
+        $grid->model()->with('privilegs');
         $grid->id('ID');
         $grid->column('level', __('level'));
         $grid->column('name', __('name'));
@@ -131,7 +124,7 @@ class OVipController extends MainController
 
         if (Admin::user()->can('browse-' . 'vip-gift') || Admin::user()->can('*')) {
             $grid->column(__('file'))->display(function () {
-                $privilegeTypes =   $this->privilegs->pluck('en_name', 'type')->sortKeys();
+                $privilegeTypes = optional($this->privilegs)->pluck('en_name', 'type')->sortKeys();
                 $type = $privilegeTypes?->keys()->first();
                 // توليد الروابط
                 $url1 = url('admin/ovip-gift/' . $this->id . '?type=' . $type);
@@ -160,15 +153,6 @@ class OVipController extends MainController
     protected function detail($id)
     {
         $show = new Show(OVip::findOrFail($id));
-
-        //        $show->id('ID');
-        //        $show->level('level');
-        //        $show->name('name');
-        //        $show->img('img');
-        //        $show->price('price');
-        //        $show->privileges('privileges');
-        //        $show->created_at(trans('admin.created_at'));
-        //        $show->updated_at(trans('admin.updated_at'));
         $this->extendShow($show);
         return $show;
     }
@@ -182,11 +166,7 @@ class OVipController extends MainController
      */
     protected function form()
     {
-        //        $arr = [];
-        //        $privs = VipPrivilege::all ();
-        //        foreach ($privs as $priv){
-        //            $arr[$priv->id]=$priv->name;
-        //        }
+
 
         $form = new Form(new OVip);
         $this->disableFormTools($form);
@@ -199,21 +179,18 @@ class OVipController extends MainController
          </script>');
         }
         $form->display(__('ID'));
-        $form->number('level', __('level'))->creationRules(['required', "unique:o_vips,level,{{id}}"])->updateRules(['required', "unique:o_vips,level,{{id}}"]);;
-        $form->text('name', __('name'));
+        $form->number('level', __('level'))
+        ->rules([
+            'required',
+            Rule::unique('o_vips', 'level')->ignore($form->model()->id),
+        ]);        $form->text('name', __('name'));
         // $form->file('img', __('img'));
         $form->file('img', trans('img'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
-        if (!$form->isEditing()) {
-
-            $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
-        }
-        if ($form->isEditing()) {
-
-            $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
-        }
-
+      
+        $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
+        
         if (Admin::user()->can('*')) {
             $form->number('expire', __('expire'))->rules('required|numeric|gt:0');
         } else {
@@ -222,66 +199,7 @@ class OVipController extends MainController
         $form->belongsToMany('privilegs', Privileges::class, __('privileges'))->rules('required|array|min:1');
 
         $form->saving(function (Form $form) {
-
-            $privilegs = request()->all();
-            $privilegs = request('privilegs');
-            $level = request('level');
-            $notActuveAll = Ware::where('level', $level)->update([
-                'is_active_for_vip' => false
-            ]);
-
-            if ($notActuveAll) {
-                $types = [];
-
-                foreach ($privilegs as $privileg) {
-                    $type_preveleg = VipPrivilege::find($privileg);
-
-                    if (!$type_preveleg) continue;
-
-                    $type = $type_preveleg->type;
-
-                    if (in_array($type, $types)) {
-
-                        admin_error('خـطأ', 'لا يمكن اختيار أكثر من امتياز من نفس النوع: ');
-                        return back();
-                    }
-
-                    $types[] = $type;
-
-                    if (isset($type_preveleg->type)) {
-
-                        $updateActive = Ware::where('type', $type_preveleg->type)->where('level', $level)->update([
-                            'is_active_for_vip' => true
-                        ]);
-                        // if (!$updateActive) {
-                        //     session()->flash('show_alert_vip', 'Your alert message');
-                        //     return redirect()->back();
-                        // }
-
-                    }
-                }
-
-
-                // try {
-                //     $updateActive = Ware::where('type', $type_preveleg->type)->where('level', $level)->update([
-                //         'is_active_for_vip' => true
-                //     ]);
-
-                //     if ($updateActive === false) {
-                //         throw new Exception("Error occurred during update");
-                //     }
-                // } catch (Exception $e) {
-                //     // Handle the exception here
-                //     dd($e->getMessage());
-                // }
-
-
-
-
-
-
-                session()->forget('show_alert_vip');
-            }
+            app(VipService::class)->handleSaving($form);
         });
 
         return $form;

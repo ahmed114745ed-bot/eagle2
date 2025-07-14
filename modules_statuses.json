@@ -21,5 +21,6 @@
     "WhatsappAuth": true,
     "DailyPrize": true,
     "Tasks": true,
-    "Wallet": true
+    "Wallet": true,
+    "Vip": true
 }
