@@ -2698,8 +2698,8 @@
     "You have received VIP access for :days days from admin.": "आपको एडमिन से :days दिनों के लिए वीआईपी एक्सेस मिला है।",
     "Coins Received": "सिक्के प्राप्त हुए",
     "You have received :coins coins (equivalent to :usd USD) from :sender.": "आपको :sender से :coins सिक्के (जो :usd USD के बराबर हैं) प्राप्त हुए हैं।",
-    "Balance Recharged": "बैलेंस रीचार्ज हुआ",
-    "Your balance has been recharged with :usd USD by :name.": "आपका बैलेंस :name द्वारा :usd USD से रीचार्ज किया गया है।",
+    "Balance Recharged": "बैलेंस रिचार्ज किया गया",
+    "Your balance has been recharged with :usd coins by :name.": ":name द्वारा आपके बैलेंस में :usd कॉइन जोड़े गए हैं।",
 
 "Reel Comments": "रील्स टिप्पणियाँ"
 
