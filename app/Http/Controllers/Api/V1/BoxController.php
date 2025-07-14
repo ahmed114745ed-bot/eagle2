@@ -150,7 +150,7 @@ class BoxController extends Controller
 
         $keyBoxUse  = 'BoxUse_' . $request->bid;
         $box_use = RedisService::getUnSerialize($keyBoxUse);
-
+      dd(123);
         if (!$box_use) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
