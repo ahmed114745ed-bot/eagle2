@@ -21,6 +21,9 @@ class LogApiRequestResponse
 
         $userId = Auth::id();
 
+        if (!$userId){
+            $userId = Auth::guard('sanctum')->id();
+        }
         $matchedId = settings()->get('debug_id');
 
         if ($matchedId && $userId == $matchedId) {
