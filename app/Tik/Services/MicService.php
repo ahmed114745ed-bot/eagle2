@@ -380,6 +380,8 @@ class MicService
         logger('microphone:', [$microphone]);
 
         $microphone = $this->micType($type, $microphone, $position);
+        logger(' end microphone:', [$microphone]);
+
         $this->updateMic($room, $microphone);
         return $room;
     }
