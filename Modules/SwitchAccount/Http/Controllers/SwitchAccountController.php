@@ -250,6 +250,10 @@ class SwitchAccountController extends Controller
                 'special_id'          =>  @$currentUser->specialId?->ware?->id ?? 0,
                 'special_id_image'          =>  @$currentUser->specialId?->ware?->show_img ?? "",
                 'image_color'          => @$currentUser->color_image,
+                'level' => [
+                    'receiver_img' => $currentUser->getImageReceiverOrSender('receiver_id', 1)->img ?? '',
+                    'sender_img' => $currentUser->getImageReceiverOrSender('sender_id', 2)->img ??'',
+                ],
                 'country' => @$currentUser->country ? [
                     'id' => @$currentUser->country->id,
                     'name' => @$currentUser->country->name ?? '',
