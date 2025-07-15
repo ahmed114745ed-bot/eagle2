@@ -20,7 +20,7 @@ use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
 use Illuminate\Database\Query\Builder;
 use App\Http\Services\RoomGameServices;
-use App\Tik\Repositories\VipRepository;
+use Modules\Vip\Repositories\VipRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
