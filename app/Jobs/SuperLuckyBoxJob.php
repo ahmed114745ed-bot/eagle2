@@ -108,7 +108,7 @@ class SuperLuckyBoxJob implements ShouldQueue
             if ($room && $room->owner) {
                 $m     = [
                     "messageContent" => [
-                        "message"      => "hideluckybox",
+                        "message"      => "winnerLuckyBox",
 
                         "boxUId" => $box_use->id,
                         "ownerId" =>  @$room->owner->id,
