@@ -42,6 +42,11 @@ class SuperLuckyBoxJob implements ShouldQueue
         $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
+         \Log::info('luckyBox', [
+                'timestamp'  => $timestamp,
+                'boxes'     => $userBoxes->toArray(),
+                
+            ]);
         if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->id;
