@@ -4,11 +4,11 @@ namespace App\Services;
 
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserGameChallange;
 use App\Models\Room;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Modules\Achievement\Entities\UserAchievementLevel;
 

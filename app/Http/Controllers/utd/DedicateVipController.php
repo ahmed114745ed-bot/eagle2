@@ -5,7 +5,7 @@ namespace App\Http\Controllers\utd;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserVip;
 use Carbon\Carbon;

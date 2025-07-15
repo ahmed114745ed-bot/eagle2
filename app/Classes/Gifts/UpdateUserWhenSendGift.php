@@ -7,7 +7,7 @@ use App\Exceptions\NotInfMoneyException;
 use App\Helpers\Common;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Modules\Public\Http\Services\UpgradeLevelServices;

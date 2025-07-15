@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\V1;
-
-
+namespace  Modules\Vip\Http\Resources;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 

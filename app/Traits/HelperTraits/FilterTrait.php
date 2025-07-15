@@ -4,7 +4,7 @@
 namespace App\Traits\HelperTraits;
 
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Family;

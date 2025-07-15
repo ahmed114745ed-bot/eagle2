@@ -5,7 +5,7 @@ namespace App\Helpers;
 use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Pk;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Pack;
 use App\Models\Role;
 use App\Models\Room;
@@ -1137,13 +1137,13 @@ class Common
             5  => 'dress_2',
             11 => 'dress_3',
         ];
-
+    
         $targetTypes = array_intersect(array_keys($dressMap), $types);
-
+    
         if (empty($targetTypes)) {
             return;
         }
-
+    
         $vipPacks = Pack::where('user_id', $user->id)
             ->whereIn('type', $targetTypes)
             ->where('get_type', 1)
@@ -1152,29 +1152,23 @@ class Common
                   ->orWhere('expire', 0);
             })
             ->get();
-
+    
         $updateData = [];
-
+    
         foreach ($vipPacks as $pack) {
             $column = $dressMap[$pack->type] ?? null;
-
-            if ($column) {
-                $updateData[$column] = '1';
-                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
+    
+            if ($column && $pack->target_id) {
+                $updateData[$column] = $pack->target_id;
+              
             }
         }
-
+    
         if (!empty($updateData)) {
             $success = $user->update($updateData);
-
-            logger()->info('✅ تم تحديث الحقول:', [
-                'user_id' => $user->id,
-                'success' => $success,
-                'updated_fields' => $updateData
-            ]);
         }
     }
-
+    
 
     public static function handelVip0($vip, $user, $expire,  $userVip)
     {

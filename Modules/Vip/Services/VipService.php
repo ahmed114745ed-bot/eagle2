@@ -2,7 +2,7 @@
 
 namespace Modules\Vip\Services;
 
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use App\Models\Ware;
 use Encore\Admin\Form;
 

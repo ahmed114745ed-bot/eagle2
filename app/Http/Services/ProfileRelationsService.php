@@ -5,7 +5,7 @@ namespace App\Http\Services;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Models\Follow;
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use Illuminate\Database\Query\JoinClause;
 
 class ProfileRelationsService

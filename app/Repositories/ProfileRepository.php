@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Models\Follow;
 use App\Models\Profile;
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use Str;
 
 class ProfileRepository

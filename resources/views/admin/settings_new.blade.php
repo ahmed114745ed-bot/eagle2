@@ -22,7 +22,7 @@
 </html> -->
 
 @php
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 
     $selectedTimeZone = App\Models\Setting::where('key', 'timezone')->first();
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();

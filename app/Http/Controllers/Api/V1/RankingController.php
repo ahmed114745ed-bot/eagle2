@@ -6,7 +6,7 @@ use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\AgencyRankingRecourse;
 use App\Services\RankingService;
-use App\Services\VipService;
+use Modules\Vip\Services\Api\VipService;
 use Illuminate\Http\Request;
 
 class RankingController extends Controller

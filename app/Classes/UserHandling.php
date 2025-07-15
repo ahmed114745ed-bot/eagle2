@@ -4,9 +4,9 @@ namespace App\Classes;
 
 use Carbon\Carbon;
 use App\Models\Ban;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Config;
 use App\Helpers\Common;

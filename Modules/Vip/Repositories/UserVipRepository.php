@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Tik\Repositories;
+namespace Modules\Vip\Repositories;
 
 use App\Models\Pack;
 use App\Models\UserVip;
+use App\Tik\Repositories\AbstractRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -180,5 +181,37 @@ class UserVipRepository extends AbstractRepository
         return $this->model->where('user_id', $userId)->where('level', $level)->where('vip_id', $vipId)->where(function ($query) {
             $query->where('expire', '!=', 0)->where('expire', '>', Carbon::now()->timestamp)->orWhere('expire', 0);
         })->first();
+    }
+
+    public function createUserVip(array $data)
+    {
+        return UserVip::create($data);
+    }
+
+    public function deleteExpiredVips($userId, $level)
+    {
+        return UserVip::where('user_id', $userId)
+            ->where('level', '<=', $level)
+            ->delete();
+    }
+
+    public function findUserVipWithOVip($vipId)
+    {
+        return UserVip::with('OVip')->has('OVip')->find($vipId);
+    }
+
+    public function updateUserVipIsUsed($userId, $isUsed)
+    {
+        return UserVip::where('user_id', $userId)->update(['is_used' => $isUsed]);
+    }
+
+    public function saveUserVip($userVip)
+    {
+        $userVip->save();
+    }
+
+    public function findUserVipById($vipId)
+    {
+        return UserVip::find($vipId);
     }
 }

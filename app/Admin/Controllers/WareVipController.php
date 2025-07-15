@@ -8,7 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use Illuminate\Support\Str;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;

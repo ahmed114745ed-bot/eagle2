@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 
 class OVipObserver
 {

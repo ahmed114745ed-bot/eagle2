@@ -4,7 +4,7 @@ namespace Modules\CP\Transformers;
 
 use App\Helpers\Common;
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;

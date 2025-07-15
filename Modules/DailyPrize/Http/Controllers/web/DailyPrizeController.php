@@ -4,7 +4,7 @@ namespace Modules\DailyPrize\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

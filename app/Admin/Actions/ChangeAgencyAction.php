@@ -2,7 +2,7 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\UsersJoinedAgency;

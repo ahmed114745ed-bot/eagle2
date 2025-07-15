@@ -11,7 +11,7 @@ use App\Models\Family;
 use App\Models\FamilyUser;
 use App\Models\Pack;
 use App\Models\Room;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Carbon\Carbon;
 use http\Client\Curl\User;

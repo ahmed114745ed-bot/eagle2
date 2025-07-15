@@ -3,7 +3,7 @@
 namespace App\Admin\Actions;
 
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserVip;

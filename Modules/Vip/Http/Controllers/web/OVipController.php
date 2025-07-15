@@ -5,12 +5,12 @@ namespace Modules\Vip\Http\Controllers\web;
 use Illuminate\Validation\Rule;
 use App\Admin\Controllers\MainController;
 use App\Models\Config;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use App\Selectables\Privileges;
@@ -111,7 +111,7 @@ class OVipController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('price', __('price'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/coin.jpg'); 
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
@@ -126,7 +126,6 @@ class OVipController extends MainController
             $grid->column(__('file'))->display(function () {
                 $privilegeTypes = optional($this->privilegs)->pluck('en_name', 'type')->sortKeys();
                 $type = $privilegeTypes?->keys()->first();
-                // توليد الروابط
                 $url1 = url('admin/ovip-gift/' . $this->id . '?type=' . $type);
 
                 $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";

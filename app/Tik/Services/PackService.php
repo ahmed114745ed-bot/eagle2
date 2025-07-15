@@ -10,8 +10,8 @@ use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
-use App\Tik\Repositories\UserVipRepository;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Vip\Repositories\UserVipRepository;
 use phpDocumentor\Reflection\Types\Mixed_;
 
 

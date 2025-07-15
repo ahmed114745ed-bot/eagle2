@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use Illuminate\Database\Eloquent\Model;
 
 class OVipRepository

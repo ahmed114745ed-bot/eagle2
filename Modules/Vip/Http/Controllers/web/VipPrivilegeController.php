@@ -6,7 +6,7 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use Encore\Admin\Layout\Content;
 use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;

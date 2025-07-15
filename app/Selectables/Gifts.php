@@ -3,7 +3,7 @@
 namespace App\Selectables;
 
 use App\Models\Gift;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use Encore\Admin\Grid\Filter;
 use Encore\Admin\Grid\Selectable;
 

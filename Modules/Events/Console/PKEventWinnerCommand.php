@@ -4,7 +4,7 @@ namespace Modules\Events\Console;
 
 use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Models\GiftLog;
 use App\Helpers\UserCommon;

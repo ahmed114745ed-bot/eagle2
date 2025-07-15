@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Vip\Entities;
 
 use App\Builders\VipCollectionBuilderService;
 use App\Traits\TimestampsWithTimezone;
@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Cache;
 class Vip extends Model
 {
     use HasFactory, TimestampsWithTimezone;
-    // public static int $useCache = 1;
     public static $useCache = true;
 
 

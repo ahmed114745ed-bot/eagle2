@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\V1;
+namespace Modules\Vip\Http\Resources;
 
 use App\Models\UserVip;
 use Illuminate\Http\Resources\Json\JsonResource;

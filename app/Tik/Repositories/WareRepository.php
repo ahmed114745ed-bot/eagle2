@@ -3,7 +3,8 @@
 namespace App\Tik\Repositories;
 
 use App\Models\Ware;
-
+use Illuminate\Support\Facades\Cache;
+use Modules\Vip\Entities\Vip;
 
 
 class WareRepository extends AbstractRepository
@@ -125,4 +126,6 @@ class WareRepository extends AbstractRepository
     {
         return $this->model->where('type', $type)->paginate($pagination);
     }
+
+
 }

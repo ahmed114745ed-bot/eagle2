@@ -6,14 +6,14 @@ use App\Http\Resources\Api\V1\OVipNewResource;
 use Exception;
 use App\Helpers\Common;
 
-use App\Services\VipService;
+use Modules\Vip\Services\Api\VipService;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\VipResource;
 use App\Http\Resources\Api\V1\OVipResource;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use Illuminate\Support\Facades\Cache;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Public\Http\Services\UpgradeLevelServices;

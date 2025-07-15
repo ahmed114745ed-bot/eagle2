@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Models\OVip;
-use App\Models\Vip;
+use Modules\Vip\Entities\OVip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
 use App\Models\Pack;
 use App\Models\Room;

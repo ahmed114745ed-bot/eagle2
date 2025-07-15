@@ -3,7 +3,7 @@
 namespace Modules\Events\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;

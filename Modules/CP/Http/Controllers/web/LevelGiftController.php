@@ -2,8 +2,8 @@
 
 namespace Modules\CP\Http\Controllers\web;
 
-use App\Models\Vip;
-use App\Models\OVip;
+use Modules\Vip\Entities\Vip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Models\Emoji;
 
