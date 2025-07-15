@@ -15,6 +15,7 @@ use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\AllOpeningRoomsZegoRequest;
+use Modules\Public\Events\SuperLuckyBox;
 use Modules\Events\Entities\WinnerReward;
 use App\Http\Resources\UserReportResource;
 use App\Http\Resources\ReportEventResource;
@@ -138,8 +139,8 @@ class BoxService
         RedisService::updateUnSerialize($key, $box_use_data);
         if (!$user instanceof User) return;
         $d2 = [
-            "messageContent" => [
-                "message" => "bannerSuperBox",
+            // "messageContent" => [
+            //     "message" => "bannerSuperBox",
                 'coins' => $request->coins ?: $box->coins,
                 "boxUId" => $boxUser->id,
                 "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
@@ -164,10 +165,11 @@ class BoxService
                 ],
 
                 "ownerBoxAL"  => $user->UserVip?->level ?? 0,
-            ]
+            // ]
         ];
-        $json2 = json_encode($d2);
-        dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
+         event(new SuperLuckyBox($d2));
+        // $json2 = json_encode($d2);
+        // dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
         return $boxUser;
     }
 
