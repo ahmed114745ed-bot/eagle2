@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Pk;
+use Illuminate\Log\Logger;
 use Modules\Vip\Entities\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -990,6 +991,11 @@ class Common
 
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
+        logger()->info('Firebase tokens_notification : ', [
+            'expire' => $expire,
+            'user
+            ' => $user
+        ]);
         if ($userVip->is_used) {
             $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
 
