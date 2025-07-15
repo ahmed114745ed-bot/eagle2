@@ -33,13 +33,16 @@
                             {{ __('Coins') }} : {{ number_format($wallet->coins) }}
                         </p>
 
-                        <button type="button"
-                                class="btn btn-primary btn-sm mt-2"
-                                data-toggle="modal"
-                                data-target="#transferModal"
-                                onclick="prepareTransferModal({{ $wallet->id }}, '{{ ucfirst(str_replace('_', ' ', $wallet->name)) }}')">
-                            <i class="fas fa-arrow-right-arrow-left"></i> {{ __('Transfer') }}
-                        </button>
+                        @if($canTransfer)
+                            <button type="button"
+                                    class="btn btn-primary btn-sm mt-2"
+                                    data-toggle="modal"
+                                    data-target="#transferModal"
+                                    onclick="prepareTransferModal({{ $wallet->id }}, '{{ ucfirst(str_replace('_', ' ', $wallet->name)) }}')">
+                                <i class="fas fa-arrow-right-arrow-left"></i> {{ __('Transfer') }}
+                            </button>
+                        @endif
+
                     </div>
 
                     <div class="position-absolute bottom-0 start-0 p-6 m-5">
