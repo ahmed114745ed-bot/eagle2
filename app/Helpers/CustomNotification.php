@@ -647,7 +647,7 @@ class CustomNotification
 
         Common::send_firebase_notification($notificationToken, $translatedTitle[$currentLang], $translatedBody[$currentLang]);
 
-        Common::sendOfficialMessage($userID, content: $translatedBody[$currentLang], title: $title['en'], titleAr: $title['ar']);
+        Common::sendOfficialMessage($userID, content: $translatedBody[$currentLang], title: $translatedTitle['en'], titleAr: $translatedTitle['ar']);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 }
