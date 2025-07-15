@@ -96,7 +96,7 @@ class BoxService
         );
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
-        dispatch(new NormalLuckyBoxJop())->delay(now()->setTimezone($timezone ?? 'UTC')->addSecond(30));
+        dispatch(new NormalLuckyBoxJop())->delay(now()->addSecond($normalDuration));
         return $boxUser;
     }
 
@@ -121,7 +121,7 @@ class BoxService
             'is_closed' => false,
         ];
         Log::info("superrrrrrrrrr");
-        dispatch(new SuperLuckyBoxJob())->delay(now()->addSecond(30));
+        dispatch(new SuperLuckyBoxJob())->delay(now()->addMinutes($box->duration));
         Log::info("superrrrrrrrrr123456");
         $boxUser = BoxUse::query()->create(
             $box_use_data
