@@ -1,0 +1,41 @@
+name: SSh-5live-pipline
+on:
+  push:
+    branches: ["5live"]
+jobs:
+  run_5live_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out 5Live
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.108.213"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          threshold=75
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits"
+          fi
+          cd /var/www/5live
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          docker build -t 5live:${{ github.sha }} .
+          docker service update --image 5live:${{ github.sha }} live-app
+          # check again
+          threshold=75
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits"
+          fi
