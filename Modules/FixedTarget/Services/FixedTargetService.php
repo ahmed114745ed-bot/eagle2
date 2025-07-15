@@ -38,10 +38,10 @@ class FixedTargetService
 
     private \DateTime $endDate;
 
-    public function __construct(private User $user, private ?int $month = null, private ?int $year = null)
+    public function __construct(private User $user, private? int $month = null, private? int $year = null)
     {
-        $timezone = getTimezone();
-        if (is_null($this->month) || is_null($this->year)) {
+            $timezone = getTimezone();
+        if (is_null($this->month) || is_null($this->year)){
             $tz = new \DateTimeZone($timezone);
             $dt = new \DateTime('now', $tz);
             $this->month = $dt->format('m');
@@ -49,15 +49,15 @@ class FixedTargetService
         }
 
         $joinDate = UsersJoinedAgency::where('user_id', $user->id)
-            ->where('agency_id', $user->agency_id)
-            ->latest()
-            ->value('join_date');
+        ->where('agency_id', $user->agency_id)
+        ->latest()
+        ->value('join_date'); 
 
-        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');
+        $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');  
+        
 
-
-        $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz: $timezone)->startOfMonth()->timezone('UTC');
-        $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz: $timezone)->endOfMonth()->timezone('UTC');
+        $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->startOfMonth()->timezone('UTC');
+        $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->endOfMonth()->timezone('UTC');
 
         $targetType           = $this->getUserTargetType($user->id);
         $this->userTargetType = $targetType;
@@ -80,7 +80,7 @@ class FixedTargetService
                 $user = $this->calculateFixedTarget($month_received, $user);
             }
         } else {*/
-
+         
         $user = $this->calculateRegularTarget($month_received, $user);
         //        }
         $user->salary_is_updated = false;
@@ -177,7 +177,7 @@ class FixedTargetService
         logger('agency_usd Achieved:', [$agency_usd]);
         logger('percentageAchieved Achieved:', [$percentageAchieved]);
         logger(' Achieved:', [$agency_usd * $percentageAchieved]);
-        logger(' Achieved: user', [$t]);
+        logger(' Achieved: user', [ $t]);
 
         try {
             $values = [
@@ -255,6 +255,9 @@ class FixedTargetService
 
                                         ])->where('id','!=', $userSalary->id)->delete();*/
         }
+
+    
+       
     }
 
     /**
@@ -267,7 +270,7 @@ class FixedTargetService
         // \Log::info('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
-
+            
             // \Log::info('$target',['$target'=>$target]);
             // \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
@@ -281,7 +284,7 @@ class FixedTargetService
 
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
-
+             
                 $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
@@ -314,24 +317,24 @@ class FixedTargetService
 
                 $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db, $percentageAchieved);
             }else{
-                 $hours = 0;
+                $hours = 0;
                 $days  = 0;
                 $times = $this->getUserLiveTime($user);
                 if ($times) {
                     $hours = $times->hnum;
                     $days  = $user->monthly_days;
                 }
-                UserSallary::updateOrCreate(
+                 UserSallary::updateOrCreate(
                     [
                         'user_id' => $user->id ,
-                         'month' => $this->month,
+                        'month' => $this->month,
                         'year' => $this->year,
                         'user_agency_id' => $user->agency_id,
-                        'is_finished' =>  0,
                     ],
                     [
                         'agency_sallary' => 0,
                         'sallary' => 0,
+                        'is_finished' =>  1,
                         'achieved_hours' =>   $hours,
                         'achieved_days' =>  $days,
                         'achieved_diamond' =>  $month_received,
