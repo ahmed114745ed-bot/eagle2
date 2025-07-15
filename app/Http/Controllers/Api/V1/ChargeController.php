@@ -374,7 +374,7 @@ class ChargeController extends Controller
         $receiver = Common::searchAgency($userUuid);
         if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
 
-        if (ShippingAgencyHelper::isVerifiedChargeForAgency($receiver)) {
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($receiver)) {
             return Common::apiResponse(0, __('not_verified_agency'), 403);
         }
 
