@@ -9,7 +9,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 class SuperLuckyBox implements ShouldBroadcastNow
 {
-    use SerializesModels. Dispatchable, InteractsWithSockets;
+    use SerializesModels, Dispatchable, InteractsWithSockets;
 
     /**
      * Create a new event instance.
