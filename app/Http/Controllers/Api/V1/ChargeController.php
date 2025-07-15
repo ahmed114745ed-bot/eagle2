@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Facades\CustomNotification;
+use Exception;
+use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
-use App\Http\Resources\Api\V1\ChargeResource;
-use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
-use App\Http\Resources\Api\V1\TrxResource;
-use App\Http\Resources\DollarChargeAgencyResource;
-use App\Http\Resources\DollarChargeLogResource;
-use App\Models\User;
-use App\Tik\Services\ChargeRepoService;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
+use App\Http\Controllers\Controller;
+use App\Tik\Services\ChargeRepoService;
+use App\Http\Resources\Api\V1\TrxResource;
+use App\Http\Resources\Api\V1\ChargeResource;
+use App\Http\Resources\DollarChargeLogResource;
+use App\Http\Resources\DollarChargeAgencyResource;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
+use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
+use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -168,9 +169,9 @@ class ChargeController extends Controller
         $from = $request->user();
         $isRoomTarget = false;
 
-        if ($from->transfer_salary == 1) {
-            return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
-        }
+        // if ($from->transfer_salary == 1) {
+        //     return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+        // }
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
         if ($to->is_frozen == 1) {
@@ -178,6 +179,9 @@ class ChargeController extends Controller
         }
         if (!Common::canTransferToAgency($to)) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
+        }
+        if (!ChargeAgency::where('agency_id', $to->id)->exists()) {
+            return Common::apiResponse(0, __('this shipping agency Unpinned'), 403);
         }
 
         $usd = $request->usd;
@@ -366,6 +370,9 @@ class ChargeController extends Controller
         }
         if (!Common::canTransferToAgency($receiver)) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
+        }
+        if (!ChargeAgency::where('agency_id', $receiver->id)->exists()) {
+            return Common::apiResponse(0, __('this shipping agency Unpinned'), 403);
         }
 
         try {
