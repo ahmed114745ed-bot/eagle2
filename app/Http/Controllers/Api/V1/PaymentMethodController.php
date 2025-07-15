@@ -89,7 +89,7 @@ class PaymentMethodController extends Controller
             $order->pid = $fawryRefNumber;
             $paymentMethod->status = 'paid';
             $order->save();
-            
+
             return response()->json(['status' => 'success', 'message' => 'Payment successful.']);
         }
         if ($orderStatus === 'UNPAID') {
@@ -111,13 +111,13 @@ class PaymentMethodController extends Controller
     public function success(Request $request): JsonResponse
     {
         try {
+            info($request->all());
             $query = Arr::only($request->query(), [
                 'statusCode',
                 'statusDescription',
                 'merchantRefNumber',
             ]);
 
-            // Validate required parameters
             if (empty($query['merchantRefNumber']) || empty($query['statusCode'])) {
                 return response()->json([
                     'status' => false,
