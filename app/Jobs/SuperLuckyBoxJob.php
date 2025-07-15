@@ -20,7 +20,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class SuperLuckyBoxJob implements ShouldQueue
 {
@@ -43,13 +43,15 @@ class SuperLuckyBoxJob implements ShouldQueue
         $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
-         \Log::info('luckyBox', [
-                'timestamp'  => $timestamp,
-                'boxes'     => $userBoxes->toArray(),
+          Log::info("boxxxxxxxxxxxxxxxxx");
+        //  \Log::info('luckyBox', [
+        //         'timestamp'  => $timestamp,
+        //         'boxes'     => $userBoxes->toArray(),
                 
-            ]);
-             Log::info("boxxxxxxxxxxxxxxxxx");
+        //     ]);
+           
         if (!$userBoxes)  return;
+                  Log::info("boxxxxxxxxxxxxxxxxxdoneeee");
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->id;
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
