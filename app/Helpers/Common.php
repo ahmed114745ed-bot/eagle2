@@ -993,8 +993,6 @@ class Common
     {
         logger()->info('Firebase tokens_notification : ', [
             'expire' => $expire,
-            'user
-            ' => $user
         ]);
         if ($userVip->is_used) {
             $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
