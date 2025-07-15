@@ -313,8 +313,8 @@ class FixedTargetService
 
 
                 $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db, $percentageAchieved);
-            } else {
-                $hours = 0;
+            }else{
+                 $hours = 0;
                 $days  = 0;
                 $times = $this->getUserLiveTime($user);
                 if ($times) {
@@ -323,16 +323,15 @@ class FixedTargetService
                 }
                 UserSallary::updateOrCreate(
                     [
-                        'user_id' => $user->id,
-                        'month' => $this->month,
+                        'user_id' => $user->id ,
+                         'month' => $this->month,
                         'year' => $this->year,
                         'user_agency_id' => $user->agency_id,
                         'is_finished' =>  0,
                     ],
                     [
-                        // 'agency_sallary' => 0,
-                        // 'sallary' => 0,
-
+                        'agency_sallary' => 0,
+                        'sallary' => 0,
                         'achieved_hours' =>   $hours,
                         'achieved_days' =>  $days,
                         'achieved_diamond' =>  $month_received,
