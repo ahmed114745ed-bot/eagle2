@@ -126,6 +126,7 @@ class BoxService
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
+        Log::info("superrrrrrId:".$boxUser->id);
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
         if (!$user instanceof User) return;
