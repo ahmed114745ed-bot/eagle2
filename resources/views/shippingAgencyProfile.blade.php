@@ -836,11 +836,28 @@
     margin: 20px 20px 20px 20px;
 }
 
-.select2-container {
-    width: 100% !important;
+.filter-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
 }
 
-    </style>
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    line-height: 38px;
+    border: 1px solid #ced4da;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 38px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+
+</style>
 
 
 </head>
@@ -1192,27 +1209,24 @@
 ">
     {{ __('Loading...') }}
 </div>
-
-<!-- Add this before your charges table -->
-<div class="filter-controls mb-3">
-    <div class="row">
-        <div class="col-md-4">
-            <select class="form-control" id="filterType">
-                <option value="">All</option>
-                <option value="user">Users</option>
-                <option value="agency">Agencies</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <select class="form-control" id="entitySelect"></select>
-        </div>
-    </div>
-</div>
-
 <!-- Charges Tab Content -->
 <div id="charges-tab" style="display: {{ ($activeTab == 'charges') ? 'block' : 'none' }}">
     <div class="performers-card">
+        <div class="filter-section mb-3">
+            <select id="receiver-type" class="form-control" style="width: 200px;">
+                <option value="">{{ __('Select type') }}</option>
+                <option value="user" {{ request('filter_by') == 'user' ? 'selected' : '' }}>{{ __('Users') }}</option>
+                <option value="agency" {{ request('filter_by') == 'agency' ? 'selected' : '' }}>{{ __('Agencies') }}</option>
+            </select>
 
+            <select id="receiver-id" class="form-control select2" style="width: 300px;">
+                <option value="">{{ __('Search') }}</option>
+            </select>
+
+            <button class="btn btn-secondary reset-filters" data-tab="charges">
+                <i class="fas fa-redo"></i> {{ __('Reset') }}
+            </button>
+        </div>
         @if($charges && $charges->count())
             <div class="table-responsive">
                 <table class="table table-bordered">
@@ -1278,6 +1292,24 @@
 <!-- Resived Tab Content -->
 <div id="resived-tab" style="display: {{ ($activeTab == 'resived') ? 'block' : 'none' }}">
     <div class="performers-card">
+        <div class="filter-section mb-3">
+            <select id="sender-type" class="form-control" style="width: 200px;">
+                <option value="">{{ __('Select type') }}</option>
+                <option value="user">{{ __('Users') }}</option>
+                <option value="agency">{{ __('Agencies') }}</option>
+                <option value="shipping_agencies">{{ __('Shipping Agencies') }}</option>
+                <option value="bd">{{ __('BD') }}</option>
+                <option value="dash">{{ __('admins') }}</option>
+            </select>
+
+            <select id="sender-id" class="form-control select2" style="width: 300px;">
+                <option value="">{{ __('Search') }}</option>
+            </select>
+
+            <button class="btn btn-secondary reset-filters" data-tab="resived">
+                <i class="fas fa-redo"></i> {{ __('Reset') }}
+            </button>
+        </div>
         @if($resiveds && $resiveds->count())
             <div class="table-responsive">
                 <table class="table table-bordered">
@@ -1339,40 +1371,53 @@
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
             <script>
                 $(document).ready(function() {
-                    $('#entitySelect').select2({
-                        placeholder: 'Search by name, UUID or ID...',
+                    $('.reset-filters').on('click', function() {
+                        const tab = $(this).data('tab');
+                        const currentUrl = new URL(window.location.href);
+
+                        Array.from(currentUrl.searchParams.keys()).forEach(key => {
+                            if (key !== 'tab') {
+                                currentUrl.searchParams.delete(key);
+                            }
+                        });
+
+                        currentUrl.searchParams.set('tab', tab);
+
+                        window.location.href = currentUrl.toString();
+                    });
+
+                });
+            </script>
+<script>
+                $(document).ready(function() {
+                    $('.select2').select2({
+                        placeholder: "Search",
                         allowClear: true,
                         minimumInputLength: 1,
                         ajax: {
-                            url: function() {
-                                return $('#filterType').val() === 'user'
-                                    ? '{{ route("search.users") }}'
-                                    : '{{ route("search.users5") }}';
-                            },
-                            dataType: 'json',
                             delay: 250,
+                            url: "{{ route('search.charges') }}",
+                            dataType: 'json',
                             data: function(params) {
                                 return {
-                                    search: params.term,
                                     q: params.term,
+                                    type: $(this).parent().find('.form-control:first').val(),
                                     page: params.page || 1
                                 };
                             },
                             processResults: function(data, params) {
-                                console.log('Search results:', data); // Debug log
-                                let items = data.data || data;
+                                params.page = params.page || 1;
+
                                 return {
-                                    results: items.map(item => ({
+                                    results: data.data.map(item => ({
                                         id: item.id,
                                         text: item.name
                                     })),
                                     pagination: {
-                                        more: (params.page * 10) < (data.total || 0)
+                                        more: data.current_page < data.last_page
                                     }
                                 };
                             },
@@ -1380,93 +1425,31 @@
                         }
                     });
 
-                    // Handle filter type change
-                    $('#filterType').on('change', function() {
-                        const selectedType = $(this).val();
-                        if (selectedType) {
-                            $('#entitySelect').prop('disabled', false)
-                                .val(null)
-                                .trigger('change');
+                    $('#receiver-type, #sender-type').on('change', function() {
+                        const idSelect = $(this).siblings('.select2');
+                        idSelect.val(null).trigger('change');
+                    });
+
+                    $('#receiver-id, #sender-id').on('select2:select', function(e) {
+                        const currentUrl = new URL(window.location.href);
+                        const type = $(this).siblings('select').val();
+                        const id = e.params.data.id;
+
+                        if ($(this).attr('id') === 'receiver-id') {
+                            currentUrl.searchParams.set('filter_by', type);
+                            currentUrl.searchParams.set('filter_id', id);
+                            currentUrl.searchParams.set('tab', 'charges');
                         } else {
-                            $('#entitySelect').prop('disabled', true)
-                                .val(null)
-                                .trigger('change');
-                            reloadOriginalData();
+                            currentUrl.searchParams.set('sender_type', type);
+                            currentUrl.searchParams.set('sender_id', id);
+                            currentUrl.searchParams.set('tab', 'resived');
                         }
+
+                        window.location.href = currentUrl.toString();
                     });
-
-                    // Handle entity selection
-                    $('#entitySelect').on('select2:select', function(e) {
-                        console.log('Selected data:', e.params.data); // Debug log
-                        filterData(e.params.data);
-                    });
-
-                    function filterData(selectedData) {
-                        const filterType = $('#filterType').val();
-                        const tableBody = $('.table tbody');
-                        const loadingRow = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
-
-                        tableBody.html(loadingRow);
-
-                        // Log the request parameters
-                        console.log('Filter request:', {
-                            filter_by: filterType,
-                            filter_id: selectedData.id,
-                            tab: '{{ $activeTab }}'
-                        });
-
-                        $.ajax({
-                            url: window.location.pathname,
-                            method: 'GET',
-                            data: {
-                                filter_by: filterType,
-                                filter_id: selectedData.id,
-                                tab: '{{ $activeTab }}'
-                            },
-                            success: function(response) {
-                                console.log('Filter response:', response); // Debug log
-                                const newContent = $(response).find('#{{ $activeTab }}-tab').html();
-                                $('#{{ $activeTab }}-tab').html(newContent);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Filter failed:', {
-                                    status: status,
-                                    error: error,
-                                    response: xhr.responseText
-                                });
-                                tableBody.html('<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>');
-                            }
-                        });
-                    }
-
-                    function reloadOriginalData() {
-                        const tableBody = $('.table tbody');
-                        const loadingRow = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
-
-                        tableBody.html(loadingRow);
-
-                        $.ajax({
-                            url: window.location.pathname,
-                            method: 'GET',
-                            data: {
-                                tab: '{{ $activeTab }}'
-                            },
-                            success: function(response) {
-                                const newContent = $(response).find('#{{ $activeTab }}-tab').html();
-                                $('#{{ $activeTab }}-tab').html(newContent);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Reload failed:', {
-                                    status: status,
-                                    error: error,
-                                    response: xhr.responseText
-                                });
-                                tableBody.html('<tr><td colspan="6" class="text-center text-danger">Error reloading data</td></tr>');
-                            }
-                        });
-                    }
                 });
             </script>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);

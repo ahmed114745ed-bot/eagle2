@@ -198,6 +198,10 @@ class Pack extends Model
     public function getCreatedAtFormattedAttribute()
     {
         $tz = request()->header('tz')[0] ?? 'UTC';
+        // Validate timezone
+        if (!in_array($tz, timezone_identifiers_list())) {
+            $tz = 'UTC'; // Fallback
+        }
         return Carbon::parse($this->created_at)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
 
