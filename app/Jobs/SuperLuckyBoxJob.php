@@ -39,6 +39,7 @@ class SuperLuckyBoxJob implements ShouldQueue
      */
     public function handle(): void
     {
+         Log::info("1234566666666");
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
 

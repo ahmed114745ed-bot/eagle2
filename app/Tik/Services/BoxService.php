@@ -12,6 +12,7 @@ use App\Facades\RedisService;
 use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Resources\Api\V1\BoxUseResource;
 
 
@@ -119,7 +120,9 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
+          Log::info("superrrrrrrrrr");
         dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($timezone ?? 'UTC')->addSecond(30));
+         Log::info("superrrrrrrrrr123456");
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
