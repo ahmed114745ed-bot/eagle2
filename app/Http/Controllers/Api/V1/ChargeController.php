@@ -179,7 +179,7 @@ class ChargeController extends Controller
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
 
-        if (ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
             return Common::apiResponse(0, __('not_verified_agency'), 403);
         }
 

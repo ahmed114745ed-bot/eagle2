@@ -2,6 +2,7 @@
 
 namespace App\Bd\Controllers;
 
+use App\Helpers\ShippingAgencyHelper;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
@@ -427,7 +428,7 @@ class WalletController extends MainController
         if (!$to || $to->is_frozen == 1) {
             throw new \Exception(__('api_responses.it_agency_freez_charge'));
         }
-        if (ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
             return Common::apiResponse(0, __('not_verified_agency'), 403);
         }
 
