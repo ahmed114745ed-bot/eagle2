@@ -46,4 +46,13 @@ class OvipRepository extends AbstractRepository
     {
         return $this->model->newQuery()->find($id);
     }
+    public function getAllWithPrivileges()
+    {
+        return OVip::with('privilegs')->orderBy('level')->get();
+    }
+
+    public function findVipById($vipId)
+    {
+        return OVip::find($vipId);
+    }
 }
