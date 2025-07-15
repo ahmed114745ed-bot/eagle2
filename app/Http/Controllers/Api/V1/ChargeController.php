@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Http\Controllers\Controller;
@@ -136,12 +137,12 @@ class ChargeController extends Controller
 
             $notificationToken[] = DB::table('users')->where('id', $to->id)->value('notification_id');
 
-            $title = __('Coins Received');
-            $body = __('You have received :coins coins (equivalent to :usd USD) from :sender.', [
-                'coins' => $coins,
-                'usd' => $usd,
-                'sender' => $from->name
-            ]);
+            $title = 'Coins Received';
+            $body = 'You have received :coins coins (equivalent to :usd USD) from :sender.';
+
+            CustomNotification::charges($to, $title, $body,
+                ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
+            );
 
             Common::send_firebase_notification($notificationToken, $title, $body);
 
@@ -321,11 +322,12 @@ class ChargeController extends Controller
 
             $notificationToken[] = DB::table('users')->where('id', $receiver->id)->value('notification_id');
 
-            $title = __('Balance Recharged');
-            $body = __('Your balance has been recharged with :usd coins by :name.', [
-                'usd' => $amount,
-                'name' => $user->name,
-            ]);
+            $title = 'Balance Recharged';
+            $body = 'Your balance has been recharged with :usd coins by :name.';
+
+            CustomNotification::charges($receiver, $title, $body,
+                ['usd' => $amount, 'name' => $user->name,]
+            );
 
             Common::send_firebase_notification($notificationToken, $title, $body);
 
