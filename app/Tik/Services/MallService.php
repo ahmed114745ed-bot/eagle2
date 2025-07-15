@@ -102,6 +102,12 @@ class MallService
             $this->packRepository->create($data);
 
             $this->service($auth, $ware->exp, $totalPrice, 'send');
+              UserCoinLogHelper::log(
+                    $toUser->id ,
+                    'pack',
+                    'packs',
+                    $totalPrice ?? 0
+                );
             DB::commit();
             return Common::apiResponse(1, 'success process');
         } catch (\Exception $exception) {
