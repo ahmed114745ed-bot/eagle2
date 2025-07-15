@@ -19,7 +19,7 @@ use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-
+use Illuminate\Support\Facades\Log;
 
 class ChargeReportController extends MainController
 {
@@ -510,8 +510,8 @@ class ChargeReportController extends MainController
                 $q->where('status', request('status'))
             );
 
-            $total = $query->sum('paid_usd');
-
+            $total = $query->where('status', 1)->sum('paid_usd');
+            Log::info($total);
             return view('admin.grid.common.report.charge-summary', [
                 'total' => $total,
             ])->render();
