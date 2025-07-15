@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use Exception;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\UserRepository;
@@ -35,7 +36,6 @@ class MallService
         $totalPrice = $ware->price * $quantity;
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
         if ($pack) {
-
             $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
         }
         try {
@@ -56,6 +56,12 @@ class MallService
             $this->packRepository->create($data);
 
             $this->service($user, $ware->exp, $totalPrice, 'buy');
+            UserCoinLogHelper::log(
+                $user->id ,
+                'pack',
+                'packs',
+                $totalPrice ?? 0
+            );
             return Common::apiResponse(1, 'success process');
         } catch (Exception $exception) {
             return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
