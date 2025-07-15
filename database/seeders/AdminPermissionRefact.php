@@ -95,13 +95,21 @@ class AdminPermissionRefact extends Seeder
                     ],
                 ],
             ],
-            ['name' => 'Wallet', 'sort' => 4, 'permissions' =>  [
-                [
-                    'key' => 'app-wallet',
-                    'except' => ['create', 'edit', 'delete', 'show'],
-                    'additional' => [],
+            ['name' => 'Wallet',
+                'sort' => 4,
+                'permissions' =>  [
+                    [
+                        'key' => 'app-wallet',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['transfer-switch'],
+                    ],
+                    [
+                        'key' => 'core-wallet-transactions',
+                        'except' => ['create'],
+                        'additional' => [],
+                    ],
                 ],
-            ],],
+            ],
             [
                 'name' => 'charge system',
                 'sort' => 5,

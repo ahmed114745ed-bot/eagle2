@@ -110,7 +110,6 @@ class PaymentMethodController extends Controller
 
     public function success(Request $request): JsonResponse
     {
-        info($request->all());
         try {
             $query = Arr::only($request->query(), [
                 'statusCode',
@@ -118,6 +117,7 @@ class PaymentMethodController extends Controller
                 'merchantRefNumber',
             ]);
 
+            // Validate required parameters
             if (empty($query['merchantRefNumber']) || empty($query['statusCode'])) {
                 return response()->json([
                     'status' => false,
@@ -153,4 +153,5 @@ class PaymentMethodController extends Controller
             ]);
         }
     }
+
 }
