@@ -21,6 +21,9 @@ class LogApiRequestResponse
 
         $userId = Auth::id();
 
+        if (!$userId){
+            $userId = Auth::guard('sanctum')->id();
+        }
         $matchedId = settings()->get('debug_id');
 
         if ($matchedId && $userId == $matchedId) {
@@ -32,6 +35,17 @@ class LogApiRequestResponse
                 'response_status' => $response->getStatusCode(),
                 'response_body' => method_exists($response, 'getContent') ? json_decode($response->getContent(), true) : null,
             ];
+
+            if (settings()->get('header_log')) {
+                $headers = $request->headers->all();
+
+                // Remove sensitive headers (case-insensitive)
+                unset($headers['authorization']);
+                unset($headers['cookie']);
+                unset($headers['x-api-key']); // Add any others you want excluded
+
+                $log['headers'] = $headers;
+            }
 
             // Write as a pure JSON line
             Log::channel('custom_log')->info($request->fullUrl().' '.PHP_EOL.json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
