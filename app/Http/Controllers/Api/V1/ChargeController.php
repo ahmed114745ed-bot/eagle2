@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
+use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
-use App\Http\Resources\Api\V1\ChargeResource;
-use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
-use App\Http\Resources\Api\V1\TrxResource;
-use App\Http\Resources\DollarChargeAgencyResource;
-use App\Http\Resources\DollarChargeLogResource;
-use App\Models\User;
-use App\Tik\Services\ChargeRepoService;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
+use App\Http\Controllers\Controller;
+use App\Tik\Services\ChargeRepoService;
+use App\Http\Resources\Api\V1\TrxResource;
+use App\Http\Resources\Api\V1\ChargeResource;
+use App\Http\Resources\DollarChargeLogResource;
+use App\Http\Resources\DollarChargeAgencyResource;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
+use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
+use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -136,12 +138,15 @@ class ChargeController extends Controller
 
             $notificationToken[] = DB::table('users')->where('id', $to->id)->value('notification_id');
 
-            $title = __('Coins Received');
-            $body = __('You have received :coins coins (equivalent to :usd USD) from :sender.', [
-                'coins' => $coins,
-                'usd' => $usd,
-                'sender' => $from->name
-            ]);
+            $title = 'Coins Received';
+            $body = 'You have received :coins coins (equivalent to :usd USD) from :sender.';
+
+            CustomNotification::charges(
+                $to,
+                $title,
+                $body,
+                ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
+            );
 
             Common::send_firebase_notification($notificationToken, $title, $body);
 
@@ -175,9 +180,10 @@ class ChargeController extends Controller
         if ($to->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-        if (!Common::canTransferToAgency($to)) {
+        if (!Common::canTransferToAgency($to) || !ChargeAgency::where('agency_id', $to->id)->exists()) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
+
 
         $usd = $request->usd;
 
@@ -321,11 +327,15 @@ class ChargeController extends Controller
 
             $notificationToken[] = DB::table('users')->where('id', $receiver->id)->value('notification_id');
 
-            $title = __('Balance Recharged');
-            $body = __('Your balance has been recharged with :usd coins by :name.', [
-                'usd' => $amount,
-                'name' => $user->name,
-            ]);
+            $title = 'Balance Recharged';
+            $body = 'Your balance has been recharged with :usd coins by :name.';
+
+            CustomNotification::charges(
+                $receiver,
+                $title,
+                $body,
+                ['usd' => $amount, 'name' => $user->name,]
+            );
 
             Common::send_firebase_notification($notificationToken, $title, $body);
 
@@ -359,12 +369,13 @@ class ChargeController extends Controller
         }
         $receiver = Common::searchAgency($userUuid);
         if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
-        if ($receiver->is_frozen == 1 ) {
+        if ($receiver->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-        if (!Common::canTransferToAgency($receiver)) {
+        if (!Common::canTransferToAgency($receiver) || !ChargeAgency::where('agency_id', $receiver->id)->exists()) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
+
 
         try {
             [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);

@@ -2,24 +2,25 @@
 
 namespace App\Tik\Services;
 
+use Exception;
+use App\Models\User;
+use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Http\Resources\Api\V1\GeneralAgencyResource;
-use App\Http\Resources\Api\V1\GeneralUserResource;
-use App\Models\Agency;
 use App\Models\ShippingAgency;
-use App\Models\User;
 use App\Services\WalletService;
+use Illuminate\Support\Facades\DB;
+use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AgencyRepository;
-use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\ChargeRepository;
 use App\Tik\Repositories\CoinLogRepository;
 use App\Tik\Repositories\RoomSalaryRepository;
-use App\Tik\Repositories\ShippingAgencyRepository;
-use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
-use Exception;
-use Illuminate\Support\Facades\DB;
+use App\Tik\Repositories\AgencySalaryRepository;
+use App\Http\Resources\Api\V1\GeneralUserResource;
+use App\Tik\Repositories\ShippingAgencyRepository;
+use App\Http\Resources\Api\V1\GeneralAgencyResource;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 class ChargeRepoService
@@ -406,7 +407,7 @@ class ChargeRepoService
                     if (! $authAgency->status) {
                         throw new Exception(__('api.notCharge'));
                     }
-                 
+
                     if ($authAgency->app_owner_id !== $auth->id) {
                         throw new Exception(__('api.yorSelf'));
                     }
@@ -483,9 +484,11 @@ class ChargeRepoService
         if ($chargeAgency->is_frozen) {
             throw new Exception(__('api_responses.frozenMass'));
         }
-        if (!Common::canTransferToAgency($chargeAgency)) {
+        if (!Common::canTransferToAgency($chargeAgency) || !ChargeAgency::where('agency_id', $chargeAgency->id)->exists()) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
+
+
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }

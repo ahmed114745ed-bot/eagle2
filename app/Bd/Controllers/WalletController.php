@@ -2,33 +2,35 @@
 
 namespace App\Bd\Controllers;
 
-use App\Admin\Controllers\MainController;
-use App\Helpers\Common;
+use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\Charge;
-use App\Http\Controllers\Controller;
-use App\Models\BDSallary;
-use App\Models\ShippingAgency;
-use App\Models\User;
-use App\Models\UserWallet;
-use App\Models\WalletTransaction;
-use App\Services\BDChargeService;
-use App\Services\WalletService;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\BDSallary;
+use App\Models\UserWallet;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\ShippingAgency;
+use App\Services\WalletService;
+use Encore\Admin\Layout\Content;
+use App\Models\WalletTransaction;
+use App\Services\BDChargeService;
+use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
 use Modules\Wallet\Enum\WalletEnum;
-use Modules\Wallet\Services\CheckAvailableBalance;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 use Modules\Wallet\Services\CheckSystemConfigs;
 use Modules\Wallet\Services\CheckUserExistence;
+use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Wallet\Services\CheckAvailableBalance;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
+
 class WalletController extends MainController
 {
     use HasResourceActions;
@@ -46,23 +48,23 @@ class WalletController extends MainController
     public function index(Content $content)
     {
         $netvalue = UserWallet::where('user_id', Auth::user()->app_id)
-        ->selectRaw('SUM(value) as total_value, SUM(cut_amount) as total_cut')
-        ->first();
+            ->selectRaw('SUM(value) as total_value, SUM(cut_amount) as total_cut')
+            ->first();
 
-    $finalvalue = ($netvalue->total_value ?? 0) - ($netvalue->total_cut ?? 0);
+        $finalvalue = ($netvalue->total_value ?? 0) - ($netvalue->total_cut ?? 0);
 
-    return $content
-        ->header(trans('admin.index'))
-        ->description(trans('admin.description'))
+        return $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
 
-        ->row(function ($row) use ($finalvalue) {
-            // الكارت سيتم تضمينه من Blade View
-            $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalvalue]));
-        })
+            ->row(function ($row) use ($finalvalue) {
+                // الكارت سيتم تضمينه من Blade View
+                $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalvalue]));
+            })
 
-        ->row(function ($row) {
-            $row->column(12, $this->grid());
-        });
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            });
     }
 
 
@@ -75,26 +77,26 @@ class WalletController extends MainController
     protected function grid()
     {
         $grid = new Grid(new \App\Models\WalletTransaction());
-    
+
         $currentUserId = \Auth::user()->app_id;
         $grid->model()->where('user_id', $currentUserId);
-    
+
         $grid->column('id', __('Id'));
-    
+
         $grid->column('user.name', __('User'))->display(function () {
             $name = $this->user?->name ?? '';
             $uid = $this->user?->uuid ?? '';
             $path = $this->user?->profile?->avatar ?? null;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-    
+
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-    
+
             $image = handleShowImageWithTypes($this->user->id ?? 0, $url, 40, 40);
             $showUrl = $this->user ? url("admin/users/{$this->user->id}") : "#";
-    
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -107,7 +109,7 @@ class WalletController extends MainController
                 </div>
             ";
         });
-    
+
         $grid->column('type', __('Type'))->display(function ($type) {
             $types = [
                 'add' => __('Add'),
@@ -116,13 +118,13 @@ class WalletController extends MainController
             ];
             return $types[$type] ?? __('Unknown');
         });
-    
+
         $grid->column('value', __('Value'));
-    
+
         $grid->column('description_data', __('Description'))->display(function () {
             $description = $this->description ?? '';
             $data = json_decode($this->description_data, true) ?? [];
-    
+
             switch ($description) {
                 case 'target_achieved':
                     $targetId = $data['target_id'] ?? null;
@@ -138,7 +140,7 @@ class WalletController extends MainController
                         ";
                     }
                     return __('Target not found');
-    
+
                 case 'transfer_to_user':
                     $userId = $data['receiver_id'] ?? null;
                     $user = \App\Models\User::find($userId);
@@ -151,7 +153,7 @@ class WalletController extends MainController
                         }
                         $image = handleShowImageWithTypes($user->id ?? 0, $url, 40, 40);
                         $showUrl = url("admin/users/{$user->id}");
-    
+
                         return "
                             <div style='display: flex; align-items: center; gap: 10px;'>
                                 $image
@@ -165,7 +167,7 @@ class WalletController extends MainController
                         ";
                     }
                     return __('User not found');
-    
+
                 case 'transfer_to_agency':
                     $agencyId = $data['agency_id'] ?? null;
                     $agency = \App\Models\Agency::find($agencyId);
@@ -188,22 +190,22 @@ class WalletController extends MainController
                         ";
                     }
                     return __('Agency not found');
-    
+
                 default:
                     return json_encode($data);
             }
         });
-    
+
         $grid->column('created_at', __('Created at'))->display(function ($created_at) {
             return \Carbon\Carbon::parse($created_at)->format('Y-m-d H:i');
         });
-    
+
         $grid->disableCreateButton();
-    
+
         return $grid;
     }
-    
-    
+
+
     /**
      * Make a show builder.
      *
@@ -215,7 +217,7 @@ class WalletController extends MainController
         $show = new Show(Charge::find($id));
 
 
-        $this->extendShow ($show);
+        $this->extendShow($show);
         return $show;
     }
 
@@ -237,44 +239,44 @@ class WalletController extends MainController
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
         ]);
-    
+
         $appID = Auth::user()->app_id;
-    
+
         $netData = BDSallary::where('bd_id', $appID)
             ->selectRaw('SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut')
             ->first();
-    
+
         $finalSalary = ($netData->total_sallary ?? 0) - ($netData->total_cut ?? 0);
-    
+
         if ($request->amount > $finalSalary) {
             admin_toastr(__('not_enough_balance'), 'error');
             return back();
         }
-    
+
         $remaining = $request->amount;
         $salaries = BDSallary::where('bd_id', $appID)
             ->whereRaw('sallary > cut_amount')
-            ->orderBy('id') 
+            ->orderBy('id')
             ->get();
-    
+
         foreach ($salaries as $salary) {
             $available = $salary->sallary - $salary->cut_amount;
-    
+
             if ($available <= 0) {
                 continue;
             }
-    
+
             $cut = min($available, $remaining);
             $salary->cut_amount += $cut;
             $salary->save();
-    
+
             $remaining -= $cut;
-    
+
             if ($remaining <= 0) {
                 break;
             }
         }
-    
+
         WalletService::storeTransaction(
             $appID,
             'add',
@@ -284,36 +286,36 @@ class WalletController extends MainController
             [],
             'trans_to_my_wallet'
         );
-    
+
         admin_toastr(__('transferred_successfully'), 'success');
         return back();
     }
 
-    
+
     public function charge(Request $request)
     {
         try {
             $request->validate([
                 'amount' => 'required|integer|min:1',
-                'target_id' => 'nullable',    
+                'target_id' => 'nullable',
                 'target_type' => 'required|string',
             ]);
-        
+
 
             $types = [
                 'user' => [$this, 'chargeToUser'],
                 'agency' => [$this, 'chargeToAgency']
             ];
-        
+
             $type = $request->input('target_type');
-        
+
             if (!array_key_exists($type, $types)) {
                 admin_toastr('نوع الوجهة غير موجود', 'error');
                 return back();
             }
-        
-       
-          
+
+
+
             $data = call_user_func($types[$type], $request->all());
             admin_toastr('تم الشحن بنجاح', 'success');
             return back();
@@ -327,12 +329,12 @@ class WalletController extends MainController
     }
 
     public function chargeToUser(array $data)
-    {     
-        $appID =Auth::user()->app_id;
+    {
+        $appID = Auth::user()->app_id;
         $sender = User::find($appID);
         $amount = $data['amount'];
         $receiverId = $data['target_id'] ?? null;
-       
+
         // $wallet = UserWallet::where('user_id', $sender->id)->first();
         // if (!$wallet || ($wallet->value - $wallet->cut_amount) < $amount) {
         //     throw new \Exception(__('balance not enough'));
@@ -340,13 +342,13 @@ class WalletController extends MainController
         $totalSalary = $sender?->bdSalary ?? 0;
         if ($totalSalary < $amount) {
             throw new \Exception(__('balance not enough'));
-           }
-      
+        }
+
         $receiver = User::find($receiverId);
         if (!$receiver) {
             throw new \Exception(__('this user not found'));
         }
-    
+
         if ($sender->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }
@@ -357,20 +359,20 @@ class WalletController extends MainController
         if (!$rate) {
             throw new \Exception(__('please set usd_value_in_coins in configs'));
         }
-    
+
         $coins = $amount * $rate;
- 
-        return $this->startTransaction( $receiver, $sender, $amount, $coins, 'user');
+
+        return $this->startTransaction($receiver, $sender, $amount, $coins, 'user');
     }
 
     public function startTransaction(User $receiver, User $sender, int $amount, int $coins, string $receiverType)
     {
         DB::beginTransaction();
         try {
-            
+
             $sender->incrementCutAmountInBdSallary($amount);
             $receiver->increment('di', $coins);
-            $descriptionData=['receiver_id'  => $receiver->id];
+            $descriptionData = ['receiver_id'  => $receiver->id];
 
             WalletTransaction::create([
                 'user_id' => $sender->id,
@@ -391,7 +393,7 @@ class WalletController extends MainController
                 'amount_type' => 2,
                 "usd" =>  $amount ?? 0,
                 'is_used_transferred' => 1,
-                'user_charger_type'=>'bd'
+                'user_charger_type' => 'bd'
             ];
 
             Charge::create($data);
@@ -412,7 +414,7 @@ class WalletController extends MainController
         $toId = $data['target_id'] ?? null;
 
         if (settings()->get("stop_charge", 0)) {
-        
+
             throw new \Exception(__('api_responses.freez_charge'));
         }
 
@@ -421,18 +423,17 @@ class WalletController extends MainController
         }
 
         $to = ShippingAgency::find($toId);
-    
+
         if (!$to || $to->is_frozen == 1) {
             throw new \Exception(__('api_responses.it_agency_freez_charge'));
-
         }
-        if (!Common::canTransferToAgency($to)) {
+        if (!Common::canTransferToAgency($to) || !ChargeAgency::where('agency_id', $to->id)->exists()) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
+
         $rate = Common::getCoinsValue('shipping_coins');
         if (!$rate) {
             throw new \Exception(__('api_responses.please set usd_value_in_coins in configs'));
-
         }
         $coins = $usd * $rate;
         // $wallet = UserWallet::where('user_id', $from->id)->first();
@@ -443,21 +444,20 @@ class WalletController extends MainController
 
         if ($totalSalary < $usd) {
             throw new \Exception(__('balance not enough'));
-           }
-    
-       
-            $this->performAgencyCharge($from, $to, $coins, $usd);
-            return 1;
-       
+        }
+
+
+        $this->performAgencyCharge($from, $to, $coins, $usd);
+        return 1;
     }
-    
+
     private function performAgencyCharge(User $fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
-        
-    
+
+
         $fromUser->incrementCutAmountInBdSallary($usd);
         $toAgency->increment('coins', $coins);
-    
+
         WalletService::storeTransaction(
             $fromUser->id,
             'cut',
@@ -468,7 +468,7 @@ class WalletController extends MainController
             'trans_to_agency'
 
         );
-        
+
         $data = [
             'charger_id' => $fromUser->id,
             'charger_type' => 'bd',
@@ -479,20 +479,12 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type'=>'bd'
+            'user_charger_type' => 'bd'
 
         ];
 
         Charge::create($data);
-      
+
         return true;
     }
-    
-
-
-
 }
-
-
-
-   
