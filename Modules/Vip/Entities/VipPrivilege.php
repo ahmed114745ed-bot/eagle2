@@ -2,6 +2,7 @@
 
 namespace Modules\Vip\Entities;
 
+use App\Models\Ware;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
