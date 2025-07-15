@@ -110,8 +110,8 @@ class PaymentMethodController extends Controller
 
     public function success(Request $request): JsonResponse
     {
+        info($request->all());
         try {
-            info($request->all());
             $query = Arr::only($request->query(), [
                 'statusCode',
                 'statusDescription',
