@@ -484,13 +484,11 @@ class ChargeRepoService
         if ($chargeAgency->is_frozen) {
             throw new Exception(__('api_responses.frozenMass'));
         }
-        if (!Common::canTransferToAgency($chargeAgency)) {
+        if (!Common::canTransferToAgency($chargeAgency) || !ChargeAgency::where('agency_id', $chargeAgency->id)->exists()) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
 
-        if (!ChargeAgency::where('agency_id', $chargeAgency->id)->exists()) {
-            return Common::apiResponse(0, __('this shipping agency Unpinned'), 403);
-        }
+
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }

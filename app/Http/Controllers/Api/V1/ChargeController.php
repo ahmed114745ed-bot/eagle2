@@ -141,7 +141,10 @@ class ChargeController extends Controller
             $title = 'Coins Received';
             $body = 'You have received :coins coins (equivalent to :usd USD) from :sender.';
 
-            CustomNotification::charges($to, $title, $body,
+            CustomNotification::charges(
+                $to,
+                $title,
+                $body,
                 ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
             );
 
@@ -169,20 +172,18 @@ class ChargeController extends Controller
         $from = $request->user();
         $isRoomTarget = false;
 
-        // if ($from->transfer_salary == 1) {
-        //     return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
-        // }
+        if ($from->transfer_salary == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+        }
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
         if ($to->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-        if (!Common::canTransferToAgency($to)) {
+        if (!Common::canTransferToAgency($to) || !ChargeAgency::where('agency_id', $to->id)->exists()) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
-        if (!ChargeAgency::where('agency_id', $to->id)->exists()) {
-            return Common::apiResponse(0, __('this shipping agency Unpinned'), 403);
-        }
+
 
         $usd = $request->usd;
 
@@ -329,7 +330,10 @@ class ChargeController extends Controller
             $title = 'Balance Recharged';
             $body = 'Your balance has been recharged with :usd coins by :name.';
 
-            CustomNotification::charges($receiver, $title, $body,
+            CustomNotification::charges(
+                $receiver,
+                $title,
+                $body,
                 ['usd' => $amount, 'name' => $user->name,]
             );
 
@@ -365,15 +369,13 @@ class ChargeController extends Controller
         }
         $receiver = Common::searchAgency($userUuid);
         if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
-        if ($receiver->is_frozen == 1 ) {
+        if ($receiver->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-        if (!Common::canTransferToAgency($receiver)) {
+        if (!Common::canTransferToAgency($receiver) || !ChargeAgency::where('agency_id', $receiver->id)->exists()) {
             return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
-        if (!ChargeAgency::where('agency_id', $receiver->id)->exists()) {
-            return Common::apiResponse(0, __('this shipping agency Unpinned'), 403);
-        }
+
 
         try {
             [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);
