@@ -20,6 +20,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Support\Facades\Log;
 
 class SuperLuckyBoxJob implements ShouldQueue
 {
@@ -38,11 +39,20 @@ class SuperLuckyBoxJob implements ShouldQueue
      */
     public function handle(): void
     {
+         Log::info("1234566666666");
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
+          Log::info("boxxxxxxxxxxxxxxxxx");
+        //  \Log::info('luckyBox', [
+        //         'timestamp'  => $timestamp,
+        //         'boxes'     => $userBoxes->toArray(),
+                
+        //     ]);
+           
         if (!$userBoxes)  return;
+                  Log::info("boxxxxxxxxxxxxxxxxxdoneeee");
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->id;
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
@@ -99,9 +109,9 @@ class SuperLuckyBoxJob implements ShouldQueue
                 }
                 $user = User::where('id', $userBox->user_id)->first();
                 $user->increment('di', $userBox->unused_coins);
-                $userBox->is_closed = true;
-                $userBox->save();
             }
+            $userBox->is_closed = true;
+            $userBox->save();
             $winners = UserBoxGift::where(['box_uses_id' => $userBox->id])->where('coins', '>', 0)->select('user_id', 'coins')->toArray();
             $box_use = BoxUse::find($userBox->id);
             $room    = Room::withoutAppends()->where('uid', $box_use->room_uid)->first();
