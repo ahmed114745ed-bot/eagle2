@@ -636,10 +636,9 @@ class CustomNotification
         return $translations;
     }
 
-    public function charges($userID, $title, $body, $replace)
+    public function charges($user, $title, $body, $replace)
     {
         $currentLang = app()->getLocale();
-        $user = User::where('id', $userID)->first();
         $notificationToken = $user->notification_id;
 
         $translatedTitle = $this->multiLang($title);
@@ -647,7 +646,7 @@ class CustomNotification
 
         Common::send_firebase_notification($notificationToken, $translatedTitle[$currentLang], $translatedBody[$currentLang]);
 
-        Common::sendOfficialMessage($userID, content: $translatedBody[$currentLang], title: $translatedTitle['en'], titleAr: $translatedTitle['ar']);
+        Common::sendOfficialMessage($user->id, content: $translatedBody[$currentLang], title: $translatedTitle['en'], titleAr: $translatedTitle['ar']);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 }
