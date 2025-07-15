@@ -991,9 +991,7 @@ class Common
 
     public static function handelVip($vip, $user, $expire,  $userVip)
     {
-        logger()->info('Firebase tokens_notification : ', [
-            'expire' => $expire,
-        ]);
+    
         if ($userVip->is_used) {
             $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
 
@@ -1085,6 +1083,10 @@ class Common
             if ($expire == null) {
                 $expire = $vip->expire;
             }
+            logger()->info('Firebase tokens_notification : ', [
+                'expire' => $expire,
+                'expire_t' => now()->addDays($expire)->timestamp,
+            ]);
             if ($pack) {
                 // if ($pack->expire == 0) {
                 //     //                    throw new \Exception('already exists');
