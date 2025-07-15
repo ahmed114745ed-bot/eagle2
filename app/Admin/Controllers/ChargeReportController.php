@@ -506,12 +506,11 @@ class ChargeReportController extends MainController
                 $q->whereDate('created_at', '<=', Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay())
             );
 
-            $query->when(request('status') !== null && request('status') !== '', fn($q) =>
-                $q->where('status', request('status'))
-            );
+            // $query->when(request('status') !== null && request('status') !== '', fn($q) =>
+            //     $q->where('status', request('status'))
+            // );
 
             $total = $query->where('status', 1)->sum('paid_usd');
-            Log::info($total);
             return view('admin.grid.common.report.charge-summary', [
                 'total' => $total,
             ])->render();
