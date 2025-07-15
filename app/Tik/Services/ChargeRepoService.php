@@ -414,6 +414,7 @@ class ChargeRepoService
                     if ($authAgency->coins < $request->amount) {
                         throw new Exception(__('api.notHaveAmount'));
                     }
+                    
                     $this->handleAgencyCharge($authAgency, $request);
                     break;
 
@@ -471,6 +472,7 @@ class ChargeRepoService
 
     private function handleAgencyCharge($authAgency, $request)
     {
+        
         // if ($authAgency->id == $request->id) {
         //     throw new \Exception(__('api.notYourself'));
         // }
@@ -484,11 +486,10 @@ class ChargeRepoService
         if ($chargeAgency->is_frozen) {
             throw new Exception(__('api_responses.frozenMass'));
         }
+        
         if (!Common::canTransferToAgency($chargeAgency) || !ChargeAgency::where('agency_id', $chargeAgency->id)->exists()) {
-            return Common::apiResponse(0, __('unreliable_agency'), 403);
+           throw new Exception( __('unreliable_agency'));
         }
-
-
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }
