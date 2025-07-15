@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Services\FilterChargeService;
 use Auth;
 use Exception;
 use App\Models\Gift;
@@ -208,6 +209,23 @@ class UserController extends Controller
         ];
         return Common::apiResponse(true, '', $data, 200);
     }
+
+    public function charges(Request $request): JsonResponse
+    {
+        $type = $request->type;
+        $key = $request->q;
+        $perPage = 10;
+        $currentPage = request()->has('page') ? request()->page : 1;
+
+        $filterCharges = (new FilterChargeService($perPage, $currentPage))->result($type, $key);
+
+        if (! $filterCharges) {
+            return response()->json(['message' => 'Invalid type'], 400);
+        }
+
+        return response()->json($filterCharges);
+    }
+
     public function search(Request $request)
     {
         $key = $request->search;
@@ -252,7 +270,7 @@ class UserController extends Controller
     public function user_bd(Request $request)
     {
         $key = $request->q;
-       
+
         $page = $request->get('page', 1);
         $users = $this->userService->user_bd($key, $page);
 

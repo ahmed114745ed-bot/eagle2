@@ -124,6 +124,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
         Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
+        Route::get('charges', [UserController::class, 'charges'])->name('charges');
     });
 
     // authorization
@@ -588,9 +589,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/public-test/{ids}', function ($ids) {
                 $title = 'System‑wide Test';
                 $body  = 'This is only a test.';
-            
+
                 $idArray = explode(',', $ids);
-            
+
                 $tokens = User::whereNotNull('notification_id')
                     ->whereIn('id', $idArray)
                     ->pluck('notification_id')
@@ -598,12 +599,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->unique()
                     ->values()
                     ->toArray();
-            
+
                 logger()->info('Kreait - Successfully  tokens from topic.', [
                     'tokens' => $tokens,
                     'ids'    => $idArray,
-                ]);  
-            
+                ]);
+
                 return Common::send_firebase_notification($tokens, $title, $body);
             });
 
@@ -615,10 +616,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->values()
                     ->toArray();
                 // $result = Common::unsubscribeFromTopic($tokens, $topic);
-            
+
                 // return response()->json($result);
             });
-            
+
 
 
         }
@@ -663,10 +664,10 @@ Route::get('/public-official-test/{ids}', function ($ids) {
                $type,
              $subType,
                         $body_ar,
-                 $image,  
+                 $image,
              $fromUser
         );
-    } 
+    }
 
     return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
 });
