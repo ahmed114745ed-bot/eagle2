@@ -511,7 +511,6 @@ class ChargeReportController extends MainController
             );
 
             $total = $query->where('status', 1)->sum('paid_usd');
-           dd($total);
             return view('admin.grid.common.report.charge-summary', [
                 'total' => $total,
             ])->render();
