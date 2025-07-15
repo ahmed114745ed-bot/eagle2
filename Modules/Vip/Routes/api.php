@@ -14,9 +14,10 @@ use Modules\Vip\Http\Controllers\Api\VipController;
 |
 */
 
-Route::middleware('auth:api')->get('/vip', function (Request $request) {
-    // return $request->user();
-    Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
+    function () {
+        
+        Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
         Route::get('/list', [VipController::class, 'vipList']);
         Route::get('/user/list', [VipController::class, 'vipUserList']);
         Route::post('/buyVip', [VipController::class, 'buyVip']);
@@ -27,5 +28,4 @@ Route::middleware('auth:api')->get('/vip', function (Request $request) {
     });
     Route::get('levels/badges', [VipController::class, 'badges']);
     Route::get('levels', [VipController::class, 'index']);
-
-});
+    });
