@@ -427,8 +427,8 @@ class WalletController extends MainController
         if (!$to || $to->is_frozen == 1) {
             throw new \Exception(__('api_responses.it_agency_freez_charge'));
         }
-        if (!Common::canTransferToAgency($to) || !ChargeAgency::where('agency_id', $to->id)->exists()) {
-            throw new \Exception(__('unreliable_agency'));
+        if (ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
+            return Common::apiResponse(0, __('not_verified_agency'), 403);
         }
 
         $rate = Common::getCoinsValue('shipping_coins');

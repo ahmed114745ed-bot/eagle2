@@ -27,9 +27,8 @@ class ShippingAgency extends Model
 
     public function chargeAgency()
     {
-        return $this->hasMany(ChargeAgency::class, 'agency_id');
+        return $this->hasOne(ChargeAgency::class, 'agency_id');
     }
-
 
     public function charges()
     {

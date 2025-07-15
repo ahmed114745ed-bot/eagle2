@@ -292,9 +292,9 @@ class AppearChargerAgencyController extends MainController
             ";
         });
 
-        $grid->column('charge_agency', __("Charge-agency"))
-            ->display(function () {
-                return ChargeAgency::where('agency_id', $this->id)->exists() ? 1 : 0;
+        $grid->column('chargeAgency.exists', __("Charge-agency"))
+            ->display(function ($exists) {
+                return $exists ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
 
