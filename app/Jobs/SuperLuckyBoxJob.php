@@ -42,6 +42,11 @@ class SuperLuckyBoxJob implements ShouldQueue
         $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
+         \Log::info('luckyBox', [
+                'timestamp'  => $timestamp,
+                'boxes'     => $userBoxes->toArray(),
+                
+            ]);
         if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->id;
@@ -99,9 +104,9 @@ class SuperLuckyBoxJob implements ShouldQueue
                 }
                 $user = User::where('id', $userBox->user_id)->first();
                 $user->increment('di', $userBox->unused_coins);
-                $userBox->is_closed = true;
-                $userBox->save();
             }
+            $userBox->is_closed = true;
+            $userBox->save();
             $winners = UserBoxGift::where(['box_uses_id' => $userBox->id])->where('coins', '>', 0)->select('user_id', 'coins')->toArray();
             $box_use = BoxUse::find($userBox->id);
             $room    = Room::withoutAppends()->where('uid', $box_use->room_uid)->first();
