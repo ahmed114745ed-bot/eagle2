@@ -45,11 +45,6 @@ class SuperLuckyBoxJob implements ShouldQueue
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
         Log::info("boxxxxxxxxxxxxxxxxx");
-        //  \Log::info('luckyBox', [
-        //         'timestamp'  => $timestamp,
-        //         'boxes'     => $userBoxes->toArray(),
-
-        //     ]);
 
         if (!$userBoxes)  return;
         Log::info("boxxxxxxxxxxxxxxxxxdoneeee");
@@ -117,6 +112,29 @@ class SuperLuckyBoxJob implements ShouldQueue
             $winners = UserBoxGift::where(['box_uses_id' => $userBox->id])->where('coins', '>', 0)->select('user_id', 'coins')->get()->toArray();
             $box_use = BoxUse::find($userBox->id);
             $room    = Room::withoutAppends()->where('uid', $box_use->room_uid)->first();
+
+            $c     = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
+            $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
+
+            $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
+            $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $pickerBoxIds)->whereHas('user')->pluck('user_id')->toArray();
+
+            foreach ($usersRoomVisit as $userRoomVisit) {
+
+                $m     = [
+                    "messageContent" => [
+                        "message"      => "hideluckybox",
+                        "ownerBoxId"   => @$owner->id,
+                        "ownerBoxName" => @$owner->name,
+                        "boxCoins"     => $userBox->coins,
+                        "boxId"        => $userBox->id,
+                        "boxType"      => $userBox->type == 1 ? 'super' : 'normal',
+                        "numOfBoxes"   => $c
+                    ]
+                ];
+                $json  = json_encode($m);
+                Common::sendToZego('SendCustomCommand', @$room->id, @$userRoomVisit->user_id, $json);
+            }
             if ($room && $room->owner) {
                 $m     = [
                     "messageContent" => [
