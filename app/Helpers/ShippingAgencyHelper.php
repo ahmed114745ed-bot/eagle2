@@ -8,7 +8,7 @@ class ShippingAgencyHelper
 {
     public static function isReliableTransferEnabled(): bool
     {
-        return settings()->get('transfer_salary_reliable_shipping_agency') === 1;
+        return settings()->get('transfer_salary_reliable_shipping_agency') == 1;
     }
 
     public static function isVerifiedChargeForAgency(ShippingAgency $shippingAgency)
