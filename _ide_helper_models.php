@@ -3171,8 +3171,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $expire
  * @property int|null $exp
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Vip\Entities\OVip;
-Privilege> $privilegs
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Vip\Entities\VipPrivilege> $privilegs
  * @property-read int|null $privilegs_count
  * @property-read \App\Models\Ware|null $wareIcon
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ware> $wares
