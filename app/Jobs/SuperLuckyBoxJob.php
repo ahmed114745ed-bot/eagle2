@@ -20,6 +20,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Log;
 
 class SuperLuckyBoxJob implements ShouldQueue
 {
@@ -47,6 +48,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                 'boxes'     => $userBoxes->toArray(),
                 
             ]);
+             Log::info("boxxxxxxxxxxxxxxxxx");
         if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->id;
