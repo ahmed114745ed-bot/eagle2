@@ -3,29 +3,17 @@
 namespace App\Tik\Services;
 
 use Carbon\Carbon;
-use App\Models\Pack;
 use App\Models\User;
 use App\Models\BoxUse;
-use App\Models\Config;
 use App\Helpers\Common;
-use App\Models\UserVip;
 use App\Models\CoreWallet;
+use App\Events\SuperLuckyBox;
 use App\Facades\RedisService;
 use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use Modules\Public\Events\SuperLuckyBox;
-use Modules\Events\Entities\WinnerReward;
-use App\Http\Resources\UserReportResource;
-use App\Http\Resources\ReportEventResource;
-use Modules\Events\Entities\RewardWinnerPk;
-use App\Http\Resources\AgencyReportResource;
-use App\Tik\Repositories\BlackLisRepository;
 use App\Http\Resources\Api\V1\BoxUseResource;
-use Modules\Events\Services\LoseWinnerRewards;
-use App\Http\Resources\AdminUserReportResource;
-use Modules\Achievement\Entities\UserAchievementLevel;
+
 
 class BoxService
 {

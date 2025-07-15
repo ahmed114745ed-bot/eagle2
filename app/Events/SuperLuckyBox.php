@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Public\Events;
+namespace App\Events;
 
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Queue\SerializesModels;
