@@ -437,139 +437,157 @@ class ChargeReportController extends MainController
     protected function stripe()
     {
         $grid = new Grid(new CoinLog());
+
         $grid->disableRowSelector();
-        $grid->model()->orderByDesc('created_at')->where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay');
+
+        $grid->model()
+            // ->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
+            ->orderByDesc('created_at');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
-
                 $filter->equal('trx', __('trx_no'));
 
                 $filter->where(function ($query) {
                     if ($this->input !== '') {
                         $query->where('method', $this->input);
                     }
-                }, __('Select type'), 'method')
-                    ->select(
-                        ['' => __('All')] +
-                            PaymentCoin::orderBy('type')
-                            ->pluck('title', 'type')
-                            ->toArray()
-                    );
+                }, __('Select type'), 'method')->select(
+                    ['' => __('All')] + PaymentCoin::orderBy('type')->pluck('title', 'type')->toArray()
+                );
 
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        request('from_date');
+                $filter->equal('status', __('Status'))->select([
+                    '' => __('All'),
+                    1  => __('success'),
+                    0  => __('failed'),
+                ]);
+            });
 
-                        $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($from = request('from_date')) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
                         $query->whereDate('created_at', '>=', $start);
-                    }, __('From Date'), 'from_date')->date();
-                });
+                    }
+                }, __('From Date'), 'from_date')->date();
 
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        request('to_date');
-
-                        $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+                $filter->where(function ($query) {
+                    if ($to = request('to_date')) {
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
                         $query->whereDate('created_at', '<=', $end);
-                    }, __('To Date'), 'to_date')->date();
-                });
-
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->equal('status', __('Status'))->select([
-                        '' => __('All'),
-                        1  => __('success'),
-                        0  => __('failed'),
-                    ]);
-                });
+                    }
+                }, __('To Date'), 'to_date')->date();
             });
         });
 
         $grid->header(function () {
-            $query =  CoinLog::where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay'); // Get the actual Eloquent builder
-            $total = $query->where('status', 1)->sum('paid_usd'); // Execute and cast
+            $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/;
+
+            $query->when(request('user.uuid'), fn($q, $uuid) =>
+                $q->whereHas('user', fn($u) => $u->where('uuid', $uuid))
+            );
+
+            $query->when(request('trx'), fn($q, $trx) =>
+                $q->where('trx', $trx)
+            );
+
+            $query->when(request('method') !== null && request('method') !== '', fn($q) =>
+                $q->where('method', request('method'))
+            );
+
+            $query->when(request('from_date'), fn($q, $from) =>
+                $q->whereDate('created_at', '>=', Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay())
+            );
+
+            $query->when(request('to_date'), fn($q, $to) =>
+                $q->whereDate('created_at', '<=', Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay())
+            );
+
+            $query->when(request('status') !== null && request('status') !== '', fn($q) =>
+                $q->where('status', request('status'))
+            );
+
+            $total = $query->where('status', 1)->sum('paid_usd');
 
             return view('admin.grid.common.report.charge-summary', [
                 'total' => $total,
             ])->render();
         });
 
-
         $grid->column('id', __('transaction id'));
-        $grid->column('user_id', __('charger'))->display(function ($recever) {
-            if (!$this->user) {
-                return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
 
-                            <span style=' cursor: pointer;'>Unknown </span>
-
-                </div>
-            ";
+        $grid->column('user_id', __('charger'))->display(function () {
+            $user = $this->user;
+            if (!$user) {
+                return "<div style='display: flex; align-items: center; gap: 10px;'><span style='cursor: pointer;'>Unknown</span></div>";
             }
-            $name =  $this->user->name ?? '';
-            $uid = @$this->user->uuid ?? 0;
-            $path = @$this->user?->profile?->avatar;
+
+            $name = $user->name ?? '';
+            $uid  = $user->uuid ?? 0;
+            $path = $user->profile->avatar ?? null;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
+
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
             return "
-             <div style='display: flex; align-items: center; gap: 10px;'>
-                 $image
-                 <div>
-                     <strong>$name</strong><br>
-                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                 </div>
-             </div>
-         ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
         });
 
-
         $grid->column('coin.usd', __('dollar'))->display(function ($coin) {
-            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/dollar.jpg');
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
-
                 </div>
             ";
         });
+
         $grid->column('obtained_coins', __('Amount'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/coin.jpg');
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                  <span>" . number_format($coin) . "</span>
+                    <span>" . number_format($coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>
             ";
         });
+
         $grid->column('trx', __('trx'));
+
         $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
             $paymentCoin = PaymentCoin::find($value);
-            if (!$paymentCoin) return '';
-            //            $options = PaymentType::getTranslatedOptions();
-
-            return __($paymentCoin->title);
-            //            return $options[$paymentCoin->title] ?? '';
+            return $paymentCoin ? __($paymentCoin->title) : '';
         });
+
         $grid->column('status', __('Status'))->display(function () {
-            if ($this->status == 1) {
-                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
-            } elseif ($this->status == 0) {
-                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Failed</span>';
-            }
+            return match ($this->status) {
+                1 => '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>',
+                0 => '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Failed</span>',
+                default => ''
+            };
         });
 
         $grid->column('created_at', __('shipping date'));
+
         return $grid;
     }
+
 
     protected function in_app_purchas()
     {
