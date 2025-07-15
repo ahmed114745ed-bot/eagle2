@@ -510,7 +510,7 @@ class ChargeReportController extends MainController
                 $q->where('status', request('status'))
             );
 
-            $total = $query->where('status', 1)->sum('paid_usd');
+            $total = $query->sum('paid_usd');
 
             return view('admin.grid.common.report.charge-summary', [
                 'total' => $total,
