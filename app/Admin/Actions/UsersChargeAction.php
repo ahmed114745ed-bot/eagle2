@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class UsersChargeAction extends Action
 {
@@ -87,16 +88,13 @@ class UsersChargeAction extends Action
             }
         });
 
-        $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-        $title = $typeCharge == 'increment'
-            ? __('Coins Added')
-            : __('Coins Deducted');
+        $title = $typeCharge == 'increment' ? 'Coins Added' : 'Coins Deducted';
 
         $body = $typeCharge === 'increment'
-            ? __('You have received :coins coins from admin.', ['coins' => $coins])
-            : __(':coins coins were deducted from your account by admin.', ['coins' => $coins]);
+            ? 'You have received :coins coins from admin.'
+            : ':coins coins were deducted from your account by admin.';
 
-        Common::send_firebase_notification($notificationToken, $title, $body);
+        CustomNotification::charges($user->id, $title, $body, ['coins' => $coins]);
 
         return $this->response()->success('Success')->refresh();
     }
