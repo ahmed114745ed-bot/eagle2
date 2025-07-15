@@ -120,9 +120,9 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-          Log::info("superrrrrrrrrr");
-        dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($timezone ?? 'UTC')->addSecond(30));
-         Log::info("superrrrrrrrrr123456");
+        Log::info("superrrrrrrrrr");
+        dispatch(new SuperLuckyBoxJob())->delay(now()->addSecond(30));
+        Log::info("superrrrrrrrrr123456");
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
@@ -132,33 +132,33 @@ class BoxService
         $d2 = [
             // "messageContent" => [
             //     "message" => "bannerSuperBox",
-                'coins' => $request->coins ?: $box->coins,
-                "boxUId" => $boxUser->id,
-                "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
-                "room" => [
-                    "id" => $room->id,
-                    "uuid" => $room->owner->uuid,
-                    "room_name" => $room->room_name ?? '',
-                    "room_session" => $room->session,
-                    "room_owner_id" => $room->uid,
-                    "is_password" => $room->room_pass ? true : false,
-                    "room_cover" => $room->room_cover ?? '',
-                    "room_background" => $room->final_room_image ?? '',
-                    "room_mode" => $room->mode,
-                ],
-                "sender" => [
-                    "id" => $user->id,
-                    "name" => @$user->name ?? '',
-                    "s_image" => @$user->profile->avatar ?? '',
-                    "s_name" => @$user->name,
-                    "s_sender_level" => $user->total_sender_level,
-                    "s_receiver_level" => $user->total_received_level,
-                ],
+            'coins' => $request->coins ?: $box->coins,
+            "boxUId" => $boxUser->id,
+            "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
+            "room" => [
+                "id" => $room->id,
+                "uuid" => $room->owner->uuid,
+                "room_name" => $room->room_name ?? '',
+                "room_session" => $room->session,
+                "room_owner_id" => $room->uid,
+                "is_password" => $room->room_pass ? true : false,
+                "room_cover" => $room->room_cover ?? '',
+                "room_background" => $room->final_room_image ?? '',
+                "room_mode" => $room->mode,
+            ],
+            "sender" => [
+                "id" => $user->id,
+                "name" => @$user->name ?? '',
+                "s_image" => @$user->profile->avatar ?? '',
+                "s_name" => @$user->name,
+                "s_sender_level" => $user->total_sender_level,
+                "s_receiver_level" => $user->total_received_level,
+            ],
 
-                "ownerBoxAL"  => $user->UserVip?->level ?? 0,
+            "ownerBoxAL"  => $user->UserVip?->level ?? 0,
             // ]
         ];
-         event(new SuperLuckyBox($d2));
+        event(new SuperLuckyBox($d2));
         // $json2 = json_encode($d2);
         // dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
         return $boxUser;
