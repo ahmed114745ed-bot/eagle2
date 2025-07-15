@@ -24,7 +24,7 @@ class ChargeAgentResource extends JsonResource
         $hasColor = Common::hasInPack($user->id, 18, true);
         $frame = Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img2', true) ?: Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img1', true);
         return [
-            'agency_id' => $this->id,
+            'agency_id' => $this?->id ?? 0,
             'id' => $user->id ?? 0,
             'name' => $this->name ?? '',
             'phone' => $user->phone ?? '',
