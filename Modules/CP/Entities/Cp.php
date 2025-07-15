@@ -57,12 +57,10 @@ class Cp extends Model
     protected static function booted()
     {
         static::created(function ($cp) {
-            Log::info(["out created",$cp->user_id,$cp->price]);
-            if (($cp->user_id ?? null) && ($cp->price ?? 0) > 0) {
+            if (($cp->user_one_id  ?? null) && ($cp->price ?? 0) > 0) {
             Log::info(["inside created",$cp->user_id,$cp->price]);
-
                 UserCoinLogHelper::log(
-                    $cp->user_id,
+                    $cp->user_one_id ,
                     'cp',
                     'cps',
                     $cp->price
