@@ -3,6 +3,7 @@
 namespace App\Bd\Controllers;
 
 use App\Helpers\ShippingAgencyHelper;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
@@ -383,6 +384,16 @@ class WalletController extends MainController
                 'description_data' => is_array($descriptionData) ? json_encode($descriptionData) : $descriptionData,
                 'message' => 'transfer_to_',
             ]);
+
+            $amountBefore =  Common::getCurrentBalance($receiver->id);
+            UserCoinLogHelper::log(
+                $receiver->id ,
+                'charge',
+                'charges',
+                $amount ?? 0,
+                $amountBefore ?? 0,
+                'bd'
+            );
 
             $data = [
                 'charger_id' => $sender->id,

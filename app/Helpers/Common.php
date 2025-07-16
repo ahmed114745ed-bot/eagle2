@@ -2165,4 +2165,10 @@ class Common
         ];
     }
 
+
+    public static function getCurrentBalance(int $userId): int
+    {
+        return (int) User::where('id', $userId)->value('coin') ?? 0;
+    }
+
 }

@@ -2,6 +2,8 @@
 
 namespace App\Tik\Services;
 
+use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Tik\Repositories\ExchangeRepository;
 use App\Tik\Repositories\ExchangeLogRepository;
 
@@ -44,6 +46,15 @@ class ExchangeService
             $user->exchange_diamonds = 0;
         }
         if ($ex->type == 0) {
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            UserCoinLogHelper::log(
+                $user->id ,
+                'exchange',
+                'exchanges',
+                $ex->value ?? 0,
+                $amountBefore ?? 0,
+                'diamonds'
+            );
             $user->di += $ex->value;
         } elseif ($ex->type == 1) {
             $user->gold +=  $ex->value;

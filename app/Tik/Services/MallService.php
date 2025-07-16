@@ -100,14 +100,18 @@ class MallService
                 'price'     => $totalPrice,
             ];
             $this->packRepository->create($data);
-
+            $amountBefore =  Common::getCurrentBalance($auth->id);
+            $logAmount = -abs($totalPrice);
+            UserCoinLogHelper::log(
+                $auth->id ,
+                'pack',
+                'packs',
+                $logAmount ?? 0,
+                $amountBefore ?? 0,
+                $ware->name
+            );
             $this->service($auth, $ware->exp, $totalPrice, 'send');
-              UserCoinLogHelper::log(
-                    $toUser->id ,
-                    'pack',
-                    'packs',
-                    $totalPrice ?? 0
-                );
+          
             DB::commit();
             return Common::apiResponse(1, 'success process');
         } catch (\Exception $exception) {
@@ -152,7 +156,7 @@ class MallService
             (new UpgradeLevelServices())->purchaseItem($user, $wareExp);
             (new UserCounterServices)->eventUser($user, 'mybag', 1);
         }
-
+       
         $this->userRepository->decrementUserCoins($user, $totalPrice);
     }
 
