@@ -120,8 +120,8 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-//        dispatch(new SuperLuckyBoxJob())->delay(now()->addSeconds(30))->onQueue('super-lucky-box');
-        dispatch(new SuperLuckyBoxJob())->delay(now()->seconds(30));
+        dispatch(new SuperLuckyBoxJob())->delay(now()->addSeconds(30))->onQueue('super-lucky-box');
+//        dispatch(new SuperLuckyBoxJob())->delay(now()->seconds(30))->onQueue('');
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
