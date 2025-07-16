@@ -3,7 +3,6 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
-use App\Models\BoxUse;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;

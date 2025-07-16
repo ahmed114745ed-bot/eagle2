@@ -330,6 +330,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('box')->group(function () {
                 Route::get('list', [BoxController::class, 'index']);
                 Route::post('send', [BoxController::class, 'send']);
+                Route::post('send_test', [BoxController::class, 'testSendSuperBoxes']);
                 Route::post('pickup', [BoxController::class, 'pickBox']);
             });
 
