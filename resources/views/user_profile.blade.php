@@ -1996,12 +1996,19 @@
                                         <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                               <div class="col-md-4">
                                     <div class="date-flex-row">
-                                        <span>{{ __('agency id') }}</span>
-                                        <input type="text" class="form-control"  name="agency_id" value="{{ request('agency_id') }}">
+                                        <label for="agency_id">{{ __('Agency') }}</label>
+                                        <select class="form-control" id="agency_id" name="agency_id">
+                                            @if(request('agency_id'))
+                                                <option value="{{ request('agency_id') }}" selected>
+                                                    {{ \App\Models\Agency::find(request('agency_id'))?->name . ' - ' . request('agency_id') }}
+                                                </option>
+                                            @endif
+                                        </select>
                                     </div>
                                 </div>
+
                              </div>
                                 <br>
                                 <!-- Buttons -->
@@ -2218,6 +2225,8 @@
 
 <script>
 
+   
+
     $(document).ready(function () {
     $('#add_form').on('submit', function (e) {
         e.preventDefault(); // prevent default form submit
@@ -2320,6 +2329,37 @@
 
 
     $(document).ready(function () {
+
+
+
+         $('#agency_id').select2({
+        placeholder: 'Select agency',
+        allowClear: true,
+        ajax: {
+            url: '/api/search/host-agency', // ✅ make sure this matches your route
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page || 1
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.data.map(item => ({
+                        id: item.id,
+                        text: item.name
+                    })),
+                    pagination: {
+                        more: data.next_page_url !== null
+                    }
+                };
+            },
+            cache: true
+        }
+    });
+
         console.log("Document ready");
 
         function showLoader() {

@@ -124,6 +124,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
         Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
+         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
     });
 
