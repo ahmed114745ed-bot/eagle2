@@ -120,7 +120,7 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-        dispatch(new SuperLuckyBoxJob())->delay(now()->addSeconds(30))->onQueue('test-super-lucky-box');
+        dispatch(new SuperLuckyBoxJob())->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
         info('afterJob');
 
         //        dispatch(new SuperLuckyBoxJob())->delay(now()->seconds(30))->onQueue('');
