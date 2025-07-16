@@ -39,15 +39,13 @@ class SuperLuckyBoxJob implements ShouldQueue
      */
     public function handle(): void
     {
-//        Log::info("1234566666666");
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
-//        Log::info("boxxxxxxxxxxxxxxxxx");
 
         if (!$userBoxes)  return;
-        Log::info("userBox");
+        Log::info("boxUser");
         foreach ($userBoxes as $userBox) {
             Log::info("Processing Box ID: " . $userBox->id);
             $keyBoxUse  = 'BoxUse_' . $userBox->id;
@@ -86,7 +84,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                             ];
 
                             if (!UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => $userBox->id])->exists()) {
-                                Log::info("userGift ");
+                                Log::info("test111111111111 ");
                                 UserBoxGift::query()->create($data);
 
                                 $userBox['used_coins'] += $coins;
