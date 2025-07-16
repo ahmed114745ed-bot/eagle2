@@ -32,6 +32,7 @@
     "registered successfully": "تم التسجيل بنجاح",
     "required": "مطلوب",
     "exists": "محجوز",
+    "not join to agency": "لم ينضم إلى وكالة",
     "this field is": "هذا الحقل",
     "validation errors": "أخطاء التحقق من صحة المدخلات",
     "credentials does't match": "بيانات الاعتماد لا تتطابق",
