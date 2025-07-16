@@ -39,7 +39,7 @@ class SuperLuckyBoxJob implements ShouldQueue
      */
     public function handle(): void
     {
-        info('im in job');
+        info('im in the job');
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
 
@@ -52,14 +52,14 @@ class SuperLuckyBoxJob implements ShouldQueue
             $keyBoxUse  = 'BoxUse_' . $userBox->id;
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
             if ($pickerBoxIds) {
-
+                info('there are picked boxes');
                 $users =  User::whereIn('id', $pickerBoxIds)->inRandomOrder()->get();
                 foreach ($users as $user) {
                     Log::info("user " . $user->user_id);
                     $userInRoom =     RoomVisitor::where('user_id', $user->id)->exists();
                     if ($userInRoom) {
+                        info('there are users in the room');
                         if ($userBox->users_num != $userBox->used_num) {
-
                             if (($userBox->not_used_num == 1)) {
                                 $userBox->not_used_num = 0;
                                 $fin = 1;
@@ -116,7 +116,9 @@ class SuperLuckyBoxJob implements ShouldQueue
             $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
 
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
+            info('boxes ids: '.$pickerBoxIds);
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $pickerBoxIds)->whereHas('user')->pluck('user_id')->toArray();
+            info('picked users inside the room : '.$usersRoomVisit);
 
             foreach ($usersRoomVisit as $userRoomVisit) {
 
