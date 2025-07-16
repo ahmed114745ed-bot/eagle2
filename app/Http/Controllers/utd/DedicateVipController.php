@@ -11,6 +11,7 @@ use App\Models\UserVip;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Vip\Helpers\VipCommon;
 
 class DedicateVipController extends Controller
 {
@@ -88,7 +89,7 @@ class DedicateVipController extends Controller
                     }
                     $userVip->save();
                 }
-                Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+                VipCommon::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
                 DB::commit();
                 CustomNotification::vips($user, $request->days, $vip->img);

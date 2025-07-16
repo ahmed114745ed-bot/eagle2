@@ -2,20 +2,17 @@
 
 namespace Modules\Vip\Services\Api;
 
-
 use Exception;
 use Carbon\Carbon;
 use App\Helpers\Common;
+use Modules\Vip\Helpers\VipCommon;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
-use Modules\Vip\Entities\Vip;
 use Modules\Vip\Traits\HandlesApiExceptions;
-use Illuminate\Support\Facades\Cache;
 use App\Tik\Repositories\{
     PackRepository,
     UserRepository,
     WareRepository,
-    
 };
 use Modules\Vip\Repositories\{
     OvipRepository,
@@ -142,7 +139,7 @@ class VipService
 
         $userVip = $this->userVipRepository->findByIdWithOVip($request->vip_id);
 
-        Common::handelVip($userVip->OVip, $user, null, $userVip);
+        VipCommon::handelVip($userVip->OVip, $user, null, $userVip);
 
         return ['target_id' => $userVip->id];
     }
@@ -281,7 +278,7 @@ class VipService
                     ]);
                 }
 
-                Common::handelVip($vip, $user, null, $userVip);
+                VipCommon::handelVip($vip, $user, null, $userVip);
 
                 DB::commit();
 
@@ -334,7 +331,7 @@ class VipService
 
                 $vipRecord = $this->userVipRepository->create($data);
 
-                Common::handelVip($vip, $user, null, $vipRecord);
+                VipCommon::handelVip($vip, $user, null, $vipRecord);
 
                 DB::commit();
 

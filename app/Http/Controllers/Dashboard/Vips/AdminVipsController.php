@@ -15,6 +15,7 @@ use App\Traits\Dashboard\DashBoardTrait;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Modules\Vip\Helpers\VipCommon;
 
 class AdminVipsController extends Controller
 {
@@ -110,7 +111,7 @@ class AdminVipsController extends Controller
             }
             $userVip->save();
         }
-        Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+        VipCommon::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
         DB::commit();
         CustomNotification::vips($user, $request->days, $vip->img);
          return 200;

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
+use Modules\Vip\Helpers\VipCommon;
 
 class VipDedicateAction extends Action
 {
@@ -83,7 +84,7 @@ class VipDedicateAction extends Action
             //     $userVip->save();
             // }
 
-            if ($is_used)  Common::handelVip($vip, $user, expire: $request->days ?? $vip->expire, userVip: $userVip);
+            if ($is_used)  VipCommon::handelVip($vip, $user, expire: $request->days ?? $vip->expire, userVip: $userVip);
 
             DB::commit();
 

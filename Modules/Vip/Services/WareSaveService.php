@@ -6,7 +6,6 @@ use App\Models\Ware;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\FfmpegService;
 use Modules\Public\Http\Services\UserCounterServices;
@@ -88,7 +87,6 @@ class WareSaveService
             $ext = strtolower($form->img2->guessExtension());
             $originalExt = strtolower($form->img2->getClientOriginalExtension());
 
-            // تصحيح بعض الامتدادات الخاصة
             if ($ext === 'zz' && $originalExt === 'svga') $ext = 'svga';
             if ($ext === 'gif' && $originalExt === 'gif') $ext = 'png';
 

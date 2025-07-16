@@ -33,24 +33,36 @@ class VipController extends Controller
         $type = request('type', 2);
         $vips = $this->vipService->vipIndex($type);
 
-        return Common::apiResponse(true, 'success', VipResource::collection($vips));
+        return Common::apiResponse(
+            true,
+            'VIP list fetched successfully.',
+            VipResource::collection($vips)
+        );
     }
 
     public function vipList()
     {
         $data = $this->vipService->vipList();
-        request()->vipPrivileges = $data['all_privileges'];
+        request()->merge(['vipPrivileges' => $data['all_privileges']]);
 
-        return Common::apiResponse(true, '', OVipResource::collection($data['o_vips']), 200);
+        return Common::apiResponse(
+            true,
+            'VIP options loaded.',
+            OVipResource::collection($data['o_vips'])
+        );
     }
-
     public function vipUserList(Request $request)
     {
         $userId = $request->user()->id;
         $data = $this->vipService->vipUserList($userId);
-        request()->vipPrivileges = $data['all_privileges'];
 
-        return Common::apiResponse(true, '', OVipNewResource::collection($data['o_vips']), 200);
+        request()->merge(['vipPrivileges' => $data['all_privileges']]);
+
+        return Common::apiResponse(
+            true,
+            'User VIPs fetched.',
+            OVipNewResource::collection($data['o_vips'])
+        );
     }
 
     public function buyVip(Request $request)

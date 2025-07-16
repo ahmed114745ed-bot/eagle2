@@ -18,6 +18,7 @@ use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Modules\AgencyApp\Entities\AgencyUserJob;
+use Modules\Vip\Helpers\VipCommon;
 
 class UserHandling
 {
@@ -81,7 +82,7 @@ class UserHandling
                     'type_send' => $type,
                 ]
             );
-            Common::handelVip($vip, $user, null, userVip: $userVip);
+            VipCommon::handelVip($vip, $user, null, userVip: $userVip);
         }
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void

@@ -20,6 +20,7 @@ use App\Classes\Enums\SubTypeMessagesType;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeServices;
+use Modules\Vip\Helpers\VipCommon;
 
 class DedicateAction extends RowAction
 {
@@ -145,7 +146,7 @@ class DedicateAction extends RowAction
                     }
                     $userVip->save();
                 }
-                Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+                VipCommon::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
                 DB::commit();
                 CustomNotification::vips($user, $request->days, $vip->img);

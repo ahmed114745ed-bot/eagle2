@@ -36,7 +36,6 @@ Route::group(
         Route::prefix('ware-gift')->group(function () {
             Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
             Route::post('/{level}', [OvipGiftTapController::class, 'store']);
-         
         });
         Route::resource('ware-gifts', OvipGiftTapController::class);
         Route::prefix('ware-gifts')->group(function () {
