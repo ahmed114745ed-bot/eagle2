@@ -126,6 +126,12 @@ class UserService
         return $this->userRepository->searchInAgency($key, $page, $perPage);
     }
 
+    public function searchInHostAgency($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchInHostAgency($key, $page, $perPage);
+    }
+
     public function searchUsersInAgencyShipping($key, $page)
     {
         $perPage = 10;

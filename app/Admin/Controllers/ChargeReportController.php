@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Widgets\InfoBox;
 use Carbon\Carbon;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -10,15 +9,17 @@ use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\CoinLog;
 use Encore\Admin\Admin;
-use App\Enums\PaymentType;
 use App\Helpers\UserCommon;
 use App\Models\ExchangeLog;
 use App\Models\PaymentCoin;
 use Encore\Admin\Layout\Row;
+use App\Models\ChargeInvoice;
 use Encore\Admin\Widgets\Box;
+use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Layout\Column;
+use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-
+use Illuminate\Support\Facades\Log;
 
 class ChargeReportController extends MainController
 {
@@ -109,7 +110,10 @@ class ChargeReportController extends MainController
 
             $grid->model()->where('charger_type', 'host_agency');
         } else {
-            $grid->model()->where('charger_type', 'agency')->orWhere('user_type', 'agency');
+            $grid->model()->where(function ($query) {
+                $query->where('charger_type', 'agency')
+                    ->orWhere('user_type', 'agency');
+            });
         }
         if ($charger_type == "shipping-agency-activity") {
             $grid->filter(function (Grid\Filter $filter) {
@@ -433,139 +437,166 @@ class ChargeReportController extends MainController
     protected function stripe()
     {
         $grid = new Grid(new CoinLog());
+
         $grid->disableRowSelector();
-        $grid->model()->orderByDesc('created_at')->where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay');
+
+        $grid->model()
+            // ->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
+            ->orderByDesc('created_at');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
-
                 $filter->equal('trx', __('trx_no'));
 
                 $filter->where(function ($query) {
                     if ($this->input !== '') {
                         $query->where('method', $this->input);
                     }
-                }, __('Select type'), 'method')
-                    ->select(
-                        ['' => __('All')] +
-                            PaymentCoin::orderBy('type')
-                            ->pluck('title', 'type')
-                            ->toArray()
-                    );
+                }, __('Select type'), 'method')->select(
+                    ['' => __('All')] + PaymentCoin::orderBy('type')->pluck('title', 'type')->toArray()
+                );
 
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        request('from_date');
+                $filter->equal('status', __('Status'))->select([
+                    '' => __('All'),
+                    1  => __('success'),
+                    0  => __('failed'),
+                ]);
+            });
 
-                        $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($from = request('from_date')) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
                         $query->whereDate('created_at', '>=', $start);
-                    }, __('From Date'), 'from_date')->date();
-                });
+                    }
+                }, __('From Date'), 'from_date')->date();
 
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        request('to_date');
-
-                        $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+                $filter->where(function ($query) {
+                    if ($to = request('to_date')) {
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
                         $query->whereDate('created_at', '<=', $end);
-                    }, __('To Date'), 'to_date')->date();
-                });
-
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->equal('status', __('Status'))->select([
-                        '' => __('All'),
-                        1  => __('success'),
-                        0  => __('failed'),
-                    ]);
-                });
+                    }
+                }, __('To Date'), 'to_date')->date();
             });
         });
 
         $grid->header(function () {
-            $query =  CoinLog::where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay'); // Get the actual Eloquent builder
-            $total = $query->where('status', 1)->sum('paid_usd'); // Execute and cast
+            $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/;
 
+            $query->when(
+                request('user.uuid'),
+                fn($q, $uuid) =>
+                $q->whereHas('user', fn($u) => $u->where('uuid', $uuid))
+            );
+
+            $query->when(
+                request('trx'),
+                fn($q, $trx) =>
+                $q->where('trx', $trx)
+            );
+
+            $query->when(
+                request('method') !== null && request('method') !== '',
+                fn($q) =>
+                $q->where('method', request('method'))
+            );
+
+            $query->when(
+                request('from_date'),
+                fn($q, $from) =>
+                $q->whereDate('created_at', '>=', Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay())
+            );
+
+            $query->when(
+                request('to_date'),
+                fn($q, $to) =>
+                $q->whereDate('created_at', '<=', Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay())
+            );
+
+            // $query->when(request('status') !== null && request('status') !== '', fn($q) =>
+            //     $q->where('status', request('status'))
+            // );
+
+            $total = $query->where('status', 1)->sum('paid_usd');
             return view('admin.grid.common.report.charge-summary', [
                 'total' => $total,
             ])->render();
         });
 
-
         $grid->column('id', __('transaction id'));
-        $grid->column('user_id', __('charger'))->display(function ($recever) {
-            if (!$this->user) {
-                return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
 
-                            <span style=' cursor: pointer;'>Unknown </span>
-
-                </div>
-            ";
+        $grid->column('user_id', __('charger'))->display(function () {
+            $user = $this->user;
+            if (!$user) {
+                return "<div style='display: flex; align-items: center; gap: 10px;'><span style='cursor: pointer;'>Unknown</span></div>";
             }
-            $name =  $this->user->name ?? '';
-            $uid = @$this->user->uuid ?? 0;
-            $path = @$this->user?->profile?->avatar;
+
+            $name = $user->name ?? '';
+            $uid  = $user->uuid ?? 0;
+            $path = $user->profile->avatar ?? null;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
+
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
             return "
-             <div style='display: flex; align-items: center; gap: 10px;'>
-                 $image
-                 <div>
-                     <strong>$name</strong><br>
-                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                 </div>
-             </div>
-         ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
         });
 
-
         $grid->column('coin.usd', __('dollar'))->display(function ($coin) {
-            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/dollar.jpg');
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
-
                 </div>
             ";
         });
+
         $grid->column('obtained_coins', __('Amount'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/coin.jpg');
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                  <span>" . number_format($coin) . "</span>
+                    <span>" . number_format($coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>
             ";
         });
+
         $grid->column('trx', __('trx'));
+
         $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
             $paymentCoin = PaymentCoin::find($value);
-            if (!$paymentCoin) return '';
-//            $options = PaymentType::getTranslatedOptions();
-
-            return __($paymentCoin->title);
-//            return $options[$paymentCoin->title] ?? '';
+            return $paymentCoin ? __($paymentCoin->title) : '';
         });
+
         $grid->column('status', __('Status'))->display(function () {
-            if ($this->status == 1) {
-                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
-            } elseif ($this->status == 0) {
-                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Failed</span>';
-            }
+            return match ($this->status) {
+                1 => '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>',
+                0 => '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Failed</span>',
+                default => ''
+            };
         });
 
         $grid->column('created_at', __('shipping date'));
+
         return $grid;
     }
+
 
     protected function in_app_purchas()
     {
@@ -792,7 +823,7 @@ class ChargeReportController extends MainController
     {
         $grid = new Grid(new Charge());
         $grid->disableRowSelector();
-        $grid->model()->where('user_id', $agency_id)->where('user_type','agency');
+        $grid->model()->where('user_id', $agency_id)->where('user_type', 'agency');
 
         // Add tabs to the header
         $grid->header(function () {
@@ -837,7 +868,7 @@ class ChargeReportController extends MainController
         // Define columns
         $grid->column('id', __('ID'));
         if ($scope === 'dash') {
-            $grid->column('admin.name', __('sender'))->display(function () {
+            $grid->column('admin.name', __('created by'))->display(function () {
                 $name = $this->admin->name ?? '';
                 $path = $this->admin->avatar ?? null;
                 $id =  $this->admin->id ?? 0;
@@ -870,80 +901,142 @@ class ChargeReportController extends MainController
         }
 
         if ($scope !== 'dash') {
-            $grid->column('charger_id', __('charger'))->display(function () {
-                if ($this->charger_type == 'agency') {
-                    $name = $this->agency->name ?? 'No Agency';
-                    $path = $this->agency->img ?? null;
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
+            $grid->column('charger_id', __("charger"))->display(function () {
 
-
-                    $showUrl = $this->agency ? url("admin/agencies/{$this->agency->id}") : '#';
-                    $link = $this->agency ? "
-                                                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                                                </a>
-                                            " : "<span style='color: gray;'>No Agency</span>";
-                    $image = "<img src='{$url}' style='width: 60px; height: 40px; object-fit: cover;'>";
+                $sender = Common::getChargerInfo($this);
+                if (empty($sender['name']) && empty($sender['uuid'])) {
                     return "
-                                <div style='display: flex; align-items: center; gap: 10px;'>
-                                    $image
-                                    $link
-                                </div>
-                            ";
-                } else {
-                    $name = $this->user->name ?? 'No User';
-                    $uid = $this->user->uuid ?? 'N/A';
-                    $path = $this->user->profile->avatar ?? null;
-                    $defaultImage = asset("images/businessman-icon.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
+                <div style='display: flex; align-items: center; gap: 10px;'>
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-                    $showUrl = $this->user ? url("admin/users/{$this->user->id}") : '#';
-                    $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                            <span style=' cursor: pointer;'>Unknown </span>
 
-                    return "
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div style='display: flex; flex-direction: column;'>
-                                <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
-                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                                </a>
-                                <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                            </div>
-                        </div>
-                    ";
+                </div>
+            ";
                 }
+
+                $name = $sender['name'];
+                $uuid = $sender['uuid'];
+                $path = $sender['image'];
+                $showUrl = $sender['url'];
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+
+                $imageStyle = $this->charger_type == 'agency'
+                    ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'     // rectangle
+                    : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
+                $image = "<img src='{$url}' alt='User Image' style='{$imageStyle}'>";
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
+                    </div>
+                </div>
+            ";
             });
         }
 
-        $grid->column('amount', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+
+        $grid->column('amount_and_usd', __('coins & USD'))->display(function () {
+            $coin = number_format($this->amount); // Assuming 'amount' is the coin value
+            $usd = $this->usd;
+
+            $coinIcon = asset('images/coin.jpg');
+            $usdIcon = asset('images/dollar.jpg');
+
             return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
+                    <div style='display: flex; flex-direction: column; gap: 5px;'>
+                        <div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$coin}</span>
+                            <img src='{$coinIcon}' alt='Coin' width='20' height='20'>
+                        </div>
+                        <div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$usd}</span>
+                            <img src='{$usdIcon}' alt='USD' width='20' height='20'>
+                        </div>
+                    </div>
+                ";
         });
-        $grid->column('usd', __('usd'))->display(function ($coin) {
+        if ($scope == 'dash') {
+            $grid->column('balance_before', __("amount before"))->display(function ($coin) {
+                $balance_after = $this->balance_before;
+                $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
 
-            $icon = asset('images/dollar.jpg');
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . $coin . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
+                   <span>
+                   " . number_format($balance_after) . "</span>
+                   <img src='{$icon}' alt='USD' width='20' height='20'>
+                   </div>";
+            });
 
-                </div>
-            ";
-        });
+            $grid->column('balance_after', __("amount after"))->display(function () {
+
+                $balance_after = $this->amount + $this->balance_before;
+                $icon = asset('images/arrows.png'); // أيقونة صعود أو نزول حسب المبلغ
+
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
+            <span>
+            " . number_format($balance_after) . "</span>
+            <img src='{$icon}' alt='USD' width='20' height='20'>
+            </div>";
+            });
+
+            $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
+                $reason = \App\Models\ChargeInvoice::where('charge_id', $this->id)->first();
+
+                if (!$reason) {
+                    return new \Encore\Admin\Widgets\Table(
+                        [__('Field Name'), __('Value')],
+                        [[__('No reasons available'), '-']]
+                    );
+                }
+
+                $invoicePath = $reason->invoice ?? '';
+                $imgUrl = $invoicePath ? getDriverUrl() . '/' . $invoicePath : '';
+                $imgTag = $imgUrl
+                    ? "<img src='" . e($imgUrl) . "' style='width:80px; height:80px;' class='img img-thumbnail' />"
+                    : '-';
+
+                $reasonText = app()->getLocale() === 'en'
+                    ? ($reason->reason_en ?? $reason->reason_ar)
+                    : ($reason->reason_ar ?? $reason->reason_en);
+
+                $reasonDiv = "<div style='
+        max-height: 150px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        word-break: break-word;
+        padding: 8px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        font-size: 14px;
+        line-height: 1.5;
+    '>" . e($reasonText) . "</div>";
+
+                $results = [
+                    __('Reason') => $reasonDiv,
+                    __('Invoice') => $imgTag,
+                ];
+
+                return new \Encore\Admin\Widgets\Table(
+                    [__('Field Name'), __('Value')],
+                    collect($results)->map(fn($v, $k) => [$k, $v])->values()->all()
+                );
+            });
+        }
         if ($scope === 'not_dash') {
             // dd(123);
             $grid->column('amount_type', __('status'))->display(function () use ($agency_id) {
@@ -955,7 +1048,11 @@ class ChargeReportController extends MainController
             });
         }
         $grid->column('created_at', __('charge date'));
-
+         $grid->tools(function (Grid\Tools $tools){
+            $url = '/admin/charges';
+            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("back").'</a>';
+            $tools->append($button);
+        });
         // Disable unnecessary buttons
         $grid->disableCreateButton();
         $grid->disableExport();

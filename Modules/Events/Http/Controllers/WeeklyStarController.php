@@ -26,25 +26,54 @@ class WeeklyStarController extends Controller
     public function previousWeeklyEvent(Request $request)
     {
         $weeklyEvent = WeeklyStar::previousEvent()->weeklyStar()->latest()->first();
-        if (!$weeklyEvent) return Common::apiResponse(0, __('no weekly star '), null, 422);
-        $giftIds             = $weeklyEvent->gifts->pluck('id')->toArray();
-        $authenticatedUserId = Auth::user();
-        $data                =
-            GiftLog::whereIn('giftId', $giftIds)->with('sender')->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
-            ->groupBy('sender_id')->whereBetween('created_at', [
-                $weeklyEvent->start_date, $weeklyEvent->end_date
-            ])->orWhere(fn ($q) => $q->where('sender_id', $authenticatedUserId->id)->whereBetween('created_at', [
-                $weeklyEvent->start_date, $weeklyEvent->end_date
-            ]))
-            ->orderByDesc('totalGiftNum')->get();
-        $firstTenQueries     = $data->take(10);
-        $existsInArray       = $firstTenQueries->contains('sender_id', $authenticatedUserId->id);
-        $data                = [
-            'top'  => TopWeeklyStarUsersResource::collection($firstTenQueries),
-            'user' => $existsInArray == true ? (object) []  : new UserWeeklyStar($authenticatedUserId, $data->where('sender_id', $request->user()->id)->first()),
-        ];
-        return Common::apiResponse(1, '', $data);
+
+        if (!$weeklyEvent) {
+            return Common::apiResponse(0, __('no weekly star'), null, 422);
+        }
+
+        $giftIds = $weeklyEvent->gifts->pluck('id')->toArray();
+        $userId  = $request->user()->id;
+
+        // Top 10 senders during the event
+        $topSenders = GiftLog::whereIn('giftId', $giftIds)
+            ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
+            ->select(DB::raw('SUM(giftPrice) as totalGiftNum'), 'sender_id')
+            ->with('sender')
+            ->groupBy('sender_id')
+            ->orderByDesc('totalGiftNum')
+            ->take(10)
+            ->get();
+
+        // Check if authenticated user is among top senders
+        $isUserInTop = $topSenders->contains('sender_id', $userId);
+
+        // If not in top 10, fetch their own rank if available and append
+        if (!$isUserInTop) {
+            $userLog = GiftLog::where('sender_id', $userId)
+                ->whereIn('giftId', $giftIds)
+                ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
+                ->select(DB::raw('SUM(giftPrice) as totalGiftNum'), 'sender_id')
+                ->with('sender')
+                ->groupBy('sender_id')
+                ->first();
+
+            if ($userLog) {
+                $topSenders->push($userLog);
+            }
+        }
+
+        // Final result: top 10 list + user data if outside top
+        $top10 = $topSenders->take(10);
+        $userData = $top10->contains('sender_id', $userId)
+            ? (object)[]
+            : new UserWeeklyStar($request->user(), $topSenders->where('sender_id', $userId)->first());
+
+        return Common::apiResponse(1, '', [
+            'top'  => TopWeeklyStarUsersResource::collection($top10),
+            'user' => $userData,
+        ]);
     }
+
     public function topUsersEvent(Request $request)
     {
         $timezone = config('app.owner_timezone');

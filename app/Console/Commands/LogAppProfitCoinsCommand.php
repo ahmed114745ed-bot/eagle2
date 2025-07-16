@@ -77,7 +77,7 @@ class LogAppProfitCoinsCommand extends Command
                     'updated_at' => $now,
                 ];
             }
-    
+            
             UserCoinLog::insert($logs);
     
             DB::table($table)

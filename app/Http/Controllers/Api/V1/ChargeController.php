@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Helpers\ShippingAgencyHelper;
+use Exception;
+use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
-use App\Http\Resources\Api\V1\ChargeResource;
-use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
-use App\Http\Resources\Api\V1\TrxResource;
-use App\Http\Resources\DollarChargeAgencyResource;
-use App\Http\Resources\DollarChargeLogResource;
-use App\Models\User;
-use App\Tik\Services\ChargeRepoService;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
+use App\Http\Controllers\Controller;
+use App\Tik\Services\ChargeRepoService;
+use App\Http\Resources\Api\V1\TrxResource;
+use App\Http\Resources\Api\V1\ChargeResource;
+use App\Http\Resources\DollarChargeLogResource;
+use App\Http\Resources\DollarChargeAgencyResource;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
+use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
+use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -133,7 +136,21 @@ class ChargeController extends Controller
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
 
             DB::commit();
-            // return $data;
+
+            $notificationToken[] = DB::table('users')->where('id', $to->id)->value('notification_id');
+
+            $title = 'Coins Received';
+            $body = 'You have received :coins coins (equivalent to :usd USD) from :sender.';
+
+            CustomNotification::charges(
+                $to,
+                $title,
+                $body,
+                ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
+            );
+
+            Common::send_firebase_notification($notificationToken, $title, $body);
+
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
             DB::rollBack();
@@ -161,12 +178,16 @@ class ChargeController extends Controller
         }
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
+
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
+            return Common::apiResponse(0, __('not_verified_agency'), 403);
+        }
+
         if ($to->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-        if (!Common::canTransferToAgency($to)) {
-            return Common::apiResponse(0, __('unreliable_agency'), 403);
-        }
+
+
 
         $usd = $request->usd;
 
@@ -307,6 +328,21 @@ class ChargeController extends Controller
             UserCommon::UserEarnedInvitation($receiver->id, $amount);
             UserCommon::addChargeLevel($receiver->id, $amount);
             $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
+
+            $notificationToken[] = DB::table('users')->where('id', $receiver->id)->value('notification_id');
+
+            $title = 'Balance Recharged';
+            $body = 'Your balance has been recharged with :usd coins by :name.';
+
+            CustomNotification::charges(
+                $receiver,
+                $title,
+                $body,
+                ['usd' => $amount, 'name' => $user->name,]
+            );
+
+            Common::send_firebase_notification($notificationToken, $title, $body);
+
             return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {
 
@@ -337,12 +373,16 @@ class ChargeController extends Controller
         }
         $receiver = Common::searchAgency($userUuid);
         if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
-        if ($receiver->is_frozen == 1 ) {
+
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($receiver)) {
+            return Common::apiResponse(0, __('not_verified_agency'), 403);
+        }
+
+        if ($receiver->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-        if (!Common::canTransferToAgency($receiver)) {
-            return Common::apiResponse(0, __('unreliable_agency'), 403);
-        }
+
+
 
         try {
             [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);

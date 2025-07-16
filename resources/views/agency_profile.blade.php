@@ -712,9 +712,9 @@
             background-color: transparent !important;
             filter: none !important;
         }
-        .rtl .gift-log-form {
+        /* .rtl .gift-log-form {
             padding-right: 13%;
-        }
+        } */
         .ltr .gift-log-form {
             padding-left: 13%;
         }
@@ -877,7 +877,20 @@
 
             }
 
+        .date-flex-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
+        .date-flex-row span {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .date-flex-row input[type="date"] {
+            flex-basis: 0;
+        }
             .target-card-stat {
                 width: 92%;
 
@@ -1100,7 +1113,7 @@
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
            @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-               <a href="?tab=members" class="tab-btn" data-target="members-tab">{{ __('Members') }}</a>
+               <a href="?tab=members" class="tab-btn {{ $activeTab == 'members' ? 'active' : '' }}" data-target="members-tab">{{ __('Members') }}</a>
             @endif
            @if (\Encore\Admin\Facades\Admin::user()->can('charge-history-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
              <a href="?tab=charges" class="tab-btn" data-target="charges-tab">{{ __('Charge History') }}</a>
@@ -1138,14 +1151,54 @@
         @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
             <div class="tab-content active" id="members-tab">
+                
                 <div class="card">
                     <div class="card-header">
                         <h3>{{ __('Agency Members') }}</h3>
                         <span class="badge count-badge">{{ optional($members)->total() ?? 0 }}</span>
                     </div>
+                    <div class="card">
+                    <div class="card-body">
+                        <form action="{{ url('admin/agencies/' . $agency->id) }}" class="form-horizontal member-form" method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="members">
+                            <input type="hidden" name="members_page" value="{{ request()->get('members_page', 1) }}">
 
+                            <div class="row mb-4" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-4">
+                                    <div class="card shadow-sm border">
+                                        <div class="card-body p-3">
+                                            <label for="from_date" class="form-label fw-bold">
+                                                <i class="fa fa-calendar me-1"></i> {{ __('UUID') }}
+                                            </label>
+                                            <input type="text"
+                                                class="form-control"
+                                                id="from_date"
+                                                name="uuid"
+                                                value="{{ request('uuid') }}"
+                                                placeholder="{{ __('Enter UUID') }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                               
+                                <!-- Buttons -->
+                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                    <a href="{{ url('admin/agencies/' . $agency->id. '?'.'tab=members' ) }}" class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                     @if($members && $members->count())
                         <div class="table-responsive">
+                           
+                        
                             <table class="data-table">
                                 <thead>
                                     <tr>
@@ -1216,7 +1269,7 @@
                                                         </td>
                                             <td>{{ $member->getLiveTimeThisMonth() }}</td>
                                             <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                            <td>{{ $member->salary?? 0 }}</td>
+                                            <td>{{ $member->salary_by_agency ?? 0 }}</td>
                                             <td>
                                                 @if($isOwner)
                                                     <span class="role-badge owner">{{ __('Owner') }}</span>
@@ -1526,6 +1579,12 @@
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
 
                             <div class="row mb-3" style="align-items: flex-end;">
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <span>{{ __('uuid') }}</span>
+                                        <input type="text" class="form-control"  name="uuid" value="{{ request('uuid') }}">
+                                    </div>
+                                </div>
                                 <!-- From Date -->
                                 <div class="col-md-4">
                                     <div class="date-flex-row">
@@ -1920,8 +1979,9 @@
 
                     <div class="tab-content active" id="members-tab">
 
-
+                         
                         <div class="table-section card">
+                            
                             <div class="table-responsive">
                                 <table class="data-table">
                                     <thead>

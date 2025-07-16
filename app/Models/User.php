@@ -810,6 +810,19 @@ class User extends Authenticatable
         return floor($total * 100) / 100;
     }
 
+    public function getSalaryByAgencyAttribute()
+    {
+        $userSalary = UserSallary::query()
+
+            ->where('user_id', $this->id)
+            ->where('user_agency_id', $this->agency_id)
+            ->orderByDesc('id')
+            ->sum(DB::raw('sallary - cut_amount'));
+        return floor($userSalary * 100) / 100;
+    }
+
+
+
     public function getSalaryWithoutCutAmountAttribute()
     {
         $userSallary = UserSallary::query()
@@ -1454,10 +1467,10 @@ class User extends Authenticatable
     public function userTypeBadge()
     {
         $lang = app()->getLocale() ?? 'en';
-
+        
         $types = [
-            1 => 'agency_owner',
-            2 => 'host',
+            1 => 'host',
+            2 => 'agency_owner',
             3 => 'shipping',
             4 => 'bd',
         ];
@@ -1468,7 +1481,7 @@ class User extends Authenticatable
             $applicableTypes[1] = $types[1];
         }
 
-        if ($this->type_user >= 2) {
+        if ($this->type_user == 2) {
             $applicableTypes[2] = $types[2];
         }
 

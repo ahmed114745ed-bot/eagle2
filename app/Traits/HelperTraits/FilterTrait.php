@@ -17,7 +17,7 @@ trait FilterTrait
         $ops = [0 => 'no agency'];
         $agencies = Agency::query()->where('status', 1)->get();
         foreach ($agencies as $agency) {
-            $ops[$agency->id] = $agency->name;
+            $ops[$agency->id] = 'id:' . $agency->id . '  ' . 'name:' . $agency->name;
         }
         return $ops;
     }

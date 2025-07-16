@@ -1881,6 +1881,12 @@
     "Image 3": "Resim 3",
     "Old Image": "Eski Resim",
     "App Wallets": "Uygulama Cüzdanları",
+    "Core Wallet Transactions": "Çekirdek Cüzdan İşlemleri",
+    "Transfer switch app wallet": "Uygulama cüzdanını aktar",
+    "Browse core wallet transactions": "Çekirdek cüzdan işlemlerini görüntüle",
+    "Delete core wallet transactions": "Çekirdek cüzdan işlemlerini sil",
+    "Edit core wallet transactions": "Çekirdek cüzdan işlemlerini düzenle",
+    "Show core wallet transactions": "Çekirdek cüzdan işlemlerini göster",
     "Revenues": "Gelirler",
     "Expenses": "Giderler",
     "Wallet Settings": "Cüzdan Ayarları",
@@ -3108,6 +3114,17 @@
     "Total success charges": "Başarılı işlemlerin toplamı",
 
     "forbidden": "İzin verilmiyor",
+
+    "Coins Added": "Jeton Eklendi",
+    "Coins Deducted": "Jeton Eksildi",
+    "You have received :coins coins from admin.": "Yöneticiden :coins jeton aldınız.",
+    ":coins coins were deducted from your account by admin.": "Hesabınızdan :coins jeton yönetici tarafından düşüldü.",
+    "VIP Assigned": "VIP Atandı",
+    "You have received VIP access for :days days from admin.": "Yönetici tarafından size :days gün VIP erişimi verildi.",
+    "Coins Received": "Jeton Alındı",
+    "You have received :coins coins (equivalent to :usd USD) from :sender.": ":sender tarafından size :coins jeton (:usd USD değerinde) gönderildi.",
+    "Balance Recharged": "Bakiye Yüklendi",
+    "Your balance has been recharged with :usd coins by :name.": "Bakiyenize :name tarafından :usd coin yüklendi.",
 
     "Reel Comments": "Video Yorumları"
 

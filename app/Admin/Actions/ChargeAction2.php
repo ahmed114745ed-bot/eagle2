@@ -3,6 +3,7 @@
 namespace App\Admin\Actions;
 
 use App\Models\Charge;
+use App\Helpers\Common;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Models\ChargeInvoice;
@@ -74,7 +75,7 @@ class ChargeAction2 extends Action
             }
             $agency->save();
 
-            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount);
+            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount, $shippingCoins);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -87,7 +88,7 @@ class ChargeAction2 extends Action
 
 
 
-    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount)
+    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount, $shippingCoins)
     {
 
         $charge = new Charge();
@@ -98,42 +99,22 @@ class ChargeAction2 extends Action
         $charge->user_type = 'agency';
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
-        $charge->balance_before =  $agency->coins  - $amount;
+        $charge->balance_before =  $agency->coins  - ($amount * $shippingCoins);
 
         $charge->save();
-
+        if ($request->hasFile('invoice')) {
+            $imagePath = Common::upload('profile', $request->file('invoice'));
+        }
         ChargeInvoice::create([
             'charge_id' => $charge->id,
             'user_id' => $agency->id,
             'reason_en' => $request->reason_en,
             'reason_ar' => $request->reason_ar,
-            'invoice' => $request->invoice,
+            'invoice' => $imagePath ?? '',
             'type' => 'agency',
         ]);
     }
 
-    // function form()
-    // {
-    //     $this->name = __('Charge');
-    //     $this->hidden('agency_id')->attribute('id', 'vid');
-    //     $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-    //     $this->text('amount', __('Amount'))
-    //         ->addElementClass('price-input')
-    //         ->help(__('Enter amount in dollars'));
-    //     $this->text('reason_en', __('reason en'));
-    //     $this->text('reason_ar', __('reason ar'));
-    //     $this->select('form', __('add'))
-    //         ->options([
-    //             0 => __('no'),
-    //             1 => __('yes'),
-    //         ])
-    //         ->attribute(['id' => 'form-select']);
-
-    //     $this->image('invoice', __('Invoice'))
-    //         ->attribute(['id' => 'invoice-field']);
-
-    //     $this->hidden('amount_type')->value(1);
-    // }
 
     public function form()
     {
@@ -148,7 +129,7 @@ class ChargeAction2 extends Action
 
         $this->text('amount', __('Amount'))
             ->addElementClass('price-input')
-            ->help(__('Enter amount in dollars'));
+            ->help(__('Enter amount in dollars'))->rules('required|numeric|min:1');
 
         $this->text('reason_en', __('reason en'));
         $this->text('reason_ar', __('reason ar'));

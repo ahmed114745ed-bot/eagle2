@@ -680,6 +680,7 @@ class UserController extends MainController
         $joinDate = request('join_date');
         $user = User::with('profile')->find($id);
         $type = request('type') ?? 4;
+        $agencyId = request('agency_id');
 
         $userJoinAgencies = UsersJoinedAgency::where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
             $query->whereDate('join_date', $joinDate);
@@ -733,12 +734,15 @@ class UserController extends MainController
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
             $q->where('sender_id', $id);
-        })->with('receiver', 'sender', 'gift', 'room')->when(isset($start) && isset($end), function ($query) use ($start, $end) {
+        })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end) {
             $query->whereBetween('created_at', [
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
+        })->when(isset($agencyId), function ($query) use ($agencyId) {
+            $query->where('agency_id', $agencyId);
         })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
+
         $diamonds = GiftLog::when($giftType == 'receiver', function ($q) use ($id) {
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
@@ -748,7 +752,10 @@ class UserController extends MainController
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
-        })->selectRaw('SUM(giftNum * giftPrice) AS total')->value('total');
+        })->when(isset($agencyId), function ($query) use ($agencyId) {
+            $query->where('agency_id', $agencyId);
+        })->selectRaw('SUM(giftPrice) AS total')->value('total');
+
         $userJoinAgencies = UsersJoinedAgency::with(['kickedByApp', 'kickedByAdmin'])->where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
             $query->whereDate('join_date', $joinDate);
         })->orderByDesc('id')->paginate(10, ['*'], 'user_agency_page');

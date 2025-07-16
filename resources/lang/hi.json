@@ -1027,6 +1027,12 @@
     "Image 3": "चित्र 3",
       "Old Image": "पुरानी छवि",
       "App Wallets": "एप्लिकेशन वॉलेट",
+    "Core Wallet Transactions": "कोर वॉलेट लेनदेन",
+    "Transfer switch app wallet": "ऐप वॉलेट स्थानांतरण",
+    "Browse core wallet transactions": "कोर वॉलेट लेनदेन देखें",
+    "Delete core wallet transactions": "कोर वॉलेट लेनदेन हटाएं",
+    "Edit core wallet transactions": "कोर वॉलेट लेनदेन संपादित करें",
+    "Show core wallet transactions": "कोर वॉलेट लेनदेन दिखाएं",
     "Revenues": "राजस्व",
     "Expenses": "व्यय",
     "Wallet Settings": "वॉलेट सेटिंग्स",
@@ -2689,6 +2695,17 @@
     "kicked By status": "निकाले जाने का तरीका",
     "Total success charges": "सफल लेन-देन की कुल राशि",
     "forbidden": "अनुमति नहीं है",
+
+    "Coins Added": "सिक्के जोड़े गए",
+    "Coins Deducted": "सिक्के काटे गए",
+    "You have received :coins coins from admin.": "आपको एडमिन से :coins सिक्के प्राप्त हुए हैं।",
+    ":coins coins were deducted from your account by admin.": "आपके खाते से :coins सिक्के एडमिन द्वारा काटे गए हैं।",
+    "VIP Assigned": "वीआईपी प्रदान किया गया",
+    "You have received VIP access for :days days from admin.": "आपको एडमिन से :days दिनों के लिए वीआईपी एक्सेस मिला है।",
+    "Coins Received": "सिक्के प्राप्त हुए",
+    "You have received :coins coins (equivalent to :usd USD) from :sender.": "आपको :sender से :coins सिक्के (जो :usd USD के बराबर हैं) प्राप्त हुए हैं।",
+    "Balance Recharged": "बैलेंस रिचार्ज किया गया",
+    "Your balance has been recharged with :usd coins by :name.": ":name द्वारा आपके बैलेंस में :usd कॉइन जोड़े गए हैं।",
 
 "Reel Comments": "रील्स टिप्पणियाँ"
 
