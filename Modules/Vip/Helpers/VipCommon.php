@@ -9,65 +9,39 @@ use App\Models\Ware;
 class VipCommon
 {
 
-public static function handelVip($vip, $user, $expire, $userVip)
+    public static function handelVip($vip, $user, $expire, $userVip)
     {
         if ($userVip->is_used) {
-            $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
+            $types = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
     
             Pack::query()
                 ->where('get_type', 1)
                 ->where('user_id', $user->id)
-                ->whereIn('type', $vipTypes)
+                ->whereIn('type', $types)
                 ->where('vip_user_id', '!=', $userVip->id)
                 ->update(['is_used' => 0]);
         }
     
         $types = $vip->privilegs()->pluck('type')->toArray();
     
-        if (!empty($types)) {
-            foreach ($types as $type) {
-                $ware = Ware::query()
-                    ->where('get_type', 1)
-                    ->where('level', $vip->level)
-                    ->where('type', $type)
-                    ->first();
+        foreach ($types as $type) {
+            $ware = Ware::where('get_type', 1)
+                ->where('level', $vip->level)
+                ->where('type', $type)
+                ->first();
     
-                if (!$ware) {
-                    $name = self::getWareTypeName($type);
-                    Ware::create([
-                        'get_type' => 1,
-                        'type' => $type,
-                        'name' => $name,
-                        'name_en' => $name,
-                        'title' => $name,
-                        'title_en' => $name,
-                        'level' => $vip->level,
-                        'price' => 0,
-                        'enable' => 1,
-                        'expire' => $expire,
-                        'show_img' => '1.png',
-                        'image_type' => 'png',
-                        'is_active_for_vip' => 1,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                } elseif ($ware->is_active_for_vip == 0 || $ware->enable == 0) {
-                    $ware->update([
-                        'is_active_for_vip' => 1,
-                        'enable' => 1,
-                    ]);
-                }
+            if ($ware) {
+                $ware->update([
+                    'is_active_for_vip' => 1,
+                    'enable' => 1,
+                ]);
             }
         }
     
         $expireDays = $expire ?? $vip->expire;
-        $expireAt = now()->addDays($expireDays);
-        $expireTimestamp = $expireAt->timestamp;
+        $expireTimestamp = now()->addDays($expireDays)->timestamp;
     
-      
-    
-        $wares = Ware::query()
-            ->where('get_type', 1)
+        $wares = Ware::where('get_type', 1)
             ->where('enable', 1)
             ->where('level', $vip->level)
             ->whereIn('type', $types)
@@ -75,61 +49,17 @@ public static function handelVip($vip, $user, $expire, $userVip)
             ->get();
     
         foreach ($wares as $ware) {
-            Pack::query()
-                ->where('user_id', $user->id)
-                ->where('expire', '<', now()->timestamp)
-                ->where('expire', '!=', 0)
-                ->delete();
-    
-            $existingPack = Pack::query()
-                ->where('user_id', $user->id)
-                ->where('get_type', 1)
-                ->where('target_id', $ware->id)
-                ->where('vip_user_id', $userVip->id)
-                ->where(function ($q) {
-                    $q->where('expire', '>=', now()->timestamp)->orWhere('expire', 0);
-                })->first();
-                
-            Pack::query()
-                ->where('user_id', $user->id)
-                ->where('type', $ware->type)
-                ->where('get_type', 1)
-                ->where('id', '!=', optional($existingPack)->id)
-                ->update(['is_used' => 0]);
-
-            if ($existingPack) {
-                $existingPack->update(['is_used' => $userVip->is_used]);
-            } else {
-                Pack::query()->create([
-                    'user_id'     => $user->id,
-                    'get_type'    => $ware->get_type,
-                    'type'        => $ware->type,
-                    'target_id'   => $ware->id,
-                    'num'         => 1,
-                    'expire'      => $expireTimestamp,
-                    'use_num'     => $ware->num,
-                    'vip_user_id' => $userVip->id,
-                    'is_used'     => $userVip->is_used,
-                    'using'       => 1,
-                ]);
-            }
-    
-            if (in_array($ware->type, [4, 5, 6])) {
-                self::userDress($ware, $user, $userVip->is_used);
-                self::unUsePack($types, $user);
-            }
+            self::assignWareToUser($ware, $user, $userVip, $expireTimestamp);
         }
     
-        UserVip::query()
-            ->where('user_id', $user->id)
+        UserVip::where('user_id', $user->id)
             ->where('id', '!=', $userVip->id)
             ->where(function ($q) {
                 $q->where("is_used", 1)
                   ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
             })->update(['is_used' => 0]);
     
-        $activeVip = UserVip::query()
-            ->where('user_id', $user->id)
+        $activeVip = UserVip::where('user_id', $user->id)
             ->where('is_used', 1)
             ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
             ->orderByDesc('level')
@@ -139,6 +69,56 @@ public static function handelVip($vip, $user, $expire, $userVip)
             $user->update(['vip' => $activeVip->id]);
         }
     }
+
+    private static function assignWareToUser($ware, $user, $userVip, $expireTimestamp)
+    {
+        Pack::query()
+            ->where('user_id', $user->id)
+            ->where('expire', '<', now()->timestamp)
+            ->where('expire', '!=', 0)
+            ->delete();
+
+        $existingPack = Pack::query()
+            ->where('user_id', $user->id)
+            ->where('get_type', 1)
+            ->where('target_id', $ware->id)
+            ->where('vip_user_id', $userVip->id)
+            ->where(function ($q) {
+                $q->where('expire', '>=', now()->timestamp)
+                ->orWhere('expire', 0);
+            })->first();
+
+        Pack::query()
+            ->where('user_id', $user->id)
+            ->where('type', $ware->type)
+            ->where('get_type', 1)
+            ->where('id', '!=', optional($existingPack)->id)
+            ->update(['is_used' => 0]);
+
+        if ($existingPack) {
+            $existingPack->update(['is_used' => $userVip->is_used]);
+        } else {
+            Pack::create([
+                'user_id'     => $user->id,
+                'get_type'    => $ware->get_type,
+                'type'        => $ware->type,
+                'target_id'   => $ware->id,
+                'num'         => 1,
+                'expire'      => $expireTimestamp,
+                'use_num'     => $ware->num,
+                'vip_user_id' => $userVip->id,
+                'is_used'     => $userVip->is_used,
+                'using'       => 1,
+            ]);
+        }
+
+        if (in_array($ware->type, [4, 5, 6])) {
+            self::userDress($ware, $user, $userVip->is_used);
+            self::unUsePack([$ware->type], $user);
+        }
+    }
+
+    
     
         private static function getWareTypeName(int $type): string
     {

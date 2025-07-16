@@ -179,11 +179,17 @@ class OVipController extends MainController
         }
         $form->display(__('ID'));
         $form->number('level', __('level'))
-        ->rules([
-            'required',
-            Rule::unique('o_vips', 'level')->ignore($form->model()->id),
-        ]);        $form->text('name', __('name'));
-        // $form->file('img', __('img'));
+        ->rules(function () use ($form) {
+            return [
+                'required',
+                $form->isCreating()
+                    ? Rule::unique('o_vips', 'level')
+                    : Rule::unique('o_vips', 'level')->ignore($form->model()->id),
+            ];
+        });
+        
+        $form->text('name', __('name'));
+       
         $form->file('img', trans('img'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
