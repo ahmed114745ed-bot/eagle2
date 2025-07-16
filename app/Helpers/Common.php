@@ -1084,14 +1084,20 @@ class Common
                 $expire = $vip->expire;
             }
             $expire_t = now()->addDays($expire);
-            $diff_seconds = $expire_t->timestamp - now()->timestamp;
-            $diff_days = ceil($diff_seconds / 86400);
+            $expire_timestamp = $expire_t->timestamp;
             
-            logger()->info('Firebase tokens_notification : ', [
-                'expire' => $expire,        
-                'expire_t' => $expire_t->timestamp,  
-                'days_left' => $diff_days, 
+            // حساب الأيام المتبقية بدقة
+            $diff_seconds = $expire_timestamp - now()->timestamp;
+            $diff_days = (int) ceil($diff_seconds / 86400);
+            
+            // طباعة البيانات
+            logger()->info('Firebase tokens_notification:', [
+                'expire_days_input' => $expire,
+                'expire_t_datetime' => $expire_t->toDateTimeString(),
+                'expire_t_timestamp' => $expire_timestamp,
+                'days_left' => $diff_days,
             ]);
+            
             if ($pack) {
                 // if ($pack->expire == 0) {
                 //     //                    throw new \Exception('already exists');
