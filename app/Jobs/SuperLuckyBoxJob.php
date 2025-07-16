@@ -55,7 +55,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                 info('there are picked boxes');
                 $users =  User::whereIn('id', $pickerBoxIds)->inRandomOrder()->get();
                 foreach ($users as $user) {
-                    Log::info("user " . $user->user_id);
+                    Log::info("user " . $user->id);
                     $userInRoom =     RoomVisitor::where('user_id', $user->id)->exists();
                     if ($userInRoom) {
                         info('there are users in the room');
