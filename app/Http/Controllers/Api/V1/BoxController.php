@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Jobs\TestSuperLuckyBoxJob;
 use Carbon\Carbon;
 use App\Models\Box;
 use App\Models\Room;
@@ -42,9 +43,9 @@ class BoxController extends Controller
         return Common::apiResponse(1, '', $data, 200);
     }
 
-    public function send(Request $request)
+    public function send($request, $user)
     {
-        $user = $request->user();
+//        $user = $request->user();
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
 
@@ -68,6 +69,10 @@ class BoxController extends Controller
         return $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
     }
 
+    public function testSendSuperBoxes(Request $request)
+    {
+        dispatch(new TestSuperLuckyBoxJob($request->all()))->onQueue('test-super-lucky-box');
+    }
 
     public function pick3(Request $request)
     {
