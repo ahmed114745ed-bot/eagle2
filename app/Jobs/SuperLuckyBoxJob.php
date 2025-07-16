@@ -47,7 +47,7 @@ class SuperLuckyBoxJob implements ShouldQueue
 //        Log::info("boxxxxxxxxxxxxxxxxx");
 
         if (!$userBoxes)  return;
-//        Log::info("boxxxxxxxxxxxxxxxxxdoneeee");
+        Log::info("userBox");
         foreach ($userBoxes as $userBox) {
             Log::info("Processing Box ID: " . $userBox->id);
             $keyBoxUse  = 'BoxUse_' . $userBox->id;
