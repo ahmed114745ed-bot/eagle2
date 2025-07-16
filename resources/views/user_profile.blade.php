@@ -1996,6 +1996,14 @@
                                         <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <span>{{ __('agency id') }}</span>
+                                        <input type="text" class="form-control"  name="agency_id" value="{{ request('agency_id') }}">
+                                    </div>
+                                </div>
+                             </div>
+                                <br>
                                 <!-- Buttons -->
                                 <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
                                     <button type="submit" class="btn btn-info btn-sm me-2">
@@ -2005,7 +2013,7 @@
                                         <i class="fa fa-undo"></i> {{__('Reset')}}
                                     </a>
                                 </div>
-                            </div>
+                            
                         </form>
                     </div>
                 </div>
@@ -2035,6 +2043,7 @@
                             <th>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}</th>
                             <th>{{ __('room') }}</th>
                             <th>{{ __('gift') }}</th>
+                            <th>{{ __('agency') }}</th>
                             <th>{{ __('quantity') }}</th>
                             <th>{{ __('price') }}</th>
                             <th>{{ __('Created at') }}</th>
@@ -2068,6 +2077,15 @@
                                 $giftName = app()->getLocale() == 'ar'
                                     ? (@$giftSLog->gift->name ?? '')
                                     : (@$giftSLog->gift->e_name ?? '');
+
+                                    $agency =$giftSLog->agency;
+                                    $agencyName = $agency->name ?? '';
+                                    $agencyId = $agency->id ?? 0;
+                                    $agencyDefaultImage = asset("images/icon-agency.jpg");
+                                    $agencyImage =getImagePath(@$agency->img) ?? $agencyDefaultImage;
+                                    if (!isImageExists($agencyImage)) {
+                                    $agencyImage = $agencyDefaultImage;
+                                }
                             @endphp
 
                             <tr>
@@ -2102,6 +2120,18 @@
                                              width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                         <span>{{ $giftName  }}</span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ url('admin/agencies/' . $agencyId) }}" target="_blank"
+                                       class="d-flex align-items-center text-decoration-none">
+                                        <img src="{{ $agencyImage }}"
+                                            width="50" height="30"
+                                            style="object-fit: cover; border-radius: 4px; border: 1px solid #ccc; padding: 2px; margin-right: 10px;">
+                                        <div>
+                                            <span>{{ $agencyName }}</span><br>
+                                            <small class="text-muted">id: {{ $agencyId ?? 0 }}</small>
+                                        </div>
                                     </a>
                                 </td>
                                 <td>{{ $giftSLog->giftNum }}</td>
