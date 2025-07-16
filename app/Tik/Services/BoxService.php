@@ -121,7 +121,7 @@ class BoxService
             'is_closed' => false,
         ];
         info('beforeJob');
-        dispatch(new SuperLuckyBoxJob())->delay(now()->addSeconds(30))->onQueue('super-lucky-box');
+        dispatch(new SuperLuckyBoxJob())->delay(now()->addSeconds(30))->onQueue('test-super-lucky-box');
         info('afterJob');
 
         //        dispatch(new SuperLuckyBoxJob())->delay(now()->seconds(30))->onQueue('');
