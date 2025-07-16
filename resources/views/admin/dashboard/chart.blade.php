@@ -1,5 +1,5 @@
 <div style="margin-bottom: 15px;">
-    <form method="GET" action="{{ url()->current() }}" style="display: inline-flex; align-items: center; gap: 10px; background: none !important;">
+    <form method="GET" action="{{ url()->current() }}" style="display: inline-flex; gap: 10px; background: none !important; filter: none;">
         <input type="month" name="date" value="{{ request('date') }}" style="padding: 5px;">
         <button type="submit" style="padding: 6px 12px; cursor: pointer;">{{ __('admin.filter') }}</button>
     </form>
