@@ -1051,9 +1051,9 @@
         .level-label {
             padding: 10px;
         }
-        .rtl .gift-log-form {
+        /* .rtl .gift-log-form {
             padding-right: 13%;
-        }
+        } */
         .ltr .gift-log-form {
             padding-left: 13%;
         }
@@ -1979,7 +1979,7 @@
                             <input type="hidden" name="gift_type" value="{{ $giftType }}">
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
 
-                            <div class="row mb-3" style="align-items: flex-end;">
+                            <div class="row mb-2" style="align-items: flex-end;">
                                 <!-- From Date -->
                                 <div class="col-md-4">
                                     <div class="date-flex-row">
@@ -1996,7 +1996,21 @@
                                         <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
                                     </div>
                                 </div>
-                                <!-- Buttons -->
+                                @if ($giftType == 'receiver')
+                                    <div class="col-md-4">
+                                            <div class="date-flex-row">
+                                                <label for="agency_id">{{ __('Agency') }}</label>
+                                                <select class="form-control" id="agency_id" name="agency_id">
+                                                    @if(request('agency_id'))
+                                                        <option value="{{ request('agency_id') }}" selected>
+                                                            {{ \App\Models\Agency::find(request('agency_id'))?->name . ' - ' . request('agency_id') }}
+                                                        </option>
+                                                    @endif
+                                                </select>
+                                            </div>
+                                        </div>
+                                @endif
+                                 <!-- Buttons -->
                                 <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
                                     <button type="submit" class="btn btn-info btn-sm me-2">
                                         <i class="fa fa-search"></i> {{__('Search')}}
@@ -2005,7 +2019,8 @@
                                         <i class="fa fa-undo"></i> {{__('Reset')}}
                                     </a>
                                 </div>
-                            </div>
+                             </div>
+                            
                         </form>
                     </div>
                 </div>
@@ -2035,6 +2050,9 @@
                             <th>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}</th>
                             <th>{{ __('room') }}</th>
                             <th>{{ __('gift') }}</th>
+                            @if($giftType == 'receiver')
+                                <th>{{ __('agency') }}</th>
+                            @endif
                             <th>{{ __('quantity') }}</th>
                             <th>{{ __('price') }}</th>
                             <th>{{ __('Created at') }}</th>
@@ -2068,6 +2086,15 @@
                                 $giftName = app()->getLocale() == 'ar'
                                     ? (@$giftSLog->gift->name ?? '')
                                     : (@$giftSLog->gift->e_name ?? '');
+
+                                    $agency =$giftSLog->agency;
+                                    $agencyName = $agency->name ?? '';
+                                    $agencyId = $agency->id ?? 0;
+                                    $agencyDefaultImage = asset("images/icon-agency.jpg");
+                                    $agencyImage =getImagePath(@$agency->img) ?? $agencyDefaultImage;
+                                    if (!isImageExists($agencyImage)) {
+                                    $agencyImage = $agencyDefaultImage;
+                                }
                             @endphp
 
                             <tr>
@@ -2103,6 +2130,24 @@
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                         <span>{{ $giftName  }}</span>
                                     </a>
+                                </td>
+                                <td> @if($giftType == 'receiver')
+                                        @if ($giftSLog->agency_id)
+                                            <a href="{{ url('admin/agencies/' . $agencyId) }}" target="_blank"
+                                        class="d-flex align-items-center text-decoration-none">
+                                            <img src="{{ $agencyImage }}"
+                                                width="50" height="30"
+                                                style="object-fit: cover; border-radius: 4px; border: 1px solid #ccc; padding: 2px; margin-right: 10px;">
+                                            <div>
+                                                <span>{{ $agencyName }}</span><br>
+                                                <small class="text-muted">id: {{ $agencyId ?? 0 }}</small>
+                                            </div>
+                                        </a>  
+                                        @else
+                                            <span class="text-danger">{{__('not join to agency')}}</span>
+                                        @endif
+                                    @endif
+                                   
                                 </td>
                                 <td>{{ $giftSLog->giftNum }}</td>
                                 <td>{{  $giftSLog->giftPrice}}</td>
@@ -2187,6 +2232,8 @@
 
 
 <script>
+
+   
 
     $(document).ready(function () {
     $('#add_form').on('submit', function (e) {
@@ -2290,6 +2337,37 @@
 
 
     $(document).ready(function () {
+
+
+
+         $('#agency_id').select2({
+        placeholder: 'Select agency',
+        allowClear: true,
+        ajax: {
+            url: '/api/search/host-agency', // ✅ make sure this matches your route
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page || 1
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.data.map(item => ({
+                        id: item.id,
+                        text: item.name
+                    })),
+                    pagination: {
+                        more: data.next_page_url !== null
+                    }
+                };
+            },
+            cache: true
+        }
+    });
+
         console.log("Document ready");
 
         function showLoader() {

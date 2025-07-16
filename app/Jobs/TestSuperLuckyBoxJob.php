@@ -50,6 +50,6 @@ class TestSuperLuckyBoxJob implements ShouldQueue
     {
         $boxService = new BoxService();
         $request = new \Illuminate\Http\Request($requestData);
-        (new BoxController($boxService))->send($request, $user);
+        (new BoxController($boxService))->sendTest($request, $user);
     }
 }

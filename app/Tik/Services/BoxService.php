@@ -120,14 +120,13 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-//        Log::info("superrrrrrrrrr");
         dispatch(new SuperLuckyBoxJob())->delay(now()->addSeconds(30))->onQueue('test-super-lucky-box');
-            //->addSecond($box->duration));
-//        Log::info("superrrrrrrrrr123456");
+        info('afterJob');
+
+        //        dispatch(new SuperLuckyBoxJob())->delay(now()->seconds(30))->onQueue('');
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
-//        Log::info("superrrrrrId:".$boxUser->id);
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
         if (!$user instanceof User) return;
