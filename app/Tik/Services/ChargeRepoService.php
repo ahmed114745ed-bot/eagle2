@@ -373,21 +373,33 @@ class ChargeRepoService
 
     public function userAgencySearch($request)
     {
-        try {
+        $type = $request->type;
+        $id = $request->id;
 
-            $agencies = $this->shippingAgencyRepository->filterAgency($request->id);
-            $users = $this->userRepository->filterUserNew($request->id);
-            $data = [
-                'agency' => GeneralAgencyResource::collection($agencies),
-                'user' => GeneralUserResource::collection($users),
-
+        if ($type === 'agency') {
+            return [
+                'agency' => GeneralAgencyResource::collection(
+                    $this->shippingAgencyRepository->filterAgency($id)
+                ),
+                'user' => [],
             ];
-
-            return $data;
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
         }
+
+        if ($type === 'user') {
+            return [
+                'agency' => [],
+                'user' => GeneralUserResource::collection(
+                    $this->userRepository->filterUserNew($id)
+                ),
+            ];
+        }
+
+        return [
+            'agency' => [],
+            'user' => [],
+        ];
     }
+
 
     public function chargeAgencyToAnother(User $auth, $request)
     {
@@ -414,6 +426,7 @@ class ChargeRepoService
                     if ($authAgency->coins < $request->amount) {
                         throw new Exception(__('api.notHaveAmount'));
                     }
+
                     $this->handleAgencyCharge($authAgency, $request);
                     break;
 
@@ -471,6 +484,7 @@ class ChargeRepoService
 
     private function handleAgencyCharge($authAgency, $request)
     {
+
         // if ($authAgency->id == $request->id) {
         //     throw new \Exception(__('api.notYourself'));
         // }
@@ -484,11 +498,6 @@ class ChargeRepoService
         if ($chargeAgency->is_frozen) {
             throw new Exception(__('api_responses.frozenMass'));
         }
-        if (!Common::canTransferToAgency($chargeAgency) || !ChargeAgency::where('agency_id', $chargeAgency->id)->exists()) {
-            return Common::apiResponse(0, __('unreliable_agency'), 403);
-        }
-
-
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }

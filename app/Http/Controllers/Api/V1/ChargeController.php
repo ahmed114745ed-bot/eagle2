@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Helpers\ShippingAgencyHelper;
 use Exception;
 use App\Models\User;
 use App\Helpers\Common;
@@ -177,12 +178,15 @@ class ChargeController extends Controller
         }
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
+
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
+            return Common::apiResponse(0, __('not_verified_agency'), 403);
+        }
+
         if ($to->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-        if (!Common::canTransferToAgency($to) || !ChargeAgency::where('agency_id', $to->id)->exists()) {
-            return Common::apiResponse(0, __('unreliable_agency'), 403);
-        }
+
 
 
         $usd = $request->usd;
@@ -369,12 +373,15 @@ class ChargeController extends Controller
         }
         $receiver = Common::searchAgency($userUuid);
         if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
+
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($receiver)) {
+            return Common::apiResponse(0, __('not_verified_agency'), 403);
+        }
+
         if ($receiver->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-        if (!Common::canTransferToAgency($receiver) || !ChargeAgency::where('agency_id', $receiver->id)->exists()) {
-            return Common::apiResponse(0, __('unreliable_agency'), 403);
-        }
+
 
 
         try {

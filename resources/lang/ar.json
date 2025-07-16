@@ -3353,7 +3353,7 @@
 "weekly-cp": "تقرير CP الأسبوعي",
 "cp reports": "تقارير CP",
 "cp relations": "علاقات CP",
-"unreliable_agency" : "تم إلغاء العملية لأن هذه الوكالة غير موثوقة",
+"not_verified_agency" : "تم إلغاء العملية لأن هذه الوكالة غير موثوقة",
 "Charge To User": "الشحن للمستخدم",
 "Browse charge to user": "تصفح الشحن للمستخدم",
 "transfer from":"تحويل من ",
