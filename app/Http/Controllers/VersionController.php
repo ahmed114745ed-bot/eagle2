@@ -25,7 +25,7 @@ class VersionController extends Controller
         [$isAuth, $user] = $this->isAuth($token);
         if ($user) {
             try {
-                if ($request->OS != 'IOS' && $user->android_version != $version) {
+                if ($request->OS == 'Android' && $user->android_version != $version) {
                     DB::table('users')->where('id', $user->id)->update(['android_version' => intval($version)]);
                 } else if ($request->OS == 'IOS' && $user->ios_version != $version) {
                     DB::table('users')->where('id', $user->id)->update(['ios_version' => intval($version)]);

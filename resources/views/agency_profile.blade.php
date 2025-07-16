@@ -712,9 +712,9 @@
             background-color: transparent !important;
             filter: none !important;
         }
-        .rtl .gift-log-form {
+        /* .rtl .gift-log-form {
             padding-right: 13%;
-        }
+        } */
         .ltr .gift-log-form {
             padding-left: 13%;
         }
@@ -877,7 +877,20 @@
 
             }
 
+        .date-flex-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
+        .date-flex-row span {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .date-flex-row input[type="date"] {
+            flex-basis: 0;
+        }
             .target-card-stat {
                 width: 92%;
 
@@ -1566,6 +1579,12 @@
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
 
                             <div class="row mb-3" style="align-items: flex-end;">
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <span>{{ __('uuid') }}</span>
+                                        <input type="text" class="form-control"  name="uuid" value="{{ request('uuid') }}">
+                                    </div>
+                                </div>
                                 <!-- From Date -->
                                 <div class="col-md-4">
                                     <div class="date-flex-row">

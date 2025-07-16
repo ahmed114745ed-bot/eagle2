@@ -91,6 +91,7 @@ class AgencyController extends MainController
 
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
+        $uuid = request('uuid');
         $tab = request('tab', 'members');
         $giftType = request()->get('gift_type', 'receiver');
         $start = request('start_at');
@@ -256,12 +257,22 @@ class AgencyController extends MainController
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
+        })->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where(function ($q) use ($uuid) {
+                $q->whereHas('sender', fn($q) => $q->where('uuid', $uuid))
+                    ->orWhereHas('receiver', fn($q) => $q->where('uuid', $uuid));
+            });
         })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
         $diamonds = GiftLog::where('agency_id', $id)->when(isset($start) && isset($end), function ($query) use ($start, $end) {
             $query->whereBetween('created_at', [
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
+        })->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where(function ($q) use ($uuid) {
+                $q->whereHas('sender', fn($q) => $q->where('uuid', $uuid))
+                    ->orWhereHas('receiver', fn($q) => $q->where('uuid', $uuid));
+            });
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
         $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
         return $content
