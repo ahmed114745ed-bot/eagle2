@@ -1083,9 +1083,13 @@ class Common
             if ($expire == null) {
                 $expire = $vip->expire;
             }
+            $expire_t = now()->addDays($expire);
+            $diff_days = now()->diffInDays($expire_t);
+            
             logger()->info('Firebase tokens_notification : ', [
-                'expire' => $expire,
-                'expire_t' => now()->addDays($expire)->timestamp,
+                'expire' => $expire,        
+                'expire_t' => $expire_t->timestamp,  
+                'days_left' => $diff_days, 
             ]);
             if ($pack) {
                 // if ($pack->expire == 0) {
