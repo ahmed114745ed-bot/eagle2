@@ -193,6 +193,7 @@ class AuthController extends Controller
                 'client_secret' => $token,
             ]);
 
+            \Log::info($res->json());
             $claims = explode('.', $res['id_token'])[1];
             $data = json_decode(base64_decode($claims), true);
         } catch (\Exception $e) {
