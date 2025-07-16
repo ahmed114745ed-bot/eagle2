@@ -173,7 +173,8 @@ class AuthController extends Controller
         $iat = strtotime('now');
         $exp = strtotime('+60days');
 
-        $keyContent = file_get_contents(config('apple.apple_service_file'));
+        $keyContent = \Storage::get(config('apple.apple_service_file'));
+
 
         $token = JWT::encode([
             'iss' => $teamId,
