@@ -1082,21 +1082,13 @@ class Common
                 })->first();
             if ($expire == null) {
                 $expire = $vip->expire;
+                $expire_t = now()->addDays($expire);
+                $expire_timestamp = $expire_t->timestamp;
+            }else{
+                $expire_timestamp = now()->addDays($expire)->timestamp ;
             }
-            $expire_t = now()->addDays($expire);
-            $expire_timestamp = $expire_t->timestamp;
-            
-            // حساب الأيام المتبقية بدقة
-            $diff_seconds = $expire_timestamp - now()->timestamp;
-            $diff_days = (int) ceil($diff_seconds / 86400);
-            
-            // طباعة البيانات
-            logger()->info('Firebase tokens_notification:', [
-                'expire_days_input' => $expire,
-                'expire_t_datetime' => $expire_t->toDateTimeString(),
-                'expire_t_timestamp' => $expire_timestamp,
-                'days_left' => $diff_days,
-            ]);
+          
+          
             
             if ($pack) {
                 // if ($pack->expire == 0) {
@@ -1115,7 +1107,7 @@ class Common
                         'type' => $ware->type,
                         'target_id' => $ware->id,
                         'num' => 1,
-                        'expire' => $vip->expire ? now()->addDays($expire)->timestamp : 0,
+                        'expire' => $expire_timestamp,
                         'use_num' => $ware->num,
                         'vip_user_id' => $userVip->id,
                         'is_used' => $userVip->is_used,
