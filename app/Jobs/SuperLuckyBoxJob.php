@@ -116,9 +116,9 @@ class SuperLuckyBoxJob implements ShouldQueue
             $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
 
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
-            info('boxes ids: '.$pickerBoxIds);
+            info('boxes ids: '.json_encode($pickerBoxIds));
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $pickerBoxIds)->whereHas('user')->pluck('user_id')->toArray();
-            info('picked users inside the room : '.$usersRoomVisit);
+            info('picked users inside the room : '.json_encode($usersRoomVisit));
 
             foreach ($usersRoomVisit as $userRoomVisit) {
 
