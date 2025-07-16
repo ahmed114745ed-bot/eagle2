@@ -40,37 +40,38 @@ class NormalLuckyBoxJop implements ShouldQueue
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
 
-        $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
-        if (!$userBoxes)  return;
-       
+        $userBoxes = BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
+        if (!$userBoxes) return;
+
         foreach ($userBoxes as $userBox) {
-           $user = User::where('id', $userBox->user_id)->first();
-           $user-> increment('di', $userBox->unused_coins);
+            $user = User::where('id', $userBox->user_id)->first();
+            $user->increment('di', $userBox->unused_coins);
             $userBox->is_closed = true;
             $userBox->save();
 
-             $room    = Room::withoutAppends()->where('uid', $userBox->room_uid)->select('id')->first();
-            $c     = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
+            $room = Room::withoutAppends()->where('uid', $userBox->room_uid)->select('id')->first();
+            $c = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
             $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
-            
-                $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->pluck('user_id')->toArray();
-           
+
+            $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->pluck('user_id')->toArray();
+
 
             foreach ($usersRoomVisit as $userRoomVisit) {
 
-                $m     = [
+                $m = [
                     "messageContent" => [
-                        "message"      => "hideluckybox",
-                        "ownerBoxId"   => @$owner->id,
+                        "message" => "hideluckybox",
+                        "ownerBoxId" => @$owner->id,
                         "ownerBoxName" => @$owner->name,
-                        "boxCoins"     => $userBox->coins,
-                        "boxId"        => $userBox->id,
-                        "boxType"      => $userBox->type == 1 ? 'super' : 'normal',
-                        "numOfBoxes"   => $c
+                        "boxCoins" => $userBox->coins,
+                        "boxId" => $userBox->id,
+                        "boxType" => $userBox->type == 1 ? 'super' : 'normal',
+                        "numOfBoxes" => $c
                     ]
                 ];
-                $json  = json_encode($m);
+                $json = json_encode($m);
                 Common::sendToZego('SendCustomCommand', @$room->id, @$userRoomVisit->user_id, $json);
+            }
         }
     }
 }

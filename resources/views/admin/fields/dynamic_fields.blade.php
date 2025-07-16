@@ -26,7 +26,7 @@
     </button>
 </div>
     </div>
-   
+
 </div>
 
 
@@ -55,12 +55,14 @@
 
     function toggleFields() {
         var type = $('#box_type').val();
+        console.log(type)
         if (type == '1') {
-            $('#users_field').closest('.form-group').hide();
-            $('#duration_field').closest('.form-group').hide();
-        } else {
             $('#users_field').closest('.form-group').show();
             $('#duration_field').closest('.form-group').show();
+        } else {
+            $('#users_field').closest('.form-group').hide();
+            $('#duration_field').closest('.form-group').hide();
+
         }
     }
 
