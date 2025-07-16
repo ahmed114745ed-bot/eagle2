@@ -110,7 +110,7 @@ class ChargeReportController extends MainController
 
             $grid->model()->where('charger_type', 'host_agency');
         } else {
-            $grid->model()->where(function($query) {
+            $grid->model()->where(function ($query) {
                 $query->where('charger_type', 'agency')
                     ->orWhere('user_type', 'agency');
             });
@@ -486,23 +486,33 @@ class ChargeReportController extends MainController
         $grid->header(function () {
             $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/;
 
-            $query->when(request('user.uuid'), fn($q, $uuid) =>
+            $query->when(
+                request('user.uuid'),
+                fn($q, $uuid) =>
                 $q->whereHas('user', fn($u) => $u->where('uuid', $uuid))
             );
 
-            $query->when(request('trx'), fn($q, $trx) =>
+            $query->when(
+                request('trx'),
+                fn($q, $trx) =>
                 $q->where('trx', $trx)
             );
 
-            $query->when(request('method') !== null && request('method') !== '', fn($q) =>
+            $query->when(
+                request('method') !== null && request('method') !== '',
+                fn($q) =>
                 $q->where('method', request('method'))
             );
 
-            $query->when(request('from_date'), fn($q, $from) =>
+            $query->when(
+                request('from_date'),
+                fn($q, $from) =>
                 $q->whereDate('created_at', '>=', Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay())
             );
 
-            $query->when(request('to_date'), fn($q, $to) =>
+            $query->when(
+                request('to_date'),
+                fn($q, $to) =>
                 $q->whereDate('created_at', '<=', Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay())
             );
 
@@ -891,59 +901,50 @@ class ChargeReportController extends MainController
         }
 
         if ($scope !== 'dash') {
-            $grid->column('charger_id', __('charger'))->display(function () {
-                if ($this->charger_type == 'agency') {
-                    $name = $this->agency->name ?? 'No Agency';
-                    $path = $this->agency->img ?? null;
-                    $id = $this->agency->id ?? 0;
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
+            $grid->column('charger_id', __("charger"))->display(function () {
 
-
-                    $showUrl = $this->agency ? url("admin/agencies/{$this->agency->id}") : '#';
-                    $link = $this->agency ? "
-                                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;'>
-                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                                    <small style='color: #666;'>ID: {$id}</small>
-                                </a>
-                            " : "<span style='color: gray;'>No Agency</span>";
-                    $image = "<img src='{$url}' style='width: 80px; height: 50px; object-fit: cover; border-radius: 0;'>";
-
+                $sender = Common::getChargerInfo($this);
+                if (empty($sender['name']) && empty($sender['uuid'])) {
                     return "
-                                <div style='display: flex; align-items: center; gap: 10px;'>
-                                    $image
-                                    $link
-                                </div>
-                            ";
-                } else {
-                    $name = $this->user->name ?? 'No User';
-                    $uid = $this->user->uuid ?? 'N/A';
-                    $path = $this->user->profile->avatar ?? null;
-                    $defaultImage = asset("images/businessman-icon.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
+                <div style='display: flex; align-items: center; gap: 10px;'>
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-                    $showUrl = $this->user ? url("admin/users/{$this->user->id}") : '#';
-                    $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                            <span style=' cursor: pointer;'>Unknown </span>
 
-                    return "
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div style='display: flex; flex-direction: column;'>
-                                <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
-                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                                </a>
-                                <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                            </div>
-                        </div>
-                    ";
+                </div>
+            ";
                 }
+
+                $name = $sender['name'];
+                $uuid = $sender['uuid'];
+                $path = $sender['image'];
+                $showUrl = $sender['url'];
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+
+                $imageStyle = $this->charger_type == 'agency'
+                    ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'     // rectangle
+                    : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
+                $image = "<img src='{$url}' alt='User Image' style='{$imageStyle}'>";
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
+                    </div>
+                </div>
+            ";
             });
         }
 
@@ -993,7 +994,7 @@ class ChargeReportController extends MainController
             });
 
             $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
-                $reason = ChargeInvoice::where('charge_id', $this->id)->first(); // get the first model from collection
+                $reason = \App\Models\ChargeInvoice::where('charge_id', $this->id)->first();
 
                 if (!$reason) {
                     return new \Encore\Admin\Widgets\Table(
@@ -1005,13 +1006,28 @@ class ChargeReportController extends MainController
                 $invoicePath = $reason->invoice ?? '';
                 $imgUrl = $invoicePath ? getDriverUrl() . '/' . $invoicePath : '';
                 $imgTag = $imgUrl
-                    ? "<img src='" . e($imgUrl) . "' style='width:50px; height:50px;' class='img img-thumbnail' />"
+                    ? "<img src='" . e($imgUrl) . "' style='width:80px; height:80px;' class='img img-thumbnail' />"
                     : '-';
 
+                $reasonText = app()->getLocale() === 'en'
+                    ? ($reason->reason_en ?? $reason->reason_ar)
+                    : ($reason->reason_ar ?? $reason->reason_en);
+
+                $reasonDiv = "<div style='
+        max-height: 150px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        word-break: break-word;
+        padding: 8px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        font-size: 14px;
+        line-height: 1.5;
+    '>" . e($reasonText) . "</div>";
+
                 $results = [
-                    __('Reason') => app()->getLocale() === 'en'
-                        ? ($reason->reason_en ?? $reason->reason_ar)
-                        : ($reason->reason_ar ?? $reason->reason_en),
+                    __('Reason') => $reasonDiv,
                     __('Invoice') => $imgTag,
                 ];
 
@@ -1032,7 +1048,11 @@ class ChargeReportController extends MainController
             });
         }
         $grid->column('created_at', __('charge date'));
-
+         $grid->tools(function (Grid\Tools $tools){
+            $url = '/admin/charges';
+            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("back").'</a>';
+            $tools->append($button);
+        });
         // Disable unnecessary buttons
         $grid->disableCreateButton();
         $grid->disableExport();
