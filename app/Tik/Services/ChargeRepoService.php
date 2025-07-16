@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Helpers\UserCoinLogHelper;
 use Exception;
 use App\Models\User;
 use App\Models\Agency;
@@ -298,6 +299,15 @@ class ChargeRepoService
 
             );
         }
+        $amountBefore =  Common::getCurrentBalance($receiver->id);
+        UserCoinLogHelper::log(
+            $receiver->id ,
+            'charge',
+            'charges',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            $chargeType
+        );
         // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
