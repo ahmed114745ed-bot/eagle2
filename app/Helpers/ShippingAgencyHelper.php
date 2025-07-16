@@ -11,22 +11,13 @@ class ShippingAgencyHelper
         return settings()->get('transfer_salary_reliable_shipping_agency') == 1;
     }
 
-    // public static function isVerifiedChargeForAgency(ShippingAgency $agency): bool
-    // {
-    //     if (!self::isReliableTransferEnabled()) {
-    //         return false;
-    //     }
-
-    //     // Safely check if agency has verified charge
-    //     return optional($agency->chargeAgency())->exists() ?? false;
-    // }
 
     public static function isVerifiedChargeForAgency(ShippingAgency $agency): bool
     {
         if (self::isReliableTransferEnabled()) {
-            return true;
+            return $agency->chargeAgency()->exists();
         }
 
-        return $agency->chargeAgency()->exists();
+        return true;
     }
 }
