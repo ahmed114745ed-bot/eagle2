@@ -1084,7 +1084,8 @@ class Common
                 $expire = $vip->expire;
             }
             $expire_t = now()->addDays($expire);
-            $diff_days = now()->diffInDays($expire_t);
+            $diff_seconds = $expire_t->timestamp - now()->timestamp;
+            $diff_days = ceil($diff_seconds / 86400);
             
             logger()->info('Firebase tokens_notification : ', [
                 'expire' => $expire,        
