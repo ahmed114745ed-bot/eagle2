@@ -3,6 +3,7 @@
 namespace App\Admin\Actions;
 
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Models\Charge;
 use App\Models\Setting;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class UsersChargeAction extends Action
 {
@@ -70,6 +72,15 @@ class UsersChargeAction extends Action
         }
 
         DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            UserCoinLogHelper::log(
+                $user->id ,
+                'users_charge',
+                'users_charges',
+                $coins ?? 0,
+                $amountBefore ?? 0,
+                'admin'
+            );
             $user->di += $coins;
             if ($user->di < 0) {
                 throw ValidationException::withMessages([
@@ -87,16 +98,13 @@ class UsersChargeAction extends Action
             }
         });
 
-        $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-        $title = $typeCharge == 'increment'
-            ? __('Coins Added')
-            : __('Coins Deducted');
+        $title = $typeCharge == 'increment' ? 'Coins Added' : 'Coins Deducted';
 
         $body = $typeCharge === 'increment'
-            ? __('You have received :coins coins from admin.', ['coins' => $coins])
-            : __(':coins coins were deducted from your account by admin.', ['coins' => $coins]);
+            ? 'You have received :coins coins from admin.'
+            : ':coins coins were deducted from your account by admin.';
 
-        Common::send_firebase_notification($notificationToken, $title, $body);
+        CustomNotification::charges($user, $title, $body, ['coins' => $coins]);
 
         return $this->response()->success('Success')->refresh();
     }
@@ -134,7 +142,8 @@ class UsersChargeAction extends Action
         $this->name = __('Charge');
         $this->hidden('userId')->attribute('id', 'vid');
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-        $this->text('amount', __('Amount'))
+        $this->integer('amount', __('Amount'))
+            ->rules('numeric|gt:0')
             ->addElementClass('price-input')
             ->help(__('Enter amount in dollars'));
         $this->text('reason_en', __('reason en'));

@@ -1051,9 +1051,9 @@
         .level-label {
             padding: 10px;
         }
-        .rtl .gift-log-form {
+        /* .rtl .gift-log-form {
             padding-right: 13%;
-        }
+        } */
         .ltr .gift-log-form {
             padding-left: 13%;
         }
@@ -1187,7 +1187,7 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           <a href="?tab=user-coins" class="tab-btn" data-target="user-coins-tab">{{ __('User Coins') }}</a>
+           <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
 
 
 
@@ -1700,8 +1700,6 @@
                                     @endphp
 
                                     @php
-                                    info($userJoinAgency->status);
-                                    info($userJoinAgency->id);
                                        if ($userJoinAgency->status == 'kick off'){
                                            if ($userJoinAgency->kicked_by_app){
                                             $status = 'app';
@@ -1791,9 +1789,53 @@
 <div class="tab-content" id="user-coins-tab" style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
 
     <div class="card">
-        <div class="card-header">
-            <h4 class="card-title" style="text-align: left;">{{ __('') }}</h4>
+    <div class="card-header">
+            <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
         </div>
+        <div class="box-body p-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
+                        <input type="hidden" name="tab" value="user-coins">
+                        <input type="hidden" name="tap" value="{{ request()->get('users-coins', 1) }}">
+
+                        <div class="row mb-3" style="align-items: flex-end;">
+                            <!-- From Date -->
+                            <div class="col-md-3">
+                                <label>{{ __('From Date') }}</label>
+                                <input type="date" class="form-control" name="from_date" value="{{ request('from_date') }}">
+                            </div>
+
+                            <!-- To Date -->
+                            <div class="col-md-3">
+                                <label>{{ __('To Date') }}</label>
+                                <input type="date" class="form-control" name="to_date" value="{{ request('to_date') }}">
+                            </div>
+
+                            <!-- Sub Type -->
+                            <div class="col-md-3">
+                                <label>{{ __('Sub Type') }}</label>
+                                <select name="sub_type" class="form-control">
+                                    <option value="">{{ __('All') }}</option>
+                                    @foreach(\App\Helpers\Common::getCoinSubTypes() as $type)
+                                        <option value="{{ $type }}" {{ request('sub_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Search/Reset Buttons -->
+                            <div class="col-md-3 d-flex align-items-end justify-content-end" style="gap: 8px;top: 23px;">
+                                <button type="submit" class="btn btn-info btn-sm me-2">
+                                    <i class="fa fa-search"></i> {{ __('Search') }}
+                                </button>
+                                <a href="{{ url('admin/users/' . $user->id. '?tab=user-coins') }}" class="btn btn-default btn-sm">
+                                    <i class="fa fa-undo"></i> {{ __('Reset') }}
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         <div class="table-responsive">
             <div class="box-body ">
                 <table class="table table-bordered table-hover align-middle data-table" id="vip">
@@ -1802,9 +1844,13 @@
                             <th>#</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('sub type') }}</th>
+                            <th>{{ __('Item Name') }}</th>
+                            <th>{{ __('balance before') }}</th>
                             <th>{{ __('amount') }}</th>
+                            <th>{{ __('balance yet') }}</th>
                             <th>{{ __('from date') }}</th>
                             <th>{{ __('to date') }}</th>
+                            <th>{{ __('action') }}</th>
                         </tr>
                     </thead>
                     @if($usersCoins && $usersCoins->count())
@@ -1814,7 +1860,12 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $coin->type }}</td>
                                     <td>{{ @$coin->sub_type ?? 0 }}</td>
-                                    <td>{{ @$coin->amount ?? 0 }}</td>
+                                    <td>{{ @$coin->item_name ?? '' }}</td>
+                                    <td>{{ @$coin->amount_before ?? 0 }}</td>
+                                    <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
+                                        {{ $coin->amount ?? 0 }}
+                                    </td>
+                                    <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
                                     <td>{{ @$coin->from_date ?? 0 }}</td>
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
                                     <td>
@@ -1841,6 +1892,7 @@
                 @endif
             </div>
         </div>
+      </div>
     </div>
 </div>
 @endif
@@ -1979,7 +2031,7 @@
                             <input type="hidden" name="gift_type" value="{{ $giftType }}">
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
 
-                            <div class="row mb-3" style="align-items: flex-end;">
+                            <div class="row mb-2" style="align-items: flex-end;">
                                 <!-- From Date -->
                                 <div class="col-md-4">
                                     <div class="date-flex-row">
@@ -1996,7 +2048,21 @@
                                         <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
                                     </div>
                                 </div>
-                                <!-- Buttons -->
+                                @if ($giftType == 'receiver')
+                                    <div class="col-md-4">
+                                            <div class="date-flex-row">
+                                                <label for="agency_id">{{ __('Agency') }}</label>
+                                                <select class="form-control" id="agency_id" name="agency_id">
+                                                    @if(request('agency_id'))
+                                                        <option value="{{ request('agency_id') }}" selected>
+                                                            {{ \App\Models\Agency::find(request('agency_id'))?->name . ' - ' . request('agency_id') }}
+                                                        </option>
+                                                    @endif
+                                                </select>
+                                            </div>
+                                        </div>
+                                @endif
+                                 <!-- Buttons -->
                                 <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
                                     <button type="submit" class="btn btn-info btn-sm me-2">
                                         <i class="fa fa-search"></i> {{__('Search')}}
@@ -2005,7 +2071,8 @@
                                         <i class="fa fa-undo"></i> {{__('Reset')}}
                                     </a>
                                 </div>
-                            </div>
+                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -2034,7 +2101,11 @@
                             <th>#</th>
                             <th>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}</th>
                             <th>{{ __('room') }}</th>
+                            <th>{{ __('moment') }}</th>
                             <th>{{ __('gift') }}</th>
+                            @if($giftType == 'receiver')
+                                <th>{{ __('agency') }}</th>
+                            @endif
                             <th>{{ __('quantity') }}</th>
                             <th>{{ __('price') }}</th>
                             <th>{{ __('Created at') }}</th>
@@ -2068,8 +2139,20 @@
                                 $giftName = app()->getLocale() == 'ar'
                                     ? (@$giftSLog->gift->name ?? '')
                                     : (@$giftSLog->gift->e_name ?? '');
-                            @endphp
 
+                                    $agency =$giftSLog->agency;
+                                    $agencyName = $agency->name ?? '';
+                                    $agencyId = $agency->id ?? 0;
+                                    $agencyDefaultImage = asset("images/icon-agency.jpg");
+                                    $agencyImage =getImagePath(@$agency->img) ?? $agencyDefaultImage;
+                                    if (!isImageExists($agencyImage)) {
+                                    $agencyImage = $agencyDefaultImage;
+                                }
+                            @endphp
+                            @php
+                                $moment = $giftSLog->moment;
+                                $galleries = @$moment->images;
+                            @endphp
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
@@ -2084,16 +2167,50 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
-                                       class="d-flex align-items-center text-decoration-none">
-                                        <img src="{{ $url }}"
-                                             width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <div>
-                                            <span>{{ $roomName }}</span><br>
-                                            <small class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
+                                    @if(!empty($giftSLog->room))
+                                        <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
+                                           class="d-flex align-items-center text-decoration-none">
+                                            <img src="{{ $url }}"
+                                                 width="30" height="30"
+                                                 style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                            <div>
+                                                <span>{{ $roomName }}</span><br>
+                                                <small class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
+                                            </div>
+                                        </a>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($galleries && $galleries->count() > 0)
+                                        <div id="image-gallery-{{ $moment->id }}" style="display: none;">
+                                            @foreach($galleries as $image)
+                                                @php
+                                                    $imgUrl = getDriverUrl() . '/' . $image->image;
+                                                @endphp
+                                                <img src="{{ $imgUrl }}"
+                                                     style="width: 100%; height: 200px; object-fit: cover;"
+                                                     data-original="{{ $imgUrl }}"
+                                                     loading="lazy"
+                                                     class="gallery-image">
+                                            @endforeach
                                         </div>
-                                    </a>
+
+                                        {{-- Show first image as thumbnail --}}
+                                        @php
+                                            $firstImageUrl = getDriverUrl() . '/' . $galleries->first()->image;
+                                        @endphp
+                                        <img src="{{ $firstImageUrl }}"
+                                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+                                             onclick="document.querySelector('#image-gallery-{{ $moment->id }} img').click()">
+
+                                        @push('scripts')
+                                            <script>
+                                                new Viewer(document.getElementById('image-gallery-{{ $moment->id }}'));
+                                            </script>
+                                        @endpush
+                                    @else
+                                        No Image
+                                    @endif
                                 </td>
                                 <td>
                                     <a href="#" target="_blank"
@@ -2103,6 +2220,24 @@
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                         <span>{{ $giftName  }}</span>
                                     </a>
+                                </td>
+                                <td> @if($giftType == 'receiver')
+                                        @if ($giftSLog->agency_id)
+                                            <a href="{{ url('admin/agencies/' . $agencyId) }}" target="_blank"
+                                        class="d-flex align-items-center text-decoration-none">
+                                            <img src="{{ $agencyImage }}"
+                                                width="50" height="30"
+                                                style="object-fit: cover; border-radius: 4px; border: 1px solid #ccc; padding: 2px; margin-right: 10px;">
+                                            <div>
+                                                <span>{{ $agencyName }}</span><br>
+                                                <small class="text-muted">id: {{ $agencyId ?? 0 }}</small>
+                                            </div>
+                                        </a>
+                                        @else
+                                            <span class="text-danger">{{__('not join to agency')}}</span>
+                                        @endif
+                                    @endif
+
                                 </td>
                                 <td>{{ $giftSLog->giftNum }}</td>
                                 <td>{{  $giftSLog->giftPrice}}</td>
@@ -2187,6 +2322,8 @@
 
 
 <script>
+
+
 
     $(document).ready(function () {
     $('#add_form').on('submit', function (e) {
@@ -2290,6 +2427,37 @@
 
 
     $(document).ready(function () {
+
+
+
+         $('#agency_id').select2({
+        placeholder: 'Select agency',
+        allowClear: true,
+        ajax: {
+            url: '/api/search/host-agency', // ✅ make sure this matches your route
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page || 1
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.data.map(item => ({
+                        id: item.id,
+                        text: item.name
+                    })),
+                    pagination: {
+                        more: data.next_page_url !== null
+                    }
+                };
+            },
+            cache: true
+        }
+    });
+
         console.log("Document ready");
 
         function showLoader() {

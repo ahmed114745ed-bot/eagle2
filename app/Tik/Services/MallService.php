@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use Exception;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\UserRepository;
@@ -35,7 +36,6 @@ class MallService
         $totalPrice = $ware->price * $quantity;
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
         if ($pack) {
-
             $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
         }
         try {
@@ -56,6 +56,16 @@ class MallService
             $this->packRepository->create($data);
 
             $this->service($user, $ware->exp, $totalPrice, 'buy');
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            $logAmount = -abs($totalPrice);
+            UserCoinLogHelper::log(
+                $user->id ,
+                'pack',
+                'packs',
+                $logAmount ?? 0,
+                $amountBefore ?? 0,
+                $ware->name
+            );
             return Common::apiResponse(1, 'success process');
         } catch (Exception $exception) {
             return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
@@ -94,8 +104,18 @@ class MallService
                 'price'     => $totalPrice,
             ];
             $this->packRepository->create($data);
-
+            $amountBefore =  Common::getCurrentBalance($auth->id);
+            $logAmount = -abs($totalPrice);
+            UserCoinLogHelper::log(
+                $auth->id ,
+                'pack',
+                'packs',
+                $logAmount ?? 0,
+                $amountBefore ?? 0,
+                $ware->name
+            );
             $this->service($auth, $ware->exp, $totalPrice, 'send');
+          
             DB::commit();
             return Common::apiResponse(1, 'success process');
         } catch (\Exception $exception) {
@@ -140,7 +160,7 @@ class MallService
             (new UpgradeLevelServices())->purchaseItem($user, $wareExp);
             (new UserCounterServices)->eventUser($user, 'mybag', 1);
         }
-
+       
         $this->userRepository->decrementUserCoins($user, $totalPrice);
     }
 

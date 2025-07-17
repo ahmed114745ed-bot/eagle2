@@ -2,6 +2,7 @@
 
 namespace Modules\Moment\Http\Controllers;
 
+use App\Helpers\UserCoinLogHelper;
 use DB;
 use App\Models\Gift;
 use App\Models\User;
@@ -95,7 +96,6 @@ class MomentUserGiftsController extends Controller
         $vip_level = @Common::ovip_center($user);
         if (@$vip_level->level < $gift->vip_level) return Common::apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');
 
-        //decrement the user coins
         try {
             $updateUserWhenSendGift->send($totalPrice, $user);
         } catch (NotInfMoneyException $e) {

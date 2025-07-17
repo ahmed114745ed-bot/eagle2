@@ -169,7 +169,7 @@ class SendGiftService
                                     ]);
     }
 
-    public function updateFamilyLevelForReceiver(\Illuminate\Database\Eloquent\Collection $users, $totalCoinsPerUser): bool
+    public function updateFamilyLevelForReceiver(Collection $users, $totalCoinsPerUser): bool
     {
         $families    = $users->pluck('family')->where('id', '!=', null);
         $familiesIds = $families->pluck('id')->toArray();

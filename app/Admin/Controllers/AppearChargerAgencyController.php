@@ -294,7 +294,7 @@ class AppearChargerAgencyController extends MainController
 
         $grid->column('charge_agency', __("Charge-agency"))
             ->display(function () {
-                return ChargeAgency::where('agency_id', $this->id)->exists() ? 1 : 0;
+                return $this->chargeAgency ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
 
