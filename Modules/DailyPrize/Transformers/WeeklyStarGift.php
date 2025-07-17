@@ -36,7 +36,7 @@ class WeeklyStarGift extends JsonResource
             default:
                 $expire = @$this->target;
                 $type = "coins";
-                $image = "";
+                $image = "coin.png";
                 break;
         }
 
