@@ -10,15 +10,18 @@ use App\Models\UserLuckyGift;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LogAppProfitCoinsCommand extends Command
 {
     
         protected $signature = 'log:app-profit-coins';
         protected $description = 'Log all app_profit_coins from cron-based tables every 10 minutes';
-    
+
         public function handle()
         {
+        Log::info("Start scanning profit tables  app-profit-coins");
+
             $this->info("Start scanning profit tables...");
     
             $tables = [
