@@ -3,6 +3,7 @@
 namespace Modules\Vip\Services\Api;
 
 use Exception;
+use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Modules\Vip\Helpers\VipCommon;
@@ -81,7 +82,16 @@ class VipService
             $sender_id = 0;
             $from = $user;
         }
-
+        $amountBefore =  Common::getCurrentBalance($from->id);
+        $logAmount = -abs($total);
+        UserCoinLogHelper::log(
+            $user->id ,
+            'vip',
+            'o_vips',
+            $logAmount ?? 0,
+            $amountBefore ?? 0,
+            $vip->name
+        );
         $this->userRepository->decrementUserCoins($from, $total);
         $this->packRepository->deleteExpirePack();
         $this->packRepository->unUseOldPack($user_id);
