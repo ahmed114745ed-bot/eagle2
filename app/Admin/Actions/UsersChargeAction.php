@@ -3,6 +3,7 @@
 namespace App\Admin\Actions;
 
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Models\Charge;
 use App\Models\Setting;
@@ -71,6 +72,15 @@ class UsersChargeAction extends Action
         }
 
         DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            UserCoinLogHelper::log(
+                $user->id ,
+                'users_charge',
+                'users_charges',
+                $coins ?? 0,
+                $amountBefore ?? 0,
+                'admin'
+            );
             $user->di += $coins;
             if ($user->di < 0) {
                 throw ValidationException::withMessages([

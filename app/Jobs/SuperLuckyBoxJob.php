@@ -104,21 +104,16 @@ class SuperLuckyBoxJob implements ShouldQueue
                     }
                 }
             }
-            $user = User::where('id', $userBox->user_id)->first();
-            $user->increment('di', $userBox->unused_coins);
+            $owner = User::where('id', $userBox->user_id)->first();
+            $owner->increment('di', $userBox->unused_coins);
             $userBox->is_closed = true;
             $userBox->save();
             $winners = UserBoxGift::where(['box_uses_id' => $userBox->id])->where('coins', '>', 0)->select('user_id', 'coins')->get()->toArray();
-            $box_use = BoxUse::find($userBox->id);
-            $room    = Room::withoutAppends()->where('uid', $box_use->room_uid)->first();
-
+            $room    = Room::withoutAppends()->where('uid', $userBox->room_uid)->first();
             $c     = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
-            $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
-
-            $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
-            info('boxes ids: '.json_encode($pickerBoxIds));
+            info('boxes ids: ' . json_encode($pickerBoxIds));
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $pickerBoxIds)->whereHas('user')->pluck('user_id')->toArray();
-            info('picked users inside the room : '.json_encode($usersRoomVisit));
+            info('picked users inside the room : ' . json_encode($usersRoomVisit));
 
             foreach ($usersRoomVisit as $userRoomVisit) {
 
@@ -141,7 +136,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                     "messageContent" => [
                         "message"      => "winnerLuckyBox",
 
-                        "boxUId" => $box_use->id,
+                        "boxUId" => $userBox->id,
                         "ownerId" =>  @$room->owner->id,
                         "ownerName" => @$room->owner->name ?? '',
                         "ownerImage" => @$room->owner->profile->avatar ?? '',

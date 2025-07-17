@@ -96,7 +96,7 @@ class BoxService
         );
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
-        dispatch(new NormalLuckyBoxJop())->delay(now()->addSecond($normalDuration));
+        dispatch(new NormalLuckyBoxJop())->delay(now()->addSecond($normalDuration))->onQueue('test-super-lucky-box');
         return $boxUser;
     }
 
