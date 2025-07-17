@@ -1862,7 +1862,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $coin->type }}</td>
                                     <td>{{ @$coin->sub_type ?? 0 }}</td>
-                                    <td>{{ @$coin->item_name ?? 0 }}</td>
+                                    <td>{{ @$coin->item_name ?? '' }}</td>
                                     <td>{{ @$coin->amount_before ?? 0 }}</td>
                                     <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
                                         {{ $coin->amount ?? 0 }}

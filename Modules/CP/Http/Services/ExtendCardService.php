@@ -58,12 +58,12 @@ class ExtendCardService
                 'expire' => $ware->expire ? now()->addDays($expire)->timestamp : 0,
                 'use_num' => $ware->num,
             ]);
-            UserCoinLogHelper::log(
-                $user->id ,
-                'pack',
-                'packs',
-                $ware->price ?? 0
-            );
+            // UserCoinLogHelper::log(
+            //     $user->id ,
+            //     'pack',
+            //     'packs',
+            //     $ware->price ?? 0
+            // );
         }
 
 

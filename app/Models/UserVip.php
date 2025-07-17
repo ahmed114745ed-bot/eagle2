@@ -31,12 +31,7 @@ class UserVip extends Model
     {
         static::created(function ($userVip) {
             if ($userVip->user_id && ($userVip->price ?? 0) > 0) {
-                UserCoinLogHelper::log(
-                    $userVip->user_id,
-                    'vip',
-                    'users_vips',
-                    $userVip->price
-                );
+         
             }
         });
     }
