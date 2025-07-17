@@ -91,11 +91,12 @@ class AgencyController extends MainController
 
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
+        $uuid = request('uuid');
         $tab = request('tab', 'members');
         $giftType = request()->get('gift_type', 'receiver');
         $start = request('start_at');
         $end = request('end_at');
-
+        $uuid = $request->uuid;
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
@@ -130,7 +131,9 @@ class AgencyController extends MainController
                 $members =
                     // Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
                     // return
-                    $agency->mempers()
+                    $agency->mempers()->when(isset($uuid), function ($query) use ($uuid) {
+                        $query->where('uuid', $uuid);
+                    })
                     ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
                     ->paginate(10, ['*'], 'members_page');
@@ -233,8 +236,7 @@ class AgencyController extends MainController
 
         $memberIds = $agency->mempers()->pluck('id');
 
-        $sumTargets = GiftLog::whereIn('receiver_id', $memberIds)
-            ->where('agency_id', $agencyId)
+        $sumTargets = GiftLog::where('agency_id', $agencyId)
             ->whereBetween('created_at', [
                 Carbon::now()->startOfMonth(),
                 Carbon::now()->endOfMonth(),
@@ -255,14 +257,24 @@ class AgencyController extends MainController
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
+        })->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where(function ($q) use ($uuid) {
+                $q->whereHas('sender', fn($q) => $q->where('uuid', $uuid))
+                    ->orWhereHas('receiver', fn($q) => $q->where('uuid', $uuid));
+            });
         })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
         $diamonds = GiftLog::where('agency_id', $id)->when(isset($start) && isset($end), function ($query) use ($start, $end) {
             $query->whereBetween('created_at', [
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
+        })->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where(function ($q) use ($uuid) {
+                $q->whereHas('sender', fn($q) => $q->where('uuid', $uuid))
+                    ->orWhereHas('receiver', fn($q) => $q->where('uuid', $uuid));
+            });
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
-        $diamondsHosts = UserSallary::where('user_agency_id',$id)->sum('achieved_diamond');
+        $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
@@ -446,7 +458,7 @@ class AgencyController extends MainController
         </div>";
         });
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
-            $coin = truncateAndTrim($this->salary??0);
+            $coin = truncateAndTrim($this->salary ?? 0);
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>

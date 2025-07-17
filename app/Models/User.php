@@ -810,6 +810,19 @@ class User extends Authenticatable
         return floor($total * 100) / 100;
     }
 
+    public function getSalaryByAgencyAttribute()
+    {
+        $userSalary = UserSallary::query()
+
+            ->where('user_id', $this->id)
+            ->where('user_agency_id', $this->agency_id)
+            ->orderByDesc('id')
+            ->sum(DB::raw('sallary - cut_amount'));
+        return floor($userSalary * 100) / 100;
+    }
+
+
+
     public function getSalaryWithoutCutAmountAttribute()
     {
         $userSallary = UserSallary::query()

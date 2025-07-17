@@ -3,28 +3,18 @@
 namespace App\Tik\Services;
 
 use Carbon\Carbon;
-use App\Models\Pack;
 use App\Models\User;
 use App\Models\BoxUse;
-use App\Models\Config;
 use App\Helpers\Common;
-use App\Models\UserVip;
 use App\Models\CoreWallet;
+use App\Events\SuperLuckyBox;
 use App\Facades\RedisService;
 use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use Modules\Events\Entities\WinnerReward;
-use App\Http\Resources\UserReportResource;
-use App\Http\Resources\ReportEventResource;
-use Modules\Events\Entities\RewardWinnerPk;
-use App\Http\Resources\AgencyReportResource;
-use App\Tik\Repositories\BlackLisRepository;
+use Illuminate\Support\Facades\Log;
 use App\Http\Resources\Api\V1\BoxUseResource;
-use Modules\Events\Services\LoseWinnerRewards;
-use App\Http\Resources\AdminUserReportResource;
-use Modules\Achievement\Entities\UserAchievementLevel;
+
 
 class BoxService
 {
@@ -62,7 +52,7 @@ class BoxService
                     "numOfBoxes" => (int)$c,
                     "ownerBoxImage" => $user->avatar,
                     "ownerBoxUId"  => $user->uuid,
-                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->toDateTimeString(),
+                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
                     //'usersNum' => $request->users_num ?: $box->users,
                     //'rem_time' => $rem_time,
                     //'is_closed' => $box->is_closed,
@@ -106,7 +96,7 @@ class BoxService
         );
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
-        dispatch(new NormalLuckyBoxJop())->delay(now()->setTimezone($timezone ?? 'UTC')->addSecond(30));
+        dispatch(new NormalLuckyBoxJop())->delay(now()->addSecond($normalDuration));
         return $boxUser;
     }
 
@@ -130,7 +120,10 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-        dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($timezone ?? 'UTC')->addSecond(30));
+        dispatch(new SuperLuckyBoxJob())->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
+        info('afterJob');
+
+        //        dispatch(new SuperLuckyBoxJob())->delay(now()->seconds(30))->onQueue('');
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
@@ -138,36 +131,37 @@ class BoxService
         RedisService::updateUnSerialize($key, $box_use_data);
         if (!$user instanceof User) return;
         $d2 = [
-            "messageContent" => [
-                "message" => "bannerSuperBox",
-                'coins' => $request->coins ?: $box->coins,
-                "boxUId" => $boxUser->id,
-                "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->toDateTimeString(),
-                "room" => [
-                    "id" => $room->id,
-                    "uuid" => $room->owner->uuid,
-                    "room_name" => $room->room_name ?? '',
-                    "room_session" => $room->session,
-                    "room_owner_id" => $room->uid,
-                    "is_password" => $room->room_pass ? true : false,
-                    "room_cover" => $room->room_cover ?? '',
-                    "room_background" => $room->final_room_image ?? '',
-                    "room_mode" => $room->mode,
-                ],
-                "sender" => [
-                    "id" => $user->id,
-                    "name" => @$user->name ?? '',
-                    "s_image" => @$user->profile->avatar ?? '',
-                    "s_name" => @$user->name,
-                    "s_sender_level" => $user->total_sender_level,
-                    "s_receiver_level" => $user->total_received_level,
-                ],
+            // "messageContent" => [
+            //     "message" => "bannerSuperBox",
+            'coins' => $request->coins ?: $box->coins,
+            "boxUId" => $boxUser->id,
+            "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
+            "room" => [
+                "id" => $room->id,
+                "uuid" => $room->owner->uuid,
+                "room_name" => $room->room_name ?? '',
+                "room_session" => $room->session,
+                "room_owner_id" => $room->uid,
+                "is_password" => $room->room_pass ? true : false,
+                "room_cover" => $room->room_cover ?? '',
+                "room_background" => $room->final_room_image ?? '',
+                "room_mode" => $room->mode,
+            ],
+            "sender" => [
+                "id" => $user->id,
+                "name" => @$user->name ?? '',
+                "s_image" => @$user->profile->avatar ?? '',
+                "s_name" => @$user->name,
+                "s_sender_level" => $user->total_sender_level,
+                "s_receiver_level" => $user->total_received_level,
+            ],
 
-                "ownerBoxAL"  => $user->UserVip?->level ?? 0,
-            ]
+            "ownerBoxAL"  => $user->UserVip?->level ?? 0,
+            // ]
         ];
-        $json2 = json_encode($d2);
-        dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
+        event(new SuperLuckyBox($d2));
+        // $json2 = json_encode($d2);
+        // dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
         return $boxUser;
     }
 

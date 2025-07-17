@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Jobs\TestSuperLuckyBoxJob;
 use Carbon\Carbon;
 use App\Models\Box;
 use App\Models\Room;
@@ -58,7 +59,7 @@ class BoxController extends Controller
         if ($user->di < $box->coins)  return Common::apiResponse(0, 'low balance', null, 407);
 
         $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
-        if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
+        // if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
         $label = '';
 
         if ($request->label && $box->type == 1 && $box->has_label == 1) {
@@ -68,6 +69,35 @@ class BoxController extends Controller
         return $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
     }
 
+    public function sendTest(Request $request, $user)
+    {
+//        $user = $request->user();
+        $timezone = Common::timeZone();
+        $timestamp = Carbon::now($timezone)->timestamp;
+
+
+        if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
+        $room = Room::query()->where('uid', $request->room_uid)->first();
+        if (!$room)  return Common::apiResponse(0, 'room not found', null, 404);
+        $box = Box::query()->find($request->box_id);
+        if (!$box) return Common::apiResponse(0, ' box not found', null, 404);
+        if (($box->type == 0) && !$request->users_num) return Common::apiResponse(0, 'missing number of users', null, 422);
+        if ($user->di < $box->coins)  return Common::apiResponse(0, 'low balance', null, 407);
+
+        $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
+        // if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
+        $label = '';
+
+        if ($request->label && $box->type == 1 && $box->has_label == 1) {
+            $label = $request->label;
+        }
+
+        return $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
+    }
+    public function testSendSuperBoxes(Request $request)
+    {
+        dispatch(new TestSuperLuckyBoxJob($request->all()))->onQueue('test-super-lucky-box');
+    }
 
     public function pick3(Request $request)
     {
@@ -143,17 +173,16 @@ class BoxController extends Controller
     {
         $user = $request->user();
         $userId = $user->id;
-        $timestamp = Carbon::now()->timestamp;
+        $timezone = Common::timeZone();
+        $timestamp = Carbon::now($timezone)->timestamp;
 
         if (!$request->bid) return Common::apiResponse(0, 'missing params', null, 422);
 
         $keyBoxUse  = 'BoxUse_' . $request->bid;
         $box_use = RedisService::getUnSerialize($keyBoxUse);
-
         if (!$box_use) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
-
         if ($box_use['end_at'] < $timestamp) {
             return Common::apiResponse(0, __("box closed"), null, 404);
         }

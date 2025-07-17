@@ -279,6 +279,7 @@ Route::group(
         Route::resource('agencies', 'AgencyController');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
+        Route::get('charges/filter/{id}', [AppearChargerAgencyController::class, 'filterCharges'])->name('charges.filter');
         Route::post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         Route::post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
@@ -483,8 +484,8 @@ Route::group(
         Route::get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         Route::resource('agency-manger-users', AgencyMangerUsers::class);
-        Route::resource('core-wallets', CoreWalletsController::class);    
-        Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);    
+        Route::resource('core-wallets', CoreWalletsController::class);
+        Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
         Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
         Route::resource('charge-agencies', AppearChargerAgencyController::class);

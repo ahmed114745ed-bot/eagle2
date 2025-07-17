@@ -294,7 +294,7 @@ class AppearChargerAgencyController extends MainController
 
         $grid->column('charge_agency', __("Charge-agency"))
             ->display(function () {
-                return ChargeAgency::where('agency_id', $this->id)->exists() ? 1 : 0;
+                return $this->chargeAgency ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
 
@@ -492,8 +492,6 @@ class AppearChargerAgencyController extends MainController
         return $form;
     }
 
-
-
     public function shippingProfile($id, Request $request, Content $content)
     {
         $year = $request->year ?? Carbon::now()->year;
@@ -504,7 +502,7 @@ class AppearChargerAgencyController extends MainController
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->findOrFail($id);
         });
 
@@ -531,15 +529,11 @@ class AppearChargerAgencyController extends MainController
 
                 $relations = [];
 
-                $charges->when($filter_by === 'user', function ($query) use (&$relations) {
-                    $query->where('user_type', 'user');
-                    $relations[] = 'receiverUser';
-                });
-
-                $charges->when($filter_by === 'agency', function ($query) use (&$relations) {
-                    $query->where('user_type', 'agency');
-                    $relations[] = 'receiverAgency';
-                });
+                if ($request->filter_by && $request->filter_id) {
+                    $charges->where('user_type', $request->filter_by)
+                        ->where('user_id', $request->filter_id);
+                    $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
+                }
 
                 if (!empty($relations)) {
                     $charges->with($relations);
@@ -549,9 +543,15 @@ class AppearChargerAgencyController extends MainController
                 break;
 
             case 'resived':
-                $resiveds = Charge::with(['sender'])
-                    ->where('user_id', $agencyId)
-                    ->where('user_type', 'agency')
+                $resiveds = Charge::where('user_id', $agencyId)
+                    ->where('user_type', 'agency');
+
+                if ($request->sender_type && $request->sender_id) {
+                    $resiveds->where('charger_type', $request->sender_type)
+                        ->where('charger_id', $request->sender_id);
+                }
+
+                $resiveds = $resiveds->with(['sender'])
                     ->latest()
                     ->paginate(10, ['*'], 'resived_page');
                 break;

@@ -89,7 +89,7 @@ class PaymentMethodController extends Controller
             $order->pid = $fawryRefNumber;
             $paymentMethod->status = 'paid';
             $order->save();
-            
+
             return response()->json(['status' => 'success', 'message' => 'Payment successful.']);
         }
         if ($orderStatus === 'UNPAID') {
@@ -153,4 +153,5 @@ class PaymentMethodController extends Controller
             ]);
         }
     }
+
 }

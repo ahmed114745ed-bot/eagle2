@@ -2,24 +2,26 @@
 
 namespace App\Tik\Services;
 
+use App\Helpers\UserCoinLogHelper;
+use Exception;
+use App\Models\User;
+use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Http\Resources\Api\V1\GeneralAgencyResource;
-use App\Http\Resources\Api\V1\GeneralUserResource;
-use App\Models\Agency;
 use App\Models\ShippingAgency;
-use App\Models\User;
 use App\Services\WalletService;
+use Illuminate\Support\Facades\DB;
+use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AgencyRepository;
-use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\ChargeRepository;
 use App\Tik\Repositories\CoinLogRepository;
 use App\Tik\Repositories\RoomSalaryRepository;
-use App\Tik\Repositories\ShippingAgencyRepository;
-use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
-use Exception;
-use Illuminate\Support\Facades\DB;
+use App\Tik\Repositories\AgencySalaryRepository;
+use App\Http\Resources\Api\V1\GeneralUserResource;
+use App\Tik\Repositories\ShippingAgencyRepository;
+use App\Http\Resources\Api\V1\GeneralAgencyResource;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 class ChargeRepoService
@@ -297,6 +299,15 @@ class ChargeRepoService
 
             );
         }
+        $amountBefore =  Common::getCurrentBalance($receiver->id);
+        UserCoinLogHelper::log(
+            $receiver->id ,
+            'charge',
+            'charges',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            $chargeType
+        );
         // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
@@ -372,21 +383,33 @@ class ChargeRepoService
 
     public function userAgencySearch($request)
     {
-        try {
+        $type = $request->type;
+        $id = $request->id;
 
-            $agencies = $this->shippingAgencyRepository->filterAgency($request->id);
-            $users = $this->userRepository->filterUserNew($request->id);
-            $data = [
-                'agency' => GeneralAgencyResource::collection($agencies),
-                'user' => GeneralUserResource::collection($users),
-
+        if ($type === 'agency') {
+            return [
+                'agency' => GeneralAgencyResource::collection(
+                    $this->shippingAgencyRepository->filterAgency($id)
+                ),
+                'user' => [],
             ];
-
-            return $data;
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
         }
+
+        if ($type === 'user') {
+            return [
+                'agency' => [],
+                'user' => GeneralUserResource::collection(
+                    $this->userRepository->filterUserNew($id)
+                ),
+            ];
+        }
+
+        return [
+            'agency' => [],
+            'user' => [],
+        ];
     }
+
 
     public function chargeAgencyToAnother(User $auth, $request)
     {
@@ -406,13 +429,14 @@ class ChargeRepoService
                     if (! $authAgency->status) {
                         throw new Exception(__('api.notCharge'));
                     }
-                 
+
                     if ($authAgency->app_owner_id !== $auth->id) {
                         throw new Exception(__('api.yorSelf'));
                     }
                     if ($authAgency->coins < $request->amount) {
                         throw new Exception(__('api.notHaveAmount'));
                     }
+
                     $this->handleAgencyCharge($authAgency, $request);
                     break;
 
@@ -470,6 +494,7 @@ class ChargeRepoService
 
     private function handleAgencyCharge($authAgency, $request)
     {
+
         // if ($authAgency->id == $request->id) {
         //     throw new \Exception(__('api.notYourself'));
         // }
@@ -482,9 +507,6 @@ class ChargeRepoService
         }
         if ($chargeAgency->is_frozen) {
             throw new Exception(__('api_responses.frozenMass'));
-        }
-        if (!Common::canTransferToAgency($chargeAgency)) {
-            return Common::apiResponse(0, __('unreliable_agency'), 403);
         }
 
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);

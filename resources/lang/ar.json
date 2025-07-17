@@ -26,12 +26,13 @@
   "reason en": "السبب بالإنجليزية",
     "male": "ذكر",
     "scope for multiplies": "نطاق للعمليات المتعددة",
-    "Salary transferred to an verified agencies":"تحويل الراتب لوكالة شحن غير موثوقة",
+    "Salary transferred to an verified agencies":"تحويل الراتب لوكالة شحن موثوقة",
     "Actions switch charge agency":"إجراءات وكالة الشحن",
    "charge date":"تاريخ الشحن",
     "registered successfully": "تم التسجيل بنجاح",
     "required": "مطلوب",
     "exists": "محجوز",
+    "not join to agency": "لم ينضم إلى وكالة",
     "this field is": "هذا الحقل",
     "validation errors": "أخطاء التحقق من صحة المدخلات",
     "credentials does't match": "بيانات الاعتماد لا تتطابق",
@@ -3018,6 +3019,12 @@
   "Browse gift a medal": "تصفح هدايا الميدالية",
   "Browse app wallet": "تصفح محفظة التطبيق",
   "App Wallet":" محفظة التطبيق",
+    "Core Wallet Transactions": "سجل العمليات",
+    "Transfer switch app wallet": "تحويل من محفظة التطبيق",
+    "Browse core wallet transactions": "عرض سجل العمليات",
+    "Delete core wallet transactions": "حذف سجل العمليات",
+    "Edit core wallet transactions": "تعديل سجل العمليات",
+    "Show core wallet transactions": "عرض تفاصيل العملية",
   "Browse charger reports": "تصفح تقارير الشاحن",
   "Browse charge settings": "تصفح إعدادات الشحن",
   "Browse coin recharge": "تصفح إعادة شحن العملات",
@@ -3347,7 +3354,7 @@
 "weekly-cp": "تقرير CP الأسبوعي",
 "cp reports": "تقارير CP",
 "cp relations": "علاقات CP",
-"unreliable_agency" : "تم إلغاء العملية لأن هذه الوكالة غير موثوقة",
+"not_verified_agency" : "تم إلغاء العملية لأن هذه الوكالة غير موثوقة",
 "Charge To User": "الشحن للمستخدم",
 "Browse charge to user": "تصفح الشحن للمستخدم",
 "transfer from":"تحويل من ",
@@ -3382,6 +3389,9 @@
 "coreWalletTransaction":"سجل المعاملات",
 "Core-wallet-transactions":"سجل المعاملات",
 "core-wallet-transactions":"سجل المعاملات",
+
+    "Shipping Agencies": "وكالات الشحن",
+
 "it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة"
 
 

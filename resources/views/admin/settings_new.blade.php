@@ -1720,7 +1720,7 @@ use Modules\Vip\Entities\Vip;
                                                             for="apple_redirect_uri">{{ __('admin.apple_service_file') }}:</label>
                                                         <input type="file" id="apple_service_file"
                                                             name="apple_service_file" placeholder="apple_service_file"
-                                                            class="form-control" required>
+                                                            class="form-control">
 
                                                         <input type="text" id="apple_service_file" disabled
                                                             name="apple_service_file" placeholder="apple_service_file"

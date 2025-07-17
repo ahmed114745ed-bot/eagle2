@@ -10,6 +10,7 @@ use App\Models\Agency;
 use App\Models\Family;
 use App\Models\OfficialMessage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Lang;
 use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
@@ -620,6 +621,32 @@ class CustomNotification
         $icon = $data['image'];
         Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'lucky_box');
         Common::sendOfficialMessage($user->id,  title: $body_en, content: $content, titleAr: $body_ar,);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    function multiLang(string $key, array $replace = []): array
+    {
+        $locales = ['en', 'ar'];
+        $translations = [];
+
+        foreach ($locales as $locale) {
+            $translations[$locale] = Lang::get($key, $replace, $locale);
+        }
+
+        return $translations;
+    }
+
+    public function charges($user, $title, $body, $replace)
+    {
+        $currentLang = app()->getLocale();
+        $notificationToken = $user->notification_id;
+
+        $translatedTitle = $this->multiLang($title);
+        $translatedBody = $this->multiLang($body, $replace);
+
+        Common::send_firebase_notification($notificationToken, $translatedTitle[$currentLang], $translatedBody[$currentLang]);
+
+        Common::sendOfficialMessage($user->id, content: $translatedBody[$currentLang], title: $translatedTitle['en'], titleAr: $translatedTitle['ar']);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 }

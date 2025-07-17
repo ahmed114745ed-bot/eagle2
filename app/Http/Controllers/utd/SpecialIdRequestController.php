@@ -84,7 +84,8 @@ class SpecialIdRequestController extends Controller
                     $user->id ,
                     'pack',
                     'packs',
-                    $total_price ?? 0
+                    $total_price ?? 0,
+                    
                 );
                 // Upgrade user level
                 (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);

@@ -160,7 +160,7 @@ class BoxController extends MainController
         <script>
            $(document).ready(function () {
                 initDynamicFieldsScript();
-           
+
             });
         </script>
         HTML);

@@ -59,7 +59,7 @@ class PackService
         $userId = $request->user_id ?:  $request->user()->id;
         $this->unlock_dress($userId);
         $type = $request->type;
-        if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 25, 22])) throw new \Exception('type not found');
+        if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 25, 22, 28])) throw new \Exception('type not found');
         if ($type == 2) {
             $data = $this->packRepository->packsJoinWithGift($userId, $type, ['ware']);
         } elseif ($type == 22) {
@@ -100,26 +100,41 @@ class PackService
 
     public function usedPack($user, $itemId)
     {
-        $types                      = [4, 5, 6, 7];
-        $user_dress_after_i_changed = [
+        $supportedTypes = [4, 5, 6, 7, 28];
+        $dressTypeMap = [
             4 => 1,
             5 => 2,
             6 => 3,
-            7 => 4
+            7 => 4,
         ];
-        $pack  = $this->packRepository->getByUserId($user->id, $itemId);
 
-        if (!$pack)  throw new \Exception('item not found');
+        $pack = $this->packRepository->getByUserId($user->id, $itemId);
 
+        if (!$pack) {
+            throw new \Exception('Item not found');
+        }
+
+        if (!in_array($pack->type, $supportedTypes)) {
+            throw new \Exception('Unusable item');
+        }
+
+        // Mark all same type packs as unused
         $this->packRepository->updateIsUsedByType($user->id, $pack->type);
-        $expire = $pack->expire ? $pack->expire : ($pack->days != 0 ? now()->addDays($pack->days)->timestamp : 0);
+
+        // Calculate expire timestamp
+        $expire = $pack->expire ?: ($pack->days ? now()->addDays($pack->days)->timestamp : 0);
+
+        // Mark selected pack as used
         $this->packRepository->updateIsUsedByPackId($user->id, $itemId, $expire);
 
-        if (!in_array($pack->type, $types))  throw new \Exception('unusable item');
-        $this->userRepository->updateDress($user, $user_dress_after_i_changed, $pack->type, $pack->target_id);
+        // If applicable, update user dress
+        if (isset($dressTypeMap[$pack->type])) {
+            $this->userRepository->updateDress($user, $dressTypeMap, $pack->type, $pack->target_id);
+        }
 
-        return  $data['target_id'] = $pack->target_id;
+        return $pack->target_id;
     }
+
 
 
     public function updateDress($user, $type, $itemId)

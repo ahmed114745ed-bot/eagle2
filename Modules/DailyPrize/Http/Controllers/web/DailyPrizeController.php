@@ -81,7 +81,7 @@ class DailyPrizeController extends MainController
     {
         $type = request('type');
         $grid = new Grid(new DailyGift());
-        $grid->model()->where('type', $type);
+        $grid->model()->where('type', $type)->orderBy('order');
         // $grid->column('order', __('Order'))->editable();
         $grid->column('order', __('days'))
             ->display(function ($order) {
