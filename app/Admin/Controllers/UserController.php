@@ -449,6 +449,20 @@ class UserController extends MainController
         //            );
         //        });
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
+        Admin::style("
+            .modal-dialog {
+                max-width: 90%;
+            }
+
+            .modal {
+                top: 5%;
+            }
+
+            .modal-body {
+                max-height: 70vh !important;
+                overflow-y: auto !important;
+            }
+        ");
         $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             return $this->sameDeviceUsers()->count();
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
