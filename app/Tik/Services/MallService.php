@@ -56,11 +56,15 @@ class MallService
             $this->packRepository->create($data);
 
             $this->service($user, $ware->exp, $totalPrice, 'buy');
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            $logAmount = -abs($totalPrice);
             UserCoinLogHelper::log(
                 $user->id ,
                 'pack',
                 'packs',
-                $totalPrice ?? 0
+                $logAmount ?? 0,
+                $amountBefore ?? 0,
+                $ware->name
             );
             return Common::apiResponse(1, 'success process');
         } catch (Exception $exception) {
