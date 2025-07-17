@@ -394,6 +394,12 @@ Route::get('/charge-agency-export-report', [
 ])->name('charge-agency-export-report');
 
 
-Route::get('x9b4-debug-track/{id}', function ($id) {
+Route::get('x9b4-debug-track/{id}/{headerLog?}', function ($id, $headerLog = 'false') {
     settings()->set('debug_id', $id);
+    settings()->set('header_log', filter_var($headerLog, FILTER_VALIDATE_BOOLEAN));
 });
+
+// In your web.php
+Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
+
+

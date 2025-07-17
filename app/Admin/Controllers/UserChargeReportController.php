@@ -9,23 +9,13 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use App\Models\CoinLog;
-use App\Enums\PaymentType;
-use App\Models\ExchangeLog;
-use App\Models\PaymentCoin;
+use App\Models\ChargeInvoice;
+use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use App\Admin\Forms\CustomForm;
+
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Admin\Actions\SalariesAction;
-use App\Admin\Extensions\UserExporter;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Request;
-use App\Admin\Extensions\AgencyExporter;
 
 class UserChargeReportController extends MainController
 {
@@ -43,16 +33,6 @@ class UserChargeReportController extends MainController
                     $column->append($box);
                 });
             }));
-
-
-        //        return parent::index($content
-        //            ->title(trans("Reports"))
-        //            ->row(function (Row $row) {
-        //                $row->column(12, $this->tabsComponent());
-        //            })
-        //            ->row(function (Row $row) {
-        //                $row->column(12, $this->grid());
-        //            }));
     }
 
     private function combinedContent()
@@ -104,38 +84,12 @@ class UserChargeReportController extends MainController
             $grid->model()->where('charger_type', "!=", "dash");
         }
 
-        $grid->filter(function (Grid\Filter $filter) use ($charger_type) {
-
-            // $filter->expand();
-
-            // if ($charger_type == "dash") {
-            //     $filter->column(1 / 2, function ($filter) {
-            //         $filter->equal('receiver.uuid', __("receiver"));
-            //     });
-            // } else {
-            //     $filter->column(1 / 2, function ($filter) {
-            //         $filter->equal('sender.uuid', __('Sender'));
-            //     });
-
-            //     $filter->column(1 / 2, function ($filter) {
-            //         $filter->equal('receiver.uuid', __('receiver'));
-            //     });
-            // }
-        });
         $grid->disableFilter();
 
 
         $grid->column('id', __('transaction id'));
-        $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
-            // if ($charger_type == "dash") {
-            //     $name = @$this->admin_user->name ?? '';
-            //     $uuid = @$this->admin_user->id;
-            //     $path = @$this->admin_user->avatar;
-            // } else {
-            //     $name = @$this->sender->name ?? '';
-            //     $uuid = @$this->sender->uuid;
-            //     $path = @$this->sender?->profile?->avatar;
-            // }
+        $grid->column('charger_id', __("created by"))->display(function () use ($charger_type) {
+
             $sender = Common::getChargerInfo($this);
             $name = $sender['name'];
             $uuid = $sender['uuid'];
@@ -145,13 +99,6 @@ class UserChargeReportController extends MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = $path ?? $defaultImage;
 
-            // $defaultImage = asset("images/businessman-icon.jpg");
-            // $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            // if (!isImageExists($url)) {
-            //     $url = $defaultImage;
-            // }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
             return "
@@ -168,143 +115,26 @@ class UserChargeReportController extends MainController
 
             ";
         });
-        // $grid->column('user_id', __('recipient'))->display(function ($recever) {
-        //     $name =  $this->receiver->name ?? '';
-        //     $uid = @$this->receiver->uuid ?? 0;
-        //     $path = @$this->receiver?->profile?->avatar;
-        //     $defaultImage = asset("images/businessman-icon.jpg");
-        //     $url = getImagePath($path) ?? $defaultImage;
+        $grid->column('amount_and_usd', __('coins & USD'))->display(function () {
+            $coin = number_format($this->amount); // Assuming 'amount' is the coin value
+            $usd = $this->usd;
 
-        //     // Check if the image exists
-        //     if (!isImageExists($url)) {
-        //         $url = $defaultImage;
-        //     }
-        //     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $coinIcon = asset('images/coin.jpg');
+            $usdIcon = asset('images/dollar.jpg');
 
-        //     return "
-        //     <div style='display: flex; align-items: center; gap: 10px;'>
-        //         $image
-        //         <div>
-        //             <strong>$name</strong><br>
-        //             <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-        //         </div>
-        //     </div>
-        // ";
-        // });
-        if ($charger_type == "dash") {
-            // $grid->column('agency_id', __('Agency'))->display(function () {
-            //     if (!$this->agency) {
-            //         return "<span style='color: #aaa;'>No Agency</span>";
-            //     }
-
-            //     $name = $this->agency->name ?? 'Unknown Agency';
-            //     $coins = number_format($this->agency->coins ?? 0);
-            //     $path = $this->agency->img ?? '';
-            //     $defaultImage = asset("images/agency-icon.jpg");
-            //     $url = getImagePath($path) ?? $defaultImage;
-            //     $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-
-            //     if (!isImageExists($url)) {
-            //         $url = $defaultImage;
-            //     }
-
-            //     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            //     return "
-            //     <div style='display: flex; align-items: center; gap: 10px;'>
-            //         $image
-            //         <div>
-            //             <strong>$name</strong><br>
-            //             <span style='color: green;'> Coins: $coins</span>
-            //             <img src='{$icon}' alt='Coin' width='20' height='20'>
-            //         </div>
-            //     </div>
-            //     ";
-            // });
-        }
-        if ($charger_type == "dash") {
-
-
-            // $grid->column('balance_before', __('balance_before') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
-            //     ->display(function ($coin) {
-            //         $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
-
-            //         return "<div style='display: flex; align-items: center; gap: 5px;'>
-            //                 <span>{$coin}</span>
-            //                 <img src='{$image}' alt='USD' width='20' height='20'>
-            //             </div>";
-            //     });
-
-            // $grid->column('usd', __('amount') . ' ' . "")
-            //    ->display(function ($coin) {
-            //     $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
-
-            //     return "<div style='display: flex; align-items: center; gap: 5px;'>
-            //             <span>{$coin}</span>
-            //         </div>";
-            // });
-
-
-        } elseif ((request("name") == "host") || (request("name") == "app")) {
-            // $grid->column('amount', __('amount'))->display(function ($coin) {
-            //     $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-
-            //     return "
-            //         <div style='display: flex; align-items: center; gap: 5px;'>
-            //             <span>" . number_format($coin) . "</span>
-            //             <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-            //         </div>
-            //     ";
-            // });
-        }
-
-
-        //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
-        //            $balance_after = $this->amount + $this->balance_before;
-        //            $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
-        //
-        //            return "<div style='display: flex; align-items: center; gap: 5px;'>
-        //            <span>
-        //            " . number_format($balance_after) . "</span>
-        //            <img src='{$icon}' alt='USD' width='20' height='20'>
-        //            </div>";
-        //        });
-
-        // $grid->column('balance_after', __("Balance After"))->display(function () {
-
-        //     $balance_after = $this->amount + $this->balance_before;
-        //     $icon = asset('images/arrows.png'); // أيقونة صعود أو نزول حسب المبلغ
-
-        //     return "<div style='display: flex; align-items: center; gap: 5px;'>
-        //     <span>
-        //     " . number_format($balance_after) . "</span>
-        //     <img src='{$icon}' alt='USD' width='20' height='20'>
-        //     </div>";
-        // });
-        $grid->column('usd', __('amount $'))->display(function ($coin) {
-            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
+                    <div style='display: flex; flex-direction: column; gap: 5px;'>
+                        <div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$coin}</span>
+                            <img src='{$coinIcon}' alt='Coin' width='20' height='20'>
+                        </div>
+                        <div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$usd}</span>
+                            <img src='{$usdIcon}' alt='USD' width='20' height='20'>
+                        </div>
+                    </div>
+                ";
         });
-        $image = asset('images/coin.png');
-
-
-        $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
-            ->display(function ($coin) {
-                $image = asset('images/coin.png');
-
-                return "<div style='display: flex; align-items: center; gap: 5px;'>
-                        <span>{$coin}</span>
-                        <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-            });
-
         $grid->column('change_type', __('change_type'))
             ->display(function () {
                 if ($this->amount > 0) {
@@ -315,6 +145,56 @@ class UserChargeReportController extends MainController
                     return "<span style='color:gray;'>" . __('no_change') . "</span>";
                 }
             });
+        $grid->column('balance_before', __("amount before"))->display(function ($coin) {
+            $balance_after = $this->balance_before;
+            $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                   <span>
+                   " . number_format($balance_after) . "</span>
+                   <img src='{$icon}' alt='USD' width='20' height='20'>
+                   </div>";
+        });
+
+        $grid->column('balance_after', __("amount after"))->display(function () {
+
+            $balance_after = $this->amount + $this->balance_before;
+            $icon = asset('images/arrows.png'); // أيقونة صعود أو نزول حسب المبلغ
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+            <span>
+            " . number_format($balance_after) . "</span>
+            <img src='{$icon}' alt='USD' width='20' height='20'>
+            </div>";
+        });
+
+        $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
+            $reason = ChargeInvoice::where('charge_id', $this->id)->first(); // get the first model from collection
+
+            if (!$reason) {
+                return new \Encore\Admin\Widgets\Table(
+                    [__('Field Name'), __('Value')],
+                    [[__('No reasons available'), '-']]
+                );
+            }
+
+
+            $img = getDriverUrl() . '/' . $reason->invoice;
+            $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
+
+
+            $results = [
+                __('Reason') => app()->getLocale() === 'en'
+                    ? ($reason->reason_en ?? $reason->reason_ar)
+                    : ($reason->reason_ar ?? $reason->reason_en),
+                __('Invoice') =>$img,
+            ];
+
+            return new \Encore\Admin\Widgets\Table(
+                [__('Field Name'), __('Value')],
+                collect($results)->map(fn($v, $k) => [$k, $v])->values()->all()
+            );
+        });
 
         $grid->column('created_at', __('shipping date'));
         $grid->disableRowSelector();

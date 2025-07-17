@@ -160,7 +160,7 @@ class BoxController extends MainController
         <script>
            $(document).ready(function () {
                 initDynamicFieldsScript();
-           
+
             });
         </script>
         HTML);
@@ -189,7 +189,7 @@ class BoxController extends MainController
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . $this->permission_setting);
         }
-        $config = Config::whereIn('name', ['app_wallet_lucky_box', 'normal_box_duration'])->pluck('value', 'name')->toArray();
+        $config = Config::whereIn('name', ['app_wallet_lucky_box', 'normal_box_duration','lucky_box_percentage'])->pluck('value', 'name')->toArray();
         return $content->view('box_settings', compact('config'));
     }
 }

@@ -836,7 +836,28 @@
     margin: 20px 20px 20px 20px;
 }
 
-    </style>
+.filter-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.select2-container--default .select2-selection--single {
+    height: 38px;
+    line-height: 38px;
+    border: 1px solid #ced4da;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 38px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+
+</style>
 
 
 </head>
@@ -860,13 +881,13 @@
                    @php
                     $image =getImagePath($agency->img);
                     $defaultImage =asset("images/icon-agency.jpg");
-                        
+
 
                     if (!isImageExists($image)) {
                         $image = $defaultImage;
                     }
 
-                    
+
                 @endphp
             <img src="{{ $image }}" alt="Agency Logo" class="logo-img" style="
                 width: 100%;
@@ -899,16 +920,16 @@
                               @php
                                 $image =getImagePath($agency?->owner?->profile->avatar);
                                 $defaultImage =asset("images/businessman-icon.jpg");
-                                    
+
 
                                 if (!isImageExists($image)) {
                                     $image = $defaultImage;
                                 }
 
-                    
+
                           @endphp
-                            <img src="{{ $image }}" 
-                                alt="Owner" 
+                            <img src="{{ $image }}"
+                                alt="Owner"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
 
@@ -920,10 +941,10 @@
                                  <br>
                             <span class="meta-uuid">(UUID: {{ $agency->owner->uuid ?? 'N/A' }})</span>
                             @else
-                               
+
                             @endif
                         </span>
-            
+
                     </div>
                 </div>
                 <div class="agency-stats">
@@ -944,7 +965,7 @@
                 {{ __('Go Back') }} <i class="fas fa-arrow-left"></i>
             </button>
 
-           
+
         </div>
 
         <div class="card">
@@ -982,7 +1003,7 @@
                             <!-- Decorative elements -->
                             <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
                             <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
-                            
+
                             <!-- Left Content -->
                             <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
                                 <div>
@@ -999,7 +1020,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
                                 <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
@@ -1040,7 +1061,7 @@
                             <!-- Decorative elements -->
                             <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
                             <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
-                            
+
                             <!-- Left Content -->
                             <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
                                 <div>
@@ -1057,7 +1078,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
                                 <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
@@ -1098,7 +1119,7 @@
                             <!-- Decorative elements -->
                             <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
                             <div style="position: absolute; bottom: -30px; left: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%;"></div>
-                            
+
                             <!-- Left Content -->
                             <div style="width: 50%; display: flex; flex-direction: column; justify-content: space-between; z-index: 2;">
                                 <div>
@@ -1115,7 +1136,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Right Content -->
                             <div style="width: 45%; display: flex; flex-direction: column; justify-content: center; gap: 12px; z-index: 2;">
                                 <div style="color: white;font-size: 18px; font-weight: bold; letter-spacing: 1px;">
@@ -1143,16 +1164,16 @@
                         <!-- Card 1 -->
                         <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{ __('Sent Balance') }}</div>
-                        
+
                         <div style="margin-top: 10px; font-size: 16px;">{{numToString(@$totalSend)}}
                             <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
                         </div>
                         </div>
-                        
+
                         <!-- Card 2 -->
                         <div style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; display: flex; flex-direction: column; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">{{__("Received Balance")}}</div>
-                        
+
                         <div style="margin-top: 10px; font-size: 16px;">{{ numToString(@$totalReceive) }}
                             <img src="{{ asset('images/coin.jpg') }}" alt="Coin" style="width: 40px; height: 40px;">
                         </div>
@@ -1160,7 +1181,7 @@
                     </div>
                     </div>
                 </div>
-                               
+
 @php
     $activeTab = request('tab', 'charges');
 @endphp
@@ -1191,7 +1212,21 @@
 <!-- Charges Tab Content -->
 <div id="charges-tab" style="display: {{ ($activeTab == 'charges') ? 'block' : 'none' }}">
     <div class="performers-card">
-    
+        <div class="filter-section mb-3">
+            <select id="receiver-type" class="form-control" style="width: 200px;">
+                <option value="">{{ __('Select type') }}</option>
+                <option value="user" {{ request('filter_by') == 'user' ? 'selected' : '' }}>{{ __('Users') }}</option>
+                <option value="agency" {{ request('filter_by') == 'agency' ? 'selected' : '' }}>{{ __('Agencies') }}</option>
+            </select>
+
+            <select id="receiver-id" class="form-control select2" style="width: 300px;">
+                <option value="">{{ __('Search') }}</option>
+            </select>
+
+            <button class="btn btn-secondary reset-filters" data-tab="charges">
+                <i class="fas fa-redo"></i> {{ __('Reset') }}
+            </button>
+        </div>
         @if($charges && $charges->count())
             <div class="table-responsive">
                 <table class="table table-bordered">
@@ -1209,7 +1244,7 @@
                         @foreach($charges as $index => $charge)
                                  @php
                                     $sender = \App\Helpers\Common::getChargerInfo($charge);
-                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge); 
+                                    $receiver = \App\Helpers\Common::getReceiverInfo($charge);
                                     $url = $receiver['url'];
                                     $image = getImagePath($receiver['image']);
                                     $defaultImage = $charge->user_type == 'agency'?  asset("images/icon-agency.jpg") :asset('images/businessman-icon.jpg');
@@ -1221,7 +1256,7 @@
                                 <td>{{$index + 1}}</td>
                                 <td>{{ $charge->id}}</td>
                                 <td>
-                                    
+
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                            <img src="{{ $image }}" alt="user"
                                                 width="{{ $charge->user_type == 'agency' ? '50' : '40' }}"
@@ -1257,6 +1292,24 @@
 <!-- Resived Tab Content -->
 <div id="resived-tab" style="display: {{ ($activeTab == 'resived') ? 'block' : 'none' }}">
     <div class="performers-card">
+        <div class="filter-section mb-3">
+            <select id="sender-type" class="form-control" style="width: 200px;">
+                <option value="">{{ __('Select type') }}</option>
+                <option value="user">{{ __('Users') }}</option>
+                <option value="agency">{{ __('Agencies') }}</option>
+                <option value="shipping_agencies">{{ __('Shipping Agencies') }}</option>
+                <option value="bd">{{ __('BD') }}</option>
+                <option value="dash">{{ __('admins') }}</option>
+            </select>
+
+            <select id="sender-id" class="form-control select2" style="width: 300px;">
+                <option value="">{{ __('Search') }}</option>
+            </select>
+
+            <button class="btn btn-secondary reset-filters" data-tab="resived">
+                <i class="fas fa-redo"></i> {{ __('Reset') }}
+            </button>
+        </div>
         @if($resiveds && $resiveds->count())
             <div class="table-responsive">
                 <table class="table table-bordered">
@@ -1286,7 +1339,7 @@
                                 <td>{{$index + 1}}</td>
                                 <td>{{ $res->id }}</td>
                                 <td>
-                                   
+
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                             <img src="{{ $image }}" alt="user"
                                                 width="{{ $res->charger_type == 'agency' ? '50' : '40' }}"
@@ -1318,6 +1371,84 @@
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+
+            <script>
+                $(document).ready(function() {
+                    $('.reset-filters').on('click', function() {
+                        const tab = $(this).data('tab');
+                        const currentUrl = new URL(window.location.href);
+
+                        Array.from(currentUrl.searchParams.keys()).forEach(key => {
+                            if (key !== 'tab') {
+                                currentUrl.searchParams.delete(key);
+                            }
+                        });
+
+                        currentUrl.searchParams.set('tab', tab);
+
+                        window.location.href = currentUrl.toString();
+                    });
+
+                });
+            </script>
+<script>
+                $(document).ready(function() {
+                    $('.select2').select2({
+                        placeholder: "Search",
+                        allowClear: true,
+                        minimumInputLength: 1,
+                        ajax: {
+                            delay: 250,
+                            url: "{{ route('search.charges') }}",
+                            dataType: 'json',
+                            data: function(params) {
+                                return {
+                                    q: params.term,
+                                    type: $(this).parent().find('.form-control:first').val(),
+                                    page: params.page || 1
+                                };
+                            },
+                            processResults: function(data, params) {
+                                params.page = params.page || 1;
+
+                                return {
+                                    results: data.data.map(item => ({
+                                        id: item.id,
+                                        text: item.name
+                                    })),
+                                    pagination: {
+                                        more: data.current_page < data.last_page
+                                    }
+                                };
+                            },
+                            cache: true
+                        }
+                    });
+
+                    $('#receiver-type, #sender-type').on('change', function() {
+                        const idSelect = $(this).siblings('.select2');
+                        idSelect.val(null).trigger('change');
+                    });
+
+                    $('#receiver-id, #sender-id').on('select2:select', function(e) {
+                        const currentUrl = new URL(window.location.href);
+                        const type = $(this).siblings('select').val();
+                        const id = e.params.data.id;
+
+                        if ($(this).attr('id') === 'receiver-id') {
+                            currentUrl.searchParams.set('filter_by', type);
+                            currentUrl.searchParams.set('filter_id', id);
+                            currentUrl.searchParams.set('tab', 'charges');
+                        } else {
+                            currentUrl.searchParams.set('sender_type', type);
+                            currentUrl.searchParams.set('sender_id', id);
+                            currentUrl.searchParams.set('tab', 'resived');
+                        }
+
+                        window.location.href = currentUrl.toString();
+                    });
+                });
+            </script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

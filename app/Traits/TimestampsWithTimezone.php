@@ -9,15 +9,22 @@ trait TimestampsWithTimezone
 {
     public function getCreatedAtAttribute($value)
     {
-        return Carbon::parse($value)
-            ->setTimezone(request()->header('tz',  Common::timeZone()))
-            ->format('Y-m-d H:i:s');
+        $tz = request()->header('tz', Common::timeZone());
+        if (!in_array($tz, timezone_identifiers_list())) {
+            $tz = 'UTC';
+        }
+
+        return Carbon::parse($value)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
 
     public function getUpdatedAtAttribute($value)
     {
-        return Carbon::parse($value)
-            ->setTimezone(request()->header('tz',  Common::timeZone()))
-            ->format('Y-m-d H:i:s');
+        $tz = request()->header('tz', Common::timeZone());
+        if (!in_array($tz, timezone_identifiers_list())) {
+            $tz = 'UTC';
+        }
+
+        return Carbon::parse($value)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
+
 }

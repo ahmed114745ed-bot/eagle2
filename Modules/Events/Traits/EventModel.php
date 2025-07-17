@@ -83,8 +83,10 @@ trait EventModel
     public function scopePreviousEvent(Builder $query)
     {
         // $timezone = config('app.owner_timezone') ?? '-03:00';
-        $timezone = Common::timeZone();
-        $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
+//        $timezone = Common::timeZone();
+        $timezone = request()->header('tz', Common::timeZone());
+
+        $nowDate = Carbon::now()->setTimezone($timezone)->toDateTimeString();
 
         return $query->whereRaw("start_date < ?", [date($nowDate)])->whereDate('end_date', '<', $nowDate); // 27
            // ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) < ?", [$timezone, $nowDate]); // 27
@@ -93,10 +95,13 @@ trait EventModel
 
     public function scopeEndToday(Builder $query)
     {
-        //$timezone = config('app.owner_timezone');
-        $timezone = Common::timeZone();
-        $nowDate     = Carbon::now()->copy()->toDateString();
-        return $query->whereDate('end_date', $nowDate);
-       // whereRaw("date(CONVERT_TZ(end_date, '+00:00', ?)) = ?", [$timezone, $nowDate]);
+        $timezone = getTimezone(); // e.g., "Africa/Cairo"
+        $nowDate  = Carbon::now($timezone)->toDateString(); // e.g., "2025-07-13"
+
+        return $query->whereRaw(
+            "DATE(CONVERT_TZ(end_date, '+00:00', ?)) = ?",
+            [$timezone, $nowDate]
+        );
     }
+
 }

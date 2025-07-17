@@ -80,12 +80,12 @@ class ChangeUsersAgencyAction extends RowAction
                 ]);
             }
         }
-        $usersSalary = UserSallary::where('user_agency_id',$request->old_agency_id)->where('month',now()->month)->where('year',now()->year)->get();
-        foreach($usersSalary as $userSalary)
-        {
-            $userSalary->user_agency_id = $request->new_agency_id;
-            $userSalary->save();
-        }
+        // $usersSalary = UserSallary::where('user_agency_id',$request->old_agency_id)->where('month',now()->month)->where('year',now()->year)->get();
+        // foreach($usersSalary as $userSalary)
+        // {
+        //     $userSalary->user_agency_id = $request->new_agency_id;
+        //     $userSalary->save();
+        // }
 
         return $this->response()->success('success')->refresh();
     }

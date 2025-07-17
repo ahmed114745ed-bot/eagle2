@@ -51,6 +51,11 @@ class Charge extends Model
         return User::find($this->charger_id);
     }
 
+    public function reason()
+    {
+        return $this->hasMany(ChargeInvoice::class, 'charge_id');
+    }
+
     public function receiver()
     {
         if ($this->user_type === 'agency') {

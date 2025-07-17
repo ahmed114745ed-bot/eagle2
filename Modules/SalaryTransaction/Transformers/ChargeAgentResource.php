@@ -21,10 +21,10 @@ class ChargeAgentResource extends JsonResource
     {
         //        if (!$this instanceof Agency) return [];
         $user = $this->owner;
-
-        $frame = Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img2', true) ?: Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img1', true);
+        $hasColor = $user && Common::hasInPack($user->id, 18, true);
+        $frame = $user ? Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img2', true) ?: Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img1', true) : '';
         return [
-            'agency_id' => $this->id,
+            'agency_id' => $this?->id ?? 0,
             'id' => $user->id ?? 0,
             'name' => $this->name ?? '',
             'phone' => $user->phone ?? '',
@@ -41,7 +41,7 @@ class ChargeAgentResource extends JsonResource
             'charge_count' => $this->charges_count ?? 0,
             'image_color'          => @$user->color_image ?? null,
             'id_image'             => @$user->specialId?->ware?->show_img ?? '',
-
+            'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
             // 'charge_count' => $userDetails->charges_count ?? 0,
         ];
     }

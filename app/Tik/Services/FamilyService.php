@@ -66,14 +66,20 @@ class FamilyService
             'status' => 1,
         ];
         $this->familyUserRepository->create($familyUserData);
-        $this->userRepository->decrementCoins($user->id, $price);
-        $this->userRepository->updateFamilyId($user, $family->id);
+
+        $amountBefore =  Common::getCurrentBalance($user->id);
+        $logAmount = -abs($price);
         UserCoinLogHelper::log(
-            $user->id,
+            $user->id ,
             'family',
             'families',
-            $price
+            $logAmount ?? 0,
+            $amountBefore ?? 0,
+            $request->name
         );
+        $this->userRepository->decrementCoins($user->id, $price);
+        $this->userRepository->updateFamilyId($user, $family->id);
+       
         return $family;
     }
 

@@ -2,6 +2,7 @@
 
 namespace Modules\DailyPrize\Http\Controllers\Api;
 
+use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 use App\Models\OVip;
 use App\Models\Ware;
@@ -116,6 +117,16 @@ class DailyGiftController extends Controller
     public function assignGiftToUser(mixed $type, \App\Models\Admin|\Illuminate\Contracts\Auth\Authenticatable|null $user, mixed $target, mixed $expire): void
     {
         if ($type == "coins") {
+
+            $amountBefore =  Common::getCurrentBalance($user->id);  
+            UserCoinLogHelper::log(
+                $user->id,
+                'daily_gift',
+                'daily_gifts',
+                $target ?? 0,
+                $amountBefore ?? 0,
+                'daily_gifts'
+            );
             $user->di += $target;
             $user->save();
         } elseif ($type == "vip") {

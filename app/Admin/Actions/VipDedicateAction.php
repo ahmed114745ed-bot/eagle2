@@ -89,6 +89,11 @@ class VipDedicateAction extends Action
 
             CustomNotification::vips($user, $request->days, $vip->img);
 
+            $title = 'VIP Assigned';
+            $body = 'You have received VIP access for :days days from admin.';
+
+            CustomNotification::charges($user, $title, $body, ['days' => $request->days]);
+
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
             DB::rollBack();

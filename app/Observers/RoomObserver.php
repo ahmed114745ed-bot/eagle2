@@ -33,7 +33,7 @@ class RoomObserver
     public function changeMode(Room &$room)
     {
         if ($room->isDirty('mode')) {
-            $mics = explode(',', $room->getAttributeValue('microphone'));
+            $mics = explode(',', $room->all_microphone);
 
             $count = count($mics);
             if ($room->mode == '0') {
