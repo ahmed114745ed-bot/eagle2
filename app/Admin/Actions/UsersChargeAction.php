@@ -142,7 +142,8 @@ class UsersChargeAction extends Action
         $this->name = __('Charge');
         $this->hidden('userId')->attribute('id', 'vid');
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-        $this->text('amount', __('Amount'))
+        $this->integer('amount', __('Amount'))
+            ->rules('numeric|gt:0')
             ->addElementClass('price-input')
             ->help(__('Enter amount in dollars'));
         $this->text('reason_en', __('reason en'));

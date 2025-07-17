@@ -1,10 +1,10 @@
 <?php
 
-use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BdController;
+use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\BoxController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
@@ -94,6 +94,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\UserController as UsersAppController;
@@ -325,7 +326,7 @@ Route::group(
             ExportController::class,
             'walletExportUser'
         ])->name('wallet-export-users');
-         Route::get('/wallet-export-agency', [
+        Route::get('/wallet-export-agency', [
             ExportController::class,
             'walletExportAgency'
         ])->name('wallet-export-agency');
@@ -472,6 +473,8 @@ Route::group(
         Route::resource('/uuid_dedicate', 'SpecialWareDedicateController');
         Route::get('/vips_dedicate', 'DedicateVipController@index');
         Route::resource('/bans', 'BanController');
+                Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
+
         Route::resource('/bans-rooms', 'BanRoomsController');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
