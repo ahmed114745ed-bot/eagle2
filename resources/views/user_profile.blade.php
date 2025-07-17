@@ -1187,7 +1187,7 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           <a href="?tab=user-coins" class="tab-btn" data-target="user-coins-tab">{{ __('User Coins') }}</a>
+           <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
 
 
 
@@ -1791,9 +1791,53 @@
 <div class="tab-content" id="user-coins-tab" style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
 
     <div class="card">
-        <div class="card-header">
-            <h4 class="card-title" style="text-align: left;">{{ __('') }}</h4>
+    <div class="card-header">
+            <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
         </div>
+        <div class="box-body p-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
+                        <input type="hidden" name="tab" value="user-coins">
+                        <input type="hidden" name="tap" value="{{ request()->get('users-coins', 1) }}">
+
+                        <div class="row mb-3" style="align-items: flex-end;">
+                            <!-- From Date -->
+                            <div class="col-md-3">
+                                <label>{{ __('From Date') }}</label>
+                                <input type="date" class="form-control" name="from_date" value="{{ request('from_date') }}">
+                            </div>
+
+                            <!-- To Date -->
+                            <div class="col-md-3">
+                                <label>{{ __('To Date') }}</label>
+                                <input type="date" class="form-control" name="to_date" value="{{ request('to_date') }}">
+                            </div>
+
+                            <!-- Sub Type -->
+                            <div class="col-md-3">
+                                <label>{{ __('Sub Type') }}</label>
+                                <select name="sub_type" class="form-control">
+                                    <option value="">{{ __('All') }}</option>
+                                    @foreach(\App\Helpers\Common::getCoinSubTypes() as $type)
+                                        <option value="{{ $type }}" {{ request('sub_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Search/Reset Buttons -->
+                            <div class="col-md-3 d-flex align-items-end justify-content-end" style="gap: 8px;top: 23px;">
+                                <button type="submit" class="btn btn-info btn-sm me-2">
+                                    <i class="fa fa-search"></i> {{ __('Search') }}
+                                </button>
+                                <a href="{{ url('admin/users/' . $user->id. '?tab=user-coins') }}" class="btn btn-default btn-sm">
+                                    <i class="fa fa-undo"></i> {{ __('Reset') }}
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         <div class="table-responsive">
             <div class="box-body ">
                 <table class="table table-bordered table-hover align-middle data-table" id="vip">
@@ -1802,9 +1846,13 @@
                             <th>#</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('sub type') }}</th>
+                            <th>{{ __('Item Name') }}</th>
+                            <th>{{ __('balance before') }}</th>
                             <th>{{ __('amount') }}</th>
+                            <th>{{ __('balance yet') }}</th>
                             <th>{{ __('from date') }}</th>
                             <th>{{ __('to date') }}</th>
+                            <th>{{ __('action') }}</th>
                         </tr>
                     </thead>
                     @if($usersCoins && $usersCoins->count())
@@ -1814,7 +1862,12 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $coin->type }}</td>
                                     <td>{{ @$coin->sub_type ?? 0 }}</td>
-                                    <td>{{ @$coin->amount ?? 0 }}</td>
+                                    <td>{{ @$coin->item_name ?? 0 }}</td>
+                                    <td>{{ @$coin->amount_before ?? 0 }}</td>
+                                    <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
+                                        {{ $coin->amount ?? 0 }}
+                                    </td> 
+                                    <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
                                     <td>{{ @$coin->from_date ?? 0 }}</td>
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
                                     <td>
@@ -1841,6 +1894,7 @@
                 @endif
             </div>
         </div>
+      </div>
     </div>
 </div>
 @endif
