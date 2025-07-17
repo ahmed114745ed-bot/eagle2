@@ -275,7 +275,7 @@ class UserCommon
                     'total' => 0
                 ]
             );
-            VipCommon::handelVip($vip, $user, null, userVip: $userVip);
+            // VipCommon::handelVip($vip, $user, null, userVip: $userVip);
         }
     }
 
@@ -369,7 +369,7 @@ class UserCommon
         $vipp->price = 0;
         $vipp->total = 0;
         $vipp->save();
-        VipCommon::handelVip($vip, $user, $expir, $vipp);
+        // VipCommon::handelVip($vip, $user, $expir, $vipp);
         DB::commit();
 
         Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));

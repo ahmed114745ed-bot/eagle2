@@ -2,34 +2,125 @@
 
 namespace Modules\Vip\Helpers;
 
+use App\Models\OVip;
 use App\Models\Pack;
+use App\Models\User;
 use App\Models\UserVip;
 use App\Models\Ware;
 
 class VipCommon
 {
 
-    public static function handelVip($vip, $user, $expire, $userVip)
+    public static function createUserVip(OVip $vip, User $user): UserVip
     {
-        if ($userVip->is_used) {
-            $types = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
+        return UserVip::create([
+            'user_id' => $user->id,
+            'vip_id'  => $vip->id,
+            'level'   => $vip->level,
+            'expire'  => null,
+            'is_used' => 0,
+        ]);
+    }
     
-            Pack::query()
-                ->where('get_type', 1)
-                ->where('user_id', $user->id)
-                ->whereIn('type', $types)
-                ->where('vip_user_id', '!=', $userVip->id)
-                ->update(['is_used' => 0]);
+    public static function handleVipActivation(int $userVipId): void
+    {
+        $userVip = UserVip::with(['user', 'OVip.privilegs'])->findOrFail($userVipId);
+    
+        match ($userVip->using) {
+            0 => self::handleInitialActivation($userVip),
+            1 => self::handleReactivation($userVip),
+            default => throw new \InvalidArgumentException('Invalid is_using value'),
+        };
+    }
+    
+    protected static function handleInitialActivation(UserVip $userVip): void
+    {
+        $user = $userVip->user;
+        $vip  = $userVip->OVip;
+    
+        self::updateVipUsage($userVip);
+        self::deactivateOtherUserVips($user, $userVip);
+        self::deactivateOldUserPacks($userVip, $vip, $user);
+        self::activateVipWares($vip);
+        self::assignWaresToUser($vip, $userVip, $user);
+        self::updateUserCurrentVip($user);
+    }
+    
+    protected static function handleReactivation(UserVip $userVip): void
+    {
+        $user = $userVip->user;
+        $vip  = $userVip->OVip;
+    
+        self::updateVipUsage($userVip);
+        self::deactivateOtherUserVips($user, $userVip);
+        self::deactivateOldUserPacks($userVip, $vip, $user);
+        self::assignWaresToUser($vip, $userVip, $user);
+        self::updateUserCurrentVip($user);
+    }
+    
+    public static function deactivateVip(int $vipId, int $userId): void
+    {
+        $vip = UserVip::where('id', $vipId)
+            ->where('user_id', $userId)
+            ->first();
+    
+        if ($vip) {
+            $vip->update(['is_used' => 0]);
+            $vip->packs()->update(['is_used' => 0]);
         }
-    
-        $types = $vip->privilegs()->pluck('type')->toArray();
-    
-        foreach ($types as $type) {
+    }
+    private static function updateVipUsage(UserVip $userVip): void
+    {
+        $userVip->num_used++;
+        $update = [
+            'num_used' => $userVip->num_used,
+            'is_used'  => 1,
+            'using'    => 1,
+        ];
+
+        if ($userVip->using == 0 && $userVip->days > 0) {
+            $update['expire'] = now()->addDays($userVip->days * $userVip->qty)->timestamp;
+        }
+
+        $userVip->update($update);
+    }
+
+    private static function deactivateOtherUserVips(User $user, UserVip $current): void
+    {
+        $vip = UserVip::where('user_id', $user->id)
+            ->where('id', '!=', $current->id)
+            ->where('is_used', 1)
+            ->where(function ($q) {
+                $q->where('expire', 0)
+                ->orWhere('expire', '>=', now()->timestamp);
+            })->first();
+
+        if ($vip) {
+            self::deactivateVip($vip->id, $user->id);
+        }
+    }
+
+    private static function deactivateOldUserPacks(UserVip $userVip, OVip $vip, User $user): void
+    {
+        if (!$userVip->is_used) return;
+
+        $types = $vip->privilegs->pluck('type')->filter()->unique()->toArray();
+
+        Pack::where('get_type', 1)
+            ->where('user_id', $user->id)
+            ->whereIn('type', $types)
+            ->where('vip_user_id', '!=', $userVip->id)
+            ->update(['is_used' => 0]);
+    }
+
+    private static function activateVipWares(OVip $vip): void
+    {
+        foreach ($vip->privilegs->pluck('type')->toArray() as $type) {
             $ware = Ware::where('get_type', 1)
                 ->where('level', $vip->level)
                 ->where('type', $type)
                 ->first();
-    
+
             if ($ware) {
                 $ware->update([
                     'is_active_for_vip' => 1,
@@ -37,34 +128,40 @@ class VipCommon
                 ]);
             }
         }
-    
-        $expireDays = $expire ?? $vip->expire;
-        $expireTimestamp = now()->addDays($expireDays)->timestamp;
-    
+    }
+
+    private static function assignWaresToUser(OVip $vip, UserVip $userVip, User $user): void
+    {
+        $types = $vip->privilegs->pluck('type')->toArray();
+
+        $expireTimestamp = $userVip->expire;
+        if (!$expireTimestamp || $expireTimestamp < now()->timestamp) {
+            $expireTimestamp = now()->addDays($userVip->days * $userVip->qty)->timestamp;
+        }
+
         $wares = Ware::where('get_type', 1)
             ->where('enable', 1)
             ->where('level', $vip->level)
             ->whereIn('type', $types)
             ->where('is_active_for_vip', 1)
             ->get();
-    
+
         foreach ($wares as $ware) {
             self::assignWareToUser($ware, $user, $userVip, $expireTimestamp);
         }
-    
-        UserVip::where('user_id', $user->id)
-            ->where('id', '!=', $userVip->id)
-            ->where(function ($q) {
-                $q->where("is_used", 1)
-                  ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
-            })->update(['is_used' => 0]);
-    
+    }
+
+    private static function updateUserCurrentVip(User $user): void
+    {
         $activeVip = UserVip::where('user_id', $user->id)
             ->where('is_used', 1)
-            ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+            ->where(function ($q) {
+                $q->where('expire', 0)
+                ->orWhere('expire', '>=', now()->timestamp);
+            })
             ->orderByDesc('level')
             ->first();
-    
+
         if ($activeVip) {
             $user->update(['vip' => $activeVip->id]);
         }
@@ -119,33 +216,7 @@ class VipCommon
     }
 
     
-    
-        private static function getWareTypeName(int $type): string
-    {
-        $types = [
-            1 => 'Gemstone',
-            3 => 'Card Scroll',
-            4 => 'Avatar Frame',
-            5 => 'Bubble Frame',
-            6 => 'Entering Special Effects',
-            7 => 'Microphone Aperture',
-            8 => 'Badge',
-            9 => 'NoKick',
-            10 => 'Icon',
-            11 => 'Intro Animation',
-            12 => 'Maple',
-            13 => 'Hide Country',
-            14 => 'VIP Gifts',
-            15 => 'No Pan',
-            19 => 'Profile Visitors Hide In',
-            20 => 'Hide Last Active',
-            28 => 'Profile Frame',
-            29 => 'Being Kicked',
-            30 => 'Anti Ban',
-        ];
 
-        return $types[$type] ?? 'Unknown Type';
-    }
 
     public static function  unUsePack($type, $user)
     {
@@ -169,6 +240,10 @@ class VipCommon
             $user->save();
         }
     }
+
+
+
+  
 
 
 

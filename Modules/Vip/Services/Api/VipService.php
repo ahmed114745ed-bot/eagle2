@@ -123,33 +123,12 @@ class VipService
         $user = $request->user();
         $isUsed = (bool) $request->type;
 
-        if (!$isUsed) {
-            $this->userVipRepository->updateIsUsedForUser($user->id);
-        }
-
-        $userVip->num_used += 1;
-
-        $updateData = [
-            'num_used' => $userVip->num_used,
-            'is_used'  => $isUsed,
-            'using'    => 1,
-        ];
-
-        if ($userVip->using == 0) {
-            $updateData['expire'] = ($userVip->days == 0)
-                ? 0
-                : now()->addDays($userVip->days * $userVip->qty)->timestamp;
-        }
-
-        $this->userVipRepository->update($updateData, $userVip->id);
-
         if ($isUsed) {
-            $this->userVipRepository->updateTrueIsUsedForUser($user->id);
+           
+            VipCommon::handleVipActivation($userVip->id);
+        } else {
+            VipCommon::deactivateVip($userVip->id, $user->id);
         }
-
-        $userVip = $this->userVipRepository->findByIdWithOVip($request->vip_id);
-
-        VipCommon::handelVip($userVip->OVip, $user, null, $userVip);
 
         return ['target_id' => $userVip->id];
     }
@@ -288,8 +267,9 @@ class VipService
                     ]);
                 }
 
-                VipCommon::handelVip($vip, $user, null, $userVip);
-
+                // VipCommon::handelVip($vip, $user, null, $userVip);
+                VipCommon::handleVipActivation($userVip->id);
+                
                 DB::commit();
 
                 $remainingDays = $ex ? Carbon::parse($ex)->diffInDays(now()) : 0;
@@ -341,7 +321,7 @@ class VipService
 
                 $vipRecord = $this->userVipRepository->create($data);
 
-                VipCommon::handelVip($vip, $user, null, $vipRecord);
+                // VipCommon::handelVip($vip, $user, null, $vipRecord);
 
                 DB::commit();
 

@@ -111,7 +111,7 @@ class DedicateAction extends RowAction
 
 
             $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
-            $is_used = $enableVipAuto === "true" ? 1 : 0;
+            $is_used = $enableVipAuto === "true" ? 0 : 0;
 
             try {
                 $uniqueAttributes = [
@@ -146,7 +146,7 @@ class DedicateAction extends RowAction
                     }
                     $userVip->save();
                 }
-                VipCommon::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+                // VipCommon::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
                 DB::commit();
                 CustomNotification::vips($user, $request->days, $vip->img);

@@ -82,7 +82,7 @@ class UserHandling
                     'type_send' => $type,
                 ]
             );
-            VipCommon::handelVip($vip, $user, null, userVip: $userVip);
+            // VipCommon::handelVip($vip, $user, null, userVip: $userVip);
         }
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void

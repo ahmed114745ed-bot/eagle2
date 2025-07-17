@@ -50,7 +50,7 @@ class VipDedicateAction extends Action
             $enableVipAuto = config('admin.isUsed_vip');
 
 
-            $is_used = $enableVipAuto === true ? 1 : 0;
+            $is_used = $enableVipAuto === true ? 0 : 0;
             $uniqueAttributes = [
                 'sender_id' => 0,
                 'user_id'   => $user->id,
@@ -84,7 +84,7 @@ class VipDedicateAction extends Action
             //     $userVip->save();
             // }
 
-            if ($is_used)  VipCommon::handelVip($vip, $user, expire: $request->days ?? $vip->expire, userVip: $userVip);
+            // if ($is_used)  VipCommon::handelVip($vip, $user, expire: $request->days ?? $vip->expire, userVip: $userVip);
 
             DB::commit();
 
