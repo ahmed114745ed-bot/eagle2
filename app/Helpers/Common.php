@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Pk;
+use App\Models\UserCoinLog;
 use App\Models\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -2163,6 +2164,22 @@ class Common
             'start_date' => $startDate->toDateString(),
             'end_date' => $endDate->toDateString(),
         ];
+    }
+
+
+    public static function getCurrentBalance(int $userId): int
+    {
+        return (int) User::where('id', $userId)->value('di') ?? 0;
+    }
+
+    public static function getCoinSubTypes()
+    {
+        return UserCoinLog::query()
+            ->select('sub_type')
+            ->distinct()
+            ->whereNotNull('sub_type')
+            ->pluck('sub_type')
+            ->toArray();
     }
 
 }
