@@ -95,7 +95,7 @@ class MomentUserGiftsController extends Controller
         // validation if this gift vip < user vip then throw Exception
         $vip_level = @Common::ovip_center($user);
         if (@$vip_level->level < $gift->vip_level) return Common::apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');
-       
+
         try {
             $updateUserWhenSendGift->send($totalPrice, $user);
         } catch (NotInfMoneyException $e) {
