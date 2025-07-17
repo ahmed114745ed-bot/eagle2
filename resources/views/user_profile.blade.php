@@ -1700,8 +1700,6 @@
                                     @endphp
 
                                     @php
-                                    info($userJoinAgency->status);
-                                    info($userJoinAgency->id);
                                        if ($userJoinAgency->status == 'kick off'){
                                            if ($userJoinAgency->kicked_by_app){
                                             $status = 'app';
@@ -1866,7 +1864,7 @@
                                     <td>{{ @$coin->amount_before ?? 0 }}</td>
                                     <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
                                         {{ $coin->amount ?? 0 }}
-                                    </td> 
+                                    </td>
                                     <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
                                     <td>{{ @$coin->from_date ?? 0 }}</td>
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
@@ -2074,7 +2072,7 @@
                                     </a>
                                 </div>
                              </div>
-                            
+
                         </form>
                     </div>
                 </div>
@@ -2103,6 +2101,7 @@
                             <th>#</th>
                             <th>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}</th>
                             <th>{{ __('room') }}</th>
+                            <th>{{ __('moment') }}</th>
                             <th>{{ __('gift') }}</th>
                             @if($giftType == 'receiver')
                                 <th>{{ __('agency') }}</th>
@@ -2150,7 +2149,10 @@
                                     $agencyImage = $agencyDefaultImage;
                                 }
                             @endphp
-
+                            @php
+                                $moment = $giftSLog->moment;
+                                $galleries = @$moment->galleries;
+                            @endphp
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
@@ -2165,16 +2167,50 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
-                                       class="d-flex align-items-center text-decoration-none">
-                                        <img src="{{ $url }}"
-                                             width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <div>
-                                            <span>{{ $roomName }}</span><br>
-                                            <small class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
+                                    @if(!empty($giftSLog->room))
+                                        <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
+                                           class="d-flex align-items-center text-decoration-none">
+                                            <img src="{{ $url }}"
+                                                 width="30" height="30"
+                                                 style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                            <div>
+                                                <span>{{ $roomName }}</span><br>
+                                                <small class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
+                                            </div>
+                                        </a>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($galleries && $galleries->count() > 0)
+                                        <div id="image-gallery-{{ $moment->id }}" style="display: none;">
+                                            @foreach($galleries as $image)
+                                                @php
+                                                    $imgUrl = getDriverUrl() . '/' . $image->image;
+                                                @endphp
+                                                <img src="{{ $imgUrl }}"
+                                                     style="width: 100%; height: 200px; object-fit: cover;"
+                                                     data-original="{{ $imgUrl }}"
+                                                     loading="lazy"
+                                                     class="gallery-image">
+                                            @endforeach
                                         </div>
-                                    </a>
+
+                                        {{-- Show first image as thumbnail --}}
+                                        @php
+                                            $firstImageUrl = getDriverUrl() . '/' . $galleries->first()->image;
+                                        @endphp
+                                        <img src="{{ $firstImageUrl }}"
+                                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+                                             onclick="document.querySelector('#image-gallery-{{ $moment->id }} img').click()">
+
+                                        @push('scripts')
+                                            <script>
+                                                new Viewer(document.getElementById('image-gallery-{{ $moment->id }}'));
+                                            </script>
+                                        @endpush
+                                    @else
+                                        No Image
+                                    @endif
                                 </td>
                                 <td>
                                     <a href="#" target="_blank"
@@ -2196,12 +2232,12 @@
                                                 <span>{{ $agencyName }}</span><br>
                                                 <small class="text-muted">id: {{ $agencyId ?? 0 }}</small>
                                             </div>
-                                        </a>  
+                                        </a>
                                         @else
                                             <span class="text-danger">{{__('not join to agency')}}</span>
                                         @endif
                                     @endif
-                                   
+
                                 </td>
                                 <td>{{ $giftSLog->giftNum }}</td>
                                 <td>{{  $giftSLog->giftPrice}}</td>
@@ -2287,7 +2323,7 @@
 
 <script>
 
-   
+
 
     $(document).ready(function () {
     $('#add_form').on('submit', function (e) {

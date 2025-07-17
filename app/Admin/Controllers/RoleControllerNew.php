@@ -165,7 +165,7 @@ class RoleControllerNew extends MainController
 
         $form->text('desc_en', __('Description en'));
         $form->text('desc_ar', __('Description ar'));
-        $form->image('image', __('Image'))->help('Image will appear beside user in app');
+        $form->image('image', __('Image'))->help('Image will appear beside user in app') ->rules('required|image|mimes:jpeg,png,jpg');
 
         $form->saving(function (Form $form) {
             $form->ignore('permissions');

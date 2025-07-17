@@ -512,6 +512,9 @@ use App\Models\Vip;
             <button onclick="showSection('workSettings')" class="position-relative">
                 {{ __('Work') }}
             </button>
+             <button onclick="showSection('mobileLinks')" class="position-relative">
+                {{ __('Application') }}
+            </button>
             <button onclick="showSection('themeSettings')">{{ __('Theme settings') }}</button>
             <button onclick="showSection('timeSettings')">{{ __('Timing settings') }}</button>
 
@@ -1331,7 +1334,7 @@ use App\Models\Vip;
                                                 <span id="rooms_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
                                             </div>
                                         </div>
-@php
+                                        @php
                                             $rooms = Vip::where('type',4)->count();
                                         @endphp
                                         @if ($rooms == 0)
@@ -1397,6 +1400,110 @@ use App\Models\Vip;
                                             </div>
                                         @endif
 
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div id="mobileLinks" class="settings-section">
+                <div class="form">
+                    
+
+                    <div class="row mt-4">
+                        <!-- android link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('Android link') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
+                                                    <input type="text"  name="android_link" value="{{ $settings['android_link'] ?? ''}}"
+                                                        class="form-control">
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                      
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- ios link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                               <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('ios link') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
+                                                    <input type="text"  name="ios_link" value="{{ $settings['ios_link'] ?? ''}}"
+                                                        class="form-control">
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                      
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- huawei  link -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('huawei link') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
+                                                    <input type="text"  name="huawei_link" value="{{ $settings['huawei_link'] ?? ''}}"
+                                                        class="form-control">
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                      
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
                                                 class="btn btn-primary">{{ __('Save') }}</button>
