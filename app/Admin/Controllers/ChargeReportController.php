@@ -808,6 +808,17 @@ class ChargeReportController extends MainController
         return $box;
     }
 
+    // public function showChargeReports(Content $content, $agency_id)
+    // {
+    //     if (!request()->has('scope')) {
+    //         return redirect()->to(url()->current() . '?scope=dash');
+    //     }
+
+    //     return $content
+    //         ->title(__('Charge Reports'))
+    //         ->body($this->customGrid($agency_id));
+    // }
+
     public function showChargeReports(Content $content, $agency_id)
     {
         if (!request()->has('scope')) {
@@ -816,30 +827,52 @@ class ChargeReportController extends MainController
 
         return $content
             ->title(__('Charge Reports'))
-            ->body($this->customGrid($agency_id));
+            ->row(function ($row) use ($agency_id) {
+                $row->column(12, $this->gridTabs($agency_id)); // <-- Tab buttons
+            })
+            ->row(function ($row) use ($agency_id) {
+                $row->column(12, $this->customGrid($agency_id)); // <-- Main grid
+            });
     }
+
+    protected function gridTabs($agency_id)
+    {
+        $scope = request('scope', 'dash');
+
+        $html = '
+    <style>
+        .tab-buttons {
+            margin-bottom: 15px;
+        }
+        .tab-buttons .tab-button {
+            color: black !important;
+            margin-right: 10px;
+            text-decoration: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f7f7f7;
+        }
+        .tab-buttons .tab-button.active {
+            background-color: #007bff;
+            color: white !important;
+            border-color: #007bff;
+        }
+    </style>
+    <div class="tab-buttons">
+        <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
+        <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
+    </div>';
+
+        return new \Encore\Admin\Widgets\Box(__(), $html);
+    }
+
 
     protected function customGrid($agency_id)
     {
         $grid = new Grid(new Charge());
         $grid->disableRowSelector();
         $grid->model()->where('user_id', $agency_id)->where('user_type', 'agency');
-
-        // Add tabs to the header
-        $grid->header(function () {
-            $scope = request('scope', 'dash');
-            return '
-    <style>
-        .tab-buttons .tab-button {
-            color: black !important;
-        }
-    </style>
-    <div class="tab-buttons">
-        <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
-        <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
-    </div>
-    ';
-        });
 
         // Apply scope based on query parameter
         $scope = request('scope');
@@ -1048,9 +1081,9 @@ class ChargeReportController extends MainController
             });
         }
         $grid->column('created_at', __('charge date'));
-         $grid->tools(function (Grid\Tools $tools){
+        $grid->tools(function (Grid\Tools $tools) {
             $url = '/admin/charges';
-            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("back").'</a>';
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
             $tools->append($button);
         });
         // Disable unnecessary buttons

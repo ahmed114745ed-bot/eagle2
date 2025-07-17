@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\BanType;
+use Illuminate\Http\Request;
 use App\Admin\Actions\BanUser;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -209,10 +210,56 @@ class BanController extends MainController
             return now()->diffForHumans($banExpiration, true);
         });
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('return', __('delete'))->display(function () {
-                return (new \App\Admin\Actions\DeleteBans($this->uid, $this->type, $this->ban_type_id))->render();
+            $grid->column('delete', __('Delete'))->display(function () {
+                $deleteLabel = __('Delete');
+                return "<button class='btn btn-danger btn-sm delete-ban' 
+            data-uid='{$this->uid}' 
+            data-type='{$this->type}' 
+            data-ban-type-id='{$this->ban_type_id}'>
+            {$deleteLabel}
+        </button>";
             });
         }
+
+        // Move this OUTSIDE the `if` block
+        $confirmMessage = json_encode(app()->getLocale() === 'ar' ? 'هل أنت متأكد من حذف هذا الحظر؟' : 'Are you sure you want to delete this ban?');
+
+        Admin::script(<<<JS
+    $('.delete-ban').off('click').on('click', function () {
+        const btn = $(this);
+        const uid = btn.data('uid');
+        const type = btn.data('type');
+        const ban_type_id = btn.data('ban-type-id');
+
+        if (!confirm({$confirmMessage})) return;
+
+        $.ajax({
+            method: 'POST',
+            url: '/admin/custom-delete-ban',
+            data: {
+                _token: LA.token,
+                uid: uid,
+                type: type,
+                ban_type_id: ban_type_id
+            },
+            success: function (response) {
+                if (response.status === true) {
+                    toastr.success('Deleted successfully');
+                    $.pjax.reload('#pjax-container');
+                } else {
+                    toastr.error(response.message || 'Failed to delete');
+                }
+            },
+            error: function () {
+                toastr.error('Error occurred during deletion.');
+            }
+        });
+    });
+JS);
+
+
+
+
 
         $grid->disableExport();
         $grid->disableRowSelector();
@@ -290,5 +337,19 @@ class BanController extends MainController
         //
         //
         //        return $form;
+    }
+
+    public function deleteBan(Request $request)
+    {
+        $deleted = Ban::where('uid', $request->uid)
+            ->where('type', $request->type)
+            ->where('ban_type_id', $request->ban_type_id)
+            ->delete();
+
+        if ($deleted) {
+            return response()->json(['status' => true]);
+        }
+
+        return response()->json(['status' => false, 'message' => 'No matching ban found']);
     }
 }

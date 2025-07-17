@@ -326,18 +326,6 @@ class UserController extends MainController
             </div>";
         });
 
-
-        //        $grid->column('profile.avatar', __('image'))->display(function ($path) {
-        //            $defaultImage = asset("images/businessman-icon.jpg");
-        //            $url = getImagePath($path) ?? $defaultImage;
-        //            if (!isImageExists($url)) {
-        //                $url = $defaultImage;
-        //            }
-        //            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        //        });
-
-        //        $grid->column('phone', __('Phone'));
-
         $grid->column('agency', __('Agency'))
             ->display(function () {
                 if (!$this->agency) {
@@ -374,81 +362,21 @@ class UserController extends MainController
                 ";
             });
 
-        //        $grid->column('agency_id', __('agency id'))->modal(__('agency'), function () {
-        //            $agency =  $this->agency;
-        //            $path = @$agency?->img;
-        //            $defaultImage = asset("images/icon-agency.jpg");
-        //            $url = getImagePath($path) ?? $defaultImage;
-        //
-        //            // Check if the image exists
-        //            if (!isImageExists($url)) {
-        //                $url = $defaultImage;
-        //            }
-        //            $results = [
-        //                __('name') => @$agency->owner->name ?? '',
-        //                __('img') => "<img src='" . $url . "' style='width:100px;height:100px' class='img img-thumbnail'$ />",
-        //
-        //            ];
-        //
-        //            return new Table([__('Field Name'), __('Value')], $results);
-        //        });
-
-        //        $grid->column('target', __('target'))->expand(function ($model) {
-        //
-        //            $targets = $model->targets()->where('agency_id', $this->agency_id)->orderBy('created_at', 'desc')->get()->map(function ($target) {
-        //                $data = json_decode($target->extras, true);
-        //
-        //                $moment_upload = $data['moment']['upload'] ?? '';
-        //                $moment_likes = $data['moment']['likes'] ?? '';
-        //                $moment_comments = $data['moment']['comments'] ?? '';
-        //
-        //                // For "reel"
-        //                $reel_upload = $data['reel']['upload'] ?? '';
-        //                $reel_likes = $data['reel']['likes'] ?? '';
-        //                $reel_comments = $data['reel']['comments'] ?? '';
-        //
-        //                // Combine moment fields
-        //                $moment_info = "Upload: {$moment_upload} | Likes: {$moment_likes} | Comments: {$moment_comments}";
-        //
-        //                // Combine reel fields
-        //                $reel_info = "Upload: {$reel_upload} | Likes: {$reel_likes} | Comments: {$reel_comments}";
-        //                $target =
-        //                    [
-        //                        'id' => $target->id,
-        //                        'add_month' => $target->add_month . '/' . $target->add_year,
-        //                        'target_usd' => $target->target_usd,
-        //                        'target_agency_share' => $target->target_agency_share,
-        //                        'user_diamonds' => $target->user_diamonds,
-        //                        'user_hours' => $target->user_hours,
-        //                        'user_days' => $target->user_days,
-        //                        'moment' => $moment_info,
-        //                        'real' => $reel_info,
-        //                        'user_obtain' => $target->user_obtain,
-        //                        'updated_at' => $target->updated_at,
-        //                    ];
-        //
-        //
-        //                return $target;
-        //            });
-        //
-        //            return new \App\Admin\Widgets\Table(
-        //                [
-        //                    'ID',
-        //                    __('month') . '/' . __('year'),
-        //                    __('usd') . ' ' . __('deserved') . '(%)',
-        //                    __('agency share') . '(%)',
-        //                    __('user diamonds'),
-        //                    __('user hours'),
-        //                    __('user days'),
-        //                    __('moment'),
-        //                    __('real'),
-        //                    __('user obtain'),
-        //                    __('at time'),
-        //                ],
-        //                $targets->toArray()
-        //            );
-        //        });
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
+        Admin::style("
+            .modal-dialog {
+                max-width: 90%;
+            }
+
+            .modal {
+                top: 5%;
+            }
+
+            .modal-body {
+                max-height: 70vh !important;
+                overflow-y: auto !important;
+            }
+        ");
         $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             return $this->sameDeviceUsers()->count();
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
@@ -487,47 +415,6 @@ class UserController extends MainController
         });
 
 
-
-
-
-        //        $grid->column('custom_button3', __('تبديل الحساب'))->modal(__('Other accounts on the same device'), function () {
-        //            $deviceToken = $this->device_token;
-        //
-        //            // First: get all related user IDs, excluding current user in SQL
-        //            $relatedUserIds = UserAccount::query()
-        //                ->where('device_token', $deviceToken)
-        //                ->where(function ($query) {
-        //                    $query->where('parent_user_id', '!=', $this->id)
-        //                        ->orWhere('child_user_id', '!=', $this->id);
-        //                })
-        //                ->get()
-        //                ->flatMap(function ($ua) {
-        //                    return [$ua->parent_user_id, $ua->child_user_id];
-        //                })
-        //                ->filter(fn($id) => $id != $this->id)
-        //                ->unique()
-        //                ->values();
-        //
-        //            // Now fetch users in one query
-        //            $users = \App\Models\User::query()
-        //                ->whereIn('id', $relatedUserIds)
-        //                ->select(['name', 'uuid', 'phone'])
-        //                ->get();
-        //
-        //            // Format users for the table
-        //            $rows = $users->map(function ($user) {
-        //                return [
-        //                    'name' => $user->name,
-        //                    'uuid' => $user->uuid,
-        //                    'phone' => $user->phone,
-        //                ];
-        //            });
-        //
-        //            return new \Encore\Admin\Widgets\Table(
-        //                [__('Name'), __('uuid'), __('phone')],
-        //                $rows->toArray()
-        //            );
-        //        });
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
@@ -760,7 +647,11 @@ class UserController extends MainController
             $query->whereDate('join_date', $joinDate);
         })->orderByDesc('id')->paginate(10, ['*'], 'user_agency_page');
 
-        $usersCoins = UserCoinLog::where('user_id', $id)->orderByDesc('id')->paginate(10, ['*'], 'coins_page');;
+        $usersCoins = UserCoinLog::where('user_id', $id)
+            ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
+            ->when(request('to_date'), fn($q) => $q->whereDate('to_date', '<=', request('to_date')))
+            ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
+            ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));

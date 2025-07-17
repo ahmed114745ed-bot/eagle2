@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Charge;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -74,6 +75,37 @@ class UserChargeReportController extends MainController
         }
 
         $grid = new Grid(new Charge());
+
+        $grid->filter(function (Grid\Filter $filter) {
+
+            $filter->expand();
+
+            $filter->disableIdFilter();
+            $filter->column(1/2, function ($filter) {
+                $filter->where(function ($query) {
+                    $date = UserCommon::arabicToEnglishNumbers($this->input);
+                    $query->whereDate('created_at', '>=', $date);
+                }, __('from_date'), 'from_date')->date();
+            });
+
+            $filter->column(1/2, function ($filter) {
+                $filter->where(function ($query) {
+                    $date = UserCommon::arabicToEnglishNumbers($this->input);
+
+                    $query->whereDate('created_at', '<=',$date);
+
+                }, __('to_date'), 'to_date')->date();
+            });
+        });
+
+        Admin::script('
+        $(document).on("click", ".submit", function () {
+            setTimeout(function() {
+                location.reload();
+            }, 500);
+        });
+    ');
+
         $grid->model()
             ->where('user_id', '=', request('id'))
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
@@ -83,8 +115,6 @@ class UserChargeReportController extends MainController
         } else {
             $grid->model()->where('charger_type', "!=", "dash");
         }
-
-        $grid->disableFilter();
 
 
         $grid->column('id', __('transaction id'));

@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Pk;
+use App\Models\UserCoinLog;
 use App\Models\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -708,8 +709,8 @@ class Common
         } else {
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-       
-            
+
+
             SendFirebaseNotificationJob::dispatch(
                 tokens: $tokens,
                 title: $title,
@@ -875,12 +876,12 @@ class Common
             'Authorization' => 'Bearer ' . $api_access_key,
             'Content-Type' => 'application/json',
         ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-     
+
 
         $status = $response->status();
         $body = $response->body();
 
-     
+
         return json_decode($response->body());
     }
 
@@ -889,15 +890,15 @@ class Common
     {
         $factory = (new Factory)->withServiceAccount(base_path(config('app.fileName')));
         $messaging = $factory->createMessaging();
-    
-    
+
+
         $result = $messaging->subscribeToTopic($topic, $registrationTokens);
-    
+
         logger()->info('✅ Kreait Topic Subscribe', [
             'topic' => $topic,
             'result' => $result,
         ]);
-    
+
         return $result;
     }
 
@@ -906,21 +907,21 @@ class Common
         try {
             $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
             $messaging = $factory->createMessaging();
-    
-    
+
+
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
-    
+
             logger()->info('✅ Unsubscribe from FCM topic result', [
                 'topic'          => $topic,
                 'tokensCount'    => count($registrationTokens),
                 'response'       => $response,
             ]);
-    
+
             // تحليل النتائج (اختياري)
             $result = $response[$topic->value()] ?? [];
             $successCount = 0;
             $failureCount = 0;
-    
+
             foreach ($result as $token => $status) {
                 if ($status === 'OK') {
                     $successCount++;
@@ -928,7 +929,7 @@ class Common
                     $failureCount++;
                 }
             }
-    
+
             return [
                 'success' => true,
                 'successCount' => $successCount,
@@ -2168,7 +2169,17 @@ class Common
 
     public static function getCurrentBalance(int $userId): int
     {
-        return (int) User::where('id', $userId)->value('coin') ?? 0;
+        return (int) User::where('id', $userId)->value('di') ?? 0;
+    }
+
+    public static function getCoinSubTypes()
+    {
+        return UserCoinLog::query()
+            ->select('sub_type')
+            ->distinct()
+            ->whereNotNull('sub_type')
+            ->pluck('sub_type')
+            ->toArray();
     }
 
 }

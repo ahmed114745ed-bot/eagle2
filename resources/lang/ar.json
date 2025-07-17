@@ -40,6 +40,7 @@
     "rooms": "الغرف",
     "Black List": "القائمة السوداء",
     "Phone Codes": "اكواد الهواتف",
+    "Agency name or id" :"اسم الوكالة أو المعرّف",
     "normal": "عادي",
     "hot": "ساخن",
     "other": "اخر",
@@ -901,11 +902,18 @@
     "payment-gateways":"بوابات الدفع",
     "Types of Managers" :"أنواع المديرين",
     "Application settings" :"اعدادات التطبيق",
+    "Application":"التطبيق",
     "List of levels":"قائمة المستويات",
     "Room categories":"فئات الغرف",
     "Complaints":"الشكاوي",
     "Target events":"الأحداث المستهدفة",
     "pk event" : "الاحدات pk",
+     "ios link": "رابط iOS",
+  "link": "الرابط",
+  "Android link": "رابط أندرويد",
+  "huawei link": "رابط هواوي",
+ "Join us and enjoy live streaming like never before!": "انضم إلينا واستمتع بالبث المباشر كما لم يحدث من قبل!",
+  "Download Our App": "قم بتنزيل تطبيقنا",
     "General rules" :"قواعد عامة",
     "Events reports":"تقارير الاحداث",
     "Events of the weeks":"احداث الاسابيع",
@@ -3382,17 +3390,19 @@
 "Not Found": "غير موجودة",
 "Unknown": "غير معروف",
 "coins & USD": "العملات والدولار",
-  "amount before": "المبلغ قبل",
-  "amount after": "المبلغ بعد",
-  "created by": "أنشئ بواسطة",
+"amount before": "المبلغ قبل",
+"amount after": "المبلغ بعد",
+"created by": "أنشئ بواسطة",
 "CoreWalletTransaction":"سجل المعاملات",
 "coreWalletTransaction":"سجل المعاملات",
 "Core-wallet-transactions":"سجل المعاملات",
 "core-wallet-transactions":"سجل المعاملات",
-
-    "Shipping Agencies": "وكالات الشحن",
-
-"it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة"
+"Shipping Agencies": "وكالات الشحن",
+"it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة",
+"Users Coins Logs":"سجل عملات المستخدم",
+"balance yet":"الرصيد بعد",
+"sub type":"النوع الفرعي",
+"Item Name":"اسم العنصر"
 
 
 
