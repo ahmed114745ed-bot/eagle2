@@ -709,8 +709,8 @@ class Common
         } else {
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-       
-            
+
+
             SendFirebaseNotificationJob::dispatch(
                 tokens: $tokens,
                 title: $title,
@@ -876,12 +876,12 @@ class Common
             'Authorization' => 'Bearer ' . $api_access_key,
             'Content-Type' => 'application/json',
         ])->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-     
+
 
         $status = $response->status();
         $body = $response->body();
 
-     
+
         return json_decode($response->body());
     }
 
@@ -890,15 +890,15 @@ class Common
     {
         $factory = (new Factory)->withServiceAccount(base_path(config('app.fileName')));
         $messaging = $factory->createMessaging();
-    
-    
+
+
         $result = $messaging->subscribeToTopic($topic, $registrationTokens);
-    
+
         logger()->info('✅ Kreait Topic Subscribe', [
             'topic' => $topic,
             'result' => $result,
         ]);
-    
+
         return $result;
     }
 
@@ -907,21 +907,21 @@ class Common
         try {
             $factory = (new Factory)->withServiceAccount(base_path(config("app.fileName")));
             $messaging = $factory->createMessaging();
-    
-    
+
+
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
-    
+
             logger()->info('✅ Unsubscribe from FCM topic result', [
                 'topic'          => $topic,
                 'tokensCount'    => count($registrationTokens),
                 'response'       => $response,
             ]);
-    
+
             // تحليل النتائج (اختياري)
             $result = $response[$topic->value()] ?? [];
             $successCount = 0;
             $failureCount = 0;
-    
+
             foreach ($result as $token => $status) {
                 if ($status === 'OK') {
                     $successCount++;
@@ -929,7 +929,7 @@ class Common
                     $failureCount++;
                 }
             }
-    
+
             return [
                 'success' => true,
                 'successCount' => $successCount,

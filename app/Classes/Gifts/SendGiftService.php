@@ -171,13 +171,9 @@ class SendGiftService
 
     public function updateFamilyLevelForReceiver(Collection $users, $totalCoinsPerUser): bool
     {
-        info('im in here');
         $families    = $users->pluck('family')->where('id', '!=', null);
-        info($families);
         $familiesIds = $families->pluck('id')->toArray();
-        info($familiesIds);
         if (count($familiesIds) == 0) return false;
-        info('after checking');
         $repeatedData = $this->getDuplication($familiesIds);
 
         foreach ($repeatedData as $data) {
