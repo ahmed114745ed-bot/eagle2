@@ -1151,7 +1151,7 @@
         @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
             <div class="tab-content active" id="members-tab">
-                
+
                 <div class="card">
                     <div class="card-header">
                         <h3>{{ __('Agency Members') }}</h3>
@@ -1181,7 +1181,7 @@
                                     </div>
                                 </div>
 
-                               
+
                                 <!-- Buttons -->
                                 <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
                                     <button type="submit" class="btn btn-info btn-sm me-2">
@@ -1197,8 +1197,8 @@
                 </div>
                     @if($members && $members->count())
                         <div class="table-responsive">
-                           
-                        
+
+
                             <table class="data-table">
                                 <thead>
                                     <tr>
@@ -1570,7 +1570,7 @@
             </div>
 
             <div class="box-body p-3">
-                
+
 
                 <div class="card mb-4">
                     <div class="card-body">
@@ -1664,7 +1664,7 @@
                                 $avatar = @$userSender->profile->avatar;
                                 $image = getImagePath($avatar) ?? $userImageDefault;
                                 $receiverAvatar = @$receiver->profile->avatar;
-                                
+
                                 $receiverImage = getImagePath($receiverAvatar) ?? $userImageDefault;
                                 if (!isImageExists($receiverImage)) {
                                     $receiverImage = $userImageDefault;
@@ -1979,9 +1979,9 @@
 
                     <div class="tab-content active" id="members-tab">
 
-                         
+
                         <div class="table-section card">
-                            
+
                             <div class="table-responsive">
                                 <table class="data-table">
                                     <thead>
@@ -2028,8 +2028,8 @@
 
                                                         $memberTarget->topSupporters = $giftLogs;
 
-                                                        $moment = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'moment') ?? [];
-                                                        $reel = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'reel') ?? [];
+                                                        $moment = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'moment', $memberTarget->agency_id) ?? [];
+                                                        $reel = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'reel', $memberTarget->agency_id) ?? [];
 
                                                         $momentUpload = $moment['upload'] ?? '0/0';
                                                         $momentLikes = $moment['likes'] ?? '0/0';
@@ -2064,7 +2064,7 @@
                                                             {{ $target->next_diamond ?? 0 }}
                                                         </span>
                                                     </td>
-                                                   
+
                                                     <td>{{ ($target->user_days ?? 0) . '/' . ($target->target_days ?? 0) }}</td>
                                                     <td>{{ ($target->user_hours ?? 0) . '/' . ($target->target_hours ?? 0) }}</td>
                                                     <td>
