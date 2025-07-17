@@ -74,6 +74,29 @@ class UserChargeReportController extends MainController
         }
 
         $grid = new Grid(new Charge());
+
+        $grid->filter(function (Grid\Filter $filter) {
+
+            $filter->expand();
+
+            $filter->disableIdFilter();
+            $filter->column(1/2, function ($filter) {
+                $filter->where(function ($query) {
+                    $date = UserCommon::arabicToEnglishNumbers($this->input);
+                    $query->whereDate('created_at', '>=', $date);
+                }, __('from_date'), 'from_date')->date();
+            });
+
+            $filter->column(1/2, function ($filter) {
+                $filter->where(function ($query) {
+                    $date = UserCommon::arabicToEnglishNumbers($this->input);
+
+                    $query->whereDate('created_at', '<=',$date);
+
+                }, __('to_date'), 'to_date')->date();
+            });
+        });
+
         $grid->model()
             ->where('user_id', '=', request('id'))
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
@@ -83,8 +106,6 @@ class UserChargeReportController extends MainController
         } else {
             $grid->model()->where('charger_type', "!=", "dash");
         }
-
-        $grid->disableFilter();
 
 
         $grid->column('id', __('transaction id'));
