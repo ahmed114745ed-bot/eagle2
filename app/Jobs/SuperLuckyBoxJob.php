@@ -136,7 +136,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                     "messageContent" => [
                         "message"      => "winnerLuckyBox",
 
-                        "boxUId" => $box_use->id,
+                        "boxUId" => $userBox->id,
                         "ownerId" =>  @$room->owner->id,
                         "ownerName" => @$room->owner->name ?? '',
                         "ownerImage" => @$room->owner->profile->avatar ?? '',
