@@ -28,7 +28,7 @@ jobs:
           pwd
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t 5live:${{ github.sha }} .
-          docker service update --image 5live:${{ github.sha }} live-app
+          docker service update --image 5live:${{ github.sha }} 5live-app
           # check again
           threshold=75
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
