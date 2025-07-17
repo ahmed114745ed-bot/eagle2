@@ -2151,7 +2151,7 @@
                             @endphp
                             @php
                                 $moment = $giftSLog->moment;
-                                $galleries = @$moment->galleries;
+                                $galleries = @$moment->images;
                             @endphp
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
