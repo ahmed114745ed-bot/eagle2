@@ -74,6 +74,7 @@ class GiftLogService
 
         // get received users data
         $receivedUsers = $this->UserRepository->getUsers($receiversIds);
+        info($receivedUsers);
 
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
