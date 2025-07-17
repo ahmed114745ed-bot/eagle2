@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Charge;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -96,6 +97,14 @@ class UserChargeReportController extends MainController
                 }, __('to_date'), 'to_date')->date();
             });
         });
+
+        Admin::script('
+        $(document).on("click", ".submit", function () {
+            setTimeout(function() {
+                location.reload();
+            }, 500);
+        });
+    ');
 
         $grid->model()
             ->where('user_id', '=', request('id'))
