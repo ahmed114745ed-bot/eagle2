@@ -13,6 +13,34 @@
             width: 24px;
             height: 24px;
         }
+
+        .store-btn {
+    display: inline-block;
+    margin: 10px;
+    text-decoration: none;
+}
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f8f8;
+    transition: background-color 0.2s;
+}
+
+.btn-content:hover {
+    background-color: #e8e8e8;
+}
+
+.store-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-100 to-white flex items-center justify-center min-h-screen">
@@ -29,6 +57,11 @@
     const androidLink = "{{ $androidLink }}";
     const iosLink = "{{ $iosLink }}";
     const huaweiLink = "{{ $huaweiLink }}";
+   
+    const androidLogo = "{{ asset('images/android_logo_PNG27.png') }}";
+    const appleLogo = "{{ asset('images/Apple-IOS-jpg.png') }}";
+    const huaweiLogo = "{{ asset('images/huawel.jpg') }}";
+
 
     function isAndroid() {
         return /Android/i.test(navigator.userAgent);
@@ -46,26 +79,33 @@
         const container = document.getElementById('download-buttons');
         let buttons = '';
 
-        const playBtn = `
-                <a href="${androidLink}" class="store-btn">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" class="store-icon" />
-                    Google Play
-                </a>
-            `;
+       const playBtn = `
+    <a href="${androidLink}" class="store-btn">
+        <div class="btn-content">
+            <img src="${androidLogo}" alt="Google Play" class="store-icon" />
+            <span>Google Play</span>
+        </div>
+    </a>
+`;
 
-        const appleBtn = `
-                <a href="${iosLink}" class="store-btn">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Apple_logo_black.svg" alt="App Store" class="store-icon" />
-                    Apple Store
-                </a>
-            `;
+const appleBtn = `
+    <a href="${iosLink}" class="store-btn">
+        <div class="btn-content">
+            <img src="${appleLogo}" alt="App Store" class="store-icon" />
+            <span>Apple Store</span>
+        </div>
+    </a>
+`;
 
-        const huaweiBtn = `
-                <a href="${huaweiLink}" class="store-btn">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9e/Huawei_AppGallery_logo.svg" alt="AppGallery" class="store-icon" />
-                    Huawei AppGallery
-                </a>
-            `;
+const huaweiBtn = `
+    <a href="${huaweiLink}" class="store-btn">
+        <div class="btn-content">
+            <img src="${huaweiLogo}" alt="AppGallery" class="store-icon" />
+            <span>Huawei AppGallery</span>
+        </div>
+    </a>
+`;
+
 
         if (isAndroid()) {
             buttons += playBtn;
