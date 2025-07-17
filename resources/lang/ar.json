@@ -3382,17 +3382,19 @@
 "Not Found": "غير موجودة",
 "Unknown": "غير معروف",
 "coins & USD": "العملات والدولار",
-  "amount before": "المبلغ قبل",
-  "amount after": "المبلغ بعد",
-  "created by": "أنشئ بواسطة",
+"amount before": "المبلغ قبل",
+"amount after": "المبلغ بعد",
+"created by": "أنشئ بواسطة",
 "CoreWalletTransaction":"سجل المعاملات",
 "coreWalletTransaction":"سجل المعاملات",
 "Core-wallet-transactions":"سجل المعاملات",
 "core-wallet-transactions":"سجل المعاملات",
-
-    "Shipping Agencies": "وكالات الشحن",
-
-"it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة"
+"Shipping Agencies": "وكالات الشحن",
+"it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة",
+"Users Coins Logs":"سجل عملات المستخدم",
+"balance yet":"الرصيد بعد",
+"sub type":"النوع الفرعي",
+"Item Name":"اسم العنصر"
 
 
 

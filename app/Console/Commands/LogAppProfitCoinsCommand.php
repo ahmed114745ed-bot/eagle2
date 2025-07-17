@@ -2,7 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\Common;
+use App\Models\CoinGameUser;
+use App\Models\GiftLog;
 use App\Models\UserCoinLog;
+use App\Models\UserLuckyGift;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -64,13 +68,40 @@ class LogAppProfitCoinsCommand extends Command
     
             $now = now();
             $logs = [];
+         
+          
     
             foreach ($rows as $row) {
+             
+                $amountBefore =  Common::getCurrentBalance($row->{$userColumn});
+                $logAmount = -abs($row->app_profit_coins);
+                $itemName = '';
+
+                switch ($table) {
+                    case 'gift_logs':
+                        $gift = GiftLog::with('gift')->find($row->id);
+                        $itemName = $gift?->gift?->name ?? '';
+                        break;
+        
+                    case 'user_lucky_gifts':
+                        $luckyGift = UserLuckyGift::with('gift')->find($row->id);
+                        $itemName = $luckyGift?->gift?->name ?? '';
+                        break;
+        
+                    case 'coin_game_users':
+                        $gameUser = CoinGameUser::with('game')->find($row->id);
+                        $itemName = $gameUser?->game?->name ?? '';
+                        break;
+                }
+                $this->info("Logging item: [$itemName] from table [$table], row ID: $row->id");
+
                 $logs[] = [
                     'user_id' => $row->{$userColumn},
                     'type' => $type,
                     'sub_type' => $subType,
-                    'amount' => $row->app_profit_coins,
+                    'amount_before' => $amountBefore,
+                    'amount' => $logAmount,
+                    'item_name'=>  $itemName ?? '',
                     'from_date' => $from,
                     'to_date' => $to,
                     'created_at' => $now,
