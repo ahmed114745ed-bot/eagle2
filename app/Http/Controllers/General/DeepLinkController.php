@@ -11,12 +11,9 @@ class DeepLinkController extends Controller
     {
         return view('general.deeplink', [
             'androidLink' => Common::getSettingValue('android_link'),
-            //'https://play.google.com/store/apps/details?id=com.yourapp',
             'iosLink' => Common::getSettingValue('ios_link'),
-            //  'https://apps.apple.com/app/id1234567890',
             'huaweiLink' => Common::getSettingValue('huawei_link'),
             'appName' => Common::getSettingValue('app_title_en'),
-            // 'https://appgallery.huawei.com/#/app/C123456',
         ]);
     }
 }
