@@ -9,6 +9,7 @@ use App\Models\AppFeature;
 use App\Models\RoomGiftTarget;
 use App\Facades\CustomNotification;
 use App\Models\RoomOwnerAchievement;
+use Illuminate\Support\Facades\Log;
 
 class RoomAchievementTargetService
 {
@@ -83,6 +84,5 @@ class RoomAchievementTargetService
         } else {
             Log::info('AppFeature not active or not found');
         }
-    
     }
 }
