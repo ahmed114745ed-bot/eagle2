@@ -96,7 +96,7 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/update-user-salaries.log'))
             ->runInBackground();
 
-//        $schedule->command('log:app-profit-coins')->everyTenMinutes();
+       $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }
 
