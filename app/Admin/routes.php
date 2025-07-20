@@ -411,9 +411,7 @@ Route::group(
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');
-        Route::resource('boxes', 'BoxController');
-        Route::get('lucy-box-settings', [BoxController::class, 'box_settings']);
-        Route::resource('thrown_boxes', 'BoxUseController');
+       
         Route::get('filter-agencies', App\Admin\Controllers\Filter\AgencyController::class)->name('filter-agencies');
         Route::resource('reports', 'ReportController');
         Route::resource('charges-reports', 'ChargeReportController');

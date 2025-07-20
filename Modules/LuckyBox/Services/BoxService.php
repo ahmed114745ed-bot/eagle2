@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Tik\Services;
+namespace Modules\LuckyBox\Services;
 
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\BoxUse;
 use App\Helpers\Common;
 use App\Models\CoreWallet;
 use App\Events\SuperLuckyBox;
@@ -12,7 +11,7 @@ use App\Facades\RedisService;
 use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Modules\LuckyBox\Entities\BoxUse;
 use App\Http\Resources\Api\V1\BoxUseResource;
 
 

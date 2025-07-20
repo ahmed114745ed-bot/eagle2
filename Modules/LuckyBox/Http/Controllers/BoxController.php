@@ -1,33 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace Modules\LuckyBox\Http\Controllers;
 
-use App\Jobs\TestSuperLuckyBoxJob;
 use Carbon\Carbon;
-use App\Models\Box;
+
 use App\Models\Room;
 use App\Models\User;
 use App\Enums\TypeBox;
-use App\Models\BoxUse;
-use App\Models\Config;
 use App\Helpers\Common;
-use App\Models\GiftLog;
 use App\Jobs\OpenBoxJob;
-use App\Models\CoreWallet;
-use App\Models\PickBoxList;
-use App\Models\UserBoxGift;
+
 use Illuminate\Http\Request;
 use App\Facades\RedisService;
-use App\Jobs\SuperLuckyBoxJob;
-use App\Jobs\NormalLuckyBoxJop;
-use App\Tik\Services\BoxService;
-use Illuminate\Support\Facades\DB;
+use App\Jobs\TestSuperLuckyBoxJob;
+
+use Modules\LuckyBox\Entities\Box;
+
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Redis;
-use App\Http\Services\LuckyBoxServices;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Http\Resources\Api\V1\BoxResource;
-use App\Http\Resources\Api\V1\BoxUseResource;
+use Modules\LuckyBox\Entities\BoxUse;
+use Modules\LuckyBox\Services\BoxService;
+use Modules\LuckyBox\Entities\PickBoxList;
+use Modules\LuckyBox\Entities\UserBoxGift;
+use Modules\LuckyBox\Http\Resources\BoxResource;
+use Modules\LuckyBox\Services\LuckyBoxServices;
 
 class BoxController extends Controller
 {
@@ -71,7 +66,6 @@ class BoxController extends Controller
 
     public function sendTest(Request $request, $user)
     {
-//        $user = $request->user();
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
 

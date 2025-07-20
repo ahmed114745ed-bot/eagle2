@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Models;
+namespace Modules\LuckyBox\Entities;
 
-use App\Helpers\UserCoinLogHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
