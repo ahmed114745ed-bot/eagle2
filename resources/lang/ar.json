@@ -3402,6 +3402,18 @@
 "Users Coins Logs":"سجل عملات المستخدم",
 "balance yet":"الرصيد بعد",
 "sub type":"النوع الفرعي",
+
+    "ware": "سلعة",
+    "vip": "عضوية مميزة",
+    "wares": "السلعة",
+    "vips": "العضوية المميزة",
+    "coins": "العملات",
+    "image": "الصورة",
+    "expire": "الانتهاء",
+    "is required": "مطلوب",
+    "is required and must be numeric": "مطلوب ويجب أن يكون رقمًا",
+    "Validation error": "خطأ في التحقق",
+
 "Item Name":"اسم العنصر"
 
 
