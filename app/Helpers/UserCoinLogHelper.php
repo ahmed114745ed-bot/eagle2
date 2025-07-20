@@ -40,7 +40,7 @@ class UserCoinLogHelper
             'to_date'       => $toDate ?? Carbon::now()->toDateString(),
         ];
 
-        Log::info('UserCoinLogHelper::log called', $logData);
+        \Log::info('UserCoinLogHelper::log called', $logData);
 
         return UserCoinLog::create($logData);
 
