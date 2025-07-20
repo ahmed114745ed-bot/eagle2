@@ -55,7 +55,6 @@ class MallService
             ];
             $this->packRepository->create($data);
 
-            $this->service($user, $ware->exp, $totalPrice, 'buy');
             $amountBefore =  Common::getCurrentBalance($user->id);
             $logAmount = -abs($totalPrice);
             UserCoinLogHelper::log(
@@ -66,6 +65,8 @@ class MallService
                 $amountBefore ?? 0,
                 $ware->name
             );
+            $this->service($user, $ware->exp, $totalPrice, 'buy');
+          
             return Common::apiResponse(1, 'success process');
         } catch (Exception $exception) {
             return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
