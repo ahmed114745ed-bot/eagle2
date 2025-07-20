@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
 use DB;
-use Illuminate\Database\Eloquent\Builder;
+use Modules\LuckyBox\Entities\BoxUse;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 

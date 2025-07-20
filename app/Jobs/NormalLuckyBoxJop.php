@@ -5,20 +5,16 @@ namespace App\Jobs;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\BoxUse;
-use App\Models\Follow;
+
 use App\Helpers\Common;
-use App\Models\PickBoxList;
 use App\Models\RoomVisitor;
-use App\Models\UserBoxGift;
-use App\Facades\RedisService;
 use Illuminate\Bus\Queueable;
+use Modules\LuckyBox\Entities\BoxUse;
 use Illuminate\Queue\SerializesModels;
-use App\Http\Services\LuckyBoxServices;
 use Illuminate\Queue\InteractsWithQueue;
+use Modules\LuckyBox\Entities\UserBoxGift;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class NormalLuckyBoxJop implements ShouldQueue
 {

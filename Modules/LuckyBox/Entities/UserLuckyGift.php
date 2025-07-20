@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace Modules\LuckyBox\Entities;
 
+use App\Models\Gift;
+use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class UserLuckyGift extends Model
 {

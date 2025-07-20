@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\LuckyBox\Http\Controllers\web;
 
-use App\Models\Box;
 use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Facades\Admin;
-use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
+use Modules\LuckyBox\Entities\Box;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
-class BoxController extends MainController
+class LuckyBoxController extends MainController
 {
     public $permission_name = 'boxes';
     public $permission_setting = 'box-settings';

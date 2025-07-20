@@ -2,19 +2,19 @@
 
 namespace App\Http\Resources\Api\V2;
 
-use App\Helpers\Common;
-use App\Http\Resources\Api\V1\AllGameResource;
-use App\Http\Resources\Api\V1\BoxUseResource;
-use App\Http\Resources\Api\V1\MiniUserResource;
-use App\Http\Resources\Api\V1\PkCollection;
-use App\Models\BoxUse;
-use App\Models\configesModel;
 use App\Models\Pk;
-use App\Models\RequestBackgroundImage;
 use App\Models\User;
-use App\Repositories\Room\RoomTopUsersRepository;
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Helpers\Common;
+use App\Models\configesModel;
 use Illuminate\Support\Facades\DB;
+use Modules\LuckyBox\Entities\BoxUse;
+use App\Models\RequestBackgroundImage;
+use App\Http\Resources\Api\V1\PkCollection;
+use App\Http\Resources\Api\V1\BoxUseResource;
+use App\Http\Resources\Api\V1\AllGameResource;
+use App\Http\Resources\Api\V1\MiniUserResource;
+use Illuminate\Http\Resources\Json\JsonResource;
+use App\Repositories\Room\RoomTopUsersRepository;
 
 class EnterRoomCollection extends JsonResource
 {
