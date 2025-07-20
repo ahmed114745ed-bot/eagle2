@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\LuckyBox\Http\Controllers\web;
+namespace Modules\LuckyBox\Http\Controllers\Web;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
