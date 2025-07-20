@@ -2,8 +2,6 @@
 
 namespace Modules\LuckyBox\Http\Controllers\web;
 
-
-
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
