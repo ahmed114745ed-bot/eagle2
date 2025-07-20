@@ -181,12 +181,7 @@ class VipCommon
                 ->orWhere('expire', 0);
             })->first();
 
-        Pack::query()
-            ->where('user_id', $user->id)
-            ->where('type', $ware->type)
-            ->where('get_type', 1)
-            ->where('id', '!=', optional($existingPack)->id)
-            ->update(['is_used' => 0]);
+   
 
         if ($existingPack) {
             $existingPack->update(['is_used' => $userVip->is_used]);
