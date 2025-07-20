@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Helpers\Common;
 use App\Models\UsersJoinedAgency;
 use Carbon\Carbon;
 use App\Models\GiftLog;
@@ -157,6 +158,7 @@ class AgencyUsersTargetResource extends JsonResource
                 $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
             })
             ->value('agency_sallary');
+        $hasColor = Common::hasInPack(@$this->id, 18, true);
 
         return [
             'id' => $this->id ?? 0,
@@ -174,10 +176,11 @@ class AgencyUsersTargetResource extends JsonResource
                 'user_days'     =>  $this->lastSallary?->achieved_days ?? 0,
                 'old_targets'  => $this->latestOldTarget(),
             ],
-            // 'top_users' => SenderGiftLogResource::collection($giftLog),
+            // 'top_users' => SenderGiftLogResource::collection($giftLog), 
             'top_users' => $giftLog->map(function ($log) {
                 return $log->sender?->profile?->avatar ?? '';
             })->filter()->values()->toArray(),
+            'colored_name' => $hasColor ? Common::wareUserVip(@$this->id, 18, 'color') ?? '' : '',
         ];
     }
 
