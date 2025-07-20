@@ -926,6 +926,8 @@
                 border-radius: 4px;
             }
             .control {
+                 width: 89%;
+                padding: 6px 12px;
                 color: #ffffff !important;               /* Text color */
                 background-color: #1e3a8a !important;     /* Background color (e.g. dark blue) */
                 border-color: #1e40af !important;         /* Optional: border color */
