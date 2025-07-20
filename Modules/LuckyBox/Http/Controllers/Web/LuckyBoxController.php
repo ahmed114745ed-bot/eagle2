@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\LuckyBox\Http\Controllers\web;
+namespace Modules\LuckyBox\Http\Controllers\Web;
 
 use App\Models\Config;
 use Encore\Admin\Form;
