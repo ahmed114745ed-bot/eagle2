@@ -19,7 +19,7 @@ use Modules\LuckyBox\Entities\PickBoxList;
 use Modules\LuckyBox\Entities\UserBoxGift;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\LuckyBox\Http\Services\LuckyBoxServices;
+use Modules\LuckyBox\Services\LuckyBoxServices;
 
 class SuperLuckyBoxJob implements ShouldQueue
 {
