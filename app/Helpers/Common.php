@@ -2063,7 +2063,7 @@ class Common
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
-                    $hasColor = Common::hasInPack(@$resource->receiveragency->owner->id, 18, true),
+                    $hasColor = Common::hasInPack(@$resource->receiveragency?->owner->id, 18, true),
 
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
@@ -2078,17 +2078,17 @@ class Common
                 ];
             case 'user':
                 return [
-                    $hasColor = Common::hasInPack(@$resource->receivnerUser->id, 18, true),
+                    $hasColor = Common::hasInPack(@$resource->receiver?->id, 18, true),
 
-                    'id' => $resource->receivnerUser->id ?? '',
-                    'name' => $resource->receiverUser->name ?? '',
-                    'image' => $resource->receiverUser->profile->avatar ?? '',
-                    'uuid' => $resource->receiverUser->uuid ?? '',
+                    'id' => $resource->receiver->id ?? '',
+                    'name' => $resource->receiver->name ?? '',
+                    'image' => $resource->receiver->profile->avatar ?? '',
+                    'uuid' => $resource->receiver->uuid ?? '',
                     'type' => 'user',
-                    'url' => $resource->receiverUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
-                    'image_color'          => @$resource->receiverUser->color_image,
-                    'id_image'             => @$resource->receiverUser->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receivnerUser->id, 18, 'color') ?? '' : '',
+                    'url' => $resource->receiver ? url("admin/users/{$resource->receiver->id}") : '#',
+                    'image_color'          => @$resource->receiver->color_image,
+                    'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
 
                 ];
             default:
