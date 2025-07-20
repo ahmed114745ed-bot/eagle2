@@ -58,12 +58,8 @@ class VipCommon
         self::updateUserCurrentVip($user);
     }
     
-    public static function deactivateVip(int $vipId, int $userId): void
+    public static function deactivateVip(UserVip $vip): void
     {
-        $vip = UserVip::where('id', $vipId)
-            ->where('user_id', $userId)
-            ->first();
-    
         if ($vip) {
             $vip->update(['is_used' => 0]);
             $vip->packs()->update(['is_used' => 0]);
@@ -96,7 +92,7 @@ class VipCommon
             })->first();
 
         if ($vip) {
-            self::deactivateVip($vip->id, $user->id);
+            self::deactivateVip($vip);
         }
     }
 

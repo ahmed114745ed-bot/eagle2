@@ -127,7 +127,7 @@ class VipService
            
             VipCommon::handleVipActivation($userVip);
         } else {
-            VipCommon::deactivateVip($userVip->id, $user->id);
+            VipCommon::deactivateVip($userVip);
         }
 
         return ['target_id' => $userVip->id];
