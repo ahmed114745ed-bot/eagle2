@@ -331,22 +331,27 @@ class PkEventGiftController extends MainController
         $form->hidden('level')->value(request()->route('level'));
         $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
-                $form->select('target1', trans('wares'))->options(function () {
-                    $ops = [0 => ''];
-                    $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
-                    foreach ($wares as  $ware) {
-                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
+                $form->select('target1', 'Wares')->options(function () {
+                    $wares = Ware::query()->select(['id', 'name', 'type', 'show_img'])->whereIn('type', [4, 5, 6])->get();
+
+                    $options = [];
+                    foreach ($wares as $ware) {
+                        $label = $ware->name . ' (' . $ware->id . ')';
 
                         if ($ware->type == 4) {
-                            $ops[$ware->id] .= '_' . 'bubble';
+                            $label .= ' - bubble';
                         } elseif ($ware->type == 5) {
-                            $ops[$ware->id] .= '_' . 'intro';
+                            $label .= ' - intro';
                         } elseif ($ware->type == 6) {
-                            $ops[$ware->id] .= '_' . 'frame';
+                            $label .= ' - frame';
                         }
+
+                        // دمج الصورة مع النص باستخدام HTML
+                        $options[$ware->id] = "<img src='" . asset($ware->show_img) . "' style='width:30px;height:30px;border-radius:4px;margin-right:5px;'> $label";
                     }
-                    return $ops;
-                });
+
+                    return $options;
+                })->attribute(['data-html' => 'true', 'class' => 'select2-html']);
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
