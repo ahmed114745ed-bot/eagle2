@@ -48,11 +48,11 @@ class AgencyUsersTargetResource extends JsonResource
 
 
         $agencySallary = UserSallary::query()
-            ->where('user_id', $this->id)
-            ->where('user_agency_id', $this->agency_id)
-            ->whereBetween('created_at', [$from, $to]) 
-            ->latest('created_at')
-            ->value('agency_sallary');
+        ->where('user_id', $this->id)
+        ->where('user_agency_id', $this->agency_id)
+        ->whereBetween('created_at', [$from, $to]) 
+        ->latest('created_at')
+        ->value('agency_sallary');
 
         $totalSeconds= $this->UserliveTime()
             ->whereBetween('created_at', [$from, $to])
@@ -132,6 +132,8 @@ class AgencyUsersTargetResource extends JsonResource
             ->sum('giftPrice');
 
 
+   
+        $hasColor = Common::hasInPack(@$this->id, 18, true);
 
         return [
             'id' => $this->id ?? 0,
