@@ -4,31 +4,21 @@ namespace App\Http\Controllers\Api\V1\Room;
 
 use App\Facades\UserHandling;
 use App\Models\AllGame;
-use App\Models\Pk;
 use App\Models\Room;
-use App\Models\RoomVisitor;
 use App\Models\User;
-use App\Models\BoxUse;
-use App\Models\Family;
-use App\Models\Follow;
+
 use App\Helpers\Common;
-use App\Models\GiftLog;
 use App\Models\LiveTime;
-use App\Models\Background;
 use App\Jobs\ResetCharisma;
 use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
-use App\Services\RoomService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Jobs\EnterRoomZigoRequest;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EditRoomRequest;
 use App\Models\RequestBackgroundImage;
-use App\Http\Resources\Api\V1\PkResource;
-use App\Jobs\SendNotificationToAllFollowers;
+
 use App\Repositories\Room\RoomRepoInterface;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Services\ProfileRelationsService;
@@ -246,20 +236,13 @@ class EnteranceController extends Controller
         // $owner_id = $request['owner_id'];
         $user = $request->user();
         $room_id = $request->input('room_id');
-        $owner_id = $request->input('owner_id');
 
-        if (!$room_id && !$owner_id) {
+        if (!$room_id ) {
             return Common::apiResponse(0, __('Please provide either owner_id or room_id.'));
         }
-        if ($room_id) {
-            $room = Room::find($room_id);
-            if (!$room) {
-                return Common::apiResponse(0, __('This room was not found.'));
-            }
-            $owner_id = $room->uid;
-        }
 
-
+        $room = Room::findOrFail($room_id);
+        $owner_id = $room->uid;
 
 
         $ban = Common::ifRoomHasband($owner_id);
@@ -268,7 +251,7 @@ class EnteranceController extends Controller
         }
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
-        return $this->enteranceRoomService->enterRoom($user, $request, $room_pass, $owner_id);
+        return $this->enteranceRoomService->enterRoom($user, $request, $room_pass, $room);
     }
 
     private function updateRoom($user_id, $owner_id, Room &$room)

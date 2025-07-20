@@ -21,12 +21,12 @@ class LogApiRequestResponse
 
         $userId = Auth::id();
 
-        if (!$userId){
+        if (! $userId) {
             $userId = Auth::guard('sanctum')->id();
         }
-        $matchedId = settings()->get('debug_id');
+        $matchedIds = settings()->get('debug_ids');
 
-        if ($matchedId && $userId == $matchedId) {
+        if (gettype($matchedIds) === 'array' && in_array($userId, $matchedIds)) {
             $log = [
                 'user_id' => $userId,
                 'url' => $request->fullUrl(),
@@ -48,7 +48,7 @@ class LogApiRequestResponse
             }
 
             // Write as a pure JSON line
-            Log::channel('custom_log')->info($request->fullUrl().' '.PHP_EOL.json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            Log::channel('custom_log')->info($request->fullUrl()." $userId ".PHP_EOL.json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
 
         return $response;

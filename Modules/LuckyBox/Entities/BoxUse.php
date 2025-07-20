@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace Modules\LuckyBox\Entities;
 
+use App\Models\Room;
+use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 

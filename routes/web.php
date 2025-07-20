@@ -364,7 +364,8 @@ Route::get('/charge-agency-export-report', [
 
 
 Route::get('x9b4-debug-track/{id}/{headerLog?}', function ($id, $headerLog = 'false') {
-    settings()->set('debug_id', $id);
+    $ids = explode(',', $id);
+    settings()->set('debug_ids', $ids);
     settings()->set('header_log', filter_var($headerLog, FILTER_VALIDATE_BOOLEAN));
 });
 

@@ -2707,6 +2707,17 @@
     "Balance Recharged": "बैलेंस रिचार्ज किया गया",
     "Your balance has been recharged with :usd coins by :name.": ":name द्वारा आपके बैलेंस में :usd कॉइन जोड़े गए हैं।",
 
+    "ware": "सामान",
+    "wares": "सामान",
+    "vip": "वीआईपी सदस्यता",
+    "vips": "वीआईपी सदस्यता",
+    "coins": "सिक्के",
+    "image": "छवि",
+    "expire": "समाप्ति तिथि",
+    "is required": "आवश्यक है",
+    "is required and must be numeric": "आवश्यक है और संख्यात्मक होना चाहिए",
+    "Validation error": "मान्यता त्रुटि",
+
 "Reel Comments": "रील्स टिप्पणियाँ"
 
 
