@@ -1,7 +1,9 @@
 <?php
 
-use Modules\LuckyBox\Http\Controllers\Web\BoxUseController;
-use Modules\LuckyBox\Http\Controllers\Web\LuckyBoxController;
+use Modules\LuckyBox\Http\Controllers\web\BoxUseController;
+use Modules\LuckyBox\Http\Controllers\web\LuckyBoxController;
+
+use Illuminate\Support\Facades\Route;
 
 
 

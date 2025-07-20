@@ -4,31 +4,21 @@ namespace App\Http\Controllers\Api\V1\Room;
 
 use App\Facades\UserHandling;
 use App\Models\AllGame;
-use App\Models\Pk;
 use App\Models\Room;
-use App\Models\RoomVisitor;
 use App\Models\User;
-use App\Models\BoxUse;
-use App\Models\Family;
-use App\Models\Follow;
+
 use App\Helpers\Common;
-use App\Models\GiftLog;
 use App\Models\LiveTime;
-use App\Models\Background;
 use App\Jobs\ResetCharisma;
 use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
-use App\Services\RoomService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Jobs\EnterRoomZigoRequest;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EditRoomRequest;
 use App\Models\RequestBackgroundImage;
-use App\Http\Resources\Api\V1\PkResource;
-use App\Jobs\SendNotificationToAllFollowers;
+
 use App\Repositories\Room\RoomRepoInterface;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Services\ProfileRelationsService;
