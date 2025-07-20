@@ -20,7 +20,8 @@ class UserCoinLog extends Model
         'created_at',
         'updated_at',
         'previous_amount',
-        'item_name'
+        'item_name',
+        'amount_before'
     ];
 
     public $timestamps = true;
