@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(
     [
         'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
+        
         'middleware' => [
             'web',
             'admin',
