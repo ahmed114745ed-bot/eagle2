@@ -263,7 +263,7 @@ class UserController extends MainController
                 $senderImg = getImagePath($sender_img) ?? $defaultImage;
 
                 $charger_img = @$this->getTotalChargeLevel($this->total_charge_level)?->img ?? '';
-                $chargerImg = getImagePath($charger_img) ?? '';
+                $chargerImg = getImagePath($charger_img) ?? $defaultImage;
 
                 // Check if the image exists
                 if (!isImageExists($url)) {
@@ -278,9 +278,9 @@ class UserController extends MainController
                                 <strong>$name</strong><br>
                                 <span style='font-size: smaller;'>UID: $uid</span><br>
                                 <span style='font-size: smaller;'>special: $special</span><br>
-                                <img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>
-                                <img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>
-                                <img src='$chargerImg' style='width: 20px; height: 20px; border-radius: 50%;'>
+                                " . (!empty($receiverImg) ? "<img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
+                                " . (!empty($senderImg) ? "<img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
+                                " . (!empty($chargerImg) ? "<img src='$chargerImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
                             </div>
                         </div>
                         ";
