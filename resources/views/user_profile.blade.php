@@ -1850,7 +1850,7 @@
                             <th>{{ __('balance yet') }}</th>
                             <th>{{ __('from date') }}</th>
                             <th>{{ __('to date') }}</th>
-                            <th>{{ __('action') }}</th>
+                            <!-- <th>{{ __('action') }}</th> -->
                         </tr>
                     </thead>
                     @if($usersCoins && $usersCoins->count())
@@ -1870,9 +1870,9 @@
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$coin->id }}">
+                                            <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </td>
                                 </tr>
