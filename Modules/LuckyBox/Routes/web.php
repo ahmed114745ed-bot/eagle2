@@ -33,8 +33,8 @@ Route::group(
         'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::resource('boxes', LuckyBoxController::class);
-        Route::get('lucy-box-settings', [LuckyBoxController::class, 'box_settings']);
-        Route::resource('thrown_boxes', BoxUseController::class);
+        Route::resource('lucky-boxes', LuckyBoxController::class);
+        Route::get('lucky-box-settings', [LuckyBoxController::class, 'box_settings']);
+        Route::resource('thrown-boxes', BoxUseController::class);
     }
 );
