@@ -347,7 +347,7 @@ class PkEventGiftController extends MainController
                         }
 
                         // دمج الصورة مع النص باستخدام HTML
-                        $options[$ware->id] = "<img src='" . asset($ware->show_img) . "' style='width:30px;height:30px;border-radius:4px;margin-right:5px;'> $label";
+                        $options[$ware->id] = "<img src='" . getImagePath($ware->show_img) . "' style='width:30px;height:30px;border-radius:4px;margin-right:5px;'> $label";
                     }
 
                     return $options;
