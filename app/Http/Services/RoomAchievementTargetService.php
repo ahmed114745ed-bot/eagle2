@@ -38,7 +38,7 @@ class RoomAchievementTargetService
                 if (!$user) return;
                 $user->di += $roomTarget->coins;
                 $user->save();
-                Log::info('Updated user coins', [
+                \Log::info('Updated user coins', [
                     'user_id' => $user->id,
                     'added' => $roomTarget->coins,
                     'after' => $user->di
