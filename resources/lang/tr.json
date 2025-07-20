@@ -3126,6 +3126,17 @@
     "Balance Recharged": "Bakiye Yüklendi",
     "Your balance has been recharged with :usd coins by :name.": "Bakiyenize :name tarafından :usd coin yüklendi.",
 
+    "ware": "Ürün",
+    "wares": "Ürün",
+    "vip": "VIP Üyelik",
+    "vips": "VIP Üyelik",
+    "coins": "Jetonlar",
+    "image": "Resim",
+    "expire": "Son Kullanma",
+    "is required": "Zorunlu",
+    "is required and must be numeric": "Zorunlu ve sayısal olmalı",
+    "Validation error": "Doğrulama hatası",
+
     "Reel Comments": "Video Yorumları"
 
 
