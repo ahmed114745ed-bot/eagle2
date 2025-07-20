@@ -263,7 +263,7 @@ class UserController extends MainController
                 $senderImg = getImagePath($sender_img) ?? $defaultImage;
 
                 $charger_img = @$this->getTotalChargeLevel($this->total_charge_level)?->img ?? '';
-                $chargerImg = getImagePath($charger_img) ?? $defaultImage;
+                $chargerImg = getImagePath($charger_img) ??'';
 
                 // Check if the image exists
                 if (!isImageExists($url)) {
