@@ -202,7 +202,6 @@ class DailyPrizeController extends MainController
         $typeId = request()->route('type');
         $orderId = request()->route('id');
 
-        // The "order" field remains required and unique.
         $form->select('order', __('order'))->options([
             1 => __('first_day'),
             2 => __('second_day'),
@@ -213,7 +212,6 @@ class DailyPrizeController extends MainController
             7 => __('seventh_day'),
         ])->rules('required|unique:daily_gifts,order,' . $orderId . ',id,type,' . $typeId);
 
-        // The main "gift_type" select is always required.
         $form->select('gift_type', __('Gift type'))
             ->options([
                 "ware"        => __('ware'),
