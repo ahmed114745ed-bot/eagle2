@@ -2,6 +2,8 @@
 
 namespace App\Http\Services;
 
+use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\GiftLog;
@@ -33,16 +35,20 @@ class RoomAchievementTargetService
 
             if (!$roomTarget) return;
             if ($this->reachTarget($room->id, $roomTarget->id)) {
-                
                 $user = User::find($room->uid);
                 if (!$user) return;
+                $amountBefore =  Common::getCurrentBalance($user->id);
+                UserCoinLogHelper::log(
+                    $user->id ,
+                    'roomTarget',
+                    'room_targets',
+                    $roomTarget->coins ?? 0,
+                    $amountBefore ?? 0,
+                    'room_target'
+                );
+               
                 $user->di += $roomTarget->coins;
                 $user->save();
-                \Log::info('Updated user coins', [
-                    'user_id' => $user->id,
-                    'added' => $roomTarget->coins,
-                    'after' => $user->di
-                ]);
                 RoomOwnerAchievement::create([
                     'target_id' => $roomTarget->id,
                     'room_id' => $room->id,
