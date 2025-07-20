@@ -320,7 +320,7 @@ class PkEventGiftController extends MainController
      *
      * @return Form
      */
-  protected function form()
+protected function form()
 {
     $form = new Form(new PkReward());
     $this->disableFormTools($form);
@@ -390,25 +390,28 @@ class PkEventGiftController extends MainController
         return redirect($route);
     });
 
-    // ✅ Inject JavaScript to render images inside select2
+    // Corrected JavaScript to properly render images in select2
     \Admin::script(<<<'JS'
         $(document).ready(function () {
-            function formatOption (state) {
-                if (!state.id) return state.text;
-                return $('<span>' + state.text + '</span>');
-            }
-
             $('.select2-html').select2({
                 escapeMarkup: function (markup) {
                     return markup;
                 },
                 templateResult: function (data) {
+                    if (!data.id) return data.text;
                     return $('<span>' + data.text + '</span>');
                 },
                 templateSelection: function (data) {
+                    if (!data.id) return data.text;
                     return $('<span>' + data.text + '</span>');
                 },
                 width: '100%'
+            });
+            
+            // Additional styling for better appearance
+            $('.select2-container--default .select2-selection--single').css({
+                'height': '38px',
+                'padding-top': '3px'
             });
         });
     JS);
