@@ -320,62 +320,100 @@ class PkEventGiftController extends MainController
      *
      * @return Form
      */
-    protected function form()
-    {
-        $form = new Form(new PkReward());
-        $this->disableFormTools($form);
+  protected function form()
+{
+    $form = new Form(new PkReward());
+    $this->disableFormTools($form);
 
-        $form->hidden('pk_event_id')->value(request('pk_event_id'));
-        $form->hidden('pk_type')->value(request('pk_type'));
+    $form->hidden('pk_event_id')->value(request('pk_event_id'));
+    $form->hidden('pk_type')->value(request('pk_type'));
+    $form->hidden('level')->value(request()->route('level'));
 
-        $form->hidden('level')->value(request()->route('level'));
-        $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
-            ->when("ware", function () use ($form) {
-                $form->select('target1', 'Wares')->options(function () {
-                    $wares = Ware::query()->select(['id', 'name', 'type', 'show_img'])->whereIn('type', [4, 5, 6])->get();
+    $form->select('type', trans('type'))->options([
+        "ware" => __('ware'),
+        "vip" => __('vip'),
+        "coins" => __('coins'),
+        "achievement" => __('achievement')
+    ])
+    ->when("ware", function () use ($form) {
+        $form->select('target1', 'Wares')->options(function () {
+            $wares = Ware::query()
+                ->select(['id', 'name', 'type', 'show_img'])
+                ->whereIn('type', [4, 5, 6])
+                ->get();
 
-                    $options = [];
-                    foreach ($wares as $ware) {
-                        $label = $ware->name . ' (' . $ware->id . ')';
+            $options = [];
+            foreach ($wares as $ware) {
+                $label = $ware->name . ' (' . $ware->id . ')';
 
-                        if ($ware->type == 4) {
-                            $label .= ' - bubble';
-                        } elseif ($ware->type == 5) {
-                            $label .= ' - intro';
-                        } elseif ($ware->type == 6) {
-                            $label .= ' - frame';
-                        }
+                if ($ware->type == 4) {
+                    $label .= ' - bubble';
+                } elseif ($ware->type == 5) {
+                    $label .= ' - intro';
+                } elseif ($ware->type == 6) {
+                    $label .= ' - frame';
+                }
 
-                        // دمج الصورة مع النص باستخدام HTML
-                        $options[$ware->id] = "<img src='" . getImagePath($ware->show_img) . "' style='width:30px;height:30px;border-radius:4px;margin-right:5px;'> $label";
-                    }
+                $img = getImagePath($ware->show_img);
+                $options[$ware->id] = "<img src='{$img}' style='width:30px;height:30px;border-radius:4px;margin-right:5px;'> $label";
+            }
 
-                    return $options;
-                })->attribute(['data-html' => 'true', 'class' => 'select2-html']);
-            })
-            ->when("vip", function () use ($form) {
-                $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    foreach ($vips as  $vip) {
-                        $ops[$vip->id] = $vip->name;
-                    }
-                    return $ops;
-                });
-            })
-            ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"));
-            })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
-            });
-        $form->number('expire', __('expire'));
-
-        $form->saved(function (Form $form) {
-
-            $route = url('admin/pk-events-gift/' . request('pk_type') . '/' . request('pk_event_id'));
-            return redirect($route);
+            return $options;
+        })->attribute([
+            'data-html' => 'true',
+            'class' => 'select2-html'
+        ]);
+    })
+    ->when("vip", function () use ($form) {
+        $form->select('target2', trans('vips'))->options(function () {
+            $vips = OVip::query()->select('id', 'name')->get();
+            $ops = [];
+            foreach ($vips as $vip) {
+                $ops[$vip->id] = $vip->name;
+            }
+            return $ops;
         });
-        return $form;
-    }
+    })
+    ->when("coins", function () use ($form) {
+        $form->number("target3", __("coins"));
+    })
+    ->when("achievement", function () use ($form) {
+        $form->image("target4", __('image'))->name(function ($file) {
+            return now()->timestamp . '.' . $file->guessExtension();
+        })->disk('gcs');
+    });
+
+    $form->number('expire', __('expire'));
+
+    $form->saved(function (Form $form) {
+        $route = url('admin/pk-events-gift/' . request('pk_type') . '/' . request('pk_event_id'));
+        return redirect($route);
+    });
+
+    // ✅ Inject JavaScript to render images inside select2
+    \Admin::script(<<<'JS'
+        $(document).ready(function () {
+            function formatOption (state) {
+                if (!state.id) return state.text;
+                return $('<span>' + state.text + '</span>');
+            }
+
+            $('.select2-html').select2({
+                escapeMarkup: function (markup) {
+                    return markup;
+                },
+                templateResult: function (data) {
+                    return $('<span>' + data.text + '</span>');
+                },
+                templateSelection: function (data) {
+                    return $('<span>' + data.text + '</span>');
+                },
+                width: '100%'
+            });
+        });
+    JS);
+
+    return $form;
+}
+
 }
