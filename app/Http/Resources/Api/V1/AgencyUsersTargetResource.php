@@ -46,7 +46,15 @@ class AgencyUsersTargetResource extends JsonResource
         $from = $joinedDate->greaterThan($startOfMonth) ? $joinedDate : $startOfMonth;
         $to = $leaveDate->lessThan($endOfMonth) ? $leaveDate : $endOfMonth;
 
-        $totalSeconds = $this->UserliveTime()
+
+        $agencySallary = UserSallary::query()
+            ->where('user_id', $this->id)
+            ->where('user_agency_id', $this->agency_id)
+            ->whereBetween('created_at', [$from, $to]) 
+            ->latest('created_at')
+            ->value('agency_sallary');
+
+        $totalSeconds= $this->UserliveTime()
             ->whereBetween('created_at', [$from, $to])
             ->get()
             ->reduce(function ($carry, $session) {
@@ -69,27 +77,7 @@ class AgencyUsersTargetResource extends JsonResource
             ->latest()
             ->first();
 
-        // $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
-        //     ->select('id', 'user_diamonds')->get();
-        // $months = collect(range($month - 2, $month - 1))
-        // ->filter(fn($m) => $m > 0)
-        // ->values();
-
-        // $userTargets = UserTarget::where('user_id', $this->id)
-        //     ->where('agency_id', $this->agency_id)
-        //     ->where('add_year', $year)
-        //     ->whereIn('add_month', $months)
-        //     ->select('add_month', 'user_diamonds')
-        //     ->pluck('user_diamonds', 'add_month');
-
-        // $result = [];
-
-        // foreach ($months as $m) {
-        //     $result[] = [
-        //         'month_number' => $m,
-        //         'diamonds'     => $userTargets->get($m, 0),
-        //     ];
-        // }
+ 
         $currentDate = Carbon::create($year, $month, 1);
 
         $monthsWithYears = collect();
@@ -144,21 +132,6 @@ class AgencyUsersTargetResource extends JsonResource
             ->sum('giftPrice');
 
 
-        // $salary = UserSallary::query()
-
-        //     ->where('user_agency_id', $this->agency_id)
-        //     ->where('user_id', $this->id)
-        //     ->where(function ($query) use ($year, $month) {
-        //         $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
-        //     })->sum(DB::raw('sallary - cut_amount'));
-        $agencySallary = UserSallary::query()
-            ->where('user_id', $this->id)
-            ->where('user_agency_id', $this->agency_id)
-            ->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
-            })
-            ->value('agency_sallary');
-        $hasColor = Common::hasInPack(@$this->id, 18, true);
 
         return [
             'id' => $this->id ?? 0,
