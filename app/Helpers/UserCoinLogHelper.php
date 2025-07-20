@@ -29,16 +29,21 @@ class UserCoinLogHelper
         ?string $fromDate = null,
         ?string $toDate = null
     ): UserCoinLog {
-        return UserCoinLog::create([
-            'user_id'    => $userId,
-            'type'       => $type,
-            'sub_type'   => $subType,
-            'amount'     => $amount ?? 0,
-            'amount_before'=> $amountBefore ?? 0,
-            'item_name'=> $itemName ?? 0,
-            'from_date'  => $fromDate ?? Carbon::now()->toDateString(),
-            'to_date'    => $toDate ?? Carbon::now()->toDateString(),
-        ]);
+        $logData = [
+            'user_id'       => $userId,
+            'type'          => $type,
+            'sub_type'      => $subType,
+            'amount'        => $amount ?? 0,
+            'amount_before' => $amountBefore ?? 0,
+            'item_name'     => $itemName ?? 0,
+            'from_date'     => $fromDate ?? Carbon::now()->toDateString(),
+            'to_date'       => $toDate ?? Carbon::now()->toDateString(),
+        ];
+
+        \Log::info('UserCoinLogHelper::log called', $logData);
+
+        return UserCoinLog::create($logData);
+
     }
 }
 
