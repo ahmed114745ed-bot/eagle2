@@ -31,11 +31,12 @@ class RemoveBanUser extends Action
         if (!Admin::user()->can('*')) {
             Permission::check('delete-' . $this->permission_name);
         }
-        $user = User::query()->where('uuid', $request->uid)->first();
+        $user = User::query()->searchByUuid('uuid', $request->uid)->first();
         if (!$user) {
             return $this->response()->error(__('user not found'))->refresh();
         }
-        Ban::query()->where('uid', $request->uid)->delete();
+        $userUuid  = $user->original_uuid;
+        Ban::query()->where('uid',  $userUuid)->delete();
         CustomNotification::removeBanUser($user);
         return $this->response()->success('success')->refresh();
     }

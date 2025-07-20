@@ -912,7 +912,7 @@
             .card-target-filter-phone .col-md-7 {
                 float: none;
             }
-
+           
             .card-target-filter-phone .form-control {
                 display: block;
                 width: 89%;
@@ -920,10 +920,20 @@
                 font-size: 14px;
                 line-height: 1.42857143;
                 color: var(--text-secondary-color) !important;
-                background-color: #fff;
+                background-color: var(--text-secondary-color) !important;;
                 background-image: none;
                 border: 1px solid var(--primary-hover-alpha) !important;
                 border-radius: 4px;
+            }
+            .control {
+                 width: 89%;
+                padding: 6px 12px;
+                color: #ffffff !important;               /* Text color */
+                background-color: #1e3a8a !important;     /* Background color (e.g. dark blue) */
+                border-color: #1e40af !important;         /* Optional: border color */
+                 border-radius: 4px;
+                  font-size: 14px;
+                line-height: 1.42857143;
             }
 
             .card-target-filter-phone .filter-form {
@@ -1582,7 +1592,7 @@
                                 <div class="col-md-4">
                                     <div class="date-flex-row">
                                         <span>{{ __('uuid') }}</span>
-                                        <input type="text" class="form-control"  name="uuid" value="{{ request('uuid') }}">
+                                        <input type="text" class="control"  name="uuid" value="{{ request('uuid') }}">
                                     </div>
                                 </div>
                                 <!-- From Date -->
@@ -1590,7 +1600,7 @@
                                     <div class="date-flex-row">
                                         <i class="fa fa-calendar"></i>
                                         <span>{{ __('From Date') }}</span>
-                                        <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
+                                        <input type="date" class="control" id="from_date" name="start_at" value="{{ request('start_at') }}">
                                     </div>
                                 </div>
                                 <!-- To Date -->
@@ -1598,7 +1608,7 @@
                                     <div class="date-flex-row">
                                         <i class="fa fa-calendar"></i>
                                         <span>{{ __('To Date') }}</span>
-                                        <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
+                                        <input type="date" class="control" id="to_date" name="end_at" value="{{ request('end_at') }}">
                                     </div>
                                 </div>
                                 <!-- Buttons -->
