@@ -121,7 +121,7 @@ class DailyPrizeController extends MainController
             });
         }
 
-        if (!request()->filled('_export_')) {
+//        if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->gift_type == 'ware') {
                     $ware = Ware::find($this->target);
@@ -135,11 +135,15 @@ class DailyPrizeController extends MainController
                     $path = 'coin.png';
                 }
 
+                if (request()->filled('_export_')) {
+                    return '=IMAGE("' . getImagePath($path) . '","flag",1)';
+                }
+
                 /** @var Gift $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
-        }
+//        }
 
         $grid->column('expir', __('expire'));
         Admin::script("

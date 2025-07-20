@@ -656,7 +656,6 @@
     .dropdown-menu {
         position: absolute;
         top: 100%;
-        left: 0;
         z-index: 1000;
         display: none;
         float: left;
@@ -676,6 +675,18 @@
         -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
         box-shadow: 0 6px 12px rgba(0,0,0,.175);
         color: var(--inverse-box-color) !important;
+    }
+
+    .rtl .dropdown-menu {
+        left: unset !important;
+    }
+
+    .ltr .dropdown-menu {
+        left: 0;
+    }
+
+    .rtl .dropdown-menu {
+        right: 0;
     }
 
     select>option{
@@ -912,9 +923,9 @@
 
             }
 
-           .rtl .column-__actions__ .grid-dropdown-actions .dropdown-menu{
-             left: 29px !important;
-           }
+           /*.rtl .column-__actions__ .grid-dropdown-actions .dropdown-menu{*/
+           /*  left: 29px !important;*/
+           /*}*/
            .rtl .pull-role{
             width: 70px;
             position: relative;
