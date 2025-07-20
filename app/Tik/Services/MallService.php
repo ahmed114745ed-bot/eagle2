@@ -35,6 +35,16 @@ class MallService
 
         $totalPrice = $ware->price * $quantity;
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+        $amountBefore =  Common::getCurrentBalance($user->id);
+        $logAmount = -abs($totalPrice);
+        UserCoinLogHelper::log(
+            $user->id ,
+            'pack',
+            'packs',
+            $logAmount ?? 0,
+            $amountBefore ?? 0,
+            $ware->name
+        );
         if ($pack) {
             $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
         }
@@ -55,16 +65,7 @@ class MallService
             ];
             $this->packRepository->create($data);
 
-            $amountBefore =  Common::getCurrentBalance($user->id);
-            $logAmount = -abs($totalPrice);
-            UserCoinLogHelper::log(
-                $user->id ,
-                'pack',
-                'packs',
-                $logAmount ?? 0,
-                $amountBefore ?? 0,
-                $ware->name
-            );
+          
             $this->service($user, $ware->exp, $totalPrice, 'buy');
           
             return Common::apiResponse(1, 'success process');
