@@ -151,7 +151,7 @@ class EnteranceRoomServices
         $userId = $request->user_account;
 
 
-        
+
 
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
@@ -224,7 +224,7 @@ class EnteranceRoomServices
         } elseif (in_array($eventType, [102, 104])) {
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
-            
+
             if (
                 Schema::hasColumn('rooms', 'is_live') &&
                 $room->uid == $user->id &&
@@ -349,14 +349,14 @@ class EnteranceRoomServices
 
     private function updateRoomVisitorsBasedOnEvent($event, $room, $userId)
     {
-       
+
         $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
 
         if ($event == 'room_login' && !in_array($userId, $visitors)) {
 
             $visitors[] = $userId;
         } elseif ($event == 'room_logout') {
-         
+
             UserHandling::calcTime($userId);
             $this->updateMicrophone($room->uid, $userId);
             $visitors = array_diff($visitors, [$userId]);
@@ -392,7 +392,7 @@ class EnteranceRoomServices
 
         if (!$room) return;
         if ($result) {
-          
+
             (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
         }
     }
@@ -411,7 +411,7 @@ class EnteranceRoomServices
         if (!$owner_id) return Common::apiResponse (0,'not found',null,404);
         //check if this user in black-list
         $black_list = Common::getUserBlackListInRoom($owner_id, $user->id);
-        if ($black_list) return Common::apiResponse(false, __('You have been blocked by the other party'), null, 423);
+        if ($black_list) return Common::apiResponse(false, __('You have been blocked by the other party'), null, 422);
 
 
         // get room by owner_id
