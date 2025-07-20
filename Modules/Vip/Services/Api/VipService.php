@@ -125,7 +125,7 @@ class VipService
 
         if ($isUsed) {
            
-            VipCommon::handleVipActivation($userVip->id);
+            VipCommon::handleVipActivation($userVip);
         } else {
             VipCommon::deactivateVip($userVip->id, $user->id);
         }
@@ -268,7 +268,7 @@ class VipService
                 }
 
                 // VipCommon::handelVip($vip, $user, null, $userVip);
-                VipCommon::handleVipActivation($userVip->id);
+                VipCommon::handleVipActivation($userVip);
                 
                 DB::commit();
 

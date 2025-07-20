@@ -22,9 +22,9 @@ class VipCommon
         ]);
     }
     
-    public static function handleVipActivation(int $userVipId): void
+    public static function handleVipActivation(UserVip $userVip): void
     {
-        $userVip = UserVip::with(['user', 'OVip.privilegs'])->findOrFail($userVipId);
+        $userVip->loadMissing(['user', 'OVip.privilegs']);
     
         match ($userVip->using) {
             0 => self::handleInitialActivation($userVip),
