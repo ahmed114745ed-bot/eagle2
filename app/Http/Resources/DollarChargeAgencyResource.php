@@ -16,14 +16,15 @@ class DollarChargeAgencyResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $receiver=   Common::getReceiverInfo($this);
-   
+        $receiver =   Common::getReceiverInfo($this);
 
-        $sender=   Common::getChargerInfo($this);
+
+        $sender =   Common::getChargerInfo($this);
         $is_sender = $sender['id'] == Auth::user()->id;
-        
+        $hasColor = Common::hasInPack($receiver['id'], 18, true);
+
         return [
-            'id'         => $receiver['id'] ,
+            'id'         => $receiver['id'],
             'uuid'       => $receiver['uuid'],
             'image'      => $receiver['image'] ?? '',
             'name'       => $receiver['name'] ?? '',
@@ -31,6 +32,8 @@ class DollarChargeAgencyResource extends JsonResource
             'totalUsed'  => (int) ($this->usd ?? 0),
             'coins'      => $this->amount ?? 0,
             'is_sender'      => $is_sender ?? 0,
+            'colored_name' => $hasColor ? common::wareUserVip($receiver['id'], 18, 'color') ?? '' : '',
+
 
 
         ];
