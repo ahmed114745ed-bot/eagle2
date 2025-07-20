@@ -1,7 +1,7 @@
 <?php
 
-use Modules\LuckyBox\Http\Controllers\web\BoxUseController;
-use Modules\LuckyBox\Http\Controllers\web\LuckyBoxController;
+use Modules\LuckyBox\Http\Controllers\Web\BoxUseController;
+use Modules\LuckyBox\Http\Controllers\Web\LuckyBoxController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(
     [
         'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
+        
         'middleware' => [
             'web',
             'admin',
@@ -33,8 +33,8 @@ Route::group(
         'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::resource('boxes', LuckyBoxController::class);
-        Route::get('lucy-box-settings', [LuckyBoxController::class, 'box_settings']);
-        Route::resource('thrown_boxes', BoxUseController::class);
+        Route::resource('lucky-boxes', LuckyBoxController::class);
+        Route::get('lucky-box-settings', [LuckyBoxController::class, 'box_settings']);
+        Route::resource('thrown-boxes', BoxUseController::class);
     }
 );

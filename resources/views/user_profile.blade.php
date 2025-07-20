@@ -1158,9 +1158,17 @@
 
             </div>
         </div>
-        <button class="btn-back" onclick="window.location.href='{{ url('admin/users') }}'">
-            <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
-        </button>
+        <div class="card p-3 bg-danger-subtle">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url('admin/users/' . $user->id . '/edit') }}" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
+                </a>
+
+                <button type="submit" class="btn btn-danger">
+                    {{ __('Update') }}
+                </button>
+            </div>
+        </div>
     </div>
 
 
