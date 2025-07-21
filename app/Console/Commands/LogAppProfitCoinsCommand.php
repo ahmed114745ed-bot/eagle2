@@ -97,7 +97,8 @@ class LogAppProfitCoinsCommand extends Command
                         break;
                 }
                 $this->info("Logging item: [$itemName] from table [$table], row ID: $row->id");
-
+                $amountBefore += $row->app_profit_coins;
+                
                 $logs[] = [
                     'user_id' => $row->{$userColumn},
                     'type' => $type,
