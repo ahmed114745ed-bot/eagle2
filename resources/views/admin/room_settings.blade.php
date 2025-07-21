@@ -143,7 +143,87 @@
 
     button {
         width: 200px;
+    }
+    /* Toggle Switch Styling */
+    .feature-toggle-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
 
+    .toggle-label {
+        margin-left: 10px;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .feature-description-container {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .external-content {
+        min-height: 200px;
+    }
+
+    .loading {
+        color: #888;
+        font-style: italic;
     }
 </style>
 </head>
@@ -153,6 +233,7 @@
         <div class="settings-sidebar">
             <h2>{{__("setting")}}</h2>
             <div class="settings-menu">
+                <button onclick="showSection('PaidRoom')"">{{ __('Paid Room') }}</button>
                 <button
                     onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
@@ -160,6 +241,35 @@
         </div>
 
         <div class="settings-content">
+
+            <div id="PaidRoom" class="settings-section active">
+                <h2>{{ __('Paid Room') }}</h2>
+                <form id="paidRoomForm" action="{{ route('admin.room-settings.store') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable Pay Room') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="switch_toggle"
+                                       {{ $settings['paid_room'] ?? false ? 'checked' : '' }}
+                                       onchange="toggleNumberInput(this);">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="paid_room" id="switch_value"
+                                   value="{{ $settings['paid_room'] ?? '0' }}">
+                        </div>
+
+                        <div id="numberInputContainer" style="{{ $settings['paid_room'] ?? false ? 'display: block;' : 'display: none;' }}">
+                            <label>{{ __('Enter Number') }}</label>
+                            <input type="number" name="paid_room_amount" class="form-control"
+                                   value="{{ $settings['paid_room_amount'] ?? '' }}">
+                        </div>
+
+                        <button type="submit">{{ __('Save') }}</button>
+                    </div>
+                </form>
+            </div>
+
             <div id="custom_background_settings" class="settings-section active">
 
                 <h3> {{ __('Custom Background settings') }}</h3>
@@ -224,9 +334,23 @@
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
         </div>
-        <!-- كود JavaScript -->
+
+
         <script>
-            showSection('custom_background_settings');
+            function toggleNumberInput(checkbox) {
+                const numberContainer = document.getElementById('numberInputContainer');
+                const switchValue = document.getElementById('switch_value');
+
+                if (checkbox.checked) {
+                    numberContainer.style.display = 'block';
+                    switchValue.value = '1';
+                } else {
+                    numberContainer.style.display = 'none';
+                    switchValue.value = '0';
+                }
+            }
+
+            showSection('PaidRoom');
             document.addEventListener("DOMContentLoaded", function() {
                 // Function to get query parameter by name
                 function getQueryParam(name) {
@@ -235,7 +359,7 @@
                 }
 
                 // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-                const activeTab = getQueryParam("firsttab") || "custom_background_settings";
+                const activeTab = getQueryParam("firsttab") || "PaidRoom";
 
                 // Show the selected tab
                 showSection(activeTab);
