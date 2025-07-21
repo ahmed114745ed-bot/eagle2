@@ -14,8 +14,9 @@ class AgencyService
     function adminAgencyData($agency): string
     {
         $cacheKey = "agency_image_{$agency->id}";
-        $image = Cache::remember($cacheKey, 3600, function () {
-            $path = @$this->img;
+        $image = Cache::remember($cacheKey, 3600, function () use ($agency){
+
+            $path = @$agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -23,7 +24,7 @@ class AgencyService
                 $url = $defaultImage;
             }
 
-            return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
+            return handleShowImageWithTypes($agency->id, $url, 40, 40, 0);
         });
 
         $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
