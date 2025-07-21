@@ -105,6 +105,7 @@ const SELECTED_USED_WARE =
     4 => 'Avatar Frame',
     5 => 'Bubble Frame',
     6 => 'Entering Special Effects',
+    28 => 'profile frame',
 ];
 
 const PACK_USER =
