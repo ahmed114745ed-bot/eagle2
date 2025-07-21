@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UserService;
 use App\Models\Page;
 use App\Http\Controllers\Controller;
 use App\Models\SalaryTrx;
@@ -44,46 +45,7 @@ class SallariesHistoryController extends MainController
                     $user = $this->user;
                     if (!$user) return '';
 
-                    $uid = $user->original_uuid;
-
-
-                    $special =  $user->uuid_v3;
-
-                    $path = @$user->profile?->avatar;
-                    $defaultImage = asset("images/businessman-icon.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
-
-                    //                $senderLevel = @$this->total_sender_level;
-                    //                $receivedLevel = @$this->total_received_level;
-
-                    $receiver_img = @$user->getImageReceiverOrSender('receiver_id', 1)?->img ?? '';
-                    $receiverImg = getImagePath($receiver_img) ?? $defaultImage;
-
-                    $sender_img = @$user->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
-                    $senderImg = getImagePath($sender_img) ?? $defaultImage;
-
-                    $charger_img = @$user->getTotalChargeLevel($user->total_charge_level)?->img ?? '';
-                    $chargerImg = getImagePath($charger_img) ??'';
-
-                    // Check if the image exists
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-                    $image = handleShowImageWithTypes($user->id, $url, 50, 50);
-
-                    return "
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div>
-                                <strong>$name</strong><br>
-                                <span style='font-size: smaller;'>UID: $uid</span><br>
-                                <span style='font-size: smaller;'>special: $special</span><br>
-                                " . (!empty($receiverImg) ? "<img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
-                                " . (!empty($senderImg) ? "<img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
-                                " . (!empty($chargerImg) ? "<img src='$chargerImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
-                            </div>
-                        </div>
-                        ";
+                    return app(UserService::class)->adminUserAvatar($user);
                 });
         }else{
             $grid->column('name', __('Agency'))->display(function ($name) {
@@ -135,6 +97,8 @@ class SallariesHistoryController extends MainController
 
         return $grid;
     }
+
+
 
 
 }
