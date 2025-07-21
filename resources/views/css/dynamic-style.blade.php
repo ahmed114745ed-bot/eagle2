@@ -1065,10 +1065,10 @@
         filter: brightness(0.85);
     }
 
-    tr[data-key="18"] {
+/*    tr[data-key="18"] {
         background-color: var(--secondary-color) !important;
         filter: brightness(2);
-    }
+    }*/
 
     .tab-button.active {
         background-color: var(--primary-color);
