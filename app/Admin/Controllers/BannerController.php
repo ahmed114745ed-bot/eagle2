@@ -138,24 +138,15 @@ class BannerController extends MainController
     {
 
         $form = new Form(new Banner());
+        $this->disableFormTools($form);
 
-        $form->text('title', __('Title'));
-        $form->text('button_text', __('Button text'));
-        $form->image('image_url', __('Image url'))->required()->dir('banners')->disk('local');
-        $form->text('redirect_url', __('Redirect url'));
-        $form->switch('publish_at', __('Publish Now'));
-        $form->switch('is_active', __('Is active'))->default(0);
-        $form->radio('is_event', __('Is event'))->options([
-            1 => __('Yes'),
-            0 => __('No'),
-        ])->when(1, function (Form $form) {
-            $form->select('event_type', trans('events'))->options([
-                'event' => __('events'),
-                'pk_event' => __('pk_event'),
-                'weekly_star' => __('weekly_star'),
-                'charge_event' => __('charge_event'),
-                'event_period' => __('event_period'),
-            ]);
-        });
+        $form->image('image_url', __('Image url'))->name(function ($file) {
+            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
+        })->required()->dir('banners');
+        $form->switch('publish', __('Publish Now'));
+        $form->number('expire', __('duration(days)'));
+        $form->switch('is_active', __('Is active'));
+
+        return $form;
     }
 }
