@@ -334,7 +334,6 @@ class UserController extends Controller
 
     public function my_data(Request $request)
     {
-        sleep(5);
         $user = $request->user();
         try {
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
