@@ -7,43 +7,62 @@ class UserService
     public function adminUserAvatar($user): string
     {
         $uid = $user->original_uuid;
-
         $special = $user->uuid_v3;
 
-        $path = @$user->profile?->avatar;
         $defaultImage = asset('images/businessman-icon.jpg');
+        $path = $user->profile->avatar ?? null;
+
         $url = getImagePath($path) ?? $defaultImage;
 
-        //                $senderLevel = @$this->total_sender_level;
-        //                $receivedLevel = @$this->total_received_level;
+        // Cache these expensive DB calls in one place
+        $senderAmount = $user->sender_level + $user->sub_sender_level;
+        $receiverAmount = $user->received_level + $user->sub_receiver_level;
 
-        $receiver_img = @$user->getImageReceiverOrSender('receiver_id', 1)?->img ?? '';
-        $receiverImg = getImagePath($receiver_img) ?? $defaultImage;
+        $vipLevels = Vip::collectionBuilder()
+            ->whereIn('type', [1, 2])
+            ->whereIn('level', [$senderAmount, $receiverAmount])
+            ->orderByDesc('exp')
+            ->get()
+            ->keyBy(function ($vip) {
+                return "{$vip->type}_{$vip->level}";
+            });
 
-        $sender_img = @$user->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
-        $senderImg = getImagePath($sender_img) ?? $defaultImage;
+        $receiverLevel = $vipLevels["1_{$receiverAmount}"] ?? null;
+        $senderLevel = $vipLevels["2_{$senderAmount}"] ?? null;
 
-        $charger_img = @$user->getTotalChargeLevel($user->total_charge_level)?->img ?? '';
-        $chargerImg = getImagePath($charger_img) ?? '';
+        $receiverImg = getImagePath($receiverLevel->img ?? null) ?? $defaultImage;
+        $senderImg = getImagePath($senderLevel->img ?? null) ?? $defaultImage;
 
-        // Check if the image exists
-        if (! isImageExists($url)) {
+        // Charge level
+        $chargeLevel = Vip::collectionBuilder()
+            ->where('type', 5)
+            ->where('level', $user->total_charge_level)
+            ->orderByDesc('exp')
+            ->limit(1)
+            ->first();
+
+        $chargerImg = getImagePath($chargeLevel->img ?? null) ?? '';
+
+        // Avoid calling external resources unless necessary
+        if (!isImageExists($url)) {
             $url = $defaultImage;
         }
+
         $image = handleShowImageWithTypes($user->id, $url, 50, 50);
 
         return "
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div>
-                                <strong>$user->name</strong><br>
-                                <span style='font-size: smaller;'>UID: $uid</span><br>
-                                <span style='font-size: smaller;'>special: $special</span><br>
-                                ".(! empty($receiverImg) ? "<img src='$receiverImg' style='width: 32px; height: 14px; '>" : '').'
-                                '.(! empty($senderImg) ? "<img src='$senderImg' style='width: 32px; height: 14px; '>" : '').'
-                                '.(! empty($chargerImg) ? "<img src='$chargerImg' style='width: 32px; height: 14px; '>" : '').'
-                            </div>
-                        </div>
-                        ';
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            $image
+            <div>
+                <strong>{$user->name}</strong><br>
+                <span style='font-size: smaller;'>UID: $uid</span><br>
+                <span style='font-size: smaller;'>special: $special</span><br>
+                " . (!empty($receiverImg) ? "<img src='$receiverImg' style='width: 32px; height: 14px;'>" : "") . "
+                " . (!empty($senderImg) ? "<img src='$senderImg' style='width: 32px; height: 14px;'>" : "") . "
+                " . (!empty($chargerImg) ? "<img src='$chargerImg' style='width: 32px; height: 14px;'>" : "") . "
+            </div>
+        </div>
+    ";
     }
+
 }
