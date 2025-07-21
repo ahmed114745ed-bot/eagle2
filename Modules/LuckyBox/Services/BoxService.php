@@ -119,6 +119,7 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
+        info('box duration'.$box->duration);
         dispatch(new SuperLuckyBoxJob())->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
         info('afterJob');
 

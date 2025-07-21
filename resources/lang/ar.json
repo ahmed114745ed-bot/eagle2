@@ -1771,7 +1771,7 @@
     "request-background-image" : "طلب صورة الخلفية",
     "appear-charger-agency" : "عرض وكالة الشاحن",
     "group Chat":"دردشة جماعية",
-
+    "Export PDF":"تصدير PDF",
     "box-use":" السندوق المستخدم",
     "bill image":"صورة الفاتورة",
     "Agency owner":"مالك الوكالة",
@@ -1791,6 +1791,7 @@
     "company_number": " رقم الهاتف للتواصل بالشركه utd",
     "user target" :"التارجت المحقق",
     "file": "ملف",
+    "Export Excel":"تصدير إكسل",
 
     "Agency Join Requests":"طلبات الانضمام للوكالة",
     "Background Report":"تقرير الخلفية",
@@ -3413,6 +3414,12 @@
     "is required": "مطلوب",
     "is required and must be numeric": "مطلوب ويجب أن يكون رقمًا",
     "Validation error": "خطأ في التحقق",
+
+    "Agency Feature": "ميزة الوكالة",
+    "Enable Agency Feature": "تفعيل ميزة الوكالة",
+    "Enable Reel Feature": "تفعيل ميزة الريل",
+    "Feature Description": "وصف الميزة",
+    "Loading feature description...": "جاري تحميل وصف الميزة...",
 
 "Item Name":"اسم العنصر"
 

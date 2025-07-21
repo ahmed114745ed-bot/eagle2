@@ -343,6 +343,21 @@ if (!function_exists('get_file_details')) {
 }
 
 
+if (!function_exists('getRoomStatusBadge')) {
+    function getRoomStatusBadge($status)
+    {
+        $badges = [
+            1 => '<span class="label label-success">Active</span>',
+            0 => '<span class="label label-default">Inactive</span>',
+            2 => '<span class="label label-danger">Closed</span>',
+            3 => '<span class="label label-warning">Banned</span>',
+            4 => '<span class="label label-info">Closed</span>',
+        ];
+
+        return $badges[$status] ?? '<span class="label label-default">Unknown</span>';
+    }
+}
+
 if (!function_exists('isSubdomain')) {
 
     function isSubdomain($host = null)

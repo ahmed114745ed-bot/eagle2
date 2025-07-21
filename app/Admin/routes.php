@@ -248,6 +248,11 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
+        Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
+        Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
+        Route::post('get-users', [RoomController::class, 'getUsers'])->name('get.users');
+
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
@@ -288,6 +293,7 @@ Route::group(
         Route::resource('families', 'FamilyController');
         Route::resource('targets', 'TargetController');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
+        Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel']);
         Route::resource('polices', PoliceController::class);
         Route::resource('offers', OfferController::class);
         Route::resource('payment-gateways', PaymentGetWayController::class);
@@ -411,7 +417,7 @@ Route::group(
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');
-       
+
         Route::get('filter-agencies', App\Admin\Controllers\Filter\AgencyController::class)->name('filter-agencies');
         Route::resource('reports', 'ReportController');
         Route::resource('charges-reports', 'ChargeReportController');

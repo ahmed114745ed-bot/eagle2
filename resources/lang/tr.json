@@ -3137,6 +3137,10 @@
     "is required and must be numeric": "Zorunlu ve sayısal olmalı",
     "Validation error": "Doğrulama hatası",
 
+    "Enable Reel Feature": "Reel Özelliğini Etkinleştir",
+    "Feature Description": "Özellik Açıklaması",
+    "Loading feature description...": "Özellik açıklaması yükleniyor...",
+
     "Reel Comments": "Video Yorumları"
 
 

@@ -328,7 +328,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
             });
 
-            
+
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
@@ -575,7 +575,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::get('app_feature', [AppFeatureController::class, 'show']);
-
 
             Route::group(['prefix' => 'paytabs', 'as' => 'paytabs.'], function () {
                 Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');
