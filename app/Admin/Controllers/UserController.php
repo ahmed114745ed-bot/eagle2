@@ -279,7 +279,7 @@ class UserController extends MainController
                 overflow-y: auto !important;
             }
         ");
-        $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+       /* $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             return $this->sameDeviceUsers()->count();
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
             $users         = $this->sameDeviceUsers;
@@ -314,7 +314,7 @@ class UserController extends MainController
             });
 
             return new Table([__('Name'), __('phone')], $rows->toArray());
-        });
+        });*/
 
 
         $permission = $this->permission_name;
