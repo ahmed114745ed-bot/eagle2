@@ -40,13 +40,12 @@ class UserService
             ->where('type', 5)
             ->where('level', $user->total_charge_level)
             ->orderByDesc('exp')
-            ->limit(1)
             ->first();
 
         $chargerImg = getImagePath($chargeLevel->img ?? null) ?? '';
 
         // Avoid calling external resources unless necessary
-        if (!isImageExists($url)) {
+        if (! isImageExists($url)) {
             $url = $defaultImage;
         }
 
