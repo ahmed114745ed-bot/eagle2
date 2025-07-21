@@ -60,6 +60,7 @@ use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
+use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
@@ -414,6 +415,11 @@ Route::group(
             Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
         });
         Route::resource('vip_privilege', 'VipPrivilegeController');
+        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        // });
+        // Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');
@@ -477,9 +483,10 @@ Route::group(
         Route::resource('/uuid_dedicate', 'SpecialWareDedicateController');
         Route::get('/vips_dedicate', 'DedicateVipController@index');
         Route::resource('/bans', 'BanController');
-                Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
+        Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
         Route::resource('/bans-rooms', 'BanRoomsController');
+        Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallaries');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
         Route::resource('/group-chat', 'GroupChatController');
