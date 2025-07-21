@@ -14,8 +14,8 @@ class RoomSettingController extends Controller
         $paidRoom = Config::where('name', 'paid_room')->first();
         $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
         $data = [
-            $paidRoom->name => (bool)$paidRoom->value ?? false,
-            $paidRoomAmount->name => $paidRoomAmount->value ?? 0,
+            'paid_room' => (bool)$paidRoom->value ?? false,
+            'paid_room_amount' => $paidRoomAmount->value ?? 0,
         ];
 
         return Common::apiResponse(true, '', $data, 200);
