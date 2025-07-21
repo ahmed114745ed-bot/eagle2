@@ -33,7 +33,7 @@ class SallariesHistoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SalaryTrx);
-        $grid->model()->where("type",\request("type"));
+        $grid->model()->where("type",\request("type"))->orderByDesc('id');
         $grid->id(__('Id'));
         if(\request("type") == 0){
             $grid->column ('user.uuid',__ ('uuid'));
@@ -44,13 +44,7 @@ class SallariesHistoryController extends MainController
             $actions->disableEdit();
             $actions->disableView();
         });
-        $grid->type()->display(function ($type) {
-            if($type == 0){
-                return "User";
-            }else{
-                return "Agency";
-            }
-        });
+
         $grid->amount()->display(function ($num) {
             if($num > 0){
                 return "<span class='text-primary '>$num</span>";
