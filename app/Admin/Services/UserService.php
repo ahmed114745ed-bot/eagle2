@@ -2,6 +2,8 @@
 
 namespace App\Admin\Services;
 
+use App\Models\Vip;
+
 class UserService
 {
     public function adminUserAvatar($user): string
