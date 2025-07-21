@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UserService;
 use App\Models\Page;
 use App\Http\Controllers\Controller;
 use App\Models\SalaryTrx;
@@ -10,6 +11,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Support\Facades\Cache;
 
 class SallariesHistoryController extends MainController
 {
@@ -36,9 +38,45 @@ class SallariesHistoryController extends MainController
         $grid->model()->where("type",\request("type"))->orderByDesc('id');
         $grid->id(__('Id'));
         if(\request("type") == 0){
-            $grid->column ('user.uuid',__ ('uuid'));
+
+            $grid->column('name', __('Name'))
+                ->display(function ($name) {
+
+                    $user = $this->user;
+                    if (!$user) return '';
+
+                    return app(UserService::class)->adminUserAvatar($user);
+                });
         }else{
-            $grid->column ('agency.owner_id',__ ('uuid') . __("owner_room_id"));
+            $grid->column('name', __('Agency'))->display(function ($name) {
+                $agency = $this->agency;
+                if(!$agency) return '';
+
+                $cacheKey = "agency_image_{$agency->id}";
+                $image = Cache::remember($cacheKey, 3600, function () {
+                    $path = @$this->img;
+                    $defaultImage = asset("images/icon-agency.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
+
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                    return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
+                });
+
+                $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
+
+                return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            {$image}
+                            <div style='display: flex; flex-direction: column;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='font-size: smaller;'>ID: {$agency->id}</span>
+                            </div>
+                        </div>
+                    </a>";
+            });
         }
         $grid->actions(function ($actions) {
             $actions->disableEdit();
@@ -59,6 +97,8 @@ class SallariesHistoryController extends MainController
 
         return $grid;
     }
+
+
 
 
 }
