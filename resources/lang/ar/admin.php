@@ -429,9 +429,9 @@ return [
     "webhook_id" => "معرف ويب هوك",
 
     "target_no" => 'رقم الهدف',
-    "diamonds" => 'هدف الألماس',
-    "usd" => 'دولار',
-    "agency_share" => 'راتب الوكلاء',
+    "diamonds" => ' الماس',
+    "usd" => 'راتب المضيف ',
+    "agency_share" => 'نسبه الوكالة',
     "db_percentage" => 'نسبة BD',
     "hours" => 'ساعات',
     "days" => 'أيام',
