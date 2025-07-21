@@ -45,13 +45,18 @@ class WareObserver
                 settings()->set('extra_updated_at', time());
             } elseif ($ware->type == 28) {
                 settings()->set('profile_frame_updated', time());
-            } elseif ($ware->type == 5) {
-                settings()->set('bubble_frame_updated_at', time());
             }
             elseif ($ware->type == 12) {
                 settings()->set('wappel_frame_updated_at', time());
             }
 
+        }
+
+        if ($ware->type == 5 && ($ware->isDirty('top') ||
+                $ware->isDirty('left') ||
+                $ware->isDirty('right') ||
+                $ware->isDirty('bottom'))) {
+            settings()->set('bubble_frame_updated_at', time());
         }
 
 
