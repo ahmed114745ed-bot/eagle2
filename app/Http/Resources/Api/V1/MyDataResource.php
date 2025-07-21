@@ -223,7 +223,7 @@ class MyDataResource extends JsonResource
 
             ],
             'phone_bind' => (bool)@$this->phone,
-//            'vip' => Common::ovip_center($this),
+            'vip' => Common::ovip_center($this),
             'image' => @$this->UserVip->OVip->img,
             'family_id' => $f == null ? null : @$this->family_id,
             'uuid' => @$this->uuid,
@@ -235,8 +235,8 @@ class MyDataResource extends JsonResource
             'profile_visitors' => $this->profileVisits()->count(),
 
             'profile' => $this->profile ? new ProfileResource($this->profile) : null,
-//            'level' => Common::level_center(@$this),
-//            'charge_level' => Common::chargeLevel(@$this->id),
+            'level' => Common::level_center(@$this),
+            'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
             $this->merge((new MyStoreResource($this->resource))),
             'family_data' => $f,
