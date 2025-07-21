@@ -26,9 +26,9 @@ class MallService
         return $this->wareRepository->all($userId, $type);
     }
 
-    public function getAllWares($userId, $type)
+    public function getAllWares($type, $userId = null)
     {
-        return $this->wareRepository->allWithType($userId, $type);
+        return $this->wareRepository->allWithType( $type, $userId);
     }
 
     public function buyWares($user, $wareId, $quantity)
