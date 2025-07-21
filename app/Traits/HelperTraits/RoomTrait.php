@@ -6,6 +6,7 @@ namespace App\Traits\HelperTraits;
 
 use App\Helpers\Common;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Models\LiveTime;
 use App\Models\Mic;
 use App\Models\Pk;
 use App\Models\Room;
@@ -147,6 +148,32 @@ trait RoomTrait
         return $roomInfo;
     }
 
+    public static function calcTime($uid)
+    {
+        $user  = User::find($uid);
+        $timer =
+            LiveTime::query()->where('uid', $uid)->whereDate('created_at', today())->where('end_time', null)->orderByDesc('id')->first();
+        if ($timer) {
+            $hours           = round((time() - $timer->start_time) / (60 * 60), 2);
+            $timer->end_time = time();
+            $timer->hours    = $hours;
+            $timer->save();
+            //$user_day = UserDay::where('user_id', $uid)->whereDate('created_at', today())->first();
+            $user_hours =
+                LiveTime::query()->where('uid', $user->id)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->whereDay('created_at', '=', Carbon::now()->day)->sum('hours');
+
+
+            $hours = (int)$user_hours;
+
+            if ($hours >= 1 && $user->today_days == 0) {
+                DB::statement("
+                UPDATE users
+                SET today_days = 1
+                WHERE id = :id
+            ", ['id' => $user->id]);
+            }
+        }
+    }
 
 
     //exit room - perform action

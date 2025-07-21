@@ -34,6 +34,16 @@ class Pk extends Model
         return number_format($res, 2);
     }
 
+    public function team1Boss()
+    {
+        return $this->belongsTo(User::class, 'team_1_boss')->with('profile');
+    }
+
+    public function team2Boss()
+    {
+        return $this->belongsTo(User::class, 'team_2_boss')->with('profile');
+    }
+
     public function room()
     {
         return $this->belongsTo(Room::class, 'room_id');
