@@ -54,7 +54,7 @@ class SallariesHistoryController extends MainController
                     return '';
                 }
 
-                return app(AgencyService::class)->adminAgencyData($agency, $name);
+                return app(AgencyService::class)->adminAgencyData($agency);
             });
         }
         $grid->actions(function ($actions) {

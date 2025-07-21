@@ -11,7 +11,7 @@ class AgencyService
      * @param $name
      * @return string
      */
-    function adminAgencyData($agency, $name): string
+    function adminAgencyData($agency): string
     {
         $cacheKey = "agency_image_{$agency->id}";
         $image = Cache::remember($cacheKey, 3600, function () {
@@ -32,7 +32,7 @@ class AgencyService
                         <div style='display: flex; align-items: center; gap: 10px;'>
                             {$image}
                             <div style='display: flex; flex-direction: column;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$agency->name}</span>
                                 <span style='font-size: smaller;'>ID: {$agency->id}</span>
                             </div>
                         </div>

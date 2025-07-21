@@ -261,7 +261,7 @@ class UserController extends MainController
                     return '';
                 }
 
-                return app(AgencyService::class)->adminAgencyData($agency, $name);
+                return app(AgencyService::class)->adminAgencyData($agency);
             });
 
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
