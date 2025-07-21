@@ -3424,8 +3424,9 @@
     "Paid Room": "الغرفة المدفوعة",
     "Enable Pay Room": "تفعيل الغرفة المدفوعة",
     "Enter Number": "أدخل المبلغ",
+    "you do not have enough coins for creating a room": "لا تملك عملات كافية لإنشاء غرفة",
 
-"Item Name":"اسم العنصر"
+    "Item Name":"اسم العنصر"
 
 
 
