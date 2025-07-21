@@ -507,7 +507,7 @@ class OvipGiftTapController extends MainController
         $alert = !$type;
 
         // Inject JS to set type param on first load
-        if (!request()->has('type') && $privilegeTypes->isNotEmpty()) {
+        if (!request()->has('type') && $privilegeTypes?->isNotEmpty()) {
             $firstType = $privilegeTypes->keys()->first();
 
             \Encore\Admin\Admin::script(<<<SCRIPT
