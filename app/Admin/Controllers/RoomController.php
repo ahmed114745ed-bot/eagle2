@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Country;
+use App\Models\KickRecord;
 use App\Models\Room;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -13,15 +14,13 @@ use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Admin\Actions\RoomPinAction;
-use App\Http\Controllers\Controller;
 use App\Admin\Actions\CloseRoomAction;
-use Illuminate\Support\Facades\Request;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class RoomController extends MainController
@@ -53,9 +52,14 @@ class RoomController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id, $content
-            ->title(trans('Rooms'))
-            ->body($this->detail($id)));
+        $room = Room::with(['owner.profile', 'roomCategory'])
+            ->withCount('roomVisitors')
+            ->findOrFail($id);
+
+        return $content
+            ->title(__('Room Profile'))
+            ->description(__('Room Details'))
+            ->body(view('room_profile', compact('room')));
     }
 
     /**
@@ -491,7 +495,7 @@ class RoomController extends MainController
         $permissionName = $this->permission_name;
 
         $grid->actions(function ($action) use ($permissionName){
-            $action->disableView();
+//            $action->disableView();
             $pin = $action->row->pin;
             $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
@@ -718,5 +722,145 @@ HTML);
 
 
         return $form;
+    }
+
+    public function removeAdmin(Request $request, $roomId)
+    {
+        $room = Room::findOrFail($roomId);
+        $adminId = $request->admin_id;
+
+        $admins = array_filter(explode(',', $room->room_admin));
+
+        $admins = array_diff($admins, [$adminId]);
+
+        $room->room_admin = implode(',', $admins);
+        $room->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Administrator removed successfully')
+        ]);
+    }
+
+    public function addVisitor(Request $request, $roomId)
+    {
+        $room = Room::findOrFail($roomId);
+
+        if ($room->roomVisitors()->where('user_id', $request->user_id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('User is already a visitor in this room')
+            ]);
+        }
+
+        $room->roomVisitors()->create([
+            'user_id' => $request->user_id,
+            'created_at' => now()
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Visitor added successfully')
+        ]);
+    }
+
+    public function kickVisitor(Request $request, $roomId)
+    {
+        $room = Room::findOrFail($roomId);
+        $visitorId = $request->user_id;
+        $duration = $request->minutes ?? 5;
+
+        if (Common::pack_get(9, $visitorId)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Cannot kick this user')
+            ]);
+        }
+
+        $blackList = $room->room_black;
+        if ($blackList === null) {
+            $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
+        } else {
+            $list = explode(',', $blackList);
+            $exists = false;
+
+            foreach ($list as &$item) {
+                $black = explode('#', $item);
+                if ($black[0] == $visitorId) {
+                    $item = $visitorId . '#' . time() . '#' . ($duration * 60);
+                    $exists = true;
+                }
+            }
+
+            if (!$exists) {
+                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
+            }
+
+            $blackList = implode(',', $list);
+        }
+
+        $room->room_black = $blackList;
+        $room->save();
+
+        Common::quit_hand($room->uid, $visitorId);
+
+        $user = User::find($visitorId);
+        if ($user) {
+            $user->now_room_uid = 0;
+            $user->save();
+        }
+
+        KickRecord::create([
+            "kicked_user_id" => auth()->id(),
+            "user_id" => $visitorId,
+            "room_id" => $room->id,
+        ]);
+
+        $messageContent = [
+            'messageContent' => [
+                'message' => 'kickout',
+                'duration' => $duration
+            ]
+        ];
+
+        Common::sendToZego_4(
+            'SendCustomCommand',
+            $room->id,
+            $room->uid,
+            $visitorId,
+            json_encode($messageContent)
+        );
+
+        Common::calcTime($visitorId);
+
+        $message = __('api.blockRoom', [
+            'name' => $user->name ?? 'Unknown',
+            'actionName' => auth()->user()->name,
+            'duration' => $duration
+        ], 'ar');
+
+        Common::sendToZego_2(
+            'SendBroadcastMessage',
+            $room->id,
+            $room->uid,
+            'room',
+            $message
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Visitor kicked successfully')
+        ]);
+    }
+
+    public function getUsers(Request $request)
+    {
+        $userIds = $request->user_ids;
+
+        $users = User::whereIn('id', array_filter($userIds))
+            ->with('profile:user_id,avatar')
+            ->get(['id', 'name', 'uuid']);
+
+        return response()->json($users);
     }
 }
