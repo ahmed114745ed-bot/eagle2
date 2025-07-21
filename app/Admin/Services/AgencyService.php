@@ -29,11 +29,12 @@ class AgencyService
 
         $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
 
+        $name = $agency->name ?? __('No name');
         return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                         <div style='display: flex; align-items: center; gap: 10px;'>
                             {$image}
                             <div style='display: flex; flex-direction: column;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$agency->name}</span>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
                                 <span style='font-size: smaller;'>ID: {$agency->id}</span>
                             </div>
                         </div>
