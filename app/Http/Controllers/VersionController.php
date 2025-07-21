@@ -68,10 +68,10 @@ class VersionController extends Controller
                 'colors' => settings()->get('colors_updated_at') ?? false,
                 'background' => settings()->get('ground_updated_at') ?? false,
                 'host_agency' => (bool)\Cache::get('host_agency'),
-                'reel_status' => (bool)$reelSettings?->value ?? false,
                 //intro - frames - extradata - emoji
             ],
-            'enable_chat'  => settings()->get('chat_status') == "on"
+            'enable_chat'  => settings()->get('chat_status') == "on",
+            'reel_status' => (bool)$reelSettings?->value ?? false,
         ];
 
         //update current version for user
