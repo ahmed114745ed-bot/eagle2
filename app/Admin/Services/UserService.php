@@ -39,9 +39,9 @@ class UserService
                                 <strong>$user->name</strong><br>
                                 <span style='font-size: smaller;'>UID: $uid</span><br>
                                 <span style='font-size: smaller;'>special: $special</span><br>
-                                ".(! empty($receiverImg) ? "<img src='$receiverImg' style='width: 50px; height: 20px; '>" : '').'
-                                '.(! empty($senderImg) ? "<img src='$senderImg' style='width: 50px; height: 20px; '>" : '').'
-                                '.(! empty($chargerImg) ? "<img src='$chargerImg' style='width: 50px; height: 20px; '>" : '').'
+                                ".(! empty($receiverImg) ? "<img src='$receiverImg' style='width: 32px; height: 14px; '>" : '').'
+                                '.(! empty($senderImg) ? "<img src='$senderImg' style='width: 32px; height: 14px; '>" : '').'
+                                '.(! empty($chargerImg) ? "<img src='$chargerImg' style='width: 32px; height: 14px; '>" : '').'
                             </div>
                         </div>
                         ';
