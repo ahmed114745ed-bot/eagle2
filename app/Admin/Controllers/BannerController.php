@@ -146,7 +146,19 @@ class BannerController extends MainController
         $form->switch('publish', __('Publish Now'));
         $form->number('expire', __('duration(days)'));
         $form->switch('is_active', __('Is active'));
-
+        $form->switch('is_active', __('Is active'))->default(0);
+        $form->radio('is_event', __('Is event'))->options([
+            1 => __('Yes'),
+            0 => __('No'),
+        ])->when(1, function (Form $form) {
+            $form->select('event_type', trans('events'))->options([
+                'event' => __('events'),
+                'pk_event' => __('pk_event'),
+                'weekly_star' => __('weekly_star'),
+                'charge_event' => __('charge_event'),
+                'event_period' => __('event_period'),
+            ]);
+        });
         return $form;
     }
 }
