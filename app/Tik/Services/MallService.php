@@ -26,6 +26,11 @@ class MallService
         return $this->wareRepository->all($userId, $type);
     }
 
+    public function getAllWares($userId, $type)
+    {
+        return $this->wareRepository->allWithType($userId, $type);
+    }
+
     public function buyWares($user, $wareId, $quantity)
     {
         $ware = $this->wareRepository->getById($wareId);
@@ -65,9 +70,9 @@ class MallService
             ];
             $this->packRepository->create($data);
 
-          
+
             $this->service($user, $ware->exp, $totalPrice, 'buy');
-          
+
             return Common::apiResponse(1, 'success process');
         } catch (Exception $exception) {
             return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
@@ -117,7 +122,7 @@ class MallService
                 $ware->name
             );
             $this->service($auth, $ware->exp, $totalPrice, 'send');
-          
+
             DB::commit();
             return Common::apiResponse(1, 'success process');
         } catch (\Exception $exception) {
@@ -162,7 +167,7 @@ class MallService
             (new UpgradeLevelServices())->purchaseItem($user, $wareExp);
             (new UserCounterServices)->eventUser($user, 'mybag', 1);
         }
-       
+
         $this->userRepository->decrementUserCoins($user, $totalPrice);
     }
 

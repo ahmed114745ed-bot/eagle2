@@ -51,6 +51,20 @@ class WareRepository extends AbstractRepository
         return $wares->get();
     }
 
+    public function allWithType( $type, $userId = null)
+    {
+        $wares = $this->model->query()
+            ->where('enable', 1)
+            ->where('type', $type);
+        if ($type == 25) {
+
+            if (!$userId) {
+                $wares = $wares->isNotUsedInPacks()->showUserCustom($userId);
+            }
+        }
+        return $wares->get();
+    }
+
     public function getById($wareId)
     {
         return $this->model->query()->where('id', $wareId)
