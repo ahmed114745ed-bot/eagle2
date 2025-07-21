@@ -241,7 +241,7 @@ class UserController extends MainController
         $grid->column('name', __('Name'))
             ->display(function ($name) {
 
-                $user = $this->user;
+                $user = $this;
                 if (! $user) {
                     return '';
                 }
