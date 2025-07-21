@@ -288,6 +288,7 @@ Route::group(
         Route::resource('families', 'FamilyController');
         Route::resource('targets', 'TargetController');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
+        Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel']);
         Route::resource('polices', PoliceController::class);
         Route::resource('offers', OfferController::class);
         Route::resource('payment-gateways', PaymentGetWayController::class);
