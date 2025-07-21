@@ -60,6 +60,7 @@ use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
+use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
@@ -485,7 +486,7 @@ Route::group(
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
         Route::resource('/bans-rooms', 'BanRoomsController');
-        Route::resource('salaries', 'SalariesController')->name('index', 'sallaries');
+        Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallaries');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
         Route::resource('/group-chat', 'GroupChatController');
