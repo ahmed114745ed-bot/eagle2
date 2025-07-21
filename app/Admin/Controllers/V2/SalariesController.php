@@ -29,7 +29,6 @@ class SalariesController extends MainController
     {
         $name = request('name') ?: 'users';
 
-
         $grid = $name;
         $grid = $this->{$grid}();
         $grid->disableexport();
@@ -207,9 +206,9 @@ class SalariesController extends MainController
         $grid->column('uuid', __('uuid'));
         $grid->column('name', __('name'));
         $grid->column('total', __('salary'))->default(0);
-        $grid->column('cashing', __('cashing'))->display(function () {
-            return (new SalariesAction($this->id, 'user'))->render();
-        });
+//        $grid->column('cashing', __('cashing'))->display(function () {
+//            return (new SalariesAction($this->id, 'user'))->render();
+//        });
         $grid->column('pay', __('pay'))->display(function () {
             return (new PaySalariesAction($this->id, 'user',$this->salary))->render();
         });
@@ -250,10 +249,10 @@ class SalariesController extends MainController
         $grid->column('name', __('name'));
         $grid->column('total', __('salary'))->default(0);
 
-        $grid->column('cashing', __('cashing'))->display(function () {
-            $options = ['agency' => __('agency')];
-            return (new SalariesAction($this->id, 'agency'))->render();
-        });
+//        $grid->column('cashing', __('cashing'))->display(function () {
+//            $options = ['agency' => __('agency')];
+//            return (new SalariesAction($this->id, 'agency'))->render();
+//        });
         $grid->column('pay', __('pay'))->display(function () {
             return (new PaySalariesAction($this->id, 'agency',$this->salary))->render();
         });
