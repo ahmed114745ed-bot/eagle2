@@ -3414,6 +3414,12 @@
     "is required and must be numeric": "مطلوب ويجب أن يكون رقمًا",
     "Validation error": "خطأ في التحقق",
 
+    "Agency Feature": "ميزة الوكالة",
+    "Enable Agency Feature": "تفعيل ميزة الوكالة",
+    "Enable Reel Feature": "تفعيل ميزة الريل",
+    "Feature Description": "وصف الميزة",
+    "Loading feature description...": "جاري تحميل وصف الميزة...",
+
 "Item Name":"اسم العنصر"
 
 
