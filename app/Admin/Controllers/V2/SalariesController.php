@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\SalariesAction;
 use App\Admin\Actions\PaySalariesAction;
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 
 class SalariesController extends MainController
 {
@@ -104,7 +105,20 @@ class SalariesController extends MainController
             $filter->disableIdFilter();
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('uuid', __('uuid'));
+                $filter->where(function ($query) {
+                    $input = $this->input;
+                    $query->where(function ($q) use ($input) {
+                        $q->where('name', 'like', "%$input%")
+                            ->orWhere('uuid', 'like', "%$input%")
+                            ->orWhere('special_id', 'like', "%$input%")
+                            ->orWhere('nickname', 'like', "%$input%")
+                            ->orWhere('email', 'like', "%$input%");
+                    });
+                }, __('User'))->placeholder(__('Search by UUID'));
+            });
+            
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
             });
         });
         $grid->column('id', __('id'));
