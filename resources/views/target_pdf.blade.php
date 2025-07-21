@@ -124,13 +124,13 @@
                                     $endFormatted = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted);
                                     echo "$$endFormatted";
                                 } elseif ($column == 'reals' || $column == 'reel') {
-                                    echo 'Update: ' . ($target->reel_parts[0] ?? 0) . '<br>';
-                                    echo 'Like: ' . ($target->reel_parts[1] ?? 0) . '<br>';
-                                    echo 'Comment: ' . ($target->reel_parts[2] ?? 0);
+                                    echo __('uploads').':'. ($target->reel_parts[0] ?? 0) . '<br>';
+                                    echo __('like').':' . ($target->reel_parts[1] ?? 0) . '<br>';
+                                    echo __('comment').':' . ($target->reel_parts[2] ?? 0);
                                 } elseif ($column == 'moments' || $column == 'moment') {
-                                    echo 'Update: ' . ($target->moment_parts[0] ?? 0) . '<br>';
-                                    echo 'Like: ' . ($target->moment_parts[1] ?? 0) . '<br>';
-                                    echo 'Comment: ' . ($target->moment_parts[2] ?? 0);
+                                    echo __('uploads').':' . ($target->moment_parts[0] ?? 0) . '<br>';
+                                    echo __('like').':' . ($target->moment_parts[1] ?? 0) . '<br>';
+                                    echo __('comment').':' . ($target->moment_parts[2] ?? 0);
                                 }elseif ($column == 'agency_share') {
                                     $coins = \App\Helpers\Common::getMaxCoins();
                                     $endFormatted = $coins ? ($target->diamonds / $coins) : 0;
