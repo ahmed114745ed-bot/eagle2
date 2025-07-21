@@ -54,7 +54,6 @@ class WareRepository extends AbstractRepository
     public function allWithType( $type, $userId = null)
     {
         $wares = $this->model->query()
-            ->where('enable', 1)
             ->where('type', $type);
         if ($type == 25) {
 
