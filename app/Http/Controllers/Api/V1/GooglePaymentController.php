@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Coin;
 use App\Models\User;
 use GuzzleHttp\Client;

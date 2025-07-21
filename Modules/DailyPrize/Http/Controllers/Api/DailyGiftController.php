@@ -4,7 +4,7 @@ namespace Modules\DailyPrize\Http\Controllers\Api;
 
 use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;

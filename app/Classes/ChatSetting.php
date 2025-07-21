@@ -3,7 +3,7 @@
 namespace App\Classes;
 
 use App\Helpers\Common;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\ChatSetting as ChatSettingModel;
 use Illuminate\Database\Eloquent\Collection;

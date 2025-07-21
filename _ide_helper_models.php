@@ -3171,7 +3171,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $expire
  * @property int|null $exp
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\VipPrivilege> $privilegs
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Vip\Entities\VipPrivilege> $privilegs
  * @property-read int|null $privilegs_count
  * @property-read \App\Models\Ware|null $wareIcon
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ware> $wares
@@ -4314,7 +4314,8 @@ namespace App\Models{
  * @property int $sort_num
  * @property int|null $game_id
  * @property int|null $total_diamond
- * @property \App\Models\Vip|null $level
+ * @property \Modules\Vip\Entities\OVip;
+|null $level
  * @property int|null $exp
  * @property int|null $level_id
  * @property int $total_game_coins
@@ -5714,7 +5715,8 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserVip> $userVips
  * @property-read int|null $user_vips_count
  * @property-read \App\Models\Family|null $user_family
- * @property-read \App\Models\Vip|null $vipImage
+ * @property-read \Modules\Vip\Entities\OVip;
+|null $vipImage
  * @property-read \App\Models\UserWallet|null $wallet
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WalletTransactionBackup> $walletTransactionBackups
  * @property-read int|null $wallet_transaction_backups_count

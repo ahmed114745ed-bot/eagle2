@@ -2,7 +2,7 @@
 
 namespace Modules\Tasks\Http\Controllers;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Modules\Tasks\Entities\TaskReward;
 use Encore\Admin\Controllers\AdminController;

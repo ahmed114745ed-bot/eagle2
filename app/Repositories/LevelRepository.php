@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use Illuminate\Database\Eloquent\Model;
 
 class LevelRepository

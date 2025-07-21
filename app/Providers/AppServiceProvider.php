@@ -17,7 +17,7 @@ use App\Models\Room;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
 use App\Observers\AgencyObserver;

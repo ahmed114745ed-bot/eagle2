@@ -3,7 +3,7 @@
 namespace Modules\DailyPrize\Entities;
 
 use App\Helpers\Common;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

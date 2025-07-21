@@ -3,7 +3,7 @@
 namespace App\Selectables;
 
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use Encore\Admin\Grid\Filter;
 use Encore\Admin\Grid\Selectable;
 

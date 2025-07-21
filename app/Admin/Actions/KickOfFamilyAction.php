@@ -5,7 +5,7 @@ namespace App\Admin\Actions;
 use App\Facades\UserHandling;
 use App\Helpers\Common;
 use App\Models\FamilyUser;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\UserVip;

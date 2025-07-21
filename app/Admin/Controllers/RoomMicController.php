@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\Ware;

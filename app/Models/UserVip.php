@@ -30,9 +30,12 @@ class UserVip extends Model
     protected static function booted()
     {
         static::created(function ($userVip) {
-            if ($userVip->user_id && ($userVip->price ?? 0) > 0) {
-         
-            }
+          
         });
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

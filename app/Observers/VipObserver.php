@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use Illuminate\Support\Facades\Cache;
 
 class VipObserver

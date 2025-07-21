@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Dashboard\Events;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

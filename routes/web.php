@@ -4,7 +4,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\RoomVisitor;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
 use Illuminate\Support\Facades\Route;

@@ -9,7 +9,6 @@ use App\Models\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
-use App\Tik\Repositories\OvipRepository;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
@@ -17,8 +16,9 @@ use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
 use App\Tik\Repositories\GiftLogRepository;
-use App\Tik\Repositories\UserVipRepository;
 use App\Tik\Repositories\LiveTimeRepository;
+use Modules\Vip\Repositories\OvipRepository;
+use Modules\Vip\Repositories\UserVipRepository;
 
 
 class HomeService

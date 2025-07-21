@@ -3,7 +3,7 @@
 namespace App\Helpers;
 
 use Carbon\Carbon;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\Ware;

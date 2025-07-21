@@ -5,8 +5,8 @@ namespace App\Helpers;
 use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Pk;
-use App\Models\UserCoinLog;
-use App\Models\Vip;
+use Illuminate\Log\Logger;
+use Modules\Vip\Entities\Vip;
 use App\Models\Pack;
 use App\Models\Role;
 use App\Models\Room;
@@ -988,193 +988,7 @@ class Common
     }
 
 
-    public static function handelVip($vip, $user, $expire,  $userVip)
-    {
-        if ($userVip->is_used) {
-            $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
-
-            Pack::query()
-                ->where('get_type', 1)
-                ->where('user_id', $user->id)
-                ->whereIn('type', $vipTypes)
-                ->where('vip_user_id', '!=', $userVip->id)
-                ->update(['is_used' => 0]);
-        }
-
-        $type = $vip->privilegs()->pluck('type')->toArray();
-        if (!empty($type)) {
-            foreach ($type as $wareType) {
-                $isSetWare = Ware::query()
-                    ->where('get_type', 1)
-                    ->where('level', $vip->level)
-                    ->where('type', $wareType)
-                    ->first();
-
-                if (!$isSetWare) {
-                    $typesArr = [
-                        1 => 'Gemstone',
-                        3 => 'Card Scroll',
-                        4 => 'Avatar Frame',
-                        5 => 'Bubble Frame',
-                        6 => 'Entering Special Effects',
-                        7 => 'Microphone Aperture',
-                        8 => 'Badge',
-                        9 => 'NoKick',
-                        10 => 'Icon',
-                        11 => 'intro animation',
-                        12 => 'maple',
-                        13 => 'hide country',
-                        14 => 'vip gifts',
-                        15 => 'no pan',
-                        19 => 'profile visitors hide in',
-                        20 => 'hide last active',
-                        28 => 'profile frame',
-                        29 => 'being kicked',
-                        30 => 'anti ban',
-                    ];
-
-                    $typeName = $typesArr[$wareType] ?? 'Unknown Type';
-                    Ware::create([
-                        'get_type' => 1,
-                        'type' => $wareType,
-                        'name' => $typeName  ?? 'VIP Ware',
-                        'name_en' => $typeName ?? 'VIP Ware',
-                        'title' => $typeName ?? '',
-                        'title_en' => $typeName ?? '',
-                        'level' => $vip->level,
-                        'price' =>  0,
-                        'enable' => 1,
-                        'expire' => $expire,
-                        'show_img' =>  '1.png',
-                        'img2' =>  '',
-                        'key' =>  '',
-                        'key_json' => '',
-                        'image_type' => 'png',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                        'is_active_for_vip' => 1
-                    ]);
-                } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
-                    $isSetWare->update([
-                        'is_active_for_vip' => 1,
-                        'enable' => 1,
-                    ]);
-                }
-            }
-        }
-        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
-            ->where('level', $vip->level)
-            ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
-        foreach ($wares as $ware) {
-            Pack::query()->where('user_id', $user->id)
-                ->where('expire', '<', now()->timestamp)
-                ->where('expire', '!=', 0)
-                ->delete();
-            $pack =  Pack::query()
-                ->where('user_id', $user->id)
-                ->where('get_type', 1)
-                ->where('target_id', $ware->id)->where('vip_user_id', $userVip->id)
-                ->where(function ($q) {
-                    $q->where('expire', '>=', now()->timestamp)
-                        ->orWhere('expire', 0);
-                })->first();
-            if ($expire == null) {
-                $expire = $vip->expire;
-            }
-            if ($pack) {
-                // if ($pack->expire == 0) {
-                //     //                    throw new \Exception('already exists');
-                // } else {
-
-                //$pack->expire = $vip->expire ? $pack->expire + ($expire * 86400) : 0;
-                $pack->is_used = $userVip->is_used;
-                $pack->save();
-                // }
-            } else {
-                Pack::query()->create(
-                    [
-                        'user_id' => $user->id,
-                        'get_type' => $ware->get_type,
-                        'type' => $ware->type,
-                        'target_id' => $ware->id,
-                        'num' => 1,
-                        'expire' => $vip->expire ? now()->addDays($expire)->timestamp : 0,
-                        'use_num' => $ware->num,
-                        'vip_user_id' => $userVip->id,
-                        'is_used' => $userVip->is_used,
-                        'using' => 1,
-                    ]
-                );
-            }
-            if (in_array($ware->type, [4, 5, 6])) {
-                self::userDress($ware, $user, $userVip->is_used);
-                self::unUsePack($type, $user);
-            }
-        }
-        $userVip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
-            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
-        })->where('id', '!=', $userVip->id)->update(['is_used' => 0]);
-        $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
-            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
-        })->orderBy('level', 'desc')->first();
-        if ($uvip) {
-            $user->update(['vip' => $uvip->id]);
-        }
-        //        self::syncUserDressesFromVip($user, $type);
-        /* $users_vips = UserVip::with('OVip')->where('user_id',$user->id)->first();
-        $preveliage = $users_vips->OVip->preveliage;
-        $wareIds = Ware::where('type', $preveliage)->where('get_type',1)->where('is_active_for_vip', 1)->pluck('id')->toArray();
-        $packs = Pack::where('user_id', $user->id)->whereIn('target_id', $wareIds)->get();
-        $exception_packs = $packs->pluck('id')->toArray();
-        Pack::where('user_id', $user->id)->whereNotIn('id', $exception_packs)->update(['is_used'=> 0]);
-        Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
-    }
-
-    public static function syncUserDressesFromVip(User $user, array $types)
-    {
-        $dressMap = [
-            4  => 'dress_1',
-            5  => 'dress_2',
-            11 => 'dress_3',
-        ];
-
-        $targetTypes = array_intersect(array_keys($dressMap), $types);
-
-        if (empty($targetTypes)) {
-            return;
-        }
-
-        $vipPacks = Pack::where('user_id', $user->id)
-            ->whereIn('type', $targetTypes)
-            ->where('get_type', 1)
-            ->where(function ($q) {
-                $q->where('expire', '>=', now()->timestamp)
-                    ->orWhere('expire', 0);
-            })
-            ->get();
-
-        $updateData = [];
-
-        foreach ($vipPacks as $pack) {
-            $column = $dressMap[$pack->type] ?? null;
-
-            if ($column) {
-                $updateData[$column] = '1';
-                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
-            }
-        }
-
-        if (!empty($updateData)) {
-            $success = $user->update($updateData);
-
-            logger()->info('✅ تم تحديث الحقول:', [
-                'user_id' => $user->id,
-                'success' => $success,
-                'updated_fields' => $updateData
-            ]);
-        }
-    }
-
+  
 
     public static function handelVip0($vip, $user, $expire,  $userVip)
     {
@@ -2190,14 +2004,7 @@ class Common
 
     public static function getCurrentBalance(int $userId): int
     {
-        $balance = User::where('id', $userId)->value('di') ?? 0;
-    
-        Log::info("Current balance fetched", [
-            'user_id' => $userId,
-            'balance' => $balance,
-        ]);
-    
-        return $balance;
+        return (int) User::where('id', $userId)->value('di') ?? 0;
     }
 
     public static function getCoinSubTypes()

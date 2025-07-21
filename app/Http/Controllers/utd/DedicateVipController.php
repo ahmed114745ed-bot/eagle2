@@ -5,12 +5,13 @@ namespace App\Http\Controllers\utd;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserVip;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Vip\Helpers\VipCommon;
 
 class DedicateVipController extends Controller
 {
@@ -53,7 +54,7 @@ class DedicateVipController extends Controller
 
 
             $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
-            $is_used = $enableVipAuto === "true" ? 1 : 0;
+            $is_used = $enableVipAuto === "true" ? 0 : 0;
 
             try {
                 $uniqueAttributes = [
@@ -88,7 +89,7 @@ class DedicateVipController extends Controller
                     }
                     $userVip->save();
                 }
-                Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+                // VipCommon::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
                 DB::commit();
                 CustomNotification::vips($user, $request->days, $vip->img);

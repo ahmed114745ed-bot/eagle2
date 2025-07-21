@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use Carbon\Carbon;
 use Modules\Achievement\Entities\UserAchievementLevel;
 

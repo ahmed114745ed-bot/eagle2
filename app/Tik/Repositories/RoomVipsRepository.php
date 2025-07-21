@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Reals\Entities\Real;

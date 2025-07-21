@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Dashboard\Levels;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 

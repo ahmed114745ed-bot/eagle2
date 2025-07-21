@@ -3,7 +3,7 @@
 namespace App\Admin\Actions;
 
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserVip;
@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
+use Modules\Vip\Helpers\VipCommon;
 
 class VipDedicateAction extends Action
 {
@@ -49,7 +50,7 @@ class VipDedicateAction extends Action
             $enableVipAuto = config('admin.isUsed_vip');
 
 
-            $is_used = $enableVipAuto === true ? 1 : 0;
+            $is_used = $enableVipAuto === true ? 0 : 0;
             $uniqueAttributes = [
                 'sender_id' => 0,
                 'user_id'   => $user->id,
@@ -83,7 +84,7 @@ class VipDedicateAction extends Action
             //     $userVip->save();
             // }
 
-            if ($is_used)  Common::handelVip($vip, $user, expire: $request->days ?? $vip->expire, userVip: $userVip);
+            // if ($is_used)  VipCommon::handelVip($vip, $user, expire: $request->days ?? $vip->expire, userVip: $userVip);
 
             DB::commit();
 

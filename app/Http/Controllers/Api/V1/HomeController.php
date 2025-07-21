@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Exception;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Room;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;

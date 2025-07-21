@@ -22,5 +22,6 @@
     "DailyPrize": true,
     "Tasks": true,
     "Wallet": true,
-    "LuckyBox": true
+    "LuckyBox": true,
+    "Vip": true
 }

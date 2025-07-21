@@ -6,15 +6,16 @@ use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Vips\AdminVipsResource;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserVip;
 use App\Models\vip_prev;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use App\Traits\Dashboard\DashBoardTrait;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Modules\Vip\Helpers\VipCommon;
 
 class AdminVipsController extends Controller
 {
@@ -110,7 +111,7 @@ class AdminVipsController extends Controller
             }
             $userVip->save();
         }
-        Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+        // VipCommon::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
         DB::commit();
         CustomNotification::vips($user, $request->days, $vip->img);
          return 200;
