@@ -110,11 +110,11 @@ class LogAppProfitCoinsCommand extends Command
                 ];
             }
             
-            UserCoinLog::insert($logs);
+            // UserCoinLog::insert($logs);
     
-            DB::table($table)
-                ->whereIn('id', collect($rows)->pluck('id'))
-                ->update(['app_profit_coins' => 0]);
+            // DB::table($table)
+            //     ->whereIn('id', collect($rows)->pluck('id'))
+            //     ->update(['app_profit_coins' => 0]);
         }
     
 }
