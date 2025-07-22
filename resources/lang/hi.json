@@ -2718,6 +2718,15 @@
     "is required and must be numeric": "आवश्यक है और संख्यात्मक होना चाहिए",
     "Validation error": "मान्यता त्रुटि",
 
+    "Enable Reel Feature": "रिल सुविधा सक्रिय करें",
+    "Feature Description": "विशेषता विवरण",
+    "Loading feature description...": "विशेषता विवरण लोड हो रहा है...",
+
+    "Paid Room": "पेड रूम",
+    "Enable Pay Room": "पेड रूम सक्षम करें",
+    "Enter Number": "राशि दर्ज करें",
+    "you do not have enough coins for creating a room": "कमरा बनाने के लिए आपके पास पर्याप्त सिक्के नहीं हैं",
+
 "Reel Comments": "रील्स टिप्पणियाँ"
 
 

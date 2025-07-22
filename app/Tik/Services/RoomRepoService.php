@@ -3,6 +3,8 @@
 namespace App\Tik\Services;
 
 
+use App\Models\Config;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Room;
 use App\Models\User;
@@ -46,9 +48,22 @@ class RoomRepoService
         return $this->repository->all($request);
     }
 
-    public function create($request, $userId)
+    /**
+     * @throws \Exception
+     */
+    public function create($request, $user)
     {
+        $userId = $user->id;
         $data = array_merge($request->all(), ['uid' => $userId]);
+        $paidRoom = Config::where('name', 'paid_room')->first();
+
+        if ($paidRoom->value){
+            $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
+            if ($user->di < $paidRoomAmount->value){
+                throw new \Exception(__('you do not have enough coins for creating a room'));
+            }
+        }
+
         $room = $this->repository->create($data);
 
         if ($request->type) {

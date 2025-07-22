@@ -3137,6 +3137,15 @@
     "is required and must be numeric": "Zorunlu ve sayısal olmalı",
     "Validation error": "Doğrulama hatası",
 
+    "Enable Reel Feature": "Reel Özelliğini Etkinleştir",
+    "Feature Description": "Özellik Açıklaması",
+    "Loading feature description...": "Özellik açıklaması yükleniyor...",
+
+    "Paid Room": "Ücretli Oda",
+    "Enable Pay Room": "Ücretli Odayı Etkinleştir",
+    "Enter Number": "Tutarı Girin",
+    "you do not have enough coins for creating a room": "Oda oluşturmak için yeterli jetonunuz yok",
+
     "Reel Comments": "Video Yorumları"
 
 

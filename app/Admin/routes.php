@@ -60,6 +60,7 @@ use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
+use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
@@ -248,6 +249,11 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
+        Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
+        Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
+        Route::post('get-users', [RoomController::class, 'getUsers'])->name('get.users');
+
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
@@ -288,6 +294,7 @@ Route::group(
         Route::resource('families', 'FamilyController');
         Route::resource('targets', 'TargetController');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
+        Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel']);
         Route::resource('polices', PoliceController::class);
         Route::resource('offers', OfferController::class);
         Route::resource('payment-gateways', PaymentGetWayController::class);
@@ -406,12 +413,20 @@ Route::group(
             // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
             // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
             // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+            Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+        Route::resource('vip_privilege', 'VipPrivilegeController');
+        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
         // });
         // Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');
-       
+
         Route::get('filter-agencies', App\Admin\Controllers\Filter\AgencyController::class)->name('filter-agencies');
         Route::resource('reports', 'ReportController');
         Route::resource('charges-reports', 'ChargeReportController');
@@ -454,6 +469,7 @@ Route::group(
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
 
+            Route::get('/host-diamonds', [\App\Admin\Controllers\AgencyControllers\HostDiamondController::class, 'index'])->name('hsot-diamond');
             // Route::get('/users/{id}/edit', 'UserController@edit');
             // Route::get('/users/{id}', 'UserController@show');
             Route::get('/userTarget', 'UserTargetController@index')->name('userTarget');
@@ -471,9 +487,10 @@ Route::group(
         Route::resource('/uuid_dedicate', 'SpecialWareDedicateController');
         Route::get('/vips_dedicate', 'DedicateVipController@index');
         Route::resource('/bans', 'BanController');
-                Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
+        Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
         Route::resource('/bans-rooms', 'BanRoomsController');
+        Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallaries');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
         Route::resource('/group-chat', 'GroupChatController');

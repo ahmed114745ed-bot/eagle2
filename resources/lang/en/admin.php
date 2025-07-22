@@ -432,9 +432,9 @@ return [
     "webhook_id" => "Webhook Id",
 
     "target_no" => 'Target Number',
-    "diamonds" => 'Diamond Target',
-    "usd" => 'dollar',
-    "agency_share" => 'Agents Salary',
+    "diamonds" => 'Diamonds',
+    "usd" => 'Host Salary',
+    "agency_share" => 'Agents percentage',
     "db_percentage" => 'BD Percentage',
     "hours" => "Hours",
     "days" => "Days",

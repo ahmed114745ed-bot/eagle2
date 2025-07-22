@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
@@ -47,6 +48,8 @@ class VersionController extends Controller
         $wapple = $this->isUpdated('wappel_frame_updated_at', @$request->wabbles_frame_time);
         $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
+        $reelSettings = Setting::where('key', 'reel_status')->first();
+
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (int)$version ,
@@ -67,7 +70,8 @@ class VersionController extends Controller
                 'host_agency' => (bool)\Cache::get('host_agency'),
                 //intro - frames - extradata - emoji
             ],
-            'enable_chat'  => settings()->get('chat_status') == "on"
+            'enable_chat'  => settings()->get('chat_status') == "on",
+            'reel_status' => (bool)$reelSettings?->value ?? false,
         ];
 
         //update current version for user
