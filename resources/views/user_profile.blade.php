@@ -2415,7 +2415,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">{{ __('cancel') }}</button>
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                             <button class="btn btn-primary" type="submit">{{ __('save') }}</button>
                         </div>
                     </form>
