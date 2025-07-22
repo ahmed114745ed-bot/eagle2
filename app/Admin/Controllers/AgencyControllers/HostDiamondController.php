@@ -46,36 +46,43 @@ class HostDiamondController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
-            $filter->column(1 / 2, function ($filter) {
+            $filter->column(1 / 2, function (Grid\Filter $filter) {
                 $filter->equal('receiver.uuid', __('uuid'));
+                $filter->where(function ($query) {
+                    $tz = getTimezone();
+
+                    $input = $this->input ?? now()->startOfMonth();
+                    $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($input);
+
+                    $utcDate = \Carbon\Carbon::parse($date, $tz)->timezone('UTC')->startOfDay();
+
+                    $query->where('created_at', '>=', $utcDate);
+                }, __('from_date'), 'from_date')
+                    ->date()
+                    ->default(request('from_date'));
+
+                $filter->where(function ($query) {
+                    $input = $this->input;
+                    $query->having('total_gift_price', '>=', $input);
+                }, __('Greater than diamond'), 'total_gift_price')->integer();
             });
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency.id', __('agency id'));
+                $filter->where(function ($query) {
+                    $tz = getTimezone();
+                    $input = $this->input ?? now()->endOfMonth();
+                    $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($input);
+                    $utcDateOnly = \Carbon\Carbon::parse($date, $tz)->timezone('UTC')->toDateString();
+                    $query->whereDate('created_at', '<=', $utcDateOnly);
+                }, __('to_date'), 'to_date')
+                    ->date()
+                    ->default(request('to_date'));
             });
 
-            $filter->where(function ($query) {
-                $tz = getTimezone();
 
-                $input = $this->input ?? now()->startOfMonth();
-                $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($input);
 
-                $utcDate = \Carbon\Carbon::parse($date, $tz)->timezone('UTC')->startOfDay();
 
-                $query->where('created_at', '>=', $utcDate);
-            }, __('from_date'), 'from_date')
-                ->date()
-                ->default(request('from_date'));
-
-            $filter->where(function ($query) {
-                $tz = getTimezone();
-                $input = $this->input ?? now()->endOfMonth();
-                $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($input);
-                $utcDateOnly = \Carbon\Carbon::parse($date, $tz)->timezone('UTC')->toDateString();
-                $query->whereDate('created_at', '<=', $utcDateOnly);
-            }, __('to_date'), 'to_date')
-                ->date()
-                ->default(request('to_date'));
         });
 
         $grid->column('receiver', __('user'))->display(function ($name) {
