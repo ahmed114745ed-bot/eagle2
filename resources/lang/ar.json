@@ -1664,6 +1664,7 @@
     "update weekly_star_rewards": "تحديث مكافآت النجمة الأسبوعية",
     "update withdraw type": "تحديث نوع السحب",
     "User setting": "إعدادات المستخدم",
+    "edit": " تعديل",
     "event-related": "متعلق بالحدث",
     "special_id": "معرف خاص",
     "daily-prize": "جائزة يومية",
@@ -1781,6 +1782,7 @@
     "questions":"أسئلة",
     "payment-coins":"العملات المعدنية",
     "host":"مضيف",
+
     "categories":"التصنيفات",
     "Fields": "الحقول",
     "Details":"التفاصيل",

@@ -528,14 +528,14 @@ class User extends Authenticatable
     public function getLiveTimeThisMonth()
     {
         $fromDate = now()->startOfMonth()->toDateString();
-    
+
         $period = Common::getEffectiveJoinPeriod($this->id, $this->agency_id, $fromDate);
-    
+
         return LiveTime::where('uid', $this->id)
             ->whereBetween('created_at', [$period['start_date'], $period['end_date']])
             ->sum('hours');
     }
-    
+
 
     public function UserliveTime()
     {
@@ -1467,14 +1467,14 @@ class User extends Authenticatable
     public function userTypeBadge()
     {
         $lang = app()->getLocale() ?? 'en';
-        
+
         $types = [
             1 => 'host',
             2 => 'agency_owner',
             3 => 'shipping',
             4 => 'bd',
         ];
-        
+
         $applicableTypes = [];
 
         if ($this->type_user >= 1) {
@@ -1658,7 +1658,7 @@ class User extends Authenticatable
                     $start = $join->join_date;
                     $end = $join->leave_date ?? now()->endOfMonth();
                     $query->where('user_agency_id', $this->agency_id)
-                        ->whereBetween('created_at', [$start, $end]);
+                        ->where(fn($q) => $q->whereBetween('created_at', [$start, $end])->orWhereBetween('updated_at', [$start, $end ]));
                 } else {
                     $query->whereRaw('1 = 0');
                 }
