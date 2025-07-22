@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\AgencyService;
+use App\Admin\Services\UserService;
 use App\Models\UserCoinLog;
 use Carbon\Carbon;
 use App\Models\Pack;
@@ -236,130 +238,30 @@ class UserController extends MainController
             });
         }
 
-        //        $grid->column('uuid', __('uuid'))->display(function () {
-        //            return $this->uuid == $this->original_uuid
-        //                ? __("uuid") . ' : ' . $this->uuid
-        //                : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
-        //        });
         $grid->column('name', __('Name'))
             ->display(function ($name) {
 
-                $uid = $this->original_uuid;
-
-
-                $special =  $this->uuid_v3;
-
-                $path = @$this->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                //                $senderLevel = @$this->total_sender_level;
-                //                $receivedLevel = @$this->total_received_level;
-
-                $receiver_img = @$this->getImageReceiverOrSender('receiver_id', 1)?->img ?? '';
-                $receiverImg = getImagePath($receiver_img) ?? $defaultImage;
-
-                $sender_img = @$this->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
-                $senderImg = getImagePath($sender_img) ?? $defaultImage;
-
-                $charger_img = @$this->getTotalChargeLevel($this->total_charge_level)?->img ?? '';
-                $chargerImg = getImagePath($charger_img) ??'';
-
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
+                $user = $this;
+                if (! $user) {
+                    return __('No Agency');
                 }
-                $image = handleShowImageWithTypes($this->id, $url, 50, 50);
 
-                return "
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div>
-                                <strong>$name</strong><br>
-                                <span style='font-size: smaller;'>UID: $uid</span><br>
-                                <span style='font-size: smaller;'>special: $special</span><br>
-                                " . (!empty($receiverImg) ? "<img src='$receiverImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
-                                " . (!empty($senderImg) ? "<img src='$senderImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
-                                " . (!empty($chargerImg) ? "<img src='$chargerImg' style='width: 20px; height: 20px; border-radius: 50%;'>" : "") . "
-                            </div>
-                        </div>
-                        ";
+                return app(UserService::class)->adminUserAvatar($user);
             });
-        //        $grid->column('return', __('status user'))->display(function () {
-        //            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
-        //            return (new \App\Admin\Actions\UserAction(
-        //                $this->id,
-        //                $this->charge_status,
-        //                $this->transfer_salary,
-        //                $userSetting->show_invite_code ?? 0,  // Extra fallback
-        //                $userSetting->hide_chat ?? 0,        // Extra fallback
-        //                $this->can_play
-        //            ))->render();
-        //        });
 
-
-        //        $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
-        //
-        //            $results = [
-        //                __('reel count') => $this->reals()->count() ?? 0,
-        //                __('moment_count') => $this->moments()->count() ?? 0,
-        //                __('total_days') => $this->total_days ?? 0,
-        //                __('total_hours') => $this->liveTime->sum("hours") ?? 0,
-        //            ];
-        //
-        //            return new Table([__('Field Name'), __('Value')], $results);
-        //        });
 
         $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
 
-        $grid->column('total_charge_level', __('admin.charge_level'))->display(function () use ($arrowIcon) {
-            $level = $this->charge_level + $this->sub_charger_level;
 
-            $diamonds = $this->getTotalChargeLevel($level);
-
-            $defaultImage = asset("images/level0.png");
-            $img = $diamonds && $diamonds->img ? getImagePath($diamonds->img) : $defaultImage;
-
-            return "<div style='display: flex; align-items: center; gap: 5px;'>
-              <img src='$img' alt='User Avatar' style='width: 64px; height: 16px;'>
-              <img src='$arrowIcon' style='width: 16px; height: 16px;'>
-            </div>";
-        });
 
         $grid->column('agency', __('Agency'))
             ->display(function () {
-                if (!$this->agency) {
-                    return "<span>No agency</span>";
+                $agency = $this->agency;
+                if (! $agency) {
+                    return '';
                 }
 
-                $name = $this->agency->name ?? '';
-
-                $cacheKey = "agency_image_{$this->agency_id}";
-                $image = Cache::remember($cacheKey, 3600, function () {
-                    $path = $this->agency->img;
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
-
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-
-                    return handleShowImageWithTypes($this->agency_id, $url, 40, 40);
-                });
-
-                $profileUrl = route('admin.agency.profile', ['id' => $this->agency_id]);
-
-                return "
-                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            {$image}
-                            <div style='display: flex; flex-direction: column;'>
-                                    <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
-                                <span style='font-size: smaller;'>ID: {$this->agency_id}</span>
-                            </div>
-                        </div>
-                    </a>
-                ";
+                return app(AgencyService::class)->adminAgencyData($agency);
             });
 
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
@@ -377,7 +279,7 @@ class UserController extends MainController
                 overflow-y: auto !important;
             }
         ");
-        $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+       /* $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             return $this->sameDeviceUsers()->count();
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
             $users         = $this->sameDeviceUsers;
@@ -412,7 +314,7 @@ class UserController extends MainController
             });
 
             return new Table([__('Name'), __('phone')], $rows->toArray());
-        });
+        });*/
 
 
         $permission = $this->permission_name;
