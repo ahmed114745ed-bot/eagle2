@@ -50,8 +50,7 @@ class AgencyUsersTargetResource extends JsonResource
         $agencySallary = UserSallary::query()
         ->where('user_id', $this->id)
         ->where('user_agency_id', $this->agency_id)
-        ->where('month', $month)
-        ->where('year', $year)
+        ->where(fn($q) => $q->whereBetween('created_at', [$from, $to])->orWhereBetween('updated_at', [$from, $to ]))
         ->latest()
         ->value('agency_sallary');
 
@@ -88,7 +87,12 @@ class AgencyUsersTargetResource extends JsonResource
         }
 
 
-        $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
+        $giftLog = GiftLog::where('agency_id', $this->agency_id)
+            ->where('receiver_id', $this->id)
+            ->whereHas('sender')
+            ->with('sender')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
             ->selectRaw("sum(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')->orderByRaw("exp desc")->limit(3)
             ->get()

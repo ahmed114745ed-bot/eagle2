@@ -7,6 +7,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\RedisService;
 use App\Helpers\Common;
+use App\Jobs\LogUserCoinProfit;
 use App\Models\CoreWallet;
 use App\Models\Cp;
 use App\Models\Gift;
@@ -106,6 +107,15 @@ class LuckyGiftService
 
                 $cashback_value = $cashback_percentage * $giftPrice * $number;
                 if ($cashback_percentage > 0) {
+
+                    LogUserCoinProfit::dispatch(
+                        $user->id,
+                        $cashback_value,
+                        'cashback',
+                        'lucky_gifts',
+                        $gift?->name 
+                    )->onQueue('log_user_coin');
+
                     $user->enableSaving = false;
                     $user->di           += $cashback_value;
                     //                $user->save();
@@ -141,6 +151,13 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
+            LogUserCoinProfit::dispatch(
+                $user->id,
+                -abs($totalPrice),
+                'lucky_gift',
+                'gift_logs',
+                $gift?->name 
+            )->onQueue('log_user_coin');
             $user->di -= $totalPrice;
             $index--;
             $message = null;
