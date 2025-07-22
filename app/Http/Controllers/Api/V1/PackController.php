@@ -109,7 +109,7 @@ class PackController extends Controller
         $type = $request->type;
         $item = $request->item_id;
         if (!$type && !$item) return Common::apiResponse(0, 'missing params', null, 422);
-        if (!in_array($type, [1, 2, 3, 4])) return Common::apiResponse(0, 'type invalid', null, 403);
+        if (!in_array($type, [1, 2, 3, 4, 28])) return Common::apiResponse(0, 'type invalid', null, 403);
 
         $this->packService->updateDress($user, $type,$item);
 
