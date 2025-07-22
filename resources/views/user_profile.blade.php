@@ -1320,7 +1320,7 @@
 
                                 </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
-                                    <td>{{ $pack->getTypeGet() }}</td>
+                                    
                                     <td>{{ $pack->getType() }}</td>
                                     <td>
                                         <img src="{{ getImagePath(@$path) }}" width="30" height="30"
