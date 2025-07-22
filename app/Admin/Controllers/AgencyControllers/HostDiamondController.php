@@ -5,7 +5,9 @@ namespace App\Admin\Controllers\AgencyControllers;
 use App\Admin\Controllers\MainController;
 use App\Admin\Services\AgencyService;
 use App\Admin\Services\UserService;
+use App\Helpers\UserCommon;
 use App\Models\GiftLog;
+use Carbon\Carbon;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -37,7 +39,6 @@ class HostDiamondController extends MainController
             ->selectRaw('receiver_id, agency_id, SUM(giftPrice) as total_gift_price')
             ->with(['receiver.profile', 'agency']) // assuming these are relationships
             ->where('agency_id', '!=', 0)
-
             ->groupBy('receiver_id', 'agency_id')
             ->when(! request('from_date'), fn ($q) => $q->where('created_at', '>=', now()->startOfMonth()))
             ->when(! request('to_date'), fn ($q) => $q->where('created_at', '<=', now()->endOfMonth()))
@@ -53,9 +54,9 @@ class HostDiamondController extends MainController
                     $tz = getTimezone();
 
                     $input = $this->input ?? now()->startOfMonth();
-                    $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($input);
+                    $date = UserCommon::arabicToEnglishNumbers($input);
 
-                    $utcDate = \Carbon\Carbon::parse($date, $tz)->timezone('UTC')->startOfDay();
+                    $utcDate = Carbon::parse($date, $tz)->timezone('UTC')->startOfDay();
 
                     $query->where('created_at', '>=', $utcDate);
                 }, __('from_date'), 'from_date')
@@ -63,7 +64,6 @@ class HostDiamondController extends MainController
                     ->default(request('from_date'));
 
                 $filter->where(function ($query) {
-
                     }, __('Greater than diamond'), 'total_gift_price')->integer();
             });
 
@@ -72,20 +72,19 @@ class HostDiamondController extends MainController
                 $filter->where(function ($query) {
                     $tz = getTimezone();
                     $input = $this->input ?? now()->endOfMonth();
-                    $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($input);
-                    $utcDateOnly = \Carbon\Carbon::parse($date, $tz)->timezone('UTC')->toDateString();
+                    $date = UserCommon::arabicToEnglishNumbers($input);
+                    $utcDateOnly = Carbon::parse($date, $tz)->timezone('UTC')->toDateString();
                     $query->whereDate('created_at', '<=', $utcDateOnly);
                 }, __('to_date'), 'to_date')
                     ->date()
                     ->default(request('to_date'));
             });
-
-
-
-
         });
 
         $grid->column('receiver', __('user'))->display(function ($name) {
+            if (request()->filled('_export_')) {
+                return $this?->receiver?->name ?: __('No agency');
+            }
             $user = @$this->receiver ?? '';
 
             /** @var UserService $service */
@@ -94,7 +93,10 @@ class HostDiamondController extends MainController
             return $service->adminUserAvatar($user, withoutLevels: true);
         });
         $grid->column('agency_id', __('agency'))->display(function () {
-            $agency = $this->agency;
+            if (request()->filled('_export_')) {
+                return $this?->agency?->name ?: __('No agency');
+            }
+                $agency = $this->agency;
             /** @var AgencyService $agencyService */
             $agencyService = app(AgencyService::class);
 
@@ -102,6 +104,9 @@ class HostDiamondController extends MainController
         });
 
         $grid->column('total_gift_price', __('Total Diamond received'))->display(function ($val) {
+            if (request()->filled('_export_')) {
+                return "\t" . number_format($val);
+            }
             return number_format($val);
         });
         $grid->disableActions();
