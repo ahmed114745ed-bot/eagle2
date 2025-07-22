@@ -134,7 +134,7 @@ class UserAchievementService
                                 ->orderByDesc('achievements.id')
                                 ->orderByDesc('achievement_levels.target')
                                 ->where(function($q) {
-                                    $q->whereNotNull('achievement_level_id')
+                                    $q->whereNull('achievement_level_id')
                                     ->orWhere(function($q2) {
                                         $q2->where('achievements.type', '!=', 'recharge_target');
                                     });
