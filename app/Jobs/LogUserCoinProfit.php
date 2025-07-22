@@ -43,7 +43,6 @@ class LogUserCoinProfit implements ShouldQueue
     public function handle()
     {
 
-
         UserCoinLog::create([
             'user_id'       => $this->userId,
             'type'          => $this->type,

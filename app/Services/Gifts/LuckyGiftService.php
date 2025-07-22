@@ -109,14 +109,14 @@ class LuckyGiftService
                 if ($cashback_percentage > 0) {
 
                     $amountBefore = $user->di;
-                    LogUserCoinProfit::dispatch(
+                    LogUserCoinProfit::dispatchSync(
                         $user->id,
                         $amountBefore,
                         $cashback_value,
                         'cashback',
                         'lucky_gifts',
                         $gift?->name 
-                    )->onQueue('log_user_coin');
+                    );
 
                     $user->enableSaving = false;
                     $user->di           += $cashback_value;
@@ -155,14 +155,14 @@ class LuckyGiftService
             ];
             $amountBefore = $user->di;
 
-            LogUserCoinProfit::dispatch(
+            LogUserCoinProfit::dispatchSync(
                 $user->id,
                        $amountBefore,
                 -abs($totalPrice),
                 'lucky_gift',
                 'gift_logs',
                 $gift?->name 
-            )->onQueue('log_user_coin');
+            );
             $user->di -= $totalPrice;
             $index--;
             $message = null;

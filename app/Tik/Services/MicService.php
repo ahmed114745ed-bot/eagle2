@@ -87,10 +87,10 @@ class MicService
             $old_status = $current;
         }
 
-        // if ($old_status == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
-        //     throw new Exception(__('This microphone is closed and cannot be accessed'));
-        // }
-       
+         if ($old_status == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
+             throw new Exception(__('This microphone is closed and cannot be accessed'));
+         }
+
 
         if (in_array($user->id, $mic_arr)) {
             CpRoomHistory::where("user_one_id", $user->id)

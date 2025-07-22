@@ -79,16 +79,18 @@ class GiftLogService
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
         try {
+           
             $sendPrice = (int)($totalPrice);
             $amountBefore = $user->di;
-            LogUserCoinProfit::dispatch(
+          
+            LogUserCoinProfit::dispatchSync(
                 $user->id,
                 $amountBefore,
                 -abs($sendPrice),
                 'gift',
                 'gift_logs',
                 'gift'
-            )->onQueue('log_user_coin');
+            );
 
             $updateUserWhenSendGift->send($sendPrice, $user);
         } catch (NotInfMoneyException $e) {
