@@ -309,18 +309,21 @@ class OvipGiftTapController extends MainController
             $form->color('color', trans('color'));
         }
     
-        $form->saving(function (Form $form) use ($isEditing) {
+        $form->saving(function (Form $form) use ($isEditing,$isType18or21) {
             $hasShowImg = $form->show_img || $form->model()->show_img;
             $hasImg2 = $form->img2 || $form->model()->img2;
-    
-            if (!$hasShowImg && !$hasImg2) {
-                return back()->with([
-                    'error' => new MessageBag([
-                        'title' => 'Error',
-                        'message' => 'Please upload at least one image',
-                    ])
-                ]);
+            $type = $form->model()->type ?? request('type');
+
+            if (!$isType18or21 || ($isEditing && !in_array((int)$type, [18, 21]))) {
+                if (!$hasShowImg && !$hasImg2) {
+                    return back()->with([
+                        'error' => new MessageBag([
+                            'title' => 'Error',
+                            'message' => 'Please upload at least one image',
+                        ])
+                    ]);
             }
+        }
     
             if ($form->show_img instanceof UploadedFile) {
                 $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
