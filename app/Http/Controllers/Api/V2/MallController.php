@@ -28,14 +28,14 @@ class MallController extends Controller
             return Common::apiResponse(false, 'type is required', null, 422);
         }
 
-        $wares = $this->mallService->getWares(  $user->id,$request->type,);
+        $wares = $this->mallService->getWares($user->id, $request->type,);
 
         return Common::apiResponse(true, '', WareResource::collection($wares), 200);
     }
 
     public function padding()
     {
-         $wares = $this->mallService->getAllWares( 5);
+        $wares = $this->mallService->getAllWares(5);
 
         return Common::apiResponse(true, '',   WarePaddingResource::collection($wares), 200);
     }
