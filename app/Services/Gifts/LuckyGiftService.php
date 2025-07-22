@@ -108,8 +108,10 @@ class LuckyGiftService
                 $cashback_value = $cashback_percentage * $giftPrice * $number;
                 if ($cashback_percentage > 0) {
 
+                    $amountBefore = $user->di;
                     LogUserCoinProfit::dispatch(
                         $user->id,
+                        $amountBefore,
                         $cashback_value,
                         'cashback',
                         'lucky_gifts',
@@ -151,8 +153,11 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
+            $amountBefore = $user->di;
+
             LogUserCoinProfit::dispatch(
                 $user->id,
+                       $amountBefore,
                 -abs($totalPrice),
                 'lucky_gift',
                 'gift_logs',

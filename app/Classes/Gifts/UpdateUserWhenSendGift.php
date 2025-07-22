@@ -167,8 +167,11 @@ class UpdateUserWhenSendGift
      */
     public function send(int $totalCoins, User $senderUser)
     {
+
+        $amountBefore = $senderUser->di;
         LogUserCoinProfit::dispatch(
             $senderUser->id,
+            $amountBefore,
             -abs($totalCoins),
             'gift',
             'gift_logs',
