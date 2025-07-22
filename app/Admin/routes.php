@@ -255,6 +255,7 @@ Route::group(
         Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
         Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
         Route::post('get-users', [RoomController::class, 'getUsers'])->name('get.users');
+        Route::put('rooms/{room}', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
 
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);

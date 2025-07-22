@@ -172,6 +172,8 @@ class RoomController extends MainController
 
         $boxes = $query->orderByDesc('created_at')->paginate(15);
 
+        $roomTypes = RoomCategory::where('enable', 1)->get();
+
         return $content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
@@ -183,6 +185,7 @@ class RoomController extends MainController
                 'visitors'      => $visitors,
                 'pks'           => $pks,
                 'boxes'         => $boxes,
+                'roomTypes'     => $roomTypes,
             ]));
     }
     /**
@@ -986,4 +989,25 @@ HTML);
 
         return response()->json($users);
     }
+
+    public function updateBasicInfo(Request $request, $id)
+    {
+        $room = Room::findOrFail($id);
+
+        $room->room_name = $request->room_name;
+        $room->room_type = $request->room_type;
+        $room->max_admin = $request->max_admin;
+        $room->is_popular = $request->has('is_popular');
+        $room->is_top = $request->has('is_top');
+        $room->is_recommended = $request->has('is_recommended');
+        $room->secret_chat = $request->has('secret_chat');
+
+        $room->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Room updated successfully!')
+        ]);
+    }
+
 }
