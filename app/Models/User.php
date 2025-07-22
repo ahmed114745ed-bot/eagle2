@@ -1658,7 +1658,7 @@ class User extends Authenticatable
                     $start = $join->join_date;
                     $end = $join->leave_date ?? now()->endOfMonth();
                     $query->where('user_agency_id', $this->agency_id)
-                        ->where(fn($q) => $q->whereBetween('created_at', [$start, $end])->whereBetween('updated_at', [$start, $end]));
+                        ->where(fn($q) => $q->whereBetween('created_at', [$start, $end])->orWhereBetween('updated_at', [$start, $end ]));
                 } else {
                     $query->whereRaw('1 = 0');
                 }
