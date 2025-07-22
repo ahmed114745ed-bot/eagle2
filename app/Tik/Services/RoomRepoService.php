@@ -62,6 +62,8 @@ class RoomRepoService
             if ($user->di < $paidRoomAmount->value){
                 throw new \Exception(__('you do not have enough coins for creating a room'));
             }
+            $user->di = $user->di - $paidRoomAmount->value;
+            $user->save();
         }
 
         $room = $this->repository->create($data);

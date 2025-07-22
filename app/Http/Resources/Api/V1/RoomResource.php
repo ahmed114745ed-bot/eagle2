@@ -58,13 +58,7 @@ class RoomResource extends JsonResource
             'room_background' => $this->final_room_image,
             'stream_type' => $this->type ?? 'audio',
             'is_live' => (bool)$this->is_live,
-            'is_lucky_box' => $this->boxUse()->where('room_uid', $this->uid)
-                ->where('not_used_num', '>', 0)
-                //            ->where('unused_coins', '>', 0)
-                ->where('end_at', '>=', now()->timestamp)
-                ->whereDoesntHave('picks', function ($q) use ($userId) {
-                    $q->where('user_id', $userId);
-                })->exists(),
+            'is_lucky_box' => $this->is_lucky_box ?? false,
             'country' => $this->country
                 ? new CountryResource($this->country)
                 : [
