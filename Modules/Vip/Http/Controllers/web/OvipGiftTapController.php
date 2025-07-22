@@ -371,7 +371,11 @@ class OvipGiftTapController extends MainController
                 ->where('get_type', 1)
                 ->when($id, fn($q) => $q->where('id', '!=', $id))
                 ->exists();
-    
+                     logger('Ware Ware:', [$exists]);
+                     logger('Ware $form->type:', [$form->type]);
+                     logger('Ware $form->model()->level', [$form->model()->level]);
+                     logger('Ware $id', [$id]);
+
             if ($exists) {
                 return back()->with([
                     'error' => new MessageBag([
