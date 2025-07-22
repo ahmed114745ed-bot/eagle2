@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
-use App\Models\BoxUse;
 use Illuminate\Http\Request;
+
+use App\Http\Controllers\Controller;
+use Modules\LuckyBox\Entities\BoxUse;
 
 class BoxUserController extends Controller
 {

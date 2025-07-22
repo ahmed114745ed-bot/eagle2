@@ -13,7 +13,6 @@
         width: 250px;
         background: var(--secondary-color);
         min-height: 400px;
-
         padding: 20px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     }
@@ -89,12 +88,10 @@
 
     .wrapper {
         width: 100%;
-
     }
 
     .settings-content {
         width: 869px;
-
     }
 
     .form {
@@ -143,63 +140,6 @@
 
     button {
         width: 200px;
-
-    }
-
-    /* Tab styling */
-    .tab-buttons {
-        display: flex;
-        border-bottom: 1px solid #444;
-        margin-bottom: 20px;
-    }
-
-    .tab-button {
-        padding: 10px 20px;
-        background: #333;
-        border: none;
-        color: white;
-        cursor: pointer;
-        margin-right: 5px;
-        border-radius: 5px 5px 0 0;
-    }
-
-    .tab-button:hover {
-        background: #555;
-    }
-
-    .tab-button.active {
-        background: #ff9800;
-        color: #121212;
-    }
-
-    .tab-content {
-        display: none;
-        padding: 20px;
-        background: #222;
-        border-radius: 0 5px 5px 5px;
-    }
-
-    .tab-content.active {
-        display: block;
-    }
-
-    .tab-content form {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-    }
-
-    .tab-content label {
-        grid-column: 1;
-    }
-
-    .tab-content input[type="file"] {
-        grid-column: 2;
-    }
-
-    .tab-content button {
-        grid-column: 1 / span 2;
-        justify-self: center;
     }
 
     /* Toggle Switch Styling */
@@ -284,179 +224,148 @@
         font-style: italic;
     }
 </style>
-</head>
 
 <body>
-    <div class="all-page">
-
-        <div class="all-page">
-            <div class="settings-sidebar">
-                <h2>{{ __('Settings') }}</h2>
-                <div class="settings-menu">
-                    <button onclick="showSection('AppFeature')"
-                            style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('App Feature') }}</button>
-                </div>
-            </div>
-
-        <div class="settings-content">
-            <div id="AppFeature" class="settings-section active">
-                <h2>{{ __('Agency Feature') }}</h2>
-
-                <form id="agencyFeatureForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @php
-                        $errorMessage = $errors ? $errors->first('msg') : null;
-                    @endphp
-                    @if ($errorMessage)
-                        <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                    @endif
-
-                    <div class="form">
-                        <!-- Toggle switch for enabling/disabling the agency feature -->
-                        <div class="feature-toggle-container">
-                            <span class="toggle-label">{{ __('Enable Agency Feature') }}</span>
-                            <label class="switch">
-                                <input type="checkbox" id="agency_toggle" {{ $hostAgencyStatus ? 'checked' : '' }}
-                                onchange="document.getElementById('host_agency_value').value = this.checked ? '1' : '0';
-                        document.getElementById('agencyFeatureForm').submit();">
-                                <span class="slider round"></span>
-                            </label>
-                            <!-- Only this input has the name attribute to be submitted -->
-                            <input type="hidden" name="host_agency" id="host_agency_value" value="{{ $hostAgencyStatus ? '1' : '0' }}">
-                        </div>
-
-                        <!-- Container for the external HTML content -->
-                        <div class="feature-description-container">
-                            <h4>{{ __('Feature Description') }}</h4>
-                            <div id="feature-description-content" class="external-content">
-                                <!-- Content will be loaded here from external URL -->
-                                <div class="loading">{{ __('Loading feature description...') }}</div>
-                            </div>
-                        </div>
-
-                    </div>
-                </form>
-            </div>
+<div class="all-page">
+    <div class="settings-sidebar">
+        <h2>{{ __('Settings') }}</h2>
+        <div class="settings-menu">
+            <button onclick="showSection('AppFeature')"
+                    style="background: var(--primary-color); color: var(--text-secondary-color);">
+                {{ __('Agency Feature') }}
+            </button>
+            <button onclick="showSection('ReelSettings')"
+                    style="text-align: right;">
+                {{ __('Reel Settings') }}
+            </button>
         </div>
-        <div id="imageModal" class="modal" onclick="closeFullScreen()">
-            <span class="close">&times;</span>
-            <img class="modal-content" id="fullImage">
-        </div>
-
-
-        <script>
-            function previewImage(input, previewId) {
-                const preview = document.getElementById(previewId);
-                const file = input.files[0];
-
-                if (file) {
-                    const reader = new FileReader();
-
-                    reader.onload = function(e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    }
-
-                    reader.readAsDataURL(file);
-                }
-            }
-
-            function openFullScreen(imgElement) {
-                var modal = document.getElementById("imageModal");
-                var modalImg = document.getElementById("fullImage");
-
-                modal.style.display = "block";
-                modalImg.src = imgElement.src;
-            }
-
-            function openLanguageTab(evt, languageCode) {
-                // Hide all tab contents
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-
-                // Remove active class from all buttons
-                document.querySelectorAll('.tab-button').forEach(button => {
-                    button.classList.remove('active');
-                });
-
-                // Show the current tab and mark button as active
-                document.getElementById(languageCode).classList.add('active');
-                evt.currentTarget.classList.add('active');
-            }
-
-        </script>
-
-        <!-- كود JavaScript -->
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                // Function to get query parameter by name
-                function getQueryParam(name) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    return urlParams.get(name);
-                }
-
-                // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-                const activeTab = getQueryParam("firsttab") || "AppFeature";
-
-                // Show the selected tab
-                showSection(activeTab);
-            });
-
-            function showSection(sectionId) {
-                // Remove active class from all sections
-                document.querySelectorAll('.settings-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-
-                // Add active class to the selected section
-                document.getElementById(sectionId).classList.add('active');
-
-                // Reset button styles
-                document.querySelectorAll('.settings-menu button').forEach(button => {
-                    button.style.backgroundColor = '';
-                    button.style.color = '';
-                });
-
-                // Highlight the active button
-                const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-                if (activeButton) {
-                    activeButton.style.backgroundColor = 'var(--primary-color)';
-                    activeButton.style.color = 'var(--text-secondary-color)';
-                }
-
-                // Update the URL with the selected tab without reloading
-                const url = new URL(window.location);
-                url.searchParams.set("firsttab", sectionId);
-                window.history.pushState({}, "", url);
-            }
-
-
-            function openFullScreen(imgElement) {
-                var modal = document.getElementById("imageModal");
-                var modalImg = document.getElementById("fullImage");
-
-                modal.style.display = "block";
-                modalImg.src = imgElement.src;
-            }
-
-            function closeFullScreen() {
-                document.getElementById("imageModal").style.display = "none";
-            }
-
-            function toggleAgencyFeature(checkbox) {
-                // Update hidden input value
-                document.getElementById('host_agency_value').value = checkbox.checked ? '1' : '0';
-
-                // Submit the form
-                document.getElementById('agencyFeatureForm').submit();
-            }
-
-            // Ensure the checkbox state matches the hidden value on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                var hiddenValue = document.getElementById('host_agency_value').value;
-                document.getElementById('agency_toggle').checked = (hiddenValue === '1');
-            });
-        </script>
     </div>
+
+    <div class="settings-content">
+        <div id="AppFeature" class="settings-section active">
+            <h2>{{ __('Agency Feature') }}</h2>
+            <form id="agencyFeatureForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
+
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable Agency Feature') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="agency_toggle" {{ $hostAgencyStatus ? 'checked' : '' }}
+                            onchange="document.getElementById('host_agency_value').value = this.checked ? '1' : '0';
+                                document.getElementById('agencyFeatureForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="host_agency" id="host_agency_value" value="{{ $hostAgencyStatus ? '1' : '0' }}">
+                    </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="ReelSettings" class="settings-section">
+            <h2>{{ __('Reel Settings') }}</h2>
+            <form id="reelFeatureForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
+
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable Reel Feature') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="reel_toggle" {{ $reelSettings ? 'checked' : '' }}
+                            onchange="document.getElementById('host_reel_value').value = this.checked ? '1' : '0';
+                                document.getElementById('reelFeatureForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="reel_status" id="host_reel_value" value="{{ $reelSettings ? '1' : '0' }}">
+                    </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="imageModal" class="modal" onclick="closeFullScreen()">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="fullImage">
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        const activeTab = getQueryParam("firsttab") || "AppFeature";
+        showSection(activeTab);
+    });
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.settings-section').forEach(section => {
+            section.classList.remove('active');
+        });
+
+        document.getElementById(sectionId).classList.add('active');
+
+        document.querySelectorAll('.settings-menu button').forEach(button => {
+            button.style.backgroundColor = '';
+            button.style.color = '';
+        });
+
+        const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+        if (activeButton) {
+            activeButton.style.backgroundColor = 'var(--primary-color)';
+            activeButton.style.color = 'var(--text-secondary-color)';
+        }
+
+        const url = new URL(window.location);
+        url.searchParams.set("firsttab", sectionId);
+        window.history.pushState({}, "", url);
+    }
+
+    function openFullScreen(imgElement) {
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("fullImage");
+        modal.style.display = "block";
+        modalImg.src = imgElement.src;
+    }
+
+    function closeFullScreen() {
+        document.getElementById("imageModal").style.display = "none";
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var agencyHiddenValue = document.getElementById('host_agency_value').value;
+        document.getElementById('agency_toggle').checked = (agencyHiddenValue === '1');
+
+        var reelHiddenValue = document.getElementById('host_reel_value').value;
+        document.getElementById('reel_toggle').checked = (reelHiddenValue === '1');
+    });
+</script>
 </body>

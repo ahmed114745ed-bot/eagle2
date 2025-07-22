@@ -94,7 +94,8 @@ class LogAppProfitCoinsCommand extends Command
                         break;
                 }
                 $this->info("Logging item: [$itemName] from table [$table], row ID: $row->id");
-
+                $amountBefore += $row->app_profit_coins;
+                
                 $logs[] = [
                     'user_id' => $row->{$userColumn},
                     'type' => $type,
@@ -109,11 +110,11 @@ class LogAppProfitCoinsCommand extends Command
                 ];
             }
             
-            UserCoinLog::insert($logs);
+            // UserCoinLog::insert($logs);
     
-            DB::table($table)
-                ->whereIn('id', collect($rows)->pluck('id'))
-                ->update(['app_profit_coins' => 0]);
+            // DB::table($table)
+            //     ->whereIn('id', collect($rows)->pluck('id'))
+            //     ->update(['app_profit_coins' => 0]);
         }
     
 }

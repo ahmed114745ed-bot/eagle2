@@ -124,14 +124,33 @@
                                     $endFormatted = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted);
                                     echo "$$endFormatted";
                                 } elseif ($column == 'reals' || $column == 'reel') {
-                                    echo 'Update: ' . ($target->reel_parts[0] ?? 0) . '<br>';
-                                    echo 'Like: ' . ($target->reel_parts[1] ?? 0) . '<br>';
-                                    echo 'Comment: ' . ($target->reel_parts[2] ?? 0);
+                                    echo __('uploads').':'. ($target->reel_parts[0] ?? 0) . '<br>';
+                                    echo __('like').':' . ($target->reel_parts[1] ?? 0) . '<br>';
+                                    echo __('comment').':' . ($target->reel_parts[2] ?? 0);
                                 } elseif ($column == 'moments' || $column == 'moment') {
-                                    echo 'Update: ' . ($target->moment_parts[0] ?? 0) . '<br>';
-                                    echo 'Like: ' . ($target->moment_parts[1] ?? 0) . '<br>';
-                                    echo 'Comment: ' . ($target->moment_parts[2] ?? 0);
-                                } else {
+                                    echo __('uploads').':' . ($target->moment_parts[0] ?? 0) . '<br>';
+                                    echo __('like').':' . ($target->moment_parts[1] ?? 0) . '<br>';
+                                    echo __('comment').':' . ($target->moment_parts[2] ?? 0);
+                                }elseif ($column == 'agency_share') {
+                                    $coins = \App\Helpers\Common::getMaxCoins();
+                                    $endFormatted = $coins ? ($target->diamonds / $coins) : 0;
+                                    $value = $target->agency_share;
+                                    $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+                                        $value = is_numeric($value) ? floatval($value) : 0;
+                                        $userUsd = $endFormatted * $value / 100;
+                                    $endFormatted = \App\Helpers\Common::roundToTwoDecimalPlaces($userUsd);
+                                    echo "$$endFormatted";
+                                }elseif ($column == 'db_percentage') {
+                                    $coins = \App\Helpers\Common::getMaxCoins();
+                                    $endFormatted = $coins ? ($target->diamonds / $coins) : 0;
+                                    $value = $target->db_percentage;
+                                    $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+                                        $value = is_numeric($value) ? floatval($value) : 0;
+                                        $userUsd = $endFormatted * $value / 100;
+                                    $endFormatted = \App\Helpers\Common::roundToTwoDecimalPlaces($userUsd);
+                                    echo "$$endFormatted";
+                                }
+                                 else {
                                     echo $target->$column ?? '-';
                                 }
                             @endphp

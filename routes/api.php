@@ -5,6 +5,7 @@ use App\Events\PublicTestEvent;
 use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\PaytabsController;
+use App\Http\Controllers\RoomSettingController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -328,12 +329,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
             });
 
-            Route::prefix('box')->group(function () {
-                Route::get('list', [BoxController::class, 'index']);
-                Route::post('send', [BoxController::class, 'send']);
-                Route::post('send_test', [BoxController::class, 'testSendSuperBoxes']);
-                Route::post('pickup', [BoxController::class, 'pickBox']);
-            });
+
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
@@ -580,7 +576,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::get('app_feature', [AppFeatureController::class, 'show']);
-
+            Route::get('room_settings', [RoomSettingController::class, 'show']);
 
             Route::group(['prefix' => 'paytabs', 'as' => 'paytabs.'], function () {
                 Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');

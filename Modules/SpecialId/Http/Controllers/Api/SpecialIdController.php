@@ -93,7 +93,17 @@ class SpecialIdController extends Controller
             ->where('id', $item_id)->with('ware')
             ->first();
 
+
         if ($pack) {
+            // Un use all packs
+            /// TODO @m2led
+            if ($status) {
+                Pack::where('type', 25)
+                    ->where('user_id', $user->id)
+                    ->where('id', '!=', $pack->id)
+                    ->update(['is_used' => 0]);
+            }
+
             $pack->update(['is_used' => $status, 'use_num' => 1]);
             SpecialHistory::where('user_id', $user->id)->where('ware_id', '!=', $pack->target_id)->update(['status' => 0]);
             $specialHistory =  SpecialHistory::where([

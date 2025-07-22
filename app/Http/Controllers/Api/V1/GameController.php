@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\AllGamesResource;
+use App\Jobs\LogUserCoinProfit;
 use App\Models\AllGame;
 use App\Models\CoinGameUser;
 use App\Models\User;
@@ -83,9 +84,20 @@ class GameController extends Controller
         if (!$user || $user->di < $data['cost'] ) {
             abort(403, 'Invalid  request');
         }
+        $amountBefore = $user->di;
+
+        LogUserCoinProfit::dispatchSync(
+            $user->id,
+            $amountBefore,
+            $data['coins'],
+            'coinGame',
+            'coin_game_users',
+            'coin_game'
+        );
 
         $user->di += $data['coins'];
         $user->update();
+
         CoinGameUser::create(['user_id' =>  $user->id, 
         'coins' => $data['coins'], 
         'app_profit_coins' =>  $data['coins'],

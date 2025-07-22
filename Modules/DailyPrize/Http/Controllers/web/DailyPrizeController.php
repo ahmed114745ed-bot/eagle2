@@ -56,7 +56,6 @@ class DailyPrizeController extends MainController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        $model = DailyGift::findOrFail($id);
 
         $form = $this->form()->edit($id);
 
@@ -122,7 +121,7 @@ class DailyPrizeController extends MainController
             });
         }
 
-        if (!request()->filled('_export_')) {
+//        if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->gift_type == 'ware') {
                     $ware = Ware::find($this->target);
@@ -136,11 +135,15 @@ class DailyPrizeController extends MainController
                     $path = 'coin.png';
                 }
 
+                if (request()->filled('_export_')) {
+                    return '=IMAGE("' . getImagePath($path) . '","flag",1)';
+                }
+
                 /** @var Gift $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
-        }
+//        }
 
         $grid->column('expir', __('expire'));
         Admin::script("
@@ -179,7 +182,19 @@ class DailyPrizeController extends MainController
     public function update($id)
     {
         $id = request()->route('id');
-        return $this->form()->update($id);
+        $response = $this->form()->update($id);
+
+        if ($response instanceof \Illuminate\Http\RedirectResponse) {
+            $errors = session()->get('errors');
+            if ($errors) {
+                info('Validation errors: ', $errors->all());
+            }
+            return $response;
+        }
+
+        $type = request()->route('type');
+        admin_toastr(__('admin.save_succeeded'));
+        return redirect()->route('admin.daily-gifts.index', ['type' => $type]);
     }
 
 
@@ -190,8 +205,7 @@ class DailyPrizeController extends MainController
 
         $typeId = request()->route('type');
         $orderId = request()->route('id');
-        $form->hidden('type')->value(request('type'));
-        // $form->select('order', __('order'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7])->required();
+
         $form->select('order', __('order'))->options([
             1 => __('first_day'),
             2 => __('second_day'),
@@ -200,35 +214,63 @@ class DailyPrizeController extends MainController
             5 => __('fifth_day'),
             6 => __('sixth_day'),
             7 => __('seventh_day'),
-        ])
-            ->rules('required|unique:daily_gifts,order,' . $orderId . ',id,type,' . $typeId);
+        ])->rules('required|unique:daily_gifts,order,' . $orderId . ',id,type,' . $typeId);
 
         $form->select('gift_type', __('Gift type'))
-            ->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
-            ->when("ware", function () use ($form) {
-                $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
+            ->options([
+                "ware"        => __('ware'),
+                "vip"         => __('vip'),
+                "coins"       => __('coins'),
+                "achievement" => __('achievement'),
+            ])
+            ->when('ware', function () use ($form) {
+                $form->belongsTo('target1', Wares::class, trans('wares'));
                 $form->number('expir', __('expire'));
             })
-            ->when("vip", function () use ($form) {
-                $form->belongsTo('target2', OVips::class, trans('vips'))->rules('required');
+            ->when('vip', function () use ($form) {
+                $form->belongsTo('target2', OVips::class, trans('vips'));
                 $form->number('expir', __('expire'));
             })
-            ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"))
-                    ->rules('required');
+            ->when('coins', function () use ($form) {
+                $form->number('target3', __('coins'));
             })
-            ->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
+            ->when('achievement', function () use ($form) {
+                $form->image('target4', __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
-                })->rules('required');
+                });
                 $form->number('expir', __('expire'));
-            })->required();
+            })
+            ->rules('required');
 
         $form->saving(function (Form $form) {
-            if ($form->gift_type === 'coins') {
-                $form->expir = null;
+            $type = $form->gift_type;
+            $errors = [];
+
+            switch ($type) {
+                case 'ware':
+                    if (!$form->target1) $errors[] = __('wares') . ' ' . __('is required');
+                    if (empty($form->expir) || !is_numeric($form->expir)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    break;
+                case 'vip':
+                    if (!$form->target2) $errors[] = __('vips') . ' ' . __('is required');
+                    if (empty($form->expir) || !is_numeric($form->expir)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    break;
+                case 'coins':
+                    if (empty($form->target3) || !is_numeric($form->target3)) $errors[] = __('coins') . ' ' . __('is required and must be numeric');
+                    $form->expir = null;
+                    break;
+                case 'achievement':
+                    if (!$form->target4) $errors[] = __('image') . ' ' . __('is required');
+                    if (empty($form->expir) || !is_numeric($form->expir)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    break;
+            }
+
+            if (count($errors)) {
+                admin_error(__('Validation error'), implode('<br>', $errors));
+                return back();
             }
         });
+
         return $form;
     }
 

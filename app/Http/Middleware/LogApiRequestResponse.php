@@ -17,21 +17,24 @@ class LogApiRequestResponse
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $startTime = microtime(true); // Start time in microseconds
+
         $response = $next($request);
 
-        $userId = Auth::id();
+        $endTime = microtime(true); // End time
+        $duration = round(($endTime - $startTime) * 1000, 2); // Duration in milliseconds
 
-        if (!$userId){
-            $userId = Auth::guard('sanctum')->id();
-        }
-        $matchedId = settings()->get('debug_id');
+        $userId = Auth::id() ?? Auth::guard('sanctum')->id();
 
-        if ($matchedId && $userId == $matchedId) {
+        $matchedIds = settings()->get('debug_ids');
+
+        if (is_array($matchedIds) && in_array($userId, $matchedIds)) {
             $log = [
                 'user_id' => $userId,
                 'url' => $request->fullUrl(),
                 'method' => $request->method(),
                 'request_body' => $request->all(),
+                'duration_ms' => $duration,
                 'response_status' => $response->getStatusCode(),
                 'response_body' => method_exists($response, 'getContent') ? json_decode($response->getContent(), true) : null,
             ];
@@ -40,15 +43,13 @@ class LogApiRequestResponse
                 $headers = $request->headers->all();
 
                 // Remove sensitive headers (case-insensitive)
-                unset($headers['authorization']);
-                unset($headers['cookie']);
-                unset($headers['x-api-key']); // Add any others you want excluded
+                unset($headers['authorization'], $headers['cookie'], $headers['x-api-key']);
 
                 $log['headers'] = $headers;
             }
 
             // Write as a pure JSON line
-            Log::channel('custom_log')->info($request->fullUrl().' '.PHP_EOL.json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            Log::channel('custom_log')->info($request->fullUrl()." $userId ".PHP_EOL.json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
 
         return $response;

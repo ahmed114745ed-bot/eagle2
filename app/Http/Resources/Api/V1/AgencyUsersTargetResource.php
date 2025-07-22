@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Helpers\Common;
 use App\Models\UsersJoinedAgency;
 use Carbon\Carbon;
 use App\Models\GiftLog;
@@ -45,7 +46,15 @@ class AgencyUsersTargetResource extends JsonResource
         $from = $joinedDate->greaterThan($startOfMonth) ? $joinedDate : $startOfMonth;
         $to = $leaveDate->lessThan($endOfMonth) ? $leaveDate : $endOfMonth;
 
-        $totalSeconds = $this->UserliveTime()
+
+        $agencySallary = UserSallary::query()
+        ->where('user_id', $this->id)
+        ->where('user_agency_id', $this->agency_id)
+        ->where(fn($q) => $q->whereBetween('created_at', [$from, $to])->orWhereBetween('updated_at', [$from, $to ]))
+        ->latest()
+        ->value('agency_sallary');
+
+        $totalSeconds= $this->UserliveTime()
             ->whereBetween('created_at', [$from, $to])
             ->get()
             ->reduce(function ($carry, $session) {
@@ -63,32 +72,8 @@ class AgencyUsersTargetResource extends JsonResource
         $hours = floor($totalSeconds / 3600);
         $minutes = floor(($totalSeconds % 3600) / 60);
 
-        $target = $this->targets()
-            ->where('agency_id', $this->agency_id)
-            ->latest()
-            ->first();
 
-        // $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
-        //     ->select('id', 'user_diamonds')->get();
-        // $months = collect(range($month - 2, $month - 1))
-        // ->filter(fn($m) => $m > 0)
-        // ->values();
 
-        // $userTargets = UserTarget::where('user_id', $this->id)
-        //     ->where('agency_id', $this->agency_id)
-        //     ->where('add_year', $year)
-        //     ->whereIn('add_month', $months)
-        //     ->select('add_month', 'user_diamonds')
-        //     ->pluck('user_diamonds', 'add_month');
-
-        // $result = [];
-
-        // foreach ($months as $m) {
-        //     $result[] = [
-        //         'month_number' => $m,
-        //         'diamonds'     => $userTargets->get($m, 0),
-        //     ];
-        // }
         $currentDate = Carbon::create($year, $month, 1);
 
         $monthsWithYears = collect();
@@ -101,34 +86,13 @@ class AgencyUsersTargetResource extends JsonResource
             ]);
         }
 
-        $userTargets = UserTarget::where('user_id', $this->id)
-            ->where('agency_id', $this->agency_id)
-            ->where(function ($query) use ($monthsWithYears) {
-                foreach ($monthsWithYears as $item) {
-                    $query->orWhere(function ($q) use ($item) {
-                        $q->where('add_year', $item['year'])
-                            ->where('add_month', $item['month']);
-                    });
-                }
-            })
-            ->select('add_year', 'add_month', 'user_diamonds')
-            ->get()
-            ->keyBy(function ($item) {
-                return $item->add_year . '-' . $item->add_month;
-            });
 
-        $result = [];
-
-        foreach ($monthsWithYears as $item) {
-            $key = $item['year'] . '-' . $item['month'];
-            $result[] = [
-                // 'year' => $item['year'],
-                'month_number' => $item['month'],
-                'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
-                'diamonds' => $userTargets->has($key) ? $userTargets->get($key)->user_diamonds : 0,
-            ];
-        }
-        $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
+        $giftLog = GiftLog::where('agency_id', $this->agency_id)
+            ->where('receiver_id', $this->id)
+            ->whereHas('sender')
+            ->with('sender')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
             ->selectRaw("sum(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')->orderByRaw("exp desc")->limit(3)
             ->get()
@@ -136,27 +100,10 @@ class AgencyUsersTargetResource extends JsonResource
                 return $q->exp > 0;
             });
 
-        $totalGiftPrice = GiftLog::where('agency_id', $this->agency_id)
-            ->where('receiver_id', $this->id)
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->sum('giftPrice');
 
 
-        // $salary = UserSallary::query()
 
-        //     ->where('user_agency_id', $this->agency_id)
-        //     ->where('user_id', $this->id)
-        //     ->where(function ($query) use ($year, $month) {
-        //         $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
-        //     })->sum(DB::raw('sallary - cut_amount'));
-        $agencySallary = UserSallary::query()
-            ->where('user_id', $this->id)
-            ->where('user_agency_id', $this->agency_id)
-            ->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
-            })
-            ->value('agency_sallary');
+        $hasColor = Common::hasInPack(@$this->id, 18, true);
 
         return [
             'id' => $this->id ?? 0,
@@ -178,6 +125,7 @@ class AgencyUsersTargetResource extends JsonResource
             'top_users' => $giftLog->map(function ($log) {
                 return $log->sender?->profile?->avatar ?? '';
             })->filter()->values()->toArray(),
+            'colored_name' => $hasColor ? Common::wareUserVip(@$this->id, 18, 'color') ?? '' : '',
         ];
     }
 

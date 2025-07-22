@@ -19,7 +19,7 @@ class RoomSettingsController extends Controller
      */
     protected $title = 'Room-setting';
     public $permission_name = 'room-settings';
-    
+
     public function index(Content $content)
     {
         if (!Admin::user()->can('*')){
@@ -29,7 +29,6 @@ class RoomSettingsController extends Controller
         return $content
             ->header(__('Settings'))
             ->description('')
-
             ->body(view('admin.room_settings', compact('settings')));
     }
 

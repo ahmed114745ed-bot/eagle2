@@ -10,7 +10,9 @@ class AppFeatureController extends Controller
     public function show()
     {
         $hostAgencySetting = Setting::where('key', 'host_agency')->first();
-        $data = [$hostAgencySetting->key => (bool)$hostAgencySetting->value];
+        $data = [
+            $hostAgencySetting->key => (bool)$hostAgencySetting->value,
+        ];
 
         return Common::apiResponse(true, '', $data, 200);
 

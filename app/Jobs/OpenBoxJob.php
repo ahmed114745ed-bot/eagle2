@@ -2,18 +2,17 @@
 
 namespace App\Jobs;
 
-use App\Helpers\Common;
-use App\Http\Services\LuckyBoxServices;
-use App\Models\BoxUse;
 use App\Models\Room;
+
 use App\Models\User;
-use App\Models\UserBoxGift;
+use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Redis;
+use Modules\LuckyBox\Entities\BoxUse;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Redis;
 
 
 class OpenBoxJob implements ShouldQueue

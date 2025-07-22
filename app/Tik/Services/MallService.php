@@ -26,6 +26,11 @@ class MallService
         return $this->wareRepository->all($userId, $type);
     }
 
+    public function getAllWares($type, $userId = null)
+    {
+        return $this->wareRepository->allWithType( $type, $userId);
+    }
+
     public function buyWares($user, $wareId, $quantity)
     {
         $ware = $this->wareRepository->getById($wareId);
@@ -35,6 +40,16 @@ class MallService
 
         $totalPrice = $ware->price * $quantity;
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+        $amountBefore =  Common::getCurrentBalance($user->id);
+        $logAmount = -abs($totalPrice);
+        UserCoinLogHelper::log(
+            $user->id ,
+            'pack',
+            'packs',
+            $logAmount ?? 0,
+            $amountBefore ?? 0,
+            $ware->name
+        );
         if ($pack) {
             $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
         }
@@ -55,17 +70,9 @@ class MallService
             ];
             $this->packRepository->create($data);
 
+
             $this->service($user, $ware->exp, $totalPrice, 'buy');
-            $amountBefore =  Common::getCurrentBalance($user->id);
-            $logAmount = -abs($totalPrice);
-            UserCoinLogHelper::log(
-                $user->id ,
-                'pack',
-                'packs',
-                $logAmount ?? 0,
-                $amountBefore ?? 0,
-                $ware->name
-            );
+
             return Common::apiResponse(1, 'success process');
         } catch (Exception $exception) {
             return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
@@ -115,7 +122,7 @@ class MallService
                 $ware->name
             );
             $this->service($auth, $ware->exp, $totalPrice, 'send');
-          
+
             DB::commit();
             return Common::apiResponse(1, 'success process');
         } catch (\Exception $exception) {
@@ -160,7 +167,7 @@ class MallService
             (new UpgradeLevelServices())->purchaseItem($user, $wareExp);
             (new UserCounterServices)->eventUser($user, 'mybag', 1);
         }
-       
+
         $this->userRepository->decrementUserCoins($user, $totalPrice);
     }
 
