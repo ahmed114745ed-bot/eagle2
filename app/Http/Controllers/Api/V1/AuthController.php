@@ -65,8 +65,8 @@ class AuthController extends Controller
         $globalKeys = [
             'is_multi' => @$request->is_multi ?? false,
             'notification_id' => @$request->notification_id,
-
         ];
+
         switch ($request['type']) {
             case 'phone_pass':
                 $fields = ['phone' => $request['phone'], 'password' => $request['password'], 'device_token' => $request['device_token']];
