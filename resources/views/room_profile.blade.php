@@ -405,7 +405,7 @@
                             </td>
                             <td>
                                 <a href="#" class="d-flex align-items-center text-decoration-none">
-                                    <img src="{{ getImagePath($gift->gift->giftIcon) }}"
+                                    <img src="{{ getImagePath($gift->gift->img ?? '') }}"
                                          width="30" height="30"
                                          style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <span>{{ $gift->gift->giftName }}</span>
