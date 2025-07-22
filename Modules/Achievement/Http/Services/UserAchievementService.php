@@ -136,7 +136,7 @@ class UserAchievementService
                                 ->where(function($q) {
                                     $q->whereNull('achievement_level_id')
                                     ->orWhere(function($q2) {
-                                        $q2->where('achievements.type', '!=', 'recharge_target');
+                                         $q2->whereNotNull('achievement_level_id')->where('achievements.type', 'recharge_target');
                                     });
                                 })
                                 ->select([
