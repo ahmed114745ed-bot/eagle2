@@ -83,11 +83,6 @@ class GiftLogService
             $sendPrice = (int)($totalPrice);
             $amountBefore = $user->di;
           
-            Log::info('Before dispatch', [
-                'user_id' => $user->id,
-                'amountBefore' => $amountBefore,
-                'sendPrice' => $sendPrice,
-            ]);
             LogUserCoinProfit::dispatchSync(
                 $user->id,
                 $amountBefore,

@@ -43,16 +43,6 @@ class LogUserCoinProfit implements ShouldQueue
     public function handle()
     {
 
-        \Log::channel('single')->info('LogUserCoinProfit Job', [
-            'user_id' => $this->userId,
-            'amount_before' => $this->amountBefore,
-            'amount' => $this->amount,
-            'type' => $this->type,
-            'sub_type' => $this->subType,
-            'item_name' => $this->itemName,
-            'from_date' => $this->createdAt,
-            'to_date' => $this->createdAt,
-        ]);
         UserCoinLog::create([
             'user_id'       => $this->userId,
             'type'          => $this->type,
