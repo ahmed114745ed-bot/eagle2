@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Country;
 use App\Models\KickRecord;
+use App\Models\Pk;
 use App\Models\Room;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -22,6 +23,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Actions\RoomPinAction;
 use App\Admin\Actions\CloseRoomAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\LuckyBox\Entities\BoxUse;
 
 class RoomController extends MainController
 {
@@ -59,7 +61,7 @@ class RoomController extends MainController
 
         // 1. Admins
         $adminIds = collect(explode(',', $room->room_admin))->filter();
-        $admins = \App\Models\User::whereIn('id', $adminIds)
+        $admins = User::whereIn('id', $adminIds)
             ->with('profile')
             ->get();
 
@@ -130,7 +132,7 @@ class RoomController extends MainController
             });
 
         // 4. PKs (Room PKs)
-        $pks = \App\Models\Pk::where('room_id', $room->id)
+        $pks = Pk::where('room_id', $room->id)
             ->with(['team1Boss.profile', 'team2Boss.profile'])
             ->orderByDesc('created_at')
             ->paginate(15);
@@ -146,7 +148,7 @@ class RoomController extends MainController
         );
 
         // 5. Boxes in Room
-        $query = \Modules\LuckyBox\Entities\BoxUse::where('room_id', $room->id)
+        $query = BoxUse::where('room_id', $room->id)
             ->with(['user.profile', 'picks', 'box']);
 
         if (request('type') !== null && request('type') !== '') {
@@ -534,7 +536,7 @@ class RoomController extends MainController
 
         $grid->column(__('microphone'))->display(function () {
             $ids = explode(',', $this->microphone);
-            $cachedUsers = \App\Models\User::whereIn('id', $ids)
+            $cachedUsers = User::whereIn('id', $ids)
                 ->with(['profile:user_id,avatar'])
                 ->get(['id', 'name']);
 
