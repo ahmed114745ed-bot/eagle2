@@ -133,7 +133,13 @@ class UserAchievementService
                                 ->leftJoin('achievements', 'achievement_levels.achievement_id', 'achievements.id')
                                 ->orderByDesc('achievements.id')
                                 ->orderByDesc('achievement_levels.target')
-                                ->where('achievements.type','!=', 'recharge_target')
+                                ->where(function($q) {
+                                    $q->whereNotNull('achievement_level_id')
+                                    ->orWhere(function($q2) {
+                                        $q2->whereNull('achievement_level_id')
+                                            ->where('achievements.type', '!=', 'recharge_target');
+                                    });
+                                })
                                 ->select([
                                              'user_achievement_levels.id',
                                              'achievement_levels.id as achievement_level_id',
