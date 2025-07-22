@@ -374,6 +374,7 @@ class OvipGiftTapController extends MainController
                      logger('Ware Ware:', [$exists]);
                      logger('Ware $form->type:', [$form->type]);
                      logger('Ware $form->model()->level', [$form->model()->level]);
+                     logger('Ware $form->re()->level', [$form->request('level')]);
                      logger('Ware $id', [$id]);
 
             if ($exists) {
