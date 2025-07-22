@@ -14,6 +14,8 @@ class RoomResource extends JsonResource
     public function toArray($request)
     {
         // Common::setHourHot($this->uid);
+
+        $userId = \Auth::id();
         $pk = $this->lastPk;
         $achievement_images = [];
         if (@$this->owner?->medals) {
@@ -56,7 +58,13 @@ class RoomResource extends JsonResource
             'room_background' => $this->final_room_image,
             'stream_type' => $this->type ?? 'audio',
             'is_live' => (bool)$this->is_live,
-            'is_lucky_box' => $this->boxUse->where('is_closed', 0)->isNotEmpty() ,
+            'is_lucky_box' => $this->boxUse()->where('room_uid', $this->uid)
+                ->where('not_used_num', '>', 0)
+                //            ->where('unused_coins', '>', 0)
+                ->where('end_at', '>=', now()->timestamp)
+                ->whereDoesntHave('picks', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })->exists(),
             'country' => $this->country
                 ? new CountryResource($this->country)
                 : [
