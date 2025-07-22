@@ -127,7 +127,7 @@ class SalariesController extends MainController
         });
         $grid->column('id', __('id'));
         $grid->column('uuid', __('uuid'));
-        $grid->column('name', __('name'))->display(fn($f) => app(UserService::class)->adminUserAvatar($this));
+        $grid->column('name', __('name'))->display(fn($f) => app(UserService::class)->adminUserAvatar($this, withoutLevels: true));
         $grid->column('total', __('salary'))->default(0);
 //        $grid->column('cashing', __('cashing'))->display(function () {
 //            return (new SalariesAction($this->id, 'user'))->render();
