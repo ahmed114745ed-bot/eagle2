@@ -76,13 +76,17 @@ class BannerController extends Controller
     {
         $user = Auth::user();
         $now = now();
-        $dataShow = UserBannerShow::whereHas("banner", function ($q) use ($now) {
+       $dataShow = UserBannerShow::whereHas("banner", function ($q) use ($now) {
             $q->where('is_active', true)
-                ->whereNotNull('publish_at')->where(fn ($q) => $q->whereRaw("DATE_ADD(created_at, INTERVAL expire DAY) > '$now'")->orWhere('expire', 0));
+            ->whereNotNull('publish_at')
+            ->where(function ($q) use ($now) {
+                $q->whereRaw("DATE_ADD(created_at, INTERVAL expire DAY) > ?", [$now])
+                    ->orWhere('expire', 0);
+            });
         })->where("user_id", $user->id)->get();
+
         $ids = $dataShow->pluck('banner_id');
         $banners = $this->bannerServices->index2($ids);
-        dd($banners);
         if (empty($banners)) {
             UserBannerShow::where("user_id", $user->id)->delete();
            return Common::apiResponse(true, 'successful', null);
