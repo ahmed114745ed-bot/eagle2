@@ -170,7 +170,6 @@ class RoomController extends MainController
 
         $boxes = $query->orderByDesc('created_at')->paginate(15);
 
-        // Return to view
         return $content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
