@@ -133,6 +133,7 @@ class UserAchievementService
                                 ->leftJoin('achievements', 'achievement_levels.achievement_id', 'achievements.id')
                                 ->orderByDesc('achievements.id')
                                 ->orderByDesc('achievement_levels.target')
+                                ->where('achievements.type','!=', 'room_target')
                                 ->select([
                                              'user_achievement_levels.id',
                                              'achievement_levels.id as achievement_level_id',

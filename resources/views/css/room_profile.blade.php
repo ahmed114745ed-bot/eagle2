@@ -384,7 +384,6 @@
     }
 
     .rtl .btn-back {
-        position: absolute;
         top: 5px;
         left: 20px;
         background: #ecf0f1;
@@ -1290,4 +1289,10 @@
         color: var(--primary-color);
     }
 
+    .edit-btn{
+        background: var(--primary-color) !important;
+    }
+    .btn-back:hover {
+        background: #d4e1ef;
+    }
 </style>

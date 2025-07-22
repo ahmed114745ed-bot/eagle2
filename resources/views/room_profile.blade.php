@@ -68,8 +68,10 @@
                     {!! getRoomStatusBadge($room->room_status) !!}
                 </div>
                 <div class="meta-item">
-                    <span class="meta-label">{{__('Room Mode')}}:</span>
-                    <span class="meta-value">{{ @$room->mode }}</span>
+                    <span class="meta-label">{{ __('Room Mode') }}:</span>
+                    <span class="meta-value">
+                        {{ @$roomModes[$room->mode] ?? '?' }} {{ __('seats') }}
+                    </span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">{{__('Features')}}:</span>
@@ -93,9 +95,14 @@
                 </div>
             </div>
         </div>
-        <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
-            <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
-        </button>
+        <div style="display: flex; justify-content: flex-start; gap: 8px; margin-bottom: 8px;">
+            <button class="btn-back edit-btn" onclick="openEditModal()">
+                <i class="fas fa-edit"></i> {{__("Edit Room")}}
+            </button>
+            <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
+                <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
+            </button>
+        </div>
     </div>
 
     @php
@@ -119,7 +126,8 @@
     </div>
 </div>
 
-<div class="modal fade" id="editRoomModal" tabindex="-1" role="dialog" aria-labelledby="editRoomModalLabel" aria-hidden="true">
+<div class="modal fade" id="editRoomModal" tabindex="-1" role="dialog" aria-labelledby="editRoomModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -141,7 +149,11 @@
                         <label>{{ __('Room Type') }}</label>
                         <select class="form-control" name="room_type">
                             <option value="">{{ __('Select Type') }}</option>
-                            <!-- Add your room types here -->
+                            @foreach($roomTypes as $type)
+                                <option value="{{ $type->id }}" {{ $room->room_type == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -151,27 +163,26 @@
                     </div>
 
                     <div class="form-group">
-                        <label>{{ __('Room Mode') }}</label>
-                        <input type="text" class="form-control" name="mode" value="{{ $room->mode }}">
-                    </div>
-
-                    <div class="form-group">
                         <label>{{ __('Features') }}</label>
                         <div class="custom-controls">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="is_popular" name="is_popular" {{ $room->is_popular ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="is_popular"
+                                       name="is_popular" {{ $room->is_popular ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="is_popular">{{ __('Popular') }}</label>
                             </div>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="is_top" name="is_top" {{ $room->is_top ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="is_top"
+                                       name="is_top" {{ $room->is_top ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="is_top">{{ __('Top') }}</label>
                             </div>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="is_recommended" name="is_recommended" {{ $room->is_recommended ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="is_recommended"
+                                       name="is_recommended" {{ $room->is_recommended ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="is_recommended">{{ __('Recommended') }}</label>
                             </div>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="secret_chat" name="secret_chat" {{ $room->secret_chat ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="secret_chat"
+                                       name="secret_chat" {{ $room->secret_chat ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="secret_chat">{{ __('Secret Chat') }}</label>
                             </div>
                         </div>
@@ -251,7 +262,7 @@
                                 <button class="btn btn-danger btn-sm remove-admin"
                                         data-room-id="{{ $room->id }}"
                                         data-admin-id="{{ $admin->id }}">
-                                        {{ __('Remove') }}
+                                    {{ __('Remove') }}
                                 </button>
                             @endif
                         </td>
@@ -402,7 +413,7 @@
                             </td>
                             <td>{{ $gift->giftNum }}</td>
                             <td>{{ $gift->giftPrice }}</td>
-                            <td>{{ \Carbon\Carbon::parse($gift->created_at)->format('Y-m-d H:i') }}</td>
+                            <td>{{ Carbon::parse($gift->created_at)->format('Y-m-d H:i') }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -490,7 +501,7 @@
                                 <button class="btn btn-danger btn-sm kick-visitor"
                                         data-room-id="{{ $room->id }}"
                                         data-user-id="{{ $visitor->user_id }}">
-                                        {{ __('Kick') }}
+                                    {{ __('Kick') }}
                                 </button>
                             @endif
                         </td>
@@ -549,8 +560,9 @@
                                 <div class="team-title">{{ $pk->team_1_title }}</div>
                                 @if($pk->team1Boss)
                                     <a href="{{ admin_url('users/' . $pk->team1Boss->id) }}" class="team-boss">
-                                        <img src="{{ getImagePath($pk->team1Boss->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
-                                             class="boss-avatar">
+                                        <img
+                                            src="{{ getImagePath($pk->team1Boss->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                            class="boss-avatar">
                                         <span>{{ $pk->team1Boss->name }}</span>
                                     </a>
                                 @endif
@@ -569,8 +581,9 @@
                                 <div class="team-title">{{ $pk->team_2_title }}</div>
                                 @if($pk->team2Boss)
                                     <a href="{{ admin_url('users/' . $pk->team2Boss->id) }}" class="team-boss">
-                                        <img src="{{ getImagePath($pk->team2Boss->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
-                                             class="boss-avatar">
+                                        <img
+                                            src="{{ getImagePath($pk->team2Boss->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                            class="boss-avatar">
                                         <span>{{ $pk->team2Boss->name }}</span>
                                     </a>
                                 @endif
@@ -659,24 +672,31 @@
                         <div class="container-fluid">
                             <div class="row g-2 align-items-end justify-content-between">
                                 <div class="col-md-4">
-                                    <label for="type-select" class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                    <label for="type-select"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
                                         <span>{{ __('Box Type') }}</span>
                                     </label>
                                     <select class="form-control" name="type" id="type-select">
                                         <option value="">{{ __('All Types') }}</option>
-                                        <option value="0" {{ request('type') === '0' ? 'selected' : '' }}>{{ __('Normal') }}</option>
-                                        <option value="1" {{ request('type') === '1' ? 'selected' : '' }}>{{ __('Super') }}</option>
+                                        <option
+                                            value="0" {{ request('type') === '0' ? 'selected' : '' }}>{{ __('Normal') }}</option>
+                                        <option
+                                            value="1" {{ request('type') === '1' ? 'selected' : '' }}>{{ __('Super') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="status-select" class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                    <label for="status-select"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
                                         <span>{{ __('Status') }}</span>
                                     </label>
                                     <select class="form-control" name="status" id="status-select">
                                         <option value="">{{ __('All Status') }}</option>
-                                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>{{ __('Active') }}</option>
-                                        <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>{{ __('Closed') }}</option>
-                                        <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>{{ __('Expired') }}</option>
+                                        <option
+                                            value="active" {{ request('status') === 'active' ? 'selected' : '' }}>{{ __('Active') }}</option>
+                                        <option
+                                            value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>{{ __('Closed') }}</option>
+                                        <option
+                                            value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>{{ __('Expired') }}</option>
                                     </select>
                                 </div>
                                 <div class="row mt-2">
@@ -723,9 +743,10 @@
                         <td>
                             <a href="{{ admin_url('users/' . $box->user->id) }}" target="_blank"
                                class="d-flex align-items-center text-decoration-none">
-                                <img src="{{ getImagePath($box->user->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
-                                     width="40" height="40"
-                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                <img
+                                    src="{{ getImagePath($box->user->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                    width="40" height="40"
+                                    style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                 <div>
                                     <strong>{{ $box->user->name }}</strong><br>
                                     <small class="text-muted">UUID: {{ $box->user->uuid }}</small>
@@ -784,7 +805,7 @@
                         </td>
                         <td>
                             @php
-                                $now = \Carbon\Carbon::now()->timestamp;
+                                $now = Carbon::now()->timestamp;
                                 $isExpired = $box->end_at < $now;
                                 $isClosed = $box->is_closed;
                             @endphp
@@ -792,8 +813,8 @@
                                 {{ $isExpired ? __('Expired') : ($isClosed ? __('Closed') : __('Active')) }}
                             </span>
                         </td>
-                        <td>{{ \Carbon\Carbon::createFromTimestamp($box->start_at)->format('Y-m-d H:i:s') }}</td>
-                        <td>{{ \Carbon\Carbon::createFromTimestamp($box->end_at)->format('Y-m-d H:i:s') }}</td>
+                        <td>{{ Carbon::createFromTimestamp($box->start_at)->format('Y-m-d H:i:s') }}</td>
+                        <td>{{ Carbon::createFromTimestamp($box->end_at)->format('Y-m-d H:i:s') }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -825,16 +846,16 @@
         $('#editRoomModal').modal('show');
     }
 
-    $(document).ready(function() {
-        $('#editRoomForm').on('submit', function(e) {
+    $(document).ready(function () {
+        $('#editRoomForm').on('submit', function (e) {
             e.preventDefault();
 
             $.ajax({
-                url: '{{ route("admin.rooms.update", $room->id) }}',
+                url: '{{ route("admin.rooms.basic_update", $room->id) }}',
                 type: 'POST',
                 data: $(this).serialize(),
-                success: function(response) {
-                    if(response.success) {
+                success: function (response) {
+                    if (response.success) {
                         Swal.fire({
                             icon: 'success',
                             title: '{{ __("Success") }}',
@@ -852,7 +873,7 @@
                         });
                     }
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     Swal.fire({
                         icon: 'error',
                         title: '{{ __("Error") }}',
@@ -863,7 +884,7 @@
         });
     });
 
-    $(document).on('click', '.show-picked-users', function() {
+    $(document).on('click', '.show-picked-users', function () {
         const pickedUsers = $(this).data('picked-users');
         const boxTitle = '{{ __("Box Picked Users") }}';
 
@@ -889,10 +910,10 @@
                     data: {
                         user_ids: userIds
                     },
-                    success: function(response) {
+                    success: function (response) {
                         let membersList = '';
 
-                        response.forEach(function(user) {
+                        response.forEach(function (user) {
                             membersList += `
                             <div class="member-item">
                                 <a href="{{ admin_url('users') }}/${user.id}"
@@ -919,7 +940,7 @@
                             showCloseButton: true
                         });
                     },
-                    error: function() {
+                    error: function () {
                         Swal.fire('{{ __("Error") }}', '{{ __("Failed to load users") }}', 'error');
                     }
                 });
@@ -927,7 +948,7 @@
         });
     });
 
-    $(document).on('click', '.show-team-members', function() {
+    $(document).on('click', '.show-team-members', function () {
         const teamMembers = $(this).data('team-members');
         const teamName = $(this).data('team-name');
 
@@ -953,10 +974,10 @@
                     data: {
                         user_ids: memberIds
                     },
-                    success: function(response) {
+                    success: function (response) {
                         let membersList = '';
 
-                        response.forEach(function(user) {
+                        response.forEach(function (user) {
                             membersList += `
                             <div class="member-item">
                                 <a href="{{ admin_url('users') }}/${user.id}"
@@ -983,7 +1004,7 @@
                             showCloseButton: true
                         });
                     },
-                    error: function() {
+                    error: function () {
                         Swal.fire('{{ __("Error") }}', '{{ __("Failed to load team members") }}', 'error');
                     }
                 });
