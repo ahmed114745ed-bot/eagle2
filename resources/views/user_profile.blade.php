@@ -1164,7 +1164,7 @@
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
                 </a>
 
-                <button type="submit" class="btn btn-danger edit_item_model_btn">
+                <button type="submit" class="btn btn-danger edit_user_item_model_btn">
                     {{ __('update') }}
                 </button>
             </div>
@@ -2415,7 +2415,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                            <button class="btn btn-secondary cancel_user_item_model_btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                             <button class="btn btn-primary" type="submit">{{ __('save') }}</button>
                         </div>
                     </form>
@@ -2439,9 +2439,13 @@
 
     $(document).ready(function () {
 
-     $(document).on('click', '.edit_item_model_btn', function() {
+     $(document).on('click', '.edit_user_item_model_btn', function() {
                 $('#item_modal_update').modal('show');
        });
+
+       $(document).on('click', '.cancel_user_item_model_btn', function() {
+            $('#item_modal_update').modal('hide');
+        });
     $('#add_form').on('submit', function (e) {
         e.preventDefault(); // prevent default form submit
 
