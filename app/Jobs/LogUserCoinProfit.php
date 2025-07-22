@@ -15,6 +15,7 @@ class LogUserCoinProfit implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $userId;
+    protected $amountBefore;
     protected $amount;
     protected $type;
     protected $subType;
@@ -23,6 +24,7 @@ class LogUserCoinProfit implements ShouldQueue
 
     public function __construct(
         int $userId,
+        float $amountBefore,
         float $amount,
         string $type,
         string $subType,
@@ -30,6 +32,7 @@ class LogUserCoinProfit implements ShouldQueue
         $createdAt = null
     ) {
         $this->userId = $userId;
+        $this->amountBefore = $amountBefore;
         $this->amount = $amount;
         $this->type = $type;
         $this->subType = $subType;
@@ -39,15 +42,12 @@ class LogUserCoinProfit implements ShouldQueue
 
     public function handle()
     {
-        $amountBefore = Common::getCurrentBalance($this->userId);
-
-
 
         UserCoinLog::create([
             'user_id'       => $this->userId,
             'type'          => $this->type,
             'sub_type'      => $this->subType,
-            'amount_before' => $amountBefore,
+            'amount_before' => $this->amountBefore,
             'amount'        => $this->amount,
             'item_name'     => $this->itemName,
             'from_date'     => $this->createdAt,

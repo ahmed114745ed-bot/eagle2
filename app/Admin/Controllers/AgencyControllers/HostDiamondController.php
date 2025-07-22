@@ -41,6 +41,7 @@ class HostDiamondController extends MainController
             ->groupBy('receiver_id', 'agency_id')
             ->when(! request('from_date'), fn ($q) => $q->where('created_at', '>=', now()->startOfMonth()))
             ->when(! request('to_date'), fn ($q) => $q->where('created_at', '<=', now()->endOfMonth()))
+            ->when(request('total_gift_price'), fn ($q) => $q->havingRaw('total_gift_price >= ?', [(int) request('total_gift_price')]))
             ->orderByDesc('total_gift_price');
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -62,9 +63,8 @@ class HostDiamondController extends MainController
                     ->default(request('from_date'));
 
                 $filter->where(function ($query) {
-                    $input = $this->input;
-                    $query->having('total_gift_price', '>=', $input);
-                }, __('Greater than diamond'), 'total_gift_price')->integer();
+
+                    }, __('Greater than diamond'), 'total_gift_price')->integer();
             });
 
             $filter->column(1 / 2, function ($filter) {

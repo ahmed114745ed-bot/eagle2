@@ -84,14 +84,16 @@ class GameController extends Controller
         if (!$user || $user->di < $data['cost'] ) {
             abort(403, 'Invalid  request');
         }
-      
-        LogUserCoinProfit::dispatch(
+        $amountBefore = $user->di;
+
+        LogUserCoinProfit::dispatchSync(
             $user->id,
+            $amountBefore,
             $data['coins'],
             'coinGame',
             'coin_game_users',
             'coin_game'
-        )->onQueue('log_user_coin');
+        );
 
         $user->di += $data['coins'];
         $user->update();

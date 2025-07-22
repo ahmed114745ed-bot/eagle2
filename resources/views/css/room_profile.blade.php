@@ -368,7 +368,6 @@
     }
 
     .ltr .btn-back {
-        position: absolute;
         top: 5px;
         right: 20px;
         background: #ecf0f1;
@@ -384,7 +383,6 @@
     }
 
     .rtl .btn-back {
-        position: absolute;
         top: 5px;
         left: 20px;
         background: #ecf0f1;
@@ -1237,5 +1235,63 @@
 
     .large-modal {
         font-size: 16px;  /* Bigger base font size */
+    }
+
+    .text-center .p-3 {
+        color: #6c757d;
+        font-size: 1rem;
+    }
+    .text-center .p-3 i {
+        margin-right: 8px;
+    }
+
+    .progress-info {
+        width: 100%;
+    }
+    .diamond-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+    .badge {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .badge-primary {
+        background-color: var(--primary-color);
+    }
+    .badge-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+    .badge-success {
+        background-color: #28a745;
+    }
+    .badge-danger {
+        background-color: #dc3545;
+    }
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .me-2 {
+        margin-right: 0.5rem;
+    }
+    .show-users-text {
+        color: var(--primary-color);
+    }
+
+    .edit-btn{
+        background: var(--primary-color) !important;
+    }
+    .btn-back:hover {
+        background: #d4e1ef;
     }
 </style>

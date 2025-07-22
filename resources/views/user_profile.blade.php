@@ -1199,7 +1199,8 @@
 
           <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
 
-        <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
+        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}" data-target="vips-tab">{{ __('vips') }}</a>
+
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
@@ -1319,7 +1320,7 @@
 
                                 </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
-                                    <td>{{ $pack->getTypeGet() }}</td>
+                                    
                                     <td>{{ $pack->getType() }}</td>
                                     <td>
                                         <img src="{{ getImagePath(@$path) }}" width="30" height="30"
@@ -1362,7 +1363,7 @@
 
 
     <!-- vips Section -->
-    <div class="tab-content" id="vips-tab">
+    <div class="tab-content" id="vips-tab" style="{{ $activeTab == 'vips' ? '' : 'display: none;' }}">
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
@@ -1409,9 +1410,8 @@
                     @if($userVips)
                         <div class="pagination-container">
                             {{ $userVips->appends([
-                                'pack_page' => $packs?->currentPage(),
-                                'salary_page' => $salaries?->currentPage(),
-                                'gift_page' => $giftSLogs?->currentPage(),
+                                'tab' => 'vips',
+                                 'vip_page' => $userVips->currentPage(),
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
                     @endif

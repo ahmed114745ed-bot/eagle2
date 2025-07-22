@@ -167,14 +167,6 @@ class UpdateUserWhenSendGift
      */
     public function send(int $totalCoins, User $senderUser)
     {
-        LogUserCoinProfit::dispatch(
-            $senderUser->id,
-            -abs($totalCoins),
-            'gift',
-            'gift_logs',
-            'gift'
-        )->onQueue('log_user_coin');
-
         $senderUser->enableSaving         = false;
         $senderUser->monthly_diamond_send += $totalCoins;
         $senderUser->total_diamond_send   += $totalCoins;
