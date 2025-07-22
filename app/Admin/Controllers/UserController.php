@@ -905,7 +905,7 @@ class UserController extends MainController
 
     public function updateUsers(Request $request)
     {
-     
+
         $user = User::find($request->id);
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -930,11 +930,13 @@ class UserController extends MainController
 
         if ($request->hasFile('image')) {
             $avatar = Common::upload('images', $request->file('image'));
+        } else {
+            $avatar =  $request->image;
         }
         if ($profileUser) {
             $profileUser->update([
                 'gender' => $request->gender,
-                'avatar' => $avatar ?? '',
+                'avatar' => $avatar,
             ]);
         } else {
             Profile::create([
