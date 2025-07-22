@@ -535,7 +535,6 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>{{ __('Title') }}</th>
                     <th>{{ __('Team 1') }}</th>
                     <th>{{ __('Team 2') }}</th>
                     <th>{{ __('Score') }}</th>
@@ -549,12 +548,6 @@
                 @forelse($pks as $index => $pk)
                     <tr>
                         <td>{{ $pk->id }}</td>
-                        <td>
-                            <div class="pk-title">{{ $pk->title }}</div>
-                            @if($pk->conditions)
-                                <small class="text-muted">{{ $pk->conditions }}</small>
-                            @endif
-                        </td>
                         <td>
                             <div class="team-info">
                                 <div class="team-title">{{ $pk->team_1_title }}</div>
