@@ -15,6 +15,7 @@ class UserAchievementLevelsResource extends JsonResource
      */
     public function toArray($request)
     {
+        dd($this);
         $description = app()->getLocale() === 'ar' ? $this->ar_description : $this->en_description;
         $title = app()->getLocale() === 'ar' ? ' هذا الإنجاز مأخوذ من المشرف' : 'this achievement is taken from Admin';
         $achievementLevel = AchievementLevel::find($this->achievement_level_id);
