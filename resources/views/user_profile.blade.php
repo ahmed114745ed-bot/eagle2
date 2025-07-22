@@ -1081,6 +1081,22 @@
 <body>
 
 <div class="agency-profile-container">
+     {{-- Error Messages --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger mx-3 mt-3">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if ($errors->has('msg'))
+                        <div class="alert alert-danger mx-3 mt-3">
+                            {{ $errors->first('msg') }}
+                        </div>
+                    @endif
     <!-- Header Section -->
     <div class="agency-header">
         <div class="agency-avatar">
@@ -1163,10 +1179,12 @@
                 <a href="{{ url('admin/users/' . $user->id . '/edit') }}" class="btn btn-light">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
                 </a>
+                     @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-                <button type="submit" class="btn btn-danger edit_user_item_model_btn">
-                    {{ __('update') }}
-                </button>
+                        <button type="submit" class="btn btn-danger edit_user_item_model_btn">
+                            {{ __('edit') }}
+                        </button>
+                 @endif
             </div>
         </div>
     </div>
@@ -2334,23 +2352,6 @@
                                 data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    {{-- Error Messages --}}
-                    @if ($errors->any())
-                        <div class="alert alert-danger mx-3 mt-3">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    @if ($errors->has('msg'))
-                        <div class="alert alert-danger mx-3 mt-3">
-                            {{ $errors->first('msg') }}
-                        </div>
-                    @endif
-
                     <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body p-0">
@@ -2416,7 +2417,7 @@
 
                         <div class="modal-footer">
                             <button class="btn btn-secondary cancel_user_item_model_btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                            <button class="btn btn-primary" type="submit">{{ __('save') }}</button>
+                            <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
                         </div>
                     </form>
                 </div>
