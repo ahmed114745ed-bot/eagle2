@@ -95,7 +95,7 @@ class GiftLogService
                 'gift',
                 'gift_logs',
                 'gift'
-            )->onQueue('log_user_coin');
+            );
 
             $updateUserWhenSendGift->send($sendPrice, $user);
         } catch (NotInfMoneyException $e) {
