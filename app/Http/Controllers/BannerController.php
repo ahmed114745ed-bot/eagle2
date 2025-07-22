@@ -10,6 +10,7 @@ use App\Models\UserBannerShow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class BannerController extends Controller
 {
@@ -81,6 +82,7 @@ class BannerController extends Controller
         })->where("user_id", $user->id)->get();
         $ids = $dataShow->pluck('banner_id');
         $banners = $this->bannerServices->index2($ids);
+        dd($banners);
         if (empty($banners)) {
             UserBannerShow::where("user_id", $user->id)->delete();
            return Common::apiResponse(true, 'successful', null);
