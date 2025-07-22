@@ -174,6 +174,17 @@ class RoomController extends MainController
 
         $roomTypes = RoomCategory::where('enable', 1)->get();
 
+        $roomModes = [
+            '0' => 10,
+            '1' => 16,
+            '2' => 12,
+            '3' => 9,
+            '4' => 4,
+            '5' => 3,
+            '6' => 21,
+            '8' => 8,
+        ];
+
         return $content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
@@ -186,6 +197,7 @@ class RoomController extends MainController
                 'pks'           => $pks,
                 'boxes'         => $boxes,
                 'roomTypes'     => $roomTypes,
+                'roomModes'     => $roomModes
             ]));
     }
     /**
