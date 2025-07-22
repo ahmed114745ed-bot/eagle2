@@ -2725,7 +2725,7 @@
     "you do not have enough coins for creating a room": "कमरा बनाने के लिए आपके पास पर्याप्त सिक्के नहीं हैं",
 
     "Room ID": "रूम आईडी",
-    "Room UID": "रूम यूआईडी",
+    "Room UID": "रूम स्वामी की आईडी",
     "Room Type": "रूम प्रकार",
     "Visitors Count": "आगंतुकों की संख्या",
     "Current Users": "वर्तमान उपयोगकर्ता",
