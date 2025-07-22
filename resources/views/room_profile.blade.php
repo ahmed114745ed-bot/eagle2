@@ -218,12 +218,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                @php
-                    $adminIds = array_filter(explode(',', $room->room_admin));
-                    $admins = \App\Models\User::whereIn('id', $adminIds)
-                        ->with('profile')
-                        ->get();
-                @endphp
 
                 @forelse($admins as $index => $admin)
                     @php
@@ -291,53 +285,51 @@
                         <input type="hidden" name="tab" value="gifts">
 
                         <div class="container-fluid">
-                            <form method="get" class="mb-3">
-                                <div class="row g-2 align-items-end justify-content-between">
-                                    <div class="col-md-2">
-                                        <label for="sender-select"
-                                               class="form-label d-flex align-items-center justify-content-end fw-bold">
-                                            <span>{{ __('Sender') }}</span>
-                                        </label>
-                                        <select class="form-control" name="sender_id" id="sender-select"></select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="receiver-select"
-                                               class="form-label d-flex align-items-center justify-content-end fw-bold">
-                                            <span>{{ __('Receiver') }}</span>
-                                        </label>
-                                        <select class="form-control" name="receiver_id" id="receiver-select"></select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="date-from"
-                                               class="form-label d-flex align-items-center justify-content-end fw-bold">
-                                            <span>{{ __('From Date') }}</span>
-                                            <i class="fa fa-calendar ms-1"></i>
-                                        </label>
-                                        <input type="date" class="form-control" name="start_at" id="date-from"
-                                               value="{{ request('start_at') }}">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="date-to"
-                                               class="form-label d-flex align-items-center justify-content-end fw-bold">
-                                            <span>{{ __('To Date') }}</span>
-                                            <i class="fa fa-calendar ms-1"></i>
-                                        </label>
-                                        <input type="date" class="form-control" name="end_at" id="date-to"
-                                               value="{{ request('end_at') }}">
-                                    </div>
-                                    <div class="row mt-2">
-                                        <div class="col-12 d-flex justify-content-end gap-2">
-                                            <button type="submit" class="btn btn-info d-flex align-items-center gap-2">
-                                                <i class="fa fa-search"></i> {{__('Search')}}
-                                            </button>
-                                            <a href="?tab=gifts"
-                                               class="btn btn-default d-flex align-items-center gap-2">
-                                                <i class="fa fa-undo"></i> {{__('Reset')}}
-                                            </a>
-                                        </div>
+                            <div class="row g-2 align-items-end justify-content-between">
+                                <div class="col-md-2">
+                                    <label for="sender-select"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('Sender') }}</span>
+                                    </label>
+                                    <select class="form-control" name="sender_id" id="sender-select"></select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="receiver-select"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('Receiver') }}</span>
+                                    </label>
+                                    <select class="form-control" name="receiver_id" id="receiver-select"></select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="date-from"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('From Date') }}</span>
+                                        <i class="fa fa-calendar ms-1"></i>
+                                    </label>
+                                    <input type="date" class="form-control" name="start_at" id="date-from"
+                                           value="{{ request('start_at') }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="date-to"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('To Date') }}</span>
+                                        <i class="fa fa-calendar ms-1"></i>
+                                    </label>
+                                    <input type="date" class="form-control" name="end_at" id="date-to"
+                                           value="{{ request('end_at') }}">
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        <button type="submit" class="btn btn-info d-flex align-items-center gap-2">
+                                            <i class="fa fa-search"></i> {{__('Search')}}
+                                        </button>
+                                        <a href="?tab=gifts"
+                                           class="btn btn-default d-flex align-items-center gap-2">
+                                            <i class="fa fa-undo"></i> {{__('Reset')}}
+                                        </a>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -349,7 +341,7 @@
                         {{ __('Total Diamonds') }}
                     </div>
                     <div class="diamond-count">
-                        <span>{{ number_format($room->gifts()->sum('giftPrice')) }}</span>
+                        <span>{{ number_format($totalDiamonds) }}</span>
                         <div class="diamond-icon-container">
                             <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
                         </div>
@@ -371,29 +363,6 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @php
-                        $query = $room->gifts()
-                            ->with(['gift', 'sender.profile', 'receiver.profile']);
-
-                        if(request('sender_id')) {
-                            $query->where('sender_id', request('sender_id'));
-                        }
-
-                        if(request('receiver_id')) {
-                            $query->where('receiver_id', request('receiver_id'));
-                        }
-
-                        if(request('start_at')) {
-                            $query->whereDate('created_at', '>=', request('start_at'));
-                        }
-
-                        if(request('end_at')) {
-                            $query->whereDate('created_at', '<=', request('end_at'));
-                        }
-
-                        $gifts = $query->orderByDesc('created_at')->paginate(15);
-                    @endphp
-
                     @forelse($gifts as $index => $gift)
                         <tr>
                             <td>{{ $gift->id }}</td>
@@ -433,7 +402,7 @@
                             </td>
                             <td>{{ $gift->giftNum }}</td>
                             <td>{{ $gift->giftPrice }}</td>
-                            <td>{{ Carbon::parse($gift->created_at)->format('Y-m-d H:i') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($gift->created_at)->format('Y-m-d H:i') }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -479,61 +448,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                @php
-                    $micPositions = [];
-                    if ($room->microphone) {
-                        $positions = explode(',', $room->microphone);
-                        foreach ($positions as $index => $userId) {
-                            if ($userId != '0') {
-                                $micPositions[$userId] = $index + 1;
-                            }
-                        }
-                    }
-
-                    $blackList = [];
-                    if ($room->room_black) {
-                        $blackListItems = explode(',', $room->room_black);
-                        foreach ($blackListItems as $item) {
-                            $parts = explode('#', $item);
-                            if (count($parts) === 3) {
-                                $userId = $parts[0];
-                                $kickTime = $parts[1];
-                                $duration = $parts[2];
-
-                                $endTime = $kickTime + $duration;
-                                if (time() < $endTime) {
-                                    $blackList[$userId] = [
-                                        'kick_time' => $kickTime,
-                                        'duration' => $duration / 60, // Convert to minutes
-                                        'remaining' => ceil(($endTime - time()) / 60) // Remaining minutes
-                                    ];
-                                }
-                            }
-                        }
-                    }
-
-                    $visitors = $room->roomVisitors()
-                        ->with('user.profile')
-                        ->get()
-                        ->map(function($visitor) use ($micPositions, $blackList) {
-                            $visitor->mic_position = $micPositions[$visitor->user_id] ?? null;
-                            $visitor->kick_info = $blackList[$visitor->user_id] ?? null;
-                            return $visitor;
-                        })
-                        ->sortBy(function($visitor) {
-                            return $visitor->mic_position === null ? PHP_INT_MAX : $visitor->mic_position;
-                        });
-
-                    $currentPage = request()->get('page', 1);
-                    $perPage = 15;
-                    $visitors = new \Illuminate\Pagination\LengthAwarePaginator(
-                        $visitors->forPage($currentPage, $perPage),
-                        $visitors->count(),
-                        $perPage,
-                        $currentPage,
-                        ['path' => request()->url(), 'query' => request()->query()]
-                    );
-                @endphp
 
                 @forelse($visitors as $index => $visitor)
                     <tr>
@@ -620,12 +534,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                @php
-                    $pks = \App\Models\Pk::where('room_id', $room->id)
-                        ->with(['team1Boss.profile', 'team2Boss.profile'])
-                        ->orderByDesc('created_at')
-                        ->paginate(15);
-                @endphp
 
                 @forelse($pks as $index => $pk)
                     <tr>
@@ -803,33 +711,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                @php
-                    $query = \Modules\LuckyBox\Entities\BoxUse::where('room_id', $room->id)
-                        ->with(['user.profile', 'picks', 'box']);
-
-                    // Apply type filter
-                    if(request('type') !== null && request('type') !== '') {
-                        $query->where('type', request('type'));
-                    }
-
-                    // Apply status filter
-                    if(request('status')) {
-                        $now = \Carbon\Carbon::now()->timestamp;
-                        switch(request('status')) {
-                            case 'active':
-                                $query->where('is_closed', false)->where('end_at', '>', $now);
-                                break;
-                            case 'closed':
-                                $query->where('is_closed', true);
-                                break;
-                            case 'expired':
-                                $query->where('end_at', '<=', $now);
-                                break;
-                        }
-                    }
-
-                    $boxes = $query->orderByDesc('created_at')->paginate(15);
-                @endphp
 
                 @forelse($boxes as $index => $box)
                     <tr>
