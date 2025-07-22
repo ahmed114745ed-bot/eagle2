@@ -2229,24 +2229,24 @@
                                         <span>{{ $giftName  }}</span>
                                     </a>
                                 </td>
-                                <td> @if($giftType == 'receiver')
+                                @if($giftType == 'receiver')
+                                    <td>
                                         @if ($giftSLog->agency_id)
                                             <a href="{{ url('admin/agencies/' . $agencyId) }}" target="_blank"
-                                        class="d-flex align-items-center text-decoration-none">
-                                            <img src="{{ $agencyImage }}"
-                                                width="50" height="30"
-                                                style="object-fit: cover; border-radius: 4px; border: 1px solid #ccc; padding: 2px; margin-right: 10px;">
-                                            <div>
-                                                <span>{{ $agencyName }}</span><br>
-                                                <small class="text-muted">id: {{ $agencyId ?? 0 }}</small>
-                                            </div>
-                                        </a>
+                                               class="d-flex align-items-center text-decoration-none">
+                                                <img src="{{ $agencyImage }}"
+                                                     width="50" height="30"
+                                                     style="object-fit: cover; border-radius: 4px; border: 1px solid #ccc; padding: 2px; margin-right: 10px;">
+                                                <div>
+                                                    <span>{{ $agencyName }}</span><br>
+                                                    <small class="text-muted">id: {{ $agencyId ?? 0 }}</small>
+                                                </div>
+                                            </a>
                                         @else
                                             <span class="text-danger">{{__('not join to agency')}}</span>
                                         @endif
-                                    @endif
-
-                                </td>
+                                    </td>
+                                @endif
                                 <td>{{ $giftSLog->giftNum }}</td>
                                 <td>{{  $giftSLog->giftPrice}}</td>
                                 <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->format('Y-m-d H:i') }}</td>

@@ -468,6 +468,7 @@ Route::group(
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
 
+            Route::get('/host-diamonds', [\App\Admin\Controllers\AgencyControllers\HostDiamondController::class, 'index'])->name('hsot-diamond');
             // Route::get('/users/{id}/edit', 'UserController@edit');
             // Route::get('/users/{id}', 'UserController@show');
             Route::get('/userTarget', 'UserTargetController@index')->name('userTarget');

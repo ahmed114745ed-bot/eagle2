@@ -13,6 +13,13 @@ class AgencyService
      */
     function adminAgencyData($agency): string
     {
+        if (! @$agency) {
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>unknown agency</span>
+            </div>
+        ";
+        }
         $cacheKey = "agency_image_{$agency->id}";
         $image = Cache::remember($cacheKey, 3600, function () use ($agency){
 
