@@ -3426,7 +3426,7 @@
     "you do not have enough coins for creating a room": "لا تملك عملات كافية لإنشاء غرفة",
 
     "Room ID": "معرف الغرفة",
-    "Room UID": "الرقم التعريفي للغرفة",
+    "Room UID": "معرف صاحب الغرقة",
     "Room Type": "نوع الغرفة",
     "Visitors Count": "عدد الزوار",
     "Current Users": "المستخدمون الحاليون",
