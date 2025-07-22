@@ -99,9 +99,11 @@
             <button class="btn-back edit-btn" onclick="openEditModal()">
                 <i class="fas fa-edit"></i> {{__("Edit Room")}}
             </button>
-            <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
-                <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
-            </button>
+            @if(Admin::user()->can('edit-rooms') || Admin::user()->can('*'))
+                <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
+                    <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
+                </button>
+            @endif
         </div>
     </div>
 
