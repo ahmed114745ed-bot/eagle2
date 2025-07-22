@@ -927,22 +927,19 @@ class UserController extends MainController
         ];
         $user->update($data);
         $profileUser = Profile::where('user_id', $user->id)->first();
+        $dataUserProfile = [
 
+            'gender' => $request->gender,
+
+        ];
         if ($request->hasFile('image')) {
-            $avatar = Common::upload('images', $request->file('image'));
-        } else {
-            $avatar =  $request->image;
+            $dataUserProfile['avatar']  = Common::upload('images', $request->file('image'));
         }
         if ($profileUser) {
-            $profileUser->update([
-                'gender' => $request->gender,
-                'avatar' => $avatar,
-            ]);
+
+            $profileUser->update($dataUserProfile);
         } else {
-            Profile::create([
-                'gender' => $request->gender,
-                'avatar' => $avatar ?? '',
-            ]);
+            Profile::create($dataUserProfile);
         }
 
         return Redirect::back();
