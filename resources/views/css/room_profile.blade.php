@@ -368,7 +368,6 @@
     }
 
     .ltr .btn-back {
-        position: absolute;
         top: 5px;
         right: 20px;
         background: #ecf0f1;
