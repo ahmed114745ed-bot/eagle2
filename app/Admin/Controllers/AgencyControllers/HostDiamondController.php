@@ -37,7 +37,10 @@ class HostDiamondController extends MainController
             ->selectRaw('receiver_id, agency_id, SUM(giftPrice) as total_gift_price')
             ->with(['receiver.profile', 'agency']) // assuming these are relationships
             ->where('agency_id', '!=', 0)
-            ->groupBy('receiver_id', 'agency_id');
+            ->groupBy('receiver_id', 'agency_id')
+            ->when(! request("from_date") , fn($q) => $q->where('created_at', '>=', now()->startOfMonth()))
+            ->when(! request("to_date") , fn($q) => $q->where('created_at', '<=', now()->endOfMonth()))
+            ->orderByDesc('total_gift_price');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -53,23 +56,24 @@ class HostDiamondController extends MainController
             $filter->where(function ($query) {
                 $tz = getTimezone();
 
-                $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
+                $input = $this->input ?? now()->startOfMonth();
+                $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($input);
 
                 $utcDate = \Carbon\Carbon::parse($date, $tz)->timezone('UTC')->startOfDay();
 
                 $query->where('created_at', '>=', $utcDate);
             }, __('from_date'), 'from_date')
-                ->default(request('from_date'));
+                ->default(request('from_date') );
 
             $filter->where(function ($query) {
                 $tz = getTimezone();
-                $input = $this->input;
+                $input = $this->input ?? now()->endOfMonth();
                 $date = \App\Helpers\UserCommon::arabicToEnglishNumbers($input);
                 $utcDateOnly = \Carbon\Carbon::parse($date, $tz)->timezone('UTC')->toDateString();
                 $query->whereDate('created_at', '<=', $utcDateOnly);
             }, __('to_date'), 'to_date')
                 ->date()
-                ->default(request('to_date'));
+                ->default(request('to_date') );
         });
 
         $grid->column('receiver', __('user'))->display(function ($name) {
