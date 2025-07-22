@@ -46,6 +46,7 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
+use App\Models\Profile;
 use App\Models\UsersJoinedAgency;
 
 class UserController extends MainController
@@ -279,7 +280,7 @@ class UserController extends MainController
                 overflow-y: auto !important;
             }
         ");
-       /* $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+        /* $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             return $this->sameDeviceUsers()->count();
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
             $users         = $this->sameDeviceUsers;
@@ -554,9 +555,20 @@ class UserController extends MainController
             ->when(request('to_date'), fn($q) => $q->whereDate('to_date', '<=', request('to_date')))
             ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
             ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins');
+        $countries = $this->countries();
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
+    }
+
+    public function countries()
+    {
+        $ops       = [null => __('no country')];
+        $countries = Country::all();
+        foreach ($countries as $country) {
+            $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+        }
+        return $ops;
     }
 
     public static function typesByLevel($id)
@@ -886,6 +898,53 @@ class UserController extends MainController
         $user->total_sender_level = $request->total_sender_level;
         $user->total_received_level = $request->total_received_level;
         $user->save();
+        return Redirect::back();
+    }
+
+
+
+    public function updateUsers(Request $request)
+    {
+
+        $user = User::find($request->id);
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'uuid' => [
+                'required',
+                Rule::unique('users', 'uuid')->ignore($user->id),
+            ],
+            'phone' => [
+                'required',
+                Rule::unique('users', 'phone')->ignore($user->id),
+            ],
+            'email' => ['nullable', 'email'],
+        ]);
+        $data = [
+            'name' => $request->name,
+            'uuid' => $request->uuid,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ];
+        $user->update($data);
+        $profileUser = Profile::where('user_id', $user->id)->first();
+
+        if ($request->hasFile('image')) {
+            $avatar = Common::upload('images', $request->file('image'));
+        } else {
+            $avatar =  $request->image;
+        }
+        if ($profileUser) {
+            $profileUser->update([
+                'gender' => $request->gender,
+                'avatar' => $avatar,
+            ]);
+        } else {
+            Profile::create([
+                'gender' => $request->gender,
+                'avatar' => $avatar ?? '',
+            ]);
+        }
+
         return Redirect::back();
     }
 }

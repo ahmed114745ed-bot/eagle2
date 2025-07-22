@@ -941,7 +941,7 @@
             }
 
             .card-target-filter-phone .form-control {
-                display: block;
+                /* display: block; */
                 width: 89%;
                 padding: 6px 12px;
                 font-size: 14px;
@@ -1164,8 +1164,8 @@
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
                 </a>
 
-                <button type="submit" class="btn btn-danger">
-                    {{ __('Update') }}
+                <button type="submit" class="btn btn-danger edit_user_item_model_btn">
+                    {{ __('update') }}
                 </button>
             </div>
         </div>
@@ -2321,6 +2321,110 @@
         </div>
     </div>
 </div>
+  
+
+
+
+    <div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg mt-6" role="document">
+            <div class="modal-content border-0">
+                <div class="modal-content position-relative">
+                    <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
+                        <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    {{-- Error Messages --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger mx-3 mt-3">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if ($errors->has('msg'))
+                        <div class="alert alert-danger mx-3 mt-3">
+                            {{ $errors->first('msg') }}
+                        </div>
+                    @endif
+
+                    <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body p-0">
+                            
+                            <div class="p-4">
+                                <div class="row flex-evenly">
+                                    <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
+
+                                    <div class="col-lg-6 mb-3 form-group">
+                                        <label class="form-label">{{ __('Name') }}</label>
+                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" required>
+                                    </div>
+
+                                    <div class="col-lg-6 mb-3 form-group">
+                                        <label class="form-label">{{ __('uuid') }}</label>
+                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" required>
+                                    </div>
+
+                                    <div class="col-lg-6 mb-3 form-group">
+                                        <label class="form-label">{{ __('email') }}</label>
+                                        <input type="email" name="email" class="form-control" value="{{ old('email', $user->email ?? '') }}">
+                                    </div>
+
+                                    <div class="col-lg-6 mb-3 form-group">
+                                        <label class="form-label">{{ __('phone') }}</label>
+                                        <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone ?? '') }}" >
+                                    </div>
+
+                                    <div class="mb-3 col-lg-12 form-group">
+                                        <label class="form-label">{{ __('Gender') }}</label>
+                                        <select class="form-select col-lg-6" name="gender">
+                                            <option value="">{{ __('Choose gender') }}</option>
+                                            <option value="0" {{ old('gender', $user->profile->gender ?? '') == '0' ? 'selected' : '' }}>{{ __('female') }}</option>
+                                            <option value="1" {{ old('gender', $user->profile->gender ?? '') == '1' ? 'selected' : '' }}>{{ __('male') }}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-6 form-group mb-3">
+                                        <label class="form-label">{{ __('image') }}</label>
+                                        <input class="form-control" name="image" accept="image/*" type="file" />
+                                        <div class="mt-2">
+                                            <img src="{{ getImagePath($user->profile->avatar ?? '') ?? asset('images/default-avatar.png') }}"
+                                                class="rounded"
+                                                style="width: 100px; height: 100px"
+                                                id="img_edit"
+                                                alt="{{ $user->name ?? '' }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3 col-lg-12 form-group">
+                                        <label class="form-label">{{ __('Country') }}</label>
+                                        <select class="form-select col-lg-6" name="country_id" id="country_id">
+                                            @foreach($countries as $id => $name)
+                                                <option value="{{ $id }}" {{ old('country_id', $user->country_id ?? null) == $id ? 'selected' : '' }}>
+                                                    {{ $name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary cancel_user_item_model_btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                            <button class="btn btn-primary" type="submit">{{ __('save') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 <!-- jQuery أولاً -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -2334,6 +2438,14 @@
 
 
     $(document).ready(function () {
+
+     $(document).on('click', '.edit_user_item_model_btn', function() {
+                $('#item_modal_update').modal('show');
+       });
+
+       $(document).on('click', '.cancel_user_item_model_btn', function() {
+            $('#item_modal_update').modal('hide');
+        });
     $('#add_form').on('submit', function (e) {
         e.preventDefault(); // prevent default form submit
 
