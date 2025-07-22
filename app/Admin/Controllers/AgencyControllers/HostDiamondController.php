@@ -64,6 +64,7 @@ class HostDiamondController extends MainController
 
                 $query->where('created_at', '>=', $utcDate);
             }, __('from_date'), 'from_date')
+                ->date()
                 ->default(request('from_date'));
 
             $filter->where(function ($query) {
@@ -98,7 +99,7 @@ class HostDiamondController extends MainController
         });
         $grid->disableActions();
         $grid->disableCreateButton();
-   
+
         return $grid;
     }
 }
