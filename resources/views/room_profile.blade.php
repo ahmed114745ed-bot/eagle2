@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     @include('css.room_profile')
 </head>
@@ -24,10 +25,15 @@
                     <span class="meta-value">{{ @$room->id }}</span>
                 </div>
                 <div class="meta-item">
+                    <span class="meta-label">{{ __("Room UID") }}:</span>
+                    <span class="meta-value">{{ @$room->uid }}</span>
+                </div>
+                <div class="meta-item">
                     <span class="meta-label">{{__("Room Type")}}:</span>
                     <span class="meta-value">{{ @$room->roomCategory->name ?? 'N/A' }}</span>
                 </div>
             </div>
+
             <div class="agency-stats">
                 <div class="agency-meta">
                     <div class="meta-item">
@@ -48,17 +54,42 @@
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Room Owner') }}:</span>
                         <span class="meta-value">
-                            <a href="{{ admin_url('users/' . @$room->owner->id) }}">
-                                {{ @$room->owner->name }} ({{ @$room->owner->uuid }})
-                            </a>
-                        </span>
+                    <a href="{{ admin_url('users/' . @$room->owner->id) }}">
+                        {{ @$room->owner->name }} ({{ @$room->owner->uuid }})
+                    </a>
+                </span>
                     </div>
                 </div>
             </div>
+
             <div class="agency-meta">
                 <div class="meta-item">
                     <span class="meta-label">{{__('Status')}}:</span>
                     {!! getRoomStatusBadge($room->room_status) !!}
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">{{__('Room Mode')}}:</span>
+                    <span class="meta-value">{{ @$room->mode }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">{{__('Features')}}:</span>
+                    <span class="meta-value">
+                @if($room->is_popular)
+                            <span class="badge badge-success">{{ __('Popular') }}</span>
+                        @endif
+                        @if($room->is_top)
+                            <span class="badge badge-primary">{{ __('Top') }}</span>
+                        @endif
+                        @if($room->is_recommended)
+                            <span class="badge badge-info">{{ __('Recommended') }}</span>
+                        @endif
+                        @if($room->secret_chat)
+                            <span class="badge badge-warning">{{ __('Secret Chat') }}</span>
+                        @endif
+                        @if($room->is_live)
+                            <span class="badge badge-danger">{{ __('Live') }}</span>
+                        @endif
+            </span>
                 </div>
             </div>
         </div>
@@ -67,9 +98,11 @@
         </button>
     </div>
 
-
     @php
-        $activeTab = request('tab', 'admins');
+        if (!request()->has('tab')) {
+            header('Location: ' . url()->current() . '?tab=admins');
+            exit();
+        }
     @endphp
 
     <div class="agency-tabs">
@@ -81,7 +114,75 @@
            data-target="visitors-tab">{{ __('Room Visitors') }}</a>
         <a href="?tab=pk" class="tab-btn {{ request('tab') == 'pk' ? 'active' : '' }}"
            data-target="pk-tab">{{ __('Pk') }}</a>
+        <a href="?tab=boxes" class="tab-btn {{ request('tab') == 'boxes' ? 'active' : '' }}"
+           data-target="boxes-tab">{{ __('Boxes') }}</a>
+    </div>
+</div>
 
+<div class="modal fade" id="editRoomModal" tabindex="-1" role="dialog" aria-labelledby="editRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRoomModalLabel">{{ __('Edit Room') }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editRoomForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>{{ __('Room Name') }}</label>
+                        <input type="text" class="form-control" name="room_name" value="{{ $room->room_name }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ __('Room Type') }}</label>
+                        <select class="form-control" name="room_type">
+                            <option value="">{{ __('Select Type') }}</option>
+                            <!-- Add your room types here -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ __('Max Admins') }}</label>
+                        <input type="number" class="form-control" name="max_admin" value="{{ $room->max_admin }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ __('Room Mode') }}</label>
+                        <input type="text" class="form-control" name="mode" value="{{ $room->mode }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>{{ __('Features') }}</label>
+                        <div class="custom-controls">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="is_popular" name="is_popular" {{ $room->is_popular ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="is_popular">{{ __('Popular') }}</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="is_top" name="is_top" {{ $room->is_top ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="is_top">{{ __('Top') }}</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="is_recommended" name="is_recommended" {{ $room->is_recommended ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="is_recommended">{{ __('Recommended') }}</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="secret_chat" name="secret_chat" {{ $room->secret_chat ? 'checked' : '' }}>
+                                <label class="custom-control-label" for="secret_chat">{{ __('Secret Chat') }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('Close') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('Save Changes') }}</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -117,12 +218,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                @php
-                    $adminIds = array_filter(explode(',', $room->room_admin));
-                    $admins = \App\Models\User::whereIn('id', $adminIds)
-                        ->with('profile')
-                        ->get();
-                @endphp
 
                 @forelse($admins as $index => $admin)
                     @php
@@ -163,7 +258,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="text-center">{{ __('No administrators found') }}</td>
+                        <td colspan="7" class="text-center">
+                            <div class="p-3">
+                                <i class="fas fa-info-circle text-muted"></i>
+                                {{ __('No data available') }}
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
                 </tbody>
@@ -185,53 +285,51 @@
                         <input type="hidden" name="tab" value="gifts">
 
                         <div class="container-fluid">
-                            <form method="get" class="mb-3">
-                                <div class="row g-2 align-items-end justify-content-between">
-                                    <div class="col-md-2">
-                                        <label for="sender-select"
-                                               class="form-label d-flex align-items-center justify-content-end fw-bold">
-                                            <span>{{ __('Sender') }}</span>
-                                        </label>
-                                        <select class="form-control" name="sender_id" id="sender-select"></select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="receiver-select"
-                                               class="form-label d-flex align-items-center justify-content-end fw-bold">
-                                            <span>{{ __('Receiver') }}</span>
-                                        </label>
-                                        <select class="form-control" name="receiver_id" id="receiver-select"></select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="date-from"
-                                               class="form-label d-flex align-items-center justify-content-end fw-bold">
-                                            <span>{{ __('From Date') }}</span>
-                                            <i class="fa fa-calendar ms-1"></i>
-                                        </label>
-                                        <input type="date" class="form-control" name="start_at" id="date-from"
-                                               value="{{ request('start_at') }}">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label for="date-to"
-                                               class="form-label d-flex align-items-center justify-content-end fw-bold">
-                                            <span>{{ __('To Date') }}</span>
-                                            <i class="fa fa-calendar ms-1"></i>
-                                        </label>
-                                        <input type="date" class="form-control" name="end_at" id="date-to"
-                                               value="{{ request('end_at') }}">
-                                    </div>
-                                    <div class="row mt-2">
-                                        <div class="col-12 d-flex justify-content-end gap-2">
-                                            <button type="submit" class="btn btn-info d-flex align-items-center gap-2">
-                                                <i class="fa fa-search"></i> {{__('Search')}}
-                                            </button>
-                                            <a href="?tab=gifts"
-                                               class="btn btn-default d-flex align-items-center gap-2">
-                                                <i class="fa fa-undo"></i> {{__('Reset')}}
-                                            </a>
-                                        </div>
+                            <div class="row g-2 align-items-end justify-content-between">
+                                <div class="col-md-2">
+                                    <label for="sender-select"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('Sender') }}</span>
+                                    </label>
+                                    <select class="form-control" name="sender_id" id="sender-select"></select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="receiver-select"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('Receiver') }}</span>
+                                    </label>
+                                    <select class="form-control" name="receiver_id" id="receiver-select"></select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="date-from"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('From Date') }}</span>
+                                        <i class="fa fa-calendar ms-1"></i>
+                                    </label>
+                                    <input type="date" class="form-control" name="start_at" id="date-from"
+                                           value="{{ request('start_at') }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="date-to"
+                                           class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('To Date') }}</span>
+                                        <i class="fa fa-calendar ms-1"></i>
+                                    </label>
+                                    <input type="date" class="form-control" name="end_at" id="date-to"
+                                           value="{{ request('end_at') }}">
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        <button type="submit" class="btn btn-info d-flex align-items-center gap-2">
+                                            <i class="fa fa-search"></i> {{__('Search')}}
+                                        </button>
+                                        <a href="?tab=gifts"
+                                           class="btn btn-default d-flex align-items-center gap-2">
+                                            <i class="fa fa-undo"></i> {{__('Reset')}}
+                                        </a>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -243,7 +341,7 @@
                         {{ __('Total Diamonds') }}
                     </div>
                     <div class="diamond-count">
-                        <span>{{ number_format($room->gifts()->sum('giftPrice')) }}</span>
+                        <span>{{ number_format($totalDiamonds) }}</span>
                         <div class="diamond-icon-container">
                             <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
                         </div>
@@ -265,30 +363,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @php
-                        $query = $room->gifts()
-                            ->with(['gift', 'sender.profile', 'receiver.profile']);
-
-                        if(request('sender_id')) {
-                            $query->where('sender_id', request('sender_id'));
-                        }
-
-                        if(request('receiver_id')) {
-                            $query->where('receiver_id', request('receiver_id'));
-                        }
-
-                        if(request('start_at')) {
-                            $query->whereDate('created_at', '>=', request('start_at'));
-                        }
-
-                        if(request('end_at')) {
-                            $query->whereDate('created_at', '<=', request('end_at'));
-                        }
-
-                        $gifts = $query->orderByDesc('created_at')->paginate(15);
-                    @endphp
-
-                    @foreach($gifts as $index => $gift)
+                    @forelse($gifts as $index => $gift)
                         <tr>
                             <td>{{ $gift->id }}</td>
                             <td>
@@ -327,9 +402,18 @@
                             </td>
                             <td>{{ $gift->giftNum }}</td>
                             <td>{{ $gift->giftPrice }}</td>
-                            <td>{{ Carbon::parse($gift->created_at)->format('Y-m-d H:i') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($gift->created_at)->format('Y-m-d H:i') }}</td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="p-3">
+                                    <i class="fas fa-info-circle text-muted"></i>
+                                    {{ __('No data available') }}
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
                     </tbody>
                 </table>
             </div>
@@ -364,61 +448,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                @php
-                    $micPositions = [];
-                    if ($room->microphone) {
-                        $positions = explode(',', $room->microphone);
-                        foreach ($positions as $index => $userId) {
-                            if ($userId != '0') {
-                                $micPositions[$userId] = $index + 1;
-                            }
-                        }
-                    }
-
-                    $blackList = [];
-                    if ($room->room_black) {
-                        $blackListItems = explode(',', $room->room_black);
-                        foreach ($blackListItems as $item) {
-                            $parts = explode('#', $item);
-                            if (count($parts) === 3) {
-                                $userId = $parts[0];
-                                $kickTime = $parts[1];
-                                $duration = $parts[2];
-
-                                $endTime = $kickTime + $duration;
-                                if (time() < $endTime) {
-                                    $blackList[$userId] = [
-                                        'kick_time' => $kickTime,
-                                        'duration' => $duration / 60, // Convert to minutes
-                                        'remaining' => ceil(($endTime - time()) / 60) // Remaining minutes
-                                    ];
-                                }
-                            }
-                        }
-                    }
-
-                    $visitors = $room->roomVisitors()
-                        ->with('user.profile')
-                        ->get()
-                        ->map(function($visitor) use ($micPositions, $blackList) {
-                            $visitor->mic_position = $micPositions[$visitor->user_id] ?? null;
-                            $visitor->kick_info = $blackList[$visitor->user_id] ?? null;
-                            return $visitor;
-                        })
-                        ->sortBy(function($visitor) {
-                            return $visitor->mic_position === null ? PHP_INT_MAX : $visitor->mic_position;
-                        });
-
-                    $currentPage = request()->get('page', 1);
-                    $perPage = 15;
-                    $visitors = new \Illuminate\Pagination\LengthAwarePaginator(
-                        $visitors->forPage($currentPage, $perPage),
-                        $visitors->count(),
-                        $perPage,
-                        $currentPage,
-                        ['path' => request()->url(), 'query' => request()->query()]
-                    );
-                @endphp
 
                 @forelse($visitors as $index => $visitor)
                     <tr>
@@ -468,7 +497,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center">{{ __('No visitors found') }}</td>
+                        <td colspan="6" class="text-center">
+                            <div class="p-3">
+                                <i class="fas fa-info-circle text-muted"></i>
+                                {{ __('No data available') }}
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
                 </tbody>
@@ -500,12 +534,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                @php
-                    $pks = \App\Models\Pk::where('room_id', $room->id)
-                        ->with(['team1Boss.profile', 'team2Boss.profile'])
-                        ->orderByDesc('created_at')
-                        ->paginate(15);
-                @endphp
 
                 @forelse($pks as $index => $pk)
                     <tr>
@@ -600,7 +628,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center">{{ __('No PK records found') }}</td>
+                        <td colspan="8" class="text-center">
+                            <div class="p-3">
+                                <i class="fas fa-info-circle text-muted"></i>
+                                {{ __('No data available') }}
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
                 </tbody>
@@ -612,6 +645,175 @@
     </div>
 </div>
 
+<div class="tab-content {{ request('tab') == 'boxes' ? 'active' : '' }}" id="boxes-tab">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">{{ __('Boxes in Room') }}</h4>
+        </div>
+
+        <div class="box-body p-3">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form action="" class="form-horizontal  gift-log-form" method="GET">
+                        <input type="hidden" name="tab" value="boxes">
+                        <div class="container-fluid">
+                            <div class="row g-2 align-items-end justify-content-between">
+                                <div class="col-md-4">
+                                    <label for="type-select" class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('Box Type') }}</span>
+                                    </label>
+                                    <select class="form-control" name="type" id="type-select">
+                                        <option value="">{{ __('All Types') }}</option>
+                                        <option value="0" {{ request('type') === '0' ? 'selected' : '' }}>{{ __('Normal') }}</option>
+                                        <option value="1" {{ request('type') === '1' ? 'selected' : '' }}>{{ __('Super') }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="status-select" class="form-label d-flex align-items-center justify-content-end fw-bold">
+                                        <span>{{ __('Status') }}</span>
+                                    </label>
+                                    <select class="form-control" name="status" id="status-select">
+                                        <option value="">{{ __('All Status') }}</option>
+                                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>{{ __('Active') }}</option>
+                                        <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>{{ __('Closed') }}</option>
+                                        <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>{{ __('Expired') }}</option>
+                                    </select>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        <button type="submit" class="btn btn-info d-flex align-items-center gap-2">
+                                            <i class="fa fa-search"></i> {{__('Search')}}
+                                        </button>
+                                        <a href="?tab=boxes" class="btn btn-default d-flex align-items-center gap-2">
+                                            <i class="fa fa-undo"></i> {{__('Reset')}}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{{ __('Box Type') }}</th>
+                    <th>{{ __('Owner') }}</th>
+                    <th>{{ __('Coins') }}</th>
+                    <th>{{ __('Users Picked') }}</th>
+                    <th>{{ __('Status') }}</th>
+                    <th>{{ __('Created At') }}</th>
+                    <th>{{ __('Expires At') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                @forelse($boxes as $index => $box)
+                    <tr>
+                        <td>{{ $box->id }}</td>
+                        <td>
+                            <span class="badge badge-{{ $box->type == 0 ? 'primary' : 'warning' }}">
+                                {{ $box->type == 0 ? __('Normal') : __('Super') }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ admin_url('users/' . $box->user->id) }}" target="_blank"
+                               class="d-flex align-items-center text-decoration-none">
+                                <img src="{{ getImagePath($box->user->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                     width="40" height="40"
+                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                <div>
+                                    <strong>{{ $box->user->name }}</strong><br>
+                                    <small class="text-muted">UUID: {{ $box->user->uuid }}</small>
+                                </div>
+                            </a>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <div class="d-flex align-items-center mb-1">
+                                    <span class="fw-bold">{{ __('Total') }}:</span>
+                                    {{ number_format($box->coins) }}
+                                    <img src="{{ asset('images/diamond.jpg') }}"
+                                         alt="Diamond"
+                                         style="width: 20px; height: 20px; margin-left: 5px;">
+                                </div>
+                                <div class="d-flex align-items-center text-muted">
+                                    <span class="fw-bold">{{ __('Used') }}:</span>
+                                    {{ number_format($box->used_coins) }}
+                                    <img src="{{ asset('images/diamond.jpg') }}"
+                                         alt="Diamond"
+                                         style="width: 15px; height: 15px; margin-left: 5px;">
+                                </div>
+                                <div class="d-flex align-items-center text-muted">
+                                    <span class="fw-bold">{{ __('Remains') }}:</span>
+                                    {{ number_format($box->unused_coins) }}
+                                    <img src="{{ asset('images/diamond.jpg') }}"
+                                         alt="Diamond"
+                                         style="width: 15px; height: 15px; margin-left: 5px;">
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="progress-info">
+                                <div class="progress" style="height: 20px;">
+                                    @php
+                                        $percentage = ($box->used_num / $box->users_num) * 100;
+                                    @endphp
+                                    <div class="progress-bar bg-success"
+                                         role="progressbar"
+                                         style="width: {{ $percentage }}%"
+                                         aria-valuenow="{{ $percentage }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <div style="text-align: center; margin-top: 5px;">
+                                    ({{ number_format($percentage, 1) }}%) {{ $box->used_num }} / {{ $box->users_num }}
+                                    <br>
+                                    <a href="javascript:void(0)"
+                                       class="show-picked-users"
+                                       data-picked-users="{{ $box->picks->pluck('user_id')->implode(',') }}">
+                                        <span class="show-users-text">{{ __('Show Users') }}</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            @php
+                                $now = \Carbon\Carbon::now()->timestamp;
+                                $isExpired = $box->end_at < $now;
+                                $isClosed = $box->is_closed;
+                            @endphp
+                            <span class="badge badge-{{ $isExpired || $isClosed ? 'danger' : 'success' }}">
+                                {{ $isExpired ? __('Expired') : ($isClosed ? __('Closed') : __('Active')) }}
+                            </span>
+                        </td>
+                        <td>{{ \Carbon\Carbon::createFromTimestamp($box->start_at)->format('Y-m-d H:i:s') }}</td>
+                        <td>{{ \Carbon\Carbon::createFromTimestamp($box->end_at)->format('Y-m-d H:i:s') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <div class="p-3">
+                                <i class="fas fa-info-circle text-muted"></i>
+                                {{ __('No boxes available') }}
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-center mt-3">
+            {{ $boxes->appends(request()->all())->links('vendor.pagination.bootstrap-4') }}
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -619,6 +821,112 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+    function openEditModal() {
+        $('#editRoomModal').modal('show');
+    }
+
+    $(document).ready(function() {
+        $('#editRoomForm').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '{{ route("admin.rooms.update", $room->id) }}',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if(response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '{{ __("Success") }}',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '{{ __("Error") }}',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '{{ __("Error") }}',
+                        text: xhr.responseJSON.message || '{{ __("Something went wrong") }}'
+                    });
+                }
+            });
+        });
+    });
+
+    $(document).on('click', '.show-picked-users', function() {
+        const pickedUsers = $(this).data('picked-users');
+        const boxTitle = '{{ __("Box Picked Users") }}';
+
+        if (!pickedUsers) {
+            Swal.fire('{{ __("Error") }}', '{{ __("No users found") }}', 'error');
+            return;
+        }
+
+        const userIds = pickedUsers.toString().split(',').filter(id => id.trim());
+
+        Swal.fire({
+            title: '{{ __("Loading...") }}',
+            allowOutsideClick: false,
+            onOpen: () => {
+                Swal.showLoading();
+
+                $.ajax({
+                    url: '{{ route("admin.get.users") }}',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        user_ids: userIds
+                    },
+                    success: function(response) {
+                        let membersList = '';
+
+                        response.forEach(function(user) {
+                            membersList += `
+                            <div class="member-item">
+                                <a href="{{ admin_url('users') }}/${user.id}"
+                                   class="member-info" target="_blank">
+                                    <img src="${user.profile?.avatar || '{{ asset("images/businessman-icon.jpg") }}'}"
+                                         class="member-avatar">
+                                    <div class="member-details">
+                                        <div class="member-name">${user.name}</div>
+                                        <div class="member-id">
+                                            <span>ID: ${user.id}</span><br>
+                                            <span>UID: ${user.uuid}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        `;
+                        });
+
+                        Swal.fire({
+                            title: boxTitle,
+                            html: `<div class="team-members-list">${membersList}</div>`,
+                            width: '800px',
+                            showConfirmButton: false,
+                            showCloseButton: true
+                        });
+                    },
+                    error: function() {
+                        Swal.fire('{{ __("Error") }}', '{{ __("Failed to load users") }}', 'error');
+                    }
+                });
+            }
+        });
+    });
+
     $(document).on('click', '.show-team-members', function() {
         const teamMembers = $(this).data('team-members');
         const teamName = $(this).data('team-name');
@@ -828,7 +1136,7 @@
     });
 
     $(document).ready(function () {
-        $('.sender-select, .receiver-select').select2({
+        $('#sender-select, #receiver-select').select2({
             ajax: {
                 url: '{{ route('search.users') }}',
                 dataType: 'json',
@@ -864,8 +1172,6 @@
             placeholder: "{{ __('Search for user...') }}",
             minimumInputLength: 1
         });
-
-
     });
 
     $(document).ready(function () {

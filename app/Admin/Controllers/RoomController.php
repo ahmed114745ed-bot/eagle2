@@ -50,18 +50,140 @@ class RoomController extends MainController
      * @param Content $content
      * @return Content
      */
+
     public function show($id, Content $content)
     {
         $room = Room::with(['owner.profile', 'roomCategory'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
+        // 1. Admins
+        $adminIds = collect(explode(',', $room->room_admin))->filter();
+        $admins = \App\Models\User::whereIn('id', $adminIds)
+            ->with('profile')
+            ->get();
+
+        // 2. Gifts
+        $giftQuery = $room->gifts()
+            ->with(['gift', 'sender.profile', 'receiver.profile']);
+
+        if(request('sender_id')) {
+            $giftQuery->where('sender_id', request('sender_id'));
+        }
+        if(request('receiver_id')) {
+            $giftQuery->where('receiver_id', request('receiver_id'));
+        }
+        if(request('start_at')) {
+            $giftQuery->whereDate('created_at', '>=', request('start_at'));
+        }
+        if(request('end_at')) {
+            $giftQuery->whereDate('created_at', '<=', request('end_at'));
+        }
+        $gifts = $giftQuery->orderByDesc('created_at')->paginate(15);
+        $totalDiamonds = $room->gifts()->sum('giftPrice');
+
+        // 3. Visitors, Microphone, Blacklist, Pagination
+        // Mic positions
+        $micPositions = [];
+        if ($room->microphone) {
+            $positions = explode(',', $room->microphone);
+            foreach ($positions as $index => $userId) {
+                if ($userId != '0') {
+                    $micPositions[$userId] = $index + 1;
+                }
+            }
+        }
+
+        // Blacklist
+        $blackList = [];
+        if ($room->room_black) {
+            $blackListItems = explode(',', $room->room_black);
+            foreach ($blackListItems as $item) {
+                $parts = explode('#', $item);
+                if (count($parts) === 3) {
+                    $userId   = $parts[0];
+                    $kickTime = $parts[1];
+                    $duration = $parts[2];
+                    $endTime = $kickTime + $duration;
+                    if (time() < $endTime) {
+                        $blackList[$userId] = [
+                            'kick_time' => $kickTime,
+                            'duration'  => $duration / 60, // minutes
+                            'remaining' => ceil(($endTime - time()) / 60) // min remaining
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Main visitors collection
+        $visitorsRaw = $room->roomVisitors()
+            ->with('user.profile')
+            ->get()
+            ->map(function($visitor) use ($micPositions, $blackList) {
+                $visitor->mic_position = $micPositions[$visitor->user_id] ?? null;
+                $visitor->kick_info = $blackList[$visitor->user_id] ?? null;
+                return $visitor;
+            })
+            ->sortBy(function($visitor) {
+                return $visitor->mic_position === null ? PHP_INT_MAX : $visitor->mic_position;
+            });
+
+        // 4. PKs (Room PKs)
+        $pks = \App\Models\Pk::where('room_id', $room->id)
+            ->with(['team1Boss.profile', 'team2Boss.profile'])
+            ->orderByDesc('created_at')
+            ->paginate(15);
+
+        $currentPage = request()->get('page', 1);
+        $perPage = 15;
+        $visitors = new \Illuminate\Pagination\LengthAwarePaginator(
+            $visitorsRaw->forPage($currentPage, $perPage)->values(),
+            $visitorsRaw->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        // 5. Boxes in Room
+        $query = \Modules\LuckyBox\Entities\BoxUse::where('room_id', $room->id)
+            ->with(['user.profile', 'picks', 'box']);
+
+        if (request('type') !== null && request('type') !== '') {
+            $query->where('type', request('type'));
+        }
+
+        if (request('status')) {
+            $now = \Carbon\Carbon::now()->timestamp;
+            switch (request('status')) {
+                case 'active':
+                    $query->where('is_closed', false)->where('end_at', '>', $now);
+                    break;
+                case 'closed':
+                    $query->where('is_closed', true);
+                    break;
+                case 'expired':
+                    $query->where('end_at', '<=', $now);
+                    break;
+            }
+        }
+
+        $boxes = $query->orderByDesc('created_at')->paginate(15);
+
+        // Return to view
         return $content
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
-            ->body(view('room_profile', compact('room')));
+            ->body(view('room_profile', [
+                'room'          => $room,
+                'admins'        => $admins,
+                'gifts'         => $gifts,
+                'totalDiamonds' => $totalDiamonds,
+                'visitors'      => $visitors,
+                'pks'           => $pks,
+                'boxes'         => $boxes,
+            ]));
     }
-
     /**
      * Edit interface.
      *
