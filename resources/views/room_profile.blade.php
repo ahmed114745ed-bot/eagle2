@@ -93,9 +93,14 @@
                 </div>
             </div>
         </div>
-        <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
-            <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
-        </button>
+        <div style="display: flex; justify-content: flex-start; gap: 8px; margin-bottom: 8px;">
+            <button class="btn-back edit-btn" onclick="openEditModal()">
+                <i class="fas fa-edit"></i> {{__("Edit Room")}}
+            </button>
+            <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
+                <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
+            </button>
+        </div>
     </div>
 
     @php
@@ -141,18 +146,17 @@
                         <label>{{ __('Room Type') }}</label>
                         <select class="form-control" name="room_type">
                             <option value="">{{ __('Select Type') }}</option>
-                            <!-- Add your room types here -->
+                            @foreach($roomTypes as $type)
+                                <option value="{{ $type->id }}" {{ $room->room_type == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>{{ __('Max Admins') }}</label>
                         <input type="number" class="form-control" name="max_admin" value="{{ $room->max_admin }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label>{{ __('Room Mode') }}</label>
-                        <input type="text" class="form-control" name="mode" value="{{ $room->mode }}">
                     </div>
 
                     <div class="form-group">
@@ -830,7 +834,7 @@
             e.preventDefault();
 
             $.ajax({
-                url: '{{ route("admin.rooms.update", $room->id) }}',
+                url: '{{ route("admin.rooms.basic_update", $room->id) }}',
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
