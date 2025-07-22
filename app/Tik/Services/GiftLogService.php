@@ -79,8 +79,15 @@ class GiftLogService
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
         try {
+           
             $sendPrice = (int)($totalPrice);
             $amountBefore = $user->di;
+          
+            Log::info('Before dispatch', [
+                'user_id' => $user->id,
+                'amountBefore' => $amountBefore,
+                'sendPrice' => $sendPrice,
+            ]);
             LogUserCoinProfit::dispatch(
                 $user->id,
                 $amountBefore,
