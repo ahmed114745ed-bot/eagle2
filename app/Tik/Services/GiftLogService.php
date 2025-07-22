@@ -82,9 +82,11 @@ class GiftLogService
            
             $sendPrice = (int)($totalPrice);
             $amountBefore = $user->di;
-            \Log::channel('single')->info('LogUserCoinProfit Job', [
-                'amount_before' => $amountBefore,
-                'amount' => $sendPrice,
+          
+            Log::info('Before dispatch', [
+                'user_id' => $user->id,
+                'amountBefore' => $amountBefore,
+                'sendPrice' => $sendPrice,
             ]);
             LogUserCoinProfit::dispatch(
                 $user->id,
