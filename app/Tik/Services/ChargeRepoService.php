@@ -303,7 +303,7 @@ class ChargeRepoService
         UserCoinLogHelper::log(
             $receiver->id ,
             'charge',
-            'charges',
+            'charge_to_user',
             $amount ?? 0,
             $amountBefore ?? 0,
             $chargeType
@@ -345,6 +345,15 @@ class ChargeRepoService
             'charge_to_agency'
         );
 
+        UserCoinLogHelper::log(
+            $receiver->id ,
+            'charge',
+            'charge_to_agency',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            $chargeType
+        );
+
         $data = [
             'charger_id' => $sender->id,
             'charger_type' => $chargeType,
@@ -362,8 +371,16 @@ class ChargeRepoService
 
     public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-
         $receiver->increment('coins', $amount);
+
+        UserCoinLogHelper::log(
+            $receiver->id ,
+            'charge',
+            'charge_dollar_for_owner_to_agency',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            $chargeType
+        );
 
         $data = [
             'charger_id' => $sender->id,
@@ -378,6 +395,7 @@ class ChargeRepoService
             'action_user_id' => auth()->user()->id,
 
         ];
+
         $this->create($data);
     }
 
@@ -467,6 +485,16 @@ class ChargeRepoService
 
     public function agencyCharge($chargerId, $userId, $amount, $type, $usd, $chargeType, $transferred = false, $agencyId = null)
     {
+        $amountBefore =  Common::getCurrentBalance($userId);
+        UserCoinLogHelper::log(
+            $userId,
+            'charge',
+            'agency_to_agency',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            $chargeType
+        );
+
         $data = [
             'charger_id' => $chargerId,
             'charger_type' => $chargeType,

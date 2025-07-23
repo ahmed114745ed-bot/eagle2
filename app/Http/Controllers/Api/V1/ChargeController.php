@@ -213,8 +213,6 @@ class ChargeController extends Controller
         }
         DB::beginTransaction();
         try {
-
-
             $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd);
 
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
