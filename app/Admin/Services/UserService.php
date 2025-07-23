@@ -69,11 +69,9 @@ class UserService
         align-items: center;
         gap: 10px;
         padding: 10px;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
         text-decoration: none;
         color: inherit;
-        background-color: #f9f9f9;
+
         transition: background-color 0.2s ease;
     ' onmouseover=\"this.style.backgroundColor='#f0f0f0'\" onmouseout=\"this.style.backgroundColor='#f9f9f9'\">
         $image
@@ -100,7 +98,7 @@ class UserService
             const text = document.getElementById(elementId)?.textContent;
             if (text) {
                 navigator.clipboard.writeText(text).then(() => {
-                    alert('UID copied: ' + text);
+                    admin_toastr('" . e(trans('Copied')) . "', 'success');
                 });
             }
         }
