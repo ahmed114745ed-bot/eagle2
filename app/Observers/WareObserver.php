@@ -46,9 +46,6 @@ class WareObserver
             } elseif ($ware->type == 28) {
                 settings()->set('profile_frame_updated', time());
             }
-            elseif ($ware->type == 12) {
-                settings()->set('wappel_frame_updated_at', time());
-            }
 
         }
 
@@ -57,6 +54,8 @@ class WareObserver
                 $ware->isDirty('right') ||
                 $ware->isDirty('bottom'))) {
             settings()->set('bubble_frame_updated_at', time());
+        }elseif ($ware->type == 12 && ($ware->isDirty('key_json') )) {
+            settings()->set('wappel_frame_updated_at', time());
         }
 
 
