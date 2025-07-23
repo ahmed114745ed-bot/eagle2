@@ -97,7 +97,7 @@ class BanController extends MainController
 
         $grid->model()->whereHas('user')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
-            ->select($reason, 'uid', 'duration', 'type', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
+            ->select($reason, 'uid', 'duration', 'type', 'img', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
             ->groupBy([$reason, 'uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id'])->orderByDesc('created_at');
         //    $grid->id(__ ('ID'));
         // $grid->uid(__('uuid'));
@@ -179,11 +179,7 @@ class BanController extends MainController
             return $locale === 'ar' ? $name_ar : $name_en;
         });
 
-        $grid->column('img', trans('image'))->display(function ($path) {
-
-            $url = getImagePath($path);
-            return $url ? handleShowImageWithTypes($this->id, $url, 50, 50) : "";
-        });
+        $grid->column('img', trans('image'))->image('', 30);
 
         $grid->device_number(__('device_number'));
         // $grid->staff_id(__('staff_id'));
