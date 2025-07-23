@@ -1098,7 +1098,7 @@ class Common
                         'type' => $ware->type,
                         'target_id' => $ware->id,
                         'num' => 1,
-                        'expire' => $vip->expire /*? now()->addDays($expire)->timestamp : 0*/,
+                        'expire' => $userVip->expire /*? now()->addDays($expire)->timestamp : 0*/,
                         'use_num' => $ware->num,
                         'vip_user_id' => $userVip->id,
                         'is_used' => $userVip->is_used,
