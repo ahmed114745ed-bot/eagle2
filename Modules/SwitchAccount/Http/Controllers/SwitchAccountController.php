@@ -233,6 +233,8 @@ class SwitchAccountController extends Controller
         $user_acount = UserAccount::query()->where(function ($q) use ($user) {
             $q->where("parent_user_id", $user->id)->orWhere("child_user_id", $user->id);
         })->first();
+
+        $frame = $this->getFrame($currentUser);
         $data = [
             'current'           => [
                 'image'         =>  $currentUser->profile->avatar,
@@ -255,6 +257,8 @@ class SwitchAccountController extends Controller
                     'sender_img' => $currentUser->getImageReceiverOrSender('sender_id', 2)->img ??'',
                 ],
                 'user_types' => $currentUser->user_types,
+                'frame' => $frame,
+                'frame_id' => $frame ? @$currentUser->dress_1 : 0,
                 'country' => @$currentUser->country ? [
                     'id' => @$currentUser->country->id,
                     'name' => @$currentUser->country->name ?? '',
@@ -268,5 +272,22 @@ class SwitchAccountController extends Controller
             'other'         => AccountResource::collection($accounts)
         ];
         return Common::apiResponse(1, 'success', $data, 200);
+    }
+
+    private function getFrame(User $user)
+    {
+        $dress_1_data = $this->getUserDress($user,4, $user->dress_1, 'img2');
+        $dress_1_fallback = $this->getUserDress($user,4, $user->dress_1, 'img1');
+        $frame = $dress_1_data ?: $dress_1_fallback;
+        return $frame;
+    }
+
+    private function getUserDress(User $user,$type, $dress, $item = 'img1')
+    {
+        $pack = $user->packs?->where('is_used', 1)
+            ->where('type', $type)
+            ->where('target_id', $dress)
+            ->first();
+        return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }
