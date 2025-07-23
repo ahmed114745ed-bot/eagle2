@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Log;
 
 class VersionController extends Controller
 {
@@ -64,7 +64,7 @@ class VersionController extends Controller
                 'extras' => $isExtraUpdated,
                 'profile_frame_updated' => $ProfileFrameUpdated,
                 'bubble_frame' => $isBubbleFrameUpdated,
-                'wapple' => $wapple,
+                'wapple' => $wapple ?? false,
                 'colors' => settings()->get('colors_updated_at') ?? false,
                 'background' => settings()->get('ground_updated_at') ?? false,
                 'host_agency' => (bool)\Cache::get('host_agency'),
@@ -135,7 +135,7 @@ class VersionController extends Controller
         // } elseif ($time) {
         //     $isGiftUpdated = $settingGiftUpdate > $time;
         // }
-
+        Log::info([$settingGiftUpdate,$time]);
         if ($settingGiftUpdate === null && $time !== null) {
             $isGiftUpdated = false;
         }
