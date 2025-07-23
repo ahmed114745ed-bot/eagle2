@@ -31,7 +31,7 @@
     @if(request()->name == 'lucky_gift' || request()->name == null)
         <div class="col my-1 form-Roles">
             @php
-                $subQuery = \App\Models\UserLuckyGift::query()
+                $subQuery = \Modules\LuckyBox\Entities\UserLuckyGift::query()
                                  ->selectRaw(
                                         'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
                                         'SUM(user_lucky_gifts.number) as total_number, ' .
