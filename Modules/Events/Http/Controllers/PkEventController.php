@@ -53,7 +53,7 @@ class PkEventController extends Controller
             $query->with(['roomOwner.ownerRoom:id,uid,room_name,room_cover']);
         } else {
             $query->with([$relation => function ($q) {
-                $q->select('id', 'name', 'avatar');
+                $q->select('id', 'name')->with('profile');
             }]);
         }
 
