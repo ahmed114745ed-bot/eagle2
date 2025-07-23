@@ -24,8 +24,8 @@ class FilterChargeService
     {
         $actions = [
             'user' => fn() => $this->users($key),
-            'agency' => fn() => $this->agencies($key),
-            'shipping_agencies' => fn() => $this->shippingAgencies($key),
+            'host_agency' => fn() => $this->agencies($key),
+            'agency' => fn() => $this->shippingAgencies($key),
             'bd' => fn() => $this->bd($key),
             'dash' => fn() => $this->admins($key),
         ];
