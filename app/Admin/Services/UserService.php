@@ -62,7 +62,7 @@ class UserService
                 }
             }
         }
-
+        admin_toastr();
         return "
     <a href='" . url("admin/users/{$user->id}") . "' style='
         display: flex;
@@ -71,9 +71,8 @@ class UserService
         padding: 10px;
         text-decoration: none;
         color: inherit;
-
         transition: background-color 0.2s ease;
-    ' onmouseover=\"this.style.backgroundColor='#f0f0f0'\" onmouseout=\"this.style.backgroundColor='#f9f9f9'\">
+    ' onmouseover=\"this.style.backgroundColor='#f0f0f0'\" >
         $image
         <div>
             <strong style='font-size: 16px;'>{$user->name}</strong><br>
@@ -98,7 +97,7 @@ class UserService
             const text = document.getElementById(elementId)?.textContent;
             if (text) {
                 navigator.clipboard.writeText(text).then(() => {
-                    admin_toastr('" . e(trans('Copied')) . "', 'success');
+                        toastr.success('" . e(trans('Copied')) . "');
                 });
             }
         }
