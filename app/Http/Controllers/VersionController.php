@@ -135,7 +135,7 @@ class VersionController extends Controller
         // } elseif ($time) {
         //     $isGiftUpdated = $settingGiftUpdate > $time;
         // }
-        Log::info([$settingGiftUpdate,$time]);
+        Log::info([$key,$settingGiftUpdate,$time]);
         if ($settingGiftUpdate === null && $time !== null) {
             $isGiftUpdated = false;
         }
