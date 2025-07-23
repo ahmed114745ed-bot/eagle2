@@ -370,7 +370,7 @@ Route::get('x9b4-debug-track/{id}/{headerLog?}', function ($id, $headerLog = 'fa
 });
 
 Route::get('get-setting/{key}', function ($key) {
-    settings()->get($key);
+    return settings()->get($key);
 });
 
 // In your web.php
