@@ -204,10 +204,11 @@ class BanController extends MainController
         });
 
         $grid->column('created_at', __('expire'))->display(function () {
+             $timezone = getTimezone();
             // \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
             //     ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
-            $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
-            return now()->diffForHumans($banExpiration, true);
+            $banExpiration = \Carbon\Carbon::parse($this->created_at)->timezone($timezone)->addHours($this->duration);
+            return now($timezone)->diffForHumans($banExpiration, true);
         });
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('delete', __('Delete'))->display(function () {
