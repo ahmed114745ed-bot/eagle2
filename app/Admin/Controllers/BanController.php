@@ -180,8 +180,9 @@ class BanController extends MainController
         });
 
         $grid->column('img', trans('image'))->display(function ($path) {
+
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            return $url ? handleShowImageWithTypes($this->id, $url, 50, 50) : "";
         });
 
         $grid->device_number(__('device_number'));
