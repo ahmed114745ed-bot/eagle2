@@ -95,7 +95,7 @@ class LuckyGiftService
         $amountBefore = $user->di;
         LogUserCoinProfit::dispatch(
             $user->id,
-            $user->di,
+            $amountBefore,
             -abs($totalPrice),
             'lucky_gift',
             'gift_logs',
@@ -155,8 +155,6 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
-            $amountBefore = $user->di;
-
           
             $user->di -= $totalPrice;
             $index--;
@@ -168,6 +166,16 @@ class LuckyGiftService
         }
 
    
+        $amountBefore = Common::getCurrentBalance($userId);
+        
+        LogUserCoinProfit::dispatch(
+            $userId,
+            $amountBefore,
+            $total_user_win,
+            'cashback',
+            'lucky_gifts',
+            'cashback'
+        )->onQueue('log_user_coin');
 
         if ($index > 0) {
             $count -= $index;
@@ -634,17 +642,6 @@ class LuckyGiftService
     public function updateUserCoins(int $userId, mixed $di, mixed $userCoins, int $toalDiamond, $senderLevel = null): void
     {
 
-        $difference = $di - $userCoins;
-        $amountBefore = Common::getCurrentBalance($userId);
-        LogUserCoinProfit::dispatch(
-            $userId,
-            $amountBefore,
-            $difference,
-            'cashback',
-            'lucky_gifts',
-            'cashback'
-        )->onQueue('log_user_coin');
-    
         $values = [
             'di'                 => \DB::raw('di + ' . ($di - $userCoins)),
             'total_diamond_send' => \DB::raw('total_diamond_send + ' . $toalDiamond)
