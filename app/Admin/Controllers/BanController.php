@@ -203,19 +203,48 @@ class BanController extends MainController
                     </div>";
         });
 
-        $grid->column('created_at', __('expire'))->display(function () {
+        // $grid->column('created_at', __('expire'))->display(function () {
 
-            // \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
-            //     ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
+        //     // \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
+        //     //     ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
+        //     $timezone = getTimezone();
+
+        //     // Get raw UTC datetime
+        //     $createdAt = \Carbon\Carbon::parse($this->getAttributes()['created_at'], 'UTC');
+
+        //     $banExpiration = $createdAt->copy()->addHours($this->duration)->setTimezone($timezone);
+
+        //     return now($timezone)->diffForHumans($banExpiration, true);
+        // });
+
+        $grid->column('created_at', __('expire'))->display(function () {
             $timezone = getTimezone();
 
             // Get raw UTC datetime
             $createdAt = \Carbon\Carbon::parse($this->getAttributes()['created_at'], 'UTC');
 
-            $banExpiration = $createdAt->copy()->addHours($this->duration)->setTimezone($timezone);
+            // Add ban duration and convert to user's timezone
+            $banExpiration = $createdAt->addHours($this->duration)->setTimezone($timezone);
 
-            return now($timezone)->diffForHumans($banExpiration, true);
+            $now = now($timezone);
+
+            // Get total remaining minutes
+            $diffInMinutes = $now->diffInMinutes($banExpiration, false);
+
+            if ($diffInMinutes <= 0) {
+                return 'منتهي'; // Expired
+            }
+
+            $hours = floor($diffInMinutes / 60);
+            $minutes = $diffInMinutes % 60;
+
+            if ($hours >= 1) {
+                return "{$hours}h:{$minutes}m";
+            } else {
+                return "{$minutes}". __('minute');
+            }
         });
+
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('delete', __('Delete'))->display(function () {
                 $deleteLabel = __('Delete');
