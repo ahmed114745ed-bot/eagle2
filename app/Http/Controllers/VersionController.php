@@ -124,9 +124,9 @@ class VersionController extends Controller
      */
     public function isUpdated($key, $time): bool
     {
-        if ($time) {
-            $time /= 1000;
-        }
+        // if ($time) {
+        //     $time /= 1000;
+        // }
         $settingGiftUpdate = settings()->get($key);
         $isGiftUpdated     = true;
         // if ($settingGiftUpdate == null && $time != null) {
@@ -135,7 +135,6 @@ class VersionController extends Controller
         // } elseif ($time) {
         //     $isGiftUpdated = $settingGiftUpdate > $time;
         // }
-        Log::info([$key,$settingGiftUpdate,$time]);
         if ($settingGiftUpdate === null && $time !== null) {
             $isGiftUpdated = false;
         }
@@ -143,6 +142,7 @@ class VersionController extends Controller
         if ($time !== null) {
             $isGiftUpdated = $settingGiftUpdate > $time;
         }
+
         return $isGiftUpdated;
     }
 
