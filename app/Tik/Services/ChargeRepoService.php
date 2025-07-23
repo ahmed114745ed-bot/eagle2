@@ -551,8 +551,14 @@ class ChargeRepoService
         $this->processUserCharge($authAgency, $receiver, $request->amount);
     }
 
+    /**
+     * @throws Exception
+     */
     private function processAgencyCharge($authAgency, $chargeAgency, $amount)
     {
+        if ($authAgency->coins < $amount) {
+            throw new Exception(__('balance not enough'));
+        }
 
         $authAgency->decrement('coins', $amount);
         $chargeAgency->increment('coins', $amount);
@@ -569,8 +575,15 @@ class ChargeRepoService
         );
     }
 
+    /**
+     * @throws Exception
+     */
     private function processUserCharge($authAgency, $receiver, $amount)
     {
+        if ($authAgency->coins < $amount) {
+            throw new Exception(__('balance not enough'));
+        }
+
         $authAgency->decrement('coins', $amount);
         $receiver->increment('di', $amount);
         $usdRate = $amount / Common::getCoinsValue('user_coins');
