@@ -65,6 +65,9 @@ class ChargeAgencyController extends MainController
 
         $grid->id(__('ID'));
         $grid->column('agency.name', __('Agency'))->display(function ($name) {
+            if (! $this->agency){
+                return ;
+            }
             $cacheKey = "agency_image_{$this->agency->id}";
             $image = Cache::remember($cacheKey, 3600, function () {
                 $path = @$this->agency->img;
