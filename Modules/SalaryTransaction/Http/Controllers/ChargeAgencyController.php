@@ -124,8 +124,17 @@ class ChargeAgencyController extends MainController
         });
 
         $grid->column('agency.phone',trans('phone'));
-        $grid->column('agency.image',trans ('image'))->image ('',30);
-
+        $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
+            if (! $this->agency){
+                return ;
+            }
+            $coin = truncateAndTrim($this->agency->salary ?? 0);
+            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . $coin . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+                </div>";
+        });
         $this->extendGrid ($grid);
 
         return $grid;
