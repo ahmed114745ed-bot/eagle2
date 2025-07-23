@@ -167,7 +167,7 @@ class LuckyGiftService
 
    
         $cashbackBefore = $user->di;
-        if($total_count_win > 0){
+        if ($total_count_win > 0) {
             LogUserCoinProfit::dispatch(
                 $userId,
                 $cashbackBefore,
