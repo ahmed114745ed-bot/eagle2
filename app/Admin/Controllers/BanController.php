@@ -203,19 +203,6 @@ class BanController extends MainController
                     </div>";
         });
 
-        // $grid->column('created_at', __('expire'))->display(function () {
-
-        //     // \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
-        //     //     ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
-        //     $timezone = getTimezone();
-
-        //     // Get raw UTC datetime
-        //     $createdAt = \Carbon\Carbon::parse($this->getAttributes()['created_at'], 'UTC');
-
-        //     $banExpiration = $createdAt->copy()->addHours($this->duration)->setTimezone($timezone);
-
-        //     return now($timezone)->diffForHumans($banExpiration, true);
-        // });
 
         $grid->column('created_at', __('expire'))->display(function () {
             $timezone = getTimezone();
