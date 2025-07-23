@@ -95,7 +95,7 @@ class Common
 
             if ($event) {
                 $pk_winner = PkWinner::with('user')->where('pk_event_id', $event->id)
-                    ->where('pk_type', 'pk-king')
+                    ->where('pk_type', 'pk-star')
                     ->where('level', 1)
                     ->first();
 
@@ -2191,12 +2191,12 @@ class Common
     public static function getCurrentBalance(int $userId): int
     {
         $balance = User::where('id', $userId)->value('di') ?? 0;
-    
+
         Log::info("Current balance fetched", [
             'user_id' => $userId,
             'balance' => $balance,
         ]);
-    
+
         return $balance;
     }
 
