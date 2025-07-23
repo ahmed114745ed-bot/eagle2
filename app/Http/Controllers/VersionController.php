@@ -141,8 +141,11 @@ class VersionController extends Controller
         }
 
         if ($time !== null) {
+            dd('inside',$settingGiftUpdate,$time,$key );
             $isGiftUpdated = $settingGiftUpdate > $time;
         }
+            dd($settingGiftUpdate,$time,$key );
+
         return $isGiftUpdated;
     }
 
