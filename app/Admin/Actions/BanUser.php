@@ -216,7 +216,7 @@ class BanUser extends Action
         $this->text('description_en', __('Enter the reason for the ban(english)'))
             ->rules(['nullable', 'string', 'max:255']);
 
-        $this->image('img', __('img'))->rules(['nullable', 'image', 'mimes:jpeg,png,jpg']);
+        $this->image('img', __('img'))->rules('nullable|image|mimes:jpeg,png,jpg');
         $this->checkbox('type', __('type'))->options([
             'normal' => __('normal'),
             'ip' => __('ip'),
