@@ -212,10 +212,26 @@ class BanController extends MainController
             // Get raw UTC datetime
             $createdAt = \Carbon\Carbon::parse($this->getAttributes()['created_at'], 'UTC');
 
-            // Use copy() to avoid mutating the Carbon object
+            // Add duration and convert to target timezone
             $banExpiration = $createdAt->copy()->addHours($this->duration)->setTimezone($timezone);
 
-            return now($timezone)->diffForHumans($banExpiration, true);
+            // Get now in the same timezone
+            $now = now($timezone);
+
+            // Calculate difference
+            $diff = $now->diff($banExpiration);
+
+            // Format output
+            $parts = [];
+
+            if ($diff->h > 0) {
+                $parts[] = $diff->h . ' hour' . ($diff->h > 1 ? 's' : '');
+            }
+            if ($diff->i > 0) {
+                $parts[] = $diff->i . ' minute' . ($diff->i > 1 ? 's' : '');
+            }
+
+            return implode(' and ', $parts);
         });
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('delete', __('Delete'))->display(function () {
