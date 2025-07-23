@@ -24,8 +24,8 @@ class FilterChargeService
     {
         $actions = [
             'user' => fn() => $this->users($key),
-            'agency' => fn() => $this->agencies($key),
-            'shipping_agencies' => fn() => $this->shippingAgencies($key),
+            'host_agency' => fn() => $this->agencies($key),
+            'agency' => fn() => $this->shippingAgencies($key),
             'bd' => fn() => $this->bd($key),
             'dash' => fn() => $this->admins($key),
         ];
@@ -52,6 +52,7 @@ class FilterChargeService
     public function agencies($key): LengthAwarePaginator
     {
         return Agency::selectRaw('concat(name, " - ", id) as name, id')
+            ->where('type', 1)
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
@@ -62,7 +63,8 @@ class FilterChargeService
     public function shippingAgencies($key): LengthAwarePaginator
     {
          return ShippingAgency::selectRaw('concat(name, " - ", id) as name, id')
-            ->where(function ($query) use ($key) {
+             ->where('type', 2)
+             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
@@ -87,7 +89,7 @@ class FilterChargeService
     public function admins($key): LengthAwarePaginator
     {
         return Admin::query()->where(function ($query) use ($key) {
-            $query->where('id_bd', 1)
+            $query->where('id_bd', 0)
                 ->where(function ($query) use ($key){
                     $query->where('name', 'like', '%' . $key . '%')
                         ->orWhere('id', 'like', '%' . $key . '%')

@@ -862,7 +862,6 @@
 
 </head>
 <body>
-
     <div class="agency-profile-container">
         <!-- Header Section -->
         <div class="agency-header">
@@ -1223,6 +1222,10 @@
                 <option value="">{{ __('Search') }}</option>
             </select>
 
+            <button class="btn btn-primary search-btn" data-tab="charges">
+                <i class="fas fa-search"></i> {{ __('Search') }}
+            </button>
+
             <button class="btn btn-secondary reset-filters" data-tab="charges">
                 <i class="fas fa-redo"></i> {{ __('Reset') }}
             </button>
@@ -1271,7 +1274,7 @@
                                             </div>
                                         </div>
                                 </td>
-                                <td>{{ '$' .$charge->usd ?? '-' }}</td>
+                                <td>{{ $charge->usd !== null ? '$' . number_format($charge->usd, 2) : 0 }}</td>
                                 <td>{{ $charge->amount ?? '-' }}</td>
                                 <td>{{ $charge->created_at }}</td>
                             </tr>
@@ -1296,8 +1299,8 @@
             <select id="sender-type" class="form-control" style="width: 200px;">
                 <option value="">{{ __('Select type') }}</option>
                 <option value="user">{{ __('Users') }}</option>
-                <option value="agency">{{ __('Agencies') }}</option>
-                <option value="shipping_agencies">{{ __('Shipping Agencies') }}</option>
+                <option value="host_agency">{{ __('Agencies') }}</option>
+                <option value="agency">{{ __('Shipping Agencies') }}</option>
                 <option value="bd">{{ __('BD') }}</option>
                 <option value="dash">{{ __('admins') }}</option>
             </select>
@@ -1305,6 +1308,10 @@
             <select id="sender-id" class="form-control select2" style="width: 300px;">
                 <option value="">{{ __('Search') }}</option>
             </select>
+
+            <button class="btn btn-primary search-btn" data-tab="resived">
+                <i class="fas fa-search"></i> {{ __('Search') }}
+            </button>
 
             <button class="btn btn-secondary reset-filters" data-tab="resived">
                 <i class="fas fa-redo"></i> {{ __('Reset') }}
@@ -1339,21 +1346,20 @@
                                 <td>{{$index + 1}}</td>
                                 <td>{{ $res->id }}</td>
                                 <td>
-
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ $image }}" alt="user"
-                                                width="{{ $res->charger_type == 'agency' ? '50' : '40' }}"
-                                                height="40"
-                                                style="border-radius: {{ $res->charger_type == 'agency' ? '0' : '50%' }};">
-                                                 <div>
-                                                <strong> <a href="{{ $url }}" target="_blank" style="text-decoration: none; color: inherit;">
-                                                    {{ $sender['name'] }}
-                                                </a></strong><br>
-                                                <small>uuid: {{$sender['uuid'] }}</small>
-                                            </div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <img src="{{ $image }}" alt="user"
+                                            width="{{ $res->charger_type == 'agency' ? '50' : '40' }}"
+                                            height="40"
+                                            style="border-radius: {{ $res->charger_type == 'agency' ? '0' : '50%' }};">
+                                             <div>
+                                            <strong> <a href="{{ $url }}" target="_blank" style="text-decoration: none; color: inherit;">
+                                                {{ $sender['name'] }}
+                                            </a></strong><br>
+                                            <small>uuid: {{$sender['uuid'] }}</small>
                                         </div>
+                                    </div>
                                 </td>
-                                <td>{{ '$' .$res->usd ?? '-' }}</td>
+                                <td>{{ $res->usd !== null ? '$' . number_format($res->usd, 2) : 0 }}</td>
                                 <td>{{ $res->amount ?? '-' }}</td>
                                 <td>{{ $res->created_at }}</td>
                             </tr>
@@ -1368,88 +1374,159 @@
     </div>
 </div>
 
-<!-- Scripts -->
+        </div>
+    </div>
+</body>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
-            <script>
-                $(document).ready(function() {
-                    $('.reset-filters').on('click', function() {
-                        const tab = $(this).data('tab');
-                        const currentUrl = new URL(window.location.href);
-
-                        Array.from(currentUrl.searchParams.keys()).forEach(key => {
-                            if (key !== 'tab') {
-                                currentUrl.searchParams.delete(key);
-                            }
-                        });
-
-                        currentUrl.searchParams.set('tab', tab);
-
-                        window.location.href = currentUrl.toString();
-                    });
-
-                });
-            </script>
 <script>
-                $(document).ready(function() {
-                    $('.select2').select2({
-                        placeholder: "Search",
-                        allowClear: true,
-                        minimumInputLength: 1,
-                        ajax: {
-                            delay: 250,
-                            url: "{{ route('search.charges') }}",
-                            dataType: 'json',
-                            data: function(params) {
-                                return {
-                                    q: params.term,
-                                    type: $(this).parent().find('.form-control:first').val(),
-                                    page: params.page || 1
-                                };
-                            },
-                            processResults: function(data, params) {
-                                params.page = params.page || 1;
+    $(document).ready(function() {
+        $('.reset-filters').on('click', function() {
+            const tab = $(this).data('tab');
+            const currentUrl = new URL(window.location.href);
 
-                                return {
-                                    results: data.data.map(item => ({
-                                        id: item.id,
-                                        text: item.name
-                                    })),
-                                    pagination: {
-                                        more: data.current_page < data.last_page
-                                    }
-                                };
-                            },
-                            cache: true
+            Array.from(currentUrl.searchParams.keys()).forEach(key => {
+                if (key !== 'tab') {
+                    currentUrl.searchParams.delete(key);
+                }
+            });
+
+            currentUrl.searchParams.set('tab', tab);
+
+            window.location.href = currentUrl.toString();
+        });
+
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentTab = urlParams.get('tab') || 'charges';
+
+        $('.select2').select2({
+            placeholder: "Search",
+            allowClear: true,
+            minimumInputLength: 1,
+            ajax: {
+                delay: 250,
+                url: "{{ route('search.charges') }}",
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        q: params.term,
+                        type: $(this).parent().find('.form-control:first').val(),
+                        page: params.page || 1
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data.map(item => ({
+                            id: item.id,
+                            text: item.name
+                        })),
+                        pagination: {
+                            more: data.current_page < data.last_page
                         }
-                    });
+                    };
+                },
+                cache: true
+            }
+        });
 
-                    $('#receiver-type, #sender-type').on('change', function() {
-                        const idSelect = $(this).siblings('.select2');
-                        idSelect.val(null).trigger('change');
-                    });
+        if (currentTab === 'charges') {
+            const filterBy = urlParams.get('filter_by');
+            const filterId = urlParams.get('filter_id');
 
-                    $('#receiver-id, #sender-id').on('select2:select', function(e) {
-                        const currentUrl = new URL(window.location.href);
-                        const type = $(this).siblings('select').val();
-                        const id = e.params.data.id;
+            if (filterBy) {
+                $('#receiver-type').val(filterBy);
+            }
 
-                        if ($(this).attr('id') === 'receiver-id') {
-                            currentUrl.searchParams.set('filter_by', type);
-                            currentUrl.searchParams.set('filter_id', id);
-                            currentUrl.searchParams.set('tab', 'charges');
-                        } else {
-                            currentUrl.searchParams.set('sender_type', type);
-                            currentUrl.searchParams.set('sender_id', id);
-                            currentUrl.searchParams.set('tab', 'resived');
+            if (filterId) {
+                $.ajax({
+                    url: "{{ route('search.charges') }}",
+                    data: {
+                        id: filterId,
+                        type: filterBy
+                    },
+                    success: function(response) {
+                        if (response.data && response.data.length > 0) {
+                            const option = new Option(response.data[0].name, filterId, true, true);
+                            $('#receiver-id').append(option).trigger('change');
                         }
-
-                        window.location.href = currentUrl.toString();
-                    });
+                    }
                 });
-            </script>
+            }
+        } else if (currentTab === 'resived') {
+            const senderType = urlParams.get('sender_type');
+            const senderId = urlParams.get('sender_id');
 
+            if (senderType) {
+                $('#sender-type').val(senderType);
+            }
+
+            if (senderId) {
+                $.ajax({
+                    url: "{{ route('search.charges') }}",
+                    data: {
+                        id: senderId,
+                        type: senderType
+                    },
+                    success: function(response) {
+                        if (response.data && response.data.length > 0) {
+                            const option = new Option(response.data[0].name, senderId, true, true);
+                            $('#sender-id').append(option).trigger('change');
+                        }
+                    }
+                });
+            }
+        }
+
+        $('#receiver-type, #sender-type').on('change', function() {
+            $(this).siblings('.select2').val(null).trigger('change');
+        });
+
+        $('.search-btn').on('click', function() {
+            const tab = $(this).data('tab');
+            const currentUrl = new URL(window.location.href);
+
+            if (tab === 'charges') {
+                const type = $('#receiver-type').val();
+                const id = $('#receiver-id').val();
+                if(type) currentUrl.searchParams.set('filter_by', type);
+                else currentUrl.searchParams.delete('filter_by');
+                if(id) currentUrl.searchParams.set('filter_id', id);
+                else currentUrl.searchParams.delete('filter_id');
+                currentUrl.searchParams.set('tab', 'charges');
+            } else {
+                const type = $('#sender-type').val();
+                const id = $('#sender-id').val();
+                if(type) currentUrl.searchParams.set('sender_type', type);
+                else currentUrl.searchParams.delete('sender_type');
+                if(id) currentUrl.searchParams.set('sender_id', id);
+                else currentUrl.searchParams.delete('sender_id');
+                currentUrl.searchParams.set('tab', 'resived');
+            }
+            window.location.href = currentUrl.toString();
+        });
+
+        $('.reset-filters').on('click', function() {
+            const tab = $(this).data('tab');
+            const currentUrl = new URL(window.location.href);
+
+            Array.from(currentUrl.searchParams.keys()).forEach(key => {
+                if (key !== 'tab') {
+                    currentUrl.searchParams.delete(key);
+                }
+            });
+
+            currentUrl.searchParams.set('tab', tab);
+            window.location.href = currentUrl.toString();
+        });
+    });
+</script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);

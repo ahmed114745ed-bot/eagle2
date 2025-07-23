@@ -707,8 +707,6 @@ class ChargeReportController extends MainController
 
     protected function exchange()
     {
-
-
         $grid = new Grid(new ExchangeLog());
         $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->where('status', 1);
