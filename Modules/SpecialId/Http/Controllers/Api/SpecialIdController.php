@@ -3,7 +3,6 @@
 namespace Modules\SpecialId\Http\Controllers\Api;
 
 
-use App\Helpers\UserCoinLogHelper;
 use App\Models\Pack;
 use App\Models\Ware;
 use App\Models\Config;
@@ -38,16 +37,6 @@ class SpecialIdController extends Controller
             if ($pack->expire == 0) return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
             if ($pack->expire > now()->timestamp) {
                 if ($ware->expire != 0) {
-                    $amountBefore =  Common::getCurrentBalance($user->id);
-                    $logAmount = -abs($total_price);
-                    UserCoinLogHelper::log(
-                        $user->id,
-                        'pack',
-                        'packs',
-                        $logAmount ?? 0,
-                        $amountBefore ?? 0,
-                        $ware->name ?? 'special_id'
-                    );
                     DB::beginTransaction();
                     try {
                         $pack->expire += (now()->addDays($ware->expire)->timestamp * 86400);
@@ -70,16 +59,6 @@ class SpecialIdController extends Controller
             }
         }
 
-        $amountBefore =  Common::getCurrentBalance($user->id);
-        $logAmount = -abs($total_price);
-        UserCoinLogHelper::log(
-            $user->id,
-            'pack',
-            'packs',
-            $logAmount ?? 0,
-            $amountBefore ?? 0,
-            $ware->name ?? 'special_id'
-        );
         DB::beginTransaction();
         try {
             $arr['user_id']   = $user->id;
