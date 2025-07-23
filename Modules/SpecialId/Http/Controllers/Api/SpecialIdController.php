@@ -3,7 +3,6 @@
 namespace Modules\SpecialId\Http\Controllers\Api;
 
 
-use App\Helpers\UserCoinLogHelper;
 use App\Models\Pack;
 use App\Models\Ware;
 use App\Models\Config;
@@ -40,20 +39,11 @@ class SpecialIdController extends Controller
                 if ($ware->expire != 0) {
                     DB::beginTransaction();
                     try {
-                        $amountBefore = $user->di;
                         $pack->expire += (now()->addDays($ware->expire)->timestamp * 86400);
                         $pack->price += $total_price;
                         $user->decrement('di', $total_price);
                         $pack->save();
                         $user->save();
-                        UserCoinLogHelper::log(
-                            $user->id,
-                            'ware',
-                            'packs',
-                            $total_price,
-                            $amountBefore,
-                            $ware->name ?? 'special_id'
-                        );
                         DB::commit();
                         (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
                         return Common::apiResponse(1, 'success process');
@@ -71,7 +61,6 @@ class SpecialIdController extends Controller
 
         DB::beginTransaction();
         try {
-            $amountBefore = $user->di;
             $arr['user_id']   = $user->id;
             $arr['type']      = $ware->type;
             $arr['get_type']  = $ware->get_type;
@@ -83,14 +72,6 @@ class SpecialIdController extends Controller
             $arr['price']     = $total_price;
             $newPack = Pack::query()->create($arr);
             $user->decrement('di', $total_price);
-            UserCoinLogHelper::log(
-                $user->id,
-                'ware',
-                'packs',
-                $total_price,
-                $amountBefore,
-                $ware->name ?? 'special_id'
-            );
             DB::commit();
             (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
             return Common::apiResponse(1, 'success process');
