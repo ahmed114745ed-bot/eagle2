@@ -21,10 +21,25 @@ class HostDiamondController extends MainController
     public function index(Content $content)
     {
         checkAgencyFeature();
+        $this->arabicToEnglishDates();
 
         return parent::index($content
             ->title(trans('Host Diamond'))
             ->body($this->grid()));
+    }
+
+    public function arabicToEnglishDates()
+    {
+        if (request()->has('from_date')) {
+            request()->merge([
+                'from_date' => UserCommon::arabicToEnglishNumbers(request('from_date')),
+            ]);
+        }
+        if (request()->has('to_date')) {
+            request()->merge([
+                'to_date' => UserCommon::arabicToEnglishNumbers(request('to_date')),
+            ]);
+        }
     }
 
     /**
