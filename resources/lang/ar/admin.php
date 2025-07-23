@@ -439,6 +439,8 @@ return [
     "moments" => 'لحظات',
 
     "charge_level" => "مستوي الشحن",
+    'custom_img_image' => 'يجب أن يكون الملف صورة.',
+    'custom_img_mimes' => 'يسمح فقط بأنواع الصور: jpeg, png, jpg.',
 
 
 
