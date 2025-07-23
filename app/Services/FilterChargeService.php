@@ -73,9 +73,8 @@ class FilterChargeService
 
     public function bd($key): LengthAwarePaginator
     {
-        return User::query()->where(function ($query) use ($key) {
-            $query->where('id_bd', 1)
-                ->where(function ($query) use ($key){
+        return User::query()->where('id_bd', 1)->where(function ($query) use ($key) {
+            $query->where(function ($query) use ($key){
                     $query->where('name', 'like', '%' . $key . '%')
                         ->orWhere('uuid', 'like', '%' . $key . '%')
                         ->orWhere('id', 'like', '%' . $key . '%')
