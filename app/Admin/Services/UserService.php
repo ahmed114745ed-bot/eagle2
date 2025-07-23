@@ -72,7 +72,7 @@ class UserService
         text-decoration: none;
         color: inherit;
         transition: background-color 0.2s ease;
-    ' onmouseover=\"this.style.backgroundColor='#f0f0f0'\" >
+    ' >
         $image
         <div>
             <strong style='font-size: 16px;'>{$user->name}</strong><br>
