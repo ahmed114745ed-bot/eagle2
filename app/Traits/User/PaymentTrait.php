@@ -2,6 +2,8 @@
 
 namespace App\Traits\User;
 
+use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
 use App\Models\User;
 use App\Models\CoinLog;
@@ -42,6 +44,15 @@ trait PaymentTrait
                 'status'         => 1,
                 'trx'            => $orderId,
             ]);
+            $amountBefore = Common::getCurrentBalance($userId);
+            UserCoinLogHelper::log(
+                $userId,
+                'charge',
+                'user_charges',
+                $coins?->coin,
+                $amountBefore ?? 0,
+                'payment'
+            );
         }
 
         UserCommon::updateUserTotalCoins($userId, $coins->coin);

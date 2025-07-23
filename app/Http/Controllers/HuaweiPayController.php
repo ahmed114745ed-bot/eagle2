@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\UserCoinLogHelper;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Exception;
@@ -94,6 +95,15 @@ class HuaweiPayController
                     'status'=>1,
                     'trx'=>$orderId,
                 ]);
+                $amountBefore =  Common::getCurrentBalance($user_id);
+                UserCoinLogHelper::log(
+                    $user_id,
+                    'charge',
+                    'user_charges',
+                    $coins?->coin,
+                    $amountBefore ?? 0,
+                    'huawei_pay'
+                );
                 return Common::apiResponse(1, 'تم الاضافه بنجاح', $data, 200);
             }else{
                 return Common::apiResponse(0, 'تمت العمليه من قبل!', 200);

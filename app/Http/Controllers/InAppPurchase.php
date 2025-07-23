@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
 use App\Models\User;
 use App\Helpers\Common;
@@ -238,6 +239,15 @@ class InAppPurchase extends Controller
             'status'=>1,
             'trx'=>$request->order_id,
         ]);
+        $amountBefore = Common::getCurrentBalance($user->id);
+        UserCoinLogHelper::log(
+            $user->id,
+            'charge',
+            'user_charges',
+            $coins?->coin,
+            $amountBefore ?? 0,
+            'google_pay'
+        );
         return Common::apiResponse(1, 'تم الاضافه بنجاح', $data, 200);
     }
 }
