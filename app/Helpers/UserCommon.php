@@ -82,6 +82,20 @@ class UserCommon
         return $data;
     }
 
+    public static function getColoredName(User $user)
+    {
+        $ownerId = optional($user->senderShippingAgency->owner)->id;
+
+        if (!$ownerId) {
+            return '';
+        }
+
+        $hasColor  = Common::hasInPack($ownerId, 18, true);
+        $colorName = $hasColor ? Common::wareUserVip($ownerId, 18, 'color') ?? '' : '';
+
+        return $colorName;
+    }
+    
     public static function UserStatistic($userId, $type, bool $reals = false, \DateTime $startDate = null, \DateTime $endDate = null)
     {
         $timezone = getTimezone();
