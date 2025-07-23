@@ -304,7 +304,7 @@ class OvipGiftTapController extends MainController
 
             $form->keyValue('key_json', 'key_json');
 
-            if ($form->isEditing()){
+            // if ($form->isEditing()){
                 $form->select('image_type1', __('image_type'))->options(
                     [
                         'svga' => __('svga'),
@@ -315,7 +315,7 @@ class OvipGiftTapController extends MainController
 
                     ]
                 )->attribute(['id' => 'image_type1']);
-            }
+            // }
 
             $form->text('key', trans('key'));
             if (request('type') == 5 || ($form->isEditing() && $ware && ($ware->type == 5))) {
