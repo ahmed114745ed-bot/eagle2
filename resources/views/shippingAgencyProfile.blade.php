@@ -862,7 +862,6 @@
 
 </head>
 <body>
-
     <div class="agency-profile-container">
         <!-- Header Section -->
         <div class="agency-header">
@@ -1223,6 +1222,10 @@
                 <option value="">{{ __('Search') }}</option>
             </select>
 
+            <button class="btn btn-primary search-btn" data-tab="charges">
+                <i class="fas fa-search"></i> {{ __('Search') }}
+            </button>
+
             <button class="btn btn-secondary reset-filters" data-tab="charges">
                 <i class="fas fa-redo"></i> {{ __('Reset') }}
             </button>
@@ -1271,7 +1274,7 @@
                                             </div>
                                         </div>
                                 </td>
-                                <td>{{ '$' .$charge->usd ?? '-' }}</td>
+                                <td>{{ $charge->usd !== null ? '$' . number_format($charge->usd, 2) : 0 }}</td>
                                 <td>{{ $charge->amount ?? '-' }}</td>
                                 <td>{{ $charge->created_at }}</td>
                             </tr>
@@ -1306,6 +1309,10 @@
                 <option value="">{{ __('Search') }}</option>
             </select>
 
+            <button class="btn btn-primary search-btn" data-tab="resived">
+                <i class="fas fa-search"></i> {{ __('Search') }}
+            </button>
+
             <button class="btn btn-secondary reset-filters" data-tab="resived">
                 <i class="fas fa-redo"></i> {{ __('Reset') }}
             </button>
@@ -1339,21 +1346,20 @@
                                 <td>{{$index + 1}}</td>
                                 <td>{{ $res->id }}</td>
                                 <td>
-
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <img src="{{ $image }}" alt="user"
-                                                width="{{ $res->charger_type == 'agency' ? '50' : '40' }}"
-                                                height="40"
-                                                style="border-radius: {{ $res->charger_type == 'agency' ? '0' : '50%' }};">
-                                                 <div>
-                                                <strong> <a href="{{ $url }}" target="_blank" style="text-decoration: none; color: inherit;">
-                                                    {{ $sender['name'] }}
-                                                </a></strong><br>
-                                                <small>uuid: {{$sender['uuid'] }}</small>
-                                            </div>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <img src="{{ $image }}" alt="user"
+                                            width="{{ $res->charger_type == 'agency' ? '50' : '40' }}"
+                                            height="40"
+                                            style="border-radius: {{ $res->charger_type == 'agency' ? '0' : '50%' }};">
+                                             <div>
+                                            <strong> <a href="{{ $url }}" target="_blank" style="text-decoration: none; color: inherit;">
+                                                {{ $sender['name'] }}
+                                            </a></strong><br>
+                                            <small>uuid: {{$sender['uuid'] }}</small>
                                         </div>
+                                    </div>
                                 </td>
-                                <td>{{ '$' .$res->usd ?? '-' }}</td>
+                                <td>{{ $res->usd !== null ? '$' . number_format($res->usd, 2) : 0 }}</td>
                                 <td>{{ $res->amount ?? '-' }}</td>
                                 <td>{{ $res->created_at }}</td>
                             </tr>
@@ -1368,87 +1374,102 @@
     </div>
 </div>
 
+        </div>
+    </div>
+</body>
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
-            <script>
-                $(document).ready(function() {
-                    $('.reset-filters').on('click', function() {
-                        const tab = $(this).data('tab');
-                        const currentUrl = new URL(window.location.href);
-
-                        Array.from(currentUrl.searchParams.keys()).forEach(key => {
-                            if (key !== 'tab') {
-                                currentUrl.searchParams.delete(key);
-                            }
-                        });
-
-                        currentUrl.searchParams.set('tab', tab);
-
-                        window.location.href = currentUrl.toString();
-                    });
-
-                });
-            </script>
 <script>
-                $(document).ready(function() {
-                    $('.select2').select2({
-                        placeholder: "Search",
-                        allowClear: true,
-                        minimumInputLength: 1,
-                        ajax: {
-                            delay: 250,
-                            url: "{{ route('search.charges') }}",
-                            dataType: 'json',
-                            data: function(params) {
-                                return {
-                                    q: params.term,
-                                    type: $(this).parent().find('.form-control:first').val(),
-                                    page: params.page || 1
-                                };
-                            },
-                            processResults: function(data, params) {
-                                params.page = params.page || 1;
+    $(document).ready(function() {
+        $('.reset-filters').on('click', function() {
+            const tab = $(this).data('tab');
+            const currentUrl = new URL(window.location.href);
 
-                                return {
-                                    results: data.data.map(item => ({
-                                        id: item.id,
-                                        text: item.name
-                                    })),
-                                    pagination: {
-                                        more: data.current_page < data.last_page
-                                    }
-                                };
-                            },
-                            cache: true
+            Array.from(currentUrl.searchParams.keys()).forEach(key => {
+                if (key !== 'tab') {
+                    currentUrl.searchParams.delete(key);
+                }
+            });
+
+            currentUrl.searchParams.set('tab', tab);
+
+            window.location.href = currentUrl.toString();
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Search",
+            allowClear: true,
+            minimumInputLength: 1,
+            ajax: {
+                delay: 250,
+                url: "{{ route('search.charges') }}",
+                dataType: 'json',
+                data: function(params) {
+                    return {
+                        q: params.term,
+                        type: $(this).parent().find('.form-control:first').val(),
+                        page: params.page || 1
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+
+                    return {
+                        results: data.data.map(item => ({
+                            id: item.id,
+                            text: item.name
+                        })),
+                        pagination: {
+                            more: data.current_page < data.last_page
                         }
-                    });
+                    };
+                },
+                cache: true
+            }
+        });
 
-                    $('#receiver-type, #sender-type').on('change', function() {
-                        const idSelect = $(this).siblings('.select2');
-                        idSelect.val(null).trigger('change');
-                    });
+        $('#receiver-type, #sender-type').on('change', function() {
+            const idSelect = $(this).siblings('.select2');
+            idSelect.val(null).trigger('change');
+        });
 
-                    $('#receiver-id, #sender-id').on('select2:select', function(e) {
-                        const currentUrl = new URL(window.location.href);
-                        const type = $(this).siblings('select').val();
-                        const id = e.params.data.id;
+        // Remove the automatic search on select2:select event
 
-                        if ($(this).attr('id') === 'receiver-id') {
-                            currentUrl.searchParams.set('filter_by', type);
-                            currentUrl.searchParams.set('filter_id', id);
-                            currentUrl.searchParams.set('tab', 'charges');
-                        } else {
-                            currentUrl.searchParams.set('sender_type', type);
-                            currentUrl.searchParams.set('sender_id', id);
-                            currentUrl.searchParams.set('tab', 'resived');
-                        }
+        // Add click handler for search buttons
+        $('.search-btn').on('click', function() {
+            const tab = $(this).data('tab');
+            const currentUrl = new URL(window.location.href);
 
-                        window.location.href = currentUrl.toString();
-                    });
-                });
-            </script>
+            if (tab === 'charges') {
+                const type = $('#receiver-type').val();
+                const id = $('#receiver-id').val();
+
+                if (type && id) {
+                    currentUrl.searchParams.set('filter_by', type);
+                    currentUrl.searchParams.set('filter_id', id);
+                    currentUrl.searchParams.set('tab', 'charges');
+                }
+            } else {
+                const type = $('#sender-type').val();
+                const id = $('#sender-id').val();
+
+                if (type && id) {
+                    currentUrl.searchParams.set('sender_type', type);
+                    currentUrl.searchParams.set('sender_id', id);
+                    currentUrl.searchParams.set('tab', 'resived');
+                }
+            }
+
+            window.location.href = currentUrl.toString();
+        });
+    });
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
