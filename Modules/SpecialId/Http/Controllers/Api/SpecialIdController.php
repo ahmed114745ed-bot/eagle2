@@ -49,7 +49,7 @@ class SpecialIdController extends Controller
                         UserCoinLogHelper::log(
                             $user->id,
                             'ware',
-                            'special_id',
+                            'packs',
                             $total_price,
                             $amountBefore,
                             $ware->name ?? 'special_id'
@@ -71,6 +71,7 @@ class SpecialIdController extends Controller
 
         DB::beginTransaction();
         try {
+            $amountBefore = $user->di;
             $arr['user_id']   = $user->id;
             $arr['type']      = $ware->type;
             $arr['get_type']  = $ware->get_type;
@@ -82,6 +83,14 @@ class SpecialIdController extends Controller
             $arr['price']     = $total_price;
             $newPack = Pack::query()->create($arr);
             $user->decrement('di', $total_price);
+            UserCoinLogHelper::log(
+                $user->id,
+                'ware',
+                'packs',
+                $total_price,
+                $amountBefore,
+                $ware->name ?? 'special_id'
+            );
             DB::commit();
             (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
             return Common::apiResponse(1, 'success process');
