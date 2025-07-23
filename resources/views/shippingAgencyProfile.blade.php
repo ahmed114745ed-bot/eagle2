@@ -1403,20 +1403,23 @@
 
 <script>
     $(document).ready(function() {
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentTab = urlParams.get('tab') || 'charges';
 
-        // Enable Select2 with AJAX for user/agency search (if used for ids)
+        // Initialize Select2
         $('.select2').select2({
             placeholder: "Search",
             allowClear: true,
             minimumInputLength: 1,
             ajax: {
                 delay: 250,
-                url: "{{ route('search.charges') }}", // <--- update this if needed
+                url: "{{ route('search.charges') }}",
                 dataType: 'json',
                 data: function(params) {
                     return {
                         q: params.term,
-                        type: $(this).parent().find('.form-control:first').val(), // Picks up the selected type for filtering
+                        type: $(this).parent().find('.form-control:first').val(),
                         page: params.page || 1
                     };
                 },
@@ -1436,12 +1439,62 @@
             }
         });
 
-        // When type is changed, clear the id select
+        // Set initial values based on URL parameters
+        if (currentTab === 'charges') {
+            const filterBy = urlParams.get('filter_by');
+            const filterId = urlParams.get('filter_id');
+
+            if (filterBy) {
+                $('#receiver-type').val(filterBy);
+            }
+
+            if (filterId) {
+                // Make an AJAX call to get the name for the ID
+                $.ajax({
+                    url: "{{ route('search.charges') }}",
+                    data: {
+                        id: filterId,
+                        type: filterBy
+                    },
+                    success: function(response) {
+                        if (response.data && response.data.length > 0) {
+                            const option = new Option(response.data[0].name, filterId, true, true);
+                            $('#receiver-id').append(option).trigger('change');
+                        }
+                    }
+                });
+            }
+        } else if (currentTab === 'resived') {
+            const senderType = urlParams.get('sender_type');
+            const senderId = urlParams.get('sender_id');
+
+            if (senderType) {
+                $('#sender-type').val(senderType);
+            }
+
+            if (senderId) {
+                // Make an AJAX call to get the name for the ID
+                $.ajax({
+                    url: "{{ route('search.charges') }}",
+                    data: {
+                        id: senderId,
+                        type: senderType
+                    },
+                    success: function(response) {
+                        if (response.data && response.data.length > 0) {
+                            const option = new Option(response.data[0].name, senderId, true, true);
+                            $('#sender-id').append(option).trigger('change');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Rest of your existing code...
         $('#receiver-type, #sender-type').on('change', function() {
             $(this).siblings('.select2').val(null).trigger('change');
         });
 
-        // Handle search on button click for either tab
         $('.search-btn').on('click', function() {
             const tab = $(this).data('tab');
             const currentUrl = new URL(window.location.href);
@@ -1449,10 +1502,8 @@
             if (tab === 'charges') {
                 const type = $('#receiver-type').val();
                 const id = $('#receiver-id').val();
-                // If the type is present, set it, else remove if previously set
                 if(type) currentUrl.searchParams.set('filter_by', type);
                 else currentUrl.searchParams.delete('filter_by');
-                // Likewise for id
                 if(id) currentUrl.searchParams.set('filter_id', id);
                 else currentUrl.searchParams.delete('filter_id');
                 currentUrl.searchParams.set('tab', 'charges');
@@ -1468,7 +1519,7 @@
             window.location.href = currentUrl.toString();
         });
 
-        // Reset button ("clear" everything except the current tab)
+        // Reset filters
         $('.reset-filters').on('click', function() {
             const tab = $(this).data('tab');
             const currentUrl = new URL(window.location.href);
