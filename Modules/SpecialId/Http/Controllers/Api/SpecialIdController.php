@@ -40,18 +40,19 @@ class SpecialIdController extends Controller
                 if ($ware->expire != 0) {
                     DB::beginTransaction();
                     try {
-                        $amountBefore = $user->di;
                         $pack->expire += (now()->addDays($ware->expire)->timestamp * 86400);
                         $pack->price += $total_price;
                         $user->decrement('di', $total_price);
                         $pack->save();
                         $user->save();
+                        $amountBefore =  Common::getCurrentBalance($user->id);
+                        $logAmount = -abs($total_price);
                         UserCoinLogHelper::log(
                             $user->id,
-                            'ware',
+                            'pack',
                             'packs',
-                            $total_price,
-                            $amountBefore,
+                            $logAmount ?? 0,
+                            $amountBefore ?? 0,
                             $ware->name ?? 'special_id'
                         );
                         DB::commit();
@@ -71,7 +72,6 @@ class SpecialIdController extends Controller
 
         DB::beginTransaction();
         try {
-            $amountBefore = $user->di;
             $arr['user_id']   = $user->id;
             $arr['type']      = $ware->type;
             $arr['get_type']  = $ware->get_type;
@@ -83,12 +83,14 @@ class SpecialIdController extends Controller
             $arr['price']     = $total_price;
             $newPack = Pack::query()->create($arr);
             $user->decrement('di', $total_price);
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            $logAmount = -abs($total_price);
             UserCoinLogHelper::log(
                 $user->id,
-                'ware',
+                'pack',
                 'packs',
-                $total_price,
-                $amountBefore,
+                $logAmount ?? 0,
+                $amountBefore ?? 0,
                 $ware->name ?? 'special_id'
             );
             DB::commit();

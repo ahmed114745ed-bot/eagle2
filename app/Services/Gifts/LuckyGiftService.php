@@ -39,6 +39,7 @@ class LuckyGiftService
         $giftId   = $data['id'];
         $number   = $data['num'];
         $count    = $data['count'] ?? 1;
+        $amountBefore = $user->di;
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
@@ -92,14 +93,13 @@ class LuckyGiftService
         $total_user_win  = 0;
         $total_count_win = 0;
 
-        $amountBefore = $user->di;
         LogUserCoinProfit::dispatch(
             $user->id,
-            $user->di,
+            $amountBefore,
             -abs($totalPrice),
             'lucky_gift',
             'gift_logs',
-            $gift?->name
+            $gift?->name ?? $gift?->e_name
         )->onQueue('log_user_coin');
         
         
@@ -155,8 +155,6 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
-            $amountBefore = $user->di;
-
           
             $user->di -= $totalPrice;
             $index--;
@@ -168,6 +166,18 @@ class LuckyGiftService
         }
 
    
+        $cashbackBefore = $user->di;
+        if ($total_user_win > 0) {
+            LogUserCoinProfit::dispatch(
+                $userId,
+                $cashbackBefore,
+                $total_user_win,
+                'cashback',
+                'lucky_gifts',
+                'cashback'
+            )->onQueue('log_user_coin');
+        }
+        
 
         if ($index > 0) {
             $count -= $index;
@@ -633,25 +643,10 @@ class LuckyGiftService
      */
     public function updateUserCoins(int $userId, mixed $di, mixed $userCoins, int $toalDiamond, $senderLevel = null): void
     {
-
-        $difference = $di - $userCoins;
-        $amountBefore = Common::getCurrentBalance($userId);
-        LogUserCoinProfit::dispatch(
-            $userId,
-            $amountBefore,
-            $difference,
-            'cashback',
-            'lucky_gifts',
-            'cashback'
-        )->onQueue('log_user_coin');
-    
         $values = [
             'di'                 => \DB::raw('di + ' . ($di - $userCoins)),
             'total_diamond_send' => \DB::raw('total_diamond_send + ' . $toalDiamond)
         ];
-
-       
-
         if ($senderLevel) {
             $values['sender_level'] = $senderLevel;
         }

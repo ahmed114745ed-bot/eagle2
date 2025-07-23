@@ -1321,7 +1321,7 @@
 
                                 </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
-                                    
+
                                     <td>{{ $pack->getType() }}</td>
                                     <td>
                                         <img src="{{ getImagePath(@$path) }}" width="30" height="30"
@@ -1814,7 +1814,6 @@
 @if($activeTab == 'user-coins')
 
 <div class="tab-content" id="user-coins-tab" style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
-
     <div class="card">
     <div class="card-header">
             <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
@@ -1824,7 +1823,7 @@
                 <div class="card-body">
                     <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
                         <input type="hidden" name="tab" value="user-coins">
-                        <input type="hidden" name="tap" value="{{ request()->get('users-coins', 1) }}">
+                        <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
 
                         <div class="row mb-3" style="align-items: flex-end;">
                             <!-- From Date -->
@@ -1884,7 +1883,7 @@
                         <tbody style="color: rgb(208, 115, 43);">
                             @foreach($usersCoins as $index => $coin)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
                                     <td>{{ $coin->type }}</td>
                                     <td>{{ @$coin->sub_type ?? 0 }}</td>
                                     <td>{{ @$coin->item_name ?? '' }}</td>
@@ -1911,9 +1910,11 @@
                 @if($usersCoins)
                     <div class="pagination-container">
                         {{ $usersCoins->appends([
+                            'tab' => 'user-coins',
                             'pack_page' => $packs?->currentPage(),
                             'salary_page' => $salaries?->currentPage(),
                             'gift_page' => $giftSLogs?->currentPage(),
+                            'coins_page' => $usersCoins?->currentPage(),
                         ])->links('vendor.pagination.bootstrap-4') }}
                     </div>
                 @endif
@@ -2340,7 +2341,7 @@
         </div>
     </div>
 </div>
-  
+
 
 
 
@@ -2356,7 +2357,7 @@
                     <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body p-0">
-                            
+
                             <div class="p-4">
                                 <div class="row flex-evenly">
                                     <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
