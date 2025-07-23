@@ -1299,8 +1299,8 @@
             <select id="sender-type" class="form-control" style="width: 200px;">
                 <option value="">{{ __('Select type') }}</option>
                 <option value="user">{{ __('Users') }}</option>
-                <option value="agency">{{ __('Agencies') }}</option>
-                <option value="shipping_agencies">{{ __('Shipping Agencies') }}</option>
+                <option value="host_agency">{{ __('Agencies') }}</option>
+                <option value="agency">{{ __('Shipping Agencies') }}</option>
                 <option value="bd">{{ __('BD') }}</option>
                 <option value="dash">{{ __('admins') }}</option>
             </select>
