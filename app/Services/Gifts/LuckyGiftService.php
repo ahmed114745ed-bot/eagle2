@@ -39,6 +39,7 @@ class LuckyGiftService
         $giftId   = $data['id'];
         $number   = $data['num'];
         $count    = $data['count'] ?? 1;
+        $amountBefore = $user->di;
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
@@ -92,7 +93,6 @@ class LuckyGiftService
         $total_user_win  = 0;
         $total_count_win = 0;
 
-        $amountBefore = $user->di;
         LogUserCoinProfit::dispatch(
             $user->id,
             $amountBefore,
@@ -167,7 +167,7 @@ class LuckyGiftService
 
    
         $amountBefore = Common::getCurrentBalance($userId);
-        
+
         LogUserCoinProfit::dispatch(
             $userId,
             $amountBefore,
