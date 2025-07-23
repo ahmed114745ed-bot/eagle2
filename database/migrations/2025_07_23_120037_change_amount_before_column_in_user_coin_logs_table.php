@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_coin_logs', function (Blueprint $table) {
-            $table->decimal('amount_before', 45, 2);
-        });
+        if (!Schema::hasColumn('user_coin_logs', 'amount_before')) {
+            Schema::table('user_coin_logs', function (Blueprint $table) {
+                $table->decimal('amount_before', 45, 2)->nullable();
+            });
+        }
     }
 
     /**
