@@ -94,7 +94,35 @@ class ChargeAgencyController extends MainController
                     </a>";
         });
 
-//        $grid->column('agency.name',trans('name'));
+        $grid->column('agency.owner.name', trans('owner'))->display(function ($name) {
+            if (! $this->agency){
+                return ;
+            }
+            $uid = @$this->agency->owner->uuid;
+            $path = @$this->agency->owner->profile?->avatar;
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->agency->id, $url, 40, 40);
+            $showUrl = $this->agency->owner ? url("admin/users/{$this->agency->owner->id}") : 0;
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+
         $grid->column('agency.phone',trans('phone'));
         $grid->column('agency.image',trans ('image'))->image ('',30);
 
