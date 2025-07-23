@@ -3,15 +3,18 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Charge;
-use App\Models\CoinGameUser;
-use App\Models\UserLuckyGift;
 use Encore\Admin\Grid;
+
+use App\Models\CoinGameUser;
 use Encore\Admin\Layout\Content;
+use Modules\LuckyBox\Entities\UserLuckyGift;
 
 class CoinReportController extends MainController
 {
+     public $permission_name = 'user-coin-report';
     public function index(Content $content)
     {
+        
         return $content
             ->title("Reports")
             ->description("Charges")

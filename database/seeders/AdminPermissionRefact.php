@@ -144,6 +144,7 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'users', 'except' => [], 'additional' => ['level-switch', 'chang-agency-switch', 'charge-switch', 'invite-switch', 'can-Play-switch', 'kick-family-switch', 'kick-agency-switch', 'salary-switch', 'delete-profile-switch']],
                     ['key' => 'complaints', 'except' => [], 'additional' => []],
                     ['key' => 'user-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
+                    ['key' => 'user-coin-report', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
 
                 ],
             ],
