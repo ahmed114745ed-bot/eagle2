@@ -15,6 +15,8 @@ class VersionController extends Controller
 {
     public function versionAndCache(Request $request)
     {
+        $wapple = $this->isUpdated('wappel_frame_updated_at', @$request->wabbles_frame_time);
+
         $version = $request->version;
         $currentVersion  = settings()->get($request->OS == 'Huawei' ? 'huawei_current_version' : ($request->OS == 'IOS' ? 'ios_current_version' : 'android_current_version'));
 
@@ -45,7 +47,6 @@ class VersionController extends Controller
         $isEmojiUpdated = $this->isUpdated('emoji_updated_at', @$request->emoji_time);
         $isExtraUpdated = $this->isUpdated('extra_updated_at', @$request->extra_time);
         $agencyBadges =$this->isUpdated('badges_agency_update_at', @$request->badges_agency_time);
-        $wapple = $this->isUpdated('wappel_frame_updated_at', @$request->wabbles_frame_time);
         $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
         $reelSettings = Setting::where('key', 'reel_status')->first();
