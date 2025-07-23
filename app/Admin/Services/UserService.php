@@ -64,17 +64,47 @@ class UserService
         }
 
         return "
-    <a href='" . url("admin/users/{$user->id}") . "' style='text-decoration: none; color: inherit;'>
-        <div style='display: flex; align-items: center; gap: 10px;'>
-            $image
-            <div>
-                <strong>{$user->name}</strong><br>
-                <span style='font-size: smaller;'>UID: $uid</span><br>
-                <span style='font-size: smaller;'>special: $special</span><br>
-                $levelImages
-            </div>
+    <a href='" . url("admin/users/{$user->id}") . "' style='
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        text-decoration: none;
+        color: inherit;
+        background-color: #f9f9f9;
+        transition: background-color 0.2s ease;
+    ' onmouseover=\"this.style.backgroundColor='#f0f0f0'\" onmouseout=\"this.style.backgroundColor='#f9f9f9'\">
+        $image
+        <div>
+            <strong style='font-size: 16px;'>{$user->name}</strong><br>
+            <span style='font-size: 13px;'>
+                UID: <span id='uid-{$user->id}'>{$uid}</span>
+                <button onclick=\"event.preventDefault(); event.stopPropagation(); copyToClipboard('uid-{$user->id}')\" style='
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    margin-left: 5px;
+                    font-size: 13px;
+                    color: #007bff;
+                ' title='Copy UID'>📝</button>
+            </span><br>
+            <span style='font-size: 13px;'>Special: {$special}</span><br>
+            $levelImages
         </div>
     </a>
+
+    <script>
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId)?.textContent;
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('UID copied: ' + text);
+                });
+            }
+        }
+    </script>
 ";
     }
 
