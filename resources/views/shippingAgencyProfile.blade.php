@@ -1403,11 +1403,9 @@
 
 <script>
     $(document).ready(function() {
-        // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const currentTab = urlParams.get('tab') || 'charges';
 
-        // Initialize Select2
         $('.select2').select2({
             placeholder: "Search",
             allowClear: true,
@@ -1439,7 +1437,6 @@
             }
         });
 
-        // Set initial values based on URL parameters
         if (currentTab === 'charges') {
             const filterBy = urlParams.get('filter_by');
             const filterId = urlParams.get('filter_id');
@@ -1449,7 +1446,6 @@
             }
 
             if (filterId) {
-                // Make an AJAX call to get the name for the ID
                 $.ajax({
                     url: "{{ route('search.charges') }}",
                     data: {
@@ -1473,7 +1469,6 @@
             }
 
             if (senderId) {
-                // Make an AJAX call to get the name for the ID
                 $.ajax({
                     url: "{{ route('search.charges') }}",
                     data: {
@@ -1490,7 +1485,6 @@
             }
         }
 
-        // Rest of your existing code...
         $('#receiver-type, #sender-type').on('change', function() {
             $(this).siblings('.select2').val(null).trigger('change');
         });
@@ -1519,7 +1513,6 @@
             window.location.href = currentUrl.toString();
         });
 
-        // Reset filters
         $('.reset-filters').on('click', function() {
             const tab = $(this).data('tab');
             const currentUrl = new URL(window.location.href);
