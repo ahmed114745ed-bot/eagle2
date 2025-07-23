@@ -209,9 +209,11 @@ class BanController extends MainController
             //     ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
             $timezone = getTimezone();
 
-            $banExpiration = \Carbon\Carbon::parse($this->created_at, 'UTC')
-                ->setTimezone($timezone)
-                ->addHours($this->duration);
+            // Get raw UTC datetime
+            $createdAt = \Carbon\Carbon::parse($this->getAttributes()['created_at'], 'UTC');
+
+            // Use copy() to avoid mutating the Carbon object
+            $banExpiration = $createdAt->copy()->addHours($this->duration)->setTimezone($timezone);
 
             return now($timezone)->diffForHumans($banExpiration, true);
         });
