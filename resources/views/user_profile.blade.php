@@ -1214,8 +1214,9 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
-
+           @if ($user->type_user != 1)
+            <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
+           @endif
 
 
     </div>
@@ -1563,9 +1564,9 @@
                                         </td>
 
 
-                                        <td>{{$salary->sallary}}</td>
+                                        <td>{{truncateAndTrim($salary->sallary)}}</td>
                                         <td>{{ $salary->cut_amount}}</td>
-                                        <td>{{ $salary->sallary - $salary->cut_amount }}</td>
+                                        <td>{{ truncateAndTrim($salary->sallary - $salary->cut_amount) }}</td>
                                         <td>{{ $salary->days }}</td>
                                         <td>{{ $salary->hours }}</td>
                                         <td>
