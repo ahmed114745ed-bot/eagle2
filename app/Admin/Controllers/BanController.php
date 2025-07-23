@@ -241,7 +241,7 @@ class BanController extends MainController
             if ($hours >= 1) {
                 return "{$hours}h:{$minutes}m";
             } else {
-                return "{$minutes}". __('minute');
+                return "{$minutes}".' '. __('minute');
             }
         });
 
