@@ -19,7 +19,7 @@ use App\Helpers\Common;
 
 class SalariesController extends MainController
 {
-
+   public $permission_name = 'salary';
     public function index(Content $content)
     {
         return $content->title(trans('Sallaries'))->description(__(request('desc') ?: 'users'))->row(function ($row) {
