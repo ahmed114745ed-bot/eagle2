@@ -179,7 +179,10 @@ class BanController extends MainController
             return $locale === 'ar' ? $name_ar : $name_en;
         });
 
-        $grid->column('img', trans('image'))->image('', 30);
+        $grid->column('img', trans('image'))->display(function ($path) {
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
 
         $grid->device_number(__('device_number'));
         // $grid->staff_id(__('staff_id'));
@@ -228,7 +231,7 @@ class BanController extends MainController
             if ($hours >= 1) {
                 return "{$hours}h:{$minutes}m";
             } else {
-                return "{$minutes}".' '. __('minute');
+                return "{$minutes}" . ' ' . __('minute');
             }
         });
 
