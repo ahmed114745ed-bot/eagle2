@@ -462,6 +462,8 @@ class UserController extends MainController
 
     public function show($id, Content $content,)
     {
+        \Log::info('Request params', request()->all());
+
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
         $start = request('start_at');
@@ -550,11 +552,22 @@ class UserController extends MainController
             $query->whereDate('join_date', $joinDate);
         })->orderByDesc('id')->paginate(10, ['*'], 'user_agency_page');
 
+        \DB::enableQueryLog(); // Before the query
+
         $usersCoins = UserCoinLog::where('user_id', $id)
             ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
             ->when(request('to_date'), fn($q) => $q->whereDate('to_date', '<=', request('to_date')))
             ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
             ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
+
+        \Log::info('Users Coins Pagination', [
+            'current_page' => $usersCoins->currentPage(),
+            'last_page' => $usersCoins->lastPage(),
+            'total' => $usersCoins->total(),
+            'per_page' => $usersCoins->perPage(),
+            'count' => $usersCoins->count(),
+        ]);
+
         $countries = $this->countries();
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return  parent::show($id, $content->title(__('user profile'))
