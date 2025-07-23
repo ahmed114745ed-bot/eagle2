@@ -17,9 +17,10 @@
                     <th>{{__('receiver id')}}</th>
                     <th>{{__('type')}}</th>
                     <th>{{__('amount')}}</th>
+                    <th>{{__('coins')}}</th>
                     <th>{{__('date')}}</th>
-                    
-                   
+
+
                 </tr>
             </thead>
             <tbody>
@@ -34,9 +35,10 @@
                         <td>{{ $receiver['name'] }}</td>
                         <td>{{ $receiver['uuid'] }}</td>
                         <td>{{ $charge->user_type }}</td>
+                        <td>{{ $charge->usd !== null ? '$' . number_format($charge->usd, 2) : 0 }}</td>
                         <td>{{ $charge->amount }}</td>
                         <td>{{ $charge->created_at }}</td>
-                       
+
                 @endforeach
             </tbody>
         </table>

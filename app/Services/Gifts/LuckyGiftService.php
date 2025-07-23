@@ -91,6 +91,18 @@ class LuckyGiftService
         $price              = $coinsForReceiver * $receiversCount;
         $total_user_win  = 0;
         $total_count_win = 0;
+
+        $amountBefore = $user->di;
+        LogUserCoinProfit::dispatch(
+            $user->id,
+            $user->di,
+            -abs($totalPrice),
+            'lucky_gift',
+            'gift_logs',
+            $gift?->name
+        )->onQueue('log_user_coin');
+        
+        
         while ($user->di >= $totalPrice && $index > 0) {
 
             $appWallet->coins   += $price * 8;
@@ -107,16 +119,6 @@ class LuckyGiftService
 
                 $cashback_value = $cashback_percentage * $giftPrice * $number;
                 if ($cashback_percentage > 0) {
-
-                    $amountBefore = $user->di;
-                    LogUserCoinProfit::dispatchSync(
-                        $user->id,
-                        $amountBefore,
-                        $cashback_value,
-                        'cashback',
-                        'lucky_gifts',
-                        $gift?->name 
-                    );
 
                     $user->enableSaving = false;
                     $user->di           += $cashback_value;
@@ -155,14 +157,7 @@ class LuckyGiftService
             ];
             $amountBefore = $user->di;
 
-            LogUserCoinProfit::dispatchSync(
-                $user->id,
-                       $amountBefore,
-                -abs($totalPrice),
-                'lucky_gift',
-                'gift_logs',
-                $gift?->name 
-            );
+          
             $user->di -= $totalPrice;
             $index--;
             $message = null;
@@ -171,6 +166,8 @@ class LuckyGiftService
             $cashback_percentage = 0;
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
+
+   
 
         if ($index > 0) {
             $count -= $index;
@@ -636,10 +633,25 @@ class LuckyGiftService
      */
     public function updateUserCoins(int $userId, mixed $di, mixed $userCoins, int $toalDiamond, $senderLevel = null): void
     {
+
+        $difference = $di - $userCoins;
+        $amountBefore = Common::getCurrentBalance($userId);
+        LogUserCoinProfit::dispatch(
+            $userId,
+            $amountBefore,
+            $difference,
+            'cashback',
+            'lucky_gifts',
+            'cashback'
+        )->onQueue('log_user_coin');
+    
         $values = [
             'di'                 => \DB::raw('di + ' . ($di - $userCoins)),
             'total_diamond_send' => \DB::raw('total_diamond_send + ' . $toalDiamond)
         ];
+
+       
+
         if ($senderLevel) {
             $values['sender_level'] = $senderLevel;
         }

@@ -55,11 +55,15 @@ class WareObserver
             }
         }
 
+
+
         if ($ware->type == 5 && ($ware->isDirty('top') ||
             $ware->isDirty('left') ||
             $ware->isDirty('right') ||
             $ware->isDirty('bottom'))) {
-            settings()->set('bubble_frame_updated_at',  $timestamp);
+            settings()->set('bubble_frame_updated_at', $timestamp);
+        } elseif ($ware->type == 12 && ($ware->isDirty('key_json'))) {
+            settings()->set('wappel_frame_updated_at', $timestamp);
         }
 
 
