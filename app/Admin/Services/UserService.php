@@ -64,6 +64,7 @@ class UserService
         }
 
         return "
+    <a href='" . url("admin/users/{$user->id}") . "' style='text-decoration: none; color: inherit;'>
         <div style='display: flex; align-items: center; gap: 10px;'>
             $image
             <div>
@@ -73,7 +74,8 @@ class UserService
                 $levelImages
             </div>
         </div>
-    ";
+    </a>
+";
     }
 
 
