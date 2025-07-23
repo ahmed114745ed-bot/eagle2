@@ -89,8 +89,7 @@ class FilterChargeService
     public function admins($key): LengthAwarePaginator
     {
         return Admin::query()->where(function ($query) use ($key) {
-            $query->where('id_bd', 0)
-                ->where(function ($query) use ($key){
+            $query->where(function ($query) use ($key){
                     $query->where('name', 'like', '%' . $key . '%')
                         ->orWhere('id', 'like', '%' . $key . '%')
                         ->orWhere('username', 'like', '%' . $key . '%');
