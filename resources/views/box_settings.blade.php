@@ -189,7 +189,7 @@
                             <span class="help-block">{{ __('duration in seconds') }}</span>
                         </div>
 
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="lucky_box_percentage">{{ __('lucky box percentage') }}</label>
                             <input type="number" 
                                 id="lucky_box_percentage" 
@@ -198,7 +198,7 @@
                                 value="{{ $config['lucky_box_percentage'] ?? 20 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter lucky box percentage') }}" />
-                        </div>
+                        </div> --}}
 
                         <!-- Submit Button -->
                         <div class="form-group">

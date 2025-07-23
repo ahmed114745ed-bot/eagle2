@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\SpecialId\Http\Controllers\Api\SpecialIdController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +15,9 @@ use Illuminate\Http\Request;
 */
 
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan'])->group(function () {
-    Route::post('buy-special-id',[\Modules\SpecialId\Http\Controllers\Api\SpecialIdController::class,'buySpecialId']);
-    Route::post('use-special-id',[\Modules\SpecialId\Http\Controllers\Api\SpecialIdController::class,'usePackItem']);
-    Route::post('upload-special-id',[\Modules\SpecialId\Http\Controllers\Api\SpecialIdController::class,'upload_special_id']);
-    Route::get('special-frame',[\Modules\SpecialId\Http\Controllers\Api\SpecialIdController::class,'specialIdFrame']);
-    Route::get('special-users',[\Modules\SpecialId\Http\Controllers\Api\SpecialIdController::class,'specialUsers']);
+    Route::post('buy-special-id',[SpecialIdController::class,'buySpecialId']);
+    Route::post('use-special-id',[SpecialIdController::class,'usePackItem']);
+    Route::post('upload-special-id',[SpecialIdController::class,'upload_special_id']);
+    Route::get('special-frame',[SpecialIdController::class,'specialIdFrame']);
+    Route::get('special-users',[SpecialIdController::class,'specialUsers']);
 });
