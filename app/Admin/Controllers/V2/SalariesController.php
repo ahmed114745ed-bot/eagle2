@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers\V2;
 
+use App\Admin\Services\UserService;
+use Encore\Admin\Facades\Admin;
 use Exception;
 use App\Models\User;
 use function request;
@@ -45,17 +47,19 @@ class SalariesController extends MainController
         $grid->column('id', __('id'));
         $grid->column('agency', __('agency'))->display(function () { return @$this->agency->name; });
         // $grid->column ('uuid',__ ('uuid'));
-        $grid->column('name', __('name'));
+        $grid->column('name', __('name'))->display(fn($f) => app(UserService::class)->adminUserAvatar($this));
         $grid->column('old_usd', __('old usd'));
         $grid->column('target_usd', __('target usd'));
         $grid->column('target_token_usd', __('target token usd'));
         $grid->column('due', __('due'))->display(function () {
             return $this->old_usd + $this->target_usd - $this->target_token_usd;
         });
-        $grid->column('cashing', __('cashing'))->display(function () {
-            $options = ['user' => __('user')];
-            return (new SalariesAction($this->id, 'user'))->render();
-        });
+        if (Admin::user()->isRole('developer') || Admin::user()->isRole('admin')) {
+            $grid->column('cashing', __('cashing'))->display(function () {
+                $options = ['user' => __('user')];
+                return (new SalariesAction($this->id, 'user'))->render();
+            });
+        }
 
         $grid->export(function ($export) {
             $export->filename('report');
@@ -116,21 +120,23 @@ class SalariesController extends MainController
                     });
                 }, __('User'))->placeholder(__('Search by UUID'));
             });
-            
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
             });
         });
         $grid->column('id', __('id'));
         $grid->column('uuid', __('uuid'));
-        $grid->column('name', __('name'));
+        $grid->column('name', __('name'))->display(fn($f) => app(UserService::class)->adminUserAvatar($this, withoutLevels: true));
         $grid->column('total', __('salary'))->default(0);
 //        $grid->column('cashing', __('cashing'))->display(function () {
 //            return (new SalariesAction($this->id, 'user'))->render();
 //        });
-        $grid->column('pay', __('pay'))->display(function () {
-            return (new PaySalariesAction($this->id, 'user',$this->salary))->render();
-        });
+        if (Admin::user()->isRole('developer') || Admin::user()->isRole('admin')) {
+            $grid->column('pay', __('pay'))->display(function () {
+                return (new PaySalariesAction($this->id, 'user', $this->salary))->render();
+            });
+        }
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=0') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
 

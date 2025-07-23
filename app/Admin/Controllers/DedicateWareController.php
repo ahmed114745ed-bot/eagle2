@@ -5,17 +5,14 @@ namespace App\Admin\Controllers;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
-//use Encore\Admin\Admin;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Admin\Actions\DedicateAction;
+use Encore\Admin\Widgets\Box;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Row;
 
 class DedicateWareController extends MainController
 {
@@ -24,11 +21,35 @@ class DedicateWareController extends MainController
 
     public function index(Content $content)
     {
+        session(['last_ware_type' => request()->get('type', 1)]);
         return parent::index($content
             ->title(trans('Gift from the store'))
-            ->body($this->grid()));
+            ->row(function (Row $row) {
+                $row->column(12, $this->tabsComponent());
+            })
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid());
+            }));
     }
+    private function tabsComponent()
+    {
+        $content = new Row();
 
+        // Define your type mapping
+        $typeMap = SELECTED_USED_WARE;
+
+        $types =  collect($typeMap);
+        $currentType = request()->get('type', $types->keys()->first());
+
+        $box = new Box(content: view('admin.grid.Form.wareTables', [
+            'types' => $types,
+            'currentType' => $currentType
+        ]));
+
+        $content->column(12, $box);
+
+        return $content;
+    }
     /**
      * Show interface.
      *
@@ -70,12 +91,13 @@ class DedicateWareController extends MainController
      */
     protected function grid()
     {
+        $type = request()->get('type', 4);
         $typeSpecial = false;
 
         $grid = new Grid(new Ware);
         $grid->model()->orderByDesc('created_at');
 
-        $grid->model()->where('get_type', 4)->where('type', '!=', 25);
+        $grid->model()->where('type',  $type)->where('get_type', 4)->where('type', '!=', 25);
 
         $grid->id('ID');
         $grid->column('name', __('name'));
