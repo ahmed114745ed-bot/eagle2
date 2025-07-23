@@ -417,19 +417,19 @@ class OvipGiftTapController extends MainController
 
             $id = $form->model()->id;
 
-            $exists = Ware::where('level', $form->model()->level)
-                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
-                    $query->where('id', "!=", $id);
-                })->exists();
+            // $exists = Ware::where('level', $form->model()->level)
+            //     ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
+            //         $query->where('id', "!=", $id);
+            //     })->exists();
 
-            if ($exists) {
-                $error = new \Illuminate\Support\MessageBag([
-                    'title' => 'Error',
-                    'message' => __('This level and type combination already exists'),
-                ]);
+            // if ($exists) {
+            //     $error = new \Illuminate\Support\MessageBag([
+            //         'title' => 'Error',
+            //         'message' => __('This level and type combination already exists'),
+            //     ]);
 
-                return back()->with(compact('error'));
-            }
+            //     return back()->with(compact('error'));
+            // }
             if (request('type') != 18 && request('type') != 21) {
                 $isEditing = $form->isEditing();
 
