@@ -9,6 +9,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Cache;
 use Modules\SalaryTransaction\Entities\ChargeAgency as EntitiesChargeAgency;
 
 class ChargeAgencyController extends MainController
@@ -63,7 +64,34 @@ class ChargeAgencyController extends MainController
         $grid = new Grid(new EntitiesChargeAgency());
 
         $grid->id(__('ID'));
-        $grid->column('agency.name',trans('name'));
+        $grid->column('agency.name', __('Agency'))->display(function ($name) {
+            $cacheKey = "agency_image_{$this->agency->id}";
+            $image = Cache::remember($cacheKey, 3600, function () {
+                $path = @$this->agency->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                return handleShowImageWithTypes($this->agency->id, $url, 40, 40, 0);
+            });
+
+            $profileUrl = route('admin.agency.profile', ['id' => $this->agency->id]);
+
+            return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            {$image}
+                            <div style='display: flex; flex-direction: column;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='font-size: smaller;'>ID: {$this->agency->id}</span>
+                            </div>
+                        </div>
+                    </a>";
+        });
+
+//        $grid->column('agency.name',trans('name'));
         $grid->column('agency.phone',trans('phone'));
         $grid->column('agency.image',trans ('image'))->image ('',30);
 
