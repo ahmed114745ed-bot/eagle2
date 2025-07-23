@@ -1400,26 +1400,28 @@
 
     });
 </script>
+
 <script>
     $(document).ready(function() {
+
+        // Enable Select2 with AJAX for user/agency search (if used for ids)
         $('.select2').select2({
             placeholder: "Search",
             allowClear: true,
             minimumInputLength: 1,
             ajax: {
                 delay: 250,
-                url: "{{ route('search.charges') }}",
+                url: "{{ route('search.charges') }}", // <--- update this if needed
                 dataType: 'json',
                 data: function(params) {
                     return {
                         q: params.term,
-                        type: $(this).parent().find('.form-control:first').val(),
+                        type: $(this).parent().find('.form-control:first').val(), // Picks up the selected type for filtering
                         page: params.page || 1
                     };
                 },
                 processResults: function(data, params) {
                     params.page = params.page || 1;
-
                     return {
                         results: data.data.map(item => ({
                             id: item.id,
@@ -1434,14 +1436,12 @@
             }
         });
 
+        // When type is changed, clear the id select
         $('#receiver-type, #sender-type').on('change', function() {
-            const idSelect = $(this).siblings('.select2');
-            idSelect.val(null).trigger('change');
+            $(this).siblings('.select2').val(null).trigger('change');
         });
 
-        // Remove the automatic search on select2:select event
-
-        // Add click handler for search buttons
+        // Handle search on button click for either tab
         $('.search-btn').on('click', function() {
             const tab = $(this).data('tab');
             const currentUrl = new URL(window.location.href);
@@ -1449,28 +1449,41 @@
             if (tab === 'charges') {
                 const type = $('#receiver-type').val();
                 const id = $('#receiver-id').val();
-
-                if (type && id) {
-                    currentUrl.searchParams.set('filter_by', type);
-                    currentUrl.searchParams.set('filter_id', id);
-                    currentUrl.searchParams.set('tab', 'charges');
-                }
+                // If the type is present, set it, else remove if previously set
+                if(type) currentUrl.searchParams.set('filter_by', type);
+                else currentUrl.searchParams.delete('filter_by');
+                // Likewise for id
+                if(id) currentUrl.searchParams.set('filter_id', id);
+                else currentUrl.searchParams.delete('filter_id');
+                currentUrl.searchParams.set('tab', 'charges');
             } else {
                 const type = $('#sender-type').val();
                 const id = $('#sender-id').val();
-
-                if (type && id) {
-                    currentUrl.searchParams.set('sender_type', type);
-                    currentUrl.searchParams.set('sender_id', id);
-                    currentUrl.searchParams.set('tab', 'resived');
-                }
+                if(type) currentUrl.searchParams.set('sender_type', type);
+                else currentUrl.searchParams.delete('sender_type');
+                if(id) currentUrl.searchParams.set('sender_id', id);
+                else currentUrl.searchParams.delete('sender_id');
+                currentUrl.searchParams.set('tab', 'resived');
             }
+            window.location.href = currentUrl.toString();
+        });
 
+        // Reset button ("clear" everything except the current tab)
+        $('.reset-filters').on('click', function() {
+            const tab = $(this).data('tab');
+            const currentUrl = new URL(window.location.href);
+
+            Array.from(currentUrl.searchParams.keys()).forEach(key => {
+                if (key !== 'tab') {
+                    currentUrl.searchParams.delete(key);
+                }
+            });
+
+            currentUrl.searchParams.set('tab', tab);
             window.location.href = currentUrl.toString();
         });
     });
 </script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
