@@ -167,15 +167,16 @@ class LuckyGiftService
 
    
         $amountBefore = Common::getCurrentBalance($userId);
-
-        LogUserCoinProfit::dispatch(
-            $userId,
-            $amountBefore,
-            $total_user_win,
-            'cashback',
-            'lucky_gifts',
-            'cashback'
-        )->onQueue('log_user_coin');
+        if($total_count_win > 0){
+            LogUserCoinProfit::dispatch(
+                $userId,
+                $amountBefore,
+                $total_user_win,
+                'cashback',
+                'lucky_gifts',
+                'cashback'
+            )->onQueue('log_user_coin');
+        }
 
         if ($index > 0) {
             $count -= $index;
