@@ -98,6 +98,32 @@ class UserChargeReportController extends MainController
             });
         });
 
+        Admin::script(<<<JS
+            $(document).ready(function() {
+                $('.form-control[id$="_date"]').datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+
+            $(document).on('pjax:complete', function() {
+                $('.form-control[id$="_date"]').datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+
+            var observer = new MutationObserver(function(mutations) {
+                $('.form-control[id$="_date"]').datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        JS
+        );
+
         Admin::script('
         $(document).on("click", ".submit", function () {
             setTimeout(function() {
@@ -199,31 +225,35 @@ class UserChargeReportController extends MainController
         });
 
         $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
-            $reason = ChargeInvoice::where('charge_id', $this->id)->first(); // get the first model from collection
+            $reason = ChargeInvoice::where('charge_id', $this->id)->first();
 
             if (!$reason) {
-                return new \Encore\Admin\Widgets\Table(
-                    [__('Field Name'), __('Value')],
-                    [[__('No reasons available'), '-']]
-                );
+                return "<table class='table'><tr><td>".__('No reasons available')."</td><td>-</td></tr></table>";
             }
 
+            Admin::style(<<<CSS
+                .modal-reason-table td {
+                    max-width: 300px;
+                    word-wrap: break-word;
+                    white-space: pre-wrap;
+                    padding: 10px;
+                }
+                CSS
+            );
 
             $img = getDriverUrl() . '/' . $reason->invoice;
-            $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
+            $imgHtml = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail' />";
 
+            $html = "<table class='table modal-reason-table'>";
+            $html .= "<tr><td>".__('Reason')."</td><td>" . htmlspecialchars(
+                    app()->getLocale() === 'en'
+                        ? ($reason->reason_en ?? $reason->reason_ar)
+                        : ($reason->reason_ar ?? $reason->reason_en)
+                ) . "</td></tr>";
+            $html .= "<tr><td>".__('Invoice')."</td><td>" . $imgHtml . "</td></tr>";
+            $html .= "</table>";
 
-            $results = [
-                __('Reason') => app()->getLocale() === 'en'
-                    ? ($reason->reason_en ?? $reason->reason_ar)
-                    : ($reason->reason_ar ?? $reason->reason_en),
-                __('Invoice') =>$img,
-            ];
-
-            return new \Encore\Admin\Widgets\Table(
-                [__('Field Name'), __('Value')],
-                collect($results)->map(fn($v, $k) => [$k, $v])->values()->all()
-            );
+            return $html;
         });
 
         $grid->column('created_at', __('shipping date'));

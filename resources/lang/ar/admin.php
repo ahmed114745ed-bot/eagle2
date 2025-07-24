@@ -429,9 +429,9 @@ return [
     "webhook_id" => "معرف ويب هوك",
 
     "target_no" => 'رقم الهدف',
-    "diamonds" => 'هدف الألماس',
-    "usd" => 'دولار',
-    "agency_share" => 'راتب الوكلاء',
+    "diamonds" => ' الماس',
+    "usd" => 'راتب المضيف ',
+    "agency_share" => 'نسبه الوكالة',
     "db_percentage" => 'نسبة BD',
     "hours" => 'ساعات',
     "days" => 'أيام',
@@ -439,6 +439,8 @@ return [
     "moments" => 'لحظات',
 
     "charge_level" => "مستوي الشحن",
+    'custom_img_image' => 'يجب أن يكون الملف صورة.',
+    'custom_img_mimes' => 'يسمح فقط بأنواع الصور: jpeg, png, jpg.',
 
 
 

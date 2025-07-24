@@ -395,9 +395,9 @@ class EnteranceRoomServices
     ///////////////////////////////
 
 
-    public function enterRoom($user, $request, $room_pass, $owner_id)
+    public function enterRoom($user, $request, $room_pass, Room $room)
     {
-
+        $owner_id = $room->uid;
         if ($request->type == 'random') {
             $owner_id = $this->roomRepository->randomOwner();
         }
@@ -406,12 +406,10 @@ class EnteranceRoomServices
         if (!$owner_id) return Common::apiResponse(0, 'not found', null, 404);
         //check if this user in black-list
         $black_list = Common::getUserBlackListInRoom($owner_id, $user->id);
-        if ($black_list) return Common::apiResponse(false, __('You have been blocked by the other party'), null, 423);
+        if ($black_list) return Common::apiResponse(false, __('You have been blocked by the other party'), null, 422);
 
 
-        // get room by owner_id
-        $room = $this->roomRepository->findRoomUser($owner_id, false);
-        if (!$room) return Common::apiResponse(false, 'No room yet, please create first', null, 404);
+        if (!$room)return Common::apiResponse (false,'No room yet, please create first',null,404);
         // if(($room->count_room_socket == 0 ) && $room->uid != $user_id && $room->pin != 1 )return Common::apiResponse(false, __('api_responses.closedRoom'), null, 402);
         if ($room->room_status == 2) {
             return Common::apiResponse(0, __('room_closed'));

@@ -97,8 +97,8 @@ class BanController extends MainController
 
         $grid->model()->whereHas('user')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
-            ->select($reason, 'uid', 'duration', 'type', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
-            ->groupBy([$reason, 'uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id'])->orderByDesc('created_at');
+            ->select($reason, 'uid', 'duration', 'type', 'img', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
+            ->groupBy([$reason, 'uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id','img'])->orderByDesc('created_at');
         //    $grid->id(__ ('ID'));
         // $grid->uid(__('uuid'));
         //        $grid->user_type(__('user_type'));
@@ -203,12 +203,35 @@ class BanController extends MainController
                     </div>";
         });
 
+
         $grid->column('created_at', __('expire'))->display(function () {
-            // \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
-            //     ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
-            $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
-            return now()->diffForHumans($banExpiration, true);
+            $timezone = getTimezone();
+
+            // Get raw UTC datetime
+            $createdAt = \Carbon\Carbon::parse($this->getAttributes()['created_at'], 'UTC');
+
+            // Add ban duration and convert to user's timezone
+            $banExpiration = $createdAt->addHours($this->duration)->setTimezone($timezone);
+
+            $now = now($timezone);
+
+            // Get total remaining minutes
+            $diffInMinutes = $now->diffInMinutes($banExpiration, false);
+
+            if ($diffInMinutes <= 0) {
+                return 'منتهي'; // Expired
+            }
+
+            $hours = floor($diffInMinutes / 60);
+            $minutes = $diffInMinutes % 60;
+
+            if ($hours >= 1) {
+                return "{$hours}h:{$minutes}m";
+            } else {
+                return "{$minutes}" . ' ' . __('minute');
+            }
         });
+
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('delete', __('Delete'))->display(function () {
                 $deleteLabel = __('Delete');

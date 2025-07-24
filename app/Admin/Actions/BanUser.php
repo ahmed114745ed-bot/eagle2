@@ -208,11 +208,21 @@ class BanUser extends Action
 
     public function form()
     {
-        $this->text('uuid', __('uuid'));
+        $this->text('uuid', __('uuid'))->rules('required');
         $this->integer('duration', __('duration(hours)'))->rules('required|max:6');
-        $this->text('description_ar', __('Enter the reason for the ban(arabic)'))->rules('required');
-        $this->text('description_en', __('Enter the reason for the ban(english)'));
-        $this->image('img', __('img'));
+        $this->text('description_ar', __('Enter the reason for the ban(arabic)'))
+            ->rules(['required', 'string', 'max:255']);
+
+        $this->text('description_en', __('Enter the reason for the ban(english)'))
+            ->rules(['nullable', 'string', 'max:255']);
+
+        $this->image('img', __('img'))
+            ->rules(['nullable', 'image', 'mimes:jpeg,png,jpg',])
+            ->setValidationMessages('img', [
+                'image' => __('admin.custom_img_image'),
+                'mimes' => __('admin.custom_img_mimes'),
+            ]);
+
         $this->checkbox('type', __('type'))->options([
             'normal' => __('normal'),
             'ip' => __('ip'),

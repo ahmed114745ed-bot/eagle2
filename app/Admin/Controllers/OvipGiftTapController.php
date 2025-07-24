@@ -350,7 +350,7 @@ class OvipGiftTapController extends MainController
 
                 if (($form->show_img instanceof UploadedFile)) {
 
-                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
+                    $allowedExtensions = ['svga', 'svg' ,'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm',];
 
                     $ext = strtolower($form->show_img->guessExtension());
 
@@ -365,7 +365,7 @@ class OvipGiftTapController extends MainController
 
                 if ($form->img2 instanceof UploadedFile) {
 
-                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
+                    $allowedExtensions = ['svga','svg', 'mp4', 'alpha', 'vap', 'png'];
 
                     $ext = strtolower($form->img2->guessExtension());
                     $originalExt = strtolower($form->img2->getClientOriginalExtension());
@@ -417,19 +417,19 @@ class OvipGiftTapController extends MainController
 
             $id = $form->model()->id;
 
-            $exists = Ware::where('level', $form->model()->level)
-                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
-                    $query->where('id', "!=", $id);
-                })->exists();
+            // $exists = Ware::where('level', $form->model()->level)
+            //     ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
+            //         $query->where('id', "!=", $id);
+            //     })->exists();
 
-            if ($exists) {
-                $error = new \Illuminate\Support\MessageBag([
-                    'title' => 'Error',
-                    'message' => __('This level and type combination already exists'),
-                ]);
+            // if ($exists) {
+            //     $error = new \Illuminate\Support\MessageBag([
+            //         'title' => 'Error',
+            //         'message' => __('This level and type combination already exists'),
+            //     ]);
 
-                return back()->with(compact('error'));
-            }
+            //     return back()->with(compact('error'));
+            // }
             if (request('type') != 18 && request('type') != 21) {
                 $isEditing = $form->isEditing();
 
@@ -507,7 +507,7 @@ class OvipGiftTapController extends MainController
         $alert = !$type;
 
         // Inject JS to set type param on first load
-        if (!request()->has('type') && $privilegeTypes->isNotEmpty()) {
+        if (!request()->has('type') && $privilegeTypes?->isNotEmpty()) {
             $firstType = $privilegeTypes->keys()->first();
 
             \Encore\Admin\Admin::script(<<<SCRIPT

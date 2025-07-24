@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
 use DB;
-use Illuminate\Database\Eloquent\Builder;
+use Modules\LuckyBox\Entities\BoxUse;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Modules\LuckyBox\Traits\RoomBoxes;
 
 /**
  * @method static withoutAppends()
@@ -15,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class Room extends Model
 {
     use TimestampsWithTimezone;
+    use RoomBoxes;
 
     /*
  * To enable and disable observer saving and updating methods

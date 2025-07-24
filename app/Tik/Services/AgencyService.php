@@ -140,6 +140,7 @@ class AgencyService
             ->groupBy(\DB::raw('date(created_at)'))
             ->limit(31)->sum('hours');
         $minutes = $hours * 60;
+        $hasColor = Common::hasInPack(@$user->id, 18, true);
 
 
         return [
@@ -152,6 +153,7 @@ class AgencyService
                     'minutes' => $minutes,
                     'image_color'          => @$user->color_image,
                     'id_image'             => @$user->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip(@$user->id, 18, 'color') ?? '' : '',
                 ],
 
                 'target' => floor($target),
@@ -652,8 +654,6 @@ class AgencyService
 
     public function dailyReport($user, $month, $year, $agencyId = null)
     {
-
-
         $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
         $joinedAgency = $member ??  $owner;

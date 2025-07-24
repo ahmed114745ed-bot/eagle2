@@ -54,6 +54,18 @@ class PaySalariesAction extends Action
                         'pending_dollar' => DB::raw("pending_dollar - $amount")
                     ]
                 );
+                SalaryTrx::query()->create(
+                    [
+                        'type' => 0,
+                        'oid' => $user->id,
+                        'amount' => -($amount ?: $user->salary),
+                        't_no' => rand(11111111, 99999999),
+                        'note' => 'paid via admin',
+                        'payer_id' => auth()->id(),
+                        'payer_type' => 0,
+                        'transaction_type'=> 'decrement'
+                    ]
+                );
 
             }elseif ( $request->type == "agency") {
                 $agency = Agency::findOrFail(\request('id'));
@@ -74,13 +86,19 @@ class PaySalariesAction extends Action
             }
 
 
-            UsdTransfer::create([
-                "admin_id"  => auth()->user()->id,
-                "user_id"   => $userId,
-                "agency_id" => $agencyId,
-                "user_type" => \request('type') == 'agency' ? 1 : 0,
-                "value"     => $amount
-            ]);
+
+                SalaryTrx::query()->create(
+                    [
+                        'type' => 1,
+                        'oid' => $agency->id,
+                        'amount' => -$amount,
+                        't_no' => rand(11111111, 99999999),
+                        'note' => 'paid via admin',
+                        'payer_id' => auth()->id(),
+                        'payer_type' => 0
+                    ]
+                );
+
 
             DB::commit();
         } catch (\Exception $exception) {

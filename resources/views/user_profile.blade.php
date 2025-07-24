@@ -941,7 +941,7 @@
             }
 
             .card-target-filter-phone .form-control {
-                display: block;
+                /* display: block; */
                 width: 89%;
                 padding: 6px 12px;
                 font-size: 14px;
@@ -1081,6 +1081,22 @@
 <body>
 
 <div class="agency-profile-container">
+     {{-- Error Messages --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger mx-3 mt-3">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if ($errors->has('msg'))
+                        <div class="alert alert-danger mx-3 mt-3">
+                            {{ $errors->first('msg') }}
+                        </div>
+                    @endif
     <!-- Header Section -->
     <div class="agency-header">
         <div class="agency-avatar">
@@ -1158,9 +1174,19 @@
 
             </div>
         </div>
-        <button class="btn-back" onclick="window.location.href='{{ url('admin/users') }}'">
-            <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
-        </button>
+        <div class="card p-3 bg-danger-subtle">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url('admin/users/' . $user->id . '/edit') }}" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
+                </a>
+                     @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+
+                        <button type="submit" class="btn btn-danger edit_user_item_model_btn">
+                            {{ __('edit') }}
+                        </button>
+                 @endif
+            </div>
+        </div>
     </div>
 
 
@@ -1173,7 +1199,8 @@
 
           <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
 
-        <a href="?tab=vips" class="tab-btn" data-target="vips-tab">{{ __('vips') }}</a>
+        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}" data-target="vips-tab">{{ __('vips') }}</a>
+
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
@@ -1187,8 +1214,9 @@
            <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
            <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
-
+           @if ($user->type_user != 1)
+            <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
+           @endif
 
 
     </div>
@@ -1293,7 +1321,7 @@
 
                                 </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
-                                    <td>{{ $pack->getTypeGet() }}</td>
+
                                     <td>{{ $pack->getType() }}</td>
                                     <td>
                                         <img src="{{ getImagePath(@$path) }}" width="30" height="30"
@@ -1336,7 +1364,7 @@
 
 
     <!-- vips Section -->
-    <div class="tab-content" id="vips-tab">
+    <div class="tab-content" id="vips-tab" style="{{ $activeTab == 'vips' ? '' : 'display: none;' }}">
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
@@ -1383,9 +1411,8 @@
                     @if($userVips)
                         <div class="pagination-container">
                             {{ $userVips->appends([
-                                'pack_page' => $packs?->currentPage(),
-                                'salary_page' => $salaries?->currentPage(),
-                                'gift_page' => $giftSLogs?->currentPage(),
+                                'tab' => 'vips',
+                                 'vip_page' => $userVips->currentPage(),
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
                     @endif
@@ -1537,9 +1564,9 @@
                                         </td>
 
 
-                                        <td>{{$salary->sallary}}</td>
+                                        <td>{{truncateAndTrim($salary->sallary)}}</td>
                                         <td>{{ $salary->cut_amount}}</td>
-                                        <td>{{ $salary->sallary - $salary->cut_amount }}</td>
+                                        <td>{{ truncateAndTrim($salary->sallary - $salary->cut_amount) }}</td>
                                         <td>{{ $salary->days }}</td>
                                         <td>{{ $salary->hours }}</td>
                                         <td>
@@ -1787,7 +1814,6 @@
 @if($activeTab == 'user-coins')
 
 <div class="tab-content" id="user-coins-tab" style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
-
     <div class="card">
     <div class="card-header">
             <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
@@ -1797,7 +1823,7 @@
                 <div class="card-body">
                     <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
                         <input type="hidden" name="tab" value="user-coins">
-                        <input type="hidden" name="tap" value="{{ request()->get('users-coins', 1) }}">
+                        <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
 
                         <div class="row mb-3" style="align-items: flex-end;">
                             <!-- From Date -->
@@ -1850,14 +1876,14 @@
                             <th>{{ __('balance yet') }}</th>
                             <th>{{ __('from date') }}</th>
                             <th>{{ __('to date') }}</th>
-                            <th>{{ __('action') }}</th>
+                            <!-- <th>{{ __('action') }}</th> -->
                         </tr>
                     </thead>
                     @if($usersCoins && $usersCoins->count())
                         <tbody style="color: rgb(208, 115, 43);">
                             @foreach($usersCoins as $index => $coin)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
                                     <td>{{ $coin->type }}</td>
                                     <td>{{ @$coin->sub_type ?? 0 }}</td>
                                     <td>{{ @$coin->item_name ?? '' }}</td>
@@ -1870,9 +1896,9 @@
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
                                     <td>
                                         <div class="d-flex">
-                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$coin->id }}">
+                                            <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </td>
                                 </tr>
@@ -1884,9 +1910,11 @@
                 @if($usersCoins)
                     <div class="pagination-container">
                         {{ $usersCoins->appends([
+                            'tab' => 'user-coins',
                             'pack_page' => $packs?->currentPage(),
                             'salary_page' => $salaries?->currentPage(),
                             'gift_page' => $giftSLogs?->currentPage(),
+                            'coins_page' => $usersCoins?->currentPage(),
                         ])->links('vendor.pagination.bootstrap-4') }}
                     </div>
                 @endif
@@ -2221,24 +2249,24 @@
                                         <span>{{ $giftName  }}</span>
                                     </a>
                                 </td>
-                                <td> @if($giftType == 'receiver')
+                                @if($giftType == 'receiver')
+                                    <td>
                                         @if ($giftSLog->agency_id)
                                             <a href="{{ url('admin/agencies/' . $agencyId) }}" target="_blank"
-                                        class="d-flex align-items-center text-decoration-none">
-                                            <img src="{{ $agencyImage }}"
-                                                width="50" height="30"
-                                                style="object-fit: cover; border-radius: 4px; border: 1px solid #ccc; padding: 2px; margin-right: 10px;">
-                                            <div>
-                                                <span>{{ $agencyName }}</span><br>
-                                                <small class="text-muted">id: {{ $agencyId ?? 0 }}</small>
-                                            </div>
-                                        </a>
+                                               class="d-flex align-items-center text-decoration-none">
+                                                <img src="{{ $agencyImage }}"
+                                                     width="50" height="30"
+                                                     style="object-fit: cover; border-radius: 4px; border: 1px solid #ccc; padding: 2px; margin-right: 10px;">
+                                                <div>
+                                                    <span>{{ $agencyName }}</span><br>
+                                                    <small class="text-muted">id: {{ $agencyId ?? 0 }}</small>
+                                                </div>
+                                            </a>
                                         @else
                                             <span class="text-danger">{{__('not join to agency')}}</span>
                                         @endif
-                                    @endif
-
-                                </td>
+                                    </td>
+                                @endif
                                 <td>{{ $giftSLog->giftNum }}</td>
                                 <td>{{  $giftSLog->giftPrice}}</td>
                                 <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->format('Y-m-d H:i') }}</td>
@@ -2314,6 +2342,93 @@
     </div>
 </div>
 
+
+
+
+    <div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg mt-6" role="document">
+            <div class="modal-content border-0">
+                <div class="modal-content position-relative">
+                    <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
+                        <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                                data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body p-0">
+
+                            <div class="p-4">
+                                <div class="row flex-evenly">
+                                    <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
+
+                                    <div class="col-lg-6 mb-3 form-group">
+                                        <label class="form-label">{{ __('Name') }}</label>
+                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" required>
+                                    </div>
+
+                                    <div class="col-lg-6 mb-3 form-group">
+                                        <label class="form-label">{{ __('uuid') }}</label>
+                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" required>
+                                    </div>
+
+                                    <div class="col-lg-6 mb-3 form-group">
+                                        <label class="form-label">{{ __('email') }}</label>
+                                        <input type="email" name="email" class="form-control" value="{{ old('email', $user->email ?? '') }}">
+                                    </div>
+
+                                    <div class="col-lg-6 mb-3 form-group">
+                                        <label class="form-label">{{ __('phone') }}</label>
+                                        <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone ?? '') }}" >
+                                    </div>
+
+                                    <div class="mb-3 col-lg-12 form-group">
+                                        <label class="form-label">{{ __('Gender') }}</label>
+                                        <select class="form-select col-lg-6" name="gender">
+                                            <option value="">{{ __('Choose gender') }}</option>
+                                            <option value="0" {{ old('gender', $user->profile->gender ?? '') == '0' ? 'selected' : '' }}>{{ __('female') }}</option>
+                                            <option value="1" {{ old('gender', $user->profile->gender ?? '') == '1' ? 'selected' : '' }}>{{ __('male') }}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-lg-6 form-group mb-3">
+                                        <label class="form-label">{{ __('image') }}</label>
+                                        <input class="form-control" name="image" accept="image/*" type="file" />
+                                        <div class="mt-2">
+                                            <img src="{{ getImagePath($user->profile->avatar ?? '') ?? asset('images/default-avatar.png') }}"
+                                                class="rounded"
+                                                style="width: 100px; height: 100px"
+                                                id="img_edit"
+                                                alt="{{ $user->name ?? '' }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3 col-lg-12 form-group">
+                                        <label class="form-label">{{ __('Country') }}</label>
+                                        <select class="form-select col-lg-6" name="country_id" id="country_id">
+                                            @foreach($countries as $id => $name)
+                                                <option value="{{ $id }}" {{ old('country_id', $user->country_id ?? null) == $id ? 'selected' : '' }}>
+                                                    {{ $name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary cancel_user_item_model_btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                            <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 <!-- jQuery أولاً -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -2326,6 +2441,14 @@
 
 
     $(document).ready(function () {
+
+     $(document).on('click', '.edit_user_item_model_btn', function() {
+                $('#item_modal_update').modal('show');
+       });
+
+       $(document).on('click', '.cancel_user_item_model_btn', function() {
+            $('#item_modal_update').modal('hide');
+        });
     $('#add_form').on('submit', function (e) {
         e.preventDefault(); // prevent default form submit
 
