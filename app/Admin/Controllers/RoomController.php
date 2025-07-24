@@ -1013,9 +1013,10 @@ HTML);
         $room->is_top = $request->has('is_top');
         $room->is_recommended = $request->has('is_recommended');
         $room->secret_chat = $request->has('secret_chat');
-        $room->save();
 
-        return redirect()->back()->with('success', __('Room updated successfully!'));
+        $room->save();
+        admin_toastr('Room updated successfully!', 'success');
+        return redirect(admin_url('rooms'));
     }
 
 }
