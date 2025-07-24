@@ -303,7 +303,7 @@ class ChargeRepoService
         UserCoinLogHelper::log(
             $receiver->id ,
             'charge',
-            'charges',
+            'charge_to_user',
             $amount ?? 0,
             $amountBefore ?? 0,
             $chargeType
@@ -332,6 +332,16 @@ class ChargeRepoService
     public function chargeAgencyNew(User $sender, ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
         $type = $receiver->owner?->user_type ?? '';
+
+        $amountBefore =  Common::getCurrentBalance($receiver->id);
+        UserCoinLogHelper::log(
+            $receiver->id ,
+            'charge',
+            'charge_to_agency',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            $chargeType
+        );
 
         $receiver->increment('coins', $amount);
 
@@ -362,6 +372,15 @@ class ChargeRepoService
 
     public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
+        $amountBefore =  Common::getCurrentBalance($receiver->id);
+        UserCoinLogHelper::log(
+            $receiver->id ,
+            'charge',
+            'charge_dollar_for_owner_to_agency',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            $chargeType
+        );
 
         $receiver->increment('coins', $amount);
 
@@ -378,6 +397,7 @@ class ChargeRepoService
             'action_user_id' => auth()->user()->id,
 
         ];
+
         $this->create($data);
     }
 
@@ -523,8 +543,24 @@ class ChargeRepoService
         $this->processUserCharge($authAgency, $receiver, $request->amount);
     }
 
+    /**
+     * @throws Exception
+     */
     private function processAgencyCharge($authAgency, $chargeAgency, $amount)
     {
+        if ($authAgency->coins < $amount) {
+            throw new Exception(__('balance not enough'));
+        }
+
+        $amountBefore =  Common::getCurrentBalance($chargeAgency->id);
+        UserCoinLogHelper::log(
+            $chargeAgency->id,
+            'charge',
+            'agency_to_agency',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            'agency'
+        );
 
         $authAgency->decrement('coins', $amount);
         $chargeAgency->increment('coins', $amount);
@@ -541,8 +577,24 @@ class ChargeRepoService
         );
     }
 
+    /**
+     * @throws Exception
+     */
     private function processUserCharge($authAgency, $receiver, $amount)
     {
+        if ($authAgency->coins < $amount) {
+            throw new Exception(__('balance not enough'));
+        }
+        $amountBefore =  Common::getCurrentBalance($receiver->id);
+        UserCoinLogHelper::log(
+            $receiver->id,
+            'charge',
+            'agency_to_user',
+            $amount ?? 0,
+            $amountBefore ?? 0,
+            'agency'
+        );
+
         $authAgency->decrement('coins', $amount);
         $receiver->increment('di', $amount);
         $usdRate = $amount / Common::getCoinsValue('user_coins');

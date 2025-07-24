@@ -95,7 +95,7 @@ class Common
 
             if ($event) {
                 $pk_winner = PkWinner::with('user')->where('pk_event_id', $event->id)
-                    ->where('pk_type', 'pk-king')
+                    ->where('pk_type', 'pk-star')
                     ->where('level', 1)
                     ->first();
 
@@ -725,7 +725,6 @@ class Common
             )->onQueue('notification_heavy');
 
             return  true;
-
         }
 
         if ($user) {
@@ -750,9 +749,9 @@ class Common
             ],
         ];
 
-       if (!empty($icon)) {
-                   $payload['notification']['icon'] = $icon;
-               }
+        if (!empty($icon)) {
+            $payload['notification']['icon'] = $icon;
+        }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
@@ -1099,7 +1098,7 @@ class Common
                         'type' => $ware->type,
                         'target_id' => $ware->id,
                         'num' => 1,
-                        'expire' => $vip->expire ? now()->addDays($expire)->timestamp : 0,
+                        'expire' => $userVip->expire /*? now()->addDays($expire)->timestamp : 0*/,
                         'use_num' => $ware->num,
                         'vip_user_id' => $userVip->id,
                         'is_used' => $userVip->is_used,
@@ -1121,7 +1120,7 @@ class Common
         if ($uvip) {
             $user->update(['vip' => $uvip->id]);
         }
-//        self::syncUserDressesFromVip($user, $type);
+        //        self::syncUserDressesFromVip($user, $type);
         /* $users_vips = UserVip::with('OVip')->where('user_id',$user->id)->first();
         $preveliage = $users_vips->OVip->preveliage;
         $wareIds = Ware::where('type', $preveliage)->where('get_type',1)->where('is_active_for_vip', 1)->pluck('id')->toArray();
@@ -1150,7 +1149,7 @@ class Common
             ->where('get_type', 1)
             ->where(function ($q) {
                 $q->where('expire', '>=', now()->timestamp)
-                  ->orWhere('expire', 0);
+                    ->orWhere('expire', 0);
             })
             ->get();
 
@@ -1986,51 +1985,70 @@ class Common
     {
         switch ($resource->charger_type) {
             case 'dash':
+                $admin = $resource->admin;
                 return [
-                    'name' => $resource->admin->name ?? '',
-                    'image' => $resource->admin->avatar ?? '',
-                    'uuid' => $resource->admin->id ?? '',
-                    'id' => $resource->admin->id ?? '',
+                    'name' => $admin->name ?? '',
+                    'image' => $admin->avatar ?? '',
+                    'uuid' => $admin->id ?? '',
+                    'id' => $admin->id ?? '',
                     'type' => 'dash',
-                    'url' => $resource->admin ? url("admin/auth/users/{$resource->admin->id}") : '#',
-                    'image_color'          => null,
-                    'id_image'             =>  '',
+                    'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
                 ];
-            case 'agency':
-                return [
-                    'name' => $resource->senderShippingAgency->name ?? '',
-                    'image' => $resource->senderShippingAgency->img ?? '',
-                    'uuid' => $resource->senderShippingAgency->id ?? '',
-                    'id' => $resource->senderShippingAgency->id ?? '',
-                    'type' => 'agency',
-                    'url' => $resource->senderShippingAgency ? url("admin/shipping-agencies/profile/{$resource->senderShippingAgency->id}") : '#',
-                    'image_color'          => @$resource->senderShippingAgency->owner->color_image,
-                    'id_image'             => @$resource->senderShippingAgency->owner->specialId?->ware?->show_img ?? '',
-                ];
-            case 'host_agency':
-                return [
-                    'name' => $resource->senderAgency->name ?? '',
-                    'image' => $resource->senderAgency->img ?? '',
-                    'uuid' => $resource->senderAgency->id ?? '',
-                    'id' => $resource->senderAgency->id ?? '',
-                    'type' => 'host_agency',
-                    'url' => $resource->senderAgency ? url("admin/agencies/profile/{$resource->senderAgency->id}") : '#',
-                    'image_color'          => @$resource->senderAgency->owner->color_image,
-                    'id_image'             => @$resource->senderAgency->owner->specialId?->ware?->show_img ?? '',
 
+            case 'agency':
+                $agency = $resource->senderShippingAgency;
+                $owner = $agency->owner ?? null;
+                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
+
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
+                    'type' => 'agency',
+                    'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
+                    'image_color' => $owner->color_image ?? null,
+                    'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
                 ];
+
+            case 'host_agency':
+                $agency = $resource->senderAgency;
+                $owner = $agency->owner ?? null;
+                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
+
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
+                    'type' => 'host_agency',
+                    'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
+                    'image_color' => $owner->color_image ?? null,
+                    'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
+                ];
+
             case 'bd':
             case 'user':
+                $user = $resource->senderUser;
+                $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
+
                 return [
-                    'name' => $resource->senderUser->name ?? '',
-                    'image' => $resource->senderUser->profile->avatar ?? '',
-                    'uuid' => $resource->senderUser->uuid ?? '',
-                    'id' => $resource->senderUser->id ?? '',
+                    'name' => $user->name ?? '',
+                    'image' => $user->profile->avatar ?? '',
+                    'uuid' => $user->uuid ?? '',
+                    'id' => $user->id ?? '',
                     'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => @$resource->senderUser->color_image,
-                    'id_image'             => @$resource->senderUser->specialId?->ware?->show_img ?? '',
+                    'url' => $user ? url("admin/users/{$user->id}") : '#',
+                    'image_color' => $user->color_image ?? null,
+                    'id_image' => $user?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($user->id, 18, 'color') ?? '' : '',
                 ];
+
             default:
                 return [
                     'name' => '',
@@ -2040,17 +2058,21 @@ class Common
                     'type' => '',
                     'type_name' => '',
                     'url' => '#',
-                    'image_color'          => null,
-                    'id_image'             => '',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
                 ];
         }
     }
+
 
     public static function getReceiverInfo($resource)
     {
         switch ($resource->user_type ??  '') {
             case 'agency':
                 return [
+                    $hasColor = Common::hasInPack(@$resource->receiveragency?->owner->id, 18, true),
+
                     'name' => $resource->receiveragency->name ?? '',
                     'image' => $resource->receiveragency->img ?? '',
                     'uuid' => $resource->receiveragency->id ?? '',
@@ -2059,17 +2081,23 @@ class Common
                     'url' => $resource->receiveragency ? url("admin/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
                     'image_color'          => @$resource->receiveragency->owner->color_image,
                     'id_image'             => @$resource->receiveragency->owner->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiveragency->owner->id, 18, 'color') ?? '' : '',
+
                 ];
             case 'user':
                 return [
-                    'id' => $resource->receivnerUser->id ?? '',
-                    'name' => $resource->receiverUser->name ?? '',
-                    'image' => $resource->receiverUser->profile->avatar ?? '',
-                    'uuid' => $resource->receiverUser->uuid ?? '',
+                    $hasColor = Common::hasInPack(@$resource->receiver?->id, 18, true),
+
+                    'id' => $resource->receiver->id ?? '',
+                    'name' => $resource->receiver->name ?? '',
+                    'image' => $resource->receiver->profile->avatar ?? '',
+                    'uuid' => $resource->receiver->uuid ?? '',
                     'type' => 'user',
-                    'url' => $resource->receiverUser ? url("admin/users/{$resource->receiverUser->id}") : '#',
-                    'image_color'          => @$resource->receiverUser->color_image,
-                    'id_image'             => @$resource->receiverUser->specialId?->ware?->show_img ?? '',
+                    'url' => $resource->receiver ? url("admin/users/{$resource->receiver->id}") : '#',
+                    'image_color'          => @$resource->receiver->color_image,
+                    'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
+
                 ];
             default:
                 return [
@@ -2081,6 +2109,7 @@ class Common
                     'url' => '#',
                     'image_color'          => null,
                     'id_image'             => '',
+                    'colored_name'         => '',
                 ];
         }
     }
@@ -2101,13 +2130,13 @@ class Common
     }
 
 
-    public static function getUserMediaStats($userId, $type,$agencyId)
+    public static function getUserMediaStats($userId, $type, $agencyId)
     {
         if (!in_array($type, ['moment', 'reel'])) {
             return null;
         }
 
-        $record = UserSallary::where('user_agency_id',$agencyId)->where('user_id', $userId)->latest()->first();
+        $record = UserSallary::where('user_agency_id', $agencyId)->where('user_id', $userId)->latest()->first();
 
         if (! $record || empty($record->extras)) {
             return null;
@@ -2169,7 +2198,14 @@ class Common
 
     public static function getCurrentBalance(int $userId): int
     {
-        return (int) User::where('id', $userId)->value('di') ?? 0;
+        $balance = User::where('id', $userId)->value('di') ?? 0;
+
+        Log::info("Current balance fetched", [
+            'user_id' => $userId,
+            'balance' => $balance,
+        ]);
+
+        return $balance;
     }
 
     public static function getCoinSubTypes()
@@ -2181,5 +2217,4 @@ class Common
             ->pluck('sub_type')
             ->toArray();
     }
-
 }

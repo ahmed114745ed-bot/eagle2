@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Modules\CP\Database\Seeders\CPDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -31,7 +32,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
 //        CoreWalletsSeeder::class,
 //            PaymentGatewaysSeeder::class,
-            AdminPermissionRefact::class,
+//            AdminPermissionRefact::class,
+            CPDatabaseSeeder::class,
 //        AdminPermission::class,
 //        AdminNewPermission::class,
 //        AdminRoleBDSeeder::class,

@@ -154,7 +154,7 @@ class GiftController extends MainController
         $grid->column('img', trans('image'))->display(function ($path) {
             $imgPath = getImagePath($path) ?: asset("images/image.png");
             $musicIcon = $this->music_gift == 1
-                ? "<img src='" . asset('images/music.jpg') . "' 
+                ? "<img src='" . asset('images/music.jpg') . "'
                 style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
                 background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>"
                 : '';
@@ -218,8 +218,7 @@ class GiftController extends MainController
      * @return Form
      */
     protected function form()
-    { 
-
+    {
         $form = new TabsFrom(new Gift);
         $this->disableFormTools($form);
         $type = old('type', $form->model()->type ?? null);
@@ -231,7 +230,7 @@ class GiftController extends MainController
             translate(TYPE_GIFT)
         )
             ->when(6, function () use ($form) {
-             
+
                 $type = old('type', $form->model()->type ?? null);
                 $form->number('luckyGift.win_probability', __('win probability'))
                     ->min(10)->max(100)
@@ -263,7 +262,7 @@ class GiftController extends MainController
 
                 $form->html(<<<'HTML'
                     <script>
-                        
+
                         (function () {
                             const fields = ['min_percentag', 'mid_percentag', 'max_percentag'];
 
@@ -345,16 +344,12 @@ class GiftController extends MainController
             ]
         )->required();
 
-
-
-
-
-
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
+
         $form->saving(function (Form $form) {
-
-
-
+            if (request()->has('_edit_inline')) {
+                return;
+            }
             if ($form->model()->type == 6 || request()->type == 6) {
                 $type = $form->input('type');
                 $win_probability = $form->input('luckyGift.win_probability');

@@ -82,9 +82,14 @@ class SpecialHistoryController extends MainController
 
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))->display(function () {
+            $name = @$this->user->name ?? '';
+            $uid = @$this->user->uuid;
+            if (request()->filled('_export_')) {
+                return "{$name} (UUID: {$uid})";
+            }
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;
-            $name = @$this->user?->name ?? '';
+
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
@@ -99,25 +104,75 @@ class SpecialHistoryController extends MainController
                 </div>
             ';
         });
-        $grid->column('ware.value', __('value'))->display(function ($coin) {
-            $icon = asset('images/coin.png'); // Ensure this path is correct
-            return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
-        });
-        $grid->column('ware.show_img', __('image'))->display(function ($path) {
-            /** @var Ware $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+        if (!request()->filled('_export_')) {
+            $grid->column('ware.value', __('value'))->display(function ($coin) {
+                $icon = asset('images/coin.png'); // Ensure this path is correct
+                return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
+            });
+            $grid->column('ware.show_img', __('image'))->display(function ($path) {
+                /** @var Ware $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+            $grid->column('ware.get_type', __('get_type'))->select(
+                [
+                    //  1=>trans ('vip level automatic acquisition'),
+                    //               2=>trans ('activity'),
+                    //               3=>trans ('treasure box'),
+                    4 => trans('purchase'),
+                    //               5=>trans ('background modification'),
+                    6 => trans('limited time purchase'),
+                    //               7=>trans ('treasure box point exchange'),
+                    //               8=>trans ('cp level unlock'),
+                ]
+            );
+        } else {
+            $grid->column('ware.name', __('value'))->display(function ($vale) {
+                if (request()->filled('_export_')) {
+                    $id = $this->ware->id;
+                    return "{$vale} (ID: {$id})";
+                }
+            });
+
+            $grid->column('ware.get_type', __('get_type'))->display(function ($status) {
+                if (request()->filled('_export_')) {
+                    return $status == 4 ? trans('purchase') : trans('limited time purchase');
+                }
+                // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
+
+            });
+        }
         $grid->column('status', __('status'))->display(function ($status) {
+            if (request()->filled('_export_')) {
+                return $status == 1 ? __('active') : __('inactive');
+            }
             // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
             return $status == 1 ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
                 "></span>" : "<span class='label-warning' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
                 "></span>";
         });
 
-        $grid->column('created_at', __('Date'))
+        $grid->column('created_at', __('start date'))
             ->display(function ($value) {
-                return Carbon::parse($value)->format('Y-m-d');
+                $timezone = getTimezone();
+                return Carbon::parse($value)->setTimezone($timezone)->format('Y-m-d');
+            });
+
+        $grid->column('ware.expire', __('end date'))
+            ->display(function ($value) {
+                $timezone = getTimezone();
+                if ($this->ware->get_type == 4) {
+                    return '∞';
+                }
+
+                if (!$this->ware) {
+                    return '-';
+                }
+
+                return Carbon::parse($this->created_at)
+                    ->addDays($this->ware->expire) // Add expire days
+                    ->setTimezone($timezone)
+                    ->format('Y-m-d');
             });
         //        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
         $grid->actions(function (Grid\Displayers\Actions $actions) {

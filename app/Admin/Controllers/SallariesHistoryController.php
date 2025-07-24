@@ -2,23 +2,24 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Page;
-use App\Http\Controllers\Controller;
+use App\Admin\Services\AgencyService;
+use App\Admin\Services\UserService;
 use App\Models\SalaryTrx;
 use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Show;
+
+use function request;
 
 class SallariesHistoryController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'salary-history';
+
     /**
      * Index interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function index(Content $content)
@@ -29,42 +30,50 @@ class SallariesHistoryController extends MainController
             ->body($this->grid()));
     }
 
-
     protected function grid()
     {
         $grid = new Grid(new SalaryTrx);
-        $grid->model()->where("type",\request("type"));
+        $grid->model()->where('type', request('type'))->orderByDesc('id');
         $grid->id(__('Id'));
-        if(\request("type") == 0){
-            $grid->column ('user.uuid',__ ('uuid'));
-        }else{
-            $grid->column ('agency.owner_id',__ ('uuid') . __("owner_room_id"));
+        if (request('type') == 0) {
+
+            $grid->column('name', __('Name'))
+                ->display(function ($name) {
+
+                    $user = $this->user;
+                    if (! $user) {
+                        return '';
+                    }
+
+                    return app(UserService::class)->adminUserAvatar($user);
+                });
+        } else {
+            $grid->column('name', __('Agency'))->display(function ($name) {
+                $agency = $this->agency;
+                if (! $agency) {
+                    return '';
+                }
+
+                return app(AgencyService::class)->adminAgencyData($agency);
+            });
         }
         $grid->actions(function ($actions) {
             $actions->disableEdit();
             $actions->disableView();
         });
-        $grid->type()->display(function ($type) {
-            if($type == 0){
-                return "User";
-            }else{
-                return "Agency";
-            }
-        });
+
         $grid->amount()->display(function ($num) {
-            if($num > 0){
+            if ($num > 0) {
                 return "<span class='text-primary '>$num</span>";
-            }else{
-                $num *= -1;
-                return "<span class='text-danger '>$num</span>";
             }
+            $num *= -1;
+
+            return "<span class='text-danger '>$num</span>";
+
         });
         $grid->disableExport();
         $grid->disableCreateButton();
 
-
         return $grid;
     }
-
-
 }
