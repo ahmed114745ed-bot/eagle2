@@ -652,8 +652,8 @@ class RoomController extends MainController
         $this->extendGrid($grid);
 
         $this->setupPinModalScript();
-
-        return $grid;
+        return redirect(admin_url('rooms'));
+        // return $grid;
     }
     public function updatePinStatus($id, Request $request)
     {
