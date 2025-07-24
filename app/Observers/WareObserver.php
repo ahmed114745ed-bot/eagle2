@@ -27,8 +27,13 @@ class WareObserver
             } elseif ($ware->type == 12) {
 
                 settings()->set('wappel_frame_updated_at', $timestamp);
+            }elseif ($ware->type == 28) {
+
+                settings()->set('profile_frame_updated', $timestamp);
             }
         }
+
+
     }
 
     /**
