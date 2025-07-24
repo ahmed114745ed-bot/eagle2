@@ -652,6 +652,7 @@ class RoomController extends MainController
         $this->extendGrid($grid);
 
         $this->setupPinModalScript();
+
         return $grid;
     }
     public function updatePinStatus($id, Request $request)
@@ -857,9 +858,7 @@ HTML);
         $form->text('room_welcome', __('room welcome'));
         $form->number('sort_num', __('Sort Num'));
 
-        $form->saved(function (Form $form) {
-                return redirect(admin_url('rooms')); // <- will redirect to index page after save
-            });
+
         return $form;
     }
 
@@ -1014,13 +1013,9 @@ HTML);
         $room->is_top = $request->has('is_top');
         $room->is_recommended = $request->has('is_recommended');
         $room->secret_chat = $request->has('secret_chat');
-
         $room->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => __('Room updated successfully!')
-        ]);
+        return redirect()->back()->with('success', __('Room updated successfully!'));
     }
 
 }
