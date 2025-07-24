@@ -1985,63 +1985,70 @@ class Common
     {
         switch ($resource->charger_type) {
             case 'dash':
+                $admin = $resource->admin;
                 return [
-                    'name' => $resource->admin->name ?? '',
-                    'image' => $resource->admin->avatar ?? '',
-                    'uuid' => $resource->admin->id ?? '',
-                    'id' => $resource->admin->id ?? '',
+                    'name' => $admin->name ?? '',
+                    'image' => $admin->avatar ?? '',
+                    'uuid' => $admin->id ?? '',
+                    'id' => $admin->id ?? '',
                     'type' => 'dash',
-                    'url' => $resource->admin ? url("admin/auth/users/{$resource->admin->id}") : '#',
-                    'image_color'          => null,
-                    'id_image'             =>  '',
-                    'colored_name'         => '',
+                    'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
                 ];
+
             case 'agency':
-                return [
-                    $hasColor = Common::hasInPack(@$resource->senderShippingAgency->owner->id, 18, true),
+                $agency = $resource->senderShippingAgency;
+                $owner = $agency->owner ?? null;
+                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
 
-                    'name' => $resource->senderShippingAgency->name ?? '',
-                    'image' => $resource->senderShippingAgency->img ?? '',
-                    'uuid' => $resource->senderShippingAgency->id ?? '',
-                    'id' => $resource->senderShippingAgency->id ?? '',
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
                     'type' => 'agency',
-                    'url' => $resource->senderShippingAgency ? url("admin/shipping-agencies/profile/{$resource->senderShippingAgency->id}") : '#',
-                    'image_color'          => @$resource->senderShippingAgency->owner->color_image,
-                    'id_image'             => @$resource->senderShippingAgency->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->senderShippingAgency->owner->id, 18, 'color') ?? '' : '',
-
+                    'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
+                    'image_color' => $owner->color_image ?? null,
+                    'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
                 ];
+
             case 'host_agency':
+                $agency = $resource->senderAgency;
+                $owner = $agency->owner ?? null;
+                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
+
                 return [
-                    $hasColor = Common::hasInPack(@$resource->senderAgency->owner->id, 18, true),
-                    'name' => $resource->senderAgency->name ?? '',
-                    'image' => $resource->senderAgency->img ?? '',
-                    'uuid' => $resource->senderAgency->id ?? '',
-                    'id' => $resource->senderAgency->id ?? '',
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
                     'type' => 'host_agency',
-                    'url' => $resource->senderAgency ? url("admin/agencies/profile/{$resource->senderAgency->id}") : '#',
-                    'image_color'          => @$resource->senderAgency->owner->color_image,
-                    'id_image'             => @$resource->senderAgency->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->senderAgency->owner->id, 18, 'color') ?? '' : '',
-
-
+                    'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
+                    'image_color' => $owner->color_image ?? null,
+                    'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
                 ];
+
             case 'bd':
             case 'user':
+                $user = $resource->senderUser;
+                $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
+
                 return [
-                    $hasColor = Common::hasInPack($resource->senderUser->id, 18, true),
-
-                    'name' => $resource->senderUser->name ?? '',
-                    'image' => $resource->senderUser->profile->avatar ?? '',
-                    'uuid' => $resource->senderUser->uuid ?? '',
-                    'id' => $resource->senderUser->id ?? '',
+                    'name' => $user->name ?? '',
+                    'image' => $user->profile->avatar ?? '',
+                    'uuid' => $user->uuid ?? '',
+                    'id' => $user->id ?? '',
                     'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => @$resource->senderUser->color_image,
-                    'id_image'             => @$resource->senderUser->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip($resource->senderUser->id, 18, 'color') ?? '' : '',
-
+                    'url' => $user ? url("admin/users/{$user->id}") : '#',
+                    'image_color' => $user->color_image ?? null,
+                    'id_image' => $user?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($user->id, 18, 'color') ?? '' : '',
                 ];
+
             default:
                 return [
                     'name' => '',
@@ -2051,12 +2058,13 @@ class Common
                     'type' => '',
                     'type_name' => '',
                     'url' => '#',
-                    'image_color'          => null,
-                    'id_image'             => '',
-                    'colored_name'         => '',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
                 ];
         }
     }
+
 
     public static function getReceiverInfo($resource)
     {
