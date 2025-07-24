@@ -81,7 +81,7 @@ class MicService
             [$old_user, $old_status] = explode('#', $current);
         } elseif (is_numeric($current) && (int)$current > 0) {
             $old_user = $current;
-            $old_status = '-1'; // Assume occupied but no explicit status
+            $old_status = '0'; // Assume occupied but no explicit status
         } else {
             $old_user = '0';
             $old_status = $current;
