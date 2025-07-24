@@ -1015,8 +1015,11 @@ HTML);
         $room->secret_chat = $request->has('secret_chat');
 
         $room->save();
-        admin_toastr('Room updated successfully!', 'success');
-        return redirect(admin_url('rooms'));
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Room updated successfully!')
+        ]);
     }
 
 }
