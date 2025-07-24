@@ -3144,7 +3144,7 @@
     "you do not have enough coins for creating a room": "Oda oluşturmak için yeterli jetonunuz yok",
 
     "Room ID": "Oda Kimliği",
-    "Room UID": "Oda UID’si",
+    "Room UID": "Oda sahibinin kimliği",
     "Room Type": "Oda Türü",
     "Visitors Count": "Ziyaretçi Sayısı",
     "Current Users": "Mevcut Kullanıcılar",
@@ -3198,6 +3198,8 @@
     "Team": "Takım",
     "Visible": "Görünür",
     "seats": "koltuk",
+    "Greater than diamond": "Elmas miktarından büyük",
+    "Total Diamond received": "Alınan toplam elmas",
 
     "Reel Comments": "Video Yorumları"
 

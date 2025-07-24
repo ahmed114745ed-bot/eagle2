@@ -28,7 +28,7 @@ class MallService
 
     public function getAllWares($type, $userId = null)
     {
-        return $this->wareRepository->allWithType( $type, $userId);
+        return $this->wareRepository->allWithType($type, $userId);
     }
 
     public function buyWares($user, $wareId, $quantity)
@@ -43,7 +43,7 @@ class MallService
         $amountBefore =  Common::getCurrentBalance($user->id);
         $logAmount = -abs($totalPrice);
         UserCoinLogHelper::log(
-            $user->id ,
+            $user->id,
             'pack',
             'packs',
             $logAmount ?? 0,
@@ -51,31 +51,33 @@ class MallService
             $ware->name
         );
         if ($pack) {
-            $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
-        }
-        try {
 
-            // no pack so create it
-            $data = [
-                'user_id'   => $user->id,
-                'type'      => $ware->type,
-                'get_type'  => $ware->get_type,
-                'target_id' => $ware->id,
-                'num'       => $quantity, //$qty,
-                'expire'    => $ware->expire ? time() + ($quantity * $ware->expire * 86400) : 0,
-                'is_read'   => 1,
-                'use_num'   => $ware->num,
-                'price'     => $totalPrice,
-                'price_item' => $ware->price
-            ];
-            $this->packRepository->create($data);
+            return  $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
+        } else {
+            try {
 
 
-            $this->service($user, $ware->exp, $totalPrice, 'buy');
+                // no pack so create it
+                $data = [
+                    'user_id'   => $user->id,
+                    'type'      => $ware->type,
+                    'get_type'  => $ware->get_type,
+                    'target_id' => $ware->id,
+                    'num'       => $quantity, //$qty,
+                    'is_read'   => 1,
+                    'use_num'   => $ware->num,
+                    'price'     => $totalPrice,
+                    'price_item' => $ware->price,
+                    'days' => $ware->expire ?  $ware->expire  : 0,
+                ];
+                $this->packRepository->create($data);
 
-            return Common::apiResponse(1, 'success process');
-        } catch (Exception $exception) {
-            return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
+
+                $this->service($user, $ware->exp, $totalPrice, 'buy');
+                return Common::apiResponse(1, 'success process');
+            } catch (Exception $exception) {
+                return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            }
         }
     }
 
@@ -114,7 +116,7 @@ class MallService
             $amountBefore =  Common::getCurrentBalance($auth->id);
             $logAmount = -abs($totalPrice);
             UserCoinLogHelper::log(
-                $auth->id ,
+                $auth->id,
                 'pack',
                 'packs',
                 $logAmount ?? 0,
@@ -133,33 +135,69 @@ class MallService
 
     public function updatePack($user, $pack, $ware, $quantity, $totalPrice, $type)
     {
-        if ($pack->expire == 0) return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
-        if ($pack->expire > now()->timestamp) { // expire pack not finished
-            if ($ware->expire != 0) {
+        // If pack is permanent (expire = 0)
+        if ($pack->expire === 0) {
+            return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
+        }
 
-                try {
-
-                    $expire = ($quantity * $ware->expire * 86400);
-                    $updateData = [
-                        'num'       => $pack->num + $quantity, //$qty,
-                        'expire'    => $expire,
-                        'price'     => $pack->price + $totalPrice,
-                    ];
-                    $this->packRepository->update($updateData, $pack->id);
-                    $this->service($user, $ware->exp, $totalPrice, $type);
-                    return Common::apiResponse(1, 'success process');
-                } catch (Exception $exception) {
-
-                    return Common::apiResponse(0, 'fail', null, 400);
-                }
-            } else {
+        // If pack is still valid (not expired)
+        if (!is_null($pack->expire) && $pack->expire > now()->timestamp) {
+            if ($ware->expire == 0) {
                 return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
             }
-        } else {
-            // id expire pack finished
-            $this->packRepository->delete($pack);
+
+            return $this->extendActivePack($pack, $ware, $quantity, $totalPrice, $user, $type);
+        } elseif (is_null($pack->expire)) {
+            if ($ware->expire == 0) {
+                return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
+            }
+
+            return $this->updatePackWithoutExpire($pack, $ware, $quantity, $totalPrice, $user, $type);
+        }
+
+        // If expired: remove it
+        $this->packRepository->delete($pack);
+    }
+    protected function extendActivePack($pack, $ware, $quantity, $totalPrice, $user, $type)
+    {
+        try {
+            $expireSeconds = $quantity * $ware->expire * 86400;
+
+            $updateData = [
+                'num'    => $pack->num + $quantity,
+                'expire' => $pack->expire + $expireSeconds,
+                'price'  => $pack->price + $totalPrice,
+            ];
+
+            $this->packRepository->update($updateData, $pack->id);
+            $this->service($user, $ware->exp, $totalPrice, $type);
+
+            return Common::apiResponse(1, 'success process');
+        } catch (Exception $e) {
+            return Common::apiResponse(0, 'fail', null, 400);
         }
     }
+
+    protected function updatePackWithoutExpire($pack, $ware, $quantity, $totalPrice, $user, $type)
+    {
+        try {
+            $updateData = [
+                'num'    => $pack->num + $quantity,
+                'price'  => $pack->price + $totalPrice,
+                'days'   => $pack->days + $ware->expire,
+            ];
+
+            $this->packRepository->update($updateData, $pack->id);
+            $this->service($user, $ware->exp, $totalPrice, $type);
+
+            return Common::apiResponse(1, 'success process');
+        } catch (Exception $e) {
+            return Common::apiResponse(0, 'fail', null, 400);
+        }
+    }
+
+
+
 
     public function service($user, $wareExp, $totalPrice, $type)
     {

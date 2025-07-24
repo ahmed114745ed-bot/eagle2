@@ -3,10 +3,11 @@
 namespace App\Jobs;
 
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\UserCoinLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable; 
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
@@ -42,7 +43,6 @@ class LogUserCoinProfit implements ShouldQueue
 
     public function handle()
     {
-
         UserCoinLog::create([
             'user_id'       => $this->userId,
             'type'          => $this->type,
@@ -53,5 +53,14 @@ class LogUserCoinProfit implements ShouldQueue
             'from_date'     => $this->createdAt,
             'to_date'       => $this->createdAt,
         ]);
+        $amountBefore = Common::getCurrentBalance($this->userId);
+        UserCoinLogHelper::log(
+            $this->userId,
+            'profit',
+            'login_profit',
+            $this->amount,
+            $amountBefore ?? 0,
+            'login_profit'
+        );
     }
 }

@@ -83,14 +83,14 @@ class GiftLogService
             $sendPrice = (int)($totalPrice);
             $amountBefore = $user->di;
           
-            LogUserCoinProfit::dispatchSync(
+            LogUserCoinProfit::dispatch(
                 $user->id,
                 $amountBefore,
                 -abs($sendPrice),
                 'gift',
                 'gift_logs',
                 'gift'
-            );
+            )->onQueue('log_user_coin');
 
             $updateUserWhenSendGift->send($sendPrice, $user);
         } catch (NotInfMoneyException $e) {

@@ -2,8 +2,9 @@
 
 namespace App\Observers;
 
-use App\Models\Ware;
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Ware;
 
 class WareObserver
 {
@@ -12,19 +13,21 @@ class WareObserver
      */
     public function created(Ware $ware): void
     {
+        $timezone = getTimezone();
+        $timestamp = Carbon::now($timezone)->timestamp;
         if ($ware->enable) {
             if ($ware->type == 6) {
-                settings()->set('intro_updated_at', time());
+                settings()->set('intro_updated_at', $timestamp);
             } elseif ($ware->type == 4) {
-                settings()->set('frame_updated_at', time());
+                settings()->set('frame_updated_at', $timestamp);
             } elseif ($ware->type == 1) {
-                settings()->set('extra_updated_at', time());
+                settings()->set('extra_updated_at', $timestamp);
             } elseif ($ware->type == 5) {
-                settings()->set('bubble_frame_updated_at', time());
+                settings()->set('bubble_frame_updated_at', $timestamp);
             } elseif ($ware->type == 12) {
-                settings()->set('wappel_frame_updated_at', time());
-            }
 
+                settings()->set('wappel_frame_updated_at', $timestamp);
+            }
         }
     }
 
@@ -35,28 +38,32 @@ class WareObserver
     {
         $isEnableOld = $ware->getOriginal('enable');
         $svgOld = $ware->getOriginal('img2');
-
+        $timezone = getTimezone();
+        $timestamp = Carbon::now($timezone)->timestamp;
+        if ($ware->type == 12) {
+            settings()->set('wappel_frame_updated_at',  $timestamp);
+        }
         if ((!$isEnableOld && $ware->enable) || ($isEnableOld && !$ware->enable) || $svgOld != $ware->img2) {
             if ($ware->type == 6) {
-                settings()->set('intro_updated_at', time());
+                settings()->set('intro_updated_at',  $timestamp);
             } elseif ($ware->type == 4) {
-                settings()->set('frame_updated_at', time());
+                settings()->set('frame_updated_at',  $timestamp);
             } elseif ($ware->type == 1) {
-                settings()->set('extra_updated_at', time());
+                settings()->set('extra_updated_at',  $timestamp);
             } elseif ($ware->type == 28) {
-                settings()->set('profile_frame_updated', time());
+                settings()->set('profile_frame_updated',  $timestamp);
             }
-            elseif ($ware->type == 12) {
-                settings()->set('wappel_frame_updated_at', time());
-            }
-
         }
 
+
+
         if ($ware->type == 5 && ($ware->isDirty('top') ||
-                $ware->isDirty('left') ||
-                $ware->isDirty('right') ||
-                $ware->isDirty('bottom'))) {
-            settings()->set('bubble_frame_updated_at', time());
+            $ware->isDirty('left') ||
+            $ware->isDirty('right') ||
+            $ware->isDirty('bottom'))) {
+            settings()->set('bubble_frame_updated_at', $timestamp);
+        } elseif ($ware->type == 12 && ($ware->isDirty('key_json'))) {
+            settings()->set('wappel_frame_updated_at', $timestamp);
         }
 
 
@@ -72,15 +79,17 @@ class WareObserver
      */
     public function deleted(Ware $ware): void
     {
+        $timezone = getTimezone();
+        $timestamp = Carbon::now($timezone)->timestamp;
         if ($ware->enable) {
             if ($ware->type == 6) {
-                settings()->set('intro_updated_at', time());
+                settings()->set('intro_updated_at', $timestamp);
             } elseif ($ware->type == 4) {
-                settings()->set('frame_updated_at', time());
+                settings()->set('frame_updated_at', $timestamp);
             } elseif ($ware->type == 1) {
-                settings()->set('extra_updated_at', time());
+                settings()->set('extra_updated_at', $timestamp);
             } elseif ($ware->type == 5) {
-                settings()->set('bubble_frame_updated_at', time());
+                settings()->set('bubble_frame_updated_at', $timestamp);
             }
         }
     }

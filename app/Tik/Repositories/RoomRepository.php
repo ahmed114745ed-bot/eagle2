@@ -9,6 +9,7 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
+/** @property Room $model*/
 class RoomRepository extends AbstractRepository
 {
     public function __construct()
@@ -85,7 +86,7 @@ class RoomRepository extends AbstractRepository
         $user = $req?->user();
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
 
-        $result = $this->model->with([
+        $result = $this->model->withLuckyBoxFlag($user->id)->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
             'lastPk',

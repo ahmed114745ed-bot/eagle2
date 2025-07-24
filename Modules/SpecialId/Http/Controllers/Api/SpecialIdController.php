@@ -3,6 +3,7 @@
 namespace Modules\SpecialId\Http\Controllers\Api;
 
 
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Pack;
 use App\Models\Ware;
 use App\Models\Config;
@@ -44,6 +45,16 @@ class SpecialIdController extends Controller
                         $user->decrement('di', $total_price);
                         $pack->save();
                         $user->save();
+                        $amountBefore =  Common::getCurrentBalance($user->id);
+                        $logAmount = -abs($total_price);
+                        UserCoinLogHelper::log(
+                            $user->id,
+                            'pack',
+                            'packs',
+                            $logAmount ?? 0,
+                            $amountBefore ?? 0,
+                            $ware->name ?? 'special_id'
+                        );
                         DB::commit();
                         (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
                         return Common::apiResponse(1, 'success process');
@@ -72,6 +83,16 @@ class SpecialIdController extends Controller
             $arr['price']     = $total_price;
             $newPack = Pack::query()->create($arr);
             $user->decrement('di', $total_price);
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            $logAmount = -abs($total_price);
+            UserCoinLogHelper::log(
+                $user->id,
+                'pack',
+                'packs',
+                $logAmount ?? 0,
+                $amountBefore ?? 0,
+                $ware->name ?? 'special_id'
+            );
             DB::commit();
             (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
             return Common::apiResponse(1, 'success process');

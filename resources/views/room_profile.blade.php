@@ -99,9 +99,11 @@
             <button class="btn-back edit-btn" onclick="openEditModal()">
                 <i class="fas fa-edit"></i> {{__("Edit Room")}}
             </button>
-            <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
-                <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
-            </button>
+            @if(Admin::user()->can('edit-rooms') || Admin::user()->can('*'))
+                <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
+                    <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
+                </button>
+            @endif
         </div>
     </div>
 
@@ -535,7 +537,6 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>{{ __('Title') }}</th>
                     <th>{{ __('Team 1') }}</th>
                     <th>{{ __('Team 2') }}</th>
                     <th>{{ __('Score') }}</th>
@@ -549,12 +550,6 @@
                 @forelse($pks as $index => $pk)
                     <tr>
                         <td>{{ $pk->id }}</td>
-                        <td>
-                            <div class="pk-title">{{ $pk->title }}</div>
-                            @if($pk->conditions)
-                                <small class="text-muted">{{ $pk->conditions }}</small>
-                            @endif
-                        </td>
                         <td>
                             <div class="team-info">
                                 <div class="team-title">{{ $pk->team_1_title }}</div>

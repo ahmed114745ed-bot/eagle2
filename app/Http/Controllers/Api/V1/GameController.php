@@ -86,14 +86,14 @@ class GameController extends Controller
         }
         $amountBefore = $user->di;
 
-        LogUserCoinProfit::dispatchSync(
+        LogUserCoinProfit::dispatch(
             $user->id,
             $amountBefore,
             $data['coins'],
             'coinGame',
             'coin_game_users',
             'coin_game'
-        );
+        )->onQueue('log_user_coin');
 
         $user->di += $data['coins'];
         $user->update();

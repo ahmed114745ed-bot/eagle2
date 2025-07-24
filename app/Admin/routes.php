@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -255,7 +256,7 @@ Route::group(
         Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
         Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
         Route::post('get-users', [RoomController::class, 'getUsers'])->name('get.users');
-        Route::put('rooms/{room}', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
+        Route::put('rooms/{room}/info', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
 
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);
@@ -469,7 +470,7 @@ Route::group(
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
 
-            Route::get('/host-diamonds', [\App\Admin\Controllers\AgencyControllers\HostDiamondController::class, 'index'])->name('hsot-diamond');
+            Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
             // Route::get('/users/{id}/edit', 'UserController@edit');
             // Route::get('/users/{id}', 'UserController@show');
             Route::get('/userTarget', 'UserTargetController@index')->name('userTarget');
