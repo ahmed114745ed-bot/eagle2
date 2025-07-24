@@ -652,8 +652,7 @@ class RoomController extends MainController
         $this->extendGrid($grid);
 
         $this->setupPinModalScript();
-        return redirect(admin_url('rooms'));
-        // return $grid;
+        return $grid;
     }
     public function updatePinStatus($id, Request $request)
     {
@@ -858,7 +857,9 @@ HTML);
         $form->text('room_welcome', __('room welcome'));
         $form->number('sort_num', __('Sort Num'));
 
-
+        $form->saved(function (Form $form) {
+                return redirect(admin_url('rooms')); // <- will redirect to index page after save
+            });
         return $form;
     }
 
