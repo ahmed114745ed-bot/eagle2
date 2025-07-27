@@ -337,8 +337,13 @@ class VipController extends MainController
         })->editable();
 
         $grid->column('img', __('Image'))->display(function ($img) {
-            if (!$img) return '';
-            $url = getImagePath($img);
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($img) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 101, 50);
+
             return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
         });
 
