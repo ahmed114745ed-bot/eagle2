@@ -13,6 +13,8 @@ use App\Admin\Fields\Image;
 
 use App\Services\AppFeatureService;
 use App\Admin\Controllers\MainController;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class VipController extends MainController
 {
@@ -425,13 +427,16 @@ class VipController extends MainController
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         //        $form->number('di', __('Diamonds'));
         //        $form->number('co', __('Coins'));
-        $form->image('img', __('Image'))->name(function ($file) {
+        $form->file('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->removable()->rules('required');
 
+        $form->saving(function ($form) {
+            if ($form->img instanceof UploadedFile) {
+                validateUploadedFileType($form->img);
+            }
+        });
 
-
-        
         $form->footer(function ($footer) {
             $footer->disableReset();        // Disables the "Reset" button
             $footer->disableViewCheck();    // Disables the "View" checkbox
