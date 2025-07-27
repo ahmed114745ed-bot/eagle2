@@ -560,13 +560,7 @@ class UserController extends MainController
             ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
             ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
 
-        \Log::info('Users Coins Pagination', [
-            'current_page' => $usersCoins->currentPage(),
-            'last_page' => $usersCoins->lastPage(),
-            'total' => $usersCoins->total(),
-            'per_page' => $usersCoins->perPage(),
-            'count' => $usersCoins->count(),
-        ]);
+ 
 
         $countries = $this->countries();
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');

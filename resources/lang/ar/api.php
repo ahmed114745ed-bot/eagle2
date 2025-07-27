@@ -17,6 +17,8 @@ return [
     'has_color_name_title' => 'الاسم الملون',
     'anonymous_title'      => 'مجهول',
     'country_title'        => 'اسم البلد',
+    "buyVip" => 'لا يمكنك شراء هذا حتى تشتري  vip :level',
+
     'last_active_title'    => 'آخر نشاط',
     'visit_title'          => 'زيارة',
     'room_title'           => 'إخفاء الغرفة',
