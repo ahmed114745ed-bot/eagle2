@@ -900,7 +900,7 @@
                 <div class="agency-meta">
                     <div class="meta-item">
                         <span class="meta-label">{{__("ID")}}:</span>
-                        <span class="meta-value">{{ $agency->id }}</span>
+                        <span class="meta-value">{{ @$agency->id }}</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{__("Phone")}}:</span>
@@ -934,11 +934,11 @@
 
                         <span class="meta-value">
                             @if($agency?->owner)
-                                <a href="{{ url('admin/users/' . $agency->owner->id) }}">
+                                <a href="{{ url('admin/users/' . $agency?->owner->id) }}">
                                     {{ $agency->owner->name ?? '' }}
                                 </a>
                                  <br>
-                            <span class="meta-uuid">(UUID: {{ $agency->owner->uuid ?? 'N/A' }})</span>
+                            <span class="meta-uuid">(UUID: {{ $agency?->owner->uuid ?? 'N/A' }})</span>
                             @else
 
                             @endif
@@ -957,7 +957,7 @@
                     </div> -->
                 </div>
             </div>
-             <a class="btn btn-success btn-back" href="{{ url('download-charge-agency/' . $agency->id) }}">
+             <a class="btn btn-success btn-back" href="{{ url('download-charge-agency/' . $agency?->id) }}">
             {{ __('Export to Excel') }}
         </a>
            <button class="btn-back" onclick="window.location.href='{{ url('admin/charge-agencies') }}'">
@@ -1257,12 +1257,12 @@
                                 @endphp
                             <tr>
                                 <td>{{$index + 1}}</td>
-                                <td>{{ $charge->id}}</td>
+                                <td>{{ $charge?->id}}</td>
                                 <td>
 
                                         <div style="display: flex; align-items: center; gap: 10px;">
                                            <img src="{{ $image }}" alt="user"
-                                                width="{{ $charge->user_type == 'agency' ? '50' : '40' }}"
+                                                width="{{ $charge?->user_type == 'agency' ? '50' : '40' }}"
                                                 height="40"
                                                 style="border-radius: {{ $charge->user_type == 'agency' ? '0' : '50%' }};">
                                             <div>
@@ -1274,9 +1274,9 @@
                                             </div>
                                         </div>
                                 </td>
-                                <td>{{ $charge->usd !== null ? '$' . number_format($charge->usd, 2) : 0 }}</td>
-                                <td>{{ $charge->amount ?? '-' }}</td>
-                                <td>{{ $charge->created_at }}</td>
+                                <td>{{ $charge?->usd !== null ? '$' . number_format($charge->usd, 2) : 0 }}</td>
+                                <td>{{ $charge?->amount ?? '-' }}</td>
+                                <td>{{ $charge?->created_at }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -1344,7 +1344,7 @@
                                 @endphp
                             <tr>
                                 <td>{{$index + 1}}</td>
-                                <td>{{ $res->id }}</td>
+                                <td>{{ $res?->id }}</td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <img src="{{ $image }}" alt="user"
