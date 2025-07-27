@@ -36,8 +36,11 @@ class MallService
         $ware = $this->wareRepository->getById($wareId);
 
         if (!$ware) return Common::apiResponse(0, 'item not found or not for sale', null, 404);
-        $userVipLevel = Common::userVipLevel($user->id, $ware->level);
-        if (!$userVipLevel) return Common::apiResponse(0, __("api.buyVip", ['level' => $ware->level]), null, 404);
+        if ($ware->level) {
+            $userVipLevel = Common::userVipLevel($user->id, $ware->level);
+            if (!$userVipLevel) return Common::apiResponse(0, __("api.buyVip", ['level' => $ware->level]), null, 404);
+        }
+
         $pack        = $this->packRepository->userPack($user->id, $ware->id);
 
         $totalPrice = $ware->price * $quantity;

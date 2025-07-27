@@ -289,7 +289,7 @@ class WareTabController extends MainController
 
         $form->select('level', __('buy with vip'))->options(function ($value) {
             $ops2 = [];
-            foreach (OVip::get() as $level) {
+            foreach (OVip::orderBy('level')->get() as $level) {
                 $ops2[$level->level] = $level->level;
             }
             return $ops2;
