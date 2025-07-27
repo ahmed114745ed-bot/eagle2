@@ -256,17 +256,13 @@ class WareTabController extends MainController
         $form->display('ID');
 
         $ware = Ware::find($id);
-        if ((request('type') && request('type') == 4) || ($form->isEditing() && $ware && ($ware->type == 4))) {
-            $form->select('get_type', trans('get_type'))->options(
-                translate(GET_TYPE_WARE_TYPES)
-            )->default(4)->when('6', function (Form $form) {
-                $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-            });
-        } else {
-            $form->select('get_type', trans('get_type'))->options(
-                translate(GET_TYPE_WARE)
-            )->default(4);
-        }
+
+        $form->select('get_type', trans('get_type'))->options(
+            translate(GET_TYPE_WARE_TYPES)
+        )->default(4)->when('6', function (Form $form) {
+            $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+        });
+
 
         if (\Str::contains(request()->fullUrl(), 'edit')) {
 
@@ -354,9 +350,7 @@ class WareTabController extends MainController
 
 
 
-        if ((request('type') && request('type') != 4) || ($form->isEditing() && $ware && ($ware->type != 4))) {
-            $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-        }
+
 
 
 
@@ -450,8 +444,9 @@ class WareTabController extends MainController
             });
         }
         $form->saving(function (Form $form) {
+            $isEditing = $form->isEditing();
             if (request('type') != 18 && request('type') != 21) {
-                $isEditing = $form->isEditing();
+
 
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
@@ -464,6 +459,10 @@ class WareTabController extends MainController
                 }
 
                 $form->model()->image_type = $image;
+            }
+
+            if (request('get_type') == 4) {
+                $form->model()->expire = 0;
             }
         });
 
