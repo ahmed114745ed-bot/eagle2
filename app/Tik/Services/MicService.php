@@ -81,13 +81,13 @@ class MicService
             [$old_user, $old_status] = explode('#', $current);
         } elseif (is_numeric($current) && (int)$current > 0) {
             $old_user = $current;
-            $old_status = '-1'; // Assume occupied but no explicit status
+            $old_status = '0'; // Assume occupied but no explicit status
         } else {
             $old_user = '0';
             $old_status = $current;
         }
 
-         if ($old_status == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
+         if ($main_mic[$position] == '-1' && !RoomHelper::checkUserIsAdminOrOwner($room->room_admin ?? '', $data['owner_id'])) {
              throw new Exception(__('This microphone is closed and cannot be accessed'));
          }
 
