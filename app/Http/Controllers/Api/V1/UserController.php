@@ -1164,45 +1164,7 @@ class UserController extends Controller
     {
         $user         = $request->user();
         $data = $this->userService->userChargeLevel($user);
-        return Common::apiResponse(true, 'success', [
-            'gift_level' => [
-                'receiver_num' => 40897,
-                'receiver_img' => 'images/1745890002484.png',
-                'sender_num' => 288194,
-                'sender_rem' => 1806,
-                'receiver_rem' => 9103,
-                'sender_img' => 'images/1749259410978.png',
-                'receiver_level' => 4,
-                'next_receiver_num' => 50000,
-                'next_receiver_level' => 5,
-                'sender_level' => 28,
-                'next_sender_num' => 290000,
-                'next_sender_level' => 29,
-                'prev_receiver_num' => 40000,
-                'prev_sender_num' => 280000,
-                'current_receiver_num' => 40000,
-                'current_sender_num' => 280000,
-                'exp-sender' => "1",
-                'exp-receiver' => "1",
-                'rt' => 10000,
-                'st' => 10000,
-                'rc' => 897,
-                'sc' => 8194,
-                'receiver_per' => 0.0897,
-                'sender_per' => 0.8194,
-            ],
-            'charge_level' => [
-                'current_level' => 4,
-                'current_exp' => 500000,
-                'current_img' => 'images/1746852603646.png',
-                'next_level' => 5,
-                'next_exp' => 1000000,
-                'next_img' => 'images/1746852569160.png',
-                'remaining' => 23800,
-                'progress' => 1,
-                'exp_charge' => 1,
-            ]
-        ]);
+        return Common::apiResponse(true, 'success', $data);
     }
 
     public function dataUser(Request $request)
