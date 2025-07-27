@@ -10,6 +10,7 @@ use App\Bd\Controllers\WalletController;
 // use App\Bd\Controllers\ChargeController;
 // use App\Bd\Controllers\BdSalariesController;
 use App\Bd\Controllers\AgencyController;
+use App\Bd\Controllers\UserController;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\Bd\Controllers\RequestAgencyController;
 
@@ -69,6 +70,7 @@ Route::group(
         Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
         Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
+        Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
 
         Route::post('/locale', MultiLanguageController::class . '@locale');
 
