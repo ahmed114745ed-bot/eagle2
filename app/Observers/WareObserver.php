@@ -27,8 +27,13 @@ class WareObserver
             } elseif ($ware->type == 12) {
 
                 settings()->set('wappel_frame_updated_at', $timestamp);
+            }elseif ($ware->type == 28) {
+
+                settings()->set('profile_frame_updated', $timestamp);
             }
         }
+
+
     }
 
     /**
@@ -38,8 +43,7 @@ class WareObserver
     {
         $isEnableOld = $ware->getOriginal('enable');
         $svgOld = $ware->getOriginal('img2');
-        $timezone = getTimezone();
-        $timestamp = Carbon::now($timezone)->timestamp;
+        $timestamp = Carbon::now()->timestamp;
         if ($ware->type == 12) {
             settings()->set('wappel_frame_updated_at',  $timestamp);
         }

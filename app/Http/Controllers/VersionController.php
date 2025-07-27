@@ -124,9 +124,11 @@ class VersionController extends Controller
      */
     public function isUpdated($key, $time): bool
     {
-        // if ($time) {
-        //     $time /= 1000;
-        // }
+        if ($time > 9999999999) {
+            // Convert milliseconds to seconds
+            $time = (int) ($time / 1000);
+        }
+
         $settingGiftUpdate = settings()->get($key);
         $isGiftUpdated     = true;
         // if ($settingGiftUpdate == null && $time != null) {
