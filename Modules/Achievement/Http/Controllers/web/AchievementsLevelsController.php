@@ -69,14 +69,17 @@ class AchievementsLevelsController extends MainController
         $grid->column('target_type', __('Target type'));
 
         $grid->column('valid_image', __('Valid image'))->display(function ($path) {
-            /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 40, 40);
+            $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+            return '<div style="direction:ltr;">'.$mediaHtml.'</div>';
         });
         $grid->column('invalid_image', __('Invalid image'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+            return '<div style="direction:ltr;">'.$mediaHtml.'</div>';
         });
         $grid->column('ar_description', __('ar_description'));
         $grid->column('en_description', __('en_description'));

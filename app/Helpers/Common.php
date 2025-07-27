@@ -134,6 +134,11 @@ class Common
         return $avatar;
     }
 
+    public static function userVipLevel($userId, $level)
+    {
+        return UserVip::where(['user_id' => $userId])->where('level', ">=", $level)->active()->exists();
+    }
+
     public static function level_center_min($user_id)
     {
         $user = User::query()->find($user_id);

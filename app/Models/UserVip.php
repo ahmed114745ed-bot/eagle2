@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use App\Helpers\UserCoinLogHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,13 @@ class UserVip extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class, 'dash_user_id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where(function ($query) {
+            $query->where('expire', '!=', 0)->where('expire', '>', Carbon::now()->timestamp)->orWhere('expire', 0);
+        })->where('is_used', 1);
     }
     protected static function booted()
     {
