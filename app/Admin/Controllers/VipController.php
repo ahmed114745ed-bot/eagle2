@@ -342,16 +342,7 @@ class VipController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-
-            $html = handleShowImageWithTypes($this->id, $url, 50, 50);
-
-            // Wrap output in a container that forces consistent style,
-            // Neutral border-radius and padding, regardless of its internal img tag or video etc
-            return "<div style='display:inline-block; width:52px; height:52px; background:#fff; padding:2px; border-radius:10px; overflow:hidden; box-shadow:0 0 4px #ddd; text-align:center;'>
-        {$html}
-    </div>";
-
-            return handleShowImageWithTypes($this->id, $url, 101, 50);
+            return handleShowImageWithTypes($this->id, $url, 150, 50);
 
             return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
         });
