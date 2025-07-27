@@ -354,10 +354,6 @@ class VipController extends MainController
             } else {
                 return $inner;
             }
-
-            return handleShowImageWithTypes($this->id, $url, 101, 50);
-
-            return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
         });
 
         // Any custom grid extensions
