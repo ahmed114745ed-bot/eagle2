@@ -88,22 +88,20 @@ class AgencyController extends MainController
         $tab = request('tab', 'members');
         $user = Auth::user();
 
-        $agency = Cache::remember("agency_{$id}", 600, function () use ($id,$user) {
-            return Agency::query()
-                ->where('bd_id' ,$user->app_id )
+        $agency = Agency::query()
+                // ->where('bd_id' ,$user->app_id )
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->find($id);
-        });
+      
 
         if (!$agency) {
-            $agency = Cache::remember("agency_{$id}", 600, function () use ($id ,$user) {
-                return ShippingAgency::query()
-                    ->where('bd_id' ,$user->app_id )
+            $agency =  ShippingAgency::query()
+                    // ->where('bd_id' ,$user->app_id )
                     ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                     ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                     ->find($id);
-            });
+           
         }
 
         if (!$agency) {

@@ -124,19 +124,19 @@ class CpRelationController extends MainController
         $form = new Form(new CpRelation());
         $this->disableFormTools($form);
 
-        $form->text('title', __('title'));
+        $form->text('title', __('title'))->rules('required');
         $form->textarea('description', __('description'));
         $form->image('image', __('Img'));
-        $form->number('price', __('price'));
+        $form->number('price', __('price'))->rules('required|min:1');
         // $form->number('relations_number', __('relations_number'))->default(0)->min(0);
-        $form->switch('relations_number', __('relations_number'))->default(0);
+        $form->switch('relations_number', __('relations_number'))->default(0)->rules('required');
 
         $form->select('type', __('Type'))->options([
             'bro' => __('bro'),
             'friend' => __('friend'),
             'lovely' => __('lovely'),
             'solution' => __('solution'),
-        ])->default(0); // Set the default type to "Friend"        $form->number("relations_number",__("relations_number"))->default(0);
+        ])->default(0)->rules('required'); // Set the default type to "Friend"        $form->number("relations_number",__("relations_number"))->default(0);
         return $form;
     }
 }
