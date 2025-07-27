@@ -3,7 +3,9 @@
 namespace Modules\TribeReward\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
+use App\Models\Gift;
 use App\Models\OVip;
+use App\Models\Ware;
 use App\Selectables\Wares;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -53,8 +55,34 @@ class TribeRewardController extends MainController
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('type', __('Type'));
-        $grid->column('target_type', __('Target Type'));
-        $grid->column('target_id', __('Target ID'));
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->target_type == "ware") {
+                return @$this->ware->name;
+            } elseif ($this->target_type == "vip") {
+                return @$this->vip->name;
+            } elseif ($this->target_type == "coins") {
+                return @$this->target;
+            } elseif ($this->target_type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
+        });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->target_type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? $ware?->show_img;
+            } elseif ($this->target_type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips?->img;
+            } elseif ($this->target_type == 'achievement') {
+                $path = $this?->target;
+            } else {
+                $path = 'coin.png';
+            }
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('quantity', __('Quantity'));
         $grid->column('expire_days', __('expire'));
         $grid->column('created_at', __('Created At'));
@@ -73,7 +101,7 @@ class TribeRewardController extends MainController
         $show->field('id', __('ID'));
         $show->field('type', __('Type'));
         $show->field('target_type', __('Target Type'));
-        $show->field('target_id', __('Target ID'));
+        $show->field('target', __('target'));
         $show->field('quantity', __('Quantity'));
         $show->field('expire_days', __('expire'));
         $show->field('created_at', __('Created At'));
