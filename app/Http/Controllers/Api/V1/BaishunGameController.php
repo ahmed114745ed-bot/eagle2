@@ -375,7 +375,8 @@ class BaishunGameController extends Controller
     public function checkWallet($request)
     {
         $gameWallet = GameWallet::filterByMonth()->first();
-        $used = $gameWallet->used + ((($request?->currency_diff ?? 0) < 0) ? ($request->currency_diff * -1) : 0);
+        $gameUsed = $gameWallet?->used ?? 0;
+        $used = $gameUsed + ((($request?->currency_diff ?? 0) < 0) ? ($request->currency_diff * -1) : 0);
         if (!$gameWallet || $used >= $gameWallet->balance) {
             $responseArray = [
                 'code' => 1,
