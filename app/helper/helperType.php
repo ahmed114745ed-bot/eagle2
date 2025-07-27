@@ -136,3 +136,10 @@ const  GET_TYPE_WARE =
     // 6 => 'limited time purchase',
 
 ];
+
+const  GET_TYPE_WARE_TYPES =
+[
+    4 => 'purchase',
+    6 => 'limited time purchase',
+
+];
