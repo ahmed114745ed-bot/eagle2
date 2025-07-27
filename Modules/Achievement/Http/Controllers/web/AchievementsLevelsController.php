@@ -69,9 +69,23 @@ class AchievementsLevelsController extends MainController
         $grid->column('target_type', __('Target type'));
 
         $grid->column('valid_image', __('Valid image'))->display(function ($path) {
-            /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 40, 40);
+            $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+            // Wrap for layout consistency in both RTL and LTR
+            return '<div style="
+        width:52px;
+        height:52px;
+        background:#fff;
+        border-radius:10px;
+        overflow:hidden;
+        box-shadow:0 0 4px #ddd;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        margin:auto;
+        direction:ltr; /* Ensures the image/video always lines up left-to-right */
+    ">'.$mediaHtml.'</div>';
         });
         $grid->column('invalid_image', __('Invalid image'))->display(function ($path) {
             /** @var Ware $this */
