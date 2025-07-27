@@ -342,7 +342,20 @@ class VipController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-//            return handleShowImageWithTypes($this->id, $url, 175, 25);
+
+            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+
+            $imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',];
+
+            $inner = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+            if (in_array($ext, $imageTypes)) {
+                return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
+            } else {
+                return $inner;
+            }
+
+            return handleShowImageWithTypes($this->id, $url, 101, 50);
 
             return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
         });
