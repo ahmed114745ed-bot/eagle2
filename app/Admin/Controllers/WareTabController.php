@@ -2,26 +2,27 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Validation\ValidationException;
-use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Reals\Http\Services\FfmpegService;
+use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Public\Http\Services\UserCounterServices;
 
 
 class WareTabController extends MainController
@@ -255,17 +256,13 @@ class WareTabController extends MainController
         $form->display('ID');
 
         $ware = Ware::find($id);
-        if ((request('type') && request('type') == 4) || ($form->isEditing() && $ware && ($ware->type == 4))) {
-            $form->select('get_type', trans('get_type'))->options(
-                translate(GET_TYPE_WARE_TYPES)
-            )->default(4)->when('6', function (Form $form) {
-                $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-            });
-        } else {
-            $form->select('get_type', trans('get_type'))->options(
-                translate(GET_TYPE_WARE)
-            )->default(4);
-        }
+
+        $form->select('get_type', trans('get_type'))->options(
+            translate(GET_TYPE_WARE_TYPES)
+        )->default(4)->when('6', function (Form $form) {
+            $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+        });
+
 
         if (\Str::contains(request()->fullUrl(), 'edit')) {
 
@@ -289,14 +286,14 @@ class WareTabController extends MainController
         $form->currency('price', __('price'))->symbol('🪙');
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
 
-        $form->number('level', trans('level'));
-        $states = [
-            'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
-            'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
-        ];
-        $form->switch('is_active_for_vip', __("active vip"))->states($states);
 
-
+        $form->select('level', __('buy with vip'))->options(function ($value) {
+            $ops2 = [];
+            foreach (OVip::orderBy('level')->get() as $level) {
+                $ops2[$level->level] = $level->level;
+            }
+            return $ops2;
+        });
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
@@ -319,9 +316,6 @@ class WareTabController extends MainController
             )->attribute(['id' => 'image_type1']);
         }
 
-
-
-        $form->text('key', trans('key'));
         $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
@@ -356,13 +350,10 @@ class WareTabController extends MainController
 
 
 
-        if ((request('type') && request('type') != 4) || ($form->isEditing() && $ware && ($ware->type != 4))) {
-            $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-           
-        }
 
 
-        $form->number('num', __('num'));
+
+
 
         if (request('type') == 18) $form->color('color', trans('color'));
         if ((request('type') && request('type') == 5) || ($form->isEditing() && $ware && ($ware->type == 5))) {
@@ -453,8 +444,9 @@ class WareTabController extends MainController
             });
         }
         $form->saving(function (Form $form) {
+            $isEditing = $form->isEditing();
             if (request('type') != 18 && request('type') != 21) {
-                $isEditing = $form->isEditing();
+
 
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
@@ -467,6 +459,10 @@ class WareTabController extends MainController
                 }
 
                 $form->model()->image_type = $image;
+            }
+
+            if (request('get_type') == 4) {
+                $form->model()->expire = 0;
             }
         });
 
