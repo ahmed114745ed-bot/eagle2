@@ -22,6 +22,7 @@ class BaishunGameController extends Controller
 
     public function changeBalance(Request $request)
     {
+        Log::info('this response ' . PHP_EOL . $request->json());
         $errorExists = $this->checkWallet($request);
         if ($errorExists) return response()->json($errorExists);
 
@@ -108,7 +109,7 @@ class BaishunGameController extends Controller
                     'uImage'  => $user->profile?->avatar ?? 0,
                     'uName'   => $user->name ?? '',
                     'uId'     => $user->id ?? 0,
-                    'coins'   => (int) $request->currency_diff,
+                    'coins'   => numToStringNew((int) $request->currency_diff),
                     "gImage"  => @$user->nowGame?->image
                 ]
             ];
