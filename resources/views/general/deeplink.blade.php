@@ -46,7 +46,7 @@
 <body class="bg-gradient-to-br from-blue-100 to-white flex items-center justify-center min-h-screen">
 <div class="max-w-md w-full mx-auto bg-white p-6 rounded-2xl shadow-2xl text-center space-y-6">
 <h1 class="text-3xl font-bold text-gray-700">{{ __('Download Our App') }}{{' '}} {{$appName}}</h1>
-    <p class="text-gray-500">{{_('Join us and enjoy live streaming like never before!')}}</p>
+    <p class="text-gray-500">{{__('Join us and enjoy live streaming like never before!')}}</p>
 
     <div id="download-buttons" class="space-y-4">
         <!-- Dynamic download buttons -->
@@ -57,7 +57,7 @@
     const androidLink = "{{ $androidLink }}";
     const iosLink = "{{ $iosLink }}";
     const huaweiLink = "{{ $huaweiLink }}";
-   
+
     const androidLogo = "{{ asset('images/android_logo_PNG27.png') }}";
     const appleLogo = "{{ asset('images/Apple-IOS-jpg.png') }}";
     const huaweiLogo = "{{ asset('images/huawel.jpg') }}";

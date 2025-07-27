@@ -96,7 +96,7 @@ class Common
 
             if ($event) {
                 $pk_winner = PkWinner::with('user')->where('pk_event_id', $event->id)
-                    ->where('pk_type', 'pk-king')
+                    ->where('pk_type', 'pk-star')
                     ->where('level', 1)
                     ->first();
 
@@ -989,7 +989,193 @@ class Common
     }
 
 
-  
+    public static function handelVip($vip, $user, $expire,  $userVip)
+    {
+        if ($userVip->is_used) {
+            $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
+
+            Pack::query()
+                ->where('get_type', 1)
+                ->where('user_id', $user->id)
+                ->whereIn('type', $vipTypes)
+                ->where('vip_user_id', '!=', $userVip->id)
+                ->update(['is_used' => 0]);
+        }
+
+        $type = $vip->privilegs()->pluck('type')->toArray();
+        if (!empty($type)) {
+            foreach ($type as $wareType) {
+                $isSetWare = Ware::query()
+                    ->where('get_type', 1)
+                    ->where('level', $vip->level)
+                    ->where('type', $wareType)
+                    ->first();
+
+                if (!$isSetWare) {
+                    $typesArr = [
+                        1 => 'Gemstone',
+                        3 => 'Card Scroll',
+                        4 => 'Avatar Frame',
+                        5 => 'Bubble Frame',
+                        6 => 'Entering Special Effects',
+                        7 => 'Microphone Aperture',
+                        8 => 'Badge',
+                        9 => 'NoKick',
+                        10 => 'Icon',
+                        11 => 'intro animation',
+                        12 => 'maple',
+                        13 => 'hide country',
+                        14 => 'vip gifts',
+                        15 => 'no pan',
+                        19 => 'profile visitors hide in',
+                        20 => 'hide last active',
+                        28 => 'profile frame',
+                        29 => 'being kicked',
+                        30 => 'anti ban',
+                    ];
+
+                    $typeName = $typesArr[$wareType] ?? 'Unknown Type';
+                    Ware::create([
+                        'get_type' => 1,
+                        'type' => $wareType,
+                        'name' => $typeName  ?? 'VIP Ware',
+                        'name_en' => $typeName ?? 'VIP Ware',
+                        'title' => $typeName ?? '',
+                        'title_en' => $typeName ?? '',
+                        'level' => $vip->level,
+                        'price' =>  0,
+                        'enable' => 1,
+                        'expire' => $expire,
+                        'show_img' =>  '1.png',
+                        'img2' =>  '',
+                        'key' =>  '',
+                        'key_json' => '',
+                        'image_type' => 'png',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                        'is_active_for_vip' => 1
+                    ]);
+                } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
+                    $isSetWare->update([
+                        'is_active_for_vip' => 1,
+                        'enable' => 1,
+                    ]);
+                }
+            }
+        }
+        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
+            ->where('level', $vip->level)
+            ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
+        foreach ($wares as $ware) {
+            Pack::query()->where('user_id', $user->id)
+                ->where('expire', '<', now()->timestamp)
+                ->where('expire', '!=', 0)
+                ->delete();
+            $pack =  Pack::query()
+                ->where('user_id', $user->id)
+                ->where('get_type', 1)
+                ->where('target_id', $ware->id)->where('vip_user_id', $userVip->id)
+                ->where(function ($q) {
+                    $q->where('expire', '>=', now()->timestamp)
+                        ->orWhere('expire', 0);
+                })->first();
+            if ($expire == null) {
+                $expire = $vip->expire;
+            }
+            if ($pack) {
+                // if ($pack->expire == 0) {
+                //     //                    throw new \Exception('already exists');
+                // } else {
+
+                //$pack->expire = $vip->expire ? $pack->expire + ($expire * 86400) : 0;
+                $pack->is_used = $userVip->is_used;
+                $pack->save();
+                // }
+            } else {
+                Pack::query()->create(
+                    [
+                        'user_id' => $user->id,
+                        'get_type' => $ware->get_type,
+                        'type' => $ware->type,
+                        'target_id' => $ware->id,
+                        'num' => 1,
+                        'expire' => $userVip->expire /*? now()->addDays($expire)->timestamp : 0*/,
+                        'use_num' => $ware->num,
+                        'vip_user_id' => $userVip->id,
+                        'is_used' => $userVip->is_used,
+                        'using' => 1,
+                    ]
+                );
+            }
+            if (in_array($ware->type, [4, 5, 6])) {
+                self::userDress($ware, $user, $userVip->is_used);
+                self::unUsePack($type, $user);
+            }
+        }
+        $userVip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->where('id', '!=', $userVip->id)->update(['is_used' => 0]);
+        $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->orderBy('level', 'desc')->first();
+        if ($uvip) {
+            $user->update(['vip' => $uvip->id]);
+        }
+        //        self::syncUserDressesFromVip($user, $type);
+        /* $users_vips = UserVip::with('OVip')->where('user_id',$user->id)->first();
+        $preveliage = $users_vips->OVip->preveliage;
+        $wareIds = Ware::where('type', $preveliage)->where('get_type',1)->where('is_active_for_vip', 1)->pluck('id')->toArray();
+        $packs = Pack::where('user_id', $user->id)->whereIn('target_id', $wareIds)->get();
+        $exception_packs = $packs->pluck('id')->toArray();
+        Pack::where('user_id', $user->id)->whereNotIn('id', $exception_packs)->update(['is_used'=> 0]);
+        Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
+    }
+
+    public static function syncUserDressesFromVip(User $user, array $types)
+    {
+        $dressMap = [
+            4  => 'dress_1',
+            5  => 'dress_2',
+            11 => 'dress_3',
+        ];
+
+        $targetTypes = array_intersect(array_keys($dressMap), $types);
+
+        if (empty($targetTypes)) {
+            return;
+        }
+
+        $vipPacks = Pack::where('user_id', $user->id)
+            ->whereIn('type', $targetTypes)
+            ->where('get_type', 1)
+            ->where(function ($q) {
+                $q->where('expire', '>=', now()->timestamp)
+                    ->orWhere('expire', 0);
+            })
+            ->get();
+
+        $updateData = [];
+
+        foreach ($vipPacks as $pack) {
+            $column = $dressMap[$pack->type] ?? null;
+
+            if ($column) {
+                $updateData[$column] = '1';
+                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
+            }
+        }
+
+        if (!empty($updateData)) {
+            $success = $user->update($updateData);
+
+            logger()->info('✅ تم تحديث الحقول:', [
+                'user_id' => $user->id,
+                'success' => $success,
+                'updated_fields' => $updateData
+            ]);
+        }
+    }
+
 
     public static function handelVip0($vip, $user, $expire,  $userVip)
     {
@@ -1800,63 +1986,70 @@ class Common
     {
         switch ($resource->charger_type) {
             case 'dash':
+                $admin = $resource->admin;
                 return [
-                    'name' => $resource->admin->name ?? '',
-                    'image' => $resource->admin->avatar ?? '',
-                    'uuid' => $resource->admin->id ?? '',
-                    'id' => $resource->admin->id ?? '',
+                    'name' => $admin->name ?? '',
+                    'image' => $admin->avatar ?? '',
+                    'uuid' => $admin->id ?? '',
+                    'id' => $admin->id ?? '',
                     'type' => 'dash',
-                    'url' => $resource->admin ? url("admin/auth/users/{$resource->admin->id}") : '#',
-                    'image_color'          => null,
-                    'id_image'             =>  '',
-                    'colored_name'         => '',
+                    'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
                 ];
+
             case 'agency':
-                return [
-                    $hasColor = Common::hasInPack(@$resource->senderShippingAgency->owner->id, 18, true),
+                $agency = $resource->senderShippingAgency;
+                $owner = $agency->owner ?? null;
+                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
 
-                    'name' => $resource->senderShippingAgency->name ?? '',
-                    'image' => $resource->senderShippingAgency->img ?? '',
-                    'uuid' => $resource->senderShippingAgency->id ?? '',
-                    'id' => $resource->senderShippingAgency->id ?? '',
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
                     'type' => 'agency',
-                    'url' => $resource->senderShippingAgency ? url("admin/shipping-agencies/profile/{$resource->senderShippingAgency->id}") : '#',
-                    'image_color'          => @$resource->senderShippingAgency->owner->color_image,
-                    'id_image'             => @$resource->senderShippingAgency->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->senderShippingAgency->owner->id, 18, 'color') ?? '' : '',
-
+                    'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
+                    'image_color' => $owner->color_image ?? null,
+                    'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
                 ];
+
             case 'host_agency':
+                $agency = $resource->senderAgency;
+                $owner = $agency->owner ?? null;
+                $hasColor = $owner ? Common::hasInPack($owner->id, 18, true) : false;
+
                 return [
-                    $hasColor = Common::hasInPack(@$resource->senderAgency->owner->id, 18, true),
-                    'name' => $resource->senderAgency->name ?? '',
-                    'image' => $resource->senderAgency->img ?? '',
-                    'uuid' => $resource->senderAgency->id ?? '',
-                    'id' => $resource->senderAgency->id ?? '',
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
                     'type' => 'host_agency',
-                    'url' => $resource->senderAgency ? url("admin/agencies/profile/{$resource->senderAgency->id}") : '#',
-                    'image_color'          => @$resource->senderAgency->owner->color_image,
-                    'id_image'             => @$resource->senderAgency->owner->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->senderAgency->owner->id, 18, 'color') ?? '' : '',
-
-
+                    'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
+                    'image_color' => $owner->color_image ?? null,
+                    'id_image' => $owner?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
                 ];
+
             case 'bd':
             case 'user':
+                $user = $resource->senderUser;
+                $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
+
                 return [
-                    $hasColor = Common::hasInPack($resource->senderUser->id, 18, true),
-
-                    'name' => $resource->senderUser->name ?? '',
-                    'image' => $resource->senderUser->profile->avatar ?? '',
-                    'uuid' => $resource->senderUser->uuid ?? '',
-                    'id' => $resource->senderUser->id ?? '',
+                    'name' => $user->name ?? '',
+                    'image' => $user->profile->avatar ?? '',
+                    'uuid' => $user->uuid ?? '',
+                    'id' => $user->id ?? '',
                     'type' => 'user',
-                    'url' => $resource->senderUser ? url("admin/users/{$resource->senderUser->id}") : '#',
-                    'image_color'          => @$resource->senderUser->color_image,
-                    'id_image'             => @$resource->senderUser->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip($resource->senderUser->id, 18, 'color') ?? '' : '',
-
+                    'url' => $user ? url("admin/users/{$user->id}") : '#',
+                    'image_color' => $user->color_image ?? null,
+                    'id_image' => $user?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => $hasColor ? Common::wareUserVip($user->id, 18, 'color') ?? '' : '',
                 ];
+
             default:
                 return [
                     'name' => '',
@@ -1866,12 +2059,13 @@ class Common
                     'type' => '',
                     'type_name' => '',
                     'url' => '#',
-                    'image_color'          => null,
-                    'id_image'             => '',
-                    'colored_name'         => '',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
                 ];
         }
     }
+
 
     public static function getReceiverInfo($resource)
     {
@@ -2005,7 +2199,8 @@ class Common
 
     public static function getCurrentBalance(int $userId): int
     {
-        return (int) User::where('id', $userId)->value('di') ?? 0;
+        $balance = User::where('id', $userId)->value('di') ?? 0;
+        return $balance;
     }
 
     public static function getCoinSubTypes()

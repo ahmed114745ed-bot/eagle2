@@ -255,10 +255,18 @@ class WareTabController extends MainController
         $form->display('ID');
 
         $ware = Ware::find($id);
+        if ((request('type') && request('type') == 4) || ($form->isEditing() && $ware && ($ware->type == 4))) {
+            $form->select('get_type', trans('get_type'))->options(
+                translate(GET_TYPE_WARE_TYPES)
+            )->default(4)->when('6', function (Form $form) {
+                $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+            });
+        } else {
+            $form->select('get_type', trans('get_type'))->options(
+                translate(GET_TYPE_WARE)
+            )->default(4);
+        }
 
-        $form->select('get_type', trans('get_type'))->options(
-            translate(GET_TYPE_WARE)
-        )->default(4);
         if (\Str::contains(request()->fullUrl(), 'edit')) {
 
             $wareType = Ware::find($id)->type;
@@ -278,31 +286,17 @@ class WareTabController extends MainController
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        $form->currency('price', __('price'));
+        $form->currency('price', __('price'))->symbol('🪙');
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-        // // if (!$form->isEditing()) {
-        // //     if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-        // //         $form->currency('price', __('price'));
-        // //         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
-        // //     }
-        // // }
-        // if ($form->isEditing()) {
 
-        //     if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-
-        //     }
-        // }
-        //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
         $states = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
         $form->switch('is_active_for_vip', __("active vip"))->states($states);
-        $form->number('exp', __('exp'));
 
 
-        //        $form->image('img1', trans('img'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
@@ -323,14 +317,6 @@ class WareTabController extends MainController
 
                 ]
             )->attribute(['id' => 'image_type1']);
-
-            // $form->select('profile_frame_type', __('image_type'))->options(
-            //     [
-            //         'svga' => __('svga'),
-            //         'png' => __('png'),
-
-            //     ]
-            // )->attribute(['id' => 'profile_frame']);
         }
 
 
@@ -368,11 +354,14 @@ class WareTabController extends MainController
             }
         }
 
-        //        $form->file('img3', trans('video'));
-        $form->color('color', trans('color'));
-        $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
 
-        //        $form->number('sort', 'sort');
+
+        if ((request('type') && request('type') != 4) || ($form->isEditing() && $ware && ($ware->type != 4))) {
+            $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+           
+        }
+
+
         $form->number('num', __('num'));
 
         if (request('type') == 18) $form->color('color', trans('color'));
