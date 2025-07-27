@@ -16,7 +16,7 @@ class SenderGiftLogResource extends JsonResource
      */
     public function toArray($request)
     {
-
+        $hasColor = Common::hasInPack(@$this->sender->id, 18, true);
         $data = [
             'id' => @$this->sender->id ?? 0, // both
             'uuid' => @$this->sender->uuid ?? '', // both
@@ -26,6 +26,8 @@ class SenderGiftLogResource extends JsonResource
             'id_image'             => @$this->sender->specialId?->ware?->show_img ?? '',
             'exp'   => $this->exp ?? '',
             'level' => Common::level_center_min(@$this->sender->id),
+            'colored_name' => $hasColor ? common::wareUserVip(@$this->sender->id, 18, 'color') ?? '' : '',
+
 
         ];
 
