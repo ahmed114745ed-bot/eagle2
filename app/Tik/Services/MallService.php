@@ -204,7 +204,7 @@ class MallService
     public function service($user, $wareExp, $totalPrice, $type)
     {
         if ($type == 'buy') {
-            (new UpgradeLevelServices())->purchaseItem($user, $wareExp);
+            (new UpgradeLevelServices())->purchaseItem($user, $totalPrice);
             (new UserCounterServices)->eventUser($user, 'mybag', 1);
         }
 
