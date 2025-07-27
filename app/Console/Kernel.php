@@ -96,6 +96,12 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/update-user-salaries.log'))
             ->runInBackground();
 
+        $schedule->command('game:user-calc')
+            ->monthly()
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/game-user-calc.log'))
+            ->runInBackground();
+
     //    $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }
