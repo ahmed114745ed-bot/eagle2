@@ -16,6 +16,6 @@ class WareLevelSeeder extends Seeder
      */
     public function run(): void
     {
-        Ware::whereIn('get_type', [4, 6])->update(['level' => 0]);
+        Ware::whereIn('get_type', [4, 6])->update(['level' => null]);
     }
 }
