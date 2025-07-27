@@ -343,17 +343,13 @@ class VipController extends MainController
                 $url = $defaultImage;
             }
 
-            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+            $html = handleShowImageWithTypes($this->id, $url, 50, 50);
 
-            $imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
-
-            $inner = handleShowImageWithTypes($this->id, $url, 50, 50); // size like your "old" style
-
-            if (in_array($ext, $imageTypes)) {
-                return "<a href='{$url}' target='_blank' style='display:inline-block;'>" . $inner . "</a>";
-            } else {
-                return $inner;
-            }
+            // Wrap output in a container that forces consistent style,
+            // Neutral border-radius and padding, regardless of its internal img tag or video etc
+            return "<div style='display:inline-block; width:52px; height:52px; background:#fff; padding:2px; border-radius:10px; overflow:hidden; box-shadow:0 0 4px #ddd; text-align:center;'>
+        {$html}
+    </div>";
 
             return handleShowImageWithTypes($this->id, $url, 101, 50);
 
