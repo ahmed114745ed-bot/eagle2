@@ -199,7 +199,7 @@ class UserController extends Controller
         $now = now();
 
         $ban = Ban::whereHas('banType',function($q){$q->where("route",'group-chat/send');})->whereNotNull('ban_type_id')->where('uid', $user->uuid)
-            ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->exist();
+            ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
   
         $data = [
             'version' => [
@@ -212,7 +212,7 @@ class UserController extends Controller
             'shared_key' => Common::getConfig('shared') ?? '1234',
             'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
             'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", $user->id)->first() != null ? true : false,
-            'group_ban' => $ban,
+            'group_ban' => $ban != null ? true : false,
         ];
         return Common::apiResponse(true, '', $data, 200);
     }
