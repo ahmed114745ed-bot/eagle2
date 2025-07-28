@@ -198,7 +198,7 @@ class UserController extends Controller
         //        $shared = Common::getConfig('shared') ?? '1234';
         $now = now();
 
-        $ban = Ban::whereHas('banType',function($q){$q->where("route",'group-chat/send');})->whereNotNull('ban_type_id')->where('uid', $user->uuid)
+        $ban = Ban::where('ban_type_id',7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
             ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
   
         $data = [
