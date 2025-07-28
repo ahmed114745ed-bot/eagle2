@@ -83,7 +83,7 @@ class SpecialHistoryController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))->display(function () {
             $name = @$this->user->name ?? '';
-            $uid = @$this->user->uuid ??0;
+            $uid = @$this->user->uuid ?? 0;
             if (request()->filled('_export_')) {
                 return "{$name} (UUID: {$uid})";
             }
@@ -110,33 +110,41 @@ class SpecialHistoryController extends MainController
                 return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
             });
             $grid->column('ware.show_img', __('image'))->display(function ($path) {
+                if ($this->ware) {
+                    $url = getImagePath($path);
+                    return handleShowImageWithTypes($this->id, $url, 50, 50);
+                }
                 /** @var Ware $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
-            $grid->column('ware.get_type', __('get_type'))->select(
-                [
-                    //  1=>trans ('vip level automatic acquisition'),
-                    //               2=>trans ('activity'),
-                    //               3=>trans ('treasure box'),
+            $grid->column('ware.get_type', __('get_type'))
+                ->display(function ($value) {
+                    if (is_null($value)) {
+                        return "<span style='color:red;'>⚠️ نوع غير متوفر</span>";
+                    }
+                    return $value;
+                })
+                ->select([
                     4 => trans('purchase'),
-                    //               5=>trans ('background modification'),
                     6 => trans('limited time purchase'),
-                    //               7=>trans ('treasure box point exchange'),
-                    //               8=>trans ('cp level unlock'),
-                ]
-            );
+                ]);
         } else {
+            $grid->model()->whereHas('ware');
             $grid->column('ware.name', __('value'))->display(function ($vale) {
-                if (request()->filled('_export_')) {
-                    $id = $this->ware->id;
-                    return "{$vale} (ID: {$id})";
+                if (@$this->ware && request()->filled('_export_')) {
+                    $name = $vale ?? '';
+                    $id = $this->ware->id ?? 0;
+                    return "{$name} (ID: {$id})";
+                } else {
+                    return '-';
                 }
             });
 
             $grid->column('ware.get_type', __('get_type'))->display(function ($status) {
-                if (request()->filled('_export_')) {
+
+                if (@$this->ware->get_type && $request()->filled('_export_')) {
                     return $status == 4 ? trans('purchase') : trans('limited time purchase');
+                } else {
+                    return '';
                 }
                 // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
 
@@ -161,13 +169,14 @@ class SpecialHistoryController extends MainController
         $grid->column('ware.expire', __('end date'))
             ->display(function ($value) {
                 $timezone = getTimezone();
+                if (!@$this->ware->get_type) {
+                    return '-';
+                }
                 if ($this->ware->get_type == 4) {
                     return '∞';
                 }
 
-                if (!$this->ware) {
-                    return '-';
-                }
+
 
                 return Carbon::parse($this->created_at)
                     ->addDays($this->ware->expire) // Add expire days
