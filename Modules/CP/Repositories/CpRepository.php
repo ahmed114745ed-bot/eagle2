@@ -124,6 +124,18 @@ class CpRepository
             ->count();
     }
 
+    public function countExistingCpSameRelationActive($userId, $relationId)
+    {
+        return Cp::where(function ($query) use ($userId,) {
+            $query->where(function ($query) use ($userId,) {
+                $query->where("user_two_id", $userId)->orWhere("user_one_id",$userId);
+            });
+        })->where('cp_relation_id', $relationId)
+            /// TODO convert these status to enum
+            ->whereIn("status", [ CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->count();
+    }
+
     public function checkExistingCpOne($userId, $cpId)
     {
         return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {

@@ -80,9 +80,9 @@ class CpserviceCo
 
         $countRequestUserOne = $this->cpRepository->countExistingCpSameRelation($user->id,  $request->cp_relation_id);
         $countRequestUserTwo = $this->cpRepository->countExistingCpSameRelation($request->user_id,  $request->cp_relation_id);
-        if (($cpRelation->relations_number == 1) &&
-            (($countRequestUserOne >= $cpRelation->relations_number) ||
-                ($countRequestUserTwo >= $cpRelation->relations_number)) && $cpRelation->type != 'solution'
+        if (($cpRelation->relations_number == 0) &&
+            (($countRequestUserOne > $cpRelation->relations_number) ||
+                ($countRequestUserTwo > $cpRelation->relations_number)) && $cpRelation->type != 'solution'
         ) {
             return Common::apiResponse(0, ' cp لقد تخطيت طلب ');
         }
@@ -236,11 +236,21 @@ class CpserviceCo
 
 
         if ($request->status == 1) {
+           
+            $countRequestUserOne = $this->cpRepository->countExistingCpSameRelationActive($cp->user_one_id,  $cp->relation->id);
+            if (($cp->relation->relations_number == 0) &&
+                (($countRequestUserOne > $cp->relation->relations_number)) && $cp->relation->type != 'solution'
+            ) {
+             
+                return Common::apiResponse(0, ' cp لقد تخطيت طلب ');
+            }
+
             if ($cp->status == 5) {
                 $cp->status = 4; // restored
                 $cp->price += $cp->cpRelation->price;
                 $cp->save();
             } else {
+        
                 $this->cpRepository->updateCpStatus($cp, 1);
             }
             $decryptedData['status'] = 1;
