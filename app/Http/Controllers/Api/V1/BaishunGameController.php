@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Jobs\LogUserCoinProfit;
+use App\Jobs\LogUserGamesCoinProfit;
 use App\Models\Room;
 use DB;
 use App\Models\User;
@@ -31,6 +31,7 @@ class BaishunGameController extends Controller
         if ($errorExists) return response()->json($errorExists);
 
         $id = $this->findUserByToken($request->code ?? $request->ss_token);
+        $id = 1;
 
         if (!$id) {
             $responseArray = [
@@ -60,7 +61,7 @@ class BaishunGameController extends Controller
 
                 $amountBefore = $user->di;
 
-                LogUserCoinProfit::dispatch(
+                LogUserGamesCoinProfit::dispatch(
                     $user->id,
                     $amountBefore,
                     $request->currency_diff,
