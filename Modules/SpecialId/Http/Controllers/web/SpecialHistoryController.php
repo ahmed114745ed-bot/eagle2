@@ -130,7 +130,7 @@ class SpecialHistoryController extends MainController
         } else {
             $grid->model()->whereHas('ware');
             $grid->column('ware.name', __('value'))->display(function ($vale) {
-                if ($this->ware && request()->filled('_export_')) {
+                if (@$this->ware && request()->filled('_export_')) {
                     $name = $vale ?? '';
                     $id = $this->ware->id ?? 0;
                     return "{$name} (ID: {$id})";
