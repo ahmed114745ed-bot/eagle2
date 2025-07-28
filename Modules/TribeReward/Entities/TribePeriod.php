@@ -3,6 +3,7 @@
 namespace Modules\TribeReward\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TribePeriod extends Model
 {
@@ -22,5 +23,10 @@ class TribePeriod extends Model
             'Y-m-d H:i:s',
             strtotime(convertArabicToEnglishNumbers($value))
         );
+    }
+
+    public function tribeTops(): HasMany
+    {
+        return $this->hasMany(TribeTop::class);
     }
 }

@@ -31,8 +31,6 @@ class TribeReward extends Model
                 $model->target = request('target1', $model->target);
             } elseif ($model->target_type == 'vip') {
                 $model->target = request('target2', $model->target);
-            } elseif ($model->target_type == 'coins') {
-                $model->target = request('target3', $model->target);
             } elseif ($model->target_type == 'achievement') {
                 $file = request('target4', $model->target);
 
@@ -52,8 +50,6 @@ class TribeReward extends Model
                 $model->target = request('target1', $model->target);
             } elseif ($model->target_type == 'vip') {
                 $model->target = request('target2', $model->target);
-            } elseif ($model->target_type == 'coins') {
-                $model->target = request('target3', $model->target);
             } elseif ($model->target_type == 'achievement') {
                 $file = request('target4', $model->target);
                 if ($file instanceof UploadedFile) {

@@ -3,6 +3,7 @@
 namespace Modules\TribeReward\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
+use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -55,12 +56,16 @@ class TribeTopController extends MainController
         $grid->column('id', __('ID'))->sortable();
         $grid->column('tribe_period_id', __('Tribe Period'))->display(function ($pid) {
             $period = TribePeriod::find($pid);
-            return $period ? ($period->start_date . ' ~ ' . $period->end_date) : '-';
+            return $period
+                ? (Carbon::parse($period->start_date)->format('Y-m-d') . ' ~ ' .
+                    Carbon::parse($period->end_date)->format('Y-m-d'))
+                : '-';
         });
         $grid->column('min', __('min'));
         $grid->column('max', __('max'));
-        $grid->column('created_at', __('Created At'));
-
+        $grid->column('created_at', __('Created At'))->display(function ($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        });
         $grid->column(__('Procedures'))->display(function () {
             $url = url('admin/tribe_rewards/'.$this->id);
             $text = __('Tribe Rewards');
@@ -81,12 +86,19 @@ class TribeTopController extends MainController
         $show->field('id', __('ID'));
         $show->field('tribe_period_id', __('Tribe Period'))->as(function ($pid) {
             $period = TribePeriod::find($pid);
-            return $period ? ($period->start_date . ' ~ ' . $period->end_date) : '-';
+            return $period
+                ? (Carbon::parse($period->start_date)->format('Y-m-d') . ' ~ ' .
+                    Carbon::parse($period->end_date)->format('Y-m-d'))
+                : '-';
         });
         $show->field('min', __('min'));
         $show->field('max', __('max'));
-        $show->field('created_at', __('Created At'));
-        $show->field('updated_at', __('Updated At'));
+        $show->column('created_at', __('Created At'))->display(function ($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        });
+        $show->column('updated_at', __('Updated At'))->display(function ($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        });
 
         return $show;
     }
@@ -101,6 +113,24 @@ class TribeTopController extends MainController
 
         $form->number('min', __('min'))->required();
         $form->number('max', __('max'))->required();
+
+        $form->saving(function ($form) {
+            $exists = TribeTop::where('tribe_period_id', $form->tribe_period_id)
+                ->where(function ($q) use ($form) {
+                    $q->where('min', '<=', $form->max)
+                        ->where('max', '>=', $form->min);
+                });
+
+            if ($form->model()->id) {
+                $exists->where('id', '!=', $form->model()->id);
+            }
+
+            if ($exists->exists()) {
+                $error = __('There is already a top with an overlapping range for this period!');
+                admin_error($error);
+                return back()->withInput();
+            }
+        });
 
         return $form;
     }

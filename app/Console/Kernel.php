@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\TribeReward\Jobs\AgencyTribeRewardJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -96,6 +97,7 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/update-user-salaries.log'))
             ->runInBackground();
 
+        $schedule->job(new AgencyTribeRewardJob())->everySecond();
     //    $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }

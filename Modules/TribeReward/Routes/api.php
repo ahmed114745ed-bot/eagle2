@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\TribeReward\Http\Controllers\Api\TribeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/tribereward', function (Request $request) {
-    return $request->user();
+
+Route::group([
+    'prefix' => 'tribes',
+    'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan']
+], function (){
+    Route::get('/general', [TribeController::class, 'index']);
 });

@@ -7,6 +7,7 @@ use App\Models\Gift;
 use App\Models\OVip;
 use App\Models\Ware;
 use App\Selectables\Wares;
+use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -60,8 +61,6 @@ class TribeRewardController extends MainController
                 return @$this->ware->name;
             } elseif ($this->target_type == "vip") {
                 return @$this->vip->name;
-            } elseif ($this->target_type == "coins") {
-                return @$this->target;
             } elseif ($this->target_type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
@@ -85,8 +84,9 @@ class TribeRewardController extends MainController
         });
         $grid->column('quantity', __('Quantity'));
         $grid->column('expire_days', __('expire'));
-        $grid->column('created_at', __('Created At'));
-
+        $grid->column('created_at', __('Created At'))->display(function ($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        });
         if (method_exists($this, 'extendGrid')) {
             $this->extendGrid($grid);
         }
@@ -104,8 +104,12 @@ class TribeRewardController extends MainController
         $show->field('target', __('target'));
         $show->field('quantity', __('Quantity'));
         $show->field('expire_days', __('expire'));
-        $show->field('created_at', __('Created At'));
-        $show->field('updated_at', __('Updated At'));
+        $show->column('created_at', __('Created At'))->display(function ($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        });
+        $show->column('updated_at', __('Updated At'))->display(function ($value) {
+            return Carbon::parse($value)->format('Y-m-d');
+        });
 
         return $show;
     }
@@ -118,29 +122,36 @@ class TribeRewardController extends MainController
         $form->hidden('tribe_top_id')->default($tribe_top_id);
 
         $form->select('type', __('Type'))->options([
-            'agency_reward' => __('Agency Reward'),
+//            'agency_reward' => __('Agency Reward'),
             'share_rewards' => __('Share Rewards'),
-        ])->required();
-
-        $form->select('target_type', trans('Target Type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
-            ->when("ware", function () use ($form) {
+        ])->default('share_rewards')->required()
+            ->when('agency_reward', function (Form $form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
             })
-            ->when("vip", function () use ($form) {
-                $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    foreach ($vips as  $vip) {
-                        $ops[$vip->id] = $vip->name;
-                    }
-                    return $ops;
-                })->rules('required');
-            })
-            ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"))->rules('required');
-            })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
+            ->when('share_rewards', function (Form $form) {
+                $form->select('target_type', trans('Target Type'))->options([
+                    "ware" => __('ware'),
+                    "vip" => __('vip'),
+                    "achievement" => __('achievement')
+                ])
+                    ->when("ware", function (Form $form) {
+                        $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
+                    })
+                    ->when("vip", function (Form $form) {
+                        $form->select('target2', trans('vips'))->options(function () {
+                            $ops = [];
+                            $vips = OVip::query()->select('id', 'name')->get();
+                            foreach ($vips as  $vip) {
+                                $ops[$vip->id] = $vip->name;
+                            }
+                            return $ops;
+                        })->rules('required');
+                    })
+                    ->when("achievement", function (Form $form) {
+                        $form->image("target4", __('image'))->name(function ($file) {
+                            return now()->timestamp . '.' . $file->guessExtension();
+                        })->disk('gcs');
+                    });
             });
 
         $form->number('quantity', __('Quantity'))->required();
