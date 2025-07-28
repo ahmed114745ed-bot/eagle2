@@ -31,7 +31,7 @@ class BaishunGameController extends Controller
         if ($errorExists) return response()->json($errorExists);
 
         $id = $this->findUserByToken($request->code ?? $request->ss_token);
-        $id = 1;
+       
 
         if (!$id) {
             $responseArray = [
