@@ -83,13 +83,13 @@ trait EventModel
     public function scopePreviousEvent(Builder $query)
     {
 
-        $timezone = getTimezone(); // dynamic app/user timezone
-
-        // Get "now" in app timezone
-        $nowUtc = Carbon::now($timezone);
+        $timezone = getTimezone(); // e.g. 'Africa/Cairo'
+        $nowUtc = Carbon::now('UTC')->toDateTimeString();
 
         return $query
-            ->whereRaw("CONVERT_TZ(CONCAT(end_date, ' 23:59:59'), '+00:00', ?) < ?", [$timezone, $nowUtc->toDateTimeString()])
+            ->whereRaw("
+            CONVERT_TZ(DATE_ADD(end_date, INTERVAL 1 DAY), ?, '+00:00') <= ?
+        ", [$timezone, $nowUtc])
             ->orderByDesc('end_date');
     }
 
