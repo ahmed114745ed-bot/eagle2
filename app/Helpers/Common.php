@@ -106,8 +106,8 @@ class Common
         } else if ($event_type == 'weekly_star') {
             $event = WeeklyStar::previousEvent()->first();
 
-            LogHelper::info('This for event', ['id' , $event->id]);
             if ($event) {
+                LogHelper::info('This for event', ['id' , $event->id]);
                 $weekly_star = Winner::with('user')->where('weekly_star_id', $event->id)
                     ->where('level', 1)
                     ->first();
