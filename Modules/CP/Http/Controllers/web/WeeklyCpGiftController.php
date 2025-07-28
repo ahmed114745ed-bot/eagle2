@@ -83,6 +83,7 @@ class WeeklyCpGiftController extends MainController
         $type = 1;
         $weekly_cp_id = request('weekly_cp_id');
         $grid = new Grid(new WeeklyCpGift());
+         $grid->disableRowSelector();
         $grid->column('created_at')->hide();
         $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
         $grid->column('id', __('Id'));
@@ -124,6 +125,7 @@ class WeeklyCpGiftController extends MainController
         $type = 2;
         $weekly_cp_id = request('weekly_cp_id');
         $grid = new Grid(new WeeklyCpGift());
+         $grid->disableRowSelector();
         $grid->column('created_at')->hide();
         $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
         $grid->column('id', __('Id'));
@@ -165,6 +167,7 @@ class WeeklyCpGiftController extends MainController
         $type = 3;
         $weekly_cp_id = request('weekly_cp_id');
         $grid = new Grid(new WeeklyCpGift());
+         $grid->disableRowSelector();
         $grid->column('created_at')->hide();
         $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
         $grid->column('id', __('Id'));
