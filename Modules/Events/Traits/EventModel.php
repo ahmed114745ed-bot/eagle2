@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Traits;
 
+use App\Helpers\LogHelper;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Builder;
@@ -86,6 +87,7 @@ trait EventModel
         $timezone = getTimezone(); // e.g. 'Africa/Cairo'
         $nowUtc = Carbon::now('UTC')->toDateTimeString();
 
+        LogHelper::info('this timezone', $nowUtc);
         return $query
             ->whereRaw("
             CONVERT_TZ(DATE_ADD(end_date, INTERVAL 1 DAY), ?, '+00:00') <= ?
