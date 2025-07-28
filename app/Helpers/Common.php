@@ -2223,7 +2223,7 @@ class Common
     public  static function  checkUserAgencyFrozen(User $user): void
     {
         $ownedAgency = Agency::withoutGlobalScopes()
-            ->where('owner_id', $user->id)
+            ->where('app_owner_id', $user->id)
             ->first();
 
         if ($ownedAgency && $ownedAgency->is_frozen) {
