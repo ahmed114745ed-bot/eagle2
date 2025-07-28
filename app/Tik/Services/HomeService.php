@@ -135,7 +135,7 @@ class HomeService
 
         // Check if the ware exists when enabling the privilege
         if ($isAvailable && !Ware::where('type', $privilegeId)->exists()) {
-            throw new \Exception('not found');
+            throw new Exception('not found');
         }
 
         // Ensure the user has the pack before updating
@@ -143,7 +143,7 @@ class HomeService
             ->where('type', $privilegeId);
 
         if (!$packQuery->exists()) {
-            throw new \Exception(__('api.notWare'));
+            throw new Exception(__('api.notWare'));
         }
 
         // Fetch the specific pack with VIP level and expiration check
@@ -161,7 +161,7 @@ class HomeService
             'is_used' => $isAvailable,
             'using' => 1,
         ]);
-
+      
 
 
         return true;

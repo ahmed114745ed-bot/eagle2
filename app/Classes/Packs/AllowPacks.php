@@ -87,7 +87,7 @@ class AllowPacks
             ->where('is_active_for_vip', true)
             ->groupBy('type')
             ->get();
-
+         
         // Load VIP prices
         $this->vipPrices = $this->getVipPrices();
     }
