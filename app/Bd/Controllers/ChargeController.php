@@ -135,8 +135,9 @@ class ChargeController extends MainController
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
 
-        $grid->column('usd', __('usd'));
-
+        $grid->column('usd', __('usd'))->display(function ($value) {
+            return number_format($value, 2);
+        });
         $grid->disableCreateButton();
 
         $grid->tools(function (Grid\Tools $tools) {

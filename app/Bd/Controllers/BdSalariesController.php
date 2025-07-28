@@ -44,18 +44,17 @@ class BdSalariesController extends AdminController
         $totalCut =$netSalary->total_cut;
         $total_sallary =$netSalary->total_sallary;
         $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
+        $finalSalary = round($finalSalary,2);
             return $content
                 ->header(trans('admin.index'))
                 ->description(trans('admin.description'))
 
         ->row(function ($row) use ($finalSalary) {
-            // الكارت سيتم تضمينه من Blade View
-            // $row->column(12, view('admin.grid.bd.sallary', ['finalSalary' => $finalSalary]));
             $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalSalary]));
         })
         ->row(function (Row $row) use ($total_sallary, $totalCut ) {
-            $row->column(6, new InfoBox(__('total_sallary'), 'money', 'green', '', $total_sallary  . ' 💰' ));
-            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', 'charges', number_format($totalCut)));
+            $row->column(6, new InfoBox(__('total_sallary'), 'money', 'green', '', round($total_sallary ,2) . ' 💰' ));
+            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', 'charges', round($totalCut,2)));
         })
 
         ->row(function ($row) {
@@ -147,16 +146,22 @@ class BdSalariesController extends AdminController
             ";
         });
     
-        $grid->column('sallary', trans('totalBd'));
-        // $grid->column('total_cut', trans('cut'));
-    
-        // $grid->column('created_at', __('Created at'))->display(function ($value) {
-        //     return Carbon::parse($value)->translatedFormat('d F Y - h:i A');
-        // });     
-    
-        $grid->column('total_agency_sallary', __('Total Agency Sallary'));
-        $grid->column('total_users_sallary', __('Total Users Sallary'));
-        $grid->column('total_diamond', __('Total Diamond'));
+        $grid->column('sallary', trans('totalBd'))->display(function ($value) {
+          
+            return number_format($value, 2);
+        });
+        
+        $grid->column('total_agency_sallary', __('Total Agency Sallary'))->display(function ($value) {
+            return number_format($value, 2);
+        });
+        
+        $grid->column('total_users_sallary', __('Total Users Sallary'))->display(function ($value) {
+            return number_format($value, 2);
+        });
+        
+        $grid->column('total_diamond', __('Total Diamond'))->display(function ($value) {
+            return number_format($value, 2);
+        });
         $grid->column('month', __('month'));
         $grid->column('year', __('year'));
         // $grid->tools(function (Grid\Tools $tools) {
