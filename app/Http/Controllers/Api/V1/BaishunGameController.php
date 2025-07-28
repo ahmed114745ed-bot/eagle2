@@ -58,7 +58,8 @@ class BaishunGameController extends Controller
                 if ($request->currency_diff < 0 && $userDi < abs($request->currency_diff)) {
                     throw new \RuntimeException('insufficient');
                 }
-
+               
+                
                 $amountBefore = $user->di;
 
                 LogUserGamesCoinProfit::dispatch(
@@ -70,7 +71,14 @@ class BaishunGameController extends Controller
                     'coin_game'
                 )->onQueue('log_user_coin');
 
-
+                \Log::info('Dispatching LogUserGamesCoinProfit Job', [
+                    'user_id'        => $user->id,
+                    'amount_before'  => $amountBefore,
+                    'currency_diff'  => $request->currency_diff,
+                    'type'           => 'coinGame',
+                    'sub_type'       => 'coin_game_users',
+                    'item_name'      => 'coin_game',
+                ]);
                 DB::table('users')->where('id', $id)->update([
                     'di' => DB::raw('di + ' . (int) $request->currency_diff)
                 ]);
