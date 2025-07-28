@@ -127,12 +127,17 @@ class HomeService
 
     public function changePackMode(string $type, array $privilegeArr, User $user, bool $isAvailable): bool
     {
+        Log::info('changePackMode started', [
+            'type' => $type,
+            'user_id' => $user->id,
+            'isAvailable' => $isAvailable,
+        ]);
         if (!array_key_exists($type, $privilegeArr)) {
             return false;
         }
 
         $privilegeId = $privilegeArr[$type];
-
+        Log::info("Privilege ID resolved", ['privilegeId' => $privilegeId]);
         // Check if the ware exists when enabling the privilege
         if ($isAvailable && !Ware::where('type', $privilegeId)->exists()) {
             throw new Exception('not found');
@@ -162,7 +167,11 @@ class HomeService
             'using' => 1,
         ]);
       
-
+        Log::info("Pack updated successfully", [
+            'pack_id' => $pack->id,
+            'is_used' => $isAvailable,
+        ]);
+    
 
         return true;
     }
