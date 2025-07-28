@@ -246,7 +246,7 @@ class UserHandling
         $url = $request->url();
         $method = $request->method();
         $path = parse_url($url, PHP_URL_PATH);
-        // Remove the leading slash
+        // Remove the leading slash 
         $path = ltrim($path, '/');
         // Split the path into segments
         $segments = explode('/', $path);

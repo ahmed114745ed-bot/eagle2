@@ -288,6 +288,7 @@ class MyDataResource extends JsonResource
                 "top_stars" => $starsImagesShippingAgency ?? (object)[],
 
             ] : null,
+            ''
 
         ];
 
