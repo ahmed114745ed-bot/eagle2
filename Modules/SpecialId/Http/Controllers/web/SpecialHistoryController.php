@@ -83,7 +83,7 @@ class SpecialHistoryController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))->display(function () {
             $name = @$this->user->name ?? '';
-            $uid = @$this->user->uuid;
+            $uid = @$this->user->uuid ??0;
             if (request()->filled('_export_')) {
                 return "{$name} (UUID: {$uid})";
             }
