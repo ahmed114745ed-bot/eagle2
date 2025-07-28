@@ -197,7 +197,7 @@ class LevelGiftController extends MainController
         ])->required();
 
         $form->saving(function (Form $form) {
-               unset(request()['type_ware']);
+            unset($form->type_ware);
             if ($form->type == 'ware') {
                 $ware = Ware::find($form->item_id);
                 if ($ware) {
