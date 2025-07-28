@@ -155,28 +155,28 @@ class SpecialHistoryController extends MainController
                 "></span>";
         });
 
-        // $grid->column('created_at', __('start date'))
-        //     ->display(function ($value) {
-        //         $timezone = getTimezone();
-        //         return Carbon::parse($value)->setTimezone($timezone)->format('Y-m-d');
-        //     });
+        $grid->column('created_at', __('start date'))
+            ->display(function ($value) {
+                $timezone = getTimezone();
+                return Carbon::parse($value)->setTimezone($timezone)->format('Y-m-d');
+            });
 
-        // $grid->column('ware.expire', __('end date'))
-        //     ->display(function ($value) {
-        //         $timezone = getTimezone();
-        //         if ($this->ware->get_type == 4) {
-        //             return '∞';
-        //         }
+        $grid->column('ware.expire', __('end date'))
+            ->display(function ($value) {
+                $timezone = getTimezone();
+                if ($this->ware->get_type == 4) {
+                    return '∞';
+                }
 
-        //         if (!$this->ware) {
-        //             return '-';
-        //         }
+                if (!$this->ware) {
+                    return '-';
+                }
 
-        //         return Carbon::parse($this->created_at)
-        //             ->addDays($this->ware->expire) // Add expire days
-        //             ->setTimezone($timezone)
-        //             ->format('Y-m-d');
-        //     });
+                return Carbon::parse($this->created_at)
+                    ->addDays($this->ware->expire) // Add expire days
+                    ->setTimezone($timezone)
+                    ->format('Y-m-d');
+            });
         //        $grid->column('created_at', trans('admin.created_at'))->diffForHumans();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableEdit();
