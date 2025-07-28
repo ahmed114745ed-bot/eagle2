@@ -97,7 +97,10 @@ class WareTabController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->disableIdFilter();
+            $filter->equal('get_type', __('get_type'))->select([
+                4 => trans('purchase'),
+                6 => trans('limited time purchase'),
+            ]);
         });
 
         $grid->id(__('ID'));
