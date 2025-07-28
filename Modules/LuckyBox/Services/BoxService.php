@@ -76,7 +76,7 @@ class BoxService
             'user_id' => $userId,
             'coins' => $boxCoin,
             'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
-            'end_at' => now()->setTimezone($timezone ?? 'UTC')->addSeconds($normalDuration)->timestamp,
+            'end_at' => now()->setTimezone($timezone ?? 'UTC')->addHours($normalDuration)->timestamp,
             'room_uid' => $room->uid,
             'room_id' => $room->id,
             'users_num' =>  $request->users_num,
@@ -95,7 +95,7 @@ class BoxService
         );
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
-        dispatch(new NormalLuckyBoxJop())->delay(now()->addSecond($normalDuration))->onQueue('test-super-lucky-box');
+        dispatch(new NormalLuckyBoxJop())->delay(now()->addHours($normalDuration))->onQueue('test-super-lucky-box');
         return $boxUser;
     }
 
