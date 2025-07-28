@@ -129,7 +129,7 @@ class SpecialHistoryController extends MainController
                 ]);
         } else {
             $grid->column('ware.name', __('value'))->display(function ($vale) {
-                if (request()->filled('_export_')) {
+                if ($this->ware && request()->filled('_export_')) {
                     $name = $vale ?? '';
                     $id = $this->ware->id ?? 0;
                     return "{$name} (ID: {$id})";
