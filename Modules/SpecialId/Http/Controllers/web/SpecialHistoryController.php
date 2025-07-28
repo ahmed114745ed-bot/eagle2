@@ -128,6 +128,7 @@ class SpecialHistoryController extends MainController
                     6 => trans('limited time purchase'),
                 ]);
         } else {
+            $grid->model()->whereHas('ware');
             $grid->column('ware.name', __('value'))->display(function ($vale) {
                 if ($this->ware && request()->filled('_export_')) {
                     $name = $vale ?? '';
