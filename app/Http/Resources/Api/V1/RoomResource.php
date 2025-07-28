@@ -25,6 +25,8 @@ class RoomResource extends JsonResource
         }
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
         $have_luck_box = $this->boxUse;
+        $isHideCountry = $this?->owner?->getPackWithType(13);
+
         /**@var Room $this*/
         $data = [
             'id' => $this->id,
@@ -56,15 +58,13 @@ class RoomResource extends JsonResource
             'room_background' => $this->final_room_image,
             'stream_type' => $this->type ?? 'audio',
             'is_live' => (bool)$this->is_live,
-            'country' => $this->country
-                ? new CountryResource($this->country)
-                : [
-                    'id' => 0,
-                    'name' => '',
-                    'flag' => '',
-                    'lang' => '',
-                    'phone_code' => ''
-                ],
+            'country' => !$isHideCountry ? new CountryResource(@$this->resource) : [
+                'id' => 0,
+                'name' => '',
+                'flag' => '',
+                'lang' => '',
+                'phone_code' => ''
+            ],
             'have_luck_box' => (bool) $have_luck_box,
             'achievement_images' => $achievement_images,
             /** refactored */

@@ -255,7 +255,8 @@ class HomeController extends Controller
                 'anti_ban'       => 30,
             ];
             $type         = $request->type;
-            $this->homeService->changePackMode($type, $privilegeArr, $user, true);
+          
+            $this->homeService->changePackMode($type, $privilegeArr, $user, false);
 
             return Common::apiResponse(1, 'ok', null, 200);
         } catch (Exception $e) {
@@ -279,7 +280,7 @@ class HomeController extends Controller
             'anti_ban'       => 30,
         ];
         $type         = $request->type;
-        $this->homeService->changePackMode($type, $privilegeArr, $user, false);
+        $this->homeService->changePackMode($type, $privilegeArr, $user, true);
 
         return Common::apiResponse(1, 'ok', null, 200);
     }
