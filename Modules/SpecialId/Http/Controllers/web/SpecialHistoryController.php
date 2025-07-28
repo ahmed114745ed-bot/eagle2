@@ -79,11 +79,11 @@ class SpecialHistoryController extends MainController
                 $filter->equal('ware.value', __('UUID'));
             });
         });
-
+       
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))->display(function () {
             $name = @$this->user->name ?? '';
-            $uid = @$this->user->uuid ??0;
+            $uid = @$this->user->uuid ?? 0;
             if (request()->filled('_export_')) {
                 return "{$name} (UUID: {$uid})";
             }
@@ -110,9 +110,11 @@ class SpecialHistoryController extends MainController
                 return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
             });
             $grid->column('ware.show_img', __('image'))->display(function ($path) {
+                if ($this->ware) {
+                    $url = getImagePath($path);
+                    return handleShowImageWithTypes($this->id, $url, 50, 50);
+                }
                 /** @var Ware $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
             $grid->column('ware.get_type', __('get_type'))->select(
                 [
@@ -129,8 +131,9 @@ class SpecialHistoryController extends MainController
         } else {
             $grid->column('ware.name', __('value'))->display(function ($vale) {
                 if (request()->filled('_export_')) {
-                    $id = $this->ware->id;
-                    return "{$vale} (ID: {$id})";
+                    $name = $vale ?? '';
+                    $id = $this->ware->id ?? 0;
+                    return "{$name} (ID: {$id})";
                 }
             });
 
