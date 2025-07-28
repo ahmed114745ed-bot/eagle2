@@ -166,7 +166,7 @@ class SpecialHistoryController extends MainController
         $grid->column('ware.expire', __('end date'))
             ->display(function ($value) {
                 $timezone = getTimezone();
-                if (!$this->ware->get_type) {
+                if (!@$this->ware->get_type) {
                     return '-';
                 }
                 if ($this->ware->get_type == 4) {
