@@ -104,7 +104,7 @@ class Common
                 }
             }
         } else if ($event_type == 'weekly_star') {
-            $event = WeeklyStar::previousEvent()->first();
+            $event = WeeklyStar::weeklyStar()->previousEvent()->first();
 
             if ($event) {
                 LogHelper::info('This for event', ['id' , $event->id]);

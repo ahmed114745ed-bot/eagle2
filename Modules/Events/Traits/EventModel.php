@@ -90,8 +90,7 @@ trait EventModel
 
         return $query
             ->whereRaw("CONVERT_TZ(CONCAT(end_date, ' 23:59:59'), '+00:00', ?) < ?", [$timezone, $nowUtc->toDateTimeString()])
-            ->orderByDesc('end_date')
-            ->limit(1);
+            ->orderByDesc('end_date');
     }
 
 
