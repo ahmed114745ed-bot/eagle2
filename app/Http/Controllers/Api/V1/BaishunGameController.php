@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Helpers\LogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Models\Room;
 use DB;
@@ -19,7 +20,111 @@ use App\Http\Services\BaishunGameServices;
 
 class BaishunGameController extends Controller
 {
+
     public function changeBalance(Request $request)
+    {
+        LogHelper::info('Change Balance Request:', $request->all());
+
+
+        $errorExists = $this->checkWallet($request);
+        if ($errorExists) return response()->json($errorExists);
+
+        $id = $this->findUserByToken($request->code ?? $request->ss_token);
+
+        if (!$id) {
+            $responseArray = [
+                'code' => 1,
+                'message' => 'user not found',
+                'unique_id' => 0,
+            ];
+
+            return response()->json($responseArray);
+        }
+
+        $userDi = 0;
+
+        try {
+            DB::transaction(function () use ($id, $request, &$userDi) {
+                $user = DB::table('users')->where('id', $id)->lockForUpdate()->first();
+
+                if (!$user) {
+                    throw new \Exception('User not found');
+                }
+
+                $userDi = $user->di;
+
+                if ($request->currency_diff < 0 && $userDi < abs($request->currency_diff)) {
+                    throw new \RuntimeException('insufficient');
+                }
+
+                DB::table('users')->where('id', $id)->update([
+                    'di' => DB::raw('di + ' . (int) $request->currency_diff)
+                ]);
+
+                $userDi += (int) $request->currency_diff;
+            });
+        } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'insufficient') {
+                $responseArray = [
+                    'code' => 1,
+                    'message' => 'failed',
+                    'unique_id' => (string) $id,
+                    'data' => [
+                        'currency_balance' => $userDi
+                    ]
+                ];
+
+                return response()->json($responseArray);
+            }
+
+            throw $e; // rethrow other unexpected errors
+        }
+
+        $type = $request->currency_diff >= 0;
+
+        $gameId = User::withoutAppends()->where('id', $id)->value('game_id');
+        dispatch(new GameWalletJop($request->currency_diff));
+
+        CoinGameUser::create([
+            'user_id' => $id,
+            'coins' => abs($request->currency_diff),
+            'app_profit_coins' => abs($request->currency_diff),
+            'type' => $type,
+            'game_id' => @$gameId
+        ]);
+
+        $responseArray = [
+            'code' => 0,
+            'message' => 'succeed',
+            'unique_id' => (string) $id,
+            'data' => [
+                'currency_balance' => floatval($userDi)
+            ]
+        ];
+
+        if ($type && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
+            $user = User::with(['profile', 'nowGame'])->find($id);
+            $room = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
+
+            $d = [
+                "messageContent" => [
+                    "message" => "SBG",
+                    'uImage'  => $user->profile?->avatar ?? 0,
+                    'uName'   => $user->name ?? '',
+                    'uId'     => $user->id ?? 0,
+                    'coins'   => numToStringNew((int) $request->currency_diff),
+                    "gImage"  => @$user->nowGame?->image
+                ]
+            ];
+
+            $json = json_encode($d);
+            dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
+        }
+
+        return response()->json($responseArray);
+    }
+
+    /**public function changeBalance(Request $request)
     {
 
 //        $allowedUsers = [1177];
@@ -89,7 +194,7 @@ class BaishunGameController extends Controller
             ]
         ];
 
-        if ($type /*&& @$user->nowGame*/ && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
+        if ($type && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
             $room      = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
             $d    = [
                 "messageContent" => [
@@ -144,7 +249,7 @@ class BaishunGameController extends Controller
         }
 
         return;
-    }
+    }**/
 
     public function obtianSstoken(Request $request)
     {
@@ -274,7 +379,8 @@ class BaishunGameController extends Controller
     public function checkWallet($request)
     {
         $gameWallet = GameWallet::filterByMonth()->first();
-        $used = $gameWallet->used + ((($request?->currency_diff ?? 0) < 0) ? ($request->currency_diff * -1) : 0);
+        $gameUsed = $gameWallet?->used ?? 0;
+        $used = $gameUsed + ((($request?->currency_diff ?? 0) < 0) ? ($request->currency_diff * -1) : 0);
         if (!$gameWallet || $used >= $gameWallet->balance) {
             $responseArray = [
                 'code' => 1,

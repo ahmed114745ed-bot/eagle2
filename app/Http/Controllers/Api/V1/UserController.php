@@ -592,7 +592,7 @@ class UserController extends Controller
             $totalDiff = isset($previousTotal) ? $previousTotal - $currentTotal : 0;
             $previousTotal = $currentTotal;
 
-            $frame = Common::getUserDress($senderId, $dressId, 4, 'img2', true) 
+            $frame = Common::getUserDress($senderId, $dressId, 4, 'img2', true)
                 ?: Common::getUserDress($senderId, $dressId, 4, 'img1', true);
 
             return [

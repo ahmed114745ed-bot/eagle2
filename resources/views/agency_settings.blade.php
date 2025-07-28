@@ -391,7 +391,7 @@
                     style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Percentage target') }}</button>
                 <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
                 <button onclick="showSection('user_days')">{{ __('user days') }}</button>
-                <button onclick="showSection('agency_settings')">{{ __('Agency Settings') }}</button>
+                {{-- <button onclick="showSection('agency_settings')">{{ __('Agency Settings') }}</button> --}}
 
                 <button onclick="showSection('targets_table')">{{ __('Targets') }}</button>
             </div>
@@ -580,48 +580,7 @@
                 @endforeach
             </div>
 
-            <div id="agency_settings" class="settings-section ">
-
-                <form id="agency_settings-form">
-                    <div class="switch-container mt-4">
-                        <div class="switch-item">
-                            <label for="stopCharge" class="switch-label">{{ __('dashboard.frazeCharge') }}</label>
-                            <label class="switch">
-                                <input type="checkbox" id="stopCharge" {{ $stop_charge == 1 ? 'checked' : '' }}>
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="switch-container mt-4">
-                        <div class="switch-item">
-                            <label for="stopInviteCode" class="switch-label">{{ __("dashboard.closeCose") }}</label>
-                            <label class="switch">
-                                <input type="checkbox" id="stopInviteCode" {{ $stop_invite_code == 1 ? 'checked' : '' }}>
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="switch-container mt-4">
-                        <div class="switch-item">
-                            <label for="stopTransferSalary" class="switch-label">{{ __("dashboard.transSalary") }}</label>
-                            <label class="switch">
-                                <input type="checkbox" id="stopTransferSalary" {{ $transfer_salary == 1 ? 'checked' : '' }}>
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="switch-container mt-4">
-                        <div class="switch-item">
-                            <label for="stopGiftCheckbox" class="switch-label">{{__('Stop sending gifts to everyone')}}</label>
-                            <label class="switch">
-                                <input type="checkbox" id="stopGiftCheckbox" {{ $make_gift_top == 1 ? 'checked' : '' }}>
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-                </form>
-
-            </div>
+            
 
             <div id="targets_table" class="settings-section">
                 <h3>{{ __('Targets table') }}</h3>

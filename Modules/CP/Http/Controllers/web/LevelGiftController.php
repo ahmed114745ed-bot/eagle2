@@ -94,6 +94,7 @@ class LevelGiftController extends MainController
         $charge_event_id = request('cp_level_id');
         $vip = CpLevel::query()->find($charge_event_id);
         $grid = new Grid(new CpLevelGift());
+         $grid->disableRowSelector();
         $grid->column('created_at')->hide();
         $grid->model()->where("vip_id",$charge_event_id);
 

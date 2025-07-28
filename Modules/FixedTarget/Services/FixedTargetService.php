@@ -225,6 +225,7 @@ class FixedTargetService
             'achieved_hours' =>   $hours ?? 0,
             'achieved_days' =>  $days ?? 0,
             'achieved_diamond' =>  $month_received ?? 0,
+            
         ];
         if (0 < $t) $values['sallary'] = $t;
 
@@ -233,6 +234,7 @@ class FixedTargetService
             'month' => $this->month,
             'year' => $this->year,
             'user_agency_id' => $user->agency_id,
+            'is_finished' =>  0,
         ])->lock()->first();
         if ($userSalary) {
             $values['remaining_diamond'] =  ($month_received - (@$target->diamonds ?? 0));
