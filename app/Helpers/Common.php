@@ -2218,4 +2218,26 @@ class Common
             ->pluck('sub_type')
             ->toArray();
     }
+
+
+    public  static function  checkUserAgencyFrozen(User $user): void
+    {
+        $ownedAgency = Agency::withoutGlobalScopes()
+            ->where('owner_id', $user->id)
+            ->first();
+
+        if ($ownedAgency && $ownedAgency->is_frozen) {
+            throw new \Exception(__('frozen_agency_by_admin'));
+        }
+        if ($user->agency_id) {
+            $hostAgency = Agency::withoutGlobalScopes()
+                ->where('id', $user->agency_id)
+                ->first();
+
+            if ($hostAgency && $hostAgency->is_frozen) {
+                throw new \Exception(__('api_responses.frozen_agency_by_admin'));
+            }
+        }
+    }
+
 }
