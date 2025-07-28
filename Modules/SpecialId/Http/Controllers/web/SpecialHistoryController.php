@@ -109,13 +109,13 @@ class SpecialHistoryController extends MainController
                 $icon = asset('images/coin.png'); // Ensure this path is correct
                 return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
             });
-            // $grid->column('ware.show_img', __('image'))->display(function ($path) {
-            //     if ($this->ware) {
-            //         $url = getImagePath($path);
-            //         return handleShowImageWithTypes($this->id, $url, 50, 50);
-            //     }
-            //     /** @var Ware $this */
-            // });
+            $grid->column('ware.show_img', __('image'))->display(function ($path) {
+                if ($this->ware) {
+                    $url = getImagePath($path);
+                    return handleShowImageWithTypes($this->id, $url, 50, 50);
+                }
+                /** @var Ware $this */
+            });
             // $grid->column('ware.get_type', __('get_type'))->select(
             //     [
             //         //  1=>trans ('vip level automatic acquisition'),
