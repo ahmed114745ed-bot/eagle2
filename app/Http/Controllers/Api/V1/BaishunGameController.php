@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Helpers\LogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Models\Room;
 use DB;
@@ -22,7 +23,9 @@ class BaishunGameController extends Controller
 
     public function changeBalance(Request $request)
     {
-        Log::info('this response ' . PHP_EOL . $request->json());
+        LogHelper::info('Change Balance Request:', $request->all());
+
+
         $errorExists = $this->checkWallet($request);
         if ($errorExists) return response()->json($errorExists);
 

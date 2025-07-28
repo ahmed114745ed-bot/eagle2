@@ -2205,10 +2205,6 @@ class Common
     {
         $balance = User::where('id', $userId)->value('di') ?? 0;
 
-        Log::info("Current balance fetched", [
-            'user_id' => $userId,
-            'balance' => $balance,
-        ]);
 
         return $balance;
     }
