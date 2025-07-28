@@ -53,14 +53,6 @@ class LogUserCoinProfit implements ShouldQueue
             'from_date'     => $this->createdAt,
             'to_date'       => $this->createdAt,
         ]);
-        $amountBefore = Common::getCurrentBalance($this->userId);
-        UserCoinLogHelper::log(
-            $this->userId,
-            'profit',
-            'login_profit',
-            $this->amount,
-            $amountBefore ?? 0,
-            'login_profit'
-        );
+    
     }
 }
