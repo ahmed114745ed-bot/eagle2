@@ -109,6 +109,7 @@ class Common
             if ($event) {
                 $weekly_star = Winner::with('user')->where('weekly_star_id', $event->id)
                     ->where('level', 1)
+                    ->latest('id')
                     ->first();
 
                 if ($weekly_star) {
