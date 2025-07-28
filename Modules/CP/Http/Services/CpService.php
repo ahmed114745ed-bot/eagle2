@@ -45,15 +45,15 @@ class CpService
                 ->where('user_two_id', $receiver->id)
                 ->orWhere(function ($query) use ($sender, $receiver) {
                     $query->where('user_two_id', $sender->id)
-                          ->where('user_one_id', $receiver->id);
+                        ->where('user_one_id', $receiver->id);
                 });
         })
-        ->whereIn('status', [1, 4])
-        ->whereHas('cpRelation', function ($q) {
-            $q->where('type', '!=', 'solution');
-        })
-        ->first();
-        
+            ->whereIn('status', [1, 4])
+            ->whereHas('cpRelation', function ($q) {
+                $q->where('type', '!=', 'solution');
+            })
+            ->first();
+
 
         if (!$checkIfExistCp) {
             return false;
@@ -68,13 +68,13 @@ class CpService
         if (!$cp) return false;
 
         $newDi = $cp->di + $diamonds;
-        $level = $this->getLevel($cp->cp_relation_id ,$newDi);
+        $level = $this->getLevel($cp->cp_relation_id, $newDi);
         if ($level) {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi,
                 'level_id' => $level->level
             ]);
-            // $this->assignGifts($level->level, $cp);
+            $this->assignGifts($level->level, $cp);
         } else {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
@@ -84,9 +84,9 @@ class CpService
         return true;
     }
 
-    public function getLevel(int $cpRelationId,int $totalCoins)
+    public function getLevel(int $cpRelationId, int $totalCoins)
     {
-        return CpLevel::query()->where('cp_relation_id',$cpRelationId)->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
+        return CpLevel::query()->where('cp_relation_id', $cpRelationId)->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }
 
 
@@ -115,7 +115,7 @@ class CpService
 
     protected function getUserById($id)
     {
-       return User::find($id);
+        return User::find($id);
     }
 
     protected function hasTakenGift($cpId, $level)
@@ -125,7 +125,7 @@ class CpService
 
     protected function getRewardsForLevel($level)
     {
-        return CpLevelGift::whereHas('cp_level', function($q) use ($level) {
+        return CpLevelGift::whereHas('cp_level', function ($q) use ($level) {
             $q->where('level', $level);
         })->get();
     }
@@ -211,6 +211,4 @@ class CpService
             'level' => $level,
         ]);
     }
-
-
 }

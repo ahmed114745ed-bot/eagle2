@@ -116,7 +116,7 @@ class CpRepository
     {
         return Cp::where(function ($query) use ($userId,) {
             $query->where(function ($query) use ($userId,) {
-                $query->where("user_two_id", $userId);
+                $query->where("user_two_id", $userId)->orWhere("user_one_id",$userId);
             });
         })->where('cp_relation_id', $relationId)
             /// TODO convert these status to enum

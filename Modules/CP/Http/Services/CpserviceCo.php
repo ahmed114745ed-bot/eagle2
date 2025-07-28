@@ -80,7 +80,7 @@ class CpserviceCo
 
         $countRequestUserOne = $this->cpRepository->countExistingCpSameRelation($user->id,  $request->cp_relation_id);
         $countRequestUserTwo = $this->cpRepository->countExistingCpSameRelation($request->user_id,  $request->cp_relation_id);
-        if (($cpRelation->relations_number > 0) &&
+        if (($cpRelation->relations_number == 1) &&
             (($countRequestUserOne >= $cpRelation->relations_number) ||
                 ($countRequestUserTwo >= $cpRelation->relations_number)) && $cpRelation->type != 'solution'
         ) {

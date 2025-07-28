@@ -38,6 +38,9 @@ class CpLevelGift extends Model
             if ($model->achievement) {
                 unset($model->achievement);
             }
+            if ($model->type_ware) {
+                unset($model->type_ware);
+            }
         });
     }
 }
