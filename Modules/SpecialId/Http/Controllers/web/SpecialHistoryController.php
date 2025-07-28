@@ -133,6 +133,8 @@ class SpecialHistoryController extends MainController
                     $name = $vale ?? '';
                     $id = $this->ware->id ?? 0;
                     return "{$name} (ID: {$id})";
+                } else {
+                    return '-';
                 }
             });
 
@@ -173,7 +175,7 @@ class SpecialHistoryController extends MainController
                     return '∞';
                 }
 
-                
+
 
                 return Carbon::parse($this->created_at)
                     ->addDays($this->ware->expire) // Add expire days
