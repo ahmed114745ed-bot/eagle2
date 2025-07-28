@@ -79,7 +79,7 @@ class SpecialHistoryController extends MainController
                 $filter->equal('ware.value', __('UUID'));
             });
         });
-       
+
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))->display(function () {
             $name = @$this->user->name ?? '';
@@ -116,18 +116,17 @@ class SpecialHistoryController extends MainController
                 }
                 /** @var Ware $this */
             });
-            // $grid->column('ware.get_type', __('get_type'))->select(
-            //     [
-            //         //  1=>trans ('vip level automatic acquisition'),
-            //         //               2=>trans ('activity'),
-            //         //               3=>trans ('treasure box'),
-            //         4 => trans('purchase'),
-            //         //               5=>trans ('background modification'),
-            //         6 => trans('limited time purchase'),
-            //         //               7=>trans ('treasure box point exchange'),
-            //         //               8=>trans ('cp level unlock'),
-            //     ]
-            // );
+            $grid->column('ware.get_type', __('get_type'))
+                ->display(function ($value) {
+                    if (is_null($value)) {
+                        return "<span style='color:red;'>⚠️ نوع غير متوفر</span>";
+                    }
+                    return $value;
+                })
+                ->select([
+                    4 => trans('purchase'),
+                    6 => trans('limited time purchase'),
+                ]);
         } else {
             $grid->column('ware.name', __('value'))->display(function ($vale) {
                 if (request()->filled('_export_')) {
@@ -138,8 +137,11 @@ class SpecialHistoryController extends MainController
             });
 
             $grid->column('ware.get_type', __('get_type'))->display(function ($status) {
-                if (request()->filled('_export_')) {
+
+                if ($this->ware->get_type && $request()->filled('_export_')) {
                     return $status == 4 ? trans('purchase') : trans('limited time purchase');
+                } else {
+                    return '';
                 }
                 // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
 
