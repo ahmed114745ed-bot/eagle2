@@ -31,7 +31,7 @@ class BaishunGameController extends Controller
         if ($errorExists) return response()->json($errorExists);
 
         $id = $this->findUserByToken($request->code ?? $request->ss_token);
-       
+
 
         if (!$id) {
             $responseArray = [
@@ -47,6 +47,7 @@ class BaishunGameController extends Controller
 
         try {
             DB::transaction(function () use ($id, $request, &$userDi) {
+                // Lock user row to prevent race conditions
                 $user = DB::table('users')->where('id', $id)->lockForUpdate()->first();
 
                 if (!$user) {
@@ -55,11 +56,20 @@ class BaishunGameController extends Controller
 
                 $userDi = $user->di;
 
+                // Check if order_id already used in coin_game_users
+                $orderExists = DB::table('coin_game_users')
+                    ->where('order_id', $request->order_id)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($orderExists) {
+                    throw new \RuntimeException('duplicate_order');
+                }
+
                 if ($request->currency_diff < 0 && $userDi < abs($request->currency_diff)) {
                     throw new \RuntimeException('insufficient');
                 }
-               
-                
+
                 $amountBefore = $user->di;
 
                 LogUserGamesCoinProfit::dispatch(
@@ -71,20 +81,28 @@ class BaishunGameController extends Controller
                     'coin_game'
                 )->onQueue('log_user_coin');
 
-                \Log::info('Dispatching LogUserGamesCoinProfit Job', [
-                    'user_id'        => $user->id,
-                    'amount_before'  => $amountBefore,
-                    'currency_diff'  => $request->currency_diff,
-                    'type'           => 'coinGame',
-                    'sub_type'       => 'coin_game_users',
-                    'item_name'      => 'coin_game',
-                ]);
                 DB::table('users')->where('id', $id)->update([
                     'di' => DB::raw('di + ' . (int) $request->currency_diff)
                 ]);
 
                 $userDi += (int) $request->currency_diff;
+
+                // Insert into coin_game_users after all checks
+                $gameId = User::withoutAppends()->where('id', $id)->value('game_id');
+
+                DB::table('coin_game_users')->insert([
+                    'user_id' => $id,
+                    'coins' => abs($request->currency_diff),
+                    'app_profit_coins' => abs($request->currency_diff),
+                    'type' => $request->currency_diff >= 0,
+                    'game_id' => $gameId,
+                    'round_id' => $request->game_round_id,
+                    'order_id' => $request->order_id,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
             });
+
         } catch (\RuntimeException $e) {
             if ($e->getMessage() === 'insufficient') {
                 $responseArray = [
@@ -104,16 +122,8 @@ class BaishunGameController extends Controller
 
         $type = $request->currency_diff >= 0;
 
-        $gameId = User::withoutAppends()->where('id', $id)->value('game_id');
         dispatch(new GameWalletJop($request->currency_diff));
 
-        CoinGameUser::create([
-            'user_id' => $id,
-            'coins' => abs($request->currency_diff),
-            'app_profit_coins' => abs($request->currency_diff),
-            'type' => $type,
-            'game_id' => @$gameId
-        ]);
 
         $responseArray = [
             'code' => 0,
