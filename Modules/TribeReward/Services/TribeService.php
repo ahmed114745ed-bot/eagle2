@@ -63,8 +63,9 @@ class TribeService
     {
         $user = auth()->user();
         $AgencyReward = AgencyReward::findOrFail($id);
+        $userOwnAgency = $user->ownAgency;
 
-        if (!$user->ownAgency || $user->ownAgency->id != $AgencyReward->agency_id) {
+        if (!$userOwnAgency || $userOwnAgency->id != $AgencyReward->agency_id) {
             throw new Exception(__('you dont have permission'), 403);
         }
 
@@ -92,11 +93,11 @@ class TribeService
                 switch ($AgencyReward->target_type) {
                     case "vip":
                         $vip = OVip::find($AgencyReward->target);
-                        UserCommon::addVipToUser($user, $vip, $AgencyReward->expire_days);
+                        UserCommon::addVipToUser($user, $vip, $AgencyReward->expire_days, $userOwnAgency);
                         break;
                     case "ware":
                         $ware = Ware::find($AgencyReward->target);
-                        UserCommon::addWareToUser($user, $ware, $AgencyReward->expire_days);
+                        UserCommon::addWareToUser($user, $ware, $AgencyReward->expire_days, $userOwnAgency);
                         break;
                     case "achievement":
                         $dateTimestamp = Carbon::parse($AgencyReward->expire_days)->format("Y-m-d H:i:s");

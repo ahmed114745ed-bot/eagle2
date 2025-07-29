@@ -993,7 +993,7 @@ class Common
     }
 
 
-    public static function handelVip($vip, $user, $expire,  $userVip)
+    public static function handelVip($vip, $user, $expire,  $userVip, $sender = null)
     {
         if ($userVip->is_used) {
             $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
@@ -1096,7 +1096,7 @@ class Common
                 $pack->save();
                 // }
             } else {
-                Pack::query()->create(
+                $pack = Pack::query()->create(
                     [
                         'user_id' => $user->id,
                         'get_type' => $ware->get_type,
@@ -1110,6 +1110,8 @@ class Common
                         'using' => 1,
                     ]
                 );
+                $pack->senderable()->associate($sender);
+                $pack->save();
             }
             if (in_array($ware->type, [4, 5, 6])) {
                 self::userDress($ware, $user, $userVip->is_used);

@@ -347,7 +347,7 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expir)
+    public static function addVipToUser(User $user, OVip $vip, $expir, $sender = null)
     {
         DB::beginTransaction();
         //        try {
@@ -374,8 +374,9 @@ class UserCommon
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;
+        $vipp->senderable()->associate($sender);
         $vipp->save();
-        Common::handelVip($vip, $user, $expir, $vipp);
+        Common::handelVip($vip, $user, $expir, $vipp, $sender);
         DB::commit();
 
         Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
@@ -387,7 +388,7 @@ class UserCommon
 
     }
 
-    public static function addWareToUser(User $user, Ware $ware, $expir)
+    public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)
     {
         $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
         if ($pack) {
@@ -423,7 +424,9 @@ class UserCommon
             $arr['num'] = 1; //$qty;
             $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
             $arr['is_read'] = 1;
-            Pack::query()->create($arr);
+            $pack = Pack::query()->create($arr);
+            $pack->senderable()->associate($sender);
+            $pack->save();
             DB::commit();
             //            \App\Helpers\CustomNotification::wareVip($user, $expir, $ware->name, $ware->show_img??'');
         } catch (\Exception $exception) {
