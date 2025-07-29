@@ -12,6 +12,7 @@ class CpLevelGift extends Model
     use TimestampsWithTimezone;
 
     protected $guarded = ['id'];
+     protected $appends = ['type_ware'];
 
     public function cp_level()
     {
@@ -26,6 +27,11 @@ class CpLevelGift extends Model
     public function ware()
     {
         return $this->belongsTo(Ware::class, 'item_id');
+    }
+
+    public function getTypeWareAttribute()
+    {
+        return $this->ware->type;
     }
 
     protected static function boot()

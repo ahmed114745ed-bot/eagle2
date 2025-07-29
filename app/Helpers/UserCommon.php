@@ -351,20 +351,7 @@ class UserCommon
     public static function addVipToUser(User $user, OVip $vip, $expir)
     {
         DB::beginTransaction();
-        //        try {
-        //            UserVip::query ()->create (
-        //                [
-        //                    'type'=>1,
-        //                    'sender_id'=>0,
-        //                    'user_id'=>$user->id,
-        //                    'vip_id'=>$vip->id,
-        //                    'level'=>$vip->level,
-        //                    'expire' => $expir,
-        //                    'qty'=>1,
-        //                    'price'=>0,
-        //                    'total'=>0
-        //                ]
-        //            );
+
         $vipp = new UserVip();
         $vipp->type = 1;
         $vipp->sender_id = 0;

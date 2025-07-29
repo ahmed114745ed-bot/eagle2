@@ -225,6 +225,7 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
+        Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
 
        Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 

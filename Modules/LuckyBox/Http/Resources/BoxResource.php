@@ -2,6 +2,7 @@
 
 namespace Modules\LuckyBox\Http\Resources;
 
+use App\Helpers\Common;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BoxResource extends JsonResource
@@ -24,9 +25,10 @@ class BoxResource extends JsonResource
             'id' => $this->id,
             'type' => $this->type == 1 ? 'super' : 'normal',
             'coins' => $this->coins,
-            'users_num' => $this->type == 1? $this->users : $dynamic_users_values,
+            'users_num' => $this->type == 1 ? $this->users : $dynamic_users_values,
             'image' => $this->image,
             'is_label' => $is_label,
+            'time'     => $this->type == 0 ? Common::getConf('normal_box_duration') : $this->duration,
         ];
     }
 }

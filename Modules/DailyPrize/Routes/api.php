@@ -18,4 +18,4 @@ use Modules\DailyPrize\Http\Controllers\Api\DailyGiftController;
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('current-day',[DailyGiftController::class,'current_day']);
     Route::post('receive-daily-prize',[DailyGiftController::class,'receive_daily_prize']);
-});
+}); 

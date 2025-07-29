@@ -199,6 +199,7 @@ return [
     "charge_level" => "charge level",
     "closeNormalBox" => "Your Normal Lucky Box duration finished",
     "closeSuperBox" => "Your Super Lucky Bos duration finished",
+      "relations_help"=> "🔒 When disabled, the message will be sent to only one friend. <br> 🔓 When enabled, the message will be sent to all friends.",
 
     "closeNormalBoxReturnCoins" => "Your Normal Lucky Box duration finished and box coins :coins return to you",
     "closeSuperBoxReturnCoins" => "Your Super Lucky Bos duration finished and box coins :coins return to you",

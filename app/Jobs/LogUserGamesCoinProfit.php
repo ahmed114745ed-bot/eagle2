@@ -18,6 +18,7 @@ class LogUserGamesCoinProfit implements ShouldQueue
     protected $userId;
     protected $amountBefore;
     protected $amount;
+    protected $helperAmount;
     protected $type;
     protected $subType;
     protected $itemName;
@@ -27,6 +28,7 @@ class LogUserGamesCoinProfit implements ShouldQueue
         int $userId,
         float $amountBefore,
         float $amount,
+        float $helperAmount,
         string $type,
         string $subType,
         ?string $itemName = '',
@@ -35,10 +37,12 @@ class LogUserGamesCoinProfit implements ShouldQueue
         $this->userId = $userId;
         $this->amountBefore = $amountBefore;
         $this->amount = $amount;
+        $this->helperAmount = $helperAmount;
         $this->type = $type;
         $this->subType = $subType;
         $this->itemName = $itemName;
         $this->createdAt = $createdAt ?? now();
+        
     }
 
     public function handle()
@@ -54,6 +58,7 @@ class LogUserGamesCoinProfit implements ShouldQueue
         ) {
             $lastLog->update([
                 'amount'      => $lastLog->amount + $this->amount,
+                'helper_amount'      => $lastLog->helper_amount + $this->helperAmount,
                 'to_date'     => $this->createdAt,
             ]);
         } else {
@@ -63,6 +68,7 @@ class LogUserGamesCoinProfit implements ShouldQueue
                 'sub_type'      => $this->subType,
                 'amount_before' => $this->amountBefore,
                 'amount'        => $this->amount,
+                'helper_amount'        => $this->helperAmount,
                 'item_name'     => $this->itemName,
                 'from_date'     => $this->createdAt,
                 'to_date'       => $this->createdAt,
