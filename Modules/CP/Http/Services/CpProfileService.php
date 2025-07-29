@@ -45,15 +45,21 @@ class CpProfileService
 
         if ($pack) {
             $ware = Ware::where('id', $pack->target_id)->first();
-            if ($ware->num == 6) {
+            if ($pack->use_num == 6) {
                 $seats = 6;
-                $ware = Ware::where('num', 9)->where('type', 100)->first();
-            } elseif ($ware->num == 3) {
+                // $ware = Ware::where('num', 9)->where('type', 100)->first();
+            } elseif ($pack->use_num == 3) {
                 $seats = 3;
-                $ware = Ware::where('num', 6)->where('type', 100)->first();
+                // $ware = Ware::where('num', 6)->where('type', 100)->first();
+            } elseif ($pack->use_num == 9) {
+                $seats = 9;
+                //  $ware = Ware::where('num', 12)->where('type', 100)->first();
+            } elseif ($pack->use_num == 12) {
+                $seats = 12;
+                //  $ware = Ware::where('num', 15)->where('type', 100)->first();
             } else {
                 $ware = null;
-                $seats = 9;
+                $seats = 15;
             }
         } else {
             $ware = Ware::select('id', 'price', 'num')->where('type', 100)->where('get_type', 100)->where('num', 6)->first();
