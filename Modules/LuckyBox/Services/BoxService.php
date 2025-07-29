@@ -8,6 +8,7 @@ use App\Helpers\Common;
 use App\Models\CoreWallet;
 use App\Events\SuperLuckyBox;
 use App\Facades\RedisService;
+use App\Helpers\UserCoinLogHelper;
 use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +33,7 @@ class BoxService
         } else {
             $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone);
         }
-
+        $amountBefore =  Common::getCurrentBalance($user->id);
         $user->decrement('di', $box->coins);
         try {
             DB::commit();
@@ -40,14 +41,16 @@ class BoxService
             $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(
                 Carbon::createFromTimestamp($boxU->end_at)
             );
+            $type = $box->type == 1 ? 'super' : 'normal';
+            $coins = $request->coins ?: $box->coins;
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
                     "ownerBoxId" => $user->id,
                     "ownerBoxName" => $user->name,
-                    "boxCoins" => $request->coins ?: $box->coins,
+                    "boxCoins" => $coins,
                     "boxId" => $boxU->id,
-                    "boxType" => $box->type == 1 ? 'super' : 'normal',
+                    "boxType" => $type,
                     "numOfBoxes" => (int)$c,
                     "ownerBoxImage" => $user->avatar,
                     "ownerBoxUId"  => $user->uuid,
@@ -60,6 +63,15 @@ class BoxService
             $json = json_encode($m);
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+            UserCoinLogHelper::log(
+                            $user->id,
+                            'lucky_box',
+                            $type,
+                            $coins,
+                            $amountBefore ?? 0,
+                            'lucky_box'
+                        );
+            
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
         } catch (\Exception $exception) {
             DB::rollBack();
