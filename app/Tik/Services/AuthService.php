@@ -131,6 +131,7 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
+        info('loginWithGoogle service');
         info($request);
         $client = new Google_Client();
 

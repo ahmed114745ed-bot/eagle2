@@ -62,7 +62,8 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        info('login method'.$request);
+        info('login method');
+        info($request->all());
         $globalKeys = [
             'is_multi' => @$request->is_multi ?? false,
             'notification_id' => @$request->notification_id,
@@ -125,6 +126,7 @@ class AuthController extends Controller
 
     protected function loginWithGoogle($data)
     {
+        info('loginWithGoogle controller');
         info($data);
         try {
             [$user, $token, $resource] = $this->authService->loginWithGoogle($data);
