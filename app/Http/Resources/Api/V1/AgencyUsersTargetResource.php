@@ -36,7 +36,7 @@ class AgencyUsersTargetResource extends JsonResource
             ->first();
 
 
-         Log::info('Latest join record:', ['joinRecord' => $joinRecord]);
+         \Log::info('Latest join record:', ['joinRecord' => $joinRecord]);
 
         $startOfMonth = Carbon::create($year, $month, 1)->startOfDay();
         $endOfMonth = Carbon::create($year, $month)->endOfMonth()->endOfDay();
