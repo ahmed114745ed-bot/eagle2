@@ -78,7 +78,7 @@ class BaishunGameController extends Controller
                 LogUserGamesCoinProfit::dispatch(
                     $user->id,
                     $amountBefore,
-                    abs($request->currency_diff ) ,
+                    $request->currency_diff  ,
                     $helperAmount,
                     'coinGame',
                     'coin_game_users',
