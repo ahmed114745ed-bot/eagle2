@@ -65,8 +65,8 @@ class AuthController extends Controller
         $globalKeys = [
             'is_multi' => @$request->is_multi ?? false,
             'notification_id' => @$request->notification_id,
-
         ];
+
         switch ($request['type']) {
             case 'phone_pass':
                 $fields = ['phone' => $request['phone'], 'password' => $request['password'], 'device_token' => $request['device_token']];
@@ -173,7 +173,8 @@ class AuthController extends Controller
         $iat = strtotime('now');
         $exp = strtotime('+60days');
 
-        $keyContent = file_get_contents(config('apple.apple_service_file'));
+        $keyContent = \Storage::get(config('apple.apple_service_file'));
+
 
         $token = JWT::encode([
             'iss' => $teamId,
@@ -192,6 +193,7 @@ class AuthController extends Controller
                 'client_secret' => $token,
             ]);
 
+            \Log::info($res->json());
             $claims = explode('.', $res['id_token'])[1];
             $data = json_decode(base64_decode($claims), true);
         } catch (\Exception $e) {

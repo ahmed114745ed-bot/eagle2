@@ -11,31 +11,42 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class CoreWalletTransactionController extends AdminController
+class CoreWalletTransactionController extends MainController
 {
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
+    public $permission_name = 'core-wallet-transactions';
+
     protected $title = '';
 
 
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->body($this->grid()));
+    }
+
+    public function show($id, Content $content)
+    {
+        return parent::show($id,$content
+            ->body($this->detail($id)));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id,$content
+            ->body($this->form()->edit($id)));
+    }
+
+
     protected function grid()
     {
         $grid = new Grid(new CoreWalletTransaction());
-    
+
         $grid->model()->latest();
         $grid->column('id', __('#'));
         $grid->column('from_wallet', __('From Wallet'))->display(function ($val) {
             return    ucfirst(str_replace('_', ' ', optional(CoreWallets::find($val))->name)) ;
 
-            
+
         });
         $grid->column('to_wallet', __('To Wallet'))->display(function ($val) {
             return    ucfirst(str_replace('_', ' ', optional(CoreWallets::find($val))->name)) ;
@@ -48,11 +59,11 @@ class CoreWalletTransactionController extends AdminController
         });
         $grid->column('created_at', __('Transfer Time'))->display(function ($val) {
             return \Carbon\Carbon::parse($val)->format('Y-m-d H:i');
-        })->sortable(); 
-        $grid->disableCreateButton();   
+        })->sortable();
+        $grid->disableCreateButton();
         return $grid;
     }
-    
+
     /**
      * Make a show builder.
      *

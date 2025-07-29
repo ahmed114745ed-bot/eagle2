@@ -91,6 +91,7 @@ class AgencyController extends MainController
 
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
+        $uuid = request('uuid');
         $tab = request('tab', 'members');
         $giftType = request()->get('gift_type', 'receiver');
         $start = request('start_at');
@@ -256,12 +257,22 @@ class AgencyController extends MainController
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
+        })->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where(function ($q) use ($uuid) {
+                $q->whereHas('sender', fn($q) => $q->where('uuid', $uuid))
+                    ->orWhereHas('receiver', fn($q) => $q->where('uuid', $uuid));
+            });
         })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
         $diamonds = GiftLog::where('agency_id', $id)->when(isset($start) && isset($end), function ($query) use ($start, $end) {
             $query->whereBetween('created_at', [
                 Carbon::parse($start)->startOfDay(),
                 Carbon::parse($end)->endOfDay()
             ]);
+        })->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where(function ($q) use ($uuid) {
+                $q->whereHas('sender', fn($q) => $q->where('uuid', $uuid))
+                    ->orWhereHas('receiver', fn($q) => $q->where('uuid', $uuid));
+            });
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
         $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
         return $content
@@ -362,7 +373,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img')
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen')
             ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
             ->where(function ($query) {
                 $query
@@ -454,6 +465,13 @@ class AgencyController extends MainController
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>";
         });
+
+
+        $grid->column('is_frozen', __("frozen"))
+            ->display(function () {
+                return $this->is_frozen ? 1 : 0;
+            })
+            ->switch(Common::getSwitchStates());
         $permission = $this->permission_name;
 
         $grid->actions(function ($actions) use ($permission) {
@@ -607,6 +625,8 @@ class AgencyController extends MainController
         $form = new Form(new Agency());
         $this->disableFormTools($form);
         $form->hidden('type', __('type'))->default(1);
+        $form->hidden('is_frozen', __('is_frozen'))->default(0);
+
         $form->display('ID');
         if (!$form->isEditing()) {
             $form->row(function ($row) {
@@ -737,7 +757,7 @@ class AgencyController extends MainController
             // if (!$modelExists)  Common::createUserAdmin($appOwnerId);
 
 
-            if ($modelExists && $newOwnerId != $originalOwnerId) {
+            if ($modelExists &&  $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
                 //   Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
 

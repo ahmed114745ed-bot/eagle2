@@ -54,7 +54,7 @@ class ChargeController extends MainController
      *
      * @return Grid
      */
-    
+
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
@@ -65,11 +65,10 @@ class ChargeController extends MainController
             $filter->expand();
 
             $filter->disableIdFilter();
-            $filter->equal('ID', __('ID'));
 
             $filter->where(function ($query) {
-                $query->where('name', 'like', "%{$this->input}%");
-            }, __('Agency name'));
+                $query->where('name', 'like', "%{$this->input}%")->orWhere('id', $this->input);
+            }, __('Agency name or id'));
 
             $filter->where(function ($query) {
                 $query->whereHas('owner', function ($q) {
@@ -84,6 +83,7 @@ class ChargeController extends MainController
 
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
+                $id = $this->id;
                 $path = @$this->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
@@ -91,14 +91,23 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
+
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $profileUrl = url("admin/shipping-agencies/profile/{$id}");
 
                 return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <span>$name</span>
-                </div>";
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            $image
+            <a href='{$profileUrl}' target='_blank' style='text-decoration: none; color: inherit;'>
+                <div>
+                    <div>$name</div>
+                    <small style='color: #888;'>ID: {$id}</small>
+                </div>
+            </a>
+        </div>
+    ";
             });
+
 
         $grid->column('owner.name', trans('owner'))
             ->display(function ($name) {

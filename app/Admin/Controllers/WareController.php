@@ -386,7 +386,7 @@ class WareController extends MainController
                 'png' => __('png'),
             ])
             ->attribute(['id' => 'image_type1']);
-           
+
 
 
         if (Session::has('show_alert')) {

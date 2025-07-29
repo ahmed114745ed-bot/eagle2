@@ -712,9 +712,9 @@
             background-color: transparent !important;
             filter: none !important;
         }
-        .rtl .gift-log-form {
+        /* .rtl .gift-log-form {
             padding-right: 13%;
-        }
+        } */
         .ltr .gift-log-form {
             padding-left: 13%;
         }
@@ -877,7 +877,20 @@
 
             }
 
+        .date-flex-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
+        .date-flex-row span {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .date-flex-row input[type="date"] {
+            flex-basis: 0;
+        }
             .target-card-stat {
                 width: 92%;
 
@@ -899,7 +912,7 @@
             .card-target-filter-phone .col-md-7 {
                 float: none;
             }
-
+           
             .card-target-filter-phone .form-control {
                 display: block;
                 width: 89%;
@@ -907,10 +920,20 @@
                 font-size: 14px;
                 line-height: 1.42857143;
                 color: var(--text-secondary-color) !important;
-                background-color: #fff;
+                background-color: var(--text-secondary-color) !important;;
                 background-image: none;
                 border: 1px solid var(--primary-hover-alpha) !important;
                 border-radius: 4px;
+            }
+            .control {
+                 width: 89%;
+                padding: 6px 12px;
+                color: #ffffff !important;               /* Text color */
+                background-color: #1e3a8a !important;     /* Background color (e.g. dark blue) */
+                border-color: #1e40af !important;         /* Optional: border color */
+                 border-radius: 4px;
+                  font-size: 14px;
+                line-height: 1.42857143;
             }
 
             .card-target-filter-phone .filter-form {
@@ -957,7 +980,7 @@
                         <div class="stat-label">{{__("salary")}}</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">{{ truncateAndTrim(@$diamondsHosts ?? 0) }}</div>
+                        <div class="stat-value">{{ truncateAndTrim(@$sumTargets ?? 0) }}</div>
                         <div class="stat-label">{{__("diamonds")}}</div>
                     </div>
 
@@ -1138,7 +1161,7 @@
         @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
             <div class="tab-content active" id="members-tab">
-                
+
                 <div class="card">
                     <div class="card-header">
                         <h3>{{ __('Agency Members') }}</h3>
@@ -1168,7 +1191,7 @@
                                     </div>
                                 </div>
 
-                               
+
                                 <!-- Buttons -->
                                 <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
                                     <button type="submit" class="btn btn-info btn-sm me-2">
@@ -1184,8 +1207,8 @@
                 </div>
                     @if($members && $members->count())
                         <div class="table-responsive">
-                           
-                        
+
+
                             <table class="data-table">
                                 <thead>
                                     <tr>
@@ -1557,7 +1580,7 @@
             </div>
 
             <div class="box-body p-3">
-                
+
 
                 <div class="card mb-4">
                     <div class="card-body">
@@ -1566,12 +1589,18 @@
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
 
                             <div class="row mb-3" style="align-items: flex-end;">
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <span>{{ __('uuid') }}</span>
+                                        <input type="text" class="control"  name="uuid" value="{{ request('uuid') }}">
+                                    </div>
+                                </div>
                                 <!-- From Date -->
                                 <div class="col-md-4">
                                     <div class="date-flex-row">
                                         <i class="fa fa-calendar"></i>
                                         <span>{{ __('From Date') }}</span>
-                                        <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
+                                        <input type="date" class="control" id="from_date" name="start_at" value="{{ request('start_at') }}">
                                     </div>
                                 </div>
                                 <!-- To Date -->
@@ -1579,7 +1608,7 @@
                                     <div class="date-flex-row">
                                         <i class="fa fa-calendar"></i>
                                         <span>{{ __('To Date') }}</span>
-                                        <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
+                                        <input type="date" class="control" id="to_date" name="end_at" value="{{ request('end_at') }}">
                                     </div>
                                 </div>
                                 <!-- Buttons -->
@@ -1645,7 +1674,7 @@
                                 $avatar = @$userSender->profile->avatar;
                                 $image = getImagePath($avatar) ?? $userImageDefault;
                                 $receiverAvatar = @$receiver->profile->avatar;
-                                
+
                                 $receiverImage = getImagePath($receiverAvatar) ?? $userImageDefault;
                                 if (!isImageExists($receiverImage)) {
                                     $receiverImage = $userImageDefault;
@@ -1960,9 +1989,9 @@
 
                     <div class="tab-content active" id="members-tab">
 
-                         
+
                         <div class="table-section card">
-                            
+
                             <div class="table-responsive">
                                 <table class="data-table">
                                     <thead>
@@ -2009,8 +2038,8 @@
 
                                                         $memberTarget->topSupporters = $giftLogs;
 
-                                                        $moment = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'moment') ?? [];
-                                                        $reel = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'reel') ?? [];
+                                                        $moment = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'moment', $memberTarget->agency_id) ?? [];
+                                                        $reel = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'reel', $memberTarget->agency_id) ?? [];
 
                                                         $momentUpload = $moment['upload'] ?? '0/0';
                                                         $momentLikes = $moment['likes'] ?? '0/0';
@@ -2045,7 +2074,7 @@
                                                             {{ $target->next_diamond ?? 0 }}
                                                         </span>
                                                     </td>
-                                                   
+
                                                     <td>{{ ($target->user_days ?? 0) . '/' . ($target->target_days ?? 0) }}</td>
                                                     <td>{{ ($target->user_hours ?? 0) . '/' . ($target->target_hours ?? 0) }}</td>
                                                     <td>

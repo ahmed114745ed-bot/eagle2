@@ -89,12 +89,10 @@ class VipDedicateAction extends Action
 
             CustomNotification::vips($user, $request->days, $vip->img);
 
-            $notificationToken[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+            $title = 'VIP Assigned';
+            $body = 'You have received VIP access for :days days from admin.';
 
-            $title = __('VIP Assigned');
-            $body = __('You have received VIP access for :days days from admin.', ['days' => $request->days]);
-
-            Common::send_firebase_notification($notificationToken, $title, $body);
+            CustomNotification::charges($user, $title, $body, ['days' => $request->days]);
 
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
@@ -106,7 +104,7 @@ class VipDedicateAction extends Action
     public function form()
     {
         $this->hidden('id')->default($this->id);
-        $this->integer('days', __('days'))->required();
+        $this->integer('days', __('days'))->rules(['required', 'integer', 'min:1']);
         $this->text('user_uuid', __('user uuid'))->required();
     }
 

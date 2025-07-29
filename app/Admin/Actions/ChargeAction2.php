@@ -75,7 +75,7 @@ class ChargeAction2 extends Action
             }
             $agency->save();
 
-            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount);
+            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount, $shippingCoins);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -88,7 +88,7 @@ class ChargeAction2 extends Action
 
 
 
-    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount)
+    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount, $shippingCoins)
     {
 
         $charge = new Charge();
@@ -99,7 +99,7 @@ class ChargeAction2 extends Action
         $charge->user_type = 'agency';
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
-        $charge->balance_before =  $agency->coins  - $amount;
+        $charge->balance_before =  $agency->coins  - ($amount * $shippingCoins);
 
         $charge->save();
         if ($request->hasFile('invoice')) {
@@ -129,7 +129,7 @@ class ChargeAction2 extends Action
 
         $this->text('amount', __('Amount'))
             ->addElementClass('price-input')
-            ->help(__('Enter amount in dollars'));
+            ->help(__('Enter amount in dollars'))->rules('required|numeric|min:1');
 
         $this->text('reason_en', __('reason en'));
         $this->text('reason_ar', __('reason ar'));

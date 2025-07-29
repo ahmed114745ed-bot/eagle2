@@ -25,6 +25,7 @@ class UserSallaryObserver
 
     public function creating(UserSallary $userSalary)
     {
+
         if (!$userSalary->extras) $userSalary->extras = '';
         $this->updateOrCreateAgencySallary($userSalary);
         $this->updateOrCreateBDSallary($userSalary);
@@ -41,6 +42,7 @@ class UserSallaryObserver
 
     public function updateOrCreateAgencySallary(UserSallary $userSalary): void
     {
+
         $app_feature = \Cache::get('host_agency');
         if ($app_feature) {
             $agency = Agency::find($userSalary->user_agency_id);

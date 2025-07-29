@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Log;
 
 class VersionController extends Controller
 {
@@ -25,7 +26,7 @@ class VersionController extends Controller
         [$isAuth, $user] = $this->isAuth($token);
         if ($user) {
             try {
-                if ($request->OS != 'IOS' && $user->android_version != $version) {
+                if ($request->OS == 'Android' && $user->android_version != $version) {
                     DB::table('users')->where('id', $user->id)->update(['android_version' => intval($version)]);
                 } else if ($request->OS == 'IOS' && $user->ios_version != $version) {
                     DB::table('users')->where('id', $user->id)->update(['ios_version' => intval($version)]);
@@ -39,14 +40,16 @@ class VersionController extends Controller
         $isBan          = $this->haveBan(@$user->uuid);
         $isGiftUpdated  = $this->isUpdated('gifts_update_at', @$request->gift_time);
         $isIntroUpdated = $this->isUpdated('intro_updated_at', @$request->intro_time);
-        $isBubbleFrameUpdated = $this->isUpdated('bubble_frame_updated_at', @$request->bubble_frame_time);
+        $isBubbleFrameUpdated = $this->isUpdated('bubble_frame_updated_at', @$request->bubbles_frame_time);
         $isFrameUpdated = $this->isUpdated('frame_updated_at', @$request->frame_time);
         $isEmojiUpdated = $this->isUpdated('emoji_updated_at', @$request->emoji_time);
         $isExtraUpdated = $this->isUpdated('extra_updated_at', @$request->extra_time);
         $agencyBadges =$this->isUpdated('badges_agency_update_at', @$request->badges_agency_time);
-        $wapple = $this->isUpdated('wappel_frame_updated_at', @$request->wappel_time);
+        $wapple = $this->isUpdated('wappel_frame_updated_at', @$request->wabbles_frame_time);
         $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
+        $reelSettings = Setting::where('key', 'reel_status')->first();
+
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (int)$version ,
@@ -61,13 +64,14 @@ class VersionController extends Controller
                 'extras' => $isExtraUpdated,
                 'profile_frame_updated' => $ProfileFrameUpdated,
                 'bubble_frame' => $isBubbleFrameUpdated,
-                'wapple' => $wapple,
+                'wapple' => $wapple ?? false,
                 'colors' => settings()->get('colors_updated_at') ?? false,
                 'background' => settings()->get('ground_updated_at') ?? false,
                 'host_agency' => (bool)\Cache::get('host_agency'),
                 //intro - frames - extradata - emoji
             ],
-            'enable_chat'  => settings()->get('chat_status') == "on"
+            'enable_chat'  => settings()->get('chat_status') == "on",
+            'reel_status' => (bool)$reelSettings?->value ?? false,
         ];
 
         //update current version for user
@@ -120,9 +124,11 @@ class VersionController extends Controller
      */
     public function isUpdated($key, $time): bool
     {
-        if ($time) {
-            $time /= 1000;
+        if ($time > 9999999999) {
+            // Convert milliseconds to seconds
+            $time = (int) ($time / 1000);
         }
+
         $settingGiftUpdate = settings()->get($key);
         $isGiftUpdated     = true;
         // if ($settingGiftUpdate == null && $time != null) {
@@ -131,7 +137,6 @@ class VersionController extends Controller
         // } elseif ($time) {
         //     $isGiftUpdated = $settingGiftUpdate > $time;
         // }
-
         if ($settingGiftUpdate === null && $time !== null) {
             $isGiftUpdated = false;
         }
@@ -139,6 +144,7 @@ class VersionController extends Controller
         if ($time !== null) {
             $isGiftUpdated = $settingGiftUpdate > $time;
         }
+
         return $isGiftUpdated;
     }
 

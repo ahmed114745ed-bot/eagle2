@@ -42,7 +42,7 @@ class UsersChargeController extends MainController
      *
      * @return Grid
      */
-   
+
     protected function grid()
     {
         $grid = new Grid(new User());

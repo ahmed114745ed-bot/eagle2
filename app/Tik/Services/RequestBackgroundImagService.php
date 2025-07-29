@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
 
@@ -29,6 +30,18 @@ class RequestBackgroundImagService
                 'expair' => now()->addDays($expire)->timestamp,
             ];
             $this->requestBackgroundImageRepository->create($data);
+
+            $amountBefore =  Common::getCurrentBalance($userId);
+            $logAmount = -abs($price);
+            UserCoinLogHelper::log(
+                $userId ,
+                'background_images',
+                'request_background_images',
+                $logAmount ?? 0,
+                $amountBefore ?? 0,
+                $request->name
+            );
+
             $this->userRepository->decrementCoins($userId, $price);
             return $image;
         }

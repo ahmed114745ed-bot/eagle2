@@ -61,7 +61,7 @@ class ChargeController extends MainController
             }, __('UUID'))->placeholder(__('ابحث في مستلم التحويل'));
 
             // فلتر التاريخ (من-إلى)
-            $filter->between('created_at', __('تاريخ الإنشاء'))->datetime();
+            $filter->between('created_at', __('تاريخ الإنشاء'))->date();
         });
 
 
@@ -86,9 +86,10 @@ class ChargeController extends MainController
                     if (!isImageExists($url)) $url = $defaultImage;
                     return handleShowImageWithTypes($info['uuid'], $url, 40, 40);
                 });
-
+                $profileUrl ='';
+                if (!empty($info['uuid'])) {
                 $profileUrl = route('bd.agency.profile', ['id' => $info['uuid']]);
-
+                }
                 return "
                         <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>
@@ -111,7 +112,7 @@ class ChargeController extends MainController
                 if (!isImageExists($url)) $url = $defaultImage;
 
                 $image = handleShowImageWithTypes($info['uuid'], $url, 40, 40);
-                $showUrl = url("admin/users/{$info['uuid']}");
+                $showUrl = url("bd/users/profile/{$info['id']}");
 
                 return "
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
@@ -134,8 +135,9 @@ class ChargeController extends MainController
             return \Carbon\Carbon::parse($value)->translatedFormat('Y-m-d h:i A');
         });
 
-        $grid->column('usd', __('usd'));
-
+        $grid->column('usd', __('usd'))->display(function ($value) {
+            return number_format($value, 2);
+        });
         $grid->disableCreateButton();
 
         $grid->tools(function (Grid\Tools $tools) {

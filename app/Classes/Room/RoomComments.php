@@ -4,6 +4,7 @@ namespace App\Classes\Room;
 
 use App\Exceptions\NotInfCoins;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\SendCustomToZend;
 use App\Models\Room;
@@ -64,6 +65,7 @@ class RoomComments
             //send comment in queue
             //            dispatch(new SendCustomToZend($user->id, $data['room_id'], $data['message'], $rooms))->onQueue('sendComment');
             // minus coins for comments
+
             $user = $this->minusUserCoins($user, $commentCoinsValue);
 
             $user->save();
@@ -79,6 +81,16 @@ class RoomComments
 
     private function minusUserCoins(User $user, int $numOfCoins)
     {
+        $amountBefore =  Common::getCurrentBalance($user->id);
+        $logAmount = -abs($numOfCoins);
+        UserCoinLogHelper::log(
+            $user->id ,
+            'comment',
+            'comments',
+            $logAmount ?? 0,
+            $amountBefore ?? 0,
+            'Special Bar'
+        );
         $user->di -= $numOfCoins;
         return $user;
     }

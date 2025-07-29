@@ -23,23 +23,25 @@ class AgencyResource extends JsonResource
         }else{
             $owner = new MiniUserResource($this->owner);
         }
-        return [
-            'id'=>$this->id,
-            'name'=>$this->name,
-            'notice'=>$this->notice,
-            'status'=>$this->status,
-            'phone'=>$this->phone,
-            'url'=>$this->url,
-            'img'=>$this->img,
-            'contents'=>$this->contents,
-            'payments'=>@$this->AgencypaymentGateways,
-            'countries'=>@$this?->countries,
-            'owner'=>$owner,
+        return[
+            'id' => $this->id ?? 0,
+            'name' => $this->name ?? '',
+            'notice' => $this->notice ?? '',
+            'status' => $this->status ?? '',
+            'phone' => $this->phone ?? '',
+            'url' => $this->url ?? '',
+            'img' => $this->img ?? '',
+            'contents' => $this->contents ?? '',
+            'payments' => $this->AgencypaymentGateways ?? [],
+            'countries' => $this->countries ?? [],
+            'owner' => $owner ?? null,
+
             $this->mergeWhen($isOwner, [
-                'dollar' => $this->salary,
-                'coins' => $this->coins,
-                'salaryTransfer' => $this->transfer_salary,
+                'dollar' => $this->salary ?? 0,
+                'coins' => $this->coins ?? 0,
+                'salaryTransfer' => $this->transfer_salary ?? 0,
             ]),
-        ];
+        ]
+            ;
     }
 }

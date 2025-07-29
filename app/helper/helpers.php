@@ -4,10 +4,13 @@ use Carbon\Carbon;
 use App\Helpers\Common;
 use Encore\Admin\Admin;
 use App\Classes\AppSetting;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Modules\Reals\Http\Services\FfmpegService;
 use Yasser\AgoraToken\RtmTokenBuilder;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
 
@@ -343,6 +346,21 @@ if (!function_exists('get_file_details')) {
 }
 
 
+if (!function_exists('getRoomStatusBadge')) {
+    function getRoomStatusBadge($status)
+    {
+        $badges = [
+            1 => '<span class="label label-success">Active</span>',
+            0 => '<span class="label label-default">Inactive</span>',
+            2 => '<span class="label label-danger">Closed</span>',
+            3 => '<span class="label label-warning">Banned</span>',
+            4 => '<span class="label label-info">Closed</span>',
+        ];
+
+        return $badges[$status] ?? '<span class="label label-default">Unknown</span>';
+    }
+}
+
 if (!function_exists('isSubdomain')) {
 
     function isSubdomain($host = null)
@@ -655,7 +673,49 @@ if (!function_exists('getToday')) {
     }
 }
 
+if (! function_exists('validateUploadedFileType')) {
+    /**
+     * @throws ValidationException
+     */
+    function validateUploadedFileType(UploadedFile $file, $itemId = null): string
+    {
+        $allowedExtensions = ['svga','svg', 'mp4', 'alpha', 'vap', 'png'];
+        $ext = strtolower($file->guessExtension());
+        $originalExt = strtolower($file->getClientOriginalExtension());
 
+        if ($ext === 'zz' && $originalExt === 'svga') {
+            $ext = 'svga';
+        }
+
+        if ($ext === 'gif' && $originalExt === 'gif') {
+            $ext = 'png';
+        }
+
+        if ($ext === 'mp4' && $itemId) {
+            $urlVideo = upload($file);
+            $videoPath = getDriverUrl() . '/' . $urlVideo;
+            (new FfmpegService())->extractByDuration($videoPath, $itemId);
+            $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $itemId . '.jpg';
+            $response = Http::attach(
+                'image',
+                Storage::disk('gcs')->get($imagePath),
+                $itemId . '.jpg'
+            )->post('https://utd-test.utdsoftware.com/api/analyze-media');
+            $responseData = $response->json();
+            if ($response->successful() && isset($responseData['data']['video_type'])) {
+                $ext = strtolower($responseData['data']['video_type']);
+            }
+        }
+
+        if (!in_array($ext, $allowedExtensions)) {
+            throw ValidationException::withMessages([
+                'img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+            ]);
+        }
+
+        return $ext;
+    }
+}
 
 if (!function_exists('bd_url')) {
     /**
@@ -678,7 +738,7 @@ if (!function_exists('bd_url')) {
 
         $secure = $secure ?? (config('bd.https') || config('bd.secure'));
 
-        if (app()->environment('production')) {
+        if (app()->environment('Production')) {
             return secure_url($base . '/' . trim($path, '/'), $parameters, $secure);
         }
 

@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\BanType;
+use Illuminate\Http\Request;
 use App\Admin\Actions\BanUser;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -96,8 +97,8 @@ class BanController extends MainController
 
         $grid->model()->whereHas('user')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
-            ->select($reason, 'uid', 'duration', 'type', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
-            ->groupBy([$reason, 'uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id'])->orderByDesc('created_at');
+            ->select($reason, 'uid', 'duration', 'type', 'img', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
+            ->groupBy([$reason, 'uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id','img'])->orderByDesc('created_at');
         //    $grid->id(__ ('ID'));
         // $grid->uid(__('uuid'));
         //        $grid->user_type(__('user_type'));
@@ -202,17 +203,86 @@ class BanController extends MainController
                     </div>";
         });
 
+
         $grid->column('created_at', __('expire'))->display(function () {
-            // \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
-            //     ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
-            $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
-            return now()->diffForHumans($banExpiration, true);
+            $timezone = getTimezone();
+
+            // Get raw UTC datetime
+            $createdAt = \Carbon\Carbon::parse($this->getAttributes()['created_at'], 'UTC');
+
+            // Add ban duration and convert to user's timezone
+            $banExpiration = $createdAt->addHours($this->duration)->setTimezone($timezone);
+
+            $now = now($timezone);
+
+            // Get total remaining minutes
+            $diffInMinutes = $now->diffInMinutes($banExpiration, false);
+
+            if ($diffInMinutes <= 0) {
+                return 'منتهي'; // Expired
+            }
+
+            $hours = floor($diffInMinutes / 60);
+            $minutes = $diffInMinutes % 60;
+
+            if ($hours >= 1) {
+                return "{$hours}h:{$minutes}m";
+            } else {
+                return "{$minutes}" . ' ' . __('minute');
+            }
         });
+
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('return', __('delete'))->display(function () {
-                return (new \App\Admin\Actions\DeleteBans($this->uid, $this->type, $this->ban_type_id))->render();
+            $grid->column('delete', __('Delete'))->display(function () {
+                $deleteLabel = __('Delete');
+                return "<button class='btn btn-danger btn-sm delete-ban' 
+            data-uid='{$this->uid}' 
+            data-type='{$this->type}' 
+            data-ban-type-id='{$this->ban_type_id}'>
+            {$deleteLabel}
+        </button>";
             });
         }
+
+        // Move this OUTSIDE the `if` block
+        $confirmMessage = json_encode(app()->getLocale() === 'ar' ? 'هل أنت متأكد من حذف هذا الحظر؟' : 'Are you sure you want to delete this ban?');
+
+        Admin::script(<<<JS
+    $('.delete-ban').off('click').on('click', function () {
+        const btn = $(this);
+        const uid = btn.data('uid');
+        const type = btn.data('type');
+        const ban_type_id = btn.data('ban-type-id');
+
+        if (!confirm({$confirmMessage})) return;
+
+        $.ajax({
+            method: 'POST',
+            url: '/admin/custom-delete-ban',
+            data: {
+                _token: LA.token,
+                uid: uid,
+                type: type,
+                ban_type_id: ban_type_id
+            },
+            success: function (response) {
+                if (response.status === true) {
+                    toastr.success('Deleted successfully');
+                    $.pjax.reload('#pjax-container');
+                } else {
+                    toastr.error(response.message || 'Failed to delete');
+                }
+            },
+            error: function () {
+                toastr.error('Error occurred during deletion.');
+            }
+        });
+    });
+JS);
+
+
+
+
 
         $grid->disableExport();
         $grid->disableRowSelector();
@@ -290,5 +360,19 @@ class BanController extends MainController
         //
         //
         //        return $form;
+    }
+
+    public function deleteBan(Request $request)
+    {
+        $deleted = Ban::where('uid', $request->uid)
+            ->where('type', $request->type)
+            ->where('ban_type_id', $request->ban_type_id)
+            ->delete();
+
+        if ($deleted) {
+            return response()->json(['status' => true]);
+        }
+
+        return response()->json(['status' => false, 'message' => 'No matching ban found']);
     }
 }

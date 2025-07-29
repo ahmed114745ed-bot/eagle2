@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Charge;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -74,6 +75,63 @@ class UserChargeReportController extends MainController
         }
 
         $grid = new Grid(new Charge());
+
+        $grid->filter(function (Grid\Filter $filter) {
+
+            $filter->expand();
+
+            $filter->disableIdFilter();
+            $filter->column(1/2, function ($filter) {
+                $filter->where(function ($query) {
+                    $date = UserCommon::arabicToEnglishNumbers($this->input);
+                    $query->whereDate('created_at', '>=', $date);
+                }, __('from_date'), 'from_date')->date();
+            });
+
+            $filter->column(1/2, function ($filter) {
+                $filter->where(function ($query) {
+                    $date = UserCommon::arabicToEnglishNumbers($this->input);
+
+                    $query->whereDate('created_at', '<=',$date);
+
+                }, __('to_date'), 'to_date')->date();
+            });
+        });
+
+        Admin::script(<<<JS
+            $(document).ready(function() {
+                $('.form-control[id$="_date"]').datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+
+            $(document).on('pjax:complete', function() {
+                $('.form-control[id$="_date"]').datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+
+            var observer = new MutationObserver(function(mutations) {
+                $('.form-control[id$="_date"]').datetimepicker({
+                    format: 'YYYY-MM-DD'
+                });
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        JS
+        );
+
+        Admin::script('
+        $(document).on("click", ".submit", function () {
+            setTimeout(function() {
+                location.reload();
+            }, 500);
+        });
+    ');
+
         $grid->model()
             ->where('user_id', '=', request('id'))
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
@@ -83,8 +141,6 @@ class UserChargeReportController extends MainController
         } else {
             $grid->model()->where('charger_type', "!=", "dash");
         }
-
-        $grid->disableFilter();
 
 
         $grid->column('id', __('transaction id'));
@@ -169,31 +225,35 @@ class UserChargeReportController extends MainController
         });
 
         $grid->column('custom_button2', __('reason'))->modal(__('reason'), function ($model) {
-            $reason = ChargeInvoice::where('charge_id', $this->id)->first(); // get the first model from collection
+            $reason = ChargeInvoice::where('charge_id', $this->id)->first();
 
             if (!$reason) {
-                return new \Encore\Admin\Widgets\Table(
-                    [__('Field Name'), __('Value')],
-                    [[__('No reasons available'), '-']]
-                );
+                return "<table class='table'><tr><td>".__('No reasons available')."</td><td>-</td></tr></table>";
             }
 
+            Admin::style(<<<CSS
+                .modal-reason-table td {
+                    max-width: 300px;
+                    word-wrap: break-word;
+                    white-space: pre-wrap;
+                    padding: 10px;
+                }
+                CSS
+            );
 
             $img = getDriverUrl() . '/' . $reason->invoice;
-            $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
+            $imgHtml = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail' />";
 
+            $html = "<table class='table modal-reason-table'>";
+            $html .= "<tr><td>".__('Reason')."</td><td>" . htmlspecialchars(
+                    app()->getLocale() === 'en'
+                        ? ($reason->reason_en ?? $reason->reason_ar)
+                        : ($reason->reason_ar ?? $reason->reason_en)
+                ) . "</td></tr>";
+            $html .= "<tr><td>".__('Invoice')."</td><td>" . $imgHtml . "</td></tr>";
+            $html .= "</table>";
 
-            $results = [
-                __('Reason') => app()->getLocale() === 'en'
-                    ? ($reason->reason_en ?? $reason->reason_ar)
-                    : ($reason->reason_ar ?? $reason->reason_en),
-                __('Invoice') =>$img,
-            ];
-
-            return new \Encore\Admin\Widgets\Table(
-                [__('Field Name'), __('Value')],
-                collect($results)->map(fn($v, $k) => [$k, $v])->values()->all()
-            );
+            return $html;
         });
 
         $grid->column('created_at', __('shipping date'));

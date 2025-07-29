@@ -24,7 +24,7 @@ trait AttributesTrait
     public static function checkPackV2($userPacks, $type, $dress = null)
     {
         $userPacks->where('type', $type)
-            ->filter(function ($item){
+            ->filter(function ($item) {
                 return $item->expire == 0 || $item->expire >= time();
             });
 
@@ -39,7 +39,7 @@ trait AttributesTrait
         if (!$dress) {
             return $dr;
         }
-        $pack = self::checkPack($user_id, $type,$dress);
+        $pack = self::checkPack($user_id, $type, $dress);
 
         if ($isUsed) {
             $pack->where('is_used', 1);
@@ -66,7 +66,7 @@ trait AttributesTrait
         if (!$dress) {
             return $dr;
         }
-        $pack = self::checkPackV2($userPacks, $type,$dress);
+        $pack = self::checkPackV2($userPacks, $type, $dress);
 
         if ($isUsed) {
             $pack->where('is_used', 1);
@@ -93,7 +93,6 @@ trait AttributesTrait
             ->where('type', $key)
             ->where(function ($q) {
                 $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
-            })
-            ->exists();
+            })->where('is_used', 1)->exists();
     }
 }

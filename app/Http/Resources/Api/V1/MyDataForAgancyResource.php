@@ -21,6 +21,7 @@ class MyDataForAgancyResource extends JsonResource
      */
     public function toArray($request)
     {
+        $hasColor = Common::hasInPack(@$this->id, 18, true);
 
         $data = [
             'id' => @$this->id, // both
@@ -30,11 +31,13 @@ class MyDataForAgancyResource extends JsonResource
             'phone' => @$this->phone ?? '',
             'country' => $this->country ?? null,
             // 'vip_level' => @$this->UserVip->level,
-            'vip'=>@Common::ovip_center ($this->id), // refactor
-            'level'=>Common::level_center_min (@$this->id), // refactor
+            'vip' => @Common::ovip_center($this->id), // refactor
+            'level' => Common::level_center_min(@$this->id), // refactor
             'profile' => new ProfileForAjancyResource(@$this->profile), // both
-            'has_color_name'=> false,
-            'gender'=>$this->gender,
+            'has_color_name' => false,
+            'gender' => $this->gender,
+            'colored_name' => $hasColor ? common::wareUserVip(@$this->id, 18, 'color') ?? '' : '',
+
         ];
 
         return $data;

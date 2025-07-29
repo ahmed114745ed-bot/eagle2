@@ -83,6 +83,24 @@ class CpRepository
             ->first();
     }
 
+    public function checkExistingSecondUserCp($otherUserId, $relationId)
+    {
+        return Cp::where(function ($query) use ($otherUserId) {
+            $query->where("user_two_id", $otherUserId)->orWhere("user_one_id", $otherUserId);
+        })->where('cp_relation_id', $relationId)->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->first();
+    }
+
+    public function checkExistingFirstUserCp($otherUserId)
+    {
+        return Cp::where(function ($query) use ($otherUserId) {
+            $query->where("user_two_id", $otherUserId)->orWhere("user_one_id", $otherUserId);
+        })->whereHas("cpRelation", function ($q) {
+            $q->where('type', '!=', 'solution');
+        })->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->first();
+    }
+
     public function checkExistingCpLovlyForUser($userId)
     {
         return Cp::where(function ($query) use ($userId) {
@@ -116,11 +134,23 @@ class CpRepository
     {
         return Cp::where(function ($query) use ($userId,) {
             $query->where(function ($query) use ($userId,) {
-                $query->where("user_two_id", $userId);
+                $query->where("user_two_id", $userId)->orWhere("user_one_id", $userId);
             });
         })->where('cp_relation_id', $relationId)
             /// TODO convert these status to enum
             ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->count();
+    }
+
+    public function countExistingCpSameRelationActive($userId, $relationId)
+    {
+        return Cp::where(function ($query) use ($userId,) {
+            $query->where(function ($query) use ($userId,) {
+                $query->where("user_two_id", $userId)->orWhere("user_one_id", $userId);
+            });
+        })->where('cp_relation_id', $relationId)
+            /// TODO convert these status to enum
+            ->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->count();
     }
 

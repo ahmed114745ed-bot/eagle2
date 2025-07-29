@@ -90,6 +90,7 @@ return [
     'queen'               => 'queen',
     'target' => 'Congrats! you achieve new target in :agency your salary now is :salary',
     'family_level_up' => 'Congrats! your family :name level up to :level',
+    "buyVip" => 'You can not buy this  until you  buy vip :level',
     'account' => "account",
     'normal' => "account",
     'ip' => "ip",

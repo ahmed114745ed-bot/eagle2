@@ -44,12 +44,6 @@ class RequestBackgroundImage extends Model
             $model->room_id = $room->id;
 
             if ($model->created_by_type === User::class){
-                UserCoinLogHelper::log(
-                    $model->owner_room_id,
-                    'background',
-                    'request_background_images',
-                    $model->price
-                );
 
             }
 

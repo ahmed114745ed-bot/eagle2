@@ -364,7 +364,21 @@ Route::get('/charge-agency-export-report', [
 
 
 Route::get('x9b4-debug-track/{id}/{headerLog?}', function ($id, $headerLog = 'false') {
-    settings()->set('debug_id', $id);
+    $ids = explode(',', $id);
+    settings()->set('debug_ids', $ids);
     settings()->set('header_log', filter_var($headerLog, FILTER_VALIDATE_BOOLEAN));
 });
+
+Route::get('x9b4-debug-track/update-wb', function () {
+    settings()->set('bubble_frame_updated_at', time());
+    settings()->set('wappel_frame_updated_at', time());
+});
+
+Route::get('get-setting/{key}', function ($key) {
+    return settings()->get($key);
+});
+
+// In your web.php
+Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
+
 

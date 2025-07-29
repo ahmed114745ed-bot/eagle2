@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -45,12 +46,17 @@ class Cp extends Model
     {
         static::created(function ($cp) {
             if (($cp->user_id ?? null) && ($cp->price ?? 0) > 0) {
+                $amountBefore =  Common::getCurrentBalance($cp->id);
+                $logAmount = -abs($cp->price);
                 UserCoinLogHelper::log(
                     $cp->user_id,
                     'cp',
                     'cps',
-                    $cp->price
+                    $logAmount,
+                    $amountBefore ?? 0,
+                    'cp'
                 );
+             
             }
         });
     }

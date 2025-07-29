@@ -80,11 +80,15 @@ class SpecialIdRequestController extends Controller
                     'price'     => $total_price,
                 ];
                 Pack::create($packData);
+                $amountBefore =  Common::getCurrentBalance($user->id);
+                $logAmount = -abs($total_price);
                 UserCoinLogHelper::log(
                     $user->id ,
                     'pack',
                     'packs',
-                    $total_price ?? 0
+                    $logAmount ?? 0,
+                    $amountBefore ?? 0,
+                    'Special Id'
                 );
                 // Upgrade user level
                 (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);

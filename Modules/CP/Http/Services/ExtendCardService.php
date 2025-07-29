@@ -40,14 +40,17 @@ class ExtendCardService
 
         /// TODO check expire packs
         $existingPack = $this->packRepository->findByUserIdAndTargetId($user->id, $ware->id);
-        $countPack = $this->packRepository->countUserVipPacks($user->id);
+        if ($existingPack && $existingPack->use_num == 15) return Common::apiResponse(0, 'لقد قمت بشراء جميع الكراسى');
+
+      //  $countPack = $this->packRepository->countUserVipPacks($user->id);
 
         // card ends today at midnight
         /// create another pack // from today to 30 days
         //if ($existingPack && $countPack == 2) {
         if ($existingPack) {
-                $existingPack->expire = $existingPack->expire ? now()->timestamp + ($expire * 86400) : now()->addDays($expire)->timestamp;
-                $existingPack->save();
+            $existingPack->expire = $existingPack->expire ? now()->timestamp + ($expire * 86400) : now()->addDays($expire)->timestamp;
+            $existingPack->use_num = $existingPack->use_num + 3;
+            $existingPack->save();
         } else {
             $this->packRepository->createPack([
                 'user_id' => $user->id,
@@ -58,12 +61,12 @@ class ExtendCardService
                 'expire' => $ware->expire ? now()->addDays($expire)->timestamp : 0,
                 'use_num' => $ware->num,
             ]);
-            UserCoinLogHelper::log(
-                $user->id ,
-                'pack',
-                'packs',
-                $ware->price ?? 0
-            );
+            // UserCoinLogHelper::log(
+            //     $user->id ,
+            //     'pack',
+            //     'packs',
+            //     $ware->price ?? 0
+            // );
         }
 
 

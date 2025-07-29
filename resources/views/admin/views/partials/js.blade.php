@@ -1,6 +1,6 @@
 @foreach($js as $j)
 <script src="{{ admin_asset ("$j") }}">
-      
+
 
 </script>
 @endforeach
@@ -35,11 +35,11 @@
             '</div>';
             $("#dynamic_fields_container").append(newField);
         });
-        
+
                 $(document).off("click", ".remove-field").on("click", ".remove-field", function() {
                     $(this).closest(".dynamic-field-group").remove();
                 });
-        
+
                 function toggleFields() {
                     var type = $("#box_type").val();
                     if (type == "1" || type == 1 ) {
@@ -84,18 +84,18 @@
                 $("#box_type").off("change").on("change", toggleFields);
                 toggleFields();
             }
-        
+
             $(document).ready(function () {
                 initDynamicFieldsScript();
             });
-        
+
             // $(document).on("pjax:end", function () {
             //     initDynamicFieldsScript();
             // });
 
 
 
-   
+
 
         function initPhoneInput() {
         document.querySelectorAll("#phone-input").forEach(function(input) {

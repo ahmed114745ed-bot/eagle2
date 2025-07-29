@@ -7,6 +7,8 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\RedisService;
 use App\Helpers\Common;
+use App\Jobs\LogUserCoinProfit;
+use App\Jobs\LogUserGamesCoinProfit;
 use App\Models\CoreWallet;
 use App\Models\Cp;
 use App\Models\Gift;
@@ -38,6 +40,7 @@ class LuckyGiftService
         $giftId   = $data['id'];
         $number   = $data['num'];
         $count    = $data['count'] ?? 1;
+        $amountBefore = $user->di;
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
@@ -90,6 +93,19 @@ class LuckyGiftService
         $price              = $coinsForReceiver * $receiversCount;
         $total_user_win  = 0;
         $total_count_win = 0;
+
+      
+        LogUserGamesCoinProfit::dispatch(
+            $user->id,
+            $amountBefore,
+            -abs($totalPrice)  ,
+             0,
+            'gift_logs',
+            'lucky_gift',
+            'lucky_gift'
+        )->onQueue('log_user_coin');
+        
+        
         while ($user->di >= $totalPrice && $index > 0) {
 
             $appWallet->coins   += $price * 8;
@@ -106,6 +122,7 @@ class LuckyGiftService
 
                 $cashback_value = $cashback_percentage * $giftPrice * $number;
                 if ($cashback_percentage > 0) {
+
                     $user->enableSaving = false;
                     $user->di           += $cashback_value;
                     //                $user->save();
@@ -141,6 +158,7 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
+          
             $user->di -= $totalPrice;
             $index--;
             $message = null;
@@ -149,6 +167,20 @@ class LuckyGiftService
             $cashback_percentage = 0;
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
+
+   
+        $cashbackBefore = $user->di;
+        if ($total_user_win > 0) {
+            LogUserCoinProfit::dispatch(
+                $userId,
+                $cashbackBefore,
+                $total_user_win,
+                'cashback',
+                'lucky_gifts',
+                'cashback'
+            )->onQueue('log_user_coin');
+        }
+        
 
         if ($index > 0) {
             $count -= $index;

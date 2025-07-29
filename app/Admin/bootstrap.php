@@ -73,3 +73,10 @@ if (request()->is('admin*')) {
         abort(403, 'Invalid request');
     }
 }
+Encore\Admin\Admin::script(<<<'JS'
+    $(document).on('pjax:start', function () {
+        $('.select2-container--open').each(function () {
+            $(this).remove();
+        });
+    });
+JS);

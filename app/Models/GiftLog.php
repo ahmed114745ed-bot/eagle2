@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Moment\Entities\Moment;
 
 class GiftLog extends Model
 {
@@ -36,6 +38,11 @@ class GiftLog extends Model
     public function room()
     {
         return $this->belongsTo(Room::class, 'room_id');
+    }
+
+    public function moment(): BelongsTo
+    {
+        return $this->belongsTo(Moment::class, 'moent_id');
     }
 
     public function cps()

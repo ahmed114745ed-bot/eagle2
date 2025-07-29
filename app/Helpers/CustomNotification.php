@@ -10,6 +10,7 @@ use App\Models\Agency;
 use App\Models\Family;
 use App\Models\OfficialMessage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Lang;
 use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
@@ -615,6 +616,71 @@ class CustomNotification
         $icon = $data['image'];
         Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'lucky_box');
         Common::sendOfficialMessage($user->id,  title: $body_en, content: $content, titleAr: $body_ar,);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    public function closeLuckyBox(User $user, $imageBox, $type)
+    {
+        $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
+        if ($type == 0) {
+            $body_ar = Lang::get('api.closeNormalBox', [], 'ar');
+            $body_en = Lang::get('api.closeNormalBox', [], 'en');
+        } else {
+            $body_ar = __('api.closeSuperBox', [], 'ar');
+            $body_en = __('api.closeSuperBox', [], 'en');
+        }
+
+        $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
+        $content = ($user->lan === 'ar') ? 'lucky box' : 'صندوق الحظ';
+        $data['image'] = getImagePath(@$imageBox);
+        $icon = $data['image'];
+        Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'close_lucky_box');
+        Common::sendOfficialMessage($user->id,  title: $body_en, content: $content, titleAr: $body_ar,);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    public function closedLuckyBosWithReturnCoins(User $user, $coins, $imageBox, $type)
+    {
+        $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
+        if ($type == 0) {
+            $body_ar = Lang::get('api.closeNormalBoxReturnCoins', ['coins' => $coins], 'ar');
+            $body_en = Lang::get('api.closeNormalBoxReturnCoins', ['coins' => $coins], 'en');
+        } else {
+            $body_ar = __('api.closeSuperBoxReturnCoins', ['coins' => $coins], 'ar');
+            $body_en = __('api.closeSuperBoxReturnCoins', ['coins' => $coins], 'en');
+        }
+        $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
+        $content = ($user->lan === 'ar') ? 'lucky box' : 'صندوق الحظ';
+        $data['image'] = getImagePath(@$imageBox);
+        $icon = $data['image'];
+        Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'return_coins_lucky_box');
+        Common::sendOfficialMessage($user->id,  title: $body_en, content: $content, titleAr: $body_ar,);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    function multiLang(string $key, array $replace = []): array
+    {
+        $locales = ['en', 'ar'];
+        $translations = [];
+
+        foreach ($locales as $locale) {
+            $translations[$locale] = Lang::get($key, $replace, $locale);
+        }
+
+        return $translations;
+    }
+
+    public function charges($user, $title, $body, $replace)
+    {
+        $currentLang = app()->getLocale();
+        $notificationToken = $user->notification_id;
+
+        $translatedTitle = $this->multiLang($title);
+        $translatedBody = $this->multiLang($body, $replace);
+
+        Common::send_firebase_notification($notificationToken, $translatedTitle[$currentLang], $translatedBody[$currentLang]);
+
+        Common::sendOfficialMessage($user->id, content: $translatedBody[$currentLang], title: $translatedTitle['en'], titleAr: $translatedTitle['ar']);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 }

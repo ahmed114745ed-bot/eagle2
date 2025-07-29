@@ -17,6 +17,8 @@ return [
     'has_color_name_title' => 'الاسم الملون',
     'anonymous_title'      => 'مجهول',
     'country_title'        => 'اسم البلد',
+    "buyVip" => 'لا يمكنك شراء هذا حتى تشتري  vip :level',
+
     'last_active_title'    => 'آخر نشاط',
     'visit_title'          => 'زيارة',
     'room_title'           => 'إخفاء الغرفة',
@@ -49,7 +51,10 @@ return [
     'chat_with_followers_description_allow'    => 'أصبح لدي جميع المتابعين امكانيه المحادثه معك ',
     'chat_with_following_description_allow'    => 'أصبح لدي جميع المتابعون امكانيه المحادثه معك ',
     'chat_with_all_description_allow'    => 'اصبح لدي جميع المستخدمين امكانيه المحادثه معك',
-
+    "closeNormalBox" => "انتهت مدة صندوق الحظ العادي الخاص بك",
+    "closeSuperBox" => "انتهت مدة صندوق الحظ السوبر الخاص بك",
+    "closeNormalBoxReturnCoins" => "انتهت مدة صندوق الحظ العادي وتمت إعادة :coins من العملات إليك",
+    "closeSuperBoxReturnCoins" => "انتهت مدة صندوق الحظ السوبر وتمت إعادة :coins من العملات إليك",
     'welcome'                          => 'مرحبا :name فى :app_name',
     'followed_you'                     => ' بمتابعتك:name قام',
     'luckBox' => 'تهانينا! لقد فزت من صندوق الحظ بـ :coins عملة',

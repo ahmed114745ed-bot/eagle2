@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use Exception;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\UserRepository;
@@ -25,40 +26,63 @@ class MallService
         return $this->wareRepository->all($userId, $type);
     }
 
+    public function getAllWares($type, $userId = null)
+    {
+        return $this->wareRepository->allWithType($type, $userId);
+    }
+
     public function buyWares($user, $wareId, $quantity)
     {
         $ware = $this->wareRepository->getById($wareId);
 
         if (!$ware) return Common::apiResponse(0, 'item not found or not for sale', null, 404);
+        if ($ware->level) {
+            $userVipLevel = Common::userVipLevel($user->id, $ware->level);
+            if (!$userVipLevel) return Common::apiResponse(0, __("api.buyVip", ['level' => $ware->level]), null, 404);
+        }
+
         $pack        = $this->packRepository->userPack($user->id, $ware->id);
 
         $totalPrice = $ware->price * $quantity;
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+        $amountBefore =  Common::getCurrentBalance($user->id);
+        $logAmount = -abs($totalPrice);
+        UserCoinLogHelper::log(
+            $user->id,
+            'pack',
+            'packs',
+            $logAmount ?? 0,
+            $amountBefore ?? 0,
+            $ware->name
+        );
         if ($pack) {
 
-            $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
-        }
-        try {
+            return  $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
+        } else {
+            try {
 
-            // no pack so create it
-            $data = [
-                'user_id'   => $user->id,
-                'type'      => $ware->type,
-                'get_type'  => $ware->get_type,
-                'target_id' => $ware->id,
-                'num'       => $quantity, //$qty,
-                'expire'    => $ware->expire ? time() + ($quantity * $ware->expire * 86400) : 0,
-                'is_read'   => 1,
-                'use_num'   => $ware->num,
-                'price'     => $totalPrice,
-                'price_item' => $ware->price
-            ];
-            $this->packRepository->create($data);
 
-            $this->service($user, $ware->exp, $totalPrice, 'buy');
-            return Common::apiResponse(1, 'success process');
-        } catch (Exception $exception) {
-            return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
+                // no pack so create it
+                $data = [
+                    'user_id'   => $user->id,
+                    'type'      => $ware->type,
+                    'get_type'  => $ware->get_type,
+                    'target_id' => $ware->id,
+                    'num'       => $quantity, //$qty,
+                    'is_read'   => 1,
+                    'use_num'   => $ware->num,
+                    'price'     => $totalPrice,
+                    'price_item' => $ware->price,
+                    'days' => $ware->expire ?  $ware->expire  : 0,
+                ];
+                $this->packRepository->create($data);
+
+
+                $this->service($user, $ware->exp, $totalPrice, 'buy');
+                return Common::apiResponse(1, 'success process');
+            } catch (Exception $exception) {
+                return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            }
         }
     }
 
@@ -94,8 +118,18 @@ class MallService
                 'price'     => $totalPrice,
             ];
             $this->packRepository->create($data);
-
+            $amountBefore =  Common::getCurrentBalance($auth->id);
+            $logAmount = -abs($totalPrice);
+            UserCoinLogHelper::log(
+                $auth->id,
+                'pack',
+                'packs',
+                $logAmount ?? 0,
+                $amountBefore ?? 0,
+                $ware->name
+            );
             $this->service($auth, $ware->exp, $totalPrice, 'send');
+
             DB::commit();
             return Common::apiResponse(1, 'success process');
         } catch (\Exception $exception) {
@@ -106,38 +140,74 @@ class MallService
 
     public function updatePack($user, $pack, $ware, $quantity, $totalPrice, $type)
     {
-        if ($pack->expire == 0) return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
-        if ($pack->expire > now()->timestamp) { // expire pack not finished
-            if ($ware->expire != 0) {
+        // If pack is permanent (expire = 0)
+        if ($pack->expire === 0) {
+            return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
+        }
 
-                try {
-
-                    $expire = ($quantity * $ware->expire * 86400);
-                    $updateData = [
-                        'num'       => $pack->num + $quantity, //$qty,
-                        'expire'    => $expire,
-                        'price'     => $pack->price + $totalPrice,
-                    ];
-                    $this->packRepository->update($updateData, $pack->id);
-                    $this->service($user, $ware->exp, $totalPrice, $type);
-                    return Common::apiResponse(1, 'success process');
-                } catch (Exception $exception) {
-
-                    return Common::apiResponse(0, 'fail', null, 400);
-                }
-            } else {
+        // If pack is still valid (not expired)
+        if (!is_null($pack->expire) && $pack->expire > now()->timestamp) {
+            if ($ware->expire == 0) {
                 return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
             }
-        } else {
-            // id expire pack finished
-            $this->packRepository->delete($pack);
+
+            return $this->extendActivePack($pack, $ware, $quantity, $totalPrice, $user, $type);
+        } elseif (is_null($pack->expire)) {
+            if ($ware->expire == 0) {
+                return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
+            }
+
+            return $this->updatePackWithoutExpire($pack, $ware, $quantity, $totalPrice, $user, $type);
+        }
+
+        // If expired: remove it
+        $this->packRepository->delete($pack);
+    }
+    protected function extendActivePack($pack, $ware, $quantity, $totalPrice, $user, $type)
+    {
+        try {
+            $expireSeconds = $quantity * $ware->expire * 86400;
+
+            $updateData = [
+                'num'    => $pack->num + $quantity,
+                'expire' => $pack->expire + $expireSeconds,
+                'price'  => $pack->price + $totalPrice,
+            ];
+
+            $this->packRepository->update($updateData, $pack->id);
+            $this->service($user, $ware->exp, $totalPrice, $type);
+
+            return Common::apiResponse(1, 'success process');
+        } catch (Exception $e) {
+            return Common::apiResponse(0, 'fail', null, 400);
         }
     }
+
+    protected function updatePackWithoutExpire($pack, $ware, $quantity, $totalPrice, $user, $type)
+    {
+        try {
+            $updateData = [
+                'num'    => $pack->num + $quantity,
+                'price'  => $pack->price + $totalPrice,
+                'days'   => $pack->days + $ware->expire,
+            ];
+
+            $this->packRepository->update($updateData, $pack->id);
+            $this->service($user, $ware->exp, $totalPrice, $type);
+
+            return Common::apiResponse(1, 'success process');
+        } catch (Exception $e) {
+            return Common::apiResponse(0, 'fail', null, 400);
+        }
+    }
+
+
+
 
     public function service($user, $wareExp, $totalPrice, $type)
     {
         if ($type == 'buy') {
-            (new UpgradeLevelServices())->purchaseItem($user, $wareExp);
+            (new UpgradeLevelServices())->purchaseItem($user, $totalPrice);
             (new UserCounterServices)->eventUser($user, 'mybag', 1);
         }
 

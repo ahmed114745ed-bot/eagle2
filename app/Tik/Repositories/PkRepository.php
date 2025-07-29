@@ -6,9 +6,6 @@ use App\Models\Pk;
 
 class PkRepository extends AbstractRepository
 {
-
-
-
     public function __construct()
     {
         parent::__construct(new Pk());

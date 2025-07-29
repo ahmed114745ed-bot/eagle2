@@ -18,6 +18,8 @@ use App\Admin\Fields\Image;
 
 use App\Services\AppFeatureService;
 use App\Admin\Controllers\MainController;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class VipController extends MainController
 {
@@ -354,9 +356,23 @@ class VipController extends MainController
         })->editable();
 
         $grid->column('img', __('Image'))->display(function ($img) {
-            if (!$img) return '';
-            $url = getImagePath($img);
-            return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($img) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+
+            $imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',];
+
+            $inner = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+            if (in_array($ext, $imageTypes)) {
+                return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
+            } else {
+                return $inner;
+            }
         });
 
         // Any custom grid extensions
@@ -444,13 +460,16 @@ class VipController extends MainController
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         //        $form->number('di', __('Diamonds'));
         //        $form->number('co', __('Coins'));
-        $form->image('img', __('Image'))->name(function ($file) {
+        $form->file('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->removable()->rules('required');
 
+        $form->saving(function ($form) {
+            if ($form->img instanceof UploadedFile) {
+                validateUploadedFileType($form->img);
+            }
+        });
 
-
-        
         $form->footer(function ($footer) {
             $footer->disableReset();        // Disables the "Reset" button
             $footer->disableViewCheck();    // Disables the "View" checkbox

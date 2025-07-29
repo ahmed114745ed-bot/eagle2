@@ -27,9 +27,8 @@ class ShippingAgency extends Model
 
     public function chargeAgency()
     {
-        return $this->hasMany(ChargeAgency::class, 'agency_id');
+        return $this->hasOne(ChargeAgency::class, 'agency_id');
     }
-
 
     public function charges()
     {
@@ -38,6 +37,11 @@ class ShippingAgency extends Model
     public function senderCharges()
     {
         return $this->hasMany(Charge::class, 'charger_id','id')->where('charger_type','agency');
+    }
+
+    public function receiveShippingAgencyCharges()
+    {
+        return $this->hasMany(Charge::class, 'user_id','id')->where('user_type','agency');
     }
 
     public function Countries()
