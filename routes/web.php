@@ -101,6 +101,8 @@ Route::prefix('payment')->group(function () {
     Route::get('payment-fail', [\App\Http\Controllers\Web\PaymentController::class, 'fail']);
 });
 Route::get("ware_image", [MallController::class, "wareImage"]);
+Route::get("expire-user-vip", [MallController::class, "updateExpireUserVip"]);
+
 Route::get('/page/{name}', function ($name) {
     $page = \App\Models\Page::query()->where('name', $name)->firstOrFail();
     return (app()->getLocale() == 'ar' ? $page->content : ($page->content_en ?? $page->content));

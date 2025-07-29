@@ -143,7 +143,7 @@ class CpRelationController extends MainController
         $form->image('image', __('Img'));
         $form->number('price', __('price'))->rules('required|min:1');
         // $form->number('relations_number', __('relations_number'))->default(0)->min(0);
-        $form->switch('relations_number', __('relations number'))->default(0)->rules('required');
+        $form->switch('relations_number', __('relations number'))->default(0)->rules('required')->help(__("admin.relations_help"));
 
         $form->select('type', __('Type'))->options([
             'bro' => __('bro'),

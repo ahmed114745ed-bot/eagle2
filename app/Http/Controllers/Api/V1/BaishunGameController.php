@@ -31,6 +31,7 @@ class BaishunGameController extends Controller
         if ($errorExists) return response()->json($errorExists);
 
         $id = $this->findUserByToken($request->code ?? $request->ss_token);
+       
 
 
         if (!$id) {
@@ -57,14 +58,14 @@ class BaishunGameController extends Controller
                 $userDi = $user->di;
 
                 // Check if order_id already used in coin_game_users
-                $orderExists = DB::table('coin_game_users')
-                    ->where('order_id', $request->order_id)
-                    ->lockForUpdate()
-                    ->exists();
+                // $orderExists = DB::table('coin_game_users')
+                //     ->where('order_id', $request->order_id)
+                //     ->lockForUpdate()
+                //     ->exists();
 
-                if ($orderExists) {
-                    throw new \RuntimeException('duplicate_order');
-                }
+                // if ($orderExists) {
+                //     throw new \RuntimeException('duplicate_order');
+                // }
 
                 if ($request->currency_diff < 0 && $userDi < abs($request->currency_diff)) {
                     throw new \RuntimeException('insufficient');
@@ -72,10 +73,13 @@ class BaishunGameController extends Controller
 
                 $amountBefore = $user->di;
 
+                $helperAmount = $request->currency_diff > 0 ? $request->currency_diff : 0;
+             
                 LogUserGamesCoinProfit::dispatch(
                     $user->id,
                     $amountBefore,
-                    $request->currency_diff,
+                    $request->currency_diff  ,
+                    $helperAmount,
                     'coinGame',
                     'coin_game_users',
                     'coin_game'
@@ -425,3 +429,4 @@ class BaishunGameController extends Controller
         }
     }
 }
+
