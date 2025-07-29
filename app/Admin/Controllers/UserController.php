@@ -134,7 +134,7 @@ class UserController extends MainController
         // Add the second row unconditionally
         $content = $content->row(function ($row) {
             $row->column(12, $this->grid());
-        });
+        })->row(view('admin.same_device_users_modal'));
 
         return $content;
     }
@@ -280,6 +280,26 @@ class UserController extends MainController
                 overflow-y: auto !important;
             }
         ");
+
+        $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+            $count = $this->sameDeviceUsers()->count();
+            return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
+        });
+
+        Admin::script("
+            $(document).on('click', '.show-same-device-modal', function() {
+                console.log('here');
+                var userId = $(this).data('user-id');
+                $('#sameDeviceUsersModal .modal-body').html('Loading...');
+                $('#sameDeviceUsersModal').modal('show');
+                $.get('/admin/users/' + userId + '/same-device-users-table', function(html) {
+                    $('#sameDeviceUsersModal .modal-body').html(html);
+                });
+            });
+        ");
+
+
+
         /* $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             return $this->sameDeviceUsers()->count();
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
@@ -560,13 +580,7 @@ class UserController extends MainController
             ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
             ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
 
-        \Log::info('Users Coins Pagination', [
-            'current_page' => $usersCoins->currentPage(),
-            'last_page' => $usersCoins->lastPage(),
-            'total' => $usersCoins->total(),
-            'per_page' => $usersCoins->perPage(),
-            'count' => $usersCoins->count(),
-        ]);
+
 
         $countries = $this->countries();
         $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
@@ -956,5 +970,46 @@ class UserController extends MainController
         }
 
         return Redirect::back();
+    }
+
+// app/Admin/Controllers/UsersAppController.php
+
+    public function ajaxSameDeviceUsersTable($id)
+    {
+        $user = User::with(['sameDeviceUsers.profile'])->findOrFail($id);
+        $users = $user->sameDeviceUsers;
+
+        $rows = $users->map(function ($user) {
+            $path = $user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($user->id, $url, 40, 40);
+
+            $nameColumn = "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                     <a  style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        <span cursor: pointer;'>$user->name</span>
+                    </a>
+                    <span style='color: #aaa; font-size: smaller;'>UUID: $user->uuid</span>
+                </div>
+            </div>
+        ";
+
+            return [
+                'name' => $nameColumn,
+                'phone' => $user->phone,
+            ];
+        });
+
+        $table = new Table([__('Name'), __('phone')], $rows->toArray());
+        // Return just table's HTML (your AJAX will inject this)
+        return $table->render();
     }
 }

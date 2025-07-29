@@ -31,7 +31,7 @@ class UserVipRepository extends AbstractRepository
     {
         return $this->model->where('user_id', $userId)->with('OVip')->where(function ($query) {
 
-            $query->where('expire', '>', Carbon::now()->timestamp)->orWhere('expire', null);
+            $query->where('expire', '>', Carbon::now()->timestamp)->orWhereNull('expire')->orWhere('expire', 0);
         })->orderBy('id')->get();
     }
 
@@ -111,7 +111,7 @@ class UserVipRepository extends AbstractRepository
             return;
         }
         $vipFeatureTypes = collect();
-        $vipPackIds = collect(); 
+        $vipPackIds = collect();
 
         foreach ($vips as $vip) {
             $vipModel = $vip->OVip;
@@ -123,7 +123,7 @@ class UserVipRepository extends AbstractRepository
 
                         $matchingPack = Pack::where('user_id', $userId)
                             ->where('type', $privilege->type)
-                            ->orderByDesc('created_at') 
+                            ->orderByDesc('created_at')
                             ->first();
 
                         if ($matchingPack) {
@@ -142,12 +142,12 @@ class UserVipRepository extends AbstractRepository
 
             if ($isSameTypeAsVip && !$isVipPack) {
                 $pack->update(['is_used' => 0]);
-        
+
             }
 
             if ($isVipPack) {
                 $pack->update(['is_used' => 1]);
-        
+
             }
         }
     }

@@ -15,6 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Modules\LuckyBox\Entities\UserBoxGift;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use App\Facades\CustomNotification;
 
 class NormalLuckyBoxJop implements ShouldQueue
 {
@@ -52,7 +53,12 @@ class NormalLuckyBoxJop implements ShouldQueue
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
             info('normal box room visitor inside the room : ' . json_encode($usersRoomVisit));
 
-
+            $winnerBox = UserBoxGift::where('box_uses_id', $userBox->box_id)->exists();
+            if (!$winnerBox) {
+                CustomNotification::closedLuckyBosWithReturnCoins($user, $userBox->unused_coins, $userBox?->image, 0);
+            } else {
+                CustomNotification::closeLuckyBox($user, $userBox?->image, 0);
+            }
             foreach ($usersRoomVisit as $userRoomVisit) {
 
                 $m = [

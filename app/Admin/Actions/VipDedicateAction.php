@@ -104,7 +104,7 @@ class VipDedicateAction extends Action
     public function form()
     {
         $this->hidden('id')->default($this->id);
-        $this->integer('days', __('days'))->required();
+        $this->integer('days', __('days'))->rules(['required', 'integer', 'min:1']);
         $this->text('user_uuid', __('user uuid'))->required();
     }
 

@@ -10,19 +10,21 @@ use App\Enums\TypeBox;
 use App\Helpers\Common;
 use App\Jobs\OpenBoxJob;
 
+use App\Models\RoomVisitor;
 use Illuminate\Http\Request;
 use App\Facades\RedisService;
+
 use App\Jobs\TestSuperLuckyBoxJob;
 
 use Modules\LuckyBox\Entities\Box;
-
+use App\Facades\CustomNotification;
 use App\Http\Controllers\Controller;
 use Modules\LuckyBox\Entities\BoxUse;
 use Modules\LuckyBox\Services\BoxService;
 use Modules\LuckyBox\Entities\PickBoxList;
 use Modules\LuckyBox\Entities\UserBoxGift;
-use Modules\LuckyBox\Http\Resources\BoxResource;
 use Modules\LuckyBox\Services\LuckyBoxServices;
+use Modules\LuckyBox\Http\Resources\BoxResource;
 
 class BoxController extends Controller
 {
@@ -194,6 +196,7 @@ class BoxController extends Controller
 
     public function normalBox($box_use, $keyBoxUse, $user, $request)
     {
+       
 
         if ($box_use['users_num'] != $box_use['used_num']) {
 
@@ -235,10 +238,49 @@ class BoxController extends Controller
             dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
 
             $user->increment('di', $coins);
-
+            $countWinners =  UserBoxGift::query()->where('box_uses_id', $request->bid)->count();
+            if ($countWinners == $box_use['users_num']) {
+                $this->closeNormalBox($request->bid);
+            }
             return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => $coins], 200);
         } else {
             return Common::apiResponse(1, 'لم يحصل ال مستخدم علي مكسب', ['is_win' => false, 'coins' => 0], 200);
+        }
+    }
+
+    public function closeNormalBox($userBoxId)
+    {
+        $userBox = BoxUse::find($userBoxId);
+        $user = User::where('id', $userBox->user_id)->first();
+        $user->increment('di', $userBox->unused_coins);
+        $userBox->is_closed = true;
+        $userBox->save();
+
+        $room = Room::withoutAppends()->where('uid', $userBox->room_uid)->select('id')->first();
+        $c = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
+        $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
+        $userWinner = UserBoxGift::where('box_uses_id', $userBox)->pluck('user_id')->toArray();
+        $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
+        //info('normal box room visitor inside the room : ' . json_encode($usersRoomVisit));
+
+
+        CustomNotification::closeLuckyBox($user, $userBox?->image, 0);
+
+        foreach ($usersRoomVisit as $userRoomVisit) {
+
+            $m = [
+                "messageContent" => [
+                    "message" => "hideluckybox",
+                    "ownerBoxId" => @$owner->id,
+                    "ownerBoxName" => @$owner->name,
+                    "boxCoins" => $userBox->coins,
+                    "boxId" => $userBox->id,
+                    "boxType" => $userBox->type == 1 ? 'super' : 'normal',
+                    "numOfBoxes" => $c
+                ]
+            ];
+            $json = json_encode($m);
+            Common::sendToZego('SendCustomCommand', @$room->id, @$userRoomVisit->user_id, $json);
         }
     }
 

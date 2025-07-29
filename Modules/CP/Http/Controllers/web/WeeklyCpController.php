@@ -92,6 +92,7 @@ class WeeklyCpController extends MainController
     {
         $grid = new Grid(new WeeklyStar());
         $grid->model()->whereType("weekly_cp");
+         $grid->disableRowSelector();
         $grid->column('id', __('Id'));
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));

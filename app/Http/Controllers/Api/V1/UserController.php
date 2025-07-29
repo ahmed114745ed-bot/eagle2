@@ -38,6 +38,7 @@ use App\Http\Resources\UserVipUtdResource;
 use App\Http\Resources\UserVisitRoomResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Services\WhatsappOtp;
+use App\Models\Ban;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Models\UserSallary;
@@ -195,6 +196,11 @@ class UserController extends Controller
             }
         }
         //        $shared = Common::getConfig('shared') ?? '1234';
+        $now = now();
+
+        $ban = Ban::where('ban_type_id',7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
+            ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
+  
         $data = [
             'version' => [
                 'android_version'   => settings()->get('android_current_version'),
@@ -206,6 +212,7 @@ class UserController extends Controller
             'shared_key' => Common::getConfig('shared') ?? '1234',
             'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
             'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", $user->id)->first() != null ? true : false,
+            'group_ban' => $ban != null ? true : false,
         ];
         return Common::apiResponse(true, '', $data, 200);
     }
@@ -586,13 +593,13 @@ class UserController extends Controller
             $senderId = $sender->id;
             $dressId = $sender->dress_1;
 
-            $image = optional(optional($sender->profile)->avatar) ?? '';
+            $image = $sender?->profile?->avatar ?? '';
 
             $currentTotal = $result->total;
             $totalDiff = isset($previousTotal) ? $previousTotal - $currentTotal : 0;
             $previousTotal = $currentTotal;
 
-            $frame = Common::getUserDress($senderId, $dressId, 4, 'img2', true) 
+            $frame = Common::getUserDress($senderId, $dressId, 4, 'img2', true)
                 ?: Common::getUserDress($senderId, $dressId, 4, 'img1', true);
 
             return [

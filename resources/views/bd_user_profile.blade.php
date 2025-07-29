@@ -1890,23 +1890,8 @@
                                     <td>{{ @$coin->amount_before ?? 0 }}</td>
                                     <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
                                         {{ $coin->amount ?? 0 }}
-                                        @if($coin->sub_type == 'coin_game_users')
-                                                <br>
-                                                <small class="d-block text-muted text-success">
-                                                    {{  $coin->helper_amount }} {{  __('profit') }}
-                                                </small>
-                                                <br>
-                                                <small class="d-block text-muted text-danger">
-                                                    {{ $coin->amount  - $coin->helper_amount }}  {{  __('loss')}}
-                                                </small>
-                                        @endif    
                                     </td>
-                                    <td>
-                                    
-                                     {{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0)}}
-                                
-
-                                     </td>
+                                    <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
                                     <td>{{ @$coin->from_date ?? 0 }}</td>
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
                                     <td>

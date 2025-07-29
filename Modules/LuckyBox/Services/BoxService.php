@@ -8,6 +8,7 @@ use App\Helpers\Common;
 use App\Models\CoreWallet;
 use App\Events\SuperLuckyBox;
 use App\Facades\RedisService;
+use App\Helpers\UserCoinLogHelper;
 use App\Jobs\SuperLuckyBoxJob;
 use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +33,7 @@ class BoxService
         } else {
             $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone);
         }
-
+        $amountBefore =  Common::getCurrentBalance($user->id);
         $user->decrement('di', $box->coins);
         try {
             DB::commit();
@@ -40,14 +41,16 @@ class BoxService
             $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(
                 Carbon::createFromTimestamp($boxU->end_at)
             );
+            $type = $box->type == 1 ? 'super' : 'normal';
+            $coins = $request->coins ?: $box->coins;
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
                     "ownerBoxId" => $user->id,
                     "ownerBoxName" => $user->name,
-                    "boxCoins" => $request->coins ?: $box->coins,
+                    "boxCoins" => $coins,
                     "boxId" => $boxU->id,
-                    "boxType" => $box->type == 1 ? 'super' : 'normal',
+                    "boxType" => $type,
                     "numOfBoxes" => (int)$c,
                     "ownerBoxImage" => $user->avatar,
                     "ownerBoxUId"  => $user->uuid,
@@ -60,6 +63,15 @@ class BoxService
             $json = json_encode($m);
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+            UserCoinLogHelper::log(
+                            $user->id,
+                            'lucky_box',
+                            $type,
+                            $coins,
+                            $amountBefore ?? 0,
+                            'lucky_box'
+                        );
+            
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -76,7 +88,7 @@ class BoxService
             'user_id' => $userId,
             'coins' => $boxCoin,
             'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
-            'end_at' => now()->setTimezone($timezone ?? 'UTC')->addSeconds($normalDuration)->timestamp,
+            'end_at' => now()->setTimezone($timezone ?? 'UTC')->addHours($normalDuration)->timestamp,
             'room_uid' => $room->uid,
             'room_id' => $room->id,
             'users_num' =>  $request->users_num,
@@ -95,7 +107,7 @@ class BoxService
         );
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
-        dispatch(new NormalLuckyBoxJop())->delay(now()->addSecond($normalDuration))->onQueue('test-super-lucky-box');
+        dispatch(new NormalLuckyBoxJop())->delay(now()->addHours($normalDuration))->onQueue('test-super-lucky-box');
         return $boxUser;
     }
 

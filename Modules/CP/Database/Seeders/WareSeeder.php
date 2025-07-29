@@ -15,9 +15,9 @@ class WareSeeder extends Seeder
      */
     public function run()
     {
-        DB::table ('wares')->insert (
+        DB::table('wares')->insert(
             [
-                ['name'=>'ثلاث مقاعد اضافيه', 'type'=>'100','price'=>1000,'expire'=>10,'get_type'=>'100', 'expire'=>0,'show_img'=>"ddsdsd", 'num'=>6],
+                ['name' => 'ثلاث مقاعد اضافيه', 'type' => '100', 'price' => 1000, 'expire' => 10, 'get_type' => '100', 'expire' => 0, 'show_img' => "ddsdsd", 'num' => 6],
             ]
         );
     }

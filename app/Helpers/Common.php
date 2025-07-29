@@ -104,7 +104,7 @@ class Common
                 }
             }
         } else if ($event_type == 'weekly_star') {
-            $event = WeeklyStar::PreviousNewEvent()->first();
+            $event = WeeklyStar::weeklyStar()->previousEvent()->first();
 
             if ($event) {
                 $weekly_star = Winner::with('user')->where('weekly_star_id', $event->id)
@@ -131,6 +131,11 @@ class Common
         }
 
         return $avatar;
+    }
+
+    public static function userVipLevel($userId, $level)
+    {
+        return UserVip::where(['user_id' => $userId])->where('level', ">=", $level)->active()->exists();
     }
 
     public static function level_center_min($user_id)
@@ -2200,10 +2205,6 @@ class Common
     {
         $balance = User::where('id', $userId)->value('di') ?? 0;
 
-        Log::info("Current balance fetched", [
-            'user_id' => $userId,
-            'balance' => $balance,
-        ]);
 
         return $balance;
     }
@@ -2217,4 +2218,26 @@ class Common
             ->pluck('sub_type')
             ->toArray();
     }
+
+
+    public  static function  checkUserAgencyFrozen(User $user): void
+    {
+        $ownedAgency = Agency::withoutGlobalScopes()
+            ->where('app_owner_id', $user->id)
+            ->first();
+
+        if ($ownedAgency && $ownedAgency->is_frozen) {
+            throw new \Exception(__('frozen_agency_by_admin'));
+        }
+        if ($user->agency_id) {
+            $hostAgency = Agency::withoutGlobalScopes()
+                ->where('id', $user->agency_id)
+                ->first();
+
+            if ($hostAgency && $hostAgency->is_frozen) {
+                throw new \Exception(__('api_responses.frozen_agency_by_admin'));
+            }
+        }
+    }
+
 }

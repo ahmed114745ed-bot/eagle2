@@ -40,10 +40,10 @@ class LevelController extends MainController
 
     public function show($id, Content $content)
     {
-        $relation_id = request()->route('relation_id'); 
+        $relation_id = request()->route('relation_id');
         return parent::show($id, $content
             ->title(trans('cp-relations'))
-            ->body($this->detail($id,$relation_id)));
+            ->body($this->detail($id, $relation_id)));
     }
 
     /**
@@ -82,20 +82,30 @@ class LevelController extends MainController
 
         $grid = new Grid(new CpLevel());
         $grid->model()->where('cp_relation_id', $relation_id);
-
+        $grid->disableRowSelector();
         $grid->column('id', __('Id'));
-        $grid->column('level', __('Level'))->editable();
-        $grid->column('exp', __('Exp'))->display(function ($value) {
-            return number_format($value);
-        })->editable();
-        $grid->column('img', __('Image'))->image('', '30');
+       
 
-        $grid->column('الاجرائات')->display(function () use ($relation_id) {
-            $url1 = url('admin/cp-level-gifts/' . $this->id);
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية</a>";
-            return $button1;
-        });
+        if (!request()->filled('_export_')) {
+             $grid->column('level', __('Level'))->editable();
+            $grid->column('exp', __('Exp'))->display(function ($value) {
 
+                return number_format($value);
+            })->editable();
+            $grid->column('img', __('Image'))->image('', '30');
+
+            $grid->column('الاجرائات')->display(function () use ($relation_id) {
+                $url1 = url('admin/cp-level-gifts/' . $this->id);
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية</a>";
+                return $button1;
+            });
+        } else {
+             $grid->column('level', __('Level'));
+            $grid->column('exp', __('Exp'))->display(function ($value) {
+
+                return number_format($value);
+            });
+        }
         return $grid;
     }
 
