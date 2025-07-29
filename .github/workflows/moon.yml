@@ -30,7 +30,7 @@ jobs:
           docker build -t moonlight:${{ github.sha }} .
           docker service update --image moonlight:${{ github.sha }} moonlight-app
           # check again
-          threshold=75
+          threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
             echo "Disk space is more than $threshold% utilized"
