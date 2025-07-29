@@ -49,8 +49,8 @@ class AgencyUsersTargetResource extends JsonResource
         $from = $joinedDate->greaterThan($startOfMonth) ? $joinedDate : $startOfMonth;
         $to = $leaveDate->lessThan($endOfMonth) ? $leaveDate : $endOfMonth;
 
-        Log::info('from join record:', [' $from' => $from]);
-        Log::info('to join record:', [' $to' => $to]);
+        \Log::info('from join record:', [' $from' => $from]);
+        \Log::info('to join record:', [' $to' => $to]);
 
 
         $agencySallary = UserSallary::query()
