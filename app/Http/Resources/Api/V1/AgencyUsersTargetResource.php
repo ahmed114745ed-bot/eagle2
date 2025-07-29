@@ -35,6 +35,9 @@ class AgencyUsersTargetResource extends JsonResource
             ->latest('join_date')
             ->first();
 
+
+         Log::info('Latest join record:', ['joinRecord' => $joinRecord]);
+
         $startOfMonth = Carbon::create($year, $month, 1)->startOfDay();
         $endOfMonth = Carbon::create($year, $month)->endOfMonth()->endOfDay();
 
@@ -45,6 +48,9 @@ class AgencyUsersTargetResource extends JsonResource
 
         $from = $joinedDate->greaterThan($startOfMonth) ? $joinedDate : $startOfMonth;
         $to = $leaveDate->lessThan($endOfMonth) ? $leaveDate : $endOfMonth;
+
+        Log::info('from join record:', [' $from' => $from]);
+        Log::info('to join record:', [' $to' => $to]);
 
 
         $agencySallary = UserSallary::query()
