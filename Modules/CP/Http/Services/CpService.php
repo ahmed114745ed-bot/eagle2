@@ -153,8 +153,10 @@ class CpService
 
     protected function assignCoins($amount, $userOne, $userTwo)
     {
-        $userOne->increment('di', $amount);
-        $userTwo->increment('di', $amount);
+        if ($amount) {
+            $userOne->increment('di', $amount);
+            $userTwo->increment('di', $amount);
+        }
     }
 
     protected function assignVip($vipId, $expire, $userOne, $userTwo)
