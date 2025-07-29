@@ -12,11 +12,14 @@ trait EventModel
     public function getStartDateAttribute($value)
     {
         $date = self::convertArabicNumbers($value);
-        return Carbon::parse($date)->timezone(config('app.owner_timezone'))->copy()->toDateTimeString();
+        $timezone = getTimezone();
+        return Carbon::parse($date)->timezone($timezone)->copy()->toDateTimeString();
     }
     public function getEndDateAttribute($value)
     {
-        return Carbon::parse($value)->timezone(config('app.owner_timezone'))->copy()->toDateTimeString();
+        $timezone = getTimezone();
+
+        return Carbon::parse($value)->timezone($timezone)->copy()->toDateTimeString();
     }
 
     public function scopePreviousNewEvent(Builder $query)
