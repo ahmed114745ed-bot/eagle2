@@ -98,6 +98,8 @@ class ChargeController extends Controller
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
 
+        Common::checkUserAgencyFrozen($from);
+
         if ($to->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
         }
@@ -176,6 +178,9 @@ class ChargeController extends Controller
         if ($from->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
+
+        Common::checkUserAgencyFrozen($from);
+
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
 
@@ -236,7 +241,10 @@ class ChargeController extends Controller
         //        }
 
         $user = $request->user();
+        
         if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+
+        Common::checkUserAgencyFrozen($user);
 
         $count = $request->amount;
         $userUuid = $request->user_id;
@@ -305,6 +313,8 @@ class ChargeController extends Controller
         if ($user->transfer_salary == 1) return Common::apiResponse(false, __('Transfer salary has been disabled!'), null, 407);
         if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
 
+        Common::checkUserAgencyFrozen($user);
+
         $count = $request->amount;
         $userUuid = $request->id;
         // if ($user->transfer_salary == 1) {
@@ -356,6 +366,8 @@ class ChargeController extends Controller
         $user = $request->user();
         if ($user->transfer_salary == 1) return Common::apiResponse(false, __('Transfer salary has been disabled!'), null, 407);
         if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+
+        Common::checkUserAgencyFrozen($user);
 
         $count = $request->amount;
         $userUuid = $request->id;

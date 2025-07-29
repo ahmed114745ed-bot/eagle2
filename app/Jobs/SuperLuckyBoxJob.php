@@ -113,7 +113,11 @@ class SuperLuckyBoxJob implements ShouldQueue
             info('boxes ids: ' . json_encode($pickerBoxIds));
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $pickerBoxIds)->whereHas('user')->pluck('user_id')->toArray();
             info('picked users inside the room : ' . json_encode($usersRoomVisit));
-
+            if (empty($winners)) {
+                CustomNotification::closedLuckyBosWithReturnCoins($owner, $userBox->unused_coins, $userBox?->image, 1);
+            } else {
+                CustomNotification::closeLuckyBox($owner, $userBox?->image, 1);
+            }
             foreach ($usersRoomVisit as $userRoomVisit) {
 
                 $m     = [

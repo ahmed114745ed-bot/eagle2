@@ -980,7 +980,7 @@
                         <div class="stat-label">{{__("salary")}}</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">{{ truncateAndTrim(@$diamondsHosts ?? 0) }}</div>
+                        <div class="stat-value">{{ truncateAndTrim(@$sumTargets ?? 0) }}</div>
                         <div class="stat-label">{{__("diamonds")}}</div>
                     </div>
 

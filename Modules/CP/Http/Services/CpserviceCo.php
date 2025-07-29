@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Modules\Chat\Events\Chat;
+use Modules\CP\Enums\CpStatus;
 use Modules\Chat\Events\OpenChat;
 use Illuminate\Support\Facades\Log;
 use Modules\Chat\Entities\ChatRoom;
@@ -66,26 +67,29 @@ class CpserviceCo
 
 
 
-        $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
-        /*         $existingLovelyOneCp = $this->cpRepository->checkExistingCpLovlyForUser($user->id);
-        $existingLovelyTwoCp = $this->cpRepository->checkExistingCpLovlyForUser($request->user_id); */
-
-        if ($existingCp && $cpRelation->type != 'solution') {
-            return Common::apiResponse(0, 'لا يمكنك تقديم cp مع هذا المستخدم حاليا!');
-        }
-
-        /*         if ($existingLovelyOneCp || $existingLovelyTwoCp) {
-            return Common::apiResponse(0, 'لا يمكن للمستخد الدخول ف اكتر من علاقه من نوع احبه');
-        } */
-
         $countRequestUserOne = $this->cpRepository->countExistingCpSameRelation($user->id,  $request->cp_relation_id);
-        $countRequestUserTwo = $this->cpRepository->countExistingCpSameRelation($request->user_id,  $request->cp_relation_id);
-        if (($cpRelation->relations_number > 0) &&
-            (($countRequestUserOne >= $cpRelation->relations_number) ||
-                ($countRequestUserTwo >= $cpRelation->relations_number)) && $cpRelation->type != 'solution'
+
+        if (($cpRelation->relations_number == 0) && ($countRequestUserOne > $cpRelation->relations_number) && $cpRelation->type != 'solution'
         ) {
             return Common::apiResponse(0, ' cp لقد تخطيت طلب ');
         }
+
+        $otherUserCp = $this->cpRepository->checkExistingSecondUserCp($request->user_id, $request->cp_relation_id);
+        if (($cpRelation->relations_number == 0) && $otherUserCp && $cpRelation->type != 'solution') {
+            return Common::apiResponse(0, 'لا يمكن تقديم cp هذا المستخدم فى علاقة');
+        }
+        $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
+        if ($existingCp && ($existingCp->status == CpStatus::PENDING->value)  && $cpRelation->type != 'solution') {
+            return Common::apiResponse(0, "لقد قمت بارسال  طلب cp من قبل ");
+        }
+
+        if ($existingCp && ($existingCp->status == CpStatus::ACTIVE->value  || $existingCp->status == CpStatus::RESTORED->value) && $cpRelation->type != 'solution') {
+            return Common::apiResponse(0, "انت في علاقة مع هذا المستخدم");
+        }
+
+
+
+
 
         $userRelation = $this->cpRepository->getUserRelationAvailable($user->id, $request->cp_relation_id);
 
@@ -191,6 +195,7 @@ class CpserviceCo
         return Common::apiResponse(1, 'تم الاضافه بنجاح');
     }
 
+    
     public function getRequestCp($user)
     {
         $data = $this->cpRepository->getRequestsForUser($user->id);
@@ -236,11 +241,21 @@ class CpserviceCo
 
 
         if ($request->status == 1) {
+
+            $countRequestUserOne = $this->cpRepository->countExistingCpSameRelationActive($cp->user_one_id,  $cp->relation->id);
+            if (($cp->relation->relations_number == 0) &&
+                (($countRequestUserOne > $cp->relation->relations_number)) && $cp->relation->type != 'solution'
+            ) {
+
+                return Common::apiResponse(0, ' cp لقد تخطيت طلب ');
+            }
+
             if ($cp->status == 5) {
                 $cp->status = 4; // restored
                 $cp->price += $cp->cpRelation->price;
                 $cp->save();
             } else {
+
                 $this->cpRepository->updateCpStatus($cp, 1);
             }
             $decryptedData['status'] = 1;

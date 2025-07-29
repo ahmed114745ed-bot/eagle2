@@ -107,7 +107,15 @@ const SELECTED_USED_WARE =
     6 => 'Entering Special Effects',
     28 => 'profile frame',
 ];
-
+function getTranslatedUsedWare()
+{
+    return [
+        4  => __('Avatar Frame'),
+        5  => __('Bubble Frame'),
+        6  => __('Entering Special Effects'),
+        28 => __('profile frame'),
+    ];
+}
 const PACK_USER =
 [
     4 => 'Avatar Frame',
@@ -134,5 +142,12 @@ const  GET_TYPE_WARE =
 [
     4 => 'purchase',
     // 6 => 'limited time purchase',
+
+];
+
+const  GET_TYPE_WARE_TYPES =
+[
+    4 => 'purchase',
+    6 => 'limited time purchase',
 
 ];

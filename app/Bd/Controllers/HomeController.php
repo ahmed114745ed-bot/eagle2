@@ -29,17 +29,11 @@ class HomeController extends Controller
         $appID = Auth::user()->app_id;
         $agencyCount = Agency::where('bd_id', $appID)->count();
 
-        // مجموع الرواتب
         $salaryData = \App\Models\BDSallary::where('bd_id', $appID)
             ->selectRaw('COALESCE(SUM(sallary),0) AS total_sallary, COALESCE(SUM(cut_amount),0) AS total_cut')
             ->first();
-        $finalSalary = $salaryData->total_sallary - $salaryData->total_cut;
+        $finalSalary = round($salaryData->total_sallary - $salaryData->total_cut, 2);
 
-        // مجموع المحفظة
-        // $walletData = \App\Models\UserWallet::where('user_id', $appID)
-        //     ->selectRaw('COALESCE(SUM(value),0) AS total_value, COALESCE(SUM(cut_amount),0) AS total_cut')
-        //     ->first();
-        // $finalWallet = $walletData->total_value - $walletData->total_cut;
         $finalWallet = '';
         return $content
             ->title('لوحة BD')
@@ -48,7 +42,6 @@ class HomeController extends Controller
             ->row(function (Row $row) use ($agencyCount, $finalSalary, $finalWallet) {
                 $row->column(6, new InfoBox(__('Agencies Count'), 'users', 'aqua', 'bd/agencies', $agencyCount));
                 $row->column(6, new InfoBox(__('BD Wallet'), 'money', 'green', 'bd/salaries', $finalSalary . ' 💰'));
-                // $row->column(4, new InfoBox(__('My Wallet'), 'credit-card', 'yellow', 'bd/wallet', number_format($finalWallet) . ' 💳'));
             });
     }
 
