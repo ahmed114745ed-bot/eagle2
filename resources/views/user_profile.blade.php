@@ -1902,11 +1902,9 @@
                                         @endif    
                                     </td>
                                     <td>
-                                     @if($coin->sub_type == 'coin_game_users')
-                                     {{ ($coin->amount_before ?? 0) - ($coin->amount ?? 0)}}
-                                     @else
+                                    
                                      {{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0)}}
-                                    @endif
+                                
 
                                      </td>
                                     <td>{{ @$coin->from_date ?? 0 }}</td>
