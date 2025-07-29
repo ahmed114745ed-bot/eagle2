@@ -104,7 +104,7 @@ class Common
                 }
             }
         } else if ($event_type == 'weekly_star') {
-            $event = WeeklyStar::PreviousNewEvent()->first();
+            $event = WeeklyStar::weeklyStar()->previousEvent()->first();
 
             if ($event) {
                 $weekly_star = Winner::with('user')->where('weekly_star_id', $event->id)
