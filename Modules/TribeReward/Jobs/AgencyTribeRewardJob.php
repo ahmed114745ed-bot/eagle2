@@ -2,6 +2,7 @@
 
 namespace Modules\TribeReward\Jobs;
 
+use App\Helpers\Common;
 use App\Models\Agency;
 use App\Models\GiftLog;
 use Carbon\Carbon;
@@ -62,19 +63,33 @@ class AgencyTribeRewardJob implements ShouldQueue
                                 'agency_id' => $agency->id,
                                 'type' => $reward->type,
                                 'target_type' => $reward->target_type,
-                                'target_id' => $reward->target,
+                                'target' => $reward->target,
                                 'quantity' => $reward->quantity,
                                 'available_quantity' => $reward->quantity,
                                 'expire_days'       => $reward->expire_days,
                                 'expire_at' => Carbon::now()->addDays($reward->expire_days ?? 15),
+                                'created_at' => now(),
+                                'updated_at' => now(),
                             ];
                         }, $rewards->all());
 
                         DB::table('agency_rewards')->insert($agencyRewardData);
                     }
-//                    if ($agency && $agency->owner) {
-//                        $agency->owner->notify(new \App\Notifications\AgencyRewardEarned($agency));
-//                    }
+
+                    if ($agency && $agency->owner) {
+                        Common::sendOfficialMessage(
+                            $agency->owner->id,
+                            __('Congratulations!'),
+                            __('Your agency has received rewards from the event!')
+                        );
+
+                        $notificationToken = \Illuminate\Support\Facades\DB::table('users')->where('id', $agency->owner->id)->value('notification_id');
+                        $title = app()->getLocale() == 'ar'
+                            ? config('app.name_ar')
+                            : config('app.name_en');
+                        $body = __('Your agency has received rewards from the event!') . " " . $agency->owner->name;
+                        Common::send_firebase_notification([$notificationToken], $title, $body);
+                    }
                 }
             }
 

@@ -19,5 +19,10 @@ Route::group([
     'prefix' => 'tribes',
     'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan']
 ], function (){
-    Route::get('/general', [TribeController::class, 'index']);
+    Route::get('general', [TribeController::class, 'index']);
+    Route::get('ranking', [TribeController::class, 'agencyRanking']);
+    Route::get('rewards', [TribeController::class, 'agencyRewards']);
 });
+
+Route::post('agencies/rewards/{id}/send', [TribeController::class, 'sendUserRewards'])
+    ->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan']);

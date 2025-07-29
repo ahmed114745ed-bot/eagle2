@@ -18,7 +18,7 @@ class CreateAgencyRewardsTable extends Migration
             $table->bigInteger('agency_id');
             $table->enum('type', ['agency_reward', 'share_rewards']);
             $table->enum('target_type', ['vip', 'ware', 'achievement']);
-            $table->bigInteger('target_id');
+            $table->string('target');
             $table->integer('quantity')->default(0);
             $table->integer('available_quantity')->default(0);
             $table->integer('expire_days');

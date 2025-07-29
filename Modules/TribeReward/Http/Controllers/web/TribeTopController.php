@@ -66,12 +66,13 @@ class TribeTopController extends MainController
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
-        $grid->column(__('Procedures'))->display(function () {
-            $url = url('admin/tribe_rewards/'.$this->id);
-            $text = __('Tribe Rewards');
-            return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
-        });
-
+        if (Admin::user()->can('browse-tribe-rewards') || Admin::user()->can('*')) {
+            $grid->column(__('Procedures'))->display(function () {
+                $url = url('admin/tribe_rewards/' . $this->id);
+                $text = __('Tribe Rewards');
+                return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
+            });
+        }
         if (method_exists($this, 'extendGrid')) {
             $this->extendGrid($grid);
         }

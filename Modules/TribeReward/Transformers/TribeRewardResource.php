@@ -28,9 +28,8 @@ class TribeRewardResource extends JsonResource
             $path = $vip?->img;
         } elseif ($this->target_type == 'achievement') {
             $path = $this->target;
-        } else {
-            $path = 'coin.png';
         }
+
         return getImagePath($path);
     }
 
