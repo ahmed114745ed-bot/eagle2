@@ -124,7 +124,6 @@ class AuthController extends Controller
 
     protected function loginWithGoogle($data)
     {
-
         try {
             [$user, $token, $resource] = $this->authService->loginWithGoogle($data);
             if ($resource!= null) {
