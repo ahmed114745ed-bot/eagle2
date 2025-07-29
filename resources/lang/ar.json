@@ -3509,7 +3509,9 @@
 "Greater than diamond": "أكثر من الماس",
 "Total Diamond received": "إجمالي الألماس المستلم",
 "Item Name":"اسم العنصر",
-"frozen_agency_by_admin":"تم تجميد الوكالة من قبل الإدارة."
+"frozen_agency_by_admin":"تم تجميد الوكالة من قبل الإدارة.",
+"profit" : "مكسب",
+"loss" : "خسارة"
 
 
 
