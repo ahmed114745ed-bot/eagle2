@@ -33,7 +33,7 @@ class AgencyUsersTargetResource extends JsonResource
             ->latest('join_date')
             ->first();
         
-            Log::info("User ID: {$this->id} | Latest join record:", [
+            \Log::info("User ID: {$this->id} | Latest join record:", [
                 'joinRecord' => $joinRecord,
             ]);
 
