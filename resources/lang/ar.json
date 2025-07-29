@@ -3511,7 +3511,9 @@
 "Item Name":"اسم العنصر",
 "frozen_agency_by_admin":"تم تجميد الوكالة من قبل الإدارة.",
 "profit" : "مكسب",
-"loss" : "خسارة"
+    "Other Accounts On The Same Device": "حسابات اخري علي نفس الجهاز",
+
+    "loss" : "خسارة"
 
 
 
