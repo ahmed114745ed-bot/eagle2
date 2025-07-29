@@ -30,8 +30,6 @@ class AgencyUsersTargetResource extends JsonResource
 
         $joinRecord = UsersJoinedAgency::where('user_id', $this->id)
             ->where('agency_id', $this->agency_id)
-            ->whereMonth('join_date', $month)
-            ->whereYear('join_date', $year)
             ->latest('join_date')
             ->first();
 
