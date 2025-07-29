@@ -631,7 +631,7 @@ class RankingService
                 'sender' => $img,
                 'receiver' => $receiverImage,
                 'room' => $roomImage,
-                'top_cp' => array_values(RankingResource::collection($cp_top_2)->toArray(request())),
+                'top_cp' => RankingResource::collection($cp_top_2),
                 'top_gamer' => GameRankingResource::collection($topGamer),
             ]
         );
