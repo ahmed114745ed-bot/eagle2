@@ -88,6 +88,14 @@ class TribeService
             throw new Exception(__('This reward has expired.'), 422);
         }
 
+        if (
+            $AgencyReward->expire_at == null &&
+            !empty($AgencyReward->expire_days) &&
+            now()->gt(Carbon::parse($AgencyReward->created_at)->addDays($AgencyReward->expire_days))
+        ) {
+            throw new Exception(__('This reward has expired.'), 422);
+        }
+
         foreach ($eligibleUsers as $user) {
             for ($i = 0; $i < $data['quantity']; $i++) {
                 switch ($AgencyReward->target_type) {
