@@ -101,7 +101,7 @@ class CpService
 
         // Fetch rewards for the specified level
         $rewards = $this->getRewardsForLevel($level);
-
+        if (!$rewards) return true;
         // Define users associated with the CP
         $userOne = $this->getUserById($cp->user_one_id);
         $userTwo = $this->getUserById($cp->user_two_id);
@@ -142,7 +142,7 @@ class CpService
                     break;
                 case 'ware':
                     $ware = Ware::find($reward->item_id);
-                    $this->assignWare($ware, $reward, $userOne, $userTwo);
+                    if ($ware) $this->assignWare($ware, $reward, $userOne, $userTwo);
                     break;
                 case 'achievement':
                     $this->assignAchievement($reward->item_id, $reward->expire, $userOne, $userTwo);
@@ -160,8 +160,10 @@ class CpService
     protected function assignVip($vipId, $expire, $userOne, $userTwo)
     {
         $vip = OVip::find($vipId);
-        UserCommon::addVipToUser($userOne, $vip, $expire);
-        UserCommon::addVipToUser($userTwo, $vip, $expire);
+        if ($vip) {
+            UserCommon::addVipToUser($userOne, $vip, $expire);
+            UserCommon::addVipToUser($userTwo, $vip, $expire);
+        }
     }
 
     protected function assignWare($ware, $reward, $userOne, $userTwo)

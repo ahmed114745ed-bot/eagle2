@@ -197,6 +197,12 @@ return [
     'app_id' => 'app_id',
     'app_sign' => 'app_sign',
     "charge_level" => "charge level",
+    "closeNormalBox" => "Your Normal Lucky Box duration finished",
+    "closeSuperBox" => "Your Super Lucky Bos duration finished",
+
+    "closeNormalBoxReturnCoins" => "Your Normal Lucky Box duration finished and box coins :coins return to you",
+    "closeSuperBoxReturnCoins" => "Your Super Lucky Bos duration finished and box coins :coins return to you",
+
 
     "fawry" => 'Fawry',
     'My Fawry'      => 'My Fawry',

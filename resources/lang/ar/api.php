@@ -51,7 +51,10 @@ return [
     'chat_with_followers_description_allow'    => 'أصبح لدي جميع المتابعين امكانيه المحادثه معك ',
     'chat_with_following_description_allow'    => 'أصبح لدي جميع المتابعون امكانيه المحادثه معك ',
     'chat_with_all_description_allow'    => 'اصبح لدي جميع المستخدمين امكانيه المحادثه معك',
-
+    "closeNormalBox" => "انتهت مدة صندوق الحظ العادي الخاص بك",
+    "closeSuperBox" => "انتهت مدة صندوق الحظ السوبر الخاص بك",
+    "closeNormalBoxReturnCoins" => "انتهت مدة صندوق الحظ العادي وتمت إعادة :coins من العملات إليك",
+    "closeSuperBoxReturnCoins" => "انتهت مدة صندوق الحظ السوبر وتمت إعادة :coins من العملات إليك",
     'welcome'                          => 'مرحبا :name فى :app_name',
     'followed_you'                     => ' بمتابعتك:name قام',
     'luckBox' => 'تهانينا! لقد فزت من صندوق الحظ بـ :coins عملة',

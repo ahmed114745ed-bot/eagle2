@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Jobs\LogUserCoinProfit;
+use App\Jobs\LogUserGamesCoinProfit;
 use App\Models\Room;
 use DB;
 use App\Models\User;
@@ -31,6 +31,7 @@ class BaishunGameController extends Controller
         if ($errorExists) return response()->json($errorExists);
 
         $id = $this->findUserByToken($request->code ?? $request->ss_token);
+       
 
         if (!$id) {
             $responseArray = [
@@ -57,10 +58,11 @@ class BaishunGameController extends Controller
                 if ($request->currency_diff < 0 && $userDi < abs($request->currency_diff)) {
                     throw new \RuntimeException('insufficient');
                 }
-
+               
+                
                 $amountBefore = $user->di;
 
-                LogUserCoinProfit::dispatch(
+                LogUserGamesCoinProfit::dispatch(
                     $user->id,
                     $amountBefore,
                     $request->currency_diff,
@@ -69,7 +71,14 @@ class BaishunGameController extends Controller
                     'coin_game'
                 )->onQueue('log_user_coin');
 
-
+                \Log::info('Dispatching LogUserGamesCoinProfit Job', [
+                    'user_id'        => $user->id,
+                    'amount_before'  => $amountBefore,
+                    'currency_diff'  => $request->currency_diff,
+                    'type'           => 'coinGame',
+                    'sub_type'       => 'coin_game_users',
+                    'item_name'      => 'coin_game',
+                ]);
                 DB::table('users')->where('id', $id)->update([
                     'di' => DB::raw('di + ' . (int) $request->currency_diff)
                 ]);
