@@ -74,7 +74,7 @@ class CpService
                 'di' => $newDi,
                 'level_id' => $level->level
             ]);
-            $this->assignGifts($level->level, $cp);
+            if ($level->level) $this->assignGifts($level->level, $cp);
         } else {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
@@ -153,8 +153,10 @@ class CpService
 
     protected function assignCoins($amount, $userOne, $userTwo)
     {
-        $userOne->increment('di', $amount);
-        $userTwo->increment('di', $amount);
+        if ($amount) {
+            $userOne->increment('di', $amount);
+            $userTwo->increment('di', $amount);
+        }
     }
 
     protected function assignVip($vipId, $expire, $userOne, $userTwo)

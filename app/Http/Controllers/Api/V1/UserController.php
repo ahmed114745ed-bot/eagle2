@@ -593,7 +593,7 @@ class UserController extends Controller
             $senderId = $sender->id;
             $dressId = $sender->dress_1;
 
-            $image = optional(optional($sender->profile)->avatar) ?? '';
+            $image = $sender?->profile?->avatar ?? '';
 
             $currentTotal = $result->total;
             $totalDiff = isset($previousTotal) ? $previousTotal - $currentTotal : 0;
