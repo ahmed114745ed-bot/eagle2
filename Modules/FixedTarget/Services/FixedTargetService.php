@@ -165,18 +165,10 @@ class FixedTargetService
         $db_usd         = Common::getTargetUsd($target->diamonds, $target->db_percentage);
 
         $next_target = Target::where('diamonds', '>', $month_received)->orderBy('diamonds')->first();
-        // WalletService::storeTransaction(
-        //     $user->id,
-        //     'add',
-        //     $t,
-        //     'user_transaction',
-        //     'target_achieved',
-        //     ['target_id' => $target->id],
-        //     'get_target'
-        // );
-        logger('agency_usd Achieved:', [$agency_usd]);
-        logger('percentageAchieved Achieved:', [$percentageAchieved]);
-        logger(' Achieved:', [$agency_usd * $percentageAchieved]);
+   
+        // logger('agency_usd Achieved:', [$agency_usd]);
+        // logger('percentageAchieved Achieved:', [$percentageAchieved]);
+        // logger(' Achieved:', [$agency_usd * $percentageAchieved]);
         logger(' Achieved: user', [ $t]);
 
         try {
@@ -249,13 +241,7 @@ class FixedTargetService
                 'target_id' =>  @$target->id,
                 ...$values
             ])->lock();
-            /* UserSallary::query()->where([
-                                            'user_id' => $user->id,
-                                            'month' => Carbon::now()->month,
-                                            'year' => Carbon::now()->year,
-                                            'user_agency_id' => $user->agency_id,
-
-                                        ])->where('id','!=', $userSalary->id)->delete();*/
+   
         }
 
     
@@ -298,9 +284,9 @@ class FixedTargetService
                 $appProfit        = $target->app_profit_percentage / 100;
                 $db               = $target->db_percentage / 100;
                 $user->target_usd = $t;
-                logger('t:', [$t]);
-                logger('Percentage Achieved:', [$percentageAchieved]);
-                logger('target_usd Achieved:', [$user->target_usd]);
+                // logger('t:', [$t]);
+                // logger('Percentage Achieved:', [$percentageAchieved]);
+                // logger('target_usd Achieved:', [$user->target_usd]);
 
                 $extras = [
                     "moment" => [

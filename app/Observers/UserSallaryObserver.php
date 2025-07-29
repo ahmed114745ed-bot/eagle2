@@ -19,14 +19,12 @@ class UserSallaryObserver
 
     public function saved(UserSallary $userSalary)
     {
-        logger(' saved: obser', [ $userSalary]);
         $this->updateOrCreateAgencySallary($userSalary);
         $this->updateOrCreateBDSallary($userSalary);
     }
 
     public function creating(UserSallary $userSalary)
     {
-        logger(' creating: obser', [ $userSalary]);
 
         if (!$userSalary->extras) $userSalary->extras = '';
         $this->updateOrCreateAgencySallary($userSalary);
