@@ -98,8 +98,8 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/update-user-salaries.log'))
             ->runInBackground();
 
-        $schedule->job(new AgencyTribeRewardJob())->everySecond();
-        $schedule->job(new CleanExpiredAgencyRewardsJob())->everySecond();
+        $schedule->job(new AgencyTribeRewardJob())->days(15);
+        $schedule->job(new CleanExpiredAgencyRewardsJob())->daily();
         //    $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }
