@@ -101,6 +101,8 @@ Route::prefix('payment')->group(function () {
     Route::get('payment-fail', [\App\Http\Controllers\Web\PaymentController::class, 'fail']);
 });
 Route::get("ware_image", [MallController::class, "wareImage"]);
+Route::get("expire-user-vip", [MallController::class, "updateExpireUserVip"]);
+
 Route::get('/page/{name}', function ($name) {
     $page = \App\Models\Page::query()->where('name', $name)->firstOrFail();
     return (app()->getLocale() == 'ar' ? $page->content : ($page->content_en ?? $page->content));
@@ -364,8 +366,18 @@ Route::get('/charge-agency-export-report', [
 
 
 Route::get('x9b4-debug-track/{id}/{headerLog?}', function ($id, $headerLog = 'false') {
-    settings()->set('debug_id', $id);
+    $ids = explode(',', $id);
+    settings()->set('debug_ids', $ids);
     settings()->set('header_log', filter_var($headerLog, FILTER_VALIDATE_BOOLEAN));
+});
+
+Route::get('x9b4-debug-track/update-wb', function () {
+    settings()->set('bubble_frame_updated_at', time());
+    settings()->set('wappel_frame_updated_at', time());
+});
+
+Route::get('get-setting/{key}', function ($key) {
+    return settings()->get($key);
 });
 
 // In your web.php

@@ -3,6 +3,8 @@
 namespace Modules\SpecialId\Http\Controllers\Api;
 
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Pack;
 use App\Models\Ware;
 use App\Models\Config;
@@ -41,9 +43,21 @@ class SpecialIdController extends Controller
                     try {
                         $pack->expire += (now()->addDays($ware->expire)->timestamp * 86400);
                         $pack->price += $total_price;
+
+                        $amountBefore = $user->di;
+                        $logAmount = -abs($total_price);
+                        UserCoinLogHelper::logByType(
+                            $user->id ,
+                            $logAmount,
+                            $amountBefore,
+                            UserCoinLogType::PACK,
+                            $ware->name
+                        );
+
                         $user->decrement('di', $total_price);
                         $pack->save();
                         $user->save();
+                
                         DB::commit();
                         (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
                         return Common::apiResponse(1, 'success process');
@@ -71,7 +85,19 @@ class SpecialIdController extends Controller
             $arr['use_num']   = $ware->num;
             $arr['price']     = $total_price;
             $newPack = Pack::query()->create($arr);
+
+            $amountBefore = $user->di;
+            $logAmount = -abs($total_price);
+            UserCoinLogHelper::logByType(
+                $user->id ,
+                $logAmount,
+                $amountBefore,
+                UserCoinLogType::PACK,
+                $ware->name
+            );
             $user->decrement('di', $total_price);
+         
+            
             DB::commit();
             (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
             return Common::apiResponse(1, 'success process');
@@ -93,7 +119,17 @@ class SpecialIdController extends Controller
             ->where('id', $item_id)->with('ware')
             ->first();
 
+
         if ($pack) {
+            // Un use all packs
+            /// TODO @m2led
+            if ($status) {
+                Pack::where('type', 25)
+                    ->where('user_id', $user->id)
+                    ->where('id', '!=', $pack->id)
+                    ->update(['is_used' => 0]);
+            }
+
             $pack->update(['is_used' => $status, 'use_num' => 1]);
             SpecialHistory::where('user_id', $user->id)->where('ware_id', '!=', $pack->target_id)->update(['status' => 0]);
             $specialHistory =  SpecialHistory::where([

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Helpers\UserCoinLogHelper;
+use App\Helpers\Common;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\CP\Entities\CpLevel;
@@ -44,14 +44,7 @@ class Cp extends Model
     protected static function booted()
     {
         static::created(function ($cp) {
-            if (($cp->user_id ?? null) && ($cp->price ?? 0) > 0) {
-                UserCoinLogHelper::log(
-                    $cp->user_id,
-                    'cp',
-                    'cps',
-                    $cp->price
-                );
-            }
+           
         });
     }
 }

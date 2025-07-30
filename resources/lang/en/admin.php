@@ -197,6 +197,13 @@ return [
     'app_id' => 'app_id',
     'app_sign' => 'app_sign',
     "charge_level" => "charge level",
+    "closeNormalBox" => "Your Normal Lucky Box duration finished",
+    "closeSuperBox" => "Your Super Lucky Bos duration finished",
+      "relations_help"=> "🔒 When disabled, the message will be sent to only one friend. <br> 🔓 When enabled, the message will be sent to all friends.",
+
+    "closeNormalBoxReturnCoins" => "Your Normal Lucky Box duration finished and box coins :coins return to you",
+    "closeSuperBoxReturnCoins" => "Your Super Lucky Bos duration finished and box coins :coins return to you",
+
 
     "fawry" => 'Fawry',
     'My Fawry'      => 'My Fawry',
@@ -432,9 +439,9 @@ return [
     "webhook_id" => "Webhook Id",
 
     "target_no" => 'Target Number',
-    "diamonds" => 'Diamond Target',
-    "usd" => 'dollar',
-    "agency_share" => 'Agents Salary',
+    "diamonds" => 'Diamonds',
+    "usd" => 'Host Salary',
+    "agency_share" => 'Agents percentage',
     "db_percentage" => 'BD Percentage',
     "hours" => "Hours",
     "days" => "Days",
@@ -442,4 +449,6 @@ return [
     "moments" => 'moments',
 
     'creator' => 'admin',
+    'custom_img_image' => 'The file must be an image.',
+    'custom_img_mimes' => 'Only jpeg, png, jpg images are allowed.',
 ];

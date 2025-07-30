@@ -100,15 +100,16 @@ class UserHandling
 
         // set user salary this month to zero
         $values = [
-            'sallary'        => 0,
-            'cut_amount'     => 0,
+            // 'sallary'        => 0,
+            // 'cut_amount'     => 0,
             // 'agency_sallary' => 0
+            'is_finished' =>  1,
         ];
 
         $user_sallaries = UserSallary::query()
             ->where([
                 'user_id' => $user->id,
-            ])
+            ])->where('user_agency_id',$agencyId)
             ->orderBy('id', 'desc')
             ->take(2)
             ->get();
@@ -245,7 +246,7 @@ class UserHandling
         $url = $request->url();
         $method = $request->method();
         $path = parse_url($url, PHP_URL_PATH);
-        // Remove the leading slash
+        // Remove the leading slash 
         $path = ltrim($path, '/');
         // Split the path into segments
         $segments = explode('/', $path);

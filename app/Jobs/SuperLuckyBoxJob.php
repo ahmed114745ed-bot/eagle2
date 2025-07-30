@@ -5,22 +5,21 @@ namespace App\Jobs;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\BoxUse;
-use App\Models\Follow;
 use App\Helpers\Common;
-use App\Models\PickBoxList;
 use App\Models\RoomVisitor;
-use App\Models\UserBoxGift;
+
 use App\Facades\RedisService;
 use Illuminate\Bus\Queueable;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Log;
+use Modules\LuckyBox\Entities\BoxUse;
 use Illuminate\Queue\SerializesModels;
-use App\Http\Services\LuckyBoxServices;
 use Illuminate\Queue\InteractsWithQueue;
+use Modules\LuckyBox\Entities\PickBoxList;
+use Modules\LuckyBox\Entities\UserBoxGift;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Support\Facades\Log;
+use Modules\LuckyBox\Services\LuckyBoxServices;
 
 class SuperLuckyBoxJob implements ShouldQueue
 {
@@ -104,22 +103,21 @@ class SuperLuckyBoxJob implements ShouldQueue
                     }
                 }
             }
-            $user = User::where('id', $userBox->user_id)->first();
-            $user->increment('di', $userBox->unused_coins);
+            $owner = User::where('id', $userBox->user_id)->first();
+            $owner->increment('di', $userBox->unused_coins);
             $userBox->is_closed = true;
             $userBox->save();
             $winners = UserBoxGift::where(['box_uses_id' => $userBox->id])->where('coins', '>', 0)->select('user_id', 'coins')->get()->toArray();
-            $box_use = BoxUse::find($userBox->id);
-            $room    = Room::withoutAppends()->where('uid', $box_use->room_uid)->first();
-
+            $room    = Room::withoutAppends()->where('uid', $userBox->room_uid)->first();
             $c     = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
-            $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
-
-            $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
-            info('boxes ids: '.json_encode($pickerBoxIds));
+            info('boxes ids: ' . json_encode($pickerBoxIds));
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $pickerBoxIds)->whereHas('user')->pluck('user_id')->toArray();
-            info('picked users inside the room : '.json_encode($usersRoomVisit));
-
+            info('picked users inside the room : ' . json_encode($usersRoomVisit));
+            if (empty($winners)) {
+                CustomNotification::closedLuckyBosWithReturnCoins($owner, $userBox->unused_coins, $userBox?->image, 1);
+            } else {
+                CustomNotification::closeLuckyBox($owner, $userBox?->image, 1);
+            }
             foreach ($usersRoomVisit as $userRoomVisit) {
 
                 $m     = [
@@ -141,7 +139,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                     "messageContent" => [
                         "message"      => "winnerLuckyBox",
 
-                        "boxUId" => $box_use->id,
+                        "boxUId" => $userBox->id,
                         "ownerId" =>  @$room->owner->id,
                         "ownerName" => @$room->owner->name ?? '',
                         "ownerImage" => @$room->owner->profile->avatar ?? '',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V2;
 
 use App\Models\Ware;
 use App\Helpers\Common;
+use App\Models\UserVip;
 use Illuminate\Http\Request;
 use App\Tik\Services\MallService;
 use App\Http\Controllers\Controller;
@@ -28,14 +29,14 @@ class MallController extends Controller
             return Common::apiResponse(false, 'type is required', null, 422);
         }
 
-        $wares = $this->mallService->getWares($user->id, $request->type);
+        $wares = $this->mallService->getWares($user->id, $request->type,);
 
         return Common::apiResponse(true, '', WareResource::collection($wares), 200);
     }
 
     public function padding()
     {
-         $wares = $this->mallService->getWares(0, 5);
+        $wares = $this->mallService->getAllWares(5);
 
         return Common::apiResponse(true, '',   WarePaddingResource::collection($wares), 200);
     }
@@ -121,5 +122,20 @@ class MallController extends Controller
                 'error' => 'Server error: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function updateExpireUserVip()
+    {
+        $userVips = UserVip::where('expire', 0)->with('packs')->get();
+
+        foreach ($userVips as $userVip) {
+            $expires = $userVip->packs->pluck('expire')->filter(function ($value) {
+                return $value !== null && $value != 0;
+            });
+            if ($expires->isNotEmpty()) {
+                $userVip->update(['expire' => $expires->first()]);
+            }
+        }
+        return 'done';
     }
 }

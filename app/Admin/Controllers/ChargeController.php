@@ -65,11 +65,10 @@ class ChargeController extends MainController
             $filter->expand();
 
             $filter->disableIdFilter();
-            $filter->equal('ID', __('ID'));
 
             $filter->where(function ($query) {
-                $query->where('name', 'like', "%{$this->input}%");
-            }, __('Agency name'));
+                $query->where('name', 'like', "%{$this->input}%")->orWhere('id', $this->input);
+            }, __('Agency name or id'));
 
             $filter->where(function ($query) {
                 $query->whereHas('owner', function ($q) {

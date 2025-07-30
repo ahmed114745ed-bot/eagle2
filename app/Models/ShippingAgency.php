@@ -39,6 +39,11 @@ class ShippingAgency extends Model
         return $this->hasMany(Charge::class, 'charger_id','id')->where('charger_type','agency');
     }
 
+    public function receiveShippingAgencyCharges()
+    {
+        return $this->hasMany(Charge::class, 'user_id','id')->where('user_type','agency');
+    }
+
     public function Countries()
     {
         return $this->belongsToMany(Country::class, 'agency_countries', 'agency_id', 'country_id')->withTimestamps();

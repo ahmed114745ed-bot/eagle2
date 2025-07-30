@@ -1,15 +1,13 @@
 <div class="grid-dropdown-actions dropdown">
-    <a href="#" style="padding: 0 10px;" class="dropdown-toggle" data-toggle="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-ellipsis-v"></i>
     </a>
-    <ul class="dropdown-menu" style="min-width: 70px !important;box-shadow: 0 2px 3px 0 rgba(0,0,0,.2);border-radius:0;left: -65px;top: 5px;">
-
+    <ul class="dropdown-menu grid-dropdown-menu">
         @foreach($default as $action)
             <li>{!! $action->render() !!}</li>
         @endforeach
 
         @if(!empty($custom))
-
             @if(!empty($default))
                 <li class="divider"></li>
             @endif
@@ -21,6 +19,33 @@
     </ul>
 </div>
 
+<style>
+    .grid-dropdown-actions .dropdown-toggle {
+        padding: 0 10px;
+    }
+
+    .grid-dropdown-menu {
+        min-width: 70px !important;
+        box-shadow: 0 2px 3px 0 rgba(0,0,0,.2);
+        border-radius: 0;
+        top: 5px;
+    }
+
+    .ltr .grid-dropdown-menu{
+        left: -65px;
+    }
+
+    .rtl .grid-dropdown-menu{
+        right: -65px;
+    }
+
+    .grid-dropdown-menu .divider {
+        height: 1px;
+        margin: 8px 0;
+        overflow: hidden;
+        background-color: #e5e5e5;
+    }
+</style>
 <script>
     $('.table-responsive').on('shown.bs.dropdown', function(e) {
         var t = $(this),

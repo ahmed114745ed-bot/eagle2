@@ -196,7 +196,7 @@
                             )->where('user_id', $user?->id)->first();
                             $value = ($coinResult->sum_type_1 ?? 0) - ($coinResult->sum_type_0 ?? 0);
                         } elseif ($name === 'luckyGiftCoin') {
-                            $giftResult = \App\Models\UserLuckyGift::select(
+                            $giftResult = \Modules\LuckyBox\Entities\UserLuckyGift::select(
                                 \DB::raw("SUM(CASE WHEN type = 1 THEN value ELSE 0 END) as sum_type_1"),
                                 \DB::raw("SUM(CASE WHEN type = 0 THEN value ELSE 0 END) as sum_type_0")
                             )->where('user_id', $user?->id)->first();

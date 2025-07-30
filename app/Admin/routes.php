@@ -1,10 +1,11 @@
 <?php
 
-use App\Admin\Controllers\CoreWalletTransactionController;
+use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BdController;
+use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\BoxController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
@@ -60,6 +61,7 @@ use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
+use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
@@ -94,6 +96,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\UserController as UsersAppController;
@@ -222,6 +225,9 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
+        Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
+
+       Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
         Route::post('/edit-level', [UsersAppController::class, 'editLevelUser']);
         Route::post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);
@@ -247,6 +253,12 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
+        Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
+        Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
+        Route::post('get-users', [RoomController::class, 'getUsers'])->name('get.users');
+        Route::put('rooms/{room}/info', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
+
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
@@ -287,6 +299,7 @@ Route::group(
         Route::resource('families', 'FamilyController');
         Route::resource('targets', 'TargetController');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
+        Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel']);
         Route::resource('polices', PoliceController::class);
         Route::resource('offers', OfferController::class);
         Route::resource('payment-gateways', PaymentGetWayController::class);
@@ -325,7 +338,7 @@ Route::group(
             ExportController::class,
             'walletExportUser'
         ])->name('wallet-export-users');
-         Route::get('/wallet-export-agency', [
+        Route::get('/wallet-export-agency', [
             ExportController::class,
             'walletExportAgency'
         ])->name('wallet-export-agency');
@@ -402,17 +415,20 @@ Route::group(
         // Route::prefix('ware-gifts')->group(function () {
 
 
-            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+            Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+        Route::resource('vip_privilege', 'VipPrivilegeController');
+        // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+        // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+        // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
         // });
         // Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');
-        Route::resource('boxes', 'BoxController');
-        Route::get('lucy-box-settings', [BoxController::class, 'box_settings']);
-        Route::resource('thrown_boxes', 'BoxUseController');
+
         Route::get('filter-agencies', App\Admin\Controllers\Filter\AgencyController::class)->name('filter-agencies');
         Route::resource('reports', 'ReportController');
         Route::resource('charges-reports', 'ChargeReportController');
@@ -455,6 +471,7 @@ Route::group(
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
 
+            Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
             // Route::get('/users/{id}/edit', 'UserController@edit');
             // Route::get('/users/{id}', 'UserController@show');
             Route::get('/userTarget', 'UserTargetController@index')->name('userTarget');
@@ -472,7 +489,10 @@ Route::group(
         Route::resource('/uuid_dedicate', 'SpecialWareDedicateController');
         Route::get('/vips_dedicate', 'DedicateVipController@index');
         Route::resource('/bans', 'BanController');
+        Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
+
         Route::resource('/bans-rooms', 'BanRoomsController');
+        Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallaries');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
         Route::resource('/group-chat', 'GroupChatController');

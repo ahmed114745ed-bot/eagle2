@@ -166,7 +166,7 @@
                     <div class="form">
                         <!-- Wallet Lucky Box -->
                         <div class="form-group">
-                            <label for="app_wallet_lucky_box">{{ __('app wallet lucky box') }}</label>
+                            <label for="app_wallet_lucky_box">{{ __('application wallet percentage from the super box') }}</label>
                             <input type="number" 
                                 id="app_wallet_lucky_box" 
                                 name="app_wallet_lucky_box" 
@@ -178,7 +178,7 @@
 
                         <!-- Normal Box Duration -->
                         <div class="form-group">
-                            <label for="normal_box_duration">{{ __('normal box duration') }}</label>
+                            <label for="normal_box_duration">{{ __('Time period until the normal box expires') }}</label>
                             <input type="number" 
                                 id="normal_box_duration" 
                                 name="normal_box_duration" 
@@ -186,10 +186,10 @@
                                 value="{{ $config['normal_box_duration'] ?? 0 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter duration in minutes') }}" />
-                            <span class="help-block">{{ __('duration in seconds') }}</span>
+                            <span class="help-block">{{ __('duration in hours') }}</span>
                         </div>
 
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="lucky_box_percentage">{{ __('lucky box percentage') }}</label>
                             <input type="number" 
                                 id="lucky_box_percentage" 
@@ -198,7 +198,7 @@
                                 value="{{ $config['lucky_box_percentage'] ?? 20 }}" 
                                 class="form-control" 
                                 placeholder="{{ __('Enter lucky box percentage') }}" />
-                        </div>
+                        </div> --}}
 
                         <!-- Submit Button -->
                         <div class="form-group">

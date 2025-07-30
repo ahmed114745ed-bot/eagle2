@@ -3,6 +3,9 @@
 namespace App\Tik\Services;
 
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
+use App\Jobs\LogUserCoinProfit;
 use App\Models\Cp;
 use App\Models\User;
 use App\Helpers\Common;
@@ -78,7 +81,18 @@ class GiftLogService
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
         try {
+           
             $sendPrice = (int)($totalPrice);
+            $amountBefore = $user->di;
+           
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $sendPrice,
+                $amountBefore,
+                UserCoinLogType::GIFT,
+                $gift?->name
+            );
+
             $updateUserWhenSendGift->send($sendPrice, $user);
         } catch (NotInfMoneyException $e) {
             return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);

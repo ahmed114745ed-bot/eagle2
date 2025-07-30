@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Traits;
 
+use App\Helpers\LogHelper;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,11 +12,14 @@ trait EventModel
     public function getStartDateAttribute($value)
     {
         $date = self::convertArabicNumbers($value);
-        return Carbon::parse($date)->timezone(config('app.owner_timezone'))->copy()->toDateTimeString();
+        $timezone = getTimezone();
+        return \Carbon\Carbon::parse($date, $timezone)->timezone('UTC')->toDateTimeString();
     }
     public function getEndDateAttribute($value)
     {
-        return Carbon::parse($value)->timezone(config('app.owner_timezone'))->copy()->toDateTimeString();
+        $timezone = getTimezone();
+
+        return \Carbon\Carbon::parse($value, $timezone)->timezone('UTC')->toDateTimeString();
     }
 
     public function scopePreviousNewEvent(Builder $query)
@@ -82,14 +86,15 @@ trait EventModel
 
     public function scopePreviousEvent(Builder $query)
     {
-        // $timezone = config('app.owner_timezone') ?? '-03:00';
-//        $timezone = Common::timeZone();
-        $timezone = request()->header('tz', Common::timeZone());
 
-        $nowDate = Carbon::now()->setTimezone($timezone)->toDateTimeString();
+        $timezone = getTimezone(); // Example: 'Africa/Cairo'
+        $now = Carbon::now($timezone)->format('Y-m-d H:i:s');
 
-        return $query->whereRaw("start_date < ?", [date($nowDate)])->whereDate('end_date', '<', $nowDate); // 27
-           // ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) < ?", [$timezone, $nowDate]); // 27
+        return $query
+            ->whereRaw("
+            CONVERT_TZ(CONCAT(end_date, ' 00:00:00'), ?, '+00:00') <= ?
+        ", [$timezone, $now])
+            ->orderByDesc('end_date');
     }
 
 

@@ -1677,8 +1677,8 @@
 
                                                         $memberTarget->topSupporters = $giftLogs;
 
-                                                        $moment = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'moment') ?? [];
-                                                        $reel = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'reel') ?? [];
+                                                        $moment = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'moment', $memberTarget->agency_id) ?? [];
+                                                        $reel = App\Helpers\Common::getUserMediaStats($memberTarget->id, 'reel', $memberTarget->agency_id) ?? [];
 
                                                         $momentUpload = $moment['upload'] ?? '0/0';
                                                         $momentLikes = $moment['likes'] ?? '0/0';

@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Console;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\UserCommon;
 use App\Models\GiftLog;
 use Modules\Vip\Entities\OVip;
@@ -51,24 +52,28 @@ class WeeklyStarWinner extends Command
 
             if (!$alreadyWinner) {
                 $winner = Winner::create([
-                                             'weekly_star_id' => $weeklyEvent->id,
-                                             'user_id' => $entry->sender_id,
-                                             'level' => $index + 1,
-                                         ]);
+                        'weekly_star_id' => $weeklyEvent->id,
+                        'user_id' => $entry->sender_id,
+                        'level' => $index + 1,
+                    ]);
                 $rewardIds = $weeklyEvent->rewards->where('level',$index + 1);
                 if (count($rewardIds) > 0){
                     foreach ($rewardIds as $reward){
 
                         $expiredAt = now()->addDays($reward->expire);
                         if ($reward->type == "coins"){
+
+                            $amountBefore = $entry?->sender?->di;
+                            UserCoinLogHelper::logByType(
+                                $entry->sender?->id,
+                                $reward->target,
+                                $amountBefore,
+                                UserCoinLogType::WEEKLY_STAR,
+                            );
+
                             $entry->sender->di+=$reward->target;
                             $entry->sender->save();
-                            UserCoinLogHelper::log(
-                                $entry->sender->id,
-                                'rewards',
-                                'weeklyStar',
-                                $reward->target
-                            );
+        
                         }elseif ($reward->type == "vip"){
                             $vip=OVip::query()->find($reward->target);
                             UserCommon::addVipToUser($entry->sender,$vip,$reward->expire);

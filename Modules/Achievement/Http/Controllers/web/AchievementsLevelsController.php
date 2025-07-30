@@ -61,7 +61,7 @@ class AchievementsLevelsController extends MainController
         $grid = new Grid(new AchievementLevel());
         $achievement_id = request('achievement_id');
 
-        $grid->model()->where('achievement_id', $achievement_id);
+        $grid->model()->where('achievement_id', $achievement_id)->orderByDesc('target');
 
         $grid->column('id', __('Id'));
         $grid->column('achievement.type', __('Achievement'));
@@ -69,14 +69,17 @@ class AchievementsLevelsController extends MainController
         $grid->column('target_type', __('Target type'));
 
         $grid->column('valid_image', __('Valid image'))->display(function ($path) {
-            /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+            return '<div style="direction:ltr;">'.$mediaHtml.'</div>';
         });
         $grid->column('invalid_image', __('Invalid image'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
+
+            return '<div style="direction:ltr;">'.$mediaHtml.'</div>';
         });
         $grid->column('ar_description', __('ar_description'));
         $grid->column('en_description', __('en_description'));
@@ -149,7 +152,7 @@ class AchievementsLevelsController extends MainController
 
             // if ($form->model()->valid_image) {
             //     AchievementValidImage::create([
-            //         'image' => $form->model()->valid_image, //  
+            //         'image' => $form->model()->valid_image, //
             //     ]);
             // }
             if ($form->model()->valid_image) {

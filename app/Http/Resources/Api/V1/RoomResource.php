@@ -14,6 +14,8 @@ class RoomResource extends JsonResource
     public function toArray($request)
     {
         // Common::setHourHot($this->uid);
+
+        $userId = \Auth::id();
         $pk = $this->lastPk;
         $achievement_images = [];
         if (@$this->owner?->medals) {
@@ -31,14 +33,14 @@ class RoomResource extends JsonResource
         $data = [
             'id' => $this->id,
             'owner_id' => $this->uid ?: 0,
-//            'owner_uuid' => $this->owner?->uuid ?: 0,
+            //            'owner_uuid' => $this->owner?->uuid ?: 0,
             'owner_uuid' => $this->owner?->uuid_v2 ?: 0,
             'room_id' => (string)($this->id ?: 0),
             'owner_special_id'          => $this->owner?->specialId?->ware?->show_img ?? "",
             'owner_image_color'          => $this->owner?->color_image,
             'name' => $this->room_name ?: '',
             "mode" => $this->mode,
-//            'visitors_count' => $this->count_room_socket,
+            //            'visitors_count' => $this->count_room_socket,
             'visitors_count' => $this->count_room_socket_v2,
             'cover' => $this->room_cover ?: '',
             'class' => $this->myClass ?: new \stdClass(),
@@ -58,18 +60,21 @@ class RoomResource extends JsonResource
             'room_background' => $this->final_room_image,
             'stream_type' => $this->type ?? 'audio',
             'is_live' => (bool)$this->is_live,
-            'country' => !$isHideCountry ? new CountryResource(@$this->resource) : [
-                'id' => 0,
-                'name' => '',
-                'flag' => '',
-                'lang' => '',
-                'phone_code' => ''
-            ],
+            'is_lucky_box' => $this->is_lucky_box ?? false,
+            'country' => $this->country
+                ? new CountryResource($this->country)
+                : [
+                    'id' => 0,
+                    'name' => '',
+                    'flag' => '',
+                    'lang' => '',
+                    'phone_code' => ''
+                ],
             'have_luck_box' => (bool) $have_luck_box,
             'achievement_images' => $achievement_images,
             /** refactored */
             'medals'               =>  @$this->owner?->enabledMedals ?? [],
-//            'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
+            //            'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
             $this->mergeWhen($this->distance, [
                 'distance' => $this->distance,
             ]),

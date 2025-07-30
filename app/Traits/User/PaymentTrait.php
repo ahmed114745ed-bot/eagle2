@@ -2,6 +2,9 @@
 
 namespace App\Traits\User;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
 use App\Models\User;
 use App\Models\CoinLog;
@@ -29,6 +32,14 @@ trait PaymentTrait
 
         if (!$item && $coins) {
             $user = User::find($userId);
+
+            $amountBefore = $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                 $coins->coin,
+                $amountBefore,
+                UserCoinLogType::PAYMENT,
+            );
 
             $user->di += $coins->coin;
             $user->save();

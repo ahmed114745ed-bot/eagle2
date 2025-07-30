@@ -21,8 +21,10 @@ class FeatureAppController extends MainController
 
     public function index(Content $content){
         $hostAgencySetting = Setting::where('key', 'host_agency')->first();
+        $reelSettings = Setting::where('key', 'reel_status')->first();
         $hostAgencyStatus = ($hostAgencySetting && $hostAgencySetting->value == 1);
+        $reelSettings = ($reelSettings && $reelSettings->value == 1);
         return parent::index($content
-        ->view('app_feature',compact('hostAgencyStatus')));
+        ->view('app_feature',compact(['hostAgencyStatus', 'reelSettings'])));
     }
 }

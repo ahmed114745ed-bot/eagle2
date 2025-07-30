@@ -38,6 +38,7 @@ use App\Http\Resources\UserVipUtdResource;
 use App\Http\Resources\UserVisitRoomResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Services\WhatsappOtp;
+use App\Models\Ban;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Models\UserSallary;
@@ -195,6 +196,11 @@ class UserController extends Controller
             }
         }
         //        $shared = Common::getConfig('shared') ?? '1234';
+        $now = now();
+
+        $ban = Ban::where('ban_type_id',7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
+            ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
+  
         $data = [
             'version' => [
                 'android_version'   => settings()->get('android_current_version'),
@@ -206,6 +212,7 @@ class UserController extends Controller
             'shared_key' => Common::getConfig('shared') ?? '1234',
             'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
             'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", $user->id)->first() != null ? true : false,
+            'group_ban' => $ban != null ? true : false,
         ];
         return Common::apiResponse(true, '', $data, 200);
     }
@@ -570,49 +577,59 @@ class UserController extends Controller
 
     public function get_users_support()
     {
-        $userId = \request('user_id');
-
+        $userId = request('user_id');
         $results = $this->userService->supporter($userId);
-
-
-        $achievement = new UserAchievementService();
+        $achievementService = new UserAchievementService();
 
         $previousTotal = null;
-        $data          = $results->map(function ($result) use ($achievement, &$previousTotal) {
 
-            $image         = optional(optional($result->sender)->profile)->avatar ?? '';
-            $currentTotal  = $result->total;
-            $totalDiff     = isset($previousTotal) ? $previousTotal - $currentTotal : 0;
+        $data = $results->map(function ($result) use ($achievementService, &$previousTotal) {
+            $sender = $result->sender;
+
+            if (!$sender) {
+                return null;
+            }
+
+            $senderId = $sender->id;
+            $dressId = $sender->dress_1;
+
+            $image = $sender?->profile?->avatar ?? '';
+
+            $currentTotal = $result->total;
+            $totalDiff = isset($previousTotal) ? $previousTotal - $currentTotal : 0;
             $previousTotal = $currentTotal;
-            $frame         =
-                Common::getUserDress($result->sender?->id, $result->sender?->dress_1, 4, 'img2', true) ?: Common::getUserDress($result->sender?->id, $result->sender?->dress_1, 4, 'img1', true);
-            return [
-                'id'           => $result->sender_id,
-                'uuid'         => $result->sender?->uuid,
-                'name'         => $result->sender?->name,
-                'image'        => $image,
-                'gender'       => $result->sender?->gender,
-                'country'      => [
-                    'id' => @$result->sender?->country?->id ?? 0,
-                    'name' => @$result->sender?->country?->name ?? '',
-                    'flag' => @$result->sender?->country?->flag ?? '',
-                ],
-                'achievements'  => UserAchievementLevelsResource::collection($achievement->getUserAchievement($result->sender)),
-                // 'sender_level' => $result->sender->total_sender_level ?? 0,
-                // 'receiver_level' => $result->receiver->total_received_level ?? 0,
-                'total'        => numToString($currentTotal),
-                'total_diff'   => $totalDiff,
-                'frame'        => $frame,
-                'frame_id'     => $frame != '' ? @$result->sender->dress_1 : 0,
-                //'vip'     => $result->sender?->userVip?->level,
-            ];
-        })->all();
 
-        $toArray      = $data;
-        $countData    = count($data);
-        $arr['top']   = $countData < 4 ? $data : array_slice($toArray, 0, 3);
-        $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
-        $arr['count'] = $countData;
+            $frame = Common::getUserDress($senderId, $dressId, 4, 'img2', true)
+                ?: Common::getUserDress($senderId, $dressId, 4, 'img1', true);
+
+            return [
+                'id'        => $sender->id,
+                'uuid'      => $sender->uuid,
+                'name'      => $sender->name,
+                'image'     => $image,
+                'gender'    => $sender->gender,
+                'country'   => [
+                    'id'   => $sender->country->id ?? 0,
+                    'name' => $sender->country->name ?? '',
+                    'flag' => $sender->country->flag ?? '',
+                ],
+                'achievements' => UserAchievementLevelsResource::collection(
+                    $achievementService->getUserAchievement($sender)
+                ),
+                'total'      => numToString($currentTotal),
+                'total_diff' => $totalDiff,
+                'frame'      => $frame,
+                'frame_id'   => $frame ? $dressId : 0,
+                'colored_name'   => UserCommon::getColoredName($sender),
+            ];
+        })->filter()->values()->all(); // filter to remove nulls
+
+        $count = count($data);
+        $arr = [
+            'top'   => $count < 4 ? $data : array_slice($data, 0, 3),
+            'other' => $count < 4 ? [] : array_slice($data, 3),
+            'count' => $count,
+        ];
 
         return Common::apiResponse(1, '', $arr);
     }

@@ -74,9 +74,9 @@ class AgencySettingsController extends MainController
         $lang = request()->header('X-localization', 'en');
 
         $types = [
+            'host'         => 1,
+            'agency_owner' => 2,
             'shipping'     => 3,
-            'host'         => 2,
-            'agency_owner' => 1,
             'bd'           => 4,
         ];
 

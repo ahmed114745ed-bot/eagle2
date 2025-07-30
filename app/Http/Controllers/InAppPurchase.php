@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
 use App\Models\User;
 use App\Helpers\Common;
@@ -48,7 +50,7 @@ class InAppPurchase extends Controller
              //dd($e->getMessage(), 'this');
          }
 
-                 $subscription->verifyReceipt($client);
+                //  $subscription->verifyReceipt($client);
      }
 
 
@@ -227,6 +229,16 @@ class InAppPurchase extends Controller
         $coins = Coin::find($request->coin_id);
         if(!$coins)return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
         if(!$request->order_id)return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
+        
+        $amountBefore =  $user->di;
+
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $coins?->coin,
+            $amountBefore,
+            UserCoinLogType::GOOGLE_PAY,
+        );
+        
         $user->di += $coins->coin;
         $user->save();
         $data=CoinLog::create([

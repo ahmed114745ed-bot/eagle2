@@ -2,7 +2,9 @@
 
 namespace App\Admin\Actions;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Models\Charge;
 use App\Models\Setting;
@@ -71,6 +73,15 @@ class UsersChargeAction extends Action
         }
 
         DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
+           
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $coins,
+                $amountBefore,
+                UserCoinLogType::ADMIN_CHARGES,
+            );
+
             $user->di += $coins;
             if ($user->di < 0) {
                 throw ValidationException::withMessages([
@@ -133,6 +144,7 @@ class UsersChargeAction extends Action
         $this->hidden('userId')->attribute('id', 'vid');
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
         $this->text('amount', __('Amount'))
+            ->rules('integer|gt:0')
             ->addElementClass('price-input')
             ->help(__('Enter amount in dollars'));
         $this->text('reason_en', __('reason en'));
@@ -182,18 +194,33 @@ class UsersChargeAction extends Action
         }
 
         if (Admin::user()->can('history-switch-charge-to-user') || Admin::user()->can('*')) {
-            $html .= '<a href="' . htmlspecialchars($url) . '" class="shipping_report btn btn-sm text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">'
+            $html .= '<a href="' . htmlspecialchars($url) . '"
+            class="shipping_report btn btn-sm text-white"
+            onclick="initDatePickersAfterNav()"
+            style="background-color: #b93a0f; border-color: #b93a0f; color: white;">'
                 . htmlspecialchars($shippingReports) .
                 '</a>';
         }
 
         $html .= <<<HTML
-<script>
-function pu(val) {
-    $("#vid").val(val);
-}
-</script>
-HTML;
+            <script>
+            function pu(val) {
+                $("#vid").val(val);
+            }
+
+            function initDatePickersAfterNav() {
+                setTimeout(function() {
+                    $('.form-control[id$="_date"]').datetimepicker({
+                        format: 'YYYY-MM-DD'
+                    });
+                }, 500);
+            }
+
+            $(document).on('pjax:complete', function() {
+                initDatePickersAfterNav();
+            });
+            </script>
+            HTML;
 
         return $html;
     }

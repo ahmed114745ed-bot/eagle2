@@ -26,22 +26,26 @@ class MiniUserResource extends JsonResource
      */
     public function toArray($request)
     {
-        if(!@$this->id){
-            return ;
+        if (!@$this->id) {
+            return;
         }
+        $hasColor = Common::hasInPack(@$this->id, 18, true);
+
         $data = [
-            'id'=>@$this->id,
-//            'uuid'=>@$this->uuid,
-            'uuid'=>@$this->uuid_v2,
-            'name'=>@$this->name?:'',
+            'id' => @$this->id,
+            //            'uuid'=>@$this->uuid,
+            'uuid' => @$this->uuid_v2,
+            'name' => @$this->name ?: '',
             'profile' => [
-                'image' =>@ $this->profile->avatar?:'',
-                'image_id' => @$this->profile->image_id?:'',
+                'image' => @$this->profile->avatar ?: '',
+                'image_id' => @$this->profile->image_id ?: '',
             ],
-            'frame'=> $this->getUserDress(4, $this->dress_1, 'img2') ?: $this->getUserDress(4, $this->dress_1, 'img1'),
-            'frame_id'=>@$this->dress_1,
-//            'has_color_name'=>$this->getPackWithType(18),
-            'has_color_name'=>$this->getPackWithTypeV2(18),
+            'frame' => $this->getUserDress(4, $this->dress_1, 'img2') ?: $this->getUserDress(4, $this->dress_1, 'img1'),
+            'frame_id' => @$this->dress_1,
+            //            'has_color_name'=>$this->getPackWithType(18),
+            'has_color_name' => $this->getPackWithTypeV2(18),
+            'colored_name' => $hasColor ? common::wareUserVip(@$this->id, 18, 'color') ?? '' : '',
+
         ];
 
         return $data;
@@ -60,6 +64,4 @@ class MiniUserResource extends JsonResource
         }
         return '';
     }
-
-
 }

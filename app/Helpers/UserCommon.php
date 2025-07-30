@@ -83,6 +83,13 @@ class UserCommon
         return $data;
     }
 
+    public static function getColoredName(User $user)
+    {
+        $hasColor  = Common::hasInPack(@$user?->senderShippingAgency?->owner?->id, 18, true);
+        $colorName = $hasColor ? common::wareUserVip(@$user?->senderShippingAgency?->owner?->id, 18, 'color') ?? '' : '';
+        return $colorName;
+    }
+
     public static function UserStatistic($userId, $type, bool $reals = false, \DateTime $startDate = null, \DateTime $endDate = null)
     {
         $timezone = getTimezone();
@@ -344,20 +351,7 @@ class UserCommon
     public static function addVipToUser(User $user, OVip $vip, $expir)
     {
         DB::beginTransaction();
-        //        try {
-        //            UserVip::query ()->create (
-        //                [
-        //                    'type'=>1,
-        //                    'sender_id'=>0,
-        //                    'user_id'=>$user->id,
-        //                    'vip_id'=>$vip->id,
-        //                    'level'=>$vip->level,
-        //                    'expire' => $expir,
-        //                    'qty'=>1,
-        //                    'price'=>0,
-        //                    'total'=>0
-        //                ]
-        //            );
+
         $vipp = new UserVip();
         $vipp->type = 1;
         $vipp->sender_id = 0;

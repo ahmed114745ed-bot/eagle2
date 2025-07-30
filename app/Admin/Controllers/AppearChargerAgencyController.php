@@ -494,11 +494,7 @@ class AppearChargerAgencyController extends MainController
 
     public function shippingProfile($id, Request $request, Content $content)
     {
-        $year = $request->year ?? Carbon::now()->year;
-        $month = $request->month ?? Carbon::now()->month;
-        $tab = request('tab') ?? 'charges';
-        $filter_by = request('filter_by') ?? null;
-
+        $tab = $request->input('tab', 'charges');
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
@@ -506,22 +502,10 @@ class AppearChargerAgencyController extends MainController
                 ->findOrFail($id);
         });
 
-
-        $path = $agency->img;
-        $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($path) ?? $defaultImage;
-        if (!isImageExists($imageUrl)) {
-            $imageUrl = $defaultImage;
-        }
-        $agency->display_image = $imageUrl;
-
         $agencyId = $agency->id;
+        $charges = null;
+        $resiveds = null;
 
-        $resived = $charges =  null;
-
-        $filterBy = $request->filter_by ?? null;
-        $filterId = $request->filter_id  ?? null;
-        $charges = $resiveds = null;
         switch ($tab) {
             case 'charges':
                 $charges = Charge::where('charger_type', 'agency')
@@ -529,10 +513,12 @@ class AppearChargerAgencyController extends MainController
 
                 $relations = [];
 
-                if ($request->filter_by && $request->filter_id) {
-                    $charges->where('user_type', $request->filter_by)
-                        ->where('user_id', $request->filter_id);
+                if ($request->has('filter_by') && $request->filter_by !== null && $request->filter_by !== '') {
+                    $charges->where('user_type', $request->filter_by);
                     $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
+                }
+                if ($request->has('filter_id') && $request->filter_id !== null && $request->filter_id !== '') {
+                    $charges->where('user_id', $request->filter_id);
                 }
 
                 if (!empty($relations)) {
@@ -546,9 +532,11 @@ class AppearChargerAgencyController extends MainController
                 $resiveds = Charge::where('user_id', $agencyId)
                     ->where('user_type', 'agency');
 
-                if ($request->sender_type && $request->sender_id) {
-                    $resiveds->where('charger_type', $request->sender_type)
-                        ->where('charger_id', $request->sender_id);
+                if ($request->has('sender_type') && $request->sender_type !== null && $request->sender_type !== '') {
+                    $resiveds->where('charger_type', $request->sender_type);
+                }
+                if ($request->has('sender_id') && $request->sender_id !== null && $request->sender_id !== '') {
+                    $resiveds->where('charger_id', $request->sender_id);
                 }
 
                 $resiveds = $resiveds->with(['sender'])
@@ -556,8 +544,10 @@ class AppearChargerAgencyController extends MainController
                     ->paginate(10, ['*'], 'resived_page');
                 break;
         }
+
         $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
         $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');
+
         return $content->title(__('agency profile'))
             ->view('shippingAgencyProfile', compact(
                 'agency',

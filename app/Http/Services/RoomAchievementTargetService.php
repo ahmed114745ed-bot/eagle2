@@ -2,6 +2,9 @@
 
 namespace App\Http\Services;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\GiftLog;
@@ -35,6 +38,15 @@ class RoomAchievementTargetService
             if ($this->reachTarget($room->id, $roomTarget->id)) {
                 $user = User::find($room->uid);
                 if (!$user) return;
+              
+                $amountBefore =  $user->di;
+                UserCoinLogHelper::logByType(
+                    $user->id,
+                    $roomTarget->coins,
+                    $amountBefore,
+                    UserCoinLogType::ROOM_TARGET,
+                );
+               
                 $user->di += $roomTarget->coins;
                 $user->save();
                 RoomOwnerAchievement::create([

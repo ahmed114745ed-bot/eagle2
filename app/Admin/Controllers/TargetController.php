@@ -2,20 +2,23 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
-use App\Models\Target;
+use PDF;
 use App\Models\User;
-use Encore\Admin\Admin;
-use Encore\Admin\Controllers\HasResourceActions;
+use App\Models\Target;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Illuminate\Http\Request as HttpRequest;
+use App\Helpers\Common;
+use Encore\Admin\Admin;
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Facades\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Admin\Extensions\TargetsExport;
+use Illuminate\Http\Request;
 
-use PDF;
+
+use Illuminate\Http\Request as HttpRequest;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class TargetController extends MainController
 {
@@ -216,7 +219,7 @@ class TargetController extends MainController
         Admin::html(
             '<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
-                    <form id="exportPdfForm" method="GET" action="/admin/download-target-pdf" target="_blank" class="exportPdfForm">
+                   <form id="exportForm" method="GET" action="#" target="_blank">
                       <div class="modal-content">
                         <div class="modal-header">
                           <h5 class="modal-title" id="exportPdfLabel">' . __('Choose Columns to Export') . '</h5>
@@ -235,9 +238,10 @@ class TargetController extends MainController
                           <label><input type="checkbox" name="columns[]" value="reals" checked> ' . __('Reals') . '</label><br>
                           <label><input type="checkbox" name="columns[]" value="moments" checked> ' . __('Moments') . '</label><br>
                         </div>
-                        <div class="modal-footer">
-                          <button type="submit" class="btn btn-primary">' . __('Export PDF') . '</button>
-                        </div>
+                         <div class="modal-footer">
+                        <button type="submit" formaction="/admin/download-target-pdf" class="btn btn-primary">' . __('Export PDF') . '</button>
+                        <button type="submit" formaction="/admin/download-target-excel" class="btn btn-success">' . __('Export Excel') . '</button>
+                    </div>
                       </div>
                     </form>
                   </div>
@@ -624,5 +628,18 @@ class TargetController extends MainController
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
+    }
+
+    public function downloadTargetExcel(Request $request)
+    {
+        $selectedColumns = $request->input('columns', []);
+
+        $targets = Target::orderBy('diamonds')->get()->map(function ($target) {
+            $target->reel_parts = array_map('trim', explode(',', $target->reel));
+            $target->moment_parts = array_map('trim', explode(',', $target->moment));
+            return $target;
+        });
+
+        return Excel::download(new TargetsExport($targets, $selectedColumns), 'target_data_' . now()->format('Y_m_d') . '.xlsx');
     }
 }

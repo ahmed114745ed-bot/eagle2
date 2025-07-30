@@ -45,15 +45,15 @@ class CpService
                 ->where('user_two_id', $receiver->id)
                 ->orWhere(function ($query) use ($sender, $receiver) {
                     $query->where('user_two_id', $sender->id)
-                          ->where('user_one_id', $receiver->id);
+                        ->where('user_one_id', $receiver->id);
                 });
         })
-        ->whereIn('status', [1, 4])
-        ->whereHas('cpRelation', function ($q) {
-            $q->where('type', '!=', 'solution');
-        })
-        ->first();
-        
+            ->whereIn('status', [1, 4])
+            ->whereHas('cpRelation', function ($q) {
+                $q->where('type', '!=', 'solution');
+            })
+            ->first();
+
 
         if (!$checkIfExistCp) {
             return false;
@@ -68,13 +68,13 @@ class CpService
         if (!$cp) return false;
 
         $newDi = $cp->di + $diamonds;
-        $level = $this->getLevel($cp->cp_relation_id ,$newDi);
+        $level = $this->getLevel($cp->cp_relation_id, $newDi);
         if ($level) {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi,
                 'level_id' => $level->level
             ]);
-            // $this->assignGifts($level->level, $cp);
+            if ($level->level) $this->assignGifts($level->level, $cp);
         } else {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
@@ -84,9 +84,9 @@ class CpService
         return true;
     }
 
-    public function getLevel(int $cpRelationId,int $totalCoins)
+    public function getLevel(int $cpRelationId, int $totalCoins)
     {
-        return CpLevel::query()->where('cp_relation_id',$cpRelationId)->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
+        return CpLevel::query()->where('cp_relation_id', $cpRelationId)->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }
 
 
@@ -101,7 +101,7 @@ class CpService
 
         // Fetch rewards for the specified level
         $rewards = $this->getRewardsForLevel($level);
-
+        if (!$rewards) return true;
         // Define users associated with the CP
         $userOne = $this->getUserById($cp->user_one_id);
         $userTwo = $this->getUserById($cp->user_two_id);
@@ -115,7 +115,7 @@ class CpService
 
     protected function getUserById($id)
     {
-       return User::find($id);
+        return User::find($id);
     }
 
     protected function hasTakenGift($cpId, $level)
@@ -125,7 +125,7 @@ class CpService
 
     protected function getRewardsForLevel($level)
     {
-        return CpLevelGift::whereHas('cp_level', function($q) use ($level) {
+        return CpLevelGift::whereHas('cp_level', function ($q) use ($level) {
             $q->where('level', $level);
         })->get();
     }
@@ -142,7 +142,7 @@ class CpService
                     break;
                 case 'ware':
                     $ware = Ware::find($reward->item_id);
-                    $this->assignWare($ware, $reward, $userOne, $userTwo);
+                    if ($ware) $this->assignWare($ware, $reward, $userOne, $userTwo);
                     break;
                 case 'achievement':
                     $this->assignAchievement($reward->item_id, $reward->expire, $userOne, $userTwo);
@@ -153,15 +153,19 @@ class CpService
 
     protected function assignCoins($amount, $userOne, $userTwo)
     {
-        $userOne->increment('di', $amount);
-        $userTwo->increment('di', $amount);
+        if ($amount) {
+            $userOne->increment('di', $amount);
+            $userTwo->increment('di', $amount);
+        }
     }
 
     protected function assignVip($vipId, $expire, $userOne, $userTwo)
     {
         $vip = OVip::find($vipId);
-        UserCommon::addVipToUser($userOne, $vip, $expire);
-        UserCommon::addVipToUser($userTwo, $vip, $expire);
+        if ($vip) {
+            UserCommon::addVipToUser($userOne, $vip, $expire);
+            UserCommon::addVipToUser($userTwo, $vip, $expire);
+        }
     }
 
     protected function assignWare($ware, $reward, $userOne, $userTwo)
@@ -211,6 +215,4 @@ class CpService
             'level' => $level,
         ]);
     }
-
-
 }

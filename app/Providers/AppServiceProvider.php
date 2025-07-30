@@ -8,19 +8,23 @@ use App\Helpers\ManagerHelper;
 use App\Helpers\RoomHelper;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
+use App\Models\CoinGameUser;
 use App\Models\Emoji;
 use App\Models\Family;
 use App\Models\FamilyUser;
 use App\Models\Gift;
+use App\Models\GiftLog;
 use App\Models\Pk;
 use App\Models\Room;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\UserLuckyGift;
 use App\Models\UserSallary;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
 use App\Observers\AgencyObserver;
+use App\Observers\AppProfitCoinsObserver;
 use App\Observers\FamilyObserver;
 use App\Observers\FamilyUserObserver;
 use App\Observers\PKObserver;
@@ -199,9 +203,12 @@ class AppServiceProvider extends ServiceProvider
 
 
         $luckyGiftService = app(LuckyGiftService::class);
-        $probabilityTimes = $luckyGiftService->getProbabilityTimes(); // مجموعة 3 مصفوفات
+        $probabilityTimes = $luckyGiftService->getProbabilityTimes(); 
         Cache::put('probability_times_1', $probabilityTimes[0], now()->addMinutes(60));
         Cache::put('probability_times_2', $probabilityTimes[1], now()->addMinutes(60));
         Cache::put('probability_times_3', $probabilityTimes[2], now()->addMinutes(60));
+  
+      
+  
     }
 }

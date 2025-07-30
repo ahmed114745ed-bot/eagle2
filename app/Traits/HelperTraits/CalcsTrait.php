@@ -1013,7 +1013,7 @@ trait CalcsTrait
     {
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
-            if (!$user) return new \stdClass();
+            if (!$user) return '';
         } else {
             $user = $user_id;
         }

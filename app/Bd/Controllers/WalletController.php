@@ -2,6 +2,7 @@
 
 namespace App\Bd\Controllers;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\ShippingAgencyHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
@@ -372,6 +373,14 @@ class WalletController extends MainController
         DB::beginTransaction();
         try {
 
+
+            $amountBefore =  Common::getCurrentBalance($receiver->id);
+            UserCoinLogHelper::logByType(
+                $receiver->id,
+                $amount,
+                $amountBefore,
+                UserCoinLogType::BD_CHARGES,
+            );
             $sender->incrementCutAmountInBdSallary($amount);
             $receiver->increment('di', $coins);
             $descriptionData = ['receiver_id'  => $receiver->id];
@@ -385,15 +394,7 @@ class WalletController extends MainController
                 'message' => 'transfer_to_',
             ]);
 
-            $amountBefore =  Common::getCurrentBalance($receiver->id);
-            UserCoinLogHelper::log(
-                $receiver->id ,
-                'charge',
-                'charges',
-                $amount ?? 0,
-                $amountBefore ?? 0,
-                'bd'
-            );
+     
 
             $data = [
                 'charger_id' => $sender->id,
@@ -437,7 +438,7 @@ class WalletController extends MainController
         $to = ShippingAgency::find($toId);
 
         if (!$to || $to->is_frozen == 1) {
-            throw new \Exception(__('api_responses.it_agency_freez_charge'));
+            throw new \Exception(__('it_agency_freez_charge'));
         }
         if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
             return Common::apiResponse(0, __('not_verified_agency'), 403);

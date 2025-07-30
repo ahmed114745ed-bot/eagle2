@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\utd;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Http\Controllers\Controller;
@@ -80,16 +81,21 @@ class SpecialIdRequestController extends Controller
                     'price'     => $total_price,
                 ];
                 Pack::create($packData);
-                UserCoinLogHelper::log(
-                    $user->id ,
-                    'pack',
-                    'packs',
-                    $total_price ?? 0,
-                    
-                );
+            
+              
                 // Upgrade user level
                 (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
             } else {
+
+                $amountBefore =  $user->di;
+                $logAmount = -abs($total_price);
+                UserCoinLogHelper::logByType(
+                    $user->id,
+                    $logAmount,
+                    $amountBefore,
+                    UserCoinLogType::PACK,
+                    'Special Id'
+                );
                 $user->increment('di', $total_price);
             }
 

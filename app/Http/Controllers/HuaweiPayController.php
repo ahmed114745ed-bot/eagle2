@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Exception;
@@ -71,6 +73,9 @@ class HuaweiPayController
 
         $response = json_decode($body, true);
         if ($response && isset($response['purchaseTokenData'])) {
+
+       
+
             $paymentStatus=$response['responseCode'];
             $purchaseTokenData = json_decode($response['purchaseTokenData'], true);
             $orderId = $purchaseTokenData['orderId'];
@@ -80,6 +85,15 @@ class HuaweiPayController
             $coins=Coin::find(request("productId"));
             if ($paymentStatus == 0 && $check_before== null) {
                 // add to user di
+
+                $amountBefore =  $user->di;
+                UserCoinLogHelper::logByType(
+                    $user->id,
+                    $coins?->coin,
+                    $amountBefore,
+                    UserCoinLogType::HUAWEI_PAY,
+                );
+
                 $user->di +=$coins?->coin;
                 $user->save();
                 $paid_usd = UserCommon::specialTransfer($coins?->coin);
@@ -94,6 +108,8 @@ class HuaweiPayController
                     'status'=>1,
                     'trx'=>$orderId,
                 ]);
+
+           
                 return Common::apiResponse(1, 'تم الاضافه بنجاح', $data, 200);
             }else{
                 return Common::apiResponse(0, 'تمت العمليه من قبل!', 200);

@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use Exception;
 use App\Models\User;
@@ -299,15 +300,14 @@ class ChargeRepoService
 
             );
         }
-        $amountBefore =  Common::getCurrentBalance($receiver->id);
-        UserCoinLogHelper::log(
-            $receiver->id ,
-            'charge',
-            'charges',
-            $amount ?? 0,
-            $amountBefore ?? 0,
-            $chargeType
+        $amountBefore =  $receiver->di;
+        UserCoinLogHelper::logByType(
+            $receiver->id,
+            $amount,
+            $amountBefore,
+            UserCoinLogType::APP_CHARGE,
         );
+    
         // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
@@ -362,6 +362,7 @@ class ChargeRepoService
 
     public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
+   
 
         $receiver->increment('coins', $amount);
 
@@ -378,6 +379,7 @@ class ChargeRepoService
             'action_user_id' => auth()->user()->id,
 
         ];
+
         $this->create($data);
     }
 
@@ -523,8 +525,16 @@ class ChargeRepoService
         $this->processUserCharge($authAgency, $receiver, $request->amount);
     }
 
+    /**
+     * @throws Exception
+     */
     private function processAgencyCharge($authAgency, $chargeAgency, $amount)
     {
+        if ($authAgency->coins < $amount) {
+            throw new Exception(__('balance not enough'));
+        }
+
+   
 
         $authAgency->decrement('coins', $amount);
         $chargeAgency->increment('coins', $amount);
@@ -541,8 +551,22 @@ class ChargeRepoService
         );
     }
 
+    /**
+     * @throws Exception
+     */
     private function processUserCharge($authAgency, $receiver, $amount)
     {
+        if ($authAgency->coins < $amount) {
+            throw new Exception(__('balance not enough'));
+        }
+        $amountBefore =  $receiver->di;
+        UserCoinLogHelper::logByType(
+            $receiver->id,
+            $amount,
+            $amountBefore,
+            UserCoinLogType::APP_CHARGE,
+        );
+
         $authAgency->decrement('coins', $amount);
         $receiver->increment('di', $amount);
         $usdRate = $amount / Common::getCoinsValue('user_coins');
