@@ -135,7 +135,7 @@ enum UserCoinLogType: string
                 'queue_job' => \App\Jobs\LogUserCoinProfit::class,
             ],
             self::VIP => [
-                'sub_type' => 'vip_logs',
+                'sub_type' => 'o_vips',
                 'item_name' => 'vip',
                 'queue_job' => null,
             ],
