@@ -29,6 +29,10 @@
                     <span class="meta-value">{{ @$room->uid }}</span>
                 </div>
                 <div class="meta-item">
+                    <span class="meta-label">{{ __("Room Owner UID") }}:</span>
+                    <span class="meta-value">{{ @$room->user->uuid }}</span>
+                </div>
+                <div class="meta-item">
                     <span class="meta-label">{{__("Room Type")}}:</span>
                     <span class="meta-value">{{ @$room->roomCategory->name ?? 'N/A' }}</span>
                 </div>
@@ -500,11 +504,19 @@
                         <td>{{ Carbon::parse($visitor->created_at)->format('Y-m-d H:i:s') }}</td>
                         <td>
                             @if(Admin::user()->can('actions-switch-rooms') || Admin::user()->can('*'))
-                                <button class="btn btn-danger btn-sm kick-visitor"
-                                        data-room-id="{{ $room->id }}"
-                                        data-user-id="{{ $visitor->user_id }}">
-                                    {{ __('Kick') }}
-                                </button>
+                                @if($visitor->kick_info)
+                                    <button class="btn btn-warning btn-sm unban-visitor"
+                                            data-room-id="{{ $room->id }}"
+                                            data-user-id="{{ $visitor->user_id }}">
+                                        {{ __('Unban') }}
+                                    </button>
+                                @else
+                                    <button class="btn btn-danger btn-sm kick-visitor"
+                                            data-room-id="{{ $room->id }}"
+                                            data-user-id="{{ $visitor->user_id }}">
+                                        {{ __('Kick') }}
+                                    </button>
+                                @endif
                             @endif
                         </td>
                     </tr>
@@ -1140,6 +1152,64 @@
             if (result.value) {
                 if (result.value.success) {
                     window.location.href = window.location.href;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '{{ __("Error") }}',
+                        text: result.value.message
+                    });
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.unban-visitor', function() {
+        const btn = $(this);
+        const roomId = btn.data('room-id');
+        const userId = btn.data('user-id');
+
+        Swal.fire({
+            title: '{{ __("Unban Visitor") }}',
+            text: '{{ __("Are you sure you want to remove the ban for this visitor?") }}',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '{{ __("Yes, unban them") }}',
+            cancelButtonText: '{{ __("Cancel") }}',
+            preConfirm: () => {
+                return new Promise((resolve) => {
+                    $.ajax({
+                        url: '{{ admin_url("rooms") }}/' + roomId + '/unban-visitor',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        data: {
+                            user_id: userId
+                        },
+                        success: function(response) {
+                            resolve(response);
+                        },
+                        error: function(xhr) {
+                            resolve({
+                                success: false,
+                                message: xhr.responseJSON?.message || '{{ __("An error occurred") }}'
+                            });
+                        }
+                    });
+                });
+            }
+        }).then((result) => {
+            if (result.value) {
+                if (result.value.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("Success") }}',
+                        text: result.value.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',

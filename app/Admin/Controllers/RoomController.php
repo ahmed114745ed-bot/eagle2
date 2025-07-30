@@ -15,6 +15,7 @@ use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -687,6 +688,24 @@ class RoomController extends MainController
 
         return $grid;
     }
+
+    public function destroy($id)
+    {
+        $room = Room::findOrFail($id);
+
+        $d = [
+            "messageContent" => [
+                "message" => "deletedRoom",
+                "roomId" => $room->id
+            ]
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
+        return parent::destroy($id);
+    }
+
     public function updatePinStatus($id, Request $request)
     {
         try {
@@ -716,88 +735,88 @@ class RoomController extends MainController
         $confirm = __('Confirm');
         $cancel  = __('admin.cancel');
         Admin::html(<<<HTML
-<div class="modal fade" id="pinRoomModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{$confirm}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="modal fade" id="pinRoomModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{$confirm}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>{$doyouwant}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{$cancel}</button>
+                            <button type="button" class="btn btn-primary confirm-pin">{$confirm}</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <p>{$doyouwant}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{$cancel}</button>
-                <button type="button" class="btn btn-primary confirm-pin">{$confirm}</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script>
-$(document).ready(function() {
-    var currentRoomId = null;
-    var currentBtn = null;
+            <script>
+            $(document).ready(function() {
+                var currentRoomId = null;
+                var currentBtn = null;
 
-    $('.pin-room-btn').click(function() {
-        currentRoomId = $(this).data('room');
-        currentBtn = $(this);
-        var isPinned = $(this).data('pinned') === 'true';
+                $('.pin-room-btn').click(function() {
+                    currentRoomId = $(this).data('room');
+                    currentBtn = $(this);
+                    var isPinned = $(this).data('pinned') === 'true';
 
-        if (isPinned) {
-            // If already pinned, unpin immediately without confirmation
-            updatePinStatus(currentRoomId, false);
-        } else {
-            // Show confirmation modal for pinning
-            $('#pinRoomModal').modal('show');
-        }
-    });
+                    if (isPinned) {
+                        // If already pinned, unpin immediately without confirmation
+                        updatePinStatus(currentRoomId, false);
+                    } else {
+                        // Show confirmation modal for pinning
+                        $('#pinRoomModal').modal('show');
+                    }
+                });
 
-    $('.confirm-pin').click(function() {
-        $('#pinRoomModal').modal('hide');
-        updatePinStatus(currentRoomId, true);
-    });
+                $('.confirm-pin').click(function() {
+                    $('#pinRoomModal').modal('hide');
+                    updatePinStatus(currentRoomId, true);
+                });
 
-    function updatePinStatus(roomId, pin) {
-        $.ajax({
-            url: '/admin/rooms/' + roomId + '/update-pin-status',
-            type: 'POST',
-            data: {
-                pin: pin ? 1 : 0,
-                _token: '{$token}',
-                _method: 'PUT'
-            },
-            success: function(response) {
-                if (response.success) {
-                    // Update button appearance without reloading
-                    currentBtn.data('pinned', pin ? 'true' : 'false');
-                    currentBtn.find('i')
-                        .toggleClass('fa-thumb-tack', !pin)
-                        .toggleClass('fa-check-circle', pin)
-                        .parent()
-                        .toggleClass('text-muted', !pin)
-                        .toggleClass('text-success', pin);
+                function updatePinStatus(roomId, pin) {
+                    $.ajax({
+                        url: '/admin/rooms/' + roomId + '/update-pin-status',
+                        type: 'POST',
+                        data: {
+                            pin: pin ? 1 : 0,
+                            _token: '{$token}',
+                            _method: 'PUT'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Update button appearance without reloading
+                                currentBtn.data('pinned', pin ? 'true' : 'false');
+                                currentBtn.find('i')
+                                    .toggleClass('fa-thumb-tack', !pin)
+                                    .toggleClass('fa-check-circle', pin)
+                                    .parent()
+                                    .toggleClass('text-muted', !pin)
+                                    .toggleClass('text-success', pin);
 
-                    // Show success message
-                    toastr.success(response.message);
+                                // Show success message
+                                toastr.success(response.message);
 
-                    // If you want to refresh the grid instead of updating just the button:
-                    // $.admin.reload();
-                } else {
-                    toastr.error(response.message || 'Operation failed');
+                                // If you want to refresh the grid instead of updating just the button:
+                                // $.admin.reload();
+                            } else {
+                                toastr.error(response.message || 'Operation failed');
+                            }
+                        },
+                        error: function() {
+                            toastr.error('Request failed');
+                        }
+                    });
                 }
-            },
-            error: function() {
-                toastr.error('Request failed');
-            }
-        });
-    }
-});
-</script>
-HTML);
-    }
+            });
+            </script>
+            HTML);
+        }
     /**
      * Make a show builder.
      *
@@ -869,7 +888,7 @@ HTML);
         $form->text('room_name', __('room name'));
         $form->image('room_cover', __('room cover'));
         $form->text('room_intro', __('room intro'));
-        $form->text('room_pass', __('room pass'));
+        $form->number('room_pass', __('room pass'))->rules('required|min:6|max:6');
         $form->hidden('is_afk', __('owner in'));
         $form->select('room_class')->options(function () {
             $options = [];
@@ -906,6 +925,17 @@ HTML);
         $room->room_admin = implode(',', $admins);
         $room->save();
 
+        $d = [
+            "messageContent" => [
+                "message" => "banAdmin",
+                "roomId" => $room->id,
+                "adminId" => $adminId,
+            ]
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
         return response()->json([
             'success' => true,
             'message' => __('Administrator removed successfully')
@@ -934,11 +964,18 @@ HTML);
         ]);
     }
 
-    public function kickVisitor(Request $request, $roomId)
+    public function kickVisitor(Request $request, $roomId): JsonResponse
     {
         $room = Room::findOrFail($roomId);
         $visitorId = $request->user_id;
         $duration = $request->minutes ?? 5;
+
+        if ($visitorId == $room->uid) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Cannot kick the room owner')
+            ]);
+        }
 
         if (Common::pack_get(9, $visitorId)) {
             return response()->json([
@@ -984,24 +1021,8 @@ HTML);
             "kicked_user_id" => auth()->id(),
             "user_id" => $visitorId,
             "room_id" => $room->id,
+            "type" => 'admin'
         ]);
-
-        $messageContent = [
-            'messageContent' => [
-                'message' => 'kickout',
-                'duration' => $duration
-            ]
-        ];
-
-        Common::sendToZego_4(
-            'SendCustomCommand',
-            $room->id,
-            $room->uid,
-            $visitorId,
-            json_encode($messageContent)
-        );
-
-        Common::calcTime($visitorId);
 
         $message = __('api.blockRoom', [
             'name' => $user->name ?? 'Unknown',
@@ -1009,18 +1030,50 @@ HTML);
             'duration' => $duration
         ], 'ar');
 
-        Common::sendToZego_2(
-            'SendBroadcastMessage',
-            $room->id,
-            $room->uid,
-            'room',
-            $message
-        );
+        $d = [
+            "messageContent" => [
+                "message" => "kickout",
+                'duration' => $duration,
+                "visitorId" => $visitorId,
+                "comment" => $message
+            ]
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
+        Common::calcTime($visitorId);
 
         return response()->json([
             'success' => true,
             'message' => __('Visitor kicked successfully')
         ]);
+    }
+
+    public function unbanVisitor(Request $request, $roomId): JsonResponse
+    {
+        info('im here');
+        $room = Room::findOrFail($roomId);
+        $visitorId = $request->user_id;
+
+        if (!$room->room_black) {
+            return response()->json(['success' => false, 'message' => __('User is not banned')]);
+        }
+
+        $list = explode(',', $room->room_black);
+        $newList = [];
+
+        foreach ($list as $item) {
+            $black = explode('#', $item);
+            if ($black[0] != $visitorId) {
+                $newList[] = $item;
+            }
+        }
+
+        $room->room_black = implode(',', $newList);
+        $room->save();
+
+        return response()->json(['success' => true, 'message' => __('User has been unbanned')]);
     }
 
     public function getUsers(Request $request)
