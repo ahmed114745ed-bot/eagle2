@@ -1905,8 +1905,8 @@
                                 
 
                                      </td>
-                                    <td>{{ @$coin->from_date ?? 0 }}</td>
-                                    <td>{{ @$coin->to_date ?? 0 }}</td>
+                                     <td>{{ \Carbon\Carbon::parse($coin->from_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
+                                     <td>{{ \Carbon\Carbon::parse($coin->to_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">

@@ -87,11 +87,12 @@ class SuperLuckyBoxJob implements ShouldQueue
                                 Log::info("test111111111111 ");
                                 UserBoxGift::query()->create($data);
 
-                                $userBox['used_coins'] += $coins;
-                                $userBox['used_num'] += 1;
-                                $userBox['unused_coins'] -= $coins;
+                                $userBox->used_coins += $coins;
+                                $userBox->used_num += 1;
+                                $userBox->unused_coins -= $coins;
+                                $userBox->save();
                                 //update box use in redis
-                                RedisService::updateUnSerialize($keyBoxUse, $userBox);
+                                // RedisService::updateUnSerialize($keyBoxUse, $userBox);
                                 dispatch(new OpenBoxJob($userBox->id, $user->id, $user->name))->onQueue('luckyBox');
 
                                 $user->increment('di', $coins);
