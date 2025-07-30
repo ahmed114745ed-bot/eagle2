@@ -82,15 +82,14 @@ class VipService
             $sender_id = 0;
             $from = $user;
         }
-        $amountBefore =  Common::getCurrentBalance($from->id);
+        $amountBefore =  $from->di;
         $logAmount = -abs($total);
-        UserCoinLogHelper::log(
-            $user->id ,
-            'vip',
-            'o_vips',
-            $logAmount ?? 0,
-            $amountBefore ?? 0,
-            $vip->name
+            UserCoinLogHelper::logByType(
+            $from->id,
+            $logAmount,
+            $amountBefore,
+            UserCoinLogType::VIPS,
+            $vip->name,
         );
         $this->userRepository->decrementUserCoins($from, $total);
         $this->packRepository->deleteExpirePack();
