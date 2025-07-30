@@ -427,7 +427,7 @@ class EnteranceRoomServices
                 info(['v' => $v]);
                 $arr = explode("#", $v);
                 info(['array' => $arr]);
-                $sjc = time() - $arr[1];
+                $sjc = time() - $arr[0];
                 $rt = $arr[2] - $sjc;
                 $h = floor($rt / 3600);
                 $r = $rt % 3600;
