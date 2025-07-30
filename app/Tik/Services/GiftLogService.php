@@ -81,10 +81,10 @@ class GiftLogService
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
         try {
-
+           
             $sendPrice = (int)($totalPrice);
             $amountBefore = $user->di;
-
+           
             UserCoinLogHelper::logByType(
                 $user->id,
                 $sendPrice,
@@ -127,12 +127,12 @@ class GiftLogService
         $cpIds = [];
         //check type of cp
         if ($cpId != null) {
-//            try {
+            try {
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
-//            } catch (\Exception $e) {
-//                return Common::apiResponse(0, $e->getMessage());
-//            }
+            } catch (\Exception $e) {
+                return Common::apiResponse(0, $e->getMessage());
+            }
         }
 
         if ($room->lastPk != null) {
