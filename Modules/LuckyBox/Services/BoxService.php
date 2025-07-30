@@ -62,7 +62,7 @@ class BoxService
                     "numOfBoxes" => (int)$c,
                     "ownerBoxImage" => $user->avatar,
                     "ownerBoxUId"  => $user->uuid,
-                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
+                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->toDateTimeString(),
                     //'usersNum' => $request->users_num ?: $box->users,
                     //'rem_time' => $rem_time,
                     //'is_closed' => $box->is_closed,
@@ -149,7 +149,7 @@ class BoxService
             //     "message" => "bannerSuperBox",
             'coins' => $request->coins ?: $box->coins,
             "boxUId" => $boxUser->id,
-            "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->setTimezone(Common::timeZone())->toDateTimeString(),
+            "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->toDateTimeString(),
             "room" => [
                 "id" => $room->id,
                 "uuid" => $room->owner->uuid,
