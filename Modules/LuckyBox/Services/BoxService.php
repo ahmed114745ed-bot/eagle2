@@ -24,15 +24,15 @@ class BoxService
     /**
      * @throws \Throwable
      */
-    public function sendBox($request, $user, $box, $room, $timezone, $label)
+    public function sendBox($request, $user, $box, $room, $label)
     {
         $boxCoin = $box->type == 0 ?  $box->coins : $this->calculationSendBox($box);
 
         DB::beginTransaction();
         if ($box->type == 0) {
-            $boxU = $this->sendNormalBox($box, $request, $boxCoin, $label, $room, $user->id, $timezone);
+            $boxU = $this->sendNormalBox($box, $request, $boxCoin, $label, $room, $user->id);
         } else {
-            $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone);
+            $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user);
         }
 
         $amountBefore = $user->di;
@@ -82,15 +82,15 @@ class BoxService
         }
     }
 
-    public function sendNormalBox($box, $request, $boxCoin, $label, $room, $userId, $timezone)
+    public function sendNormalBox($box, $request, $boxCoin, $label, $room, $userId)
     {
         $normalDuration = Common::getConf('normal_box_duration') ?? 1;
         $box_use_data = [
             'box_id' => $box->id,
             'user_id' => $userId,
             'coins' => $box->coins,
-            'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
-            'end_at' => now()->setTimezone($timezone ?? 'UTC')->addHours($normalDuration)->timestamp,
+            'start_at' => now()->timestamp,
+            'end_at' => now()->addHours($normalDuration)->timestamp,
             'room_uid' => $room->uid,
             'room_id' => $room->id,
             'users_num' =>  $request->users_num,
@@ -113,7 +113,7 @@ class BoxService
         return $boxUser;
     }
 
-    public function sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone)
+    public function sendSuperBox($box, $request,  $boxCoin, $label, $room, $user)
     {
         $box_use_data = [
             'box_id' => $box->id,
