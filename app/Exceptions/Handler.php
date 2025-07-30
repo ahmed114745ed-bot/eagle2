@@ -46,7 +46,7 @@ class Handler extends ExceptionHandler
                 return Common::apiResponse (false,'Wrong passed data',[],401);
             }
 
-            return Common::apiResponse(0, $e->getMessage(), null, 500);
+//            return Common::apiResponse(0, $e->getMessage(), null, 500);
 
         }
         // Handle validation exceptions
