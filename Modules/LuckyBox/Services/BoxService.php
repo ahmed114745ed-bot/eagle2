@@ -50,7 +50,7 @@ class BoxService
                 Carbon::createFromTimestamp($boxU->end_at)
             );
             $type = $box->type == 1 ? 'super' : 'normal';
-            $coins = $boxCoin;
+            $coins = $box->coins;
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
@@ -88,7 +88,7 @@ class BoxService
         $box_use_data = [
             'box_id' => $box->id,
             'user_id' => $userId,
-            'coins' => $boxCoin,
+            'coins' => $box->coins,
             'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
             'end_at' => now()->setTimezone($timezone ?? 'UTC')->addHours($normalDuration)->timestamp,
             'room_uid' => $room->uid,
@@ -118,7 +118,7 @@ class BoxService
         $box_use_data = [
             'box_id' => $box->id,
             'user_id' => $user->id,
-            'coins' => $boxCoin,
+            'coins' => $box->coins,
             'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
             'end_at' => now()->setTimezone($timezone ?? 'UTC')->addMinutes($box->duration)->timestamp,
             'room_uid' => $room->uid,
