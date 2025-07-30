@@ -88,7 +88,7 @@ class VipService
             $from->id,
             $logAmount,
             $amountBefore,
-            UserCoinLogType::VIPS,
+            UserCoinLogType::VIP,
             $vip->name,
         );
         $this->userRepository->decrementUserCoins($from, $total);
