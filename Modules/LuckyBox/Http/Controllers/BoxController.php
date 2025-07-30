@@ -2,6 +2,8 @@
 
 namespace Modules\LuckyBox\Http\Controllers;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 
 use App\Models\Room;
@@ -238,7 +240,13 @@ class BoxController extends Controller
 
             // RedisService::updateUnSerialize($keyBoxUse, $box_use);
             dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
-
+            $amountBefore = $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id ,
+                $coins,
+                $amountBefore,
+                UserCoinLogType::LUCK_BOX,
+            );
             $user->increment('di', $coins);
             $countWinners =  UserBoxGift::query()->where('box_uses_id', $request->bid)->count();
             if ($countWinners == $box_use['users_num']) {

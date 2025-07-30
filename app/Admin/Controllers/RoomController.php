@@ -970,12 +970,12 @@ class RoomController extends MainController
         $visitorId = $request->user_id;
         $duration = $request->minutes ?? 5;
 
-        if ($visitorId == $room->uid) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Cannot kick the room owner')
-            ]);
-        }
+//        if ($visitorId == $room->uid) {
+//            return response()->json([
+//                'success' => false,
+//                'message' => __('Cannot kick the room owner')
+//            ]);
+//        }
 
         if (Common::pack_get(9, $visitorId)) {
             return response()->json([
@@ -989,21 +989,29 @@ class RoomController extends MainController
             $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
         } else {
             $list = explode(',', $blackList);
-            $exists = false;
+            $newList = [];
+//            $exists = false;
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
-                if ($black[0] == $visitorId) {
-                    $item = $visitorId . '#' . time() . '#' . ($duration * 60);
-                    $exists = true;
+                if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
+                    $newList[] = $item;
                 }
+//                if ($black[0] == $visitorId) {
+//                    $item = $visitorId . '#' . time() . '#' . ($duration * 60);
+//                    $exists = true;
+//                }
             }
 
-            if (!$exists) {
-                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
-            }
+            $newList = array_filter($newList);
 
-            $blackList = implode(',', $list);
+            $blackList= implode(',', $newList) ?: null;
+
+//            if (!$exists) {
+//                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
+//            }
+
+//            $blackList = implode(',', $list);
         }
 
         $room->room_black = $blackList;
@@ -1052,7 +1060,6 @@ class RoomController extends MainController
 
     public function unbanVisitor(Request $request, $roomId): JsonResponse
     {
-        info('im here');
         $room = Room::findOrFail($roomId);
         $visitorId = $request->user_id;
 
