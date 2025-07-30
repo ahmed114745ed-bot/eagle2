@@ -102,11 +102,7 @@ class SuperLuckyBoxJob implements ShouldQueue
         $remainingBoxCount = BoxUse::where('room_uid', $box->room_uid)->where('not_used_num', '>', 0)->count();
 
         $roomId = $box->room?->id ?? 0;
-        $roomVisitors = RoomVisitor::where('room_id', $roomId)
-            ->whereNotIn('user_id', $pickerIds)
-            ->whereHas('user')
-            ->pluck('user_id')
-            ->toArray();
+ 
 
         if (empty($winners)) {
             CustomNotification::closedLuckyBosWithReturnCoins($box->user, $box->unused_coins, $box->image, 1);
@@ -114,7 +110,7 @@ class SuperLuckyBoxJob implements ShouldQueue
             CustomNotification::closeLuckyBox($box->user, $box->image, 1);
         }
 
-        $this->hideLuckyBoxForAllUsers($roomVisitors, $box->user, $box, $remainingBoxCount, $box->room);
+        $this->hideLuckyBoxForAllUsers( $box->user, $box, $remainingBoxCount, $box->room);
         $this->sendWinnerMap($box, $winners, $roomId);
     }
 
@@ -139,7 +135,7 @@ class SuperLuckyBoxJob implements ShouldQueue
         Common::sendToZego('SendCustomCommand', $roomId, $box->room?->owner?->id ?? 0, json_encode($payload));
     }
 
-    public function hideLuckyBoxForAllUsers(array $usersRoomVisit, User $owner, BoxUse $box, int $remaining, $room): void
+    public function hideLuckyBoxForAllUsers(User $owner, BoxUse $box, int $remaining, $room): void
     {
         $payload = [
             'messageContent' => [
