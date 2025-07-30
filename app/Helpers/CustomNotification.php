@@ -622,11 +622,31 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
+    public function cpAction(User $user, User $sender, $action)
+    {
+        $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
+        if ($action == 1) {
+            $body_ar = __('api.acceptCp', ['name' => $sender->name], 'ar');
+            $body_en = __('api.acceptCp', ['name' => $sender->name], 'en');
+        } else {
+            $body_ar = __('api.rejectCp', ['name' => $sender->name], 'ar');
+            $body_en = __('api.rejectCp', ['name' => $sender->name], 'en');
+        }
+
+        $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
+        $content = ($user->lan === 'ar') ? 'cp' : ' علاقه';
+        $data['image'] = getImagePath(@$sender->profile->avatar);
+        $icon = $data['image'];
+        Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'action-cp');
+        Common::sendOfficialMessage($user->id,  title: $body_en, content: $content, titleAr: $body_ar,);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
     public function luckyBox(User $user, $coins, $imageBox)
     {
         $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
         $body_ar = __('api.luckBox', ['coins' => $coins], 'ar');
-        $body_en = __('api.luckBox', ['coins' => $coins], 'en');    
+        $body_en = __('api.luckBox', ['coins' => $coins], 'en');
         $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         $content = ($user->lan === 'en') ? 'lucky box' : 'صندوق الحظ';
         $data['image'] = getImagePath(@$imageBox);

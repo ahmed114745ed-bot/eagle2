@@ -176,10 +176,10 @@ class CpserviceCo
         }
         $chatMessage = ChatMessage::create($chatMessageData);
 
-        if ($user2->is_logout != 1) {
 
-            CustomNotification::makeCp($user2, $user, $cpRelation->type);
-        }
+
+        CustomNotification::makeCp($user2, $user, $cpRelation->type);
+
 
         $message_resource = new ChatMessageResource($chatMessage);
         $room_resource =  new ChatRoomResourcePusher($chatRoom);
@@ -238,6 +238,7 @@ class CpserviceCo
         }
 
         $user = $request->user();
+        $user2 = User::find($cp->user_one_id);
         if (!$cp || ($cp->status != 0 && $cp->status != 5)) {
             return Common::apiResponse(0, 'لا يوجد cp');
         }
@@ -266,6 +267,7 @@ class CpserviceCo
 
                 $this->cpRepository->updateCpStatus($cp, 1);
             }
+            CustomNotification::cpAction($user2, $user, 1);
             $decryptedData['status'] = 1;
         } elseif ($request->status == 2) {
 
@@ -277,6 +279,7 @@ class CpserviceCo
             }
             $this->cpRepository->updateOrCreateUserRelation($cp->user_one_id, $cp->cp_relation_id);
             $decryptedData['status'] = 2;
+            CustomNotification::cpAction($user2, $user, 2);
         }
 
         $message->message = json_encode($decryptedData);
