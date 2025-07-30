@@ -34,7 +34,8 @@ class BoxService
             $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone);
         }
         $amountBefore =  Common::getCurrentBalance($user->id);
-        $user->decrement('di', $boxCoin);
+        $user->decrement('di', $box->coins);
+
         try {
             DB::commit();
             $c = BoxUse::query()->where('room_uid', $room->uid)->where('not_used_num', '>', 0)->count();
