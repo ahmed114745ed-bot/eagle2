@@ -8,7 +8,8 @@ class PKObserver
 {
     public function creating(PK $pK)
     {
-        $mics = $pK->mics;
+//        $mics = $pK->mics;
+        $mics = is_string($pK->mics) ? explode(',', $pK->mics) : $pK->mics;
         $m = explode(',', $mics);
         $mic_1 = isset($m[1]) ? $m[1] : 0;
         $mic_2 = isset($m[2]) ? $m[2] : 0;
@@ -28,8 +29,8 @@ class PKObserver
 
     public function updating(PK $pK)
     {
-        $mics = $pK->mics;
-        info(['mics' => $mics]);
+//        $mics = $pK->mics;
+        $mics = is_string($pK->mics) ? explode(',', $pK->mics) : $pK->mics;
         $m = explode(',', $mics);
         $mic_1 = isset($m[1]) ? $m[1] : 0;
         $mic_2 = isset($m[2]) ? $m[2] : 0;
