@@ -167,15 +167,15 @@ class LuckyGiftService
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
 
-        \Log::info('coin log gifts',['2' => $amountBefore]);
-        \Log::info('di log gifts',['3' =>  $user->di]);
+        \Log::info('coin log gifts',['2' => $amountBefore - $total_user_win]);
+        \Log::info('di log gifts',['3' =>  $user->di ]);
 
         if ($total_user_win > 0) {
 
             UserCoinLogHelper::logByType(
                 $userId,
                 $total_user_win,
-                $amountBefore,
+                ($amountBefore -  $total_user_win ),
                 UserCoinLogType::CASHBACK,
                 null,
             );
