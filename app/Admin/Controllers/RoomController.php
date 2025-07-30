@@ -989,21 +989,29 @@ class RoomController extends MainController
             $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
         } else {
             $list = explode(',', $blackList);
-            $exists = false;
+            $newList = [];
+//            $exists = false;
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
-                if ($black[0] == $visitorId) {
-                    $item = $visitorId . '#' . time() . '#' . ($duration * 60);
-                    $exists = true;
+                if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
+                    $newList[] = $item;
                 }
+//                if ($black[0] == $visitorId) {
+//                    $item = $visitorId . '#' . time() . '#' . ($duration * 60);
+//                    $exists = true;
+//                }
             }
 
-            if (!$exists) {
-                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
-            }
+            $newList = array_filter($newList);
 
-            $blackList = implode(',', $list);
+            $blackList= implode(',', $newList) ?: null;
+
+//            if (!$exists) {
+//                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
+//            }
+
+//            $blackList = implode(',', $list);
         }
 
         $room->room_black = $blackList;
