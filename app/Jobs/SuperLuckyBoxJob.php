@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\RoomVisitor;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -81,6 +83,18 @@ class SuperLuckyBoxJob implements ShouldQueue
                 $box->used_coins += $coins;
                 $box->unused_coins = max(0, $box->unused_coins - $coins);
 
+                $amountBefore = $user->di;
+                UserCoinLogHelper::logByType(
+                    userId: $user->id,
+                    amount: $coins,
+                    amountBefore: $amountBefore,
+                    type: UserCoinLogType::LUCK_BOX,
+                    itemNameOverride: null,
+                    helperAmount: 0,
+                    fromDate: now(),
+                    toDate: now(),
+                );
+                
                 // Safely update user's DI
                 User::where('id', $user->id)->lockForUpdate()->increment('di', $coins);
 
