@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
@@ -67,14 +68,13 @@ class FamilyService
         ];
         $this->familyUserRepository->create($familyUserData);
 
-        $amountBefore =  Common::getCurrentBalance($user->id);
         $logAmount = -abs($price);
-        UserCoinLogHelper::log(
-            $user->id ,
-            'family',
-            'families',
-            $logAmount ?? 0,
-            $amountBefore ?? 0,
+        $amountBefore =  $user->di;
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $logAmount,
+            $amountBefore,
+            UserCoinLogType::FAMILY,
             $request->name
         );
         $this->userRepository->decrementCoins($user->id, $price);

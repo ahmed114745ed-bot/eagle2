@@ -4,11 +4,13 @@ namespace App\Services\Gifts;
 
 use App\Classes\Gifts\SendGiftService;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Enums\UserCoinLogType;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\RedisService;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
-use App\Jobs\LogUserGamesCoinProfit;
+use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\CoreWallet;
 use App\Models\Cp;
 use App\Models\Gift;
@@ -94,16 +96,13 @@ class LuckyGiftService
         $total_user_win  = 0;
         $total_count_win = 0;
 
-      
-        LogUserGamesCoinProfit::dispatch(
+        UserCoinLogHelper::logByType(
             $user->id,
+            -abs($totalPrice),
             $amountBefore,
-            -abs($totalPrice)  ,
-             0,
-            'gift_logs',
-            'lucky_gift',
-            'lucky_gift'
-        )->onQueue('log_user_coin');
+            UserCoinLogType::LUCKY_GIFT,
+            $gift?->name ,
+        );
         
         
         while ($user->di >= $totalPrice && $index > 0) {
@@ -171,14 +170,13 @@ class LuckyGiftService
    
         $cashbackBefore = $user->di;
         if ($total_user_win > 0) {
-            LogUserCoinProfit::dispatch(
+            UserCoinLogHelper::logByType(
                 $userId,
-                $cashbackBefore,
                 $total_user_win,
-                'cashback',
-                'lucky_gifts',
-                'cashback'
-            )->onQueue('log_user_coin');
+                $amountBefore,
+                UserCoinLogType::CASHBACK,
+                null,
+            );
         }
         
 

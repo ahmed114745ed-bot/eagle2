@@ -2,6 +2,7 @@
 
 namespace Modules\LuckyBox\Services;
 
+use App\Enums\UserCoinLogType;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Helpers\Common;
@@ -33,9 +34,15 @@ class BoxService
         } else {
             $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone);
         }
-        $amountBefore =  Common::getCurrentBalance($user->id);
+        
+        $amountBefore = $user->di;
+        UserCoinLogHelper::logByType(
+            $user->id ,
+            $box->coins,
+            $amountBefore,
+            UserCoinLogType::LUCK_BOX,
+        );
         $user->decrement('di', $box->coins);
-
         try {
             DB::commit();
             $c = BoxUse::query()->where('room_uid', $room->uid)->where('not_used_num', '>', 0)->count();
@@ -64,15 +71,9 @@ class BoxService
             $json = json_encode($m);
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-            UserCoinLogHelper::log(
-                $user->id,
-                'lucky_box',
-                $type,
-                $coins,
-                $amountBefore ?? 0,
-                'lucky_box'
-            );
+        
 
+            
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
         } catch (\Exception $exception) {
             DB::rollBack();

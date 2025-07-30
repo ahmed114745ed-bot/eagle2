@@ -2,6 +2,7 @@
 
 namespace App\Bd\Controllers;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\ShippingAgencyHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
@@ -372,6 +373,14 @@ class WalletController extends MainController
         DB::beginTransaction();
         try {
 
+
+            $amountBefore =  Common::getCurrentBalance($receiver->id);
+            UserCoinLogHelper::logByType(
+                $receiver->id,
+                $amount,
+                $amountBefore,
+                UserCoinLogType::BD_CHARGES,
+            );
             $sender->incrementCutAmountInBdSallary($amount);
             $receiver->increment('di', $coins);
             $descriptionData = ['receiver_id'  => $receiver->id];
@@ -385,15 +394,7 @@ class WalletController extends MainController
                 'message' => 'transfer_to_',
             ]);
 
-            $amountBefore =  Common::getCurrentBalance($receiver->id);
-            UserCoinLogHelper::log(
-                $receiver->id ,
-                'charge',
-                'charges',
-                $amount ?? 0,
-                $amountBefore ?? 0,
-                'bd'
-            );
+     
 
             $data = [
                 'charger_id' => $sender->id,
