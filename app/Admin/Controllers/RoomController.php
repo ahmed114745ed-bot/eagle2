@@ -250,123 +250,65 @@ class RoomController extends MainController
         $filterType = request('filter', 'all'); // Fetch from query string
 
         $user = auth()->user();
-        // $grid->header(function () use ($filterType) {
-        //     $tabs = [
-        //         'all'       => __('All'),
-        //         // 'trend'     => __('Trend'),
-        //         'popular'   => __('Popular'),
-        //         'last_create' => __('New'),
-        //         'pk'        => __('PK'),
-        //         //  'boss'      => __('Boss'),
-        //         //'friends'   => 'Friends',
-        //         //'following' => 'Following',
-        //         "close_room"     => __('close room'),
-        //         "hide_room"      => __('hide room'),
-        //         'country'    => __('countries'),
-        //         // 'recently'  => __('Recently'),
-        //         // 'interested' => __('Interested'),
-        //         // 'nearby'    => __('Nearby'),
-
-        //         // 'party'     => __('Party'),
-        //         // 'festival'  => __('Festival'),
-        //         // 'top_gift'  => __('Top Gift'),
-        //     ];
-
-        //     $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-        //     foreach ($tabs as $key => $label) {
-        //         $active = $filterType === $key ? 'active' : '';
-        //         $url = request()->fullUrlWithQuery(['filter' => $key]);
-        //         $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
-        //     }
-        //     $html .= '</ul></div>';
-
-        //     $html .= <<<HTML
-        //                 <script>
-        //                     document.addEventListener('DOMContentLoaded', function () {
-        //                         const tabLinks = document.querySelectorAll('.tab-link');
-        //                         const loader = document.getElementById('tab-loading');
-
-        //                         tabLinks.forEach(function (tab) {
-        //                             tab.addEventListener('click', function (e) {
-        //                                 e.preventDefault();
-        //                                 loader.style.display = 'block';
-        //                                 tabLinks.forEach(t => t.style.pointerEvents = 'none');
-        //                                 setTimeout(() => {
-        //                                     window.location.href = tab.getAttribute('href');
-        //                                 }, 300);
-        //                             });
-        //                         });
-        //                     });
-        //                 </script>
-        //                 HTML;
-
-        //     return $html;
-        // });
-
-
-
-
-
-
         $grid->header(function () use ($filterType) {
             $tabs = [
-                'all'         => __('All'),
-                'popular'     => __('Popular'),
+                'all'       => __('All'),
+                // 'trend'     => __('Trend'),
+                'popular'   => __('Popular'),
                 'last_create' => __('New'),
-                'pk'          => __('PK'),
-                'close_room'  => __('Close Room'),
-                'hide_room'   => __('hide room'),
-                'country'     => __('countries'),
+                'pk'        => __('PK'),
+                //  'boss'      => __('Boss'),
+                //'friends'   => 'Friends',
+                //'following' => 'Following',
+                "close_room"     => __('close room'),
+                "hide_room"      => __('hide room'),
+                'country'    => __('countries'),
+                // 'recently'  => __('Recently'),
+                // 'interested' => __('Interested'),
+                // 'nearby'    => __('Nearby'),
+
+                // 'party'     => __('Party'),
+                // 'festival'  => __('Festival'),
+                // 'top_gift'  => __('Top Gift'),
             ];
 
-            $html = '<div class="nav-tabs-custom" style="display: flex; justify-content: space-between; align-items: center;">';
-            $html .= '<ul class="nav nav-tabs">';
-
+            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
             foreach ($tabs as $key => $label) {
                 $active = $filterType === $key ? 'active' : '';
                 $url = request()->fullUrlWithQuery(['filter' => $key]);
                 $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
             }
+            $html .= '</ul></div>';
 
-            $html .= '</ul>';
-
-            // 🔽 Add country select with icon
-            $selectedCountry = request('country_id');
-            $countries = Country::pluck('name', 'id')->toArray();
-            $html .= '
-           <form method="GET" style="margin: 10px 15px 0 0; display: flex; align-items: center; gap: 5px;">   
-            <select name="country_id" class="form-control" onchange="this.form.submit()" style="min-width: 150px;">
-                <option value="">' . __('all') . '</option>';
-
-            foreach ($countries as $id => $name) {
-                $selected = $selectedCountry == $id ? 'selected' : '';
-                $html .= "<option value='{$id}' {$selected}>{$name}</option>";
-            }
-
-            $html .= '</select></form></div>';
-
-            // JS loader (unchanged)
             $html .= <<<HTML
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const tabLinks = document.querySelectorAll('.tab-link');
-                const loader = document.getElementById('tab-loading');
-                tabLinks.forEach(function (tab) {
-                    tab.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        if (loader) loader.style.display = 'block';
-                        tabLinks.forEach(t => t.style.pointerEvents = 'none');
-                        setTimeout(() => {
-                            window.location.href = tab.getAttribute('href');
-                        }, 300);
-                    });
-                });
-            });
-        </script>
-    HTML;
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const tabLinks = document.querySelectorAll('.tab-link');
+                                const loader = document.getElementById('tab-loading');
+
+                                tabLinks.forEach(function (tab) {
+                                    tab.addEventListener('click', function (e) {
+                                        e.preventDefault();
+                                        loader.style.display = 'block';
+                                        tabLinks.forEach(t => t.style.pointerEvents = 'none');
+                                        setTimeout(() => {
+                                            window.location.href = tab.getAttribute('href');
+                                        }, 300);
+                                    });
+                                });
+                            });
+                        </script>
+                        HTML;
 
             return $html;
         });
+
+
+
+
+
+
+
 
 
         $grid->model()
