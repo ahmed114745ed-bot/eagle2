@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Helpers\Common;
-use App\Helpers\UserCoinLogHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
