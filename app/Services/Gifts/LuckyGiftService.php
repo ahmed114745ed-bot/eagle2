@@ -123,15 +123,6 @@ class LuckyGiftService
                 if ($cashback_percentage > 0) {
 
                     $user->enableSaving = false;
-
-                    UserCoinLogHelper::logByType(
-                        $userId,
-                        $total_user_win,
-                        $user->di,
-                        UserCoinLogType::CASHBACK,
-                        null,
-                    );
-                   
                     $user->di           += $cashback_value;
                     //                $user->save();
                     $appWallet->coins -= $cashback_value;
@@ -178,6 +169,17 @@ class LuckyGiftService
 
    
 
+        if ($total_user_win > 0) {
+
+            UserCoinLogHelper::logByType(
+                $userId,
+                $total_user_win,
+                $user->di,
+                UserCoinLogType::CASHBACK,
+                null,
+            );
+        }
+        
 
         if ($index > 0) {
             $count -= $index;

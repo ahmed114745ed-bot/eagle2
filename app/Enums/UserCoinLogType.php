@@ -132,7 +132,7 @@ enum UserCoinLogType: string
             self::CASHBACK => [
                 'sub_type' => 'lucky_gifts', 
                 'item_name' => 'cashback',
-                'queue_job' => \App\Jobs\LogUserCumulativeCoinProfit::class,
+                'queue_job' => \App\Jobs\LogUserCoinProfit::class,
             ],
             self::VIP => [
                 'sub_type' => 'o_vips',
