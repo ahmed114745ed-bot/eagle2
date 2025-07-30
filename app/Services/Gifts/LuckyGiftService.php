@@ -174,7 +174,7 @@ class LuckyGiftService
             UserCoinLogHelper::logByType(
                 $userId,
                 $total_user_win,
-                $user->di,
+                ($user->di - $total_user_win),
                 UserCoinLogType::CASHBACK,
                 null,
             );
