@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Helpers\Common;
-use App\Helpers\UserCoinLogHelper;
 use App\Models\UserCoinLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,6 +17,7 @@ class LogUserCoinProfit implements ShouldQueue
     protected $userId;
     protected $amountBefore;
     protected $amount;
+    protected $helperAmount;
     protected $type;
     protected $subType;
     protected $itemName;
@@ -27,6 +27,7 @@ class LogUserCoinProfit implements ShouldQueue
         int $userId,
         float $amountBefore,
         float $amount,
+        float $helperAmount = 0,
         string $type,
         string $subType,
         ?string $itemName = '',
@@ -35,6 +36,7 @@ class LogUserCoinProfit implements ShouldQueue
         $this->userId = $userId;
         $this->amountBefore = $amountBefore;
         $this->amount = $amount;
+        $this->helperAmount = $helperAmount;
         $this->type = $type;
         $this->subType = $subType;
         $this->itemName = $itemName;
@@ -49,6 +51,7 @@ class LogUserCoinProfit implements ShouldQueue
             'sub_type'      => $this->subType,
             'amount_before' => $this->amountBefore,
             'amount'        => $this->amount,
+            'helper_amount'        => $this->helperAmount ?? 0,
             'item_name'     => $this->itemName,
             'from_date'     => $this->createdAt,
             'to_date'       => $this->createdAt,

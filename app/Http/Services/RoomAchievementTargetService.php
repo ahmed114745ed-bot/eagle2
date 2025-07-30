@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Room;
@@ -37,14 +38,13 @@ class RoomAchievementTargetService
             if ($this->reachTarget($room->id, $roomTarget->id)) {
                 $user = User::find($room->uid);
                 if (!$user) return;
-                $amountBefore =  Common::getCurrentBalance($user->id);
-                UserCoinLogHelper::log(
-                    $user->id ,
-                    'roomTarget',
-                    'room_targets',
-                    $roomTarget->coins ?? 0,
-                    $amountBefore ?? 0,
-                    'room_target'
+              
+                $amountBefore =  $user->di;
+                UserCoinLogHelper::logByType(
+                    $user->id,
+                    $roomTarget->coins,
+                    $amountBefore,
+                    UserCoinLogType::ROOM_TARGET,
                 );
                
                 $user->di += $roomTarget->coins;

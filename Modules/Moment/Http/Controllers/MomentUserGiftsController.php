@@ -2,7 +2,6 @@
 
 namespace Modules\Moment\Http\Controllers;
 
-use App\Helpers\UserCoinLogHelper;
 use DB;
 use App\Models\Gift;
 use App\Models\User;
