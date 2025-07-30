@@ -617,7 +617,7 @@ class CustomNotification
         $content = ($user->lan === 'ar') ? 'cp' : ' علاقه';
         $data['image'] = getImagePath(@$sender->profile->avatar);
         $icon = $data['image'];
-        Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'lucky_box');
+        Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'text');
         Common::sendOfficialMessage($user->id,  title: $body_en, content: $content, titleAr: $body_ar,);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
