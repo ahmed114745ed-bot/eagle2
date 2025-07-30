@@ -26,7 +26,7 @@ class RoomResource extends JsonResource
             }
         }
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
-        $have_luck_box = $this->boxUse;
+        $have_luck_box = $this->boxUse->where("is_closed",0);
         $isHideCountry = $this?->owner?->getPackWithType(13);
 
         /**@var Room $this*/
