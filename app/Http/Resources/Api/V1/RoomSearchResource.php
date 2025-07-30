@@ -58,7 +58,7 @@ class RoomSearchResource extends JsonResource
             'type-number'                => @$this->room_type ?? 0,
             'type' => @$this->myType ?: new \stdClass(),
             "is_pk"               => (bool)((@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0),
-
+ 
             "room_pass" => $this->room_pass ?? '',
             "uid" => $this->uid ?? 0,
             'owner_id' =>  $this->uid ?? 0,
@@ -69,7 +69,7 @@ class RoomSearchResource extends JsonResource
             'country' =>$endCountry ,
             'achievement_images' => $achievement_images,
             'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
-
+            'country_hidden' => $isHideCountry,
 
         ];
     }
