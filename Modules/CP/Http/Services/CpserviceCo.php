@@ -2,14 +2,15 @@
 
 namespace Modules\CP\Http\Services;
 
-use App\Enums\UserCoinLogType;
-use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Modules\Chat\Events\Chat;
+use App\Enums\UserCoinLogType;
 use Modules\CP\Enums\CpStatus;
 use Modules\Chat\Events\OpenChat;
+use App\Helpers\UserCoinLogHelper;
+use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Modules\Chat\Entities\ChatRoom;
 use Modules\CP\Entities\CpRelation;
@@ -105,7 +106,7 @@ class CpserviceCo
             $amountBefore =  $user->id;
             UserCoinLogHelper::logByType(
                 $user->id,
-                -abs( $cpRelation->price),
+                -abs($cpRelation->price),
                 $amountBefore,
                 UserCoinLogType::CP,
             );
@@ -176,11 +177,8 @@ class CpserviceCo
         $chatMessage = ChatMessage::create($chatMessageData);
 
         if ($user2->is_logout != 1) {
-            $tokens_notfacion[] = \DB::table('users')->where('id', $user2->id)->value('notification_id');
-            $title = $user->name;
-            $body = $message;
-            $type = $message->type ?? 'text';
-            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
+
+            CustomNotification::makeCp($user2, $user, $cpRelation->type);
         }
 
         $message_resource = new ChatMessageResource($chatMessage);
@@ -205,7 +203,7 @@ class CpserviceCo
         return Common::apiResponse(1, 'تم الاضافه بنجاح');
     }
 
-    
+
     public function getRequestCp($user)
     {
         $data = $this->cpRepository->getRequestsForUser($user->id);
