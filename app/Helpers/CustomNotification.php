@@ -626,7 +626,7 @@ class CustomNotification
     {
         $tokens_notfacion = DB::table('users')->where('id', $user->id)->value('notification_id');
         $body_ar = __('api.luckBox', ['coins' => $coins], 'ar');
-        $body_en = __('api.luckBox', ['coins' => $coins], 'en');
+        $body_en = __('api.luckBox', ['coins' => $coins], 'en');    
         $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         $content = ($user->lan === 'en') ? 'lucky box' : 'صندوق الحظ';
         $data['image'] = getImagePath(@$imageBox);

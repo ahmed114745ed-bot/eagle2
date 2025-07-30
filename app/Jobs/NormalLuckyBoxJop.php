@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
@@ -42,6 +44,13 @@ class NormalLuckyBoxJop implements ShouldQueue
 
         foreach ($userBoxes as $userBox) {
             $user = User::where('id', $userBox->user_id)->first();
+            $amountBefore = $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id ,
+                $userBox->unused_coins,
+                $amountBefore,
+                UserCoinLogType::LUCK_BOX,
+            );
             $user->increment('di', $userBox->unused_coins);
             $userBox->is_closed = true;
             $userBox->save();
