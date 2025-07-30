@@ -179,9 +179,9 @@ class BoxService
 
     public function calculationSendBox($box)
     {
-        $app_percentage = Common::getConfig('lucky_box_percentage') ?? 20;
+        $app_percentage = Common::getConfig('app_wallet_lucky_box') ?? 20;
+     
         $walletCoins = ($box->coins * $app_percentage) / 100;
-
         $boxCoin = $box->coins - $walletCoins;
 
         $walletApp = CoreWallet::where('name', 'lucky_box')->first();
