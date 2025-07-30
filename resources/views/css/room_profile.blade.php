@@ -300,6 +300,12 @@
         object-fit: cover;
     }
 
+    .cover-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
     .agency-info {
         flex: 1;
     }

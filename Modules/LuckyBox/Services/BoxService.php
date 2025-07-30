@@ -50,7 +50,7 @@ class BoxService
                 Carbon::createFromTimestamp($boxU->end_at)
             );
             $type = $box->type == 1 ? 'super' : 'normal';
-            $coins = $request->coins ?: $box->coins;
+            $coins = $boxCoin;
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
@@ -133,7 +133,7 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-        info('box duration'.$box->duration);
+        info('box duration' . $box->duration);
         dispatch(new SuperLuckyBoxJob())->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
         info('afterJob');
 
@@ -181,9 +181,9 @@ class BoxService
 
     public function calculationSendBox($box)
     {
-        $app_percentage = Common::getConfig('lucky_box_percentage') ?? 20;
-        $walletCoins = ($box->coins * $app_percentage) / 100;
+        $app_percentage = Common::getConfig('app_wallet_lucky_box') ?? 20;
 
+        $walletCoins = ($box->coins * $app_percentage) / 100;
         $boxCoin = $box->coins - $walletCoins;
 
         $walletApp = CoreWallet::where('name', 'lucky_box')->first();
