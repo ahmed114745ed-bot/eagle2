@@ -971,12 +971,12 @@ class RoomController extends MainController
         $visitorId = $request->user_id;
         $duration = $request->minutes ?? 5;
 
-//        if ($visitorId == $room->uid) {
-//            return response()->json([
-//                'success' => false,
-//                'message' => __('Cannot kick the room owner')
-//            ]);
-//        }
+        if ($visitorId == $room->uid) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Cannot kick the room owner')
+            ]);
+        }
 
         if (Common::pack_get(9, $visitorId)) {
             return response()->json([
@@ -986,43 +986,25 @@ class RoomController extends MainController
         }
 
         $blackList = $room->room_black;
-        Log::info('Original room_black:', ['room_black' => $blackList]);
 
         if (empty($blackList)) {
             $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
-            Log::info('Blacklist was null, new blacklist:', ['blackList' => $blackList]);
         } else {
             $list = explode(',', $blackList);
-            Log::info('Exploded blacklist list:', ['list' => $list]);
             $newList = [];
-//            $exists = false;
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
-                Log::info('Blacklist item:', ['item' => $item, 'black' => $black]);
                 if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
                     $newList[] = $item;
                 }
-//                if ($black[0] == $visitorId) {
-//                    $item = $visitorId . '#' . time() . '#' . ($duration * 60);
-//                    $exists = true;
-//                }
             }
 
             $newList = array_filter($newList);
-            Log::info('Filtered newList:', ['newList' => $newList]);
 
             $blackList= implode(',', $newList) ?: null;
-            Log::info('Imploded new blacklist:', ['blackList' => $blackList]);
-
-//            if (!$exists) {
-//                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
-//            }
-
-//            $blackList = implode(',', $list);
         }
 
-        Log::info('Imploded new blacklist:', ['blackList' => $blackList]);
         $room->room_black = $blackList;
         $room->save();
 
@@ -1049,7 +1031,7 @@ class RoomController extends MainController
 
         $d = [
             "messageContent" => [
-                "message" => "kickout",
+                "message" => "kickVisitorOut",
                 'duration' => $duration,
                 "visitorId" => $visitorId,
                 "comment" => $message
