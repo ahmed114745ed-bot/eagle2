@@ -95,7 +95,7 @@ class LuckyGiftService
         $price              = $coinsForReceiver * $receiversCount;
         $total_user_win  = 0;
         $total_count_win = 0;
-        \Log::info('coin log gifts',['2' => $amountBefore]);
+
         UserCoinLogHelper::logByType(
             $user->id,
             -abs($totalPrice),
@@ -123,6 +123,15 @@ class LuckyGiftService
                 if ($cashback_percentage > 0) {
 
                     $user->enableSaving = false;
+
+                    UserCoinLogHelper::logByType(
+                        $userId,
+                        $total_user_win,
+                        $user->di,
+                        UserCoinLogType::CASHBACK,
+                        null,
+                    );
+                   
                     $user->di           += $cashback_value;
                     //                $user->save();
                     $appWallet->coins -= $cashback_value;
@@ -167,20 +176,8 @@ class LuckyGiftService
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
 
-        \Log::info('coin log gifts',['2' => $amountBefore - $total_user_win]);
-        \Log::info('di log gifts',['3' =>  $user->di ]);
+   
 
-        if ($total_user_win > 0) {
-
-            UserCoinLogHelper::logByType(
-                $userId,
-                $total_user_win,
-                ($amountBefore -  $total_user_win ),
-                UserCoinLogType::CASHBACK,
-                null,
-            );
-        }
-        
 
         if ($index > 0) {
             $count -= $index;
