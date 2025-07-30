@@ -2,6 +2,8 @@
 
 namespace Modules\CP\Http\Services;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
@@ -99,6 +101,14 @@ class CpserviceCo
             if ($user->di < $cpRelation->price) {
                 return Common::apiResponse(0, 'لا يوجد رصيد كافي من الكوينات برجاء الشحن!');
             }
+
+            $amountBefore =  $user->id;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs( $cpRelation->price),
+                $amountBefore,
+                UserCoinLogType::CP,
+            );
             $user->di -= $cpRelation->price;
             $user->save();
         }
