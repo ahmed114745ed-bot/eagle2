@@ -3423,6 +3423,7 @@
 "amount before": "المبلغ قبل",
 "amount after": "المبلغ بعد",
 "created by": "أنشئ بواسطة",
+"created at": "تاريخ الإنشاء",
 "CoreWalletTransaction":"سجل المعاملات",
 "coreWalletTransaction":"سجل المعاملات",
 "Core-wallet-transactions":"سجل المعاملات",
