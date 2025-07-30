@@ -988,7 +988,7 @@ class RoomController extends MainController
         $blackList = $room->room_black;
         Log::info('Original room_black:', ['room_black' => $blackList]);
 
-        if ($blackList === null) {
+        if (empty($blackList)) {
             $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
             Log::info('Blacklist was null, new blacklist:', ['blackList' => $blackList]);
         } else {
