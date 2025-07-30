@@ -175,7 +175,7 @@ class BoxController extends Controller
         if (!$request->bid) return Common::apiResponse(0, 'missing params', null, 422);
 
         $keyBoxUse  = 'BoxUse_' . $request->bid;
-        $box_use = RedisService::getUnSerialize($keyBoxUse);
+        $box_use =  BoxUse::find($request->bid);
         if (!$box_use) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
@@ -196,32 +196,32 @@ class BoxController extends Controller
 
     public function normalBox($box_use, $keyBoxUse, $user, $request)
     {
-       
 
-        if ($box_use['users_num'] != $box_use['used_num']) {
 
-            if (($box_use['not_used_num'] == 1)) {
-                $box_use['not_used_num'] = 0;
+        if ($box_use->users_num != $box_use->used_num) {
+
+            if (($box_use->not_used_num == 1)) {
+                $box_use->not_used_num = 0;
                 $fin = 1;
             } else {
                 $fin = 0;
-                $box_use['not_used_num'] -= 1;
+                $box_use->not_used_num -= 1;
             }
 
             $giftService = new LuckyBoxServices();
-            $coins = $giftService->getCoins($fin, $box_use['unused_coins'], $box_use['not_used_num']);
+            $coins = $giftService->getCoins($fin, $box_use->unused_coins, $box_use->not_used_num);
 
             //            put user in redis
             $data = [
                 'box_uses_id' => $request->bid,
                 'user_id' => $user->id,
                 'coins' => $coins,
-                'room_uid' => $box_use['room_uid'],
-                'room_id' => $box_use['room_id'],
-                'type' => $box_use['type'],
-                'box_uses_owner_id' => $box_use['user_id'],
-                'image' => $box_use['image'],
-                'label' => $box_use['label']
+                'room_uid' => $box_use->room_uid,
+                'room_id' => $box_use->room_id,
+                'type' => $box_use->type,
+                'box_uses_owner_id' => $box_use->user_id,
+                'image' => $box_use->image,
+                'label' => $box_use->label,
             ];
 
             if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => true])->exists()) {
@@ -230,12 +230,14 @@ class BoxController extends Controller
 
             UserBoxGift::query()->create($data);
 
-            $box_use['used_coins'] += $coins;
-            $box_use['used_num'] += 1;
-            $box_use['unused_coins'] -= $coins;
+            $box_use->used_coins += $coins;
+            $box_use->used_num += 1;
+            $box_use->unused_coins -= $coins;
+            $box_use->save();
             //update box use in redis
-            RedisService::updateUnSerialize($keyBoxUse, $box_use);
-            dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
+
+            // RedisService::updateUnSerialize($keyBoxUse, $box_use);
+           // dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
 
             $user->increment('di', $coins);
             $countWinners =  UserBoxGift::query()->where('box_uses_id', $request->bid)->count();
