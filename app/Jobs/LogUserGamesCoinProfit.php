@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Helpers\Common;
-use App\Helpers\UserCoinLogHelper;
 use App\Models\UserCoinLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

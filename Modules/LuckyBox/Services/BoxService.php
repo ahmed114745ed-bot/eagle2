@@ -2,6 +2,7 @@
 
 namespace Modules\LuckyBox\Services;
 
+use App\Enums\UserCoinLogType;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Helpers\Common;
@@ -33,7 +34,14 @@ class BoxService
         } else {
             $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone);
         }
-        $amountBefore =  Common::getCurrentBalance($user->id);
+        
+        $amountBefore = $user->di;
+        UserCoinLogHelper::logByType(
+            $user->id ,
+            $box->coins,
+            $amountBefore,
+            UserCoinLogType::LUCK_BOX,
+        );
         $user->decrement('di', $box->coins);
         try {
             DB::commit();
@@ -42,7 +50,7 @@ class BoxService
                 Carbon::createFromTimestamp($boxU->end_at)
             );
             $type = $box->type == 1 ? 'super' : 'normal';
-            $coins = $request->coins ?: $box->coins;
+            $coins = $boxCoin;
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
@@ -63,14 +71,8 @@ class BoxService
             $json = json_encode($m);
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-            UserCoinLogHelper::log(
-                            $user->id,
-                            'lucky_box',
-                            $type,
-                            $coins,
-                            $amountBefore ?? 0,
-                            'lucky_box'
-                        );
+        
+
             
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
         } catch (\Exception $exception) {
@@ -131,7 +133,7 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-        info('box duration'.$box->duration);
+        info('box duration' . $box->duration);
         dispatch(new SuperLuckyBoxJob())->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
         info('afterJob');
 
@@ -179,9 +181,9 @@ class BoxService
 
     public function calculationSendBox($box)
     {
-        $app_percentage = Common::getConfig('lucky_box_percentage') ?? 20;
-        $walletCoins = ($box->coins * $app_percentage) / 100;
+        $app_percentage = Common::getConfig('app_wallet_lucky_box') ?? 20;
 
+        $walletCoins = ($box->coins * $app_percentage) / 100;
         $boxCoin = $box->coins - $walletCoins;
 
         $walletApp = CoreWallet::where('name', 'lucky_box')->first();

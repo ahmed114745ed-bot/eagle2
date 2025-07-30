@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Http\Controllers;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 use App\Models\OVip;
@@ -137,16 +138,15 @@ class ChargeEventController extends Controller
         $rewards =  RewardTarget::where('charge_event_id', $target->id)->get();
         foreach ($rewards as $reward) {
             if ($reward->type == "coins") {
-                $amountBefore =  Common::getCurrentBalance($user->id);
-                $logAmount = $reward->target;
-                UserCoinLogHelper::log(
+
+                $amountBefore = $user->di;
+                UserCoinLogHelper::logByType(
                     $user->id ,
-                    'charge_event',
-                    'charge_events',
-                    $logAmount ?? 0,
-                    $amountBefore ?? 0,
-                    'event'
+                    $reward->target,
+                    $amountBefore,
+                    UserCoinLogType::CHARGE_EVENT,
                 );
+    
                 $user->di += $reward->target;
                 $user->save();
             } elseif ($reward->type == "vip") {

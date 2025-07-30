@@ -2,6 +2,7 @@
 
 namespace App\Classes\Room;
 
+use App\Enums\UserCoinLogType;
 use App\Exceptions\NotInfCoins;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
@@ -81,15 +82,13 @@ class RoomComments
 
     private function minusUserCoins(User $user, int $numOfCoins)
     {
-        $amountBefore =  Common::getCurrentBalance($user->id);
+        $amountBefore =  $user->di;
         $logAmount = -abs($numOfCoins);
-        UserCoinLogHelper::log(
-            $user->id ,
-            'comment',
-            'comments',
-            $logAmount ?? 0,
-            $amountBefore ?? 0,
-            'Special Bar'
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $logAmount,
+            $amountBefore,
+            UserCoinLogType::ROOM_COMMENT,
         );
         $user->di -= $numOfCoins;
         return $user;
