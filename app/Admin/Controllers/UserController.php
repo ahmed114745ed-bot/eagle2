@@ -482,8 +482,6 @@ class UserController extends MainController
 
     public function show($id, Content $content,)
     {
-        \Log::info('Request params', request()->all());
-
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
         $start = request('start_at');
