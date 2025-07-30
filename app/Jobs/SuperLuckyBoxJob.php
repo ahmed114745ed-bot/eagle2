@@ -108,7 +108,7 @@ class SuperLuckyBoxJob implements ShouldQueue
 
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
-                 $user->id,
+                 $box?->user?->id,
                  $box->unused_coins,
                  $amountBefore,
                 UserCoinLogType::LUCK_BOX,
