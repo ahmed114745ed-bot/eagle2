@@ -106,6 +106,17 @@ class SuperLuckyBoxJob implements ShouldQueue
                 }
             }
 
+            $amountBefore = $user->di;
+            UserCoinLogHelper::logByType(
+                 $box?->user?->id,
+                 $box->unused_coins,
+                 $amountBefore,
+                UserCoinLogType::LUCK_BOX,
+                 null,
+                 0,
+                 now(),
+                now(),
+            );
             // Refund remaining coins to box owner
             User::where('id', $box->user_id)->lockForUpdate()->increment('di', $box->unused_coins);
 
