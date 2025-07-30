@@ -64,7 +64,7 @@ class CpProfileService
         } else {
             $ware = Ware::select('id', 'price', 'num')->where('type', 100)->where('get_type', 100)->where('num', 6)->first();
         }
-        $mainCp = $data->firstWhere('relation.type', 'lovely') ?? $data->sortByDesc('level')->first();
+        $mainCp = $data->firstWhere('relation.type', 'lovely') ?? null;
 
 
         $remainingCps = $data->reject(function ($cp) use ($mainCp) {
