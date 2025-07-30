@@ -34,7 +34,7 @@ class BoxService
         } else {
             $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone);
         }
-        
+
         $amountBefore = $user->di;
         UserCoinLogHelper::logByType(
             $user->id ,
@@ -71,9 +71,9 @@ class BoxService
             $json = json_encode($m);
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-        
 
-            
+
+
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -133,14 +133,14 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-        info('box duration' . $box->duration);
-        dispatch(new SuperLuckyBoxJob())->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
-        info('afterJob');
 
         //        dispatch(new SuperLuckyBoxJob())->delay(now()->seconds(30))->onQueue('');
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
+
+        dispatch(new SuperLuckyBoxJob($boxUser->id))->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
+
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
         if (!$user instanceof User) return;
