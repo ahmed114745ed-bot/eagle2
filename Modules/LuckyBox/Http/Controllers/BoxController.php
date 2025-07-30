@@ -237,7 +237,7 @@ class BoxController extends Controller
             //update box use in redis
 
             // RedisService::updateUnSerialize($keyBoxUse, $box_use);
-           // dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
+            dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
 
             $user->increment('di', $coins);
             $countWinners =  UserBoxGift::query()->where('box_uses_id', $request->bid)->count();
