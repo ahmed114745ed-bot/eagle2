@@ -87,7 +87,7 @@ class GiftLogService
 
             UserCoinLogHelper::logByType(
                 $user->id,
-                $sendPrice,
+                -abs($sendPrice),
                 $amountBefore,
                 UserCoinLogType::GIFT,
                 $gift?->name
