@@ -505,8 +505,9 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
 
-            return "
+            return "<a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <div>
