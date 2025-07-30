@@ -9,6 +9,8 @@ use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\RoomVisitor;
 use App\Models\User;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Promise\Utils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -132,20 +134,29 @@ class SuperLuckyBoxJob implements ShouldQueue
         $roomId = $box->room?->id ?? 0;
 
 
+        $js[] = $this->hideLuckyBoxForAllUsers( $box->user, $box, $remainingBoxCount);
+        $js[] = $this->sendWinnerMap($box, $winners);
+
+        $promises = Common::sendToZego3('SendCustomCommand', $roomId, $box->user?->id, $js);
+
         if (empty($winners)) {
             CustomNotification::closedLuckyBosWithReturnCoins($box->user, $box->unused_coins, $box->image, 1);
         } else {
             CustomNotification::closeLuckyBox($box->user, $box->image, 1);
         }
 
-        $this->hideLuckyBoxForAllUsers( $box->user, $box, $remainingBoxCount, $box->room);
-        $this->sendWinnerMap($box, $winners, $roomId);
+        try {
+            Utils::unwrap($promises);
+        } catch (BadResponseException $e) {
+        }
+
+
     }
 
-    public function sendWinnerMap(BoxUse $box, array $winners, int $roomId): void
+    public function sendWinnerMap(BoxUse $box, array $winners): string|bool
     {
         if (! $box || ! $box->user) {
-            return;
+            return false;
         }
 
         $payload = [
@@ -160,11 +171,11 @@ class SuperLuckyBoxJob implements ShouldQueue
             ],
         ];
 
-        $json_encode = json_encode($payload);
-        Common::sendToZego('SendCustomCommand', $roomId, $box->room?->owner?->id ?? 0, $json_encode);
+        return json_encode($payload);
+
     }
 
-    public function hideLuckyBoxForAllUsers(User $owner, BoxUse $box, int $remaining, $room): void
+    public function hideLuckyBoxForAllUsers(User $owner, BoxUse $box, int $remaining): string|bool
     {
         $payload = [
             'messageContent' => [
@@ -178,6 +189,7 @@ class SuperLuckyBoxJob implements ShouldQueue
             ],
         ];
 
-        Common::sendToZego('SendCustomCommand', $room->id ?? 0, $owner->id, json_encode($payload));
+        return json_encode($payload);
+
     }
 }

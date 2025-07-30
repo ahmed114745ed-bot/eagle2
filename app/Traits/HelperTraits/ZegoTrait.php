@@ -55,56 +55,37 @@ Trait ZegoTrait
 
         return null;
     }
-
-    public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false') {
+    public static function sendToZego($Action,$RoomId,$FromUserId,$MessageContent,$IsTest = 'false'){
         $url = 'https://rtc-api.zego.im';
-        $AppId = self::getConf('zego_app_id');
-        $SignatureNonce = self::getSignatureNonce();
-        $Timestamp = time();
-        $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $AppId = self::getConf ('zego_app_id');
+        $SignatureNonce = self::getSignatureNonce ();
+        $Timestamp = time ();
+        $str = $AppId.$SignatureNonce.self::getConf('zego_server_secret').$Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
-
         $params = [
-            'Action'           => $Action,
-            'RoomId'           => $RoomId,
-            'FromUserId'       => $FromUserId,
-            'MessageContent'   => $MessageContent,
-            'AppId'            => $AppId,
-            'SignatureNonce'   => $SignatureNonce,
-            'Timestamp'        => $Timestamp,
-            'Signature'        => $signature,
-            'SignatureVersion' => $SignatureVersion,
-            'IsTest'           => $IsTest
+            'Action'=>$Action,
+            'RoomId'=>$RoomId,
+            'FromUserId'=>$FromUserId,
+            'MessageContent'=>$MessageContent,
+            'AppId'=>$AppId,
+            'SignatureNonce'=>$SignatureNonce,
+            'Timestamp'=>$Timestamp,
+            'Signature'=>$signature,
+            'SignatureVersion'=>$SignatureVersion,
+            'IsTest'=>$IsTest
         ];
+        $headers = [
 
-        // Log the full URL with query string
-        \Log::info('Sending request to Zego', [
-            'url' => $url,
-            'query' => $params
-        ]);
-
+        ];
         try {
-            $response = Http::withHeaders([])->acceptJson()->timeout(20)->get($url, $params);
+            return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
+        }catch (\Exception $exception){
 
-            // Log the response
-            \Log::info('Zego response', [
-                'status' => $response->status(),
-                'body'   => $response->body()
-            ]);
-
-            return $response->json();
-        } catch (\Exception $exception) {
-            // Log exception
-            \Log::error('Zego request failed', [
-                'message' => $exception->getMessage(),
-                'trace'   => $exception->getTraceAsString()
-            ]);
         }
 
         return null;
     }
-
 
     public static function sendToZego_2($Action,$RoomId,$UserId,$UserName,$MessageContent,$IsTest = 'false'){
         $url = 'https://rtc-api.zego.im';
