@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
@@ -94,7 +96,13 @@ class SuperLuckyBoxJob implements ShouldQueue
                                 //update box use in redis
                                 // RedisService::updateUnSerialize($keyBoxUse, $userBox);
                                 dispatch(new OpenBoxJob($userBox->id, $user->id, $user->name))->onQueue('luckyBox');
-
+                                $amountBefore = $user->di;
+                                UserCoinLogHelper::logByType(
+                                    $user->id ,
+                                    $coins,
+                                    $amountBefore,
+                                    UserCoinLogType::LUCK_BOX,
+                                );
                                 $user->increment('di', $coins);
                                 if ($coins > 0) {
                                     CustomNotification::luckyBox($user, $coins, $userBox?->image);
