@@ -6,6 +6,7 @@ use Exception;
 use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 use App\Helpers\Common;
+use App\Enums\UserCoinLogType;
 use Modules\Vip\Helpers\VipCommon;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
