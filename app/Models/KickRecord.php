@@ -10,5 +10,5 @@ class KickRecord extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $fillable = ['id', 'kicked_user_id', 'user_id', 'room_id'];
+    protected $fillable = ['id', 'kicked_user_id', 'user_id', 'room_id', 'type'];
 }
