@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
+use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\RoomVisitor;
 use App\Models\User;
@@ -30,6 +31,8 @@ class SuperLuckyBoxJob implements ShouldQueue
 
         $this->boxUse = BoxUse::with(['user', 'room.owner'])
             ->findOrFail($boxUseId);
+
+        LogHelper::info('this is box ', $this->boxUse);
     }
 
     public function handle(): void
@@ -94,7 +97,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                     fromDate: now(),
                     toDate: now(),
                 );
-                
+
                 // Safely update user's DI
                 User::where('id', $user->id)->lockForUpdate()->increment('di', $coins);
 
