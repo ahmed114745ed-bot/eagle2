@@ -67,8 +67,8 @@ class UserResourceSerche extends JsonResource
             'level'=>Common::level_centerSerch (@$this->id), // both     ---- resever img   , sendr img  req
             'vip'=>@Common::ovip_center ($this->resource), // both
             'is_agent'=>$this->is_agent, // both
-            'has_color_name'=>$this->getPackWithType(18), // both
-            'country_hidden'=>$this->getPackWithType(13), // both
+            'has_color_name' => $this->getPackWithType(18), // both
+            'country_hidden' => $this->getPackWithType(13), // both
             'type_user'            => intval(@$this->type_user) ?: 0, // both
             "manger_type"          =>new MangerTypeResource(@$this->mangerType),
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
