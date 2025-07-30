@@ -67,9 +67,11 @@ class CpProfileService
         $mainCp = $data->firstWhere('relation.type', 'lovely') ?? null;
 
 
-        $remainingCps = $data->reject(function ($cp) use ($mainCp) {
-            return $cp->id === $mainCp->id;
-        });
+        if ($mainCp) {
+            $remainingCps = $data->reject(function ($cp) use ($mainCp) {
+                return $cp->id === $mainCp->id;
+            });
+        }
 
         $result = [
             'seats' => $seats,
