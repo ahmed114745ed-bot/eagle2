@@ -48,7 +48,9 @@ class UserResourceSerche extends JsonResource
                 $pass_status = true;
             }
         }
-
+        $dress_1_data = $this->getUserDress(4, $this->owner?->dress_1, 'img2');
+        $dress_1_fallback = $this->getUserDress(4, $this->owner?->dress_1, 'img1');
+        $frame = $dress_1_data ?: $dress_1_fallback;
         $data = [
             'id'=>@$this->id, // both
             'uuid'=>@$this->uuid, // both
@@ -75,8 +77,20 @@ class UserResourceSerche extends JsonResource
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'country'          =>  @$this->country ?? (object)[],
             'image_color'          => @$this->color_image,
+            'frame' => $frame,
+
         ];
         return $data;
+    }
+
+
+    public function getUserDress($type, $dress, $item = 'img1')
+    {
+        $pack = $this->packs->where('is_used', 1)
+            ->where('type', $type)
+            ->where('target_id', $dress)
+            ->first();
+        return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 
 }
