@@ -38,7 +38,7 @@ class BoxService
         $amountBefore = $user->di;
         UserCoinLogHelper::logByType(
             $user->id ,
-            $box->coins,
+            -abs($box->coins),
             $amountBefore,
             UserCoinLogType::LUCK_BOX,
         );
