@@ -422,8 +422,14 @@ class EnteranceRoomServices
         $roomBlack = $room->room_black;
         if (!empty($roomBlack)) {
             $is_black = explode(',', $roomBlack);
+            info('is black');
+            info($is_black);
             foreach ($is_black as $k => &$v) {
+                info($v);
+                info($v);
                 $arr = explode("#", $v);
+                info('array');
+                info($arr);
                 $sjc = time() - $arr[1];
                 $rt = $arr[2] - $sjc;
                 $h = floor($rt / 3600);
