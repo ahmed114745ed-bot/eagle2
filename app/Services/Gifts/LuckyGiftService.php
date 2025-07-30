@@ -168,7 +168,6 @@ class LuckyGiftService
         }
 
    
-        $cashbackBefore = $user->di;
         if ($total_user_win > 0) {
             UserCoinLogHelper::logByType(
                 $userId,
