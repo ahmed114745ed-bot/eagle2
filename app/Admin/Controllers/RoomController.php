@@ -24,6 +24,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Actions\RoomPinAction;
 use App\Admin\Actions\CloseRoomAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Log;
 use Modules\LuckyBox\Entities\BoxUse;
 
 class RoomController extends MainController
@@ -985,15 +986,20 @@ class RoomController extends MainController
         }
 
         $blackList = $room->room_black;
+        Log::info('Original room_black:', ['room_black' => $blackList]);
+
         if ($blackList === null) {
             $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
+            Log::info('Blacklist was null, new blacklist:', ['blackList' => $blackList]);
         } else {
             $list = explode(',', $blackList);
+            Log::info('Exploded blacklist list:', ['list' => $list]);
             $newList = [];
 //            $exists = false;
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
+                Log::info('Blacklist item:', ['item' => $item, 'black' => $black]);
                 if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
                     $newList[] = $item;
                 }
@@ -1004,8 +1010,10 @@ class RoomController extends MainController
             }
 
             $newList = array_filter($newList);
+            Log::info('Filtered newList:', ['newList' => $newList]);
 
             $blackList= implode(',', $newList) ?: null;
+            Log::info('Imploded new blacklist:', ['blackList' => $blackList]);
 
 //            if (!$exists) {
 //                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
@@ -1014,6 +1022,7 @@ class RoomController extends MainController
 //            $blackList = implode(',', $list);
         }
 
+        Log::info('Imploded new blacklist:', ['blackList' => $blackList]);
         $room->room_black = $blackList;
         $room->save();
 
