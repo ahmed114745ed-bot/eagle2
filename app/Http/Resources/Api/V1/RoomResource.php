@@ -27,6 +27,8 @@ class RoomResource extends JsonResource
         }
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
         $have_luck_box = $this->boxUse;
+        $isHideCountry = $this?->owner?->getPackWithType(13);
+
         /**@var Room $this*/
         $data = [
             'id' => $this->id,
@@ -82,6 +84,7 @@ class RoomResource extends JsonResource
             $this->mergeWhen($this->relationLoaded('roomVisitorUsers'), [
                 'visitors_images' => $this->getVisitorsImages(),
             ]),
+            'country_hidden' => $isHideCountry,
         ];
 
         if ($request['show']) {
