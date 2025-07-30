@@ -256,6 +256,7 @@ Route::group(
         Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
         Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
         Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
+        Route::post('/rooms/{room}/unban-visitor', [RoomController::class, 'unbanVisitor']);
         Route::post('get-users', [RoomController::class, 'getUsers'])->name('get.users');
         Route::put('rooms/{room}/info', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
 
