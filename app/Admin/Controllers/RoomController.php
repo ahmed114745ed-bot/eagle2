@@ -70,16 +70,16 @@ class RoomController extends MainController
         $giftQuery = $room->gifts()
             ->with(['gift', 'sender.profile', 'receiver.profile']);
 
-        if(request('sender_id')) {
+        if (request('sender_id')) {
             $giftQuery->where('sender_id', request('sender_id'));
         }
-        if(request('receiver_id')) {
+        if (request('receiver_id')) {
             $giftQuery->where('receiver_id', request('receiver_id'));
         }
-        if(request('start_at')) {
+        if (request('start_at')) {
             $giftQuery->whereDate('created_at', '>=', request('start_at'));
         }
-        if(request('end_at')) {
+        if (request('end_at')) {
             $giftQuery->whereDate('created_at', '<=', request('end_at'));
         }
         $gifts = $giftQuery->orderByDesc('created_at')->paginate(15);
@@ -123,12 +123,12 @@ class RoomController extends MainController
         $visitorsRaw = $room->roomVisitors()
             ->with('user.profile')
             ->get()
-            ->map(function($visitor) use ($micPositions, $blackList) {
+            ->map(function ($visitor) use ($micPositions, $blackList) {
                 $visitor->mic_position = $micPositions[$visitor->user_id] ?? null;
                 $visitor->kick_info = $blackList[$visitor->user_id] ?? null;
                 return $visitor;
             })
-            ->sortBy(function($visitor) {
+            ->sortBy(function ($visitor) {
                 return $visitor->mic_position === null ? PHP_INT_MAX : $visitor->mic_position;
             });
 
@@ -254,19 +254,23 @@ class RoomController extends MainController
         $grid->header(function () use ($filterType) {
             $tabs = [
                 'all'       => __('All'),
-                'trend'     => __('Trend'),
+                // 'trend'     => __('Trend'),
                 'popular'   => __('Popular'),
-                'boss'      => __('Boss'),
-                //'friends'   => 'Friends',
-                //'following' => 'Following',
-                'recently'  => __('Recently'),
-                'interested' => __('Interested'),
-                'nearby'    => __('Nearby'),
                 'last_create' => __('New'),
                 'pk'        => __('PK'),
-                'party'     => __('Party'),
-                'festival'  => __('Festival'),
-                'top_gift'  => __('Top Gift'),
+                //  'boss'      => __('Boss'),
+                //'friends'   => 'Friends',
+                //'following' => 'Following',
+                "close_room"     => __('close room'),
+                "hide_room"      => __('hide room'),
+                'country'    => __('countries'),
+                // 'recently'  => __('Recently'),
+                // 'interested' => __('Interested'),
+                // 'nearby'    => __('Nearby'),
+
+                // 'party'     => __('Party'),
+                // 'festival'  => __('Festival'),
+                // 'top_gift'  => __('Top Gift'),
             ];
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
@@ -299,6 +303,15 @@ class RoomController extends MainController
 
             return $html;
         });
+
+
+
+
+
+
+
+
+
         $grid->model()
             ->select('*', \DB::raw("CASE room_status
                 WHEN 1 THEN 100
@@ -416,6 +429,28 @@ class RoomController extends MainController
                     ->orderByDesc('total_gift_exp');
                 break;
 
+            case 'close_room':
+                $grid->model()->whereHas('bans');
+                break;
+            case 'hide_room':
+                $grid->model()
+                    ->whereHas('owner')
+                    ->whereHas('owner.packs', function ($q) {
+                        $q->where('type', 16)
+                            ->where('is_used', 1)
+                            ->where(function ($q) {
+                                $q->where('expire', 0)
+                                    ->orWhere('expire', '>=', now()->timestamp);
+                            });
+                    });
+                break;
+            case 'country':
+                $grid->model()
+                    ->join('users', 'rooms.uid', '=', 'users.id') // assuming `owner_id` in rooms
+                    ->join('countries', 'users.country_id', '=', 'countries.id')
+                    ->orderBy('countries.id');
+                break;
+
             default:
                 $grid->model()
                     ->orderByDesc('pin')
@@ -448,13 +483,13 @@ class RoomController extends MainController
                     Country::query()->pluck('name', 'id')
                 );
 
-//                $filter->equal('room_status', __('Room Status'))->select([
-//                    1 => __('Active'),
-//                    0 => __('Inactive'),
-//                    2 => __('Closed'),
-//                    3 => __('Banned'),
-//                    4 => __('Closed'),
-//                ]);
+                //                $filter->equal('room_status', __('Room Status'))->select([
+                //                    1 => __('Active'),
+                //                    0 => __('Inactive'),
+                //                    2 => __('Closed'),
+                //                    3 => __('Banned'),
+                //                    4 => __('Closed'),
+                //                ]);
             });
         });
 
@@ -469,31 +504,27 @@ class RoomController extends MainController
         $grid->id(__('ID'));
 
         $grid->column('room_name', __('room'))->display(function ($name) {
-
             $path = @$this->room_cover;
             $id = @$this->id;
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
+            // Fallback if image doesn't exist
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
             return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <span  cursor: pointer;'>$name</span><br>
-                        <span  cursor: pointer;'>ID: $id</span>
-                        </a>
-                    </div>
-
-                </div>
-            ";
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+            <div>
+                <span style='cursor: pointer;'>$name</span><br>
+                <span style='cursor: pointer;'>ID: $id</span>
+            </div>
+        </div>
+    ";
         });
+
         $grid->column('owner.name', __('room owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $id = @$this->owner->id;
@@ -634,8 +665,8 @@ class RoomController extends MainController
 
         $permissionName = $this->permission_name;
 
-        $grid->actions(function ($action) use ($permissionName){
-//            $action->disableView();
+        $grid->actions(function ($action) use ($permissionName) {
+            //            $action->disableView();
             $pin = $action->row->pin;
             $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
@@ -1075,5 +1106,4 @@ class RoomController extends MainController
             'message' => __('Room updated successfully!')
         ]);
     }
-
 }

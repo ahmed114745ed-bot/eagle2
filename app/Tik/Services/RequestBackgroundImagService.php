@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Tik\Repositories\UserRepository;
@@ -33,12 +34,11 @@ class RequestBackgroundImagService
 
             $amountBefore =  Common::getCurrentBalance($userId);
             $logAmount = -abs($price);
-            UserCoinLogHelper::log(
-                $userId ,
-                'background_images',
-                'request_background_images',
-                $logAmount ?? 0,
-                $amountBefore ?? 0,
+            UserCoinLogHelper::logByType(
+                $userId,
+                $logAmount,
+                $amountBefore,
+                UserCoinLogType::BACKGROUND_IMAGES,
                 $request->name
             );
 

@@ -3,6 +3,8 @@
 namespace App\Tik\Services;
 
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
 use App\Models\Cp;
 use App\Models\User;
@@ -79,18 +81,17 @@ class GiftLogService
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
         try {
-           
+
             $sendPrice = (int)($totalPrice);
             $amountBefore = $user->di;
-          
-            LogUserCoinProfit::dispatch(
+
+            UserCoinLogHelper::logByType(
                 $user->id,
+                $sendPrice,
                 $amountBefore,
-                -abs($sendPrice),
-                'gift',
-                'gift_logs',
-                'gift'
-            )->onQueue('log_user_coin');
+                UserCoinLogType::GIFT,
+                $gift?->name
+            );
 
             $updateUserWhenSendGift->send($sendPrice, $user);
         } catch (NotInfMoneyException $e) {
@@ -126,12 +127,12 @@ class GiftLogService
         $cpIds = [];
         //check type of cp
         if ($cpId != null) {
-            try {
+//            try {
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
-            } catch (\Exception $e) {
-                return Common::apiResponse(0, $e->getMessage());
-            }
+//            } catch (\Exception $e) {
+//                return Common::apiResponse(0, $e->getMessage());
+//            }
         }
 
         if ($room->lastPk != null) {

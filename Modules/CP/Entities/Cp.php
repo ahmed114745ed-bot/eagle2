@@ -3,7 +3,6 @@
 namespace Modules\CP\Entities;
 
 use App\Helpers\Common;
-use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -58,19 +57,7 @@ class Cp extends Model
     protected static function booted()
     {
         static::created(function ($cp) {
-            if (($cp->user_one_id  ?? null) && ($cp->price ?? 0) > 0) {
-                $amountBefore =  Common::getCurrentBalance($cp->user_one_id);
-                $logAmount = -abs($cp->price);
-                UserCoinLogHelper::log(
-                    $cp->user_one_id ,
-                    'cp',
-                    'cps',
-                    $logAmount ?? 0,
-                    $amountBefore ?? 0,
-                    'cp'
-                );
-                
-            }
+
         });
     }
 

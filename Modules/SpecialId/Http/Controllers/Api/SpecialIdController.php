@@ -3,6 +3,7 @@
 namespace Modules\SpecialId\Http\Controllers\Api;
 
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Pack;
 use App\Models\Ware;
@@ -42,19 +43,21 @@ class SpecialIdController extends Controller
                     try {
                         $pack->expire += (now()->addDays($ware->expire)->timestamp * 86400);
                         $pack->price += $total_price;
+
+                        $amountBefore = $user->di;
+                        $logAmount = -abs($total_price);
+                        UserCoinLogHelper::logByType(
+                            $user->id ,
+                            $logAmount,
+                            $amountBefore,
+                            UserCoinLogType::PACK,
+                            $ware->name
+                        );
+
                         $user->decrement('di', $total_price);
                         $pack->save();
                         $user->save();
-                        $amountBefore =  Common::getCurrentBalance($user->id);
-                        $logAmount = -abs($total_price);
-                        UserCoinLogHelper::log(
-                            $user->id,
-                            'pack',
-                            'packs',
-                            $logAmount ?? 0,
-                            $amountBefore ?? 0,
-                            $ware->name ?? 'special_id'
-                        );
+                
                         DB::commit();
                         (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
                         return Common::apiResponse(1, 'success process');
@@ -82,17 +85,19 @@ class SpecialIdController extends Controller
             $arr['use_num']   = $ware->num;
             $arr['price']     = $total_price;
             $newPack = Pack::query()->create($arr);
-            $user->decrement('di', $total_price);
-            $amountBefore =  Common::getCurrentBalance($user->id);
+
+            $amountBefore = $user->di;
             $logAmount = -abs($total_price);
-            UserCoinLogHelper::log(
-                $user->id,
-                'pack',
-                'packs',
-                $logAmount ?? 0,
-                $amountBefore ?? 0,
-                $ware->name ?? 'special_id'
+            UserCoinLogHelper::logByType(
+                $user->id ,
+                $logAmount,
+                $amountBefore,
+                UserCoinLogType::PACK,
+                $ware->name
             );
+            $user->decrement('di', $total_price);
+         
+            
             DB::commit();
             (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
             return Common::apiResponse(1, 'success process');

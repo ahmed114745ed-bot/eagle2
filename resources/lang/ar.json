@@ -2757,6 +2757,7 @@
   "Delete close room": "حذف الغلق",
   "Edit close room": "تعديل غرفة مغلقة",
   "Show close room": "عرض غرفة مغلقة",
+  "close room":"غرفة مغلقة",
   "Create special uuid requests": "إنشاء طلبات المعرف المميز خاصة",
   "Delete special uuid requests": "حذف طلبات المعرف المميز خاصة",
   "Edit special uuid requests": "تعديل طلبات المعرف المميز خاصة",

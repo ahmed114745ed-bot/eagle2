@@ -4,11 +4,13 @@ namespace App\Services\Gifts;
 
 use App\Classes\Gifts\SendGiftService;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Enums\UserCoinLogType;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\RedisService;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
-use App\Jobs\LogUserGamesCoinProfit;
+use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\CoreWallet;
 use App\Models\Cp;
 use App\Models\Gift;
@@ -93,17 +95,14 @@ class LuckyGiftService
         $price              = $coinsForReceiver * $receiversCount;
         $total_user_win  = 0;
         $total_count_win = 0;
-
-      
-        LogUserGamesCoinProfit::dispatch(
+        \Log::info('coin log gifts',['2' => $amountBefore]);
+        UserCoinLogHelper::logByType(
             $user->id,
+            -abs($totalPrice),
             $amountBefore,
-            -abs($totalPrice)  ,
-             0,
-            'gift_logs',
-            'lucky_gift',
-            'lucky_gift'
-        )->onQueue('log_user_coin');
+            UserCoinLogType::LUCKY_GIFT,
+            $gift?->name ,
+        );
         
         
         while ($user->di >= $totalPrice && $index > 0) {
@@ -168,17 +167,18 @@ class LuckyGiftService
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
 
-   
-        $cashbackBefore = $user->di;
+        \Log::info('coin log gifts',['2' => $amountBefore - $total_user_win]);
+        \Log::info('di log gifts',['3' =>  $user->di ]);
+
         if ($total_user_win > 0) {
-            LogUserCoinProfit::dispatch(
+
+            UserCoinLogHelper::logByType(
                 $userId,
-                $cashbackBefore,
                 $total_user_win,
-                'cashback',
-                'lucky_gifts',
-                'cashback'
-            )->onQueue('log_user_coin');
+                ($amountBefore -  $total_user_win ),
+                UserCoinLogType::CASHBACK,
+                null,
+            );
         }
         
 
