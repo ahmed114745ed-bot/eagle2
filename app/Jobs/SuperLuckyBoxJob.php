@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
+use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\RoomVisitor;
 use App\Models\User;
@@ -30,6 +31,8 @@ class SuperLuckyBoxJob implements ShouldQueue
 
         $this->boxUse = BoxUse::with(['user', 'room.owner'])
             ->findOrFail($boxUseId);
+
+        LogHelper::info('this is box ', $this->boxUse);
     }
 
     public function handle(): void
@@ -94,7 +97,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                     fromDate: now(),
                     toDate: now(),
                 );
-                
+
                 // Safely update user's DI
                 User::where('id', $user->id)->lockForUpdate()->increment('di', $coins);
 
@@ -127,7 +130,7 @@ class SuperLuckyBoxJob implements ShouldQueue
         $remainingBoxCount = BoxUse::where('room_uid', $box->room_uid)->where('not_used_num', '>', 0)->count();
 
         $roomId = $box->room?->id ?? 0;
- 
+
 
         if (empty($winners)) {
             CustomNotification::closedLuckyBosWithReturnCoins($box->user, $box->unused_coins, $box->image, 1);
@@ -157,7 +160,8 @@ class SuperLuckyBoxJob implements ShouldQueue
             ],
         ];
 
-        Common::sendToZego('SendCustomCommand', $roomId, $box->room?->owner?->id ?? 0, json_encode($payload));
+        $json_encode = json_encode($payload);
+        Common::sendToZego('SendCustomCommand', $roomId, $box->room?->owner?->id ?? 0, $json_encode);
     }
 
     public function hideLuckyBoxForAllUsers(User $owner, BoxUse $box, int $remaining, $room): void
