@@ -54,7 +54,6 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('redis:get_data')
             ->everyFiveMinutes()
-            ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/redis-get-data.log'))
             ->runInBackground();
 
