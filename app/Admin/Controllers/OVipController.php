@@ -182,11 +182,7 @@ class OVipController extends MainController
      */
     protected function form()
     {
-        //        $arr = [];
-        //        $privs = VipPrivilege::all ();
-        //        foreach ($privs as $priv){
-        //            $arr[$priv->id]=$priv->name;
-        //        }
+ 
 
         $form = new Form(new OVip);
         $this->disableFormTools($form);
@@ -253,32 +249,9 @@ class OVipController extends MainController
                         $updateActive = Ware::where('type', $type_preveleg->type)->where('level', $level)->update([
                             'is_active_for_vip' => true
                         ]);
-                        // if (!$updateActive) {
-                        //     session()->flash('show_alert_vip', 'Your alert message');
-                        //     return redirect()->back();
-                        // }
 
                     }
                 }
-
-
-                // try {
-                //     $updateActive = Ware::where('type', $type_preveleg->type)->where('level', $level)->update([
-                //         'is_active_for_vip' => true
-                //     ]);
-
-                //     if ($updateActive === false) {
-                //         throw new Exception("Error occurred during update");
-                //     }
-                // } catch (Exception $e) {
-                //     // Handle the exception here
-                //     dd($e->getMessage());
-                // }
-
-
-
-
-
 
                 session()->forget('show_alert_vip');
             }

@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Helpers\Common;
-use App\Helpers\UserCoinLogHelper;
 use App\Models\UserCoinLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class LogUserGamesCoinProfit implements ShouldQueue
+class LogUserCumulativeCoinProfit implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

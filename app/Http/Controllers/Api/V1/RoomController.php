@@ -152,6 +152,7 @@ class RoomController extends Controller
             ->whereDoesntHave('picks', function ($q) use ($userId) {
                 $q->where('user_id', $userId);
             })
+            ->where('is_closed',0)
             ->get();
     }
 

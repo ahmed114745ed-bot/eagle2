@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\AllGamesResource;
 use App\Jobs\LogUserCoinProfit;
@@ -85,15 +87,16 @@ class GameController extends Controller
             abort(403, 'Invalid  request');
         }
         $amountBefore = $user->di;
+        $helperAmount = $request->currency_diff > 0 ? $request->currency_diff : 0;
 
-        LogUserCoinProfit::dispatch(
+        UserCoinLogHelper::logByType(
             $user->id,
+            $request->currency_diff,
             $amountBefore,
-            $data['coins'],
-            'coinGame',
-            'coin_game_users',
-            'coin_game'
-        )->onQueue('log_user_coin');
+            UserCoinLogType::COIN_GAME,
+            null,
+            $helperAmount
+        );
 
         $user->di += $data['coins'];
         $user->update();

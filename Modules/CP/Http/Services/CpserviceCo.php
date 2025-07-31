@@ -6,8 +6,11 @@ use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Modules\Chat\Events\Chat;
+use App\Enums\UserCoinLogType;
 use Modules\CP\Enums\CpStatus;
 use Modules\Chat\Events\OpenChat;
+use App\Helpers\UserCoinLogHelper;
+use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Modules\Chat\Entities\ChatRoom;
 use Modules\CP\Entities\CpRelation;
@@ -99,6 +102,14 @@ class CpserviceCo
             if ($user->di < $cpRelation->price) {
                 return Common::apiResponse(0, 'لا يوجد رصيد كافي من الكوينات برجاء الشحن!');
             }
+
+            $amountBefore =  $user->id;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($cpRelation->price),
+                $amountBefore,
+                UserCoinLogType::CP,
+            );
             $user->di -= $cpRelation->price;
             $user->save();
         }
@@ -165,13 +176,10 @@ class CpserviceCo
         }
         $chatMessage = ChatMessage::create($chatMessageData);
 
-        if ($user2->is_logout != 1) {
-            $tokens_notfacion[] = \DB::table('users')->where('id', $user2->id)->value('notification_id');
-            $title = $user->name;
-            $body = $message;
-            $type = $message->type ?? 'text';
-            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
-        }
+
+
+        CustomNotification::makeCp($user2, $user, $cpRelation->type);
+
 
         $message_resource = new ChatMessageResource($chatMessage);
         $room_resource =  new ChatRoomResourcePusher($chatRoom);
@@ -192,10 +200,10 @@ class CpserviceCo
 
         event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
 
-        return Common::apiResponse(1, 'تم الاضافه بنجاح');
+        return Common::apiResponse(1, 'تم إرسال الطلب');
     }
 
-    
+
     public function getRequestCp($user)
     {
         $data = $this->cpRepository->getRequestsForUser($user->id);
@@ -230,6 +238,7 @@ class CpserviceCo
         }
 
         $user = $request->user();
+        $user2 = User::find($cp->user_one_id);
         if (!$cp || ($cp->status != 0 && $cp->status != 5)) {
             return Common::apiResponse(0, 'لا يوجد cp');
         }
@@ -258,6 +267,7 @@ class CpserviceCo
 
                 $this->cpRepository->updateCpStatus($cp, 1);
             }
+            CustomNotification::cpAction($user2, $user, 1);
             $decryptedData['status'] = 1;
         } elseif ($request->status == 2) {
 
@@ -269,6 +279,7 @@ class CpserviceCo
             }
             $this->cpRepository->updateOrCreateUserRelation($cp->user_one_id, $cp->cp_relation_id);
             $decryptedData['status'] = 2;
+            CustomNotification::cpAction($user2, $user, 2);
         }
 
         $message->message = json_encode($decryptedData);

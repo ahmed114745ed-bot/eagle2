@@ -176,7 +176,21 @@ class CpService
 
     protected function assignAchievement($itemId, $expire, $userOne, $userTwo)
     {
-        $dateTimestamp = Carbon::parse($expire)->format('Y-m-d H:i:s');
+        // Handle different formats of $expire
+        if (is_numeric($expire)) {
+            // Assume it's a timestamp (seconds or milliseconds)
+            if ($expire > 9999999999) {
+                // Milliseconds -> convert to seconds
+                $expire = (int) ($expire / 1000);
+            }
+            $dateTimestamp = Carbon::createFromTimestamp($expire)->format('Y-m-d H:i:s');
+        } elseif (strtotime($expire)) {
+            // It's a valid date string
+            $dateTimestamp = Carbon::parse($expire)->format('Y-m-d H:i:s');
+        } else {
+            // Invalid date format fallback
+            throw new \InvalidArgumentException("Invalid expire value: $expire");
+        }
 
         $attributes = [
             'custom_image' => $itemId,

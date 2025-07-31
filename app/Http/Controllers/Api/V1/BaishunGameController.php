@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
+use App\Helpers\UserCoinLogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Jobs\LogUserGamesCoinProfit;
+use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\Room;
 use DB;
 use App\Models\User;
@@ -75,15 +77,15 @@ class BaishunGameController extends Controller
 
                 $helperAmount = $request->currency_diff > 0 ? $request->currency_diff : 0;
              
-                LogUserGamesCoinProfit::dispatch(
+                UserCoinLogHelper::logByType(
                     $user->id,
+                    $request->currency_diff,
                     $amountBefore,
-                    $request->currency_diff  ,
-                    $helperAmount,
-                    'coinGame',
-                    'coin_game_users',
-                    'coin_game'
-                )->onQueue('log_user_coin');
+                    UserCoinLogType::COIN_GAME,
+                    null,
+                    $helperAmount
+                );
+              
 
                 DB::table('users')->where('id', $id)->update([
                     'di' => DB::raw('di + ' . (int) $request->currency_diff)

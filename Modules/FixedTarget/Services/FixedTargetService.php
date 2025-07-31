@@ -165,7 +165,7 @@ class FixedTargetService
         $db_usd         = Common::getTargetUsd($target->diamonds, $target->db_percentage);
 
         $next_target = Target::where('diamonds', '>', $month_received)->orderBy('diamonds')->first();
-   
+
         // logger('agency_usd Achieved:', [$agency_usd]);
         // logger('percentageAchieved Achieved:', [$percentageAchieved]);
         // logger(' Achieved:', [$agency_usd * $percentageAchieved]);
@@ -217,7 +217,7 @@ class FixedTargetService
             'achieved_hours' =>   $hours ?? 0,
             'achieved_days' =>  $days ?? 0,
             'achieved_diamond' =>  $month_received ?? 0,
-            
+
         ];
         if (0 < $t) $values['sallary'] = $t;
 
@@ -241,7 +241,7 @@ class FixedTargetService
                 'target_id' =>  @$target->id,
                 ...$values
             ])->lock();
-   
+
         }
 
 
@@ -258,7 +258,7 @@ class FixedTargetService
         // \Log::info('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
-            
+
             // \Log::info('$target',['$target'=>$target]);
             // \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
@@ -318,11 +318,11 @@ class FixedTargetService
                         'month' => $this->month,
                         'year' => $this->year,
                         'user_agency_id' => $user->agency_id,
+                        'is_finished' => 0
                     ],
                     [
                         'agency_sallary' => 0,
                         'sallary' => 0,
-                        'is_finished' =>  1,
                         'achieved_hours' =>   $hours,
                         'achieved_days' =>  $days,
                         'achieved_diamond' =>  $month_received,

@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Enums\UserCoinLogType;
 use Exception;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
@@ -45,16 +46,8 @@ class MallService
 
         $totalPrice = $ware->price * $quantity;
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
-        $amountBefore =  Common::getCurrentBalance($user->id);
-        $logAmount = -abs($totalPrice);
-        UserCoinLogHelper::log(
-            $user->id,
-            'pack',
-            'packs',
-            $logAmount ?? 0,
-            $amountBefore ?? 0,
-            $ware->name
-        );
+       
+
         if ($pack) {
 
             return  $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
@@ -77,6 +70,15 @@ class MallService
                 ];
                 $this->packRepository->create($data);
 
+                $logAmount = -abs($totalPrice);
+                $amountBefore =  $user->di;
+                UserCoinLogHelper::logByType(
+                    $user->id,
+                    $logAmount,
+                    $amountBefore,
+                    UserCoinLogType::PACK,
+                    $ware->name
+                );
 
                 $this->service($user, $ware->exp, $totalPrice, 'buy');
                 return Common::apiResponse(1, 'success process');
@@ -118,16 +120,17 @@ class MallService
                 'price'     => $totalPrice,
             ];
             $this->packRepository->create($data);
-            $amountBefore =  Common::getCurrentBalance($auth->id);
+
             $logAmount = -abs($totalPrice);
-            UserCoinLogHelper::log(
+            $amountBefore =  $auth->di;
+            UserCoinLogHelper::logByType(
                 $auth->id,
-                'pack',
-                'packs',
-                $logAmount ?? 0,
-                $amountBefore ?? 0,
+                $logAmount,
+                $amountBefore,
+                UserCoinLogType::PACK,
                 $ware->name
             );
+            
             $this->service($auth, $ware->exp, $totalPrice, 'send');
 
             DB::commit();

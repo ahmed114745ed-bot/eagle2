@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Modules\CP\Entities\Cp;
 use Modules\CP\Entities\CpLevel;
 
-class CpListResource extends JsonResource
+class CpDataResource extends JsonResource
 {
     public function toArray($request)
     {
-        $loginUserId = request('user_id') ?? Auth::id();
+        $loginUserId = request('id') ?? Auth::id();
         if ($this->user_one_id == $loginUserId) {
             $user = $this->toUser;
         } else {

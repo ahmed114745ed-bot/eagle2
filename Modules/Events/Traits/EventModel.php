@@ -13,13 +13,13 @@ trait EventModel
     {
         $date = self::convertArabicNumbers($value);
         $timezone = getTimezone();
-        return Carbon::parse($date)->timezone($timezone)->copy()->toDateTimeString();
+        return \Carbon\Carbon::parse($date, $timezone)->timezone('UTC')->toDateTimeString();
     }
     public function getEndDateAttribute($value)
     {
         $timezone = getTimezone();
 
-        return Carbon::parse($value)->timezone($timezone)->copy()->toDateTimeString();
+        return \Carbon\Carbon::parse($value, $timezone)->timezone('UTC')->toDateTimeString();
     }
 
     public function scopePreviousNewEvent(Builder $query)

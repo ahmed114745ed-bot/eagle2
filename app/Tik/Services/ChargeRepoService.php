@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use Exception;
 use App\Models\User;
@@ -299,15 +300,14 @@ class ChargeRepoService
 
             );
         }
-        $amountBefore =  Common::getCurrentBalance($receiver->id);
-        UserCoinLogHelper::log(
-            $receiver->id ,
-            'charge',
-            'charge_to_user',
-            $amount ?? 0,
-            $amountBefore ?? 0,
-            $chargeType
+        $amountBefore =  $receiver->di;
+        UserCoinLogHelper::logByType(
+            $receiver->id,
+            $amount,
+            $amountBefore,
+            UserCoinLogType::APP_CHARGE,
         );
+    
         // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
@@ -332,16 +332,6 @@ class ChargeRepoService
     public function chargeAgencyNew(User $sender, ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
         $type = $receiver->owner?->user_type ?? '';
-
-        $amountBefore =  Common::getCurrentBalance($receiver->id);
-        UserCoinLogHelper::log(
-            $receiver->id ,
-            'charge',
-            'charge_to_agency',
-            $amount ?? 0,
-            $amountBefore ?? 0,
-            $chargeType
-        );
 
         $receiver->increment('coins', $amount);
 
@@ -372,15 +362,7 @@ class ChargeRepoService
 
     public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-        $amountBefore =  Common::getCurrentBalance($receiver->id);
-        UserCoinLogHelper::log(
-            $receiver->id ,
-            'charge',
-            'charge_dollar_for_owner_to_agency',
-            $amount ?? 0,
-            $amountBefore ?? 0,
-            $chargeType
-        );
+   
 
         $receiver->increment('coins', $amount);
 
@@ -552,15 +534,7 @@ class ChargeRepoService
             throw new Exception(__('balance not enough'));
         }
 
-        $amountBefore =  Common::getCurrentBalance($chargeAgency->id);
-        UserCoinLogHelper::log(
-            $chargeAgency->id,
-            'charge',
-            'agency_to_agency',
-            $amount ?? 0,
-            $amountBefore ?? 0,
-            'agency'
-        );
+   
 
         $authAgency->decrement('coins', $amount);
         $chargeAgency->increment('coins', $amount);
@@ -585,14 +559,12 @@ class ChargeRepoService
         if ($authAgency->coins < $amount) {
             throw new Exception(__('balance not enough'));
         }
-        $amountBefore =  Common::getCurrentBalance($receiver->id);
-        UserCoinLogHelper::log(
+        $amountBefore =  $receiver->di;
+        UserCoinLogHelper::logByType(
             $receiver->id,
-            'charge',
-            'agency_to_user',
-            $amount ?? 0,
-            $amountBefore ?? 0,
-            'agency'
+            $amount,
+            $amountBefore,
+            UserCoinLogType::APP_CHARGE,
         );
 
         $authAgency->decrement('coins', $amount);
