@@ -184,8 +184,9 @@ class MicService
                     'user_id' => $user->id,
                     'user_other_id' => $userOtherId,
                 ]);
-                $this->handleCpRoomHistory($user, $room, $position, $antherUserPosition, $userOtherId);
+                $this->handleCpRoomHistory($user, $room, $position, $neighborPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
+    
                 return true;
             }
         }
