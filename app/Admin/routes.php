@@ -86,6 +86,7 @@ use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
+use App\Admin\Controllers\UserChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -162,7 +163,8 @@ Route::group(
     function () {
         Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
 
-         Route::resource('reset-salary', ResetUserSalaryController::class);
+        Route::resource('reset-salary', ResetUserSalaryController::class);
+        Route::get('user-charge-history/{User_id}', [UserChargeHistoryController::class, 'indexCharge']);
         Route::post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
         Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
@@ -228,7 +230,7 @@ Route::group(
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
 
-       Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
+        Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
         Route::post('/edit-level', [UsersAppController::class, 'editLevelUser']);
         Route::post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);
