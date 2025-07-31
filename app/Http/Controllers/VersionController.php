@@ -44,7 +44,7 @@ class VersionController extends Controller
         $isFrameUpdated = $this->isUpdated('frame_updated_at', @$request->frame_time);
         $isEmojiUpdated = $this->isUpdated('emoji_updated_at', @$request->emoji_time);
         $isExtraUpdated = $this->isUpdated('extra_updated_at', @$request->extra_time);
-        $agencyBadges =$this->isUpdated('badges_agency_update_at', @$request->badges_agency_time);
+        $agencyBadges = $this->isUpdated('badges_agency_update_at', @$request->badges_agency_time);
         $wapple = $this->isUpdated('wappel_frame_updated_at', @$request->wabbles_frame_time);
         $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
@@ -52,9 +52,10 @@ class VersionController extends Controller
 
         $data = [
             'is_auth'         => $isAuth && !$isBan,
-            'is_last_version' => $currentVersion <= (int)$version ,
+            'is_last_version' => $currentVersion <= (int)$version,
             'is_force'        => $this->isForce($version, $request->OS),
             'is_show_shipping_agencies' => true,
+            'images' => false,
             'badges-agency' =>  $agencyBadges,
             'cache_update' => [
                 'gifts'  => $isGiftUpdated,
