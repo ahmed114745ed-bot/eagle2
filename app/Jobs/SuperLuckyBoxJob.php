@@ -45,9 +45,6 @@ class SuperLuckyBoxJob implements ShouldQueue
         }
 
         $pickerIds = PickBoxList::where('box_user_id', $box->id)->pluck('user_id')->toArray();
-        if (empty($pickerIds)) {
-            return;
-        }
 
         $users = User::whereIn('id', $pickerIds)->inRandomOrder()->take(100)->get();
         $giftService = new LuckyBoxServices();
@@ -108,7 +105,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                 }
             }
 
-            $amountBefore = $user->di;
+            $amountBefore = $box->user?->di;
             UserCoinLogHelper::logByType(
                  $box?->user?->id,
                  $box->unused_coins,
@@ -135,7 +132,9 @@ class SuperLuckyBoxJob implements ShouldQueue
 
 
         $js[] = $this->hideLuckyBoxForAllUsers( $box->user, $box, $remainingBoxCount);
-        $js[] = $this->sendWinnerMap($box, $winners);
+        if ($winners) {
+            $js[] = $this->sendWinnerMap($box, $winners);
+        }
 
         $promises = Common::sendToZego3('SendCustomCommand', $roomId, $box->user?->id, $js);
 
