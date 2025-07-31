@@ -147,6 +147,8 @@ class HomeService
         $packQuery = Pack::where('user_id', $user->id)
             ->where('type', $privilegeId);
 
+        if(!$isAvailable) $packQuery->where('is_used', true);
+
         if (!$packQuery->exists()) {
             throw new Exception(__('api.notWare'));
         }

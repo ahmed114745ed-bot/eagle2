@@ -162,9 +162,10 @@ class MicService
             if ($existingCp) {
                 $this->handleCpRoomHistory($user, $room, $position, $antherUserPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
+                return true;
             }
         }
-        // $this->sendCpLovelyMessage($room, $user);
+        $this->sendCpLovelyMessage($room, $user);
 
         return true;
     }

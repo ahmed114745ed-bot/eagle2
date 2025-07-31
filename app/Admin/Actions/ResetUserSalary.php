@@ -44,12 +44,7 @@ class ResetUserSalary extends RowAction
             return $this->response()->error(__('no salary record'));
         }
 
-        // Calculate new salary value to reset total to zero
-        $adjustedSallary = ($lastSalary->sallary - $lastSalary->cut_amount) - $totalSalary;
-
-        // Update only the sallary field (or cut_amount if you prefer)
-        $lastSalary->sallary = $adjustedSallary + $lastSalary->cut_amount;
-         
+        $lastSalary->cut_amount += $totalSalary;
         $lastSalary->save();
 
         return $this->response()->success(__('dashboard.successful'))->refresh();

@@ -93,14 +93,14 @@ class LevelGiftController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
-                return @$this->ware->name;
-            } elseif ($this->type == "vip") {
-                return @$this->vip->name;
-            } elseif ($this->type == "coins") {
-                return @$this->item_id;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->item_id;
+            if ($this?->type == "ware") {
+                return @$this?->ware?->name;
+            } elseif ($this?->type == "vip") {
+                return @$this?->vip?->name;
+            } elseif ($this?->type == "coins") {
+                return @$this?->item_id;
+            } elseif ($this?->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this?->item_id;
                 return "<img src='$value' width='80' height='80'>";
             }
         });
@@ -202,11 +202,11 @@ class LevelGiftController extends MainController
             if ($form->type == 'ware') {
                 $ware = Ware::find($form->item_id);
                 if ($ware) {
-                    if ($ware->type == 4) {
+                    if ($ware?->type == 4) {
                         $form->sub_type = 'bubble';
-                    } elseif ($ware->type == 5) {
+                    } elseif ($ware?->type == 5) {
                         $form->sub_type = 'intro';
-                    } elseif ($ware->type == 6) {
+                    } elseif ($ware?->type == 6) {
                         $form->sub_type = 'frame';
                     }
                 }
