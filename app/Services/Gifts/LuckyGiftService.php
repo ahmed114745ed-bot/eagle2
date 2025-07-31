@@ -103,8 +103,8 @@ class LuckyGiftService
             UserCoinLogType::LUCKY_GIFT,
             $gift?->name ,
         );
-        
-        
+
+
         while ($user->di >= $totalPrice && $index > 0) {
 
             $appWallet->coins   += $price * 8;
@@ -157,7 +157,7 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
-          
+
             $user->di -= $totalPrice;
             $index--;
             $message = null;
@@ -167,7 +167,7 @@ class LuckyGiftService
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
 
-   
+
 
         if ($total_user_win > 0) {
 
@@ -179,7 +179,7 @@ class LuckyGiftService
                 null,
             );
         }
-        
+
 
         if ($index > 0) {
             $count -= $index;
