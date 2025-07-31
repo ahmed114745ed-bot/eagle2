@@ -2,155 +2,194 @@
 
 namespace App\Jobs;
 
-use Carbon\Carbon;
-use App\Models\Room;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Models\RoomVisitor;
-
-use App\Facades\RedisService;
-use Illuminate\Bus\Queueable;
+use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
-use Illuminate\Support\Facades\Log;
-use Modules\LuckyBox\Entities\BoxUse;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Modules\LuckyBox\Entities\PickBoxList;
-use Modules\LuckyBox\Entities\UserBoxGift;
+use App\Helpers\Common;
+use App\Helpers\LogHelper;
+use App\Helpers\UserCoinLogHelper;
+use App\Models\RoomVisitor;
+use App\Models\User;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Promise\Utils;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
+use Modules\LuckyBox\Entities\BoxUse;
+use Modules\LuckyBox\Entities\PickBoxList;
+use Modules\LuckyBox\Entities\UserBoxGift;
 use Modules\LuckyBox\Services\LuckyBoxServices;
 
 class SuperLuckyBoxJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
+    private ?BoxUse $boxUse = null;
+
+    public function __construct(?int $boxUseId = null)
     {
-        //
+
+        $this->boxUse = BoxUse::with(['user', 'room.owner'])
+            ->findOrFail($boxUseId);
+
+        LogHelper::info('this is box ', $this->boxUse);
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(): void
     {
-        info('im in the job');
-        $timezone = Common::timeZone();
-        $timestamp = Carbon::now($timezone)->timestamp;
+        $box = $this->boxUse;
+        if (! $box) {
+            return;
+        }
 
-        $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
+        $pickerIds = PickBoxList::where('box_user_id', $box->id)->pluck('user_id')->toArray();
+        if (empty($pickerIds)) {
+            return;
+        }
 
-        if (!$userBoxes)  return;
-        Log::info("boxUser");
-        foreach ($userBoxes as $userBox) {
-            Log::info("Processing Box ID: " . $userBox->id);
-            $keyBoxUse  = 'BoxUse_' . $userBox->id;
-            $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
-            if ($pickerBoxIds) {
-                info('there are picked boxes');
-                $users =  User::whereIn('id', $pickerBoxIds)->inRandomOrder()->get();
-                foreach ($users as $user) {
-                    Log::info("user " . $user->id);
-                    $userInRoom =     RoomVisitor::where('user_id', $user->id)->exists();
-                    if ($userInRoom) {
-                        info('there are users in the room');
-                        if ($userBox->users_num != $userBox->used_num) {
-                            if (($userBox->not_used_num == 1)) {
-                                $userBox->not_used_num = 0;
-                                $fin = 1;
-                            } else {
-                                $fin = 0;
-                                $userBox->not_used_num -= 1;
-                            }
+        $users = User::whereIn('id', $pickerIds)->inRandomOrder()->take(100)->get();
+        $giftService = new LuckyBoxServices();
 
-                            $giftService = new LuckyBoxServices();
-                            $coins = $giftService->getCoins($fin, $userBox->unused_coins, $userBox->not_used_num);
+        DB::transaction(function () use ($box, $users, $giftService) {
+            foreach ($users as $user) {
+                if ($box->users_num <= $box->used_num) {
+                    break;
+                }
 
-                            //            put user in redis
-                            $data = [
-                                'box_uses_id' => $userBox->id,
-                                'user_id' => $user->id,
-                                'coins' => $coins,
-                                'room_uid' => $userBox->room_uid,
-                                'room_id' => $userBox->room_id,
-                                'type' => $userBox->type,
-                                'box_uses_owner_id' => $userBox->user_id,
-                                'image' => $userBox->image,
-                                'label' => $userBox->label
-                            ];
+                // Skip if not in room
+                if (! RoomVisitor::where('user_id', $user->id)->exists()) {
+                    continue;
+                }
 
-                            if (!UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => $userBox->id])->exists()) {
-                                Log::info("test111111111111 ");
-                                UserBoxGift::query()->create($data);
+                // Skip if already gifted
+                if (UserBoxGift::where('user_id', $user->id)->where('box_uses_id', $box->id)->exists()) {
+                    continue;
+                }
 
-                                $userBox->used_coins += $coins;
-                                $userBox->used_num += 1;
-                                $userBox->unused_coins -= $coins;
-                                $userBox->save();
-                                //update box use in redis
-                                // RedisService::updateUnSerialize($keyBoxUse, $userBox);
-                                dispatch(new OpenBoxJob($userBox->id, $user->id, $user->name))->onQueue('luckyBox');
+                $final = $box->not_used_num === 1;
+                $box->not_used_num = max(0, $box->not_used_num - 1);
+                $coins = $giftService->getCoins($final ? 1 : 0, $box->unused_coins, $box->not_used_num);
 
-                                $user->increment('di', $coins);
-                                if ($coins > 0) {
-                                    CustomNotification::luckyBox($user, $coins, $userBox?->image);
-                                }
-                            }
-                        }
-                    }
+                UserBoxGift::create([
+                    'box_uses_id' => $box->id,
+                    'user_id' => $user->id,
+                    'coins' => $coins,
+                    'room_uid' => $box->room_uid,
+                    'room_id' => $box->room_id,
+                    'type' => $box->type,
+                    'box_uses_owner_id' => $box->user_id,
+                    'image' => $box->image,
+                    'label' => $box->label,
+                ]);
+
+                $box->used_num += 1;
+                $box->used_coins += $coins;
+                $box->unused_coins = max(0, $box->unused_coins - $coins);
+
+                $amountBefore = $user->di;
+                UserCoinLogHelper::logByType(
+                    userId: $user->id,
+                    amount: $coins,
+                    amountBefore: $amountBefore,
+                    type: UserCoinLogType::LUCK_BOX,
+                    itemNameOverride: null,
+                    helperAmount: 0,
+                    fromDate: now(),
+                    toDate: now(),
+                );
+
+                // Safely update user's DI
+                User::where('id', $user->id)->lockForUpdate()->increment('di', $coins);
+
+                if ($coins > 0) {
+                    CustomNotification::luckyBox($user, $coins, $box->image);
                 }
             }
-            $owner = User::where('id', $userBox->user_id)->first();
-            $owner->increment('di', $userBox->unused_coins);
-            $userBox->is_closed = true;
-            $userBox->save();
-            $winners = UserBoxGift::where(['box_uses_id' => $userBox->id])->where('coins', '>', 0)->select('user_id', 'coins')->get()->toArray();
-            $room    = Room::withoutAppends()->where('uid', $userBox->room_uid)->first();
-            $c     = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
-            info('boxes ids: ' . json_encode($pickerBoxIds));
-            $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $pickerBoxIds)->whereHas('user')->pluck('user_id')->toArray();
-            info('picked users inside the room : ' . json_encode($usersRoomVisit));
-            if (empty($winners)) {
-                CustomNotification::closedLuckyBosWithReturnCoins($owner, $userBox->unused_coins, $userBox?->image, 1);
-            } else {
-                CustomNotification::closeLuckyBox($owner, $userBox?->image, 1);
-            }
-            foreach ($usersRoomVisit as $userRoomVisit) {
 
-                $m     = [
-                    "messageContent" => [
-                        "message"      => "hideluckybox",
-                        "ownerBoxId"   => @$owner->id,
-                        "ownerBoxName" => @$owner->name,
-                        "boxCoins"     => $userBox->coins,
-                        "boxId"        => $userBox->id,
-                        "boxType"      => $userBox->type == 1 ? 'super' : 'normal',
-                        "numOfBoxes"   => $c
-                    ]
-                ];
-                $json  = json_encode($m);
-                Common::sendToZego('SendCustomCommand', @$room->id, @$userRoomVisit->user_id, $json);
-            }
-            if ($room && $room->owner) {
-                $m     = [
-                    "messageContent" => [
-                        "message"      => "winnerLuckyBox",
+            $amountBefore = $user->di;
+            UserCoinLogHelper::logByType(
+                 $box?->user?->id,
+                 $box->unused_coins,
+                 $amountBefore,
+                UserCoinLogType::LUCK_BOX,
+                 null,
+                 0,
+                 now(),
+                now(),
+            );
+            // Refund remaining coins to box owner
+            User::where('id', $box->user_id)->lockForUpdate()->increment('di', $box->unused_coins);
 
-                        "boxUId" => $userBox->id,
-                        "ownerId" =>  @$room->owner->id,
-                        "ownerName" => @$room->owner->name ?? '',
-                        "ownerImage" => @$room->owner->profile->avatar ?? '',
-                        "ownerUuId" => @$room->owner->uuid,
-                        "winners"     => $winners,
-                    ]
-                ];
-                $json  = json_encode($m);
-                Common::sendToZego('SendCustomCommand', @$room->id, @$room->owner->id, $json);
-            }
+            $box->is_closed = true;
+            $box->save();
+        });
+
+        $winners = UserBoxGift::where('box_uses_id', $box->id)->where('coins', '>', 0)
+            ->select('user_id', 'coins')->get()->toArray();
+
+        $remainingBoxCount = BoxUse::where('room_uid', $box->room_uid)->where('not_used_num', '>', 0)->count();
+
+        $roomId = $box->room?->id ?? 0;
+
+
+        $js[] = $this->hideLuckyBoxForAllUsers( $box->user, $box, $remainingBoxCount);
+        $js[] = $this->sendWinnerMap($box, $winners);
+
+        $promises = Common::sendToZego3('SendCustomCommand', $roomId, $box->user?->id, $js);
+
+        if (empty($winners)) {
+            CustomNotification::closedLuckyBosWithReturnCoins($box->user, $box->unused_coins, $box->image, 1);
+        } else {
+            CustomNotification::closeLuckyBox($box->user, $box->image, 1);
         }
+
+        try {
+            Utils::unwrap($promises);
+        } catch (BadResponseException $e) {
+        }
+
+
+    }
+
+    public function sendWinnerMap(BoxUse $box, array $winners): string|bool
+    {
+        if (! $box || ! $box->user) {
+            return false;
+        }
+
+        $payload = [
+            'messageContent' => [
+                'message' => 'winnerLuckyBox',
+                'boxUId' => $box->id,
+                'ownerId' => $box->user->id,
+                'ownerName' => $box->user->name ?? '',
+                'ownerImage' => $box->user->profile->avatar ?? '',
+                'ownerUuId' => $box->user->uuid,
+                'winners' => $winners,
+            ],
+        ];
+
+        return json_encode($payload);
+
+    }
+
+    public function hideLuckyBoxForAllUsers(User $owner, BoxUse $box, int $remaining): string|bool
+    {
+        $payload = [
+            'messageContent' => [
+                'message' => 'hideluckybox',
+                'ownerBoxId' => $owner->id,
+                'ownerBoxName' => $owner->name,
+                'boxCoins' => $box->coins,
+                'boxId' => $box->id,
+                'boxType' => $box->type === 1 ? 'super' : 'normal',
+                'numOfBoxes' => $remaining,
+            ],
+        ];
+
+        return json_encode($payload);
+
     }
 }

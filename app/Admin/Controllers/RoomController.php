@@ -24,6 +24,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Actions\RoomPinAction;
 use App\Admin\Actions\CloseRoomAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Log;
 use Modules\LuckyBox\Entities\BoxUse;
 
 class RoomController extends MainController
@@ -985,25 +986,23 @@ class RoomController extends MainController
         }
 
         $blackList = $room->room_black;
-        if ($blackList === null) {
+
+        if (empty($blackList)) {
             $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
         } else {
             $list = explode(',', $blackList);
-            $exists = false;
+            $newList = [];
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
-                if ($black[0] == $visitorId) {
-                    $item = $visitorId . '#' . time() . '#' . ($duration * 60);
-                    $exists = true;
+                if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
+                    $newList[] = $item;
                 }
             }
 
-            if (!$exists) {
-                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
-            }
+            $newList = array_filter($newList);
 
-            $blackList = implode(',', $list);
+            $blackList= implode(',', $newList) ?: null;
         }
 
         $room->room_black = $blackList;
@@ -1032,7 +1031,7 @@ class RoomController extends MainController
 
         $d = [
             "messageContent" => [
-                "message" => "kickout",
+                "message" => "kickVisitorOut",
                 'duration' => $duration,
                 "visitorId" => $visitorId,
                 "comment" => $message
@@ -1052,7 +1051,6 @@ class RoomController extends MainController
 
     public function unbanVisitor(Request $request, $roomId): JsonResponse
     {
-        info('im here');
         $room = Room::findOrFail($roomId);
         $visitorId = $request->user_id;
 

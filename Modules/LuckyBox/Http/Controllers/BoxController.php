@@ -2,6 +2,8 @@
 
 namespace Modules\LuckyBox\Http\Controllers;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
 
 use App\Models\Room;
@@ -43,8 +45,7 @@ class BoxController extends Controller
     public function send(Request $request)
     {
         $user = $request->user();
-        $timezone = Common::timeZone();
-        $timestamp = Carbon::now($timezone)->timestamp;
+        $timestamp = Carbon::now()->timestamp;
 
 
         if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
@@ -63,14 +64,12 @@ class BoxController extends Controller
             $label = $request->label;
         }
 
-        return $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
+        return $this->boxService->sendBox($request, $user, $box, $room, $label);
     }
 
     public function sendTest(Request $request, $user)
     {
-        $timezone = Common::timeZone();
-        $timestamp = Carbon::now($timezone)->timestamp;
-
+        $timestamp = Carbon::now()->timestamp;
 
         if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
         $room = Room::query()->where('uid', $request->room_uid)->first();
@@ -88,7 +87,7 @@ class BoxController extends Controller
             $label = $request->label;
         }
 
-        return $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
+        return $this->boxService->sendBox($request, $user, $box, $room, $label);
     }
     public function testSendSuperBoxes(Request $request)
     {
@@ -169,8 +168,7 @@ class BoxController extends Controller
     {
         $user = $request->user();
         $userId = $user->id;
-        $timezone = Common::timeZone();
-        $timestamp = Carbon::now($timezone)->timestamp;
+        $timestamp = Carbon::now()->timestamp;
 
         if (!$request->bid) return Common::apiResponse(0, 'missing params', null, 422);
 
@@ -238,7 +236,13 @@ class BoxController extends Controller
 
             // RedisService::updateUnSerialize($keyBoxUse, $box_use);
             dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
-
+            $amountBefore = $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id ,
+                $coins,
+                $amountBefore,
+                UserCoinLogType::LUCK_BOX,
+            );
             $user->increment('di', $coins);
             $countWinners =  UserBoxGift::query()->where('box_uses_id', $request->bid)->count();
             if ($countWinners == $box_use['users_num']) {

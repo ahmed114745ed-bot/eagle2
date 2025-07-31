@@ -1,6 +1,5 @@
 <?php
 
-use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -80,12 +79,14 @@ use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\ReportFromUsersController;
+use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
+use App\Admin\Controllers\UserChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -101,6 +102,7 @@ use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 
 Route::group(
     [
@@ -161,7 +163,8 @@ Route::group(
     function () {
         Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
 
-
+        Route::resource('reset-salary', ResetUserSalaryController::class);
+        Route::get('user-charge-history/{User_id}', [UserChargeHistoryController::class, 'indexCharge']);
         Route::post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
         Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
@@ -227,7 +230,7 @@ Route::group(
         ]);
         Route::get('users/{id}/same-device-users-table', [UsersAppController::class, 'ajaxSameDeviceUsersTable']);
 
-       Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
+        Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
         Route::post('/edit-level', [UsersAppController::class, 'editLevelUser']);
         Route::post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);

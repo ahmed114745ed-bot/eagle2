@@ -24,21 +24,21 @@ class BoxService
     /**
      * @throws \Throwable
      */
-    public function sendBox($request, $user, $box, $room, $timezone, $label)
+    public function sendBox($request, $user, $box, $room, $label)
     {
         $boxCoin = $box->type == 0 ?  $box->coins : $this->calculationSendBox($box);
 
         DB::beginTransaction();
         if ($box->type == 0) {
-            $boxU = $this->sendNormalBox($box, $request, $boxCoin, $label, $room, $user->id, $timezone);
+            $boxU = $this->sendNormalBox($box, $request, $boxCoin, $label, $room, $user->id);
         } else {
-            $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone);
+            $boxU = $this->sendSuperBox($box, $request,  $boxCoin, $label, $room, $user);
         }
-        
+
         $amountBefore = $user->di;
         UserCoinLogHelper::logByType(
             $user->id ,
-            $box->coins,
+            -abs($box->coins),
             $amountBefore,
             UserCoinLogType::LUCK_BOX,
         );
@@ -50,7 +50,7 @@ class BoxService
                 Carbon::createFromTimestamp($boxU->end_at)
             );
             $type = $box->type == 1 ? 'super' : 'normal';
-            $coins = $boxCoin;
+            $coins = $box->coins;
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
@@ -71,9 +71,9 @@ class BoxService
             $json = json_encode($m);
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-        
 
-            
+
+
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -82,15 +82,15 @@ class BoxService
         }
     }
 
-    public function sendNormalBox($box, $request, $boxCoin, $label, $room, $userId, $timezone)
+    public function sendNormalBox($box, $request, $boxCoin, $label, $room, $userId)
     {
         $normalDuration = Common::getConf('normal_box_duration') ?? 1;
         $box_use_data = [
             'box_id' => $box->id,
             'user_id' => $userId,
-            'coins' => $boxCoin,
-            'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
-            'end_at' => now()->setTimezone($timezone ?? 'UTC')->addHours($normalDuration)->timestamp,
+            'coins' => $box->coins,
+            'start_at' => now()->timestamp,
+            'end_at' => now()->addHours($normalDuration)->timestamp,
             'room_uid' => $room->uid,
             'room_id' => $room->id,
             'users_num' =>  $request->users_num,
@@ -113,14 +113,14 @@ class BoxService
         return $boxUser;
     }
 
-    public function sendSuperBox($box, $request,  $boxCoin, $label, $room, $user, $timezone)
+    public function sendSuperBox($box, $request,  $boxCoin, $label, $room, $user)
     {
         $box_use_data = [
             'box_id' => $box->id,
             'user_id' => $user->id,
-            'coins' => $boxCoin,
-            'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
-            'end_at' => now()->setTimezone($timezone ?? 'UTC')->addMinutes($box->duration)->timestamp,
+            'coins' => $box->coins,
+            'start_at' => now()->timestamp,
+            'end_at' => now()->addMinutes($box->duration)->timestamp,
             'room_uid' => $room->uid,
             'room_id' => $room->id,
             'users_num' =>  $box->users,
@@ -133,14 +133,14 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-        info('box duration' . $box->duration);
-        dispatch(new SuperLuckyBoxJob())->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
-        info('afterJob');
 
         //        dispatch(new SuperLuckyBoxJob())->delay(now()->seconds(30))->onQueue('');
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
+
+        dispatch(new SuperLuckyBoxJob($boxUser->id))->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
+
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
         if (!$user instanceof User) return;
