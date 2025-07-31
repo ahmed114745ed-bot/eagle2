@@ -232,18 +232,22 @@ class MicService
     }
     public function getUserNearby($index, $mode, $rowSize = 4)
     {
-
-        if ($index % $rowSize == 0) {
-            return [$index + 1];
-        } elseif (($index + 1) % $rowSize == 0) {
-            return [$index - 1];
-        } else {
-            /*if ($mode == 0 && ($index + 1) % $rowSize == 0) {
-                return [$index + 1];
-            }*/
-            return [$index - 1, $index + 1];
+        $neighbors = [];
+    
+        $rowStart = intdiv($index, $rowSize) * $rowSize;
+        $rowEnd = $rowStart + $rowSize - 1;
+    
+        if ($index - 1 >= $rowStart) {
+            $neighbors[] = $index - 1;
         }
+    
+        if ($index + 1 <= $rowEnd) {
+            $neighbors[] = $index + 1;
+        }
+    
+        return $neighbors;
     }
+    
     public function goMic($data)
     {
         $user = $this->userRepository->findById($data->user_id);
