@@ -318,6 +318,7 @@ class FixedTargetService
                         'month' => $this->month,
                         'year' => $this->year,
                         'user_agency_id' => $user->agency_id,
+                        'is_finished' => 0
                     ],
                     [
                         'agency_sallary' => 0,
