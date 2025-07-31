@@ -145,28 +145,26 @@ class MicService
         if ($room->mode == 0 && $position == 0) {
             return true;
         }
+        $userSeats = $this->getUserNearby($position, mode: $room->mode);
 
-        if ($room->mode == 0) {
-            $userSeats = $this->getUserNearby($position - 1, mode: $room->mode);
-            $userSeats = array_map(fn($item) => $item + 1, $userSeats);
-        } else {
+        $micSeats = explode(',', $room->microphone);
 
-            $userSeats = $this->getUserNearby($position, mode: $room->mode);
-        }
-
-        foreach ($userSeats as $antherUserPosition) {
-            $newMic = explode(',', $room->microphone);
-            $userOtherId = $newMic[$antherUserPosition];
-
+        foreach ($userSeats as $nearbyPosition) {
+            $userOtherId = $micSeats[$nearbyPosition] ?? null;
+    
+            if (!$userOtherId || $userOtherId == 0 || $userOtherId == $user->id) {
+                continue;
+            }
+    
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
-                $this->handleCpRoomHistory($user, $room, $position, $antherUserPosition, $userOtherId);
+                $this->handleCpRoomHistory($user, $room, $position, $nearbyPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
                 return true;
             }
         }
+    
         $this->sendCpLovelyMessage($room, $user);
-
         return true;
     }
 
