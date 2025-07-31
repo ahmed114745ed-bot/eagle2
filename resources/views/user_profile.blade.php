@@ -2259,7 +2259,10 @@
                                         <div>
                                             <span>{{ $giftName }}</span><br>
                                             <small class="text-muted">
-                                                {{ __('Type') }}: {{ __(ucfirst(TYPE_GIFT[@$giftSLog->gift->type ?? 1])) }}
+                                                {{ __('Type') }}: {{ __(ucfirst(TYPE_GIFT[@$giftSLog->gift->type ?? 1])) }}<br>
+                                                @if(@$giftSLog->gift->pk)
+                                                    <br>{{ __('PK') }}
+                                                @endif
                                             </small>
                                         </div>
                                     </a>
