@@ -470,20 +470,33 @@
                     <tr>
                         <td>{{ ($visitors->currentPage() - 1) * $visitors->perPage() + $loop->iteration }}</td>
                         <td>
-                            <a href="{{ admin_url('users/' . $visitor->user->id) }}" target="_blank"
-                               style="display: inline-flex; align-items: center; text-decoration: none;">
+                            @if($visitor->user)
+                                <a href="{{ admin_url('users/' . $visitor->user->id) }}" target="_blank"
+                                   style="display: inline-flex; align-items: center; text-decoration: none;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <img
+                                            src="{{ getImagePath($visitor->user->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                            width="40" height="40"
+                                            style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        <div>
+                                            <div>{{ $visitor->user->name }}</div>
+                                            <small>ID: {{ $visitor->user->id }}</small><br>
+                                            <small>UID: {{ $visitor->user->uuid }}</small>
+                                        </div>
+                                    </div>
+                                </a>
+                            @else
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <img
-                                        src="{{ getImagePath($visitor->user->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                        src="{{ asset('images/businessman-icon.jpg') }}"
                                         width="40" height="40"
                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <div>
-                                        <div>{{ $visitor->user->name }}</div>
-                                        <small>ID: {{ $visitor->user->id }}</small><br>
-                                        <small>UID: {{ $visitor->user->uuid }}</small>
+                                        <div>{{ __('Unknown User') }}</div>
+                                        <small>{{ __('User Missing/Deleted') }}</small>
                                     </div>
                                 </div>
-                            </a>
+                            @endif
                         </td>
                         <td>
                             @if($visitor->mic_position)
