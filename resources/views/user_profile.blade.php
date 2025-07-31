@@ -2256,7 +2256,12 @@
                                         <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
                                              width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span>{{ $giftName  }}</span>
+                                        <div>
+                                            <span>{{ $giftName }}</span><br>
+                                            <small class="text-muted">
+                                                Type: {{ __(ucfirst(TYPE_GIFT[@$giftSLog->gift->type ?? 1])) }}
+                                            </small>
+                                        </div>
                                     </a>
                                 </td>
                                 @if($giftType == 'receiver')
