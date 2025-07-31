@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\RoomDeleteAction;
 use App\Models\Country;
 use App\Models\KickRecord;
 use App\Models\Pk;
@@ -667,6 +668,10 @@ class RoomController extends MainController
         $permissionName = $this->permission_name;
 
         $grid->actions(function ($action) use ($permissionName) {
+            $action->disableDelete();
+            if (Admin::user()->can('delete-' . $permissionName) || Admin::user()->can('*')) {
+                $action->add(new RoomDeleteAction());
+            }
             //            $action->disableView();
             $pin = $action->row->pin;
             $model = $action->row;
@@ -688,23 +693,6 @@ class RoomController extends MainController
         $this->setupPinModalScript();
 
         return $grid;
-    }
-
-    public function destroy($id)
-    {
-        $room = Room::findOrFail($id);
-
-        $d = [
-            "messageContent" => [
-                "message" => "deletedRoom",
-                "roomId" => $room->id
-            ]
-        ];
-        $json = json_encode($d);
-
-        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
-
-        return parent::destroy($id);
     }
 
     public function updatePinStatus($id, Request $request)
