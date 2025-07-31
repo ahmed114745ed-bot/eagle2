@@ -21,13 +21,8 @@ enum UserCoinLogType: string
     case CHARGE_EVENT = 'charge_event';
     case LUCK_BOX = 'lucky_box';
     
-    
-    
-    
-    
-    
-    
     case COIN_GAME = 'coin_game';
+    case LUCKY_GIFT = 'lucky_gift';
     case CASHBACK = 'cashback';
     case VIP = 'vip';
     case PACK = 'packs';
@@ -124,21 +119,15 @@ enum UserCoinLogType: string
                 'queue_job' => null,
             ],
             
-            
-            
-          
-
-            
-            
-            
-            
-            
-            
-            
             self::COIN_GAME => [
                 'sub_type' => 'coin_game_users',
                 'item_name' => 'coin_game',
-                'queue_job' => \App\Jobs\LogUserGamesCoinProfit::class,
+                'queue_job' => \App\Jobs\LogUserCumulativeCoinProfit::class,
+            ],
+            self::LUCKY_GIFT => [
+                'sub_type' => 'gifts',
+                'item_name' => 'lucky_gift',
+                'queue_job' => \App\Jobs\LogUserCumulativeCoinProfit::class,
             ],
             self::CASHBACK => [
                 'sub_type' => 'lucky_gifts', 
@@ -146,7 +135,7 @@ enum UserCoinLogType: string
                 'queue_job' => \App\Jobs\LogUserCoinProfit::class,
             ],
             self::VIP => [
-                'sub_type' => 'vip_logs',
+                'sub_type' => 'o_vips',
                 'item_name' => 'vip',
                 'queue_job' => null,
             ],

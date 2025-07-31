@@ -200,7 +200,7 @@ class UserController extends Controller
 
         $ban = Ban::where('ban_type_id',7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
             ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
-  
+
         $data = [
             'version' => [
                 'android_version'   => settings()->get('android_current_version'),
@@ -1179,6 +1179,7 @@ class UserController extends Controller
         $id = $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
         $data = $this->userService->dataUser($id);
+        request()->merge(['user_id' => $id]);
         return Common::apiResponse(true, 'done', new DataUserResource($data));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\RoomDeleteAction;
 use App\Models\Country;
 use App\Models\KickRecord;
 use App\Models\Pk;
@@ -15,6 +16,7 @@ use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -23,6 +25,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Actions\RoomPinAction;
 use App\Admin\Actions\CloseRoomAction;
 use Encore\Admin\Controllers\HasResourceActions;
+use Log;
 use Modules\LuckyBox\Entities\BoxUse;
 
 class RoomController extends MainController
@@ -69,16 +72,16 @@ class RoomController extends MainController
         $giftQuery = $room->gifts()
             ->with(['gift', 'sender.profile', 'receiver.profile']);
 
-        if(request('sender_id')) {
+        if (request('sender_id')) {
             $giftQuery->where('sender_id', request('sender_id'));
         }
-        if(request('receiver_id')) {
+        if (request('receiver_id')) {
             $giftQuery->where('receiver_id', request('receiver_id'));
         }
-        if(request('start_at')) {
+        if (request('start_at')) {
             $giftQuery->whereDate('created_at', '>=', request('start_at'));
         }
-        if(request('end_at')) {
+        if (request('end_at')) {
             $giftQuery->whereDate('created_at', '<=', request('end_at'));
         }
         $gifts = $giftQuery->orderByDesc('created_at')->paginate(15);
@@ -122,12 +125,12 @@ class RoomController extends MainController
         $visitorsRaw = $room->roomVisitors()
             ->with('user.profile')
             ->get()
-            ->map(function($visitor) use ($micPositions, $blackList) {
+            ->map(function ($visitor) use ($micPositions, $blackList) {
                 $visitor->mic_position = $micPositions[$visitor->user_id] ?? null;
                 $visitor->kick_info = $blackList[$visitor->user_id] ?? null;
                 return $visitor;
             })
-            ->sortBy(function($visitor) {
+            ->sortBy(function ($visitor) {
                 return $visitor->mic_position === null ? PHP_INT_MAX : $visitor->mic_position;
             });
 
@@ -253,19 +256,23 @@ class RoomController extends MainController
         $grid->header(function () use ($filterType) {
             $tabs = [
                 'all'       => __('All'),
-                'trend'     => __('Trend'),
+                // 'trend'     => __('Trend'),
                 'popular'   => __('Popular'),
-                'boss'      => __('Boss'),
-                //'friends'   => 'Friends',
-                //'following' => 'Following',
-                'recently'  => __('Recently'),
-                'interested' => __('Interested'),
-                'nearby'    => __('Nearby'),
                 'last_create' => __('New'),
                 'pk'        => __('PK'),
-                'party'     => __('Party'),
-                'festival'  => __('Festival'),
-                'top_gift'  => __('Top Gift'),
+                //  'boss'      => __('Boss'),
+                //'friends'   => 'Friends',
+                //'following' => 'Following',
+                "close_room"     => __('close room'),
+                "hide_room"      => __('hide room'),
+                'country'    => __('countries'),
+                // 'recently'  => __('Recently'),
+                // 'interested' => __('Interested'),
+                // 'nearby'    => __('Nearby'),
+
+                // 'party'     => __('Party'),
+                // 'festival'  => __('Festival'),
+                // 'top_gift'  => __('Top Gift'),
             ];
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
@@ -298,6 +305,15 @@ class RoomController extends MainController
 
             return $html;
         });
+
+
+
+
+
+
+
+
+
         $grid->model()
             ->select('*', \DB::raw("CASE room_status
                 WHEN 1 THEN 100
@@ -415,6 +431,28 @@ class RoomController extends MainController
                     ->orderByDesc('total_gift_exp');
                 break;
 
+            case 'close_room':
+                $grid->model()->whereHas('bans');
+                break;
+            case 'hide_room':
+                $grid->model()
+                    ->whereHas('owner')
+                    ->whereHas('owner.packs', function ($q) {
+                        $q->where('type', 16)
+                            ->where('is_used', 1)
+                            ->where(function ($q) {
+                                $q->where('expire', 0)
+                                    ->orWhere('expire', '>=', now()->timestamp);
+                            });
+                    });
+                break;
+            case 'country':
+                $grid->model()
+                    ->join('users', 'rooms.uid', '=', 'users.id') // assuming `owner_id` in rooms
+                    ->join('countries', 'users.country_id', '=', 'countries.id')
+                    ->orderBy('countries.id');
+                break;
+
             default:
                 $grid->model()
                     ->orderByDesc('pin')
@@ -447,13 +485,13 @@ class RoomController extends MainController
                     Country::query()->pluck('name', 'id')
                 );
 
-//                $filter->equal('room_status', __('Room Status'))->select([
-//                    1 => __('Active'),
-//                    0 => __('Inactive'),
-//                    2 => __('Closed'),
-//                    3 => __('Banned'),
-//                    4 => __('Closed'),
-//                ]);
+                //                $filter->equal('room_status', __('Room Status'))->select([
+                //                    1 => __('Active'),
+                //                    0 => __('Inactive'),
+                //                    2 => __('Closed'),
+                //                    3 => __('Banned'),
+                //                    4 => __('Closed'),
+                //                ]);
             });
         });
 
@@ -468,31 +506,27 @@ class RoomController extends MainController
         $grid->id(__('ID'));
 
         $grid->column('room_name', __('room'))->display(function ($name) {
-
             $path = @$this->room_cover;
             $id = @$this->id;
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
+            // Fallback if image doesn't exist
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
             return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <span  cursor: pointer;'>$name</span><br>
-                        <span  cursor: pointer;'>ID: $id</span>
-                        </a>
-                    </div>
-
-                </div>
-            ";
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+            <div>
+                <span style='cursor: pointer;'>$name</span><br>
+                <span style='cursor: pointer;'>ID: $id</span>
+            </div>
+        </div>
+    ";
         });
+
         $grid->column('owner.name', __('room owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $id = @$this->owner->id;
@@ -633,8 +667,12 @@ class RoomController extends MainController
 
         $permissionName = $this->permission_name;
 
-        $grid->actions(function ($action) use ($permissionName){
-//            $action->disableView();
+        $grid->actions(function ($action) use ($permissionName) {
+            $action->disableDelete();
+            if (Admin::user()->can('delete-' . $permissionName) || Admin::user()->can('*')) {
+                $action->add(new RoomDeleteAction());
+            }
+            //            $action->disableView();
             $pin = $action->row->pin;
             $model = $action->row;
             // إضافة الفعل مع تمرير الـ pin
@@ -656,6 +694,7 @@ class RoomController extends MainController
 
         return $grid;
     }
+
     public function updatePinStatus($id, Request $request)
     {
         try {
@@ -685,88 +724,88 @@ class RoomController extends MainController
         $confirm = __('Confirm');
         $cancel  = __('admin.cancel');
         Admin::html(<<<HTML
-<div class="modal fade" id="pinRoomModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{$confirm}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="modal fade" id="pinRoomModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{$confirm}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>{$doyouwant}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{$cancel}</button>
+                            <button type="button" class="btn btn-primary confirm-pin">{$confirm}</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <p>{$doyouwant}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{$cancel}</button>
-                <button type="button" class="btn btn-primary confirm-pin">{$confirm}</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<script>
-$(document).ready(function() {
-    var currentRoomId = null;
-    var currentBtn = null;
+            <script>
+            $(document).ready(function() {
+                var currentRoomId = null;
+                var currentBtn = null;
 
-    $('.pin-room-btn').click(function() {
-        currentRoomId = $(this).data('room');
-        currentBtn = $(this);
-        var isPinned = $(this).data('pinned') === 'true';
+                $('.pin-room-btn').click(function() {
+                    currentRoomId = $(this).data('room');
+                    currentBtn = $(this);
+                    var isPinned = $(this).data('pinned') === 'true';
 
-        if (isPinned) {
-            // If already pinned, unpin immediately without confirmation
-            updatePinStatus(currentRoomId, false);
-        } else {
-            // Show confirmation modal for pinning
-            $('#pinRoomModal').modal('show');
-        }
-    });
+                    if (isPinned) {
+                        // If already pinned, unpin immediately without confirmation
+                        updatePinStatus(currentRoomId, false);
+                    } else {
+                        // Show confirmation modal for pinning
+                        $('#pinRoomModal').modal('show');
+                    }
+                });
 
-    $('.confirm-pin').click(function() {
-        $('#pinRoomModal').modal('hide');
-        updatePinStatus(currentRoomId, true);
-    });
+                $('.confirm-pin').click(function() {
+                    $('#pinRoomModal').modal('hide');
+                    updatePinStatus(currentRoomId, true);
+                });
 
-    function updatePinStatus(roomId, pin) {
-        $.ajax({
-            url: '/admin/rooms/' + roomId + '/update-pin-status',
-            type: 'POST',
-            data: {
-                pin: pin ? 1 : 0,
-                _token: '{$token}',
-                _method: 'PUT'
-            },
-            success: function(response) {
-                if (response.success) {
-                    // Update button appearance without reloading
-                    currentBtn.data('pinned', pin ? 'true' : 'false');
-                    currentBtn.find('i')
-                        .toggleClass('fa-thumb-tack', !pin)
-                        .toggleClass('fa-check-circle', pin)
-                        .parent()
-                        .toggleClass('text-muted', !pin)
-                        .toggleClass('text-success', pin);
+                function updatePinStatus(roomId, pin) {
+                    $.ajax({
+                        url: '/admin/rooms/' + roomId + '/update-pin-status',
+                        type: 'POST',
+                        data: {
+                            pin: pin ? 1 : 0,
+                            _token: '{$token}',
+                            _method: 'PUT'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Update button appearance without reloading
+                                currentBtn.data('pinned', pin ? 'true' : 'false');
+                                currentBtn.find('i')
+                                    .toggleClass('fa-thumb-tack', !pin)
+                                    .toggleClass('fa-check-circle', pin)
+                                    .parent()
+                                    .toggleClass('text-muted', !pin)
+                                    .toggleClass('text-success', pin);
 
-                    // Show success message
-                    toastr.success(response.message);
+                                // Show success message
+                                toastr.success(response.message);
 
-                    // If you want to refresh the grid instead of updating just the button:
-                    // $.admin.reload();
-                } else {
-                    toastr.error(response.message || 'Operation failed');
+                                // If you want to refresh the grid instead of updating just the button:
+                                // $.admin.reload();
+                            } else {
+                                toastr.error(response.message || 'Operation failed');
+                            }
+                        },
+                        error: function() {
+                            toastr.error('Request failed');
+                        }
+                    });
                 }
-            },
-            error: function() {
-                toastr.error('Request failed');
-            }
-        });
-    }
-});
-</script>
-HTML);
-    }
+            });
+            </script>
+            HTML);
+        }
     /**
      * Make a show builder.
      *
@@ -838,7 +877,7 @@ HTML);
         $form->text('room_name', __('room name'));
         $form->image('room_cover', __('room cover'));
         $form->text('room_intro', __('room intro'));
-        $form->text('room_pass', __('room pass'));
+        $form->number('room_pass', __('room pass'))->rules('required|min:6|max:6');
         $form->hidden('is_afk', __('owner in'));
         $form->select('room_class')->options(function () {
             $options = [];
@@ -875,6 +914,17 @@ HTML);
         $room->room_admin = implode(',', $admins);
         $room->save();
 
+        $d = [
+            "messageContent" => [
+                "message" => "banAdmin",
+                "roomId" => $room->id,
+                "adminId" => $adminId,
+            ]
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
         return response()->json([
             'success' => true,
             'message' => __('Administrator removed successfully')
@@ -903,11 +953,18 @@ HTML);
         ]);
     }
 
-    public function kickVisitor(Request $request, $roomId)
+    public function kickVisitor(Request $request, $roomId): JsonResponse
     {
         $room = Room::findOrFail($roomId);
         $visitorId = $request->user_id;
         $duration = $request->minutes ?? 5;
+
+        if ($visitorId == $room->uid) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Cannot kick the room owner')
+            ]);
+        }
 
         if (Common::pack_get(9, $visitorId)) {
             return response()->json([
@@ -917,25 +974,23 @@ HTML);
         }
 
         $blackList = $room->room_black;
-        if ($blackList === null) {
+
+        if (empty($blackList)) {
             $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
         } else {
             $list = explode(',', $blackList);
-            $exists = false;
+            $newList = [];
 
             foreach ($list as &$item) {
                 $black = explode('#', $item);
-                if ($black[0] == $visitorId) {
-                    $item = $visitorId . '#' . time() . '#' . ($duration * 60);
-                    $exists = true;
+                if (isset($black[0]) && $black[0] != $visitorId && $item !== "" ) {
+                    $newList[] = $item;
                 }
             }
 
-            if (!$exists) {
-                array_push($list, $visitorId . '#' . time() . '#' . ($duration * 60));
-            }
+            $newList = array_filter($newList);
 
-            $blackList = implode(',', $list);
+            $blackList= implode(',', $newList) ?: null;
         }
 
         $room->room_black = $blackList;
@@ -953,24 +1008,8 @@ HTML);
             "kicked_user_id" => auth()->id(),
             "user_id" => $visitorId,
             "room_id" => $room->id,
+            "type" => 'admin'
         ]);
-
-        $messageContent = [
-            'messageContent' => [
-                'message' => 'kickout',
-                'duration' => $duration
-            ]
-        ];
-
-        Common::sendToZego_4(
-            'SendCustomCommand',
-            $room->id,
-            $room->uid,
-            $visitorId,
-            json_encode($messageContent)
-        );
-
-        Common::calcTime($visitorId);
 
         $message = __('api.blockRoom', [
             'name' => $user->name ?? 'Unknown',
@@ -978,18 +1017,49 @@ HTML);
             'duration' => $duration
         ], 'ar');
 
-        Common::sendToZego_2(
-            'SendBroadcastMessage',
-            $room->id,
-            $room->uid,
-            'room',
-            $message
-        );
+        $d = [
+            "messageContent" => [
+                "message" => "kickVisitorOut",
+                'duration' => $duration,
+                "visitorId" => $visitorId,
+                "comment" => $message
+            ]
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
+        Common::calcTime($visitorId);
 
         return response()->json([
             'success' => true,
             'message' => __('Visitor kicked successfully')
         ]);
+    }
+
+    public function unbanVisitor(Request $request, $roomId): JsonResponse
+    {
+        $room = Room::findOrFail($roomId);
+        $visitorId = $request->user_id;
+
+        if (!$room->room_black) {
+            return response()->json(['success' => false, 'message' => __('User is not banned')]);
+        }
+
+        $list = explode(',', $room->room_black);
+        $newList = [];
+
+        foreach ($list as $item) {
+            $black = explode('#', $item);
+            if ($black[0] != $visitorId) {
+                $newList[] = $item;
+            }
+        }
+
+        $room->room_black = implode(',', $newList);
+        $room->save();
+
+        return response()->json(['success' => true, 'message' => __('User has been unbanned')]);
     }
 
     public function getUsers(Request $request)
@@ -1022,5 +1092,4 @@ HTML);
             'message' => __('Room updated successfully!')
         ]);
     }
-
 }

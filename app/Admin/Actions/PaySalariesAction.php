@@ -83,10 +83,6 @@ class PaySalariesAction extends Action
                         'cut_amount' => DB::raw("cut_amount + $amount"),
                     ]
                 );
-            }
-
-
-
                 SalaryTrx::query()->create(
                     [
                         'type' => 1,
@@ -98,6 +94,10 @@ class PaySalariesAction extends Action
                         'payer_type' => 0
                     ]
                 );
+            }
+
+
+
 
 
             DB::commit();

@@ -27,8 +27,8 @@ class UserCoinLogHelper
             'amount_before' => $amountBefore,
             'item_name'     => $itemNameOverride ?? $meta['item_name'],
             'helper_amount' => $helperAmount,
-            'from_date'     => $fromDate ?? now()->toDateString(),
-            'to_date'       => $toDate ?? now()->toDateString(),
+            'from_date'     => $fromDate ?? now(),
+            'to_date'       => $toDate ?? now(),
         ];
 
         if ($meta['queue_job']) {
