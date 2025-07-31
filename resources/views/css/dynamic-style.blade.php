@@ -664,7 +664,7 @@
         padding: 5px 0;
         margin: 2px 0 0;
         font-size: 14px;
-        text-align: left;
+        text-align: right;
         list-style: none;
         background-color: var(--secondary-color) !important;
         filter: brightness(0.80);
