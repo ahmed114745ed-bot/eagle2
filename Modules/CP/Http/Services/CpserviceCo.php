@@ -200,7 +200,7 @@ class CpserviceCo
 
         event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
 
-        return Common::apiResponse(1, 'تم الاضافه بنجاح');
+        return Common::apiResponse(1, 'تم إرسال الطلب');
     }
 
 

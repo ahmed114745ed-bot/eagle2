@@ -1,6 +1,5 @@
 <?php
 
-use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -80,6 +79,7 @@ use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\ReportFromUsersController;
+use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\UserChargeReportController;
@@ -101,6 +101,7 @@ use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 
 Route::group(
     [
@@ -161,7 +162,7 @@ Route::group(
     function () {
         Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
 
-
+         Route::resource('reset-salary', ResetUserSalaryController::class);
         Route::post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
         Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
