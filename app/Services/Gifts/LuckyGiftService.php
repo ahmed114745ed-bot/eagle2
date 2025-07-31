@@ -80,7 +80,7 @@ class LuckyGiftService
         $firstOwnerWalletCoins = $ownerWallet->coins;
 
 
-        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
+        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
         $receiverName = $receivedUsers->first()->name;
         $receiversCount  = $receivedUsers->count();
         $isToRoom      = $receiversCount > 1;
@@ -103,8 +103,8 @@ class LuckyGiftService
             UserCoinLogType::LUCKY_GIFT,
             $gift?->name ,
         );
-        
-        
+
+
         while ($user->di >= $totalPrice && $index > 0) {
 
             $appWallet->coins   += $price * 8;
@@ -157,7 +157,7 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
-          
+
             $user->di -= $totalPrice;
             $index--;
             $message = null;
@@ -167,7 +167,7 @@ class LuckyGiftService
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
 
-   
+
 
         if ($total_user_win > 0) {
 
@@ -179,7 +179,7 @@ class LuckyGiftService
                 null,
             );
         }
-        
+
 
         if ($index > 0) {
             $count -= $index;
@@ -411,9 +411,11 @@ class LuckyGiftService
         $newUserCoin = ($user->di - $userCoins);
         $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
 
+        info($room->lastPk);
         if ($room->charizma_status && $coinsForReceiver > 1) {
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
         } elseif ($room->lastPk && $coinsForReceiver > 1) {
+            info('dispatch room redis');
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds, "pk");
         }
 

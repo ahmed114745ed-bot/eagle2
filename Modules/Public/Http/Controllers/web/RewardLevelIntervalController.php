@@ -85,6 +85,19 @@ class RewardLevelIntervalController extends MainController
     {
         $level_interval = request('level_interval_id');
         $grid = new Grid(new RewardLevelInterval());
+
+         $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('type', __('type'))->select([
+                    "vip" => __('vip'),
+                    'coins' => __('coins'),
+                    'achievement' => __('achievement'),
+                    "ware" => __("ware"),
+
+                ]);
+            });
+        });
         $grid->model()->where('level_interval_id', $level_interval);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
@@ -100,6 +113,12 @@ class RewardLevelIntervalController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+         $grid->tools(function (Grid\Tools $tools) {
+            $url = '/admin/level-intervals';
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
+            $tools->append($button);
+        });
+        $this->extendGrid($grid);
 
         return $grid;
     }
