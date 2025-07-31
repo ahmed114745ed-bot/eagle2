@@ -130,6 +130,14 @@ class MicService
 
     public function handleCpLovely($user, $room, $position)
     {
+
+        Log::info("🚀 [CP] handleCpLovely called", [
+            'user_id' => $user->id,
+            'room_id' => $room->id,
+            'position' => $position,
+            'mode' => $room->mode,
+        ]);
+    
         $existingCps = Cp::where(function ($query) use ($user) {
             $query->where("user_one_id", $user->id)
                 ->orWhere("user_two_id", $user->id);
@@ -145,48 +153,67 @@ class MicService
         if ($room->mode == 0 && $position == 0) {
             return true;
         }
+
         $userSeats = $this->getUserNearby($position, mode: $room->mode);
+
+        Log::info("📍 [CP] Nearby positions", [
+            'position' => $position,
+            'neighbors' => $userSeats,
+        ]);
+    
 
         $micSeats = array_map(function ($v) {
             return is_numeric($v) ? (int)$v : null;
-        }, explode(',', $room->microphone_only_users));
-
-        foreach ($userSeats as $nearbyPosition) {
-            $userOtherId = $micSeats[$nearbyPosition] ?? null;
+        }, explode(',', $room->microphone));
     
+        foreach ($userSeats as $neighborPosition) {     
+
+            $userOtherId = $micSeats[$neighborPosition] ?? null;
+
+            Log::info("👥 [CP] Checking neighbor", [
+                'neighbor_position' => $neighborPosition,
+                'user_other_id' => $userOtherId,
+            ]);
             if (!$userOtherId || $userOtherId == 0 || $userOtherId == $user->id) {
                 continue;
             }
-    
+
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
-                $this->handleCpRoomHistory($user, $room, $position, $nearbyPosition, $userOtherId);
+                Log::info("💖 [CP] CP found with neighbor", [
+                    'user_id' => $user->id,
+                    'user_other_id' => $userOtherId,
+                ]);
+                $this->handleCpRoomHistory($user, $room, $position, $antherUserPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
                 return true;
             }
         }
-    
+        Log::info("📩 [CP] No nearby CPs found, sending lovely message anyway", []);
+
         $this->sendCpLovelyMessage($room, $user);
+
         return true;
     }
 
     public function getUserNearby($index, $mode, $rowSize = 4)
     {
         $neighbors = [];
-    
+
         $rowStart = intdiv($index, $rowSize) * $rowSize;
         $rowEnd = $rowStart + $rowSize - 1;
-    
+
         if ($index - 1 >= $rowStart) {
             $neighbors[] = $index - 1;
         }
-    
+
         if ($index + 1 <= $rowEnd) {
             $neighbors[] = $index + 1;
         }
-    
+
         return $neighbors;
     }
+
 
     public function sendCpLovelyMessage($room, $user)
     {
@@ -250,8 +277,7 @@ class MicService
             // ->where("cp_relation_id",5)
             ->first();
     }
-  
-    
+
     public function goMic($data)
     {
         $user = $this->userRepository->findById($data->user_id);
