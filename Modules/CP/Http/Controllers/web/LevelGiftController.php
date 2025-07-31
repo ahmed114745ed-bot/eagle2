@@ -202,17 +202,17 @@ class LevelGiftController extends MainController
                 $ware = Ware::find($form->item_id);
                 if ($ware) {
                     if ($ware?->type == 4) {
-                        $form?->sub_type = 'bubble';
+                        $form->sub_type = 'bubble';
                     } elseif ($ware?->type == 5) {
-                        $form?->sub_type = 'intro';
+                        $form->sub_type = 'intro';
                     } elseif ($ware?->type == 6) {
-                        $form?->sub_type = 'frame';
+                        $form->sub_type = 'frame';
                     }
                 }
-            } elseif ($form?->type == 'vip') {
-            } elseif ($form?->type == 'coins') {
+            } elseif ($form->type == 'vip') {
+            } elseif ($form->type == 'coins') {
                 $form->item_id = $form->coins;
-            } elseif ($form?->type == 'achievement') {
+            } elseif ($form->type == 'achievement') {
                 $form->item_id = $form->achievement;
             }
         });
