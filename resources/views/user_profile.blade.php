@@ -1897,12 +1897,12 @@
                                                 <small class="d-block text-muted text-danger">
                                                     {{ $coin->amount  - $coin->helper_amount }}  {{  __('loss')}}
                                                 </small>
-                                        @endif    
+                                        @endif
                                     </td>
                                     <td>
-                                    
+
                                      {{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0)}}
-                                
+
 
                                      </td>
                                      <td>{{ \Carbon\Carbon::parse($coin->from_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
@@ -2131,9 +2131,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
                 <!-- Table -->
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle">
@@ -2255,11 +2252,14 @@
                                 </td>
                                 <td>
                                     <a href="#" target="_blank"
-                                       class="d-flex align-items-center text-decoration-none">
+                                       class="d-flex align-items-center text-decoration-none flex-column" style="align-items: flex-start;">
                                         <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
                                              width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span>{{ $giftName  }}</span>
+                                             style="object-fit: cover; border-radius: 50%; margin-bottom: 5px;">
+                                        <span>{{ $giftName }}</span>
+                                        <span class="badge bg-secondary mt-1" style="font-size: 12px;">
+                                            {{ TYPE_GIFT[$giftSLog->gift->type ?? 1] ?? '-' }}
+                                        </span>
                                     </a>
                                 </td>
                                 @if($giftType == 'receiver')
