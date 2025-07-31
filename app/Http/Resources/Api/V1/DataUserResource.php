@@ -7,6 +7,7 @@ use App\Models\GiftLog;
 use Modules\CP\Entities\Cp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\CP\Transformers\CpDataResource;
 use Modules\CP\Transformers\CpListResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -71,7 +72,7 @@ class DataUserResource extends JsonResource
             'family_data'          => @$f,
             'achievement_images' => $achievement_images,
             'gifts' =>  GiftLogResource::collection($gifts),
-            'cp' => $mainCp ? new CpListResource($mainCp) : null,
+            'cp' => $mainCp ? new CpDataResource($mainCp) : null,
             'is_followed' => $this->isFollowedBy(auth()->id()),
             'colored_name' => $this->color_image,
             'image_color'          => @$this->color_image,

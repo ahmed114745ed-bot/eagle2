@@ -9,7 +9,10 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Selectables\OVips;
+use App\Selectables\Wares;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Entities\RewardLevelInterval;
@@ -86,7 +89,7 @@ class RewardLevelIntervalController extends MainController
         $level_interval = request('level_interval_id');
         $grid = new Grid(new RewardLevelInterval());
 
-         $grid->filter(function (Grid\Filter $filter) {
+        $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('type', __('type'))->select([
@@ -113,7 +116,7 @@ class RewardLevelIntervalController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
-         $grid->tools(function (Grid\Tools $tools) {
+        $grid->tools(function (Grid\Tools $tools) {
             $url = '/admin/level-intervals';
             $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
             $tools->append($button);
@@ -148,44 +151,73 @@ class RewardLevelIntervalController extends MainController
     protected function form()
     {
         $form = new Form(new RewardLevelInterval());
-        $this->disableFormTools($form);
 
         $form->hidden('level_interval_id')->value(request('level_interval_id'));
-        $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
-            ->when("ware", function () use ($form) {
-                $form->select('target1', trans('wares'))->options(function () {
-                    $ops = [0 => ''];
-                    $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
-                    foreach ($wares as  $ware) {
-                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
 
-                        if ($ware->type == 4) {
-                            $ops[$ware->id] .= '_' . 'frame';
-                        } elseif ($ware->type == 5) {
-                            $ops[$ware->id] .= '_' . 'bubble';
-                        } elseif ($ware->type == 6) {
-                            $ops[$ware->id] .= '_' . 'intro';
-                        }
-                    }
-                    return $ops;
-                });
+        $form->select('type', __('Gift type'))
+            ->options([
+                "ware"        => __('ware'),
+                "vip"         => __('vip'),
+                "coins"       => __('coins'),
+                "achievement" => __('achievement'),
+            ])
+            ->when('ware', function () use ($form) {
+                $form->belongsTo('target1', Wares::class, trans('wares'));
+                $form->number('expire', __('expire'));
             })
-            ->when("vip", function () use ($form) {
-                $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    foreach ($vips as  $vip) {
-                        $ops[$vip->id] = $vip->name;
-                    }
-                    return $ops;
-                });
+            ->when('vip', function () use ($form) {
+                $form->belongsTo('target2', OVips::class, trans('vips'));
+                $form->number('expire', __('expire'));
             })
-            ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"));
-            })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
+            ->when('coins', function () use ($form) {
+                $form->number('target3', __('coins'));
+            })
+            ->when('achievement', function () use ($form) {
+                $form->image('target4', __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
                 });
-            });
+                $form->number('expire', __('expire'));
+            })
+            ->rules('required');
+
+        $form->saving(function (Form $form) {
+            $type = $form->type;
+            $errors = [];
+
+            switch ($type) {
+                case 'ware':
+                    if (!$form->target1) $errors[] = __('wares') . ' ' . __('is required');
+                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    break;
+                case 'vip':
+                    if (!$form->target2) $errors[] = __('vips') . ' ' . __('is required');
+                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    break;
+                case 'coins':
+                    if (empty($form->target3) || !is_numeric($form->target3)) $errors[] = __('coins') . ' ' . __('is required and must be numeric');
+                    $form->expir = null;
+                    break;
+                case 'achievement':
+                    if (!$form->target4) $errors[] = __('image') . ' ' . __('is required');
+                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    break;
+            }
+
+            if (count($errors)) {
+                admin_error(__('Validation error'), implode('<br>', $errors));
+                return back();
+            }
+        });
+        $form->tools(function (Form\Tools $tools) {
+            $url = '/admin/reward_level_interval/' . request('level_interval_id');
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';
+            $tools->append($button);
+            if (request()->is('*edit*')) {
+                $tools->disableDelete();
+            }
+        });
+
+
         return $form;
     }
 }
