@@ -104,7 +104,7 @@ class Kernel extends ConsoleKernel
             ->runInBackground();
 
         $schedule->command('users:freeze-unfinished')
-            ->everyTenMinutes()
+            ->everySecond()
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/stop-transfer-salary.log'))
             ->runInBackground();
