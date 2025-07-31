@@ -46,7 +46,7 @@ class HandlingRoomZigoRequests extends Command
     {
 
         $data = Redis::keys('*CharismaGift*');
-
+ 
 
         $allData = [];
 
