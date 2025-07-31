@@ -2,6 +2,7 @@
 
 namespace App\Traits\User;
 
+use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
@@ -32,6 +33,14 @@ trait PaymentTrait
         if (!$item && $coins) {
             $user = User::find($userId);
 
+            $amountBefore = $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                 $coins->coin,
+                $amountBefore,
+                UserCoinLogType::PAYMENT,
+            );
+
             $user->di += $coins->coin;
             $user->save();
             UserCommon::addChargeLevel($user->id, $coins->coin);
@@ -44,15 +53,6 @@ trait PaymentTrait
                 'status'         => 1,
                 'trx'            => $orderId,
             ]);
-            $amountBefore = Common::getCurrentBalance($userId);
-            UserCoinLogHelper::log(
-                $userId,
-                'charge',
-                'user_charges',
-                $coins?->coin,
-                $amountBefore ?? 0,
-                'payment'
-            );
         }
 
         UserCommon::updateUserTotalCoins($userId, $coins->coin);

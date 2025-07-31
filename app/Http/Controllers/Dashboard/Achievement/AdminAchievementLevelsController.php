@@ -31,7 +31,7 @@ class AdminAchievementLevelsController extends Controller
             'img1'             => 'required|image|mimes:jpeg,png,jpg',
             'img2'             => 'required|image|mimes:jpeg,png,jpg',
         ]);
-        $img1_name = $request->hasFile('img1') ? $this->store_img($request->file('img1'), 'images') : null;;
+        $img1_name = $request->hasFile('img1') ? $this->store_img($request->file('img1'), 'images') : null;
         $img2_name = $request->hasFile('img2') ? $this->store_img($request->file('img2'), 'files') : null;
         AchievementLevel::insert([
             'en_description'     => $request->en_description,

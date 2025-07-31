@@ -71,6 +71,26 @@ class LevelIntervalController extends MainController
     {
         $grid = new Grid(new LevelInterval());
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('type', __('type'))->select([
+                    1 => __('receiver'),
+                    2 => __('sender'),
+                    3 => __('room'),
+
+                ]);
+            });
+
+             $filter->column(1 / 2, function ($filter) {
+                $filter->equal('min', __('min'));
+            });
+             $filter->column(1 / 2, function ($filter) {
+                $filter->equal('max', __('max'));
+            });
+        });
+
+
         $grid->column('id', __('Id'));
         $grid->column('name', __('name'));
         $grid->column('type', __('type'))->display(function ($value) {
@@ -79,18 +99,22 @@ class LevelIntervalController extends MainController
         $grid->column('min', __('min'));
         $grid->column('max', __('max'));
 
-        if (Admin::user()->can('browse-' . 'reward_level_interval') || Admin::user()->can('*')) {
-            $grid->column(__('Procedures'))->display(function () {
-                // توليد الروابط
-                $url1 = url('admin/reward_level_interval/' . $this->id);
-                $gifts = __('Gifts');
-                // إنشاء أزرار HTML
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . $gifts . " </a>";
+        if (!request()->filled('_export_')) {
+            if (Admin::user()->can('browse-' . 'reward_level_interval') || Admin::user()->can('*')) {
+                $grid->column(__('Procedures'))->display(function () {
+                    // توليد الروابط
+                    $url1 = url('admin/reward_level_interval/' . $this->id);
+                    $gifts = __('Gifts');
+                    // إنشاء أزرار HTML
+                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . $gifts . " </a>";
 
-                // دمج الأزرار في سلسلة واحدة وإرجاعها
-                return $button1;
-            });
+                    // دمج الأزرار في سلسلة واحدة وإرجاعها
+                    return $button1;
+                });
+            }
         }
+
+
         $this->extendGrid($grid);
         return $grid;
     }
