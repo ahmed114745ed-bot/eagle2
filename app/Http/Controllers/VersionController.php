@@ -49,13 +49,13 @@ class VersionController extends Controller
         $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
         $reelSettings = Setting::where('key', 'reel_status')->first();
-
+        $images = $this->isUpdated('images_updated_at', @$request->images_time);
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (int)$version,
             'is_force'        => $this->isForce($version, $request->OS),
             'is_show_shipping_agencies' => true,
-            'images' => false,
+            'images' => $images,
             'badges-agency' =>  $agencyBadges,
             'cache_update' => [
                 'gifts'  => $isGiftUpdated,
