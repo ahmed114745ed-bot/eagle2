@@ -147,7 +147,7 @@ class MicService
         }
         $userSeats = $this->getUserNearby($position, mode: $room->mode);
 
-        $micSeats = explode(',', $room->microphone);
+        $micSeats = explode(',', $room->microphone_only_users);
 
         foreach ($userSeats as $nearbyPosition) {
             $userOtherId = $micSeats[$nearbyPosition] ?? null;
