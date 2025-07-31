@@ -45,6 +45,7 @@ use App\Models\UserSallary;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Modules\Achievement\Http\Services\UserAchievementService;
@@ -175,7 +176,11 @@ class UserController extends Controller
         $year = $date?->year ?? now()->year;
 
         if (now()->month == $month && now()->year == $year) {
-            (new FixedTargetService($user))->calculateTarget();
+            $cacheKey = 'cache-data-my-store-' . $user->id;
+            if (Cache::add($cacheKey, true, now()->addSeconds(30)))  {
+                $targetService = new FixedTargetService($user);
+                ($targetService)->calculateTarget();
+            }
         }
         $data = $this->userService->userStatic($user,  $month, $year);
         return Common::apiResponse(true, '', $data, 200);
