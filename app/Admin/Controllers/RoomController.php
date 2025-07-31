@@ -695,16 +695,6 @@ class RoomController extends MainController
         return $grid;
     }
 
-    public function destroy($id)
-    {
-        info('ime here');
-
-
-
-
-        return parent::destroy($id);
-    }
-
     public function updatePinStatus($id, Request $request)
     {
         try {
