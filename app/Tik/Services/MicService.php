@@ -147,7 +147,9 @@ class MicService
         }
         $userSeats = $this->getUserNearby($position, mode: $room->mode);
 
-        $micSeats = explode(',', $room->microphone_only_users);
+        $micSeats = array_map(function ($v) {
+            return is_numeric($v) ? (int)$v : null;
+        }, explode(',', $room->microphone_only_users));
 
         foreach ($userSeats as $nearbyPosition) {
             $userOtherId = $micSeats[$nearbyPosition] ?? null;
@@ -166,6 +168,24 @@ class MicService
     
         $this->sendCpLovelyMessage($room, $user);
         return true;
+    }
+
+    public function getUserNearby($index, $mode, $rowSize = 4)
+    {
+        $neighbors = [];
+    
+        $rowStart = intdiv($index, $rowSize) * $rowSize;
+        $rowEnd = $rowStart + $rowSize - 1;
+    
+        if ($index - 1 >= $rowStart) {
+            $neighbors[] = $index - 1;
+        }
+    
+        if ($index + 1 <= $rowEnd) {
+            $neighbors[] = $index + 1;
+        }
+    
+        return $neighbors;
     }
 
     public function sendCpLovelyMessage($room, $user)
@@ -230,23 +250,7 @@ class MicService
             // ->where("cp_relation_id",5)
             ->first();
     }
-    public function getUserNearby($index, $mode, $rowSize = 4)
-    {
-        $neighbors = [];
-    
-        $rowStart = intdiv($index, $rowSize) * $rowSize;
-        $rowEnd = $rowStart + $rowSize - 1;
-    
-        if ($index - 1 >= $rowStart) {
-            $neighbors[] = $index - 1;
-        }
-    
-        if ($index + 1 <= $rowEnd) {
-            $neighbors[] = $index + 1;
-        }
-    
-        return $neighbors;
-    }
+  
     
     public function goMic($data)
     {
