@@ -29,6 +29,7 @@ class ChargeSwitchAction extends RowAction
         Log::info(['before_transfer_salary' => $model->transfer_salary,'mode_id' => $model->id]);
        $model->transfer_salary = $model->transfer_salary ? 0 : 1;
         $model->save();
+        Log::info(['after_transfer_salary' => $model->transfer_salary,'mode_id' => $model->id]);
 
         $message = $model->transfer_salary
             ? __('Transfer salary has been disabled!')
