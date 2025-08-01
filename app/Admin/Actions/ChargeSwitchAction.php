@@ -25,22 +25,27 @@ class ChargeSwitchAction extends RowAction
             : __('Disable Transfer Salary');
     }
 
-    public function handle(Model $model)
-    {
-        Log::info(['before_transfer_salary' => $model->transfer_salary,'mode_id' => $model->id]);
-        User::where("id", $model->id)->update([
-            'transfer_salary' => DB::raw('NOT transfer_salary')
-        ]);       
-        Log::info(['after_transfer_salary' => $model->transfer_salary,'mode_id' => $model->id]);
+   public function handle(Model $model)
+{
+    Log::info(['before_transfer_salary' => $model->transfer_salary, 'mode_id' => $model->id]);
 
-        $message = $model->transfer_salary
-            ? __('Transfer salary has been disabled!')
-            : __('Transfer salary has been enabled!');
+    User::where("id", $model->id)->update([
+        'transfer_salary' => DB::raw('NOT transfer_salary')
+    ]);
 
-        $response = $model->transfer_salary ? 'error' : 'success';
+    $model->refresh(); // ✅ الحل هنا
 
-        return $this->response()->$response($message)->refresh();
-    }
+    Log::info(['after_transfer_salary' => $model->transfer_salary, 'mode_id' => $model->id]);
+
+    $message = $model->transfer_salary
+        ? __('Disable Transfer Salary!')
+        : __('Enable Transfer Salary!');
+
+    $response = $model->transfer_salary ? 'success' : 'error';
+
+    return $this->response()->$response($message)->refresh();
+}
+
 
     public function icon()
     {
