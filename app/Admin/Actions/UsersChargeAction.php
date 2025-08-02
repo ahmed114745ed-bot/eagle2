@@ -65,16 +65,17 @@ class UsersChargeAction extends Action
             $setting =   Setting::where('key', 'user_coins')->first();
             return $setting?->value;
         });
-
+        
         $coins = $amount * $userCoins;
-
+        
         if (! $userCoins || $userCoins == 0) {
             return $this->response()->error(__('please set user coins in configs'))->refresh();
         }
-
+        
         DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
-           
+            
             $amountBefore =  Common::getCurrentBalance($user->id);
+
             UserCoinLogHelper::logByType(
                 $user->id,
                 $coins,
@@ -114,7 +115,6 @@ class UsersChargeAction extends Action
 
     private function createChargeRecord(Request $request, User $user, $amount, $coins = 0, $usdAmount)
     {
-
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
@@ -144,7 +144,7 @@ class UsersChargeAction extends Action
         $this->hidden('userId')->attribute('id', 'vid');
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
         $this->text('amount', __('Amount'))
-            ->rules('integer|gt:0')
+            ->rules('numeric|gt:0')
             ->addElementClass('price-input')
             ->help(__('Enter amount in dollars'));
         $this->text('reason_en', __('reason en'));
