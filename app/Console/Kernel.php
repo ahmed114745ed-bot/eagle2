@@ -103,11 +103,11 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/game-user-calc.log'))
             ->runInBackground();
 
-        $schedule->command('users:freeze-unfinished')
-            ->everySecond()
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/stop-transfer-salary.log'))
-            ->runInBackground();
+        // $schedule->command('users:freeze-unfinished')
+        //     ->everySecond()
+        //     ->timezone(getTimezone())
+        //     ->appendOutputTo(storage_path('logs/stop-transfer-salary.log'))
+        //     ->runInBackground();
 
        $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
