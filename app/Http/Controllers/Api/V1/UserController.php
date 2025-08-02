@@ -45,6 +45,7 @@ use App\Models\UserSallary;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Modules\Achievement\Http\Services\UserAchievementService;
@@ -175,7 +176,11 @@ class UserController extends Controller
         $year = $date?->year ?? now()->year;
 
         if (now()->month == $month && now()->year == $year) {
-            (new FixedTargetService($user))->calculateTarget();
+            $cacheKey = 'cache-data-my-store-' . $user->id;
+            if (Cache::add($cacheKey, true, now()->addSeconds(30)))  {
+                $targetService = new FixedTargetService($user);
+                ($targetService)->calculateTarget();
+            }
         }
         $data = $this->userService->userStatic($user,  $month, $year);
         return Common::apiResponse(true, '', $data, 200);
@@ -200,7 +205,7 @@ class UserController extends Controller
 
         $ban = Ban::where('ban_type_id',7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
             ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
-  
+
         $data = [
             'version' => [
                 'android_version'   => settings()->get('android_current_version'),
@@ -1179,6 +1184,7 @@ class UserController extends Controller
         $id = $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
         $data = $this->userService->dataUser($id);
+        request()->merge(['user_id' => $id]);
         return Common::apiResponse(true, 'done', new DataUserResource($data));
     }
 }

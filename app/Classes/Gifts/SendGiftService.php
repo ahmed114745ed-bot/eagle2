@@ -345,15 +345,15 @@ class SendGiftService
         if(!($pk instanceof Pk)) return [];
 
         $m = explode (',',$microphone);
-        $mic_1 = isset($m[1])?$m[1]:0;
-        $mic_2 = isset($m[2])?$m[2]:0;
-        $mic_3 = isset($m[3])?$m[3]:0;
-        $mic_4 = isset($m[4])?$m[4]:0;
-        $mic_5 = isset($m[5])?$m[5]:0;
-        $mic_6 = isset($m[6])?$m[6]:0;
-        $mic_7 = isset($m[7])?$m[7]:0;
-        $mic_8 = isset($m[8])?$m[8]:0;
-        $mic_9 = isset($m[9])?$m[9]:0;
+        $mic_1 = isset($m[0])?$m[0]:0;
+        $mic_2 = isset($m[1])?$m[1]:0;
+        $mic_3 = isset($m[2])?$m[2]:0;
+        $mic_4 = isset($m[3])?$m[3]:0;
+        $mic_5 = isset($m[4])?$m[4]:0;
+        $mic_6 = isset($m[5])?$m[5]:0;
+        $mic_7 = isset($m[6])?$m[6]:0;
+        $mic_8 = isset($m[7])?$m[7]:0;
+        $mic_9 = isset($m[8])?$m[8]:0;
         $team_1 = [$mic_2,$mic_3,$mic_6,$mic_7];
         $team_2 = [$mic_4,$mic_5,$mic_8,$mic_9];
         $t1 = implode (',',$team_1);

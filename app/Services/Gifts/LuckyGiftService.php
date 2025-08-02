@@ -4,11 +4,13 @@ namespace App\Services\Gifts;
 
 use App\Classes\Gifts\SendGiftService;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Enums\UserCoinLogType;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\RedisService;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
-use App\Jobs\LogUserGamesCoinProfit;
+use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\CoreWallet;
 use App\Models\Cp;
 use App\Models\Gift;
@@ -34,6 +36,7 @@ class LuckyGiftService
 
     public function sendLuckyGift2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
         $ownerId  = $data['owner_id'];
@@ -78,7 +81,7 @@ class LuckyGiftService
         $firstOwnerWalletCoins = $ownerWallet->coins;
 
 
-        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
+        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
         $receiverName = $receivedUsers->first()->name;
         $receiversCount  = $receivedUsers->count();
         $isToRoom      = $receiversCount > 1;
@@ -94,18 +97,15 @@ class LuckyGiftService
         $total_user_win  = 0;
         $total_count_win = 0;
 
-      
-        LogUserGamesCoinProfit::dispatch(
+        UserCoinLogHelper::logByType(
             $user->id,
+            -abs($totalPrice),
             $amountBefore,
-            -abs($totalPrice)  ,
-             0,
-            'gift_logs',
-            'lucky_gift',
-            'lucky_gift'
-        )->onQueue('log_user_coin');
-        
-        
+            UserCoinLogType::LUCKY_GIFT,
+            $gift?->name ,
+        );
+
+
         while ($user->di >= $totalPrice && $index > 0) {
 
             $appWallet->coins   += $price * 8;
@@ -158,7 +158,7 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
-          
+
             $user->di -= $totalPrice;
             $index--;
             $message = null;
@@ -168,19 +168,19 @@ class LuckyGiftService
             //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
         }
 
-   
-        $cashbackBefore = $user->di;
+
+
         if ($total_user_win > 0) {
-            LogUserCoinProfit::dispatch(
+
+            UserCoinLogHelper::logByType(
                 $userId,
-                $cashbackBefore,
                 $total_user_win,
-                'cashback',
-                'lucky_gifts',
-                'cashback'
-            )->onQueue('log_user_coin');
+                ($user->di - $total_user_win),
+                UserCoinLogType::CASHBACK,
+                null,
+            );
         }
-        
+
 
         if ($index > 0) {
             $count -= $index;
@@ -412,9 +412,11 @@ class LuckyGiftService
         $newUserCoin = ($user->di - $userCoins);
         $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
 
+        info($room->lastPk);
         if ($room->charizma_status && $coinsForReceiver > 1) {
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
         } elseif ($room->lastPk && $coinsForReceiver > 1) {
+            info('dispatch room redis');
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds, "pk");
         }
 
@@ -644,16 +646,30 @@ class LuckyGiftService
      * @param mixed $userCoins
      * @return void
      */
-    public function updateUserCoins(int $userId, mixed $di, mixed $userCoins, int $toalDiamond, $senderLevel = null): void
+    public function updateUserCoins(int $userId, mixed $currentDi, mixed $userCoins, int $totalDiamond, $senderLevel = null): void
     {
-        $values = [
-            'di'                 => \DB::raw('di + ' . ($di - $userCoins)),
-            'total_diamond_send' => \DB::raw('total_diamond_send + ' . $toalDiamond)
-        ];
-        if ($senderLevel) {
-            $values['sender_level'] = $senderLevel;
-        }
-        \DB::table('users')->where('id', $userId)->update($values);
+        \DB::transaction(function () use ($userId, $currentDi, $userCoins, $totalDiamond, $senderLevel) {
+            $user = \DB::table('users')
+                ->where('id', $userId)
+                ->lockForUpdate()
+                ->first();
+    
+            if (!$user) {
+                return;
+            }
+    
+            $diDifference = $currentDi - $userCoins;
+    
+            $updateData = [
+                'di' => $user->di + $diDifference,
+                'total_diamond_send' => $user->total_diamond_send + $totalDiamond,
+            ];
+    
+            if ($senderLevel !== null) {
+                $updateData['sender_level'] = $senderLevel;
+            }
+            \DB::table('users')->where('id', $userId)->update($updateData);
+        });
     }
 
 

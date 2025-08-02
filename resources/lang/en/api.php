@@ -28,6 +28,9 @@ return [
     'spechEfeect_title'    => 'Special Effect',
     'chat_with_friends_title'    => "Chat with friends",
     'chat_with_all_title'    => "Chat with everyone",
+    'maleCp' => "A relationship of type :type was sent by :name.",
+    'acceptCp' => ' :name accepted your relation request',
+    'rejectCp' => ' :name rejected your relation request',
 
     'chat_with_friends_description_allow'    => "All my friends now have the ability to chat with you",
     'chat_with_all_description_allow'    => "After activating this option, users will be able to chat with you'",

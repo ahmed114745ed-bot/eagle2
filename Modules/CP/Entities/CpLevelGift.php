@@ -31,7 +31,7 @@ class CpLevelGift extends Model
 
     public function getTypeWareAttribute()
     {
-        return $this->ware->type;
+        return $this->ware?->type ?? null;
     }
 
     protected static function boot()
