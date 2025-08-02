@@ -349,7 +349,7 @@ class FreeUserController extends MainController
                     return (new \App\Admin\Actions\UserAction(
                         $model->id,
 //                        $model->charge_status,
-                        // $model->transfer_salary,
+                        $model->transfer_salary,
 //                        $userSetting->show_invite_code,
 //                        $userSetting->hide_chat,
 //                        $model->can_play

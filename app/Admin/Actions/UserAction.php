@@ -39,7 +39,7 @@ class UserAction extends Action
         }
         $this->id = $id;
         $this->charge_status = $charge_status;
-        // $this->transfer_salary = $transfer_salary;
+        $this->transfer_salary = $transfer_salary;
         $this->show_invite_code = $show_invite_code;
         $this->hide_chat = $hide_chat;
         $this->can_play = $can_play;
