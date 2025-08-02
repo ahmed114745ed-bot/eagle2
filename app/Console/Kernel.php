@@ -12,6 +12,7 @@ class Kernel extends ConsoleKernel
         Commands\OpenStatusAppFeature::class,
         Commands\CloseStatusAppFeature::class,
         Commands\DeleteTrashedUsers::class,
+        Commands\FreezeUsersCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -101,6 +102,12 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/game-user-calc.log'))
             ->runInBackground();
+
+        // $schedule->command('users:freeze-unfinished')
+        //     ->everySecond()
+        //     ->timezone(getTimezone())
+        //     ->appendOutputTo(storage_path('logs/stop-transfer-salary.log'))
+        //     ->runInBackground();
 
        $schedule->command('log:app-profit-coins')->everyTenMinutes();
 

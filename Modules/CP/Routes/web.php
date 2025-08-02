@@ -21,10 +21,10 @@ Route::group(
         ],
         'as' => config('admin.route.prefix') . '.',
     ],
-    function () {
-        Route::resource('cp-relations', CpRelationController::class);
-        Route::resource('weekly-cp', WeeklyCpController::class);
-        Route::resource('cp-reports', CpReportRelationController::class); //'CpReportRelationController');
+    function (\Illuminate\Routing\Router $router) {
+        $router->resource('cp-relations', CpRelationController::class);
+        $router->resource ('weekly-cp',WeeklyCpController::class);
+        $router->resource ('cp-reports',CpReportRelationController::class);
        
 
         Route::prefix('cp-levels/{relation_id}')->group(function () {
