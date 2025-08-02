@@ -107,6 +107,7 @@ class ChargeController extends Controller
         if (!$to) Common::apiResponse(0, __('user not found'), 404);
 
 
+
        $usd = floatval($request->usd); 
 
         if ($usd <= 0) {
