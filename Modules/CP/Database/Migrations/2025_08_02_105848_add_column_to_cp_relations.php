@@ -13,7 +13,7 @@ return new class extends Migration
     {
          if (Schema::hasColumn('cp_relations', 'description')) {
             Schema::table('cp_relations', function (Blueprint $table) {
-                $table->string('description')->change();
+                $table->string('description')->nullable();
             });
         }
     }
