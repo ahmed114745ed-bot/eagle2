@@ -214,28 +214,29 @@ class CpRepository
     public function getCpRanking($relationType, $type)
     {
         return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
-            ->whereNotNull("cp_id")
-            ->with(['cp' => function ($query) use ($relationType) {
-                $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id')
-                    ->whereHas("relation", function ($q) use ($relationType) {
-                        $q->where('type', $relationType);
-                    });
-            }])
-            ->when($type, function ($query) use ($type) {
-                /// todo update this filter
-                switch ($type) {
-                    case 1:
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
-                    case 2:
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                    case 3:
-                        return $query->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
-                }
-            })
-            ->groupBy('cp_id')
-            ->orderByDesc('total_gifts')
-            ->take(20)
-            ->get();
+        ->whereNotNull("cp_id")
+        ->with(['cp' => function ($query) use ($relationType) {
+            $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id') 
+                ->whereHas("relation", function ($q) use ($relationType) {
+                    $q->where('type', $relationType);
+                })
+                ->with(['relation']);
+        }])
+        ->when($type, function ($query) use ($type) {
+            switch ($type) {
+                case 1:
+                    return $query->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()]);
+                case 2:
+                    return $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                case 3:
+                    return $query->whereMonth('created_at', now()->month)
+                                 ->whereYear('created_at', now()->year);
+            }
+        })
+        ->groupBy('cp_id')
+        ->orderByDesc('total_gifts')
+        ->take(20)
+        ->get();
     }
 
     public function getCpRankingWithOutRelation($type)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Jobs\CalculateUserTargetJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
@@ -101,7 +102,6 @@ public function calculateSalaryV2()
     ->chunk(500, function ($users) use($month, $year){
         foreach ($users as $user) {
             try {
-                Log::info('user',['test'=>$user->id ]);
                 CalculateUserTargetJob::dispatch($user, $month, $year)->onQueue('calculate-target');
 
             } catch (\Throwable $e) {

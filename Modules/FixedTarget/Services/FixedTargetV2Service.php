@@ -5,6 +5,7 @@ namespace Modules\FixedTarget\Services;
 use App\Helpers\Common;
 use App\Models\BDSallary;
 use App\Models\GiftLog;
+use App\Models\UsersJoinedAgency;
 use App\Services\WalletService;
 use Carbon\Carbon;
 use App\Models\User;
@@ -14,7 +15,6 @@ use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
-use Modules\Agency\Entities\UsersJoinedAgency;
 use Modules\Reals\Entities\Real;
 use Modules\Moment\Entities\Moment;
 use Illuminate\Database\Eloquent\Model;
@@ -47,13 +47,13 @@ class FixedTargetV2Service
             ->where('agency_id', $user->agency_id)
             ->latest()
             ->value('join_date');
-    
+
         $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');
-    
+
         $now         = Carbon::now($timezone);
         $inputMonth  = $this->month ?? $now->month;
         $inputYear   = $this->year  ?? $now->year;
-    
+
         $this->month      = $inputMonth;
         $this->year       = $inputYear;
         $this->startDate  = Carbon::createFromDate($inputYear, $inputMonth, 1, $timezone)->startOfMonth()->timezone('UTC');
@@ -61,7 +61,7 @@ class FixedTargetV2Service
 
         $this->userTargetType = $this->getUserTargetType($user->id);
         $this->targetInstance = new RegularTarget();
-  
+
     }
 
     private function getUserTargetType(int $userId): TargetType
@@ -73,7 +73,10 @@ class FixedTargetV2Service
     public function calculateTarget()
     {
         $user           = $this->user;
-        $month_received = GiftLog::where('receiver_id', $user->id)->whereBetween('created_at', [$this->startDate, $this->endDate])->sum('giftPrice');
+        $month_received = GiftLog::where('receiver_id', $user->id)
+        ->whereBetween('created_at', [$this->startDate, $this->endDate])
+        ->where('agency_id', $user->agency_id)
+        ->sum('giftPrice');
 
         $user = $this->calculateRegularTarget($month_received, $user);
         $user->salary_is_updated = false;
@@ -171,12 +174,7 @@ class FixedTargetV2Service
         //     ['target_id' => $target->id],
         //     'get_target'
         // );
-        \Log::info('updateSalaries',['test'=>$user->id ,'$this->month' => $this->month,'$t'=>$t]);
 
-        // logger('agency_usd Achieved:', [$agency_usd]);
-        // logger('percentageAchieved Achieved:', [$percentageAchieved]);
-        // logger(' Achieved:', [$agency_usd * $percentageAchieved]);
-        // logger(' Achieved: user', [ $t]);
 
         try {
             $values = [
@@ -255,8 +253,8 @@ class FixedTargetV2Service
                                         ])->where('id','!=', $userSalary->id)->delete();*/
         }
 
-    
-       
+
+
     }
 
     /**
@@ -266,10 +264,10 @@ class FixedTargetV2Service
      */
     public function calculateRegularTarget($month_received, User $user): User
     {
-      
+
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
-            
+
             if ($target) {
                 $hours = 0;
                 $days  = 0;
@@ -277,7 +275,7 @@ class FixedTargetV2Service
 
                 $times = $this->getUserLiveTime($user);
                 if ($times) {
-                    
+
                     $hours = $times->hnum;
                     // $days  = $user->monthly_days;
                     $days  = $user->getTotalDaysJoinedAgencyByMonth($startDate,$this->endDate,$this->year);
@@ -286,7 +284,7 @@ class FixedTargetV2Service
 
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
-             
+
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
 
