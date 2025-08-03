@@ -20,10 +20,12 @@ use Encore\Admin\Layout\Column;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Log;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class ChargeReportController extends MainController
 {
     public $permission_name = 'charger-reports';
+     use HasResourceActions;
 
     public function index(Content $content)
     {
@@ -402,7 +404,7 @@ class ChargeReportController extends MainController
 
 
         $grid->column('created_at', __('shipping date'));
-
+         $this->extendGrid($grid);
         return $grid;
     }
 
@@ -565,7 +567,7 @@ class ChargeReportController extends MainController
         });
 
         $grid->column('created_at', __('shipping date'));
-
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -670,6 +672,7 @@ class ChargeReportController extends MainController
         $grid->column('return', __('Return'))->display(function () {
             return (new \App\Admin\Actions\ReturnDiAction($this->id))->render();
         });
+         $this->extendGrid($grid);
         return $grid;
     }
 
@@ -678,6 +681,26 @@ class ChargeReportController extends MainController
         $grid = new Grid(new ExchangeLog());
         $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->where('status', 1);
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($from = request('from_date')) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                        $query->whereDate('created_at', '>=', $start);
+                    }
+                }, __('From Date'), 'from_date')->date();
+
+                $filter->where(function ($query) {
+                    if ($to = request('to_date')) {
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
+                        $query->whereDate('created_at', '<=', $end);
+                    }
+                }, __('To Date'), 'to_date')->date();
+            });
+        });
+
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -752,7 +775,7 @@ class ChargeReportController extends MainController
         });
         $grid->column('created_at', __('shipping date'));
 
-
+       $this->extendGrid($grid);
         return $grid;
     }
 
