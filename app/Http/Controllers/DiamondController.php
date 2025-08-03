@@ -102,7 +102,6 @@ public function calculateSalaryV2()
     ->chunk(500, function ($users) use($month, $year){
         foreach ($users as $user) {
             try {
-                Log::info('user',['test'=>$user->id ]);
                 CalculateUserTargetJob::dispatch($user, $month, $year)->onQueue('calculate-target');
 
             } catch (\Throwable $e) {

@@ -47,13 +47,13 @@ class FixedTargetV2Service
             ->where('agency_id', $user->agency_id)
             ->latest()
             ->value('join_date');
-    
+
         $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');
-    
+
         $now         = Carbon::now($timezone);
         $inputMonth  = $this->month ?? $now->month;
         $inputYear   = $this->year  ?? $now->year;
-    
+
         $this->month      = $inputMonth;
         $this->year       = $inputYear;
         $this->startDate  = Carbon::createFromDate($inputYear, $inputMonth, 1, $timezone)->startOfMonth()->timezone('UTC');
@@ -61,7 +61,7 @@ class FixedTargetV2Service
 
         $this->userTargetType = $this->getUserTargetType($user->id);
         $this->targetInstance = new RegularTarget();
-  
+
     }
 
     private function getUserTargetType(int $userId): TargetType
@@ -174,12 +174,7 @@ class FixedTargetV2Service
         //     ['target_id' => $target->id],
         //     'get_target'
         // );
-        \Log::info('updateSalaries',['test'=>$user->id ,'$this->month' => $this->month,'$t'=>$t]);
 
-        // logger('agency_usd Achieved:', [$agency_usd]);
-        // logger('percentageAchieved Achieved:', [$percentageAchieved]);
-        // logger(' Achieved:', [$agency_usd * $percentageAchieved]);
-        // logger(' Achieved: user', [ $t]);
 
         try {
             $values = [
@@ -258,8 +253,8 @@ class FixedTargetV2Service
                                         ])->where('id','!=', $userSalary->id)->delete();*/
         }
 
-    
-       
+
+
     }
 
     /**
@@ -269,10 +264,10 @@ class FixedTargetV2Service
      */
     public function calculateRegularTarget($month_received, User $user): User
     {
-      
+
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
-            
+
             if ($target) {
                 $hours = 0;
                 $days  = 0;
@@ -280,7 +275,7 @@ class FixedTargetV2Service
 
                 $times = $this->getUserLiveTime($user);
                 if ($times) {
-                    
+
                     $hours = $times->hnum;
                     // $days  = $user->monthly_days;
                     $days  = $user->getTotalDaysJoinedAgencyByMonth($startDate,$this->endDate,$this->year);
@@ -289,7 +284,7 @@ class FixedTargetV2Service
 
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
-             
+
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
 
