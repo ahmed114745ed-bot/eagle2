@@ -1078,6 +1078,8 @@
     </style>
 
 </head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" />
+
 <body>
 
 <div class="agency-profile-container">
@@ -1176,7 +1178,7 @@
         </div>
         <div class="card p-3 bg-danger-subtle">
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ url('admin/users/' . $user->id . '/edit') }}" class="btn btn-light">
+                <a href="{{ url('admin/users/') }}" class="btn btn-light">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
                 </a>
                      @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))

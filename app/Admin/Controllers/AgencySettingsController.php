@@ -27,7 +27,6 @@ class AgencySettingsController extends MainController
             Permission::check('browse-' . $this->permission_name);
         }
 
-        checkAgencyFeature();
         // $hours =  settings()->get('hours');
         // $days =  settings()->get('days');
         // $moments =  settings()->get('moments');

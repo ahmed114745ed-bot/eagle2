@@ -20,7 +20,6 @@ class HostDiamondController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
         $this->arabicToEnglishDates();
 
         return parent::index($content

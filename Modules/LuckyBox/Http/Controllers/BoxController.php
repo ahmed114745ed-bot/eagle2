@@ -248,7 +248,7 @@ class BoxController extends Controller
             if ($countWinners == $box_use['users_num']) {
                 $this->closeNormalBox($request->bid);
             }
-            return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => $coins], 200);
+            return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' =>(int) $coins], 200);
         } else {
             return Common::apiResponse(1, 'لم يحصل ال مستخدم علي مكسب', ['is_win' => false, 'coins' => 0], 200);
         }
