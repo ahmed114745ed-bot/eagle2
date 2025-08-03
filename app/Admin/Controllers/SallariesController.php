@@ -22,8 +22,6 @@ class SallariesController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(trans('Agencies Wallet'))
             ->description(__(request('desc') ?: 'users'))

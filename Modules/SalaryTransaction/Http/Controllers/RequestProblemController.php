@@ -23,8 +23,6 @@ class RequestProblemController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(trans('transaction request problem'))
             ->body($this->grid()));

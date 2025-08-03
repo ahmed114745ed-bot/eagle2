@@ -22,8 +22,6 @@ class AgentRequestController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(trans('report'))
             ->body($this->grid()));

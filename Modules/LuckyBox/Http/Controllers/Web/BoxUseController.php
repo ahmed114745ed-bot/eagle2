@@ -104,6 +104,17 @@ class BoxUseController extends MainController
     {
         $grid = new Grid(new BoxUse);
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+
+            $filter->disableIdFilter();
+
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user.uuid', __('uuid'));
+            });
+        });
+
         $grid->id(__('ID'));
 
         $grid->column('user_id', __('User'))->display(function () {
