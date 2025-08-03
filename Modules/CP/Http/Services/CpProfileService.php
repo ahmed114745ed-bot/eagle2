@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\CP\Repositories\CpRepository;
 use Modules\CP\Repositories\PackRepository;
 use Modules\CP\Transformers\CpListResource;
+use Modules\CP\Transformers\CpProfileResource;
 
 class CpProfileService
 {
@@ -77,7 +78,7 @@ class CpProfileService
             'seats' => $seats,
             'wares' => $ware,
             'main_cp' => $mainCp ? new CpListResource($mainCp) : null,
-            'remaining_cp' => $remainingCps ? CpListResource::collection($remainingCps) : []
+            'remaining_cp' => $remainingCps ? CpProfileResource::collection($remainingCps) : []
         ];
 
         return Common::apiResponse(1, '', $result);
