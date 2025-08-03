@@ -2,22 +2,23 @@
 
 namespace Modules\LuckyBox\Http\Controllers;
 
-use App\Enums\UserCoinLogType;
-use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
-
 use App\Models\Room;
 use App\Models\User;
+
 use App\Enums\TypeBox;
 use App\Helpers\Common;
 use App\Jobs\OpenBoxJob;
-
 use App\Models\RoomVisitor;
 use Illuminate\Http\Request;
+
 use App\Facades\RedisService;
+use App\Jobs\NormalBoxRtmJob;
+use App\Enums\UserCoinLogType;
+
+use App\Helpers\UserCoinLogHelper;
 
 use App\Jobs\TestSuperLuckyBoxJob;
-
 use Modules\LuckyBox\Entities\Box;
 use App\Facades\CustomNotification;
 use App\Http\Controllers\Controller;
@@ -151,7 +152,7 @@ class BoxController extends Controller
                 'label' => $box_use->label,
             ];
 
-            if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => true])->exists()) {
+            if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => $request->bid])->exists()) {
                 return Common::apiResponse(0, 'used it before', null, 403);
             }
 
@@ -161,7 +162,7 @@ class BoxController extends Controller
             $box_use->used_num += 1;
             $box_use->unused_coins -= $coins;
             $box_use->save();
-            dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
+           // dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
                 $user->id,
@@ -173,7 +174,7 @@ class BoxController extends Controller
             $countWinners =  $box_use->userBoxGifts()->count();
 
             if ($countWinners == $box_use['users_num']) {
-                $this->closeNormalBox($box_use);
+                dispatch(new NormalBoxRtmJob($box_use->id))->onQueue('test-super-lucky-box');
             }
             return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => (int) $coins], 200);
         } else {
@@ -181,35 +182,6 @@ class BoxController extends Controller
         }
     }
 
-    public function closeNormalBox($userBox)
-    {
-        $user = $userBox->user;
-        $user->increment('di', $userBox->unused_coins);
-        $userBox->is_closed = true;
-        $userBox->save();
-        $room = Room::withoutAppends()->where('uid', $userBox->room_uid)->select('id')->first();
-        $c = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
-        $userWinner = $userBox->userBoxGifts()->pluck('user_id')->toArray();
-        $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
-        CustomNotification::closeLuckyBox($user, $userBox?->image, 0);
-
-        foreach ($usersRoomVisit as $userRoomVisit) {
-
-            $m = [
-                "messageContent" => [
-                    "message" => "hideluckybox",
-                    "ownerBoxId" => @$user->id,
-                    "ownerBoxName" => @$user->name,
-                    "boxCoins" => $userBox->coins,
-                    "boxId" => $userBox->id,
-                    "boxType" => $userBox->type == 1 ? 'super' : 'normal',
-                    "numOfBoxes" => $c
-                ]
-            ];
-            $json = json_encode($m);
-            Common::sendToZego('SendCustomCommand', @$room->id, @$userRoomVisit->user_id, $json);
-        }
-    }
 
     public function superBox($box_use, $user, $keyBoxUse, $bosUserId)
     {
