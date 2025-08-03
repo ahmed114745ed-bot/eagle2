@@ -29,13 +29,16 @@ class CpsUserResource extends JsonResource
             $query->where('user_one_id', $this->id)
                   ->orWhere('user_two_id', $this->id);
         })
+        ->where(function ($query) {
+            $query->where('status', 1)
+                  ->orWhere('status', 4);
+        })
         ->whereHas('cpRelation', function ($q) {
             $q->where('type', $this->relationType);
 
         })
         ->first();
 
-        dd($cp ,$this->relationType ,$this->id);
         if ($cp && ($cp->user_one_id == $this->id)) {
             $otherUser = User::Find($cp->user_two_id);
         } elseif ($cp && ($cp->user_two_id == $this->id)) {
