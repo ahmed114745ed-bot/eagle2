@@ -31,8 +31,6 @@ class ChargeCountryController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(trans('charge-country'))
             ->body($this->grid()));

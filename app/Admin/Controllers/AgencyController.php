@@ -54,8 +54,6 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))

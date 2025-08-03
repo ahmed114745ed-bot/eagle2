@@ -23,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 use Encore\Admin\Facades\Admin;
+use App\Models\Admin as AdminModel;
 use Encore\Admin\Layout\Content;
 use App\Admin\Actions\RoomPinAction;
 use App\Admin\Actions\CloseRoomAction;
@@ -909,6 +910,8 @@ class RoomController extends MainController
         $room = Room::findOrFail($roomId);
         $adminId = $request->admin_id;
 
+        $admin = AdminModel::find($adminId);
+
         $admins = array_filter(explode(',', $room->room_admin));
 
         $admins = array_diff($admins, [$adminId]);
@@ -916,11 +919,15 @@ class RoomController extends MainController
         $room->room_admin = implode(',', $admins);
         $room->save();
 
+        $adminName = $admin?->name ?? __('Unknown');
+        $comment = __(':name has been removed from administrators.', ['name' => $adminName]);
+
         $d = [
             "messageContent" => [
                 "message" => "banAdmin",
                 "roomId" => $room->id,
                 "adminId" => $adminId,
+                "comment" => $comment
             ]
         ];
         $json = json_encode($d);
