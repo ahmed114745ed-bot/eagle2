@@ -291,7 +291,8 @@ class CpserviceCo
 
     public function getCpRanking()
     {
-        $relationType = request("relationType") ?? CpRelation::first()?->id;
+    
+        $relationType = request("relationType") ?? 'lovely';
         $type = request("type") ?? 1;
 
         $data = $this->cpRepository->getCpRanking($relationType, $type);
