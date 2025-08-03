@@ -44,6 +44,7 @@ class CpProfileResource extends JsonResource
             'next_level'     => $nextLevelPercentage,
             'di'        => $this->di,
             'ratio' => $ratio,
+            'exp' => $nextLevel->exp ,
             "user"      => [
                 "id"        => $user?->id,
                 "uid"       => $user?->uuid,
