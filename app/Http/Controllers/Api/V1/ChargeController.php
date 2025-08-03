@@ -106,9 +106,7 @@ class ChargeController extends Controller
 
         if (!$to) Common::apiResponse(0, __('user not found'), 404);
 
-
-
-       $usd = floatval($request->usd); 
+       $usd = floatval($request->usd);
 
         if ($usd <= 0) {
             return Common::apiResponse(0, 'This value is not allowed', 422);
@@ -194,7 +192,7 @@ class ChargeController extends Controller
 
 
 
-        $usd = floatval($request->usd); 
+        $usd = floatval($request->usd);
 
         if ($usd <= 0) {
             return Common::apiResponse(0, 'This value is not allowed', 422);
@@ -241,7 +239,7 @@ class ChargeController extends Controller
         //        }
 
         $user = $request->user();
-        
+
         if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
 
         Common::checkUserAgencyFrozen($user);
