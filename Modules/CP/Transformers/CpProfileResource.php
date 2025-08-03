@@ -30,15 +30,13 @@ class CpProfileResource extends JsonResource
         $nextLevel = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
 
         $nextLevelPercentage = 0;
-        $ratio = 1;
+        $ratio = 0;
         
         if ($nextLevel && $nextLevel->exp > 0) {
             $nextLevelPercentage = $nextLevel->level;
             $ratio = $this->di / $nextLevel->exp;
-            $ratio = round(min($ratio, 1) * 100, 2); 
-        } else {
-            $ratio = 100;
-        }
+            $ratio = round(($this->di / $nextLevel->exp) * 100, 2);
+        } 
         
 
         return [

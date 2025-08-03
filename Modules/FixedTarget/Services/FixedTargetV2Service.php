@@ -73,7 +73,10 @@ class FixedTargetV2Service
     public function calculateTarget()
     {
         $user           = $this->user;
-        $month_received = GiftLog::where('receiver_id', $user->id)->whereBetween('created_at', [$this->startDate, $this->endDate])->sum('giftPrice');
+        $month_received = GiftLog::where('receiver_id', $user->id)
+        ->whereBetween('created_at', [$this->startDate, $this->endDate])
+        ->where('agency_id', $user->agency_id)
+        ->sum('giftPrice');
 
         $user = $this->calculateRegularTarget($month_received, $user);
         $user->salary_is_updated = false;
