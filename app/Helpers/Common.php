@@ -941,7 +941,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
+//            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -1371,7 +1371,7 @@ class Common
 //            ]);
         }
 
-        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
+//        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
 
 
         // OfficialMessage::query()->create(

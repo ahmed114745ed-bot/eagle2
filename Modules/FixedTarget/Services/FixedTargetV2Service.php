@@ -5,7 +5,6 @@ namespace Modules\FixedTarget\Services;
 use App\Helpers\Common;
 use App\Models\BDSallary;
 use App\Models\GiftLog;
-use App\Models\UsersJoinedAgency;
 use App\Services\WalletService;
 use Carbon\Carbon;
 use App\Models\User;
@@ -15,6 +14,7 @@ use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
+use Modules\Agency\Entities\UsersJoinedAgency;
 use Modules\Reals\Entities\Real;
 use Modules\Moment\Entities\Moment;
 use Illuminate\Database\Eloquent\Model;
@@ -74,6 +74,7 @@ class FixedTargetV2Service
     {
         $user           = $this->user;
         $month_received = GiftLog::where('receiver_id', $user->id)->whereBetween('created_at', [$this->startDate, $this->endDate])->sum('giftPrice');
+
         $user = $this->calculateRegularTarget($month_received, $user);
         $user->salary_is_updated = false;
         $user->save();
