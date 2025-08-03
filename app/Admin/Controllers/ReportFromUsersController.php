@@ -22,8 +22,6 @@ class ReportFromUsersController extends AdminController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return $content
             ->header(trans('User_Report'))
             // ->description(trans('admin.User_Report'))

@@ -24,8 +24,6 @@ class SalaryRequestController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(trans('salary-requests'))
             ->body($this->grid()));

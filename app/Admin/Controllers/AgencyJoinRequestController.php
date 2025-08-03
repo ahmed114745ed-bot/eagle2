@@ -55,8 +55,6 @@ class AgencyJoinRequestController extends MainController
      */
     public function show($id, Content $content)
     {
-        checkAgencyFeature();
-
         return parent::show($id, $content
             ->title(trans('Join To Agency Requests'))
             ->body($this->detail($id)));
