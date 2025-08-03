@@ -161,7 +161,7 @@ class BoxController extends Controller
             $box_use->used_num += 1;
             $box_use->unused_coins -= $coins;
             $box_use->save();
-          //  dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
+            dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
                 $user->id,
