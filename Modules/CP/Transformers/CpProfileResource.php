@@ -44,16 +44,13 @@ class CpProfileResource extends JsonResource
         } else {
             $ratio = 100;
         }
-        
-        
 
         return [
             'id'        => $this->id,
             'level'     => $this->level_id,
-            'next_level'     => $nextLevelPercentage,
+            'next_level'     =>  $nextLevel->level,
             'di'        => $this->di,
             'ratio' => $ratio,
-            'exp' => $nextLevel->exp ,
             "user"      => [
                 "id"        => $user?->id,
                 "uid"       => $user?->uuid,
