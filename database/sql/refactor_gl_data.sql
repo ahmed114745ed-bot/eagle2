@@ -1,4 +1,4 @@
-REATE PROCEDURE refactor_gl_data()
+CREATE PROCEDURE refactor_gl_data()
 BEGIN
 
     CREATE TABLE IF NOT EXISTS gift_logs_history LIKE gift_logs;
