@@ -29,10 +29,10 @@ class CpsUserResource extends JsonResource
             $query->where('user_one_id', $this->id)
                   ->orWhere('user_two_id', $this->id);
         })
-        ->whereHas('cpRelation', function ($q) {
-            $q->where('title', $this->relationType);
+        // ->whereHas('cpRelation', function ($q) {
+        //     $q->where('title', $this->relationType);
 
-        })
+        // })
         ->first();
 
         dd($cp ,$this->relationType ,$this->id);
