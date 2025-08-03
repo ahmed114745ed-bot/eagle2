@@ -129,7 +129,7 @@ class ChargeAction2 extends Action
 
         $this->text('amount', __('Amount'))
             ->addElementClass('price-input')
-            ->help(__('Enter amount in dollars'))->rules('required|numeric|min:1');
+            ->help(__('Enter amount in dollars'))->rules('required|numeric|gt:0');
 
         $this->text('reason_en', __('reason en'));
         $this->text('reason_ar', __('reason ar'));
