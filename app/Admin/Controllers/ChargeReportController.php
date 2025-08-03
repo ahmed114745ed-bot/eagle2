@@ -678,6 +678,26 @@ class ChargeReportController extends MainController
         $grid = new Grid(new ExchangeLog());
         $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->where('status', 1);
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($from = request('from_date')) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                        $query->whereDate('created_at', '>=', $start);
+                    }
+                }, __('From Date'), 'from_date')->date();
+
+                $filter->where(function ($query) {
+                    if ($to = request('to_date')) {
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
+                        $query->whereDate('created_at', '<=', $end);
+                    }
+                }, __('To Date'), 'to_date')->date();
+            });
+        });
+
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
