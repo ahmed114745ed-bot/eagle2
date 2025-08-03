@@ -34,7 +34,6 @@ class CpProfileResource extends JsonResource
         $ratio = 0;
         
         if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
-            $nextLevelPercentage = $nextLevel->level;
         
             $currentExp = $this->di;
             $startExp   = $currentLevel->exp;
@@ -48,7 +47,7 @@ class CpProfileResource extends JsonResource
         return [
             'id'        => $this->id,
             'level'     => $this->level_id,
-            'next_level'     =>  $nextLevel->level,
+            'next_level'     =>  $nextLevel?->level ?? 0,
             'di'        => $this->di,
             'ratio' => $ratio,
             "user"      => [
