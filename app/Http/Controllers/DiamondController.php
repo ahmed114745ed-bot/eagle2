@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Jobs\CalculateUserTargetJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
