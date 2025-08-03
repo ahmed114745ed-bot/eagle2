@@ -36,8 +36,7 @@ class SetDataFromJob extends Command
             }
         }
 
-        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
-
+//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 
 }

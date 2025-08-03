@@ -93,7 +93,6 @@ public function calculateSalaryV2()
 {
     $month =request()->month ?? now()->month;
     $year =request()->year ?? now()->year;
-    Log::info('user',['test'=>$year ]);
 
      User::query()
             ->where('agency_id', '!=', 0)
@@ -102,8 +101,6 @@ public function calculateSalaryV2()
             ->chunk(500, function ($users) use($month, $year){
                 foreach ($users as $user) {
                     try {
-                        Log::info('user',['test'=>$user->id ]);
-
                         $targetService = new FixedTargetV2Service($user, month: $month, year: $year);
                         $targetService->calculateTarget();
                     } catch (\Throwable $e) {

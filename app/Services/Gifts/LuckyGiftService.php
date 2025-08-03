@@ -412,11 +412,9 @@ class LuckyGiftService
         $newUserCoin = ($user->di - $userCoins);
         $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
 
-        info($room->lastPk);
         if ($room->charizma_status && $coinsForReceiver > 1) {
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
         } elseif ($room->lastPk && $coinsForReceiver > 1) {
-            info('dispatch room redis');
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds, "pk");
         }
 
@@ -600,7 +598,6 @@ class LuckyGiftService
 
         $cashback_percentage = $properties ? $valueTimes : rand(1, $times);
         $properties1         = $properties ? explode(',', $properties) : null;
-        Log::channel('lucky_gift')->info($properties);
         $cashback_percentage = $this->getRandomDuplicate($probability, $cashback_percentage, $properties1);
         return $cashback_percentage;
     }
@@ -653,18 +650,18 @@ class LuckyGiftService
                 ->where('id', $userId)
                 ->lockForUpdate()
                 ->first();
-    
+
             if (!$user) {
                 return;
             }
-    
+
             $diDifference = $currentDi - $userCoins;
-    
+
             $updateData = [
                 'di' => $user->di + $diDifference,
                 'total_diamond_send' => $user->total_diamond_send + $totalDiamond,
             ];
-    
+
             if ($senderLevel !== null) {
                 $updateData['sender_level'] = $senderLevel;
             }
