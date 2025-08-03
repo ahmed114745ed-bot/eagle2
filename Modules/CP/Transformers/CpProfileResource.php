@@ -27,24 +27,30 @@ class CpProfileResource extends JsonResource
         $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
         $frame = $dress_1_data ?: $dress_1_fallback;
 
-        $nextLevel = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
-
+        $currentLevel = CpLevel::find($this->level_id);
+        $nextLevel    = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
+        
         $nextLevelPercentage = 0;
         $ratio = 0;
         
-        if ($nextLevel && $nextLevel->exp > 0) {
+        if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
             $nextLevelPercentage = $nextLevel->level;
-            $ratio = round(min(($this->di / $nextLevel->exp) * 100, 100), 2);
-        } 
         
+            $currentExp = $this->di;
+            $startExp   = $currentLevel->exp;
+            $endExp     = $nextLevel->exp;
+        
+            $ratio = round(min((($currentExp - $startExp) / ($endExp - $startExp)) * 100, 100), 2);
+        } else {
+            $ratio = 100;
+        }
 
         return [
             'id'        => $this->id,
             'level'     => $this->level_id,
-            'next_level'     => $nextLevelPercentage,
+            'next_level'     =>  $nextLevel->level,
             'di'        => $this->di,
             'ratio' => $ratio,
-            'exp' => $nextLevel->exp ,
             "user"      => [
                 "id"        => $user?->id,
                 "uid"       => $user?->uuid,

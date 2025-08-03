@@ -218,8 +218,6 @@ trait RoomTrait
         $mainMicrophone = $room->main_microphone;
         $baseMic = $room->all_microphone;
         // $baseMic = $room->getOriginal('microphone');
-        logger('baseMic:', [$baseMic]);
-
 
 
         $microphone = explode(',', $microphone);
