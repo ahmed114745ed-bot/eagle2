@@ -38,6 +38,7 @@ class CpsUserResource extends JsonResource
         ->with('cpRelation')
         ->first();
 
+        dd($cp ,$this->relationType);
         if ($cp && ($cp->user_one_id == $this->id)) {
             $otherUser = User::Find($cp->user_two_id);
         } elseif ($cp && ($cp->user_two_id == $this->id)) {
