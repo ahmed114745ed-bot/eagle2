@@ -85,6 +85,8 @@ class UserChargeHistoryController extends AdminController
                   ->where('user_type', 'user');
         }
     
+        $model->orderByDesc('created_at');
+        
         $grid->column('id', __('ID'));
     
         if ($scope === 'charge-to') {
