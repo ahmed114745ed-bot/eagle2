@@ -74,9 +74,8 @@ class UserChargeHistoryController extends AdminController
         $grid->disableRowSelector();
     
         $scope = request('scope');
-        $model = $grid->model()->with(Common::chargerRelationsQuery())
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year);
+        $model = $grid->model()->with(Common::chargerRelationsQuery());
+           
     
         if ($scope === 'charge-to') {
             $model->where('charger_id', $userId)
