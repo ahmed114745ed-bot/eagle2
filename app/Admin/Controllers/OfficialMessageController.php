@@ -33,7 +33,7 @@ class OfficialMessageController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('official-messages'))
             ->body($this->detail($id)));
     }
@@ -47,7 +47,7 @@ class OfficialMessageController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('official-messages'))
             ->body($this->form()->edit($id)));
     }
@@ -69,15 +69,15 @@ class OfficialMessageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OfficialMessage);
-        $grid->model ()->where ('type',2);
-        $grid->filter (function (Grid\Filter $filter){
-            $filter->expand ();
-            $filter->column(1/2, function ($filter) {
-                $filter->equal('user.uuid',__ ('uuid'));
+        $grid->model()->where('type', 2)->orderByDesc('id');
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user.uuid', __('uuid'));
             });
         });
-        $grid->id(__ ('ID'));
-        $grid->column('user.name',trans ('user id'))->display(function ($name) {
+        $grid->id(__('ID'));
+        $grid->column('user.name', trans('user id'))->display(function ($name) {
             $uid = @$this->user->uuid;
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -100,10 +100,10 @@ class OfficialMessageController extends MainController
         ";
         });
         $grid->title(trans('title'));
-       
-      
-        $grid->content(__ ('content'));
-        $grid->column('img',trans ('img'))->display(function ($img) {
+
+
+        $grid->content(__('content'));
+        $grid->column('img', trans('img'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img);
             if (!isImageExists(@$path)) {
@@ -142,13 +142,13 @@ class OfficialMessageController extends MainController
                 ";
         });
         $grid->column('url', trans('url'))
-        ->display(function ($value) {
-            return "<span style='color: #89CFF0;'>$value</span>";
-        });
+            ->display(function ($value) {
+                return "<span style='color: #89CFF0;'>$value</span>";
+            });
         $grid->created_at(trans('admin.created_at'));
         $grid->disableExport();
 
-        $this->extendGrid ($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -162,14 +162,14 @@ class OfficialMessageController extends MainController
     {
         $show = new Show(OfficialMessage::findOrFail($id));
 
-//        $show->id('ID');
-//        $show->title(trans('title'));
-//        $show->img('img');
-//        $show->user_id('user_id');
-//        $show->content('content');
-//        $show->type('type');
-//        $show->url('url');
-        $this->extendShow ($show);
+        //        $show->id('ID');
+        //        $show->title(trans('title'));
+        //        $show->img('img');
+        //        $show->user_id('user_id');
+        //        $show->content('content');
+        //        $show->type('type');
+        //        $show->url('url');
+        $this->extendShow($show);
         return $show;
     }
 
@@ -201,22 +201,21 @@ class OfficialMessageController extends MainController
         $this->disableFormTools($form);
 
         $form->display('ID');
-        $form->text('title', __ ('title'))->rules('nullable|max:255');;
-        $form->image('img', __ ('img'));
+        $form->text('title', __('title'))->rules('nullable|max:255');;
+        $form->image('img', __('img'));
         $form->select('user_id', __('user'))->options(function ($search) {
             $ops = [0 => __('all')];
             return $ops;
-        })->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name','uuid');
-        $form->text('content', __ ('content'));
-        $form->select('type', __ ('type'))->options (
+        })->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name', 'uuid');
+        $form->text('content', __('content'));
+        $form->select('type', __('type'))->options(
             [
-                2=>trans(__ ('official message'))
+                2 => trans(__('official message'))
             ]
-        )->default (2);
-        $form->text('url', __ ('url'));
+        )->default(2);
+        $form->text('url', __('url'));
 
 
         return $form;
     }
 }
-
