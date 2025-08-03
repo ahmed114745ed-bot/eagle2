@@ -31,7 +31,7 @@ class HandlingRoomZigoRequests extends Command
     {
         $roomFactory = new RoomJobFactory();
         while (true) {
-
+            // This is a long-running Redis listener loop
             $this->withRedis($roomFactory);
         }
     }
