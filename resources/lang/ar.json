@@ -3525,6 +3525,7 @@
     "Are you sure you want to delete this room?": "هل أنت متأكد أنك تريد حذف هذه الغرفة؟",
     "Unknown User": "مستخدم غير معروف",
     "User Missing/Deleted": "المستخدم مفقود أو تم حذفه",
+    ":name has been removed from administrators.": ":name تم إزالته من المسؤولين",
     "loss" : "خسارة"
 
 
