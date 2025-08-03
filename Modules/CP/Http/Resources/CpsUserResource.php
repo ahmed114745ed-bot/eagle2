@@ -24,12 +24,20 @@ class CpsUserResource extends JsonResource
 
     public function toArray($request)
     {
+  
         $cp = Cp::where(function ($query) {
             $query->where('user_one_id', $this->id)
-                ->orWhere('user_two_id', $this->id);
-        })->where('cp_relation_id', $this->relationType)->where(function ($query) {
-            $query->where('status', 1)->orWhere('status', 4);
-        })->first();
+                  ->orWhere('user_two_id', $this->id);
+        })
+        ->where(function ($query) {
+            $query->where('status', 1)
+                  ->orWhere('status', 4);
+        })
+        ->whereHas('cpRelation', function ($q) {
+            $q->where('type', $this->relationType);
+
+        })
+        ->first();
 
         if ($cp && ($cp->user_one_id == $this->id)) {
             $otherUser = User::Find($cp->user_two_id);
