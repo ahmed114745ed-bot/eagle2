@@ -404,7 +404,7 @@ class ChargeReportController extends MainController
 
 
         $grid->column('created_at', __('shipping date'));
-
+         $this->extendGrid($grid);
         return $grid;
     }
 
@@ -567,7 +567,7 @@ class ChargeReportController extends MainController
         });
 
         $grid->column('created_at', __('shipping date'));
-
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -672,6 +672,7 @@ class ChargeReportController extends MainController
         $grid->column('return', __('Return'))->display(function () {
             return (new \App\Admin\Actions\ReturnDiAction($this->id))->render();
         });
+         $this->extendGrid($grid);
         return $grid;
     }
 
@@ -774,7 +775,7 @@ class ChargeReportController extends MainController
         });
         $grid->column('created_at', __('shipping date'));
 
-
+       $this->extendGrid($grid);
         return $grid;
     }
 
