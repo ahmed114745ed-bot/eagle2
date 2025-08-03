@@ -282,7 +282,7 @@ Route::group(
         Route::put('wares/toggle-enable/{id}', [WareController::class, 'toggleEnable']);
 
         Route::resource('test-pusher', TestPusherController::class);
-        Route::resource('report_user', ReportUserController::class);
+        Route::resource('report_user', ReportUserController::class)->middleware('web-agency-feature');
         // Route::resource('coupons', 'CouponController');
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
@@ -292,7 +292,7 @@ Route::group(
         Route::resource('emojis', 'EmojiController');
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');
-        Route::resource('agencies', 'AgencyController');
+        Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::get('shipping-agencies/profile/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
         Route::get('charges/filter/{id}', [AppearChargerAgencyController::class, 'filterCharges'])->name('charges.filter');
@@ -301,9 +301,9 @@ Route::group(
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
-        Route::resource('targets', 'TargetController');
-        Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
-        Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel']);
+        Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
+        Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf')->middleware('web-agency-feature');
+        Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel'])->middleware('web-agency-feature');
         Route::resource('polices', PoliceController::class);
         Route::resource('offers', OfferController::class);
         Route::resource('payment-gateways', PaymentGetWayController::class);
@@ -328,7 +328,7 @@ Route::group(
             'names' => [
                 'index' => 'user_targets'
             ]
-        ]);
+        ])->middleware('web-agency-feature');
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
 
@@ -368,7 +368,7 @@ Route::group(
         Route::resource('manger-types', 'MangerTypeController');
         Route::resource('userscharg', chargUsersSleemController::class);
         Route::resource('image-colors', ImageColorController::class);
-        Route::resource('agency_join_requests', 'AgencyJoinRequestController');
+        Route::resource('agency_join_requests', 'AgencyJoinRequestController')->middleware('web-agency-feature');
         Route::resource('requests-for-get-salary', 'GetSalaryRequestController');
         Route::resource('requests-for-get-salary-history', 'GetSalaryRequestFilterationController');
         Route::resource('special-id-requests', 'SpecialIdRequestController');
@@ -434,18 +434,18 @@ Route::group(
         Route::resource('exchanges', 'ExchangeController');
 
         Route::get('filter-agencies', App\Admin\Controllers\Filter\AgencyController::class)->name('filter-agencies');
-        Route::resource('reports', 'ReportController');
+        Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
         Route::resource('charges-reports', 'ChargeReportController');
         Route::get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
-        Route::resource('sallaries', 'SallariesController')->name('index', 'sallaries');
+        Route::resource('sallaries', 'SallariesController')->name('index', 'sallaries')->middleware('web-agency-feature');
         Route::resource('total-statistics', 'AllStatisticController');
         Route::resource('coin-reports', 'CoinReportController');
         Route::resource('ban-types', BanTypeController::class);
         Route::resource('sallaries_history', 'SallariesHistoryController');
         // Route::resource ('export-excel','ImportExcelReportController');
         Route::resource('agencies-tareget-manger', AgencyMangerTaregetController::class);
-        Route::resource('report_users', ReportFromUsersController::class);
-        Route::post('cashing', 'ReportController@cashing')->name('cashing');
+        Route::resource('report_users', ReportFromUsersController::class)->middleware('web-agency-feature');
+        Route::post('cashing', 'ReportController@cashing')->name('cashing')->middleware('web-agency-feature');
         Route::resource('trxs', 'CoinLogController');
         Route::resource('images', 'ImageController');
         Route::resource('moments', MomentController::class);
@@ -471,7 +471,7 @@ Route::group(
         // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
 
 
-        Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function () {
+        Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
             Route::resource('/users', UserController::class);
 
@@ -512,8 +512,8 @@ Route::group(
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
         Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        Route::resource('charge-agencies', AppearChargerAgencyController::class);
-        Route::resource('users-joined-agencies', UsersJoinedAgencyController::class);
+        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
+        Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
 
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
@@ -526,7 +526,7 @@ Route::group(
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
-        Route::resource('agency-settings', AgencySettingsController::class);
+        Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
         Route::resource('app-feature', FeatureAppController::class);
         Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');

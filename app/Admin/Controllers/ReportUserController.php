@@ -23,8 +23,6 @@ class ReportUserController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(trans('Hosts Reports'))
             ->body($this->grid()));

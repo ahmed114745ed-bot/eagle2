@@ -11,7 +11,7 @@ class AppFeatureController extends Controller
     {
         $hostAgencySetting = Setting::where('key', 'host_agency')->first();
         $data = [
-            $hostAgencySetting->key => (bool)$hostAgencySetting->value,
+            'host_agency' => (bool)($hostAgencySetting?->value ?? true),
         ];
 
         return Common::apiResponse(true, '', $data, 200);
