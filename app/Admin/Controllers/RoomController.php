@@ -877,7 +877,7 @@ class RoomController extends MainController
         $form->text('room_name', __('room name'));
         $form->image('room_cover', __('room cover'));
         $form->text('room_intro', __('room intro'));
-        $form->number('room_pass', __('room pass'))->rules('required|min:6|max:6');
+        $form->number('room_pass', __('room pass'));
         $form->hidden('is_afk', __('owner in'));
         $form->select('room_class')->options(function () {
             $options = [];

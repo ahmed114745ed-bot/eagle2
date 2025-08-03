@@ -174,9 +174,7 @@ class MicService
                 'neighbor_position' => $neighborPosition,
                 'user_other_id' => $userOtherId,
             ]);
-            if (!$userOtherId || $userOtherId == 0 || $userOtherId == $user->id) {
-                continue;
-            }
+       
 
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
@@ -200,20 +198,21 @@ class MicService
     public function getUserNearby($index, $mode, $rowSize = 4)
     {
         $neighbors = [];
-
-        $rowStart = intdiv($index, $rowSize) * $rowSize;
+    
+        $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
         $rowEnd = $rowStart + $rowSize - 1;
-
+    
         if ($index - 1 >= $rowStart) {
             $neighbors[] = $index - 1;
         }
-
+    
         if ($index + 1 <= $rowEnd) {
             $neighbors[] = $index + 1;
         }
-
+    
         return $neighbors;
     }
+    
 
 
     public function sendCpLovelyMessage($room, $user)

@@ -36,6 +36,7 @@ class LuckyGiftService
 
     public function sendLuckyGift2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
         $ownerId  = $data['owner_id'];
@@ -645,16 +646,30 @@ class LuckyGiftService
      * @param mixed $userCoins
      * @return void
      */
-    public function updateUserCoins(int $userId, mixed $di, mixed $userCoins, int $toalDiamond, $senderLevel = null): void
+    public function updateUserCoins(int $userId, mixed $currentDi, mixed $userCoins, int $totalDiamond, $senderLevel = null): void
     {
-        $values = [
-            'di'                 => \DB::raw('di + ' . ($di - $userCoins)),
-            'total_diamond_send' => \DB::raw('total_diamond_send + ' . $toalDiamond)
-        ];
-        if ($senderLevel) {
-            $values['sender_level'] = $senderLevel;
-        }
-        \DB::table('users')->where('id', $userId)->update($values);
+        \DB::transaction(function () use ($userId, $currentDi, $userCoins, $totalDiamond, $senderLevel) {
+            $user = \DB::table('users')
+                ->where('id', $userId)
+                ->lockForUpdate()
+                ->first();
+    
+            if (!$user) {
+                return;
+            }
+    
+            $diDifference = $currentDi - $userCoins;
+    
+            $updateData = [
+                'di' => $user->di + $diDifference,
+                'total_diamond_send' => $user->total_diamond_send + $totalDiamond,
+            ];
+    
+            if ($senderLevel !== null) {
+                $updateData['sender_level'] = $senderLevel;
+            }
+            \DB::table('users')->where('id', $userId)->update($updateData);
+        });
     }
 
 

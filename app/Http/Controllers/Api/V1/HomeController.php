@@ -213,6 +213,7 @@ class HomeController extends Controller
      */
     private function getGamesImages(): array
     {
+        settings()->set('images_updated_at', time());
         return [
             'dice'     => [
                 'id'    => 1,
@@ -245,7 +246,7 @@ class HomeController extends Controller
             $user         = $request->user();
             $privilegeArr = [
                 'has_color_name' => 18,
-             // 'anonymous'      => 17,
+                // 'anonymous'      => 17,
                 'country'        => 13,
                 'last_active'    => 20,
                 'visit'          => 19,
