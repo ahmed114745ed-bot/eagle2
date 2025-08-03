@@ -20,10 +20,12 @@ use Encore\Admin\Layout\Column;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Log;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class ChargeReportController extends MainController
 {
     public $permission_name = 'charger-reports';
+     use HasResourceActions;
 
     public function index(Content $content)
     {
