@@ -18,7 +18,7 @@ class AppFeatureEnable
      */
     public function handle(Request $request, Closure $next, ...$slug): Response
     {
-        $appFeature = AppFeature::where("slug",$slug[0])->first();
+      /*  $appFeature = AppFeature::where("slug",$slug[0])->first();
         if ($appFeature != null && $appFeature->status == 0) {
             if ($request->is('api/*')) {
                 // Handle API response
@@ -26,7 +26,7 @@ class AppFeatureEnable
             } else {
                 abort(403, __('This feature has not been activated for you'));
             }
-        }
+        }*/
 
         return $next($request);
     }
