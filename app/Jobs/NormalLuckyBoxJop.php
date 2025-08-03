@@ -60,7 +60,6 @@ class NormalLuckyBoxJop implements ShouldQueue
             $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
             $userWinner = UserBoxGift::where('box_uses_id', $userBox)->pluck('user_id')->toArray();
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
-            info('normal box room visitor inside the room : ' . json_encode($usersRoomVisit));
 
             $winnerBox = UserBoxGift::where('box_uses_id', $userBox->box_id)->exists();
             if (!$winnerBox) {

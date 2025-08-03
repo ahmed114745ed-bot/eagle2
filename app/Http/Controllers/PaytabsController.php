@@ -26,9 +26,9 @@ class Paytabs
             'server_key'        => Common::getSettingValue('paytabs_server_key'),
             'base_url'          => Common::getSettingValue('paytabs_base_url'),
             'payment_address'   => Common::getSettingValue('paytabs_payment_address'),
-          
+
         ];
-        
+
     }
 
     public function getConfig($key)
@@ -60,21 +60,16 @@ class Paytabs
     }
 
     function is_valid_redirect($post_values)
-    {                 
+    {
 
-    
+
         $serverKey = $this->getConfig('server_key');
 
         $rawPayload = file_get_contents('php://input');
-        // \Log::info("📬 Raw Payload:", [$rawPayload]);
 
         $requestSignature = request()->header('signature');
-        // \Log::info("📬 Signature from Header:", [$requestSignature]);
 
         $calculatedSignature = hash_hmac('sha256', $rawPayload, $serverKey);
-
-        // \Log::info("📬 Calculated Signature:", [$calculatedSignature]);
-        // \Log::info("📬  Signature:", [$requestSignature]);
 
         return hash_equals($calculatedSignature, $requestSignature);
     }
@@ -129,10 +124,10 @@ class PaytabsController extends Controller
                 'status' => 0,
                 'coin_id' => $request->coin_id,
             ];
-           
-           
+
+
         $log = $this->coinLogRepository->create($dataCoinLog);
-      
+
 
         $plugin = new Paytabs();
         $request_url = 'payment/request';
@@ -144,7 +139,7 @@ class PaytabsController extends Controller
             "cart_amount" => round($log->paid_usd, 2),
             "cart_description" => "products",
             "paypage_lang" => "en",
-            "callback" => route('paytabs.callback'),   
+            "callback" => route('paytabs.callback'),
             "return" => route('paytabs.return', ['payment_id' => $log->id]),
             "customer_details" => [
                 "name" => $user->name,
@@ -177,45 +172,42 @@ class PaytabsController extends Controller
             return Common::apiResponse(0, 'try leter', null, 404);
         }
         return Common::apiResponse(1, '', ['url' => $page['redirect_url']], 200);
-        
+
     }
 
     public function callback(Request $request)
     {
- 
-        // \Log::info("📬 هيدر الطلب:", $request->headers->all());
-
         $response_data = $request->post();
-    
+
         $transRef = $response_data['tran_ref'] ?? null;
-        $cartId = $response_data['cart_id'] ?? null; 
-        
-    
+        $cartId = $response_data['cart_id'] ?? null;
+
+
         $invoiceNumber = null;
         if ($cartId) {
             $parts = explode('_', $cartId);
             if (isset($parts[1])) {
-                $invoiceNumber = $parts[1];  
+                $invoiceNumber = $parts[1];
             }
         }
-    
+
         if (!$transRef) {
             return Common::apiResponse(0, 'try later', null, 200);
         }
         $plugin = new Paytabs();
 
-        
-    
+
+
         $request_url = 'payment/query';
         $data = ["tran_ref" => $transRef];
         $verify_result = $plugin->send_api_request($request_url, $data);
-    
+
         $is_valid = $plugin->is_valid_redirect($request);
 
         if (!$is_valid) {
             return Common::apiResponse(0, 'try later', null, 200);
         }
-        
+
 
         $is_success = isset($verify_result['payment_result']['response_status']) &&
                     $verify_result['payment_result']['response_status'] === 'A';
@@ -223,11 +215,9 @@ class PaytabsController extends Controller
         $payment_data = $this->coinLogRepository->getCoinsById($invoiceNumber);
 
         if ($payment_data) {
-            // \Log::info("📬  coinLogRepository:", ['payment_data' => $payment_data->toArray()]);
         } else {
-            // \Log::info("📬  coinLogRepository: null");
         }
-    
+
 
     if ($is_success) {
         if ($payment_data) {
@@ -240,7 +230,7 @@ class PaytabsController extends Controller
 
                 $this->onPaymentSuccess($payment_data);
             }
-           
+
 
         }
         return $this->payment_response($payment_data, 'success');

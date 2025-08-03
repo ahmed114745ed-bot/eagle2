@@ -226,10 +226,6 @@ class RoomController extends Controller
 
     public function quit_room(Request $request)
     {
-        // Log::info('shami test quit_room', [
-        //     'data' => $request->all()
-        // ]);
-
         if (!$request->owner_id) {
 
             return Common::apiResponse(false, __('missing owner_id'), null, 422);
@@ -1841,10 +1837,6 @@ class RoomController extends Controller
 
     private function updateMicrophone($room_uid, $user_id)
     {
-        // Log::info('shami test quit_room', [
-        //     'data' => $room_uid,
-        //     'user_id' => $user_id
-        // ]);
         $user = User::query()->find($user_id);
         if (!$user) return;
         $result  = Common::go_microphone_hand($room_uid, $user_id);

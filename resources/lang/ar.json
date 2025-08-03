@@ -3425,6 +3425,8 @@
 "history":"سجل",
 "Charged to": "شُحِنَ إلى",
   "Charged from": "شُحِنَ من",
+ "total transfer dollars": "إجمالي الدولارات المحولة",
+"total transfer coins": "إجمالي الكوينات المحولة",
 "created by": "أنشئ بواسطة",
 "created at": "تاريخ الإنشاء",
 "reset salary":"تصفير الراتب",

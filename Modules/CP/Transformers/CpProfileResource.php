@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\CP\Entities\Cp;
 use Modules\CP\Entities\CpLevel;
 
-class CpListResource extends JsonResource
+class CpProfileResource extends JsonResource
 {
     public function toArray($request)
     {
@@ -27,16 +27,16 @@ class CpListResource extends JsonResource
         $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
         $frame = $dress_1_data ?: $dress_1_fallback;
 
-        $nextLevel = CpLevel::where("level", ">", $this->level_id)->first();
-        $ratio = 0;
-        if ($nextLevel) {
-            $nextLevelPercentage = $nextLevel->level;
-            $ratio = $this->di / $nextLevel->exp;
-        } else {
-            $nextLevelPercentage = 0;
-            $ratio = 1;
-        }
+        $nextLevel = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
 
+        $nextLevelPercentage = 0;
+        $ratio = 0;
+        
+        if ($nextLevel && $nextLevel->exp > 0) {
+            $nextLevelPercentage = $nextLevel->level;
+            $ratio = round(min(($this->di / $nextLevel->exp) * 100, 100), 2);
+        } 
+        
 
         return [
             'id'        => $this->id,
@@ -44,6 +44,7 @@ class CpListResource extends JsonResource
             'next_level'     => $nextLevelPercentage,
             'di'        => $this->di,
             'ratio' => $ratio,
+            'exp' => $nextLevel->exp ,
             "user"      => [
                 "id"        => $user?->id,
                 "uid"       => $user?->uuid,

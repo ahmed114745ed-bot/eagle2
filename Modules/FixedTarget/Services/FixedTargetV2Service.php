@@ -5,7 +5,6 @@ namespace Modules\FixedTarget\Services;
 use App\Helpers\Common;
 use App\Models\BDSallary;
 use App\Models\GiftLog;
-use App\Models\UsersJoinedAgency;
 use App\Services\WalletService;
 use Carbon\Carbon;
 use App\Models\User;
@@ -15,6 +14,7 @@ use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
+use Modules\Agency\Entities\UsersJoinedAgency;
 use Modules\Reals\Entities\Real;
 use Modules\Moment\Entities\Moment;
 use Illuminate\Database\Eloquent\Model;
@@ -43,7 +43,6 @@ class FixedTargetV2Service
     {
         $timezone = getTimezone();
 
-        // جلب تاريخ انضمام المستخدم
         $joinDate = UsersJoinedAgency::where('user_id', $user->id)
             ->where('agency_id', $user->agency_id)
             ->latest()
@@ -51,29 +50,15 @@ class FixedTargetV2Service
     
         $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');
     
-        // استخدام التاريخ الحالي كافتراضي إذا لم يُرسل شهر وسنة
-        $now = Carbon::now($timezone);
-        $inputMonth = $this->month ?? $now->month;
-        $inputYear  = $this->year  ?? $now->year;
+        $now         = Carbon::now($timezone);
+        $inputMonth  = $this->month ?? $now->month;
+        $inputYear   = $this->year  ?? $now->year;
     
-        // بناء startDate من الشهر والسنة المدخلة
-        $inputStartDate = Carbon::createFromDate($inputYear, $inputMonth, 1, $timezone)->startOfMonth()->timezone('UTC');
-    
-        // تحقق: هل التاريخ المدخل قبل تاريخ الانضمام؟
-        if ($inputStartDate->lt($this->joinDate)) {
-            // إذا كان التاريخ أقدم من الانضمام، استخدم شهر الانضمام
-            $this->month = $this->joinDate->month;
-            $this->year  = $this->joinDate->year;
-            $this->startDate = $this->joinDate->copy()->startOfMonth();
-            $this->endDate   = $this->joinDate->copy()->endOfMonth();
-        } else {
-            // إذا كان التاريخ صالحًا، استخدمه
-            $this->month = $inputMonth;
-            $this->year  = $inputYear;
-            $this->startDate = $inputStartDate->copy()->startOfMonth();
-            $this->endDate   = $inputStartDate->copy()->endOfMonth();
-        }
-    
+        $this->month      = $inputMonth;
+        $this->year       = $inputYear;
+        $this->startDate  = Carbon::createFromDate($inputYear, $inputMonth, 1, $timezone)->startOfMonth()->timezone('UTC');
+        $this->endDate = Carbon::createFromDate($inputYear, $inputMonth, 1, $timezone)->endOfMonth()->setTime(23, 59, 59)->timezone('UTC');
+
         $this->userTargetType = $this->getUserTargetType($user->id);
         $this->targetInstance = new RegularTarget();
   
@@ -88,20 +73,12 @@ class FixedTargetV2Service
     public function calculateTarget()
     {
         $user           = $this->user;
-        // $month_received = $user->monthly_diamond_received;
-        /*     $agency=Agency::find($user->agency_id);
-        if ($this->userTargetType == TargetType::FIXED) {
-            if ($agency->users->where("type_user",1)->sum("monthly_diamond_received") >= $agency->monthly_target) {
-                $user = $this->calculateFixedTarget($month_received, $user);
-            }
-        } else {*/
-       
-            $month_received = GiftLog::where('receiver_id', $user->id)->whereBetween('created_at', [$this->startDate, $this->endDate])->sum('giftPrice');
+        $month_received = GiftLog::where('receiver_id', $user->id)
+        ->whereBetween('created_at', [$this->startDate, $this->endDate])
+        ->where('agency_id', $user->agency_id)
+        ->sum('giftPrice');
 
-            $user = $this->calculateRegularTarget($month_received, $user);
-
-        //  }
-       
+        $user = $this->calculateRegularTarget($month_received, $user);
         $user->salary_is_updated = false;
         $user->save();
     }
@@ -292,12 +269,10 @@ class FixedTargetV2Service
      */
     public function calculateRegularTarget($month_received, User $user): User
     {
-        // \Log::info('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
       
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
             
-            // \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
                 $hours = 0;
                 $days  = 0;

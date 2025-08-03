@@ -53,8 +53,7 @@ class WeeklyStarUpdate extends Command
             DB::table('weekly_star_gifts')->insert($gifts);
         }
         $this->repeatRewards($weeklyEvent, $newWeeklyStar->id);
-        $this->info(now()->toDateTimeString() . ' ' . $this->signature . ' Run successful...');
-
+//        $this->info(now()->toDateTimeString() . ' ' . $this->signature . ' Run successful...');
     }
 
     public function repeatRewards(WeeklyStar $weeklyStar, int $weeklyStarNewId)
@@ -83,6 +82,6 @@ class WeeklyStarUpdate extends Command
         }
 
         Reward::query()->insert($previousRewards);
-        $this->info($this->signature . ' Run successfully');
+//        $this->info($this->signature . ' Run successfully');
     }
 }

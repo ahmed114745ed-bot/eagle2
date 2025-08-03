@@ -59,7 +59,7 @@ class RemoveBackgroundCron extends Command
             }
             $img->delete();
         }
-        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
 
         //$this->info('update-room-user-now:cron Command Run Successfully !');
     }

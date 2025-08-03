@@ -34,4 +34,9 @@ class BoxUse extends Model
     {
         return $this->belongsTo(Room::class, 'room_uid', 'uid');
     }
+
+    public function userBoxGifts()
+    {
+        return $this->hasMany(UserBoxGift::class, 'box_uses_id');
+    }
 }

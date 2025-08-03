@@ -2,6 +2,7 @@
 
 namespace Modules\CP\Http\Controllers\web;
 
+use App\Helpers\Common;
 use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Http\UploadedFile;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
 use Encore\Admin\Admin;
@@ -213,7 +215,11 @@ class LevelGiftController extends MainController
             } elseif ($form->type == 'coins') {
                 $form->item_id = $form->coins;
             } elseif ($form->type == 'achievement') {
-                $form->item_id = $form->achievement;
+
+                if ($form->achievement instanceof UploadedFile) {
+                    $url = Common::upload('cp', $form->achievement);
+                }
+                $form->item_id = $url ?? '';
             }
         });
 
