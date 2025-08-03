@@ -186,7 +186,7 @@ class LevelGiftController extends MainController
             ->when("achievement", function () use ($form) {
                 $form->image("achievement", __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
-                });
+                })->disk('gcs');
             });
 
         $form->number('expire', __('expire'));
@@ -213,6 +213,7 @@ class LevelGiftController extends MainController
             } elseif ($form->type == 'coins') {
                 $form->item_id = $form->coins;
             } elseif ($form->type == 'achievement') {
+                info('im here', ['achievement image' => $form->achievement]);
                 $form->item_id = $form->achievement;
             }
         });
