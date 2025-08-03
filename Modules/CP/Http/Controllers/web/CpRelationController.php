@@ -139,7 +139,7 @@ class CpRelationController extends MainController
         $this->disableFormTools($form);
 
         $form->text('title', __('title'))->rules('required');
-        $form->textarea('description', __('description'));
+        // $form->textarea('description', __('description'));
         $form->image('image', __('Img'));
         $form->number('price', __('price'))->rules('required|min:1');
         // $form->number('relations_number', __('relations_number'))->default(0)->min(0);

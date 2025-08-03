@@ -21,8 +21,6 @@ class UserTargetController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(trans('Hosts Target'))
             ->body($this->grid()));
