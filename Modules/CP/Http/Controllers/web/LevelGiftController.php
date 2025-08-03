@@ -185,6 +185,7 @@ class LevelGiftController extends MainController
             })
             ->when("achievement", function () use ($form) {
                 $form->image("achievement", __('image'))->name(function ($file) {
+                    info('im here', ['achievement image' => $file]);
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
             });
