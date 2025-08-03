@@ -463,12 +463,7 @@ class VipController extends MainController
         $form->file('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->removable()->rules('required');
-
-        $form->saving(function ($form) {
-            if ($form->img instanceof UploadedFile) {
-                validateUploadedFileType($form->img);
-            }
-        });
+        
 
         $form->footer(function ($footer) {
             $footer->disableReset();        // Disables the "Reset" button

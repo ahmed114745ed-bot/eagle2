@@ -898,10 +898,10 @@ class Common
 
         $result = $messaging->subscribeToTopic($topic, $registrationTokens);
 
-        logger()->info('✅ Kreait Topic Subscribe', [
-            'topic' => $topic,
-            'result' => $result,
-        ]);
+//        logger()->info('✅ Kreait Topic Subscribe', [
+//            'topic' => $topic,
+//            'result' => $result,
+//        ]);
 
         return $result;
     }
@@ -915,11 +915,11 @@ class Common
 
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-            logger()->info('✅ Unsubscribe from FCM topic result', [
-                'topic'          => $topic,
-                'tokensCount'    => count($registrationTokens),
-                'response'       => $response,
-            ]);
+//            logger()->info('✅ Unsubscribe from FCM topic result', [
+//                'topic'          => $topic,
+//                'tokensCount'    => count($registrationTokens),
+//                'response'       => $response,
+//            ]);
 
             // تحليل النتائج (اختياري)
             $result = $response[$topic->value()] ?? [];
@@ -941,7 +941,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
+//            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -1165,18 +1165,18 @@ class Common
 
             if ($column) {
                 $updateData[$column] = '1';
-                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
+//                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
             }
         }
 
         if (!empty($updateData)) {
             $success = $user->update($updateData);
 
-            logger()->info('✅ تم تحديث الحقول:', [
-                'user_id' => $user->id,
-                'success' => $success,
-                'updated_fields' => $updateData
-            ]);
+//            logger()->info('✅ تم تحديث الحقول:', [
+//                'user_id' => $user->id,
+//                'success' => $success,
+//                'updated_fields' => $updateData
+//            ]);
         }
     }
 
@@ -1359,19 +1359,19 @@ class Common
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
-            logger()->info('[sendOfficialMessage] Bulk insert success', [
-                'id' => $id,
-            ]);
+//            logger()->info('[sendOfficialMessage] Bulk insert success', [
+//                'id' => $id,
+//            ]);
         }
 
         if (!empty($data)) {
             OfficialMessage::insert($data);
-            logger()->info('[sendOfficialMessage] Bulk insert success', [
-                'user_ids' => $userIds,
-            ]);
+//            logger()->info('[sendOfficialMessage] Bulk insert success', [
+//                'user_ids' => $userIds,
+//            ]);
         }
 
-        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
+//        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
 
 
         // OfficialMessage::query()->create(

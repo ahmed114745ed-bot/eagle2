@@ -27,7 +27,7 @@ use Illuminate\Console\Command;
             $tx->delete();
         }
 
-        $this->info("تم أرشفة {$oldTransactions->count()} معاملة.");
+//        $this->info("تم أرشفة {$oldTransactions->count()} معاملة.");
     }
 
 

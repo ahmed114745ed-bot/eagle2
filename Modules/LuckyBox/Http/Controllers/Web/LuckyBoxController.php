@@ -96,7 +96,6 @@ class LuckyBoxController extends MainController
         });
         $grid->column('users', __('users'));
         $grid->column('image', __('image'))->image('', 30);
-        $grid->column('has_label', __('has_label'));
         $grid->column('duration', __('duration'));
         $grid->disableExport();
         $this->extendGrid($grid);

@@ -30,7 +30,8 @@ class GameUserWeeklyCommand extends Command
             $this->callProcedure();
 
         }
-        $this->info('Data refactor successfully on :' . now());
+
+//        $this->info('Data refactor successfully on :' . now());
     }
 
     private function callProcedure()

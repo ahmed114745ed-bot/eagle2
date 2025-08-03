@@ -35,8 +35,6 @@ class CpserviceCo
 
     public function makeRequestCp($request, $user)
     {
-
-
         $cpRelation = $this->cpRepository->getCpRelationById($request->cp_relation_id);
 
         if (!$cpRelation) {
@@ -68,8 +66,6 @@ class CpserviceCo
             }
         }
 
-
-
         $countRequestUserOne = $this->cpRepository->countExistingCpSameRelation($user->id,  $request->cp_relation_id);
 
         if (($cpRelation->relations_number == 0) && ($countRequestUserOne > $cpRelation->relations_number) && $cpRelation->type != 'solution'
@@ -89,10 +85,6 @@ class CpserviceCo
         if ($existingCp && ($existingCp->status == CpStatus::ACTIVE->value  || $existingCp->status == CpStatus::RESTORED->value) && $cpRelation->type != 'solution') {
             return Common::apiResponse(0, "انت في علاقة مع هذا المستخدم");
         }
-
-
-
-
 
         $userRelation = $this->cpRepository->getUserRelationAvailable($user->id, $request->cp_relation_id);
 
@@ -130,7 +122,6 @@ class CpserviceCo
 
         $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
 
-
         if (!$chatRoom) {
 
             $chatRoom = ChatRoom::create([
@@ -145,7 +136,6 @@ class CpserviceCo
                 'status' => 'Chat not Found',
             ], 404); */
         }
-
 
         $user2 = User::find($request->user_id);
 
@@ -176,10 +166,7 @@ class CpserviceCo
         }
         $chatMessage = ChatMessage::create($chatMessageData);
 
-
-
         CustomNotification::makeCp($user2, $user, $cpRelation->type);
-
 
         $message_resource = new ChatMessageResource($chatMessage);
         $room_resource =  new ChatRoomResourcePusher($chatRoom);
@@ -247,8 +234,6 @@ class CpserviceCo
             return Common::apiResponse(0, 'هناك شئ ما خطا');
         }
 
-
-
         if ($request->status == 1) {
 
             $countRequestUserOne = $this->cpRepository->countExistingCpSameRelationActive($cp->user_one_id,  $cp->relation->id);
@@ -291,7 +276,7 @@ class CpserviceCo
 
     public function getCpRanking()
     {
-    
+
         $relationType = request("relationType") ?? 'lovely';
         $type = request("type") ?? 1;
 

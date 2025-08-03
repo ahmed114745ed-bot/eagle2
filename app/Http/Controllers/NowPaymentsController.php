@@ -23,20 +23,20 @@ class NowPaymentsController extends Controller
     public function rechargeForm()
     {
         $data = $this->nowPayments->getCurrencies();
-        
+
         return view('payments.now_payments.index', ['currencies' => $data['currencies']]);
     }
 
-   
+
     public function createPayment(Request $request)
     {
-   
+
         try {
             $invoice = $this->nowPayments->createInvoice($request);
-    
+
             // تحقق أن invoice_url موجود
             if (isset($invoice['invoice_url'])) {
-    
+
                 // حفظ الفاتورة في قاعدة البيانات
                 NowpaymentOrder::create([
                     'payment_id' => $invoice['id'] ?? null,
@@ -51,9 +51,9 @@ class NowPaymentsController extends Controller
                     'pay_address' => $invoice['pay_address'] ?? '',
                     'amount_received' => 0.0,
                 ]);
-    
+
                 return redirect()->to($invoice['invoice_url']);
-    
+
             } elseif (isset($invoice['pay_address'])) {
                 // في حال لم يرجع invoice_url لكن رجع عنوان محفظة، اعرض بيانات الدفع اليدوي
                 return view('manual_payment', [
@@ -63,9 +63,9 @@ class NowPaymentsController extends Controller
                     'order_id' => $invoice['order_id'] ?? uniqid(),
                 ]);
             }
-    
+
             return back()->with('error', 'لم يتم إنشاء رابط الفاتورة. قد تكون العملة غير مدعومة حالياً.');
-            
+
         } catch (\Exception $e) {
             return back()->with('error', 'خطأ أثناء إنشاء الدفع: ' . $e->getMessage());
         }
@@ -98,10 +98,8 @@ class NowPaymentsController extends Controller
     // public function paymentCallback(Request $request)
     // {
     //     // Handle IPN callback from Now Payments
-    //     Log::info('now payments'. $request->payment_id);
     //     $paymentId = $request->input('payment_id');
     //     $status = $this->nowPayments->getPaymentStatus($paymentId);
-    //     Log::info($status);
 
     //     // Update your database or trigger actions based on payment status
     //     if($status['payment_status'] == 'paid'){
@@ -109,7 +107,6 @@ class NowPaymentsController extends Controller
     //             'payment_status' => 'paid'
     //         ]);
     //     }
-    //     Log::info('callback end now payments');
     //     // Example: Mark order as paid
 
     //     return response()->json(['status' => 'success']);
@@ -124,7 +121,7 @@ class NowPaymentsController extends Controller
 
     // تحقق  حالة الدفع
     if ($status === 'paid') {
-       
+
 
         // تحديث حالة الدفع في قاعدة البيانات
         $order = NowpaymentOrder::where('payment_id', $paymentId)->update([
@@ -133,18 +130,18 @@ class NowPaymentsController extends Controller
 
         // التحقق من نجاح التحديث في قاعدة البيانات
         if ($order) {
-           
+
             return redirect()->route('payment.success');
         } else {
-           
+
             return redirect()->route('payment.cancel');
         }
     } else {
-      
+
         return redirect()->route('payment.cancel');
     }
 
-   
+
     return response()->json(['status' => 'received']);
     }
 }
