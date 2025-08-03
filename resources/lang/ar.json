@@ -3526,7 +3526,8 @@
 "Unknown User": "مستخدم غير معروف",
 "User Missing/Deleted": "المستخدم مفقود أو تم حذفه",
 "loss" : "خسارة",
-"Agency": "وكالة",
+    ":name has been removed from administrators.": ":name تم إزالته من المسؤولين",
+    "Agency": "وكالة",
 "User": "مستخدم"
 
 

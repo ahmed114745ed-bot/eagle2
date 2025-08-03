@@ -87,7 +87,6 @@ class RoomRepository extends AbstractRepository
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
 
         $result = $this->model->withLuckyBoxFlag($user->id)->with([
-            'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
             'lastPk',
             'background',

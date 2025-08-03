@@ -49,7 +49,7 @@ class LogApiRequestResponse
             }
 
             // Write as a pure JSON line
-            Log::channel('custom_log')->info($request->fullUrl()." $userId ".PHP_EOL.json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+//            Log::channel('custom_log')->info($request->fullUrl()." $userId ".PHP_EOL.json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         }
 
         return $response;

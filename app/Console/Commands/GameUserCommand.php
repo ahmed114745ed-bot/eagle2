@@ -31,8 +31,7 @@ class GameUserCommand extends Command
 
         }
 
-        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
-
+//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 
     private function callProcedure()

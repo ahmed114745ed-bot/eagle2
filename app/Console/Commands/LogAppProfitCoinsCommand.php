@@ -13,14 +13,14 @@ use Illuminate\Support\Facades\DB;
 
 class LogAppProfitCoinsCommand extends Command
 {
-    
+
         protected $signature = 'log:app-profit-coins';
         protected $description = 'Log all app_profit_coins from cron-based tables every 10 minutes';
-    
+
         public function handle()
         {
-            $this->info("Start scanning profit tables...");
-    
+//            $this->info("Start scanning profit tables...");
+
             $tables = [
                 [
                     'table' => 'gift_logs',
@@ -41,7 +41,7 @@ class LogAppProfitCoinsCommand extends Command
                     'sub_type' => 'user_lucky_gifts'
                 ]
             ];
-    
+
             foreach ($tables as $config) {
                 $this->processTable(
                     $config['table'],
@@ -50,29 +50,29 @@ class LogAppProfitCoinsCommand extends Command
                     $config['sub_type']
                 );
             }
-    
-            $this->info("Profit logs completed ✅");
+
+//            $this->info("Profit logs completed ✅");
         }
-    
+
         protected function processTable(string $table, string $userColumn, string $type, string $subType): void
         {
             $rows = DB::table($table)
                 ->select('id', $userColumn, 'app_profit_coins', 'created_at')
                 ->where('app_profit_coins', '!=', 0)
                 ->get();
-    
+
             if ($rows->isEmpty()) return;
-    
+
             $from = $rows->min('created_at');
             $to = $rows->max('created_at');
-    
+
             $now = now();
             $logs = [];
-         
-          
-    
+
+
+
             foreach ($rows as $row) {
-             
+
                 $amountBefore =  Common::getCurrentBalance($row->{$userColumn});
                 $logAmount = -abs($row->app_profit_coins);
                 $itemName = '';
@@ -82,20 +82,20 @@ class LogAppProfitCoinsCommand extends Command
                         $gift = GiftLog::with('gift')->find($row->id);
                         $itemName = $gift?->gift?->name ?? '';
                         break;
-        
+
                     case 'user_lucky_gifts':
                         $luckyGift = UserLuckyGift::with('gift')->find($row->id);
                         $itemName = $luckyGift?->gift?->name ?? '';
                         break;
-        
+
                     case 'coin_game_users':
                         $gameUser = CoinGameUser::with('game')->find($row->id);
                         $itemName = $gameUser?->game?->name ?? '';
                         break;
                 }
-                $this->info("Logging item: [$itemName] from table [$table], row ID: $row->id");
+//                $this->info("Logging item: [$itemName] from table [$table], row ID: $row->id");
                 $amountBefore += $row->app_profit_coins;
-                
+
                 $logs[] = [
                     'user_id' => $row->{$userColumn},
                     'type' => $type,
@@ -109,12 +109,12 @@ class LogAppProfitCoinsCommand extends Command
                     'updated_at' => $now,
                 ];
             }
-            
+
             // UserCoinLog::insert($logs);
-    
+
             // DB::table($table)
             //     ->whereIn('id', collect($rows)->pluck('id'))
             //     ->update(['app_profit_coins' => 0]);
         }
-    
+
 }

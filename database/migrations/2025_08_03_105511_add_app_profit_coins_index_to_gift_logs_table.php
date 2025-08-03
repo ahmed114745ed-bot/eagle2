@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-         if (!Schema::hasColumn('cp_relations', 'description')) {
-            Schema::table('cp_relations', function (Blueprint $table) {
-                $table->string('description')->nullable();
-            });
-        }
+        Schema::table('gift_logs', function (Blueprint $table) {
+            $table->index('app_profit_coins');
+        });
     }
 
     /**
@@ -23,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cp_relations', function (Blueprint $table) {
+        Schema::table('gift_logs', function (Blueprint $table) {
             //
         });
     }

@@ -52,9 +52,6 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego(Request $request)
     {
-
-        // Log::info('Zego req',[ 'key' =>$request->all()]);
-
         /*$library = Common::getConfig('library');
         if ($library == 2) return Common::apiResponse(false, 'you used pusher');*/
         return $this->enteranceRoomService->updateRoomCountFromZego($request);

@@ -74,11 +74,7 @@ class ResetUserMonthlyDiamond extends Command
 //        } catch (\Exception $e) {
 //        }
 
-
-
-
-
-            $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+//            $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
 
         }catch (\Exception $exception){
             $this->error('reset monthly diamond failed: '.$exception->getMessage());

@@ -59,7 +59,7 @@ class PKWork implements RoomJobInterface
                 ];
             }
 
-            $grouped[$pk['room_id']]['end_at'] = $pk['end_at'];
+            $grouped[$pk['room_id']]['end_at'] = $pk['end_at'] ?? null;
             $grouped[$pk['room_id']]['t1_score'] += $pk['t1_score'];
             $grouped[$pk['room_id']]['t2_score'] += $pk['t2_score'];
             $grouped[$pk['room_id']]['t1_per'] = $this->per_1($grouped[$pk['room_id']]['t1_score'],$grouped[$pk['room_id']]['t2_score']);
