@@ -1088,7 +1088,8 @@
 "profit" : "Profit",
 "loss" : "Loss",
 "Agency": "Agency",
-"User": "User"
+    ":name has been removed from administrators.": ":name has been removed from administrators.",
+    "User": "User"
 
 
 
