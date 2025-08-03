@@ -55,6 +55,8 @@ class LevelController extends MainController
      */
     public function edit($id, Content $content)
     {
+        $id = request('id');
+
         return parent::edit($id, $content
             ->title(trans('cp-relations'))
             ->body($this->form()->edit($id)));
@@ -84,7 +86,7 @@ class LevelController extends MainController
         $grid->model()->where('cp_relation_id', $relation_id);
         $grid->disableRowSelector();
         $grid->column('id', __('Id'));
-       
+
 
         if (!request()->filled('_export_')) {
              $grid->column('level', __('Level'))->editable();
@@ -153,5 +155,12 @@ class LevelController extends MainController
         });
 
         return $form;
+    }
+
+    public function update($id)
+    {
+        $id = request('id');
+
+        Parent::update($id);
     }
 }

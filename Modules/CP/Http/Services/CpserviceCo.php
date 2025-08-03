@@ -234,8 +234,6 @@ class CpserviceCo
             return Common::apiResponse(0, 'هناك شئ ما خطا');
         }
 
-
-
         if ($request->status == 1) {
 
             $countRequestUserOne = $this->cpRepository->countExistingCpSameRelationActive($cp->user_one_id,  $cp->relation->id);
