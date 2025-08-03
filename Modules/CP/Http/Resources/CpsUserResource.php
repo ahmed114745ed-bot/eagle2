@@ -50,9 +50,9 @@ class CpsUserResource extends JsonResource
                 'id' => $otherUser->id ?? 0,
                 'name' => $otherUser->name ?? '',
                 'uuid' => $otherUser->uuid ?? 0,
-                'image' => $otherUser->profile->avatar ?? null,
-            ], fn ($value, $key) => $key !== 'image' || !empty($value), ARRAY_FILTER_USE_BOTH),
-        ], fn ($value, $key) => $key !== 'image' || !empty($value), ARRAY_FILTER_USE_BOTH);
+                'image' => $otherUser->profile->avatar ?? '',
+            ], 
+        ];
     
    
     }
