@@ -568,7 +568,7 @@ class TargetController extends MainController
 
 
 
-        $request->replace($data);
+        \request()->replace($data);
         return $this->form()->update($id);
     }
 
