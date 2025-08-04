@@ -59,4 +59,7 @@ class GiftLog extends Model
     {
         return $this->belongsTo(Agency::class, 'agency_id');
     }
+
+
+
 }
