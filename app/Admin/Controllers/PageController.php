@@ -81,7 +81,7 @@ class PageController extends MainController
         // $grid->type(__('type'));
         $grid->name(__('name_en'));
         $grid->column('link', __('url'))->display(function () {
-            $url = url("/$this->name");
+            $url = url("/page/$this->name");
             return "<a href='$url'>$url</a>";
         });
         // $grid->content(__('content'));
