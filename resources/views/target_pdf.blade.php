@@ -119,20 +119,10 @@
                                 } elseif ($column == 'diamonds') {
                                     echo $target->diamonds;
                                 } elseif ($column == 'usd') {
-                                    // $coins = \App\Helpers\Common::getMaxCoins();
-                                    // $endFormatted = $coins ? ($target->diamonds / $coins) : 0;
-                                    // $endFormatted = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted);
-
-                                    $endFormatted = $target->diamonds / $coins;
-
-                                    $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
-                                    $value = is_numeric($value) ? floatval($value) : 0;
-                                    $userUsd = $endFormatted * $value / 100;
-                                    $userUsd = common::roundToTwoDecimalPlaces($userUsd);
-
-                                    $userPercentage = number_format($value);
-
-                                    echo "$$userPercentage";
+                                    $coins = \App\Helpers\Common::getMaxCoins();
+                                    $endFormatted = $coins ? ($target->diamonds / $coins) : 0;
+                                    $endFormatted = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted);
+                                    echo "$$endFormatted";
                                 } elseif ($column == 'reals' || $column == 'reel') {
                                     echo __('uploads').':'. ($target->reel_parts[0] ?? 0) . '<br>';
                                     echo __('like').':' . ($target->reel_parts[1] ?? 0) . '<br>';
