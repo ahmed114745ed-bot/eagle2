@@ -67,7 +67,7 @@ class DataUserResource extends JsonResource
             ->whereIn('status', [1, 4])
             ->orderByDesc('di')->get();
 
-        $mainCp = $data->firstWhere('relation.type', 'lovely') ?? $data->sortByDesc('level')->first();
+        $mainCp = $data->firstWhere('relation.type', 'lovely') ?? (object)[];
         return [
             'family_data'          => @$f,
             'achievement_images' => $achievement_images,
