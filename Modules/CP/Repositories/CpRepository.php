@@ -320,4 +320,14 @@ class CpRepository
             });
         })->with('relation:id,title,type', 'toUser', 'fromUser')->get();
     }
+
+    public function getCpsByUserAndRelation(int $userId, int $relationId)
+    {
+        return Cp::where(function ($q) use ($userId) {
+                    $q->where('user_one_id', $userId)
+                    ->orWhere('user_two_id', $userId);
+                })
+                ->where('cp_relation_id', $relationId)
+                ->get();
+    }
 }
