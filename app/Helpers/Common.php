@@ -756,10 +756,10 @@ class Common
             ],
         ];
 
-        info('icon', [$icon]);
-        if ($icon) {
-            $payload['notification']['icon'] = $icon;
-        }
+//        info('icon', [$icon]);
+//        if ($icon) {
+//            $payload['notification']['icon'] = $icon;
+//        }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
