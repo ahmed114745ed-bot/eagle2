@@ -232,7 +232,7 @@ class ChargeReportController extends MainController
                                     ->orWhere('name', 'like', "%$input%");
                             });
                         }
-                    }, __('Receiver UUID or Shipping Agency ID'));
+                    }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
                 });
             });
 
@@ -319,7 +319,7 @@ class ChargeReportController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            
+
             $imageStyle = $this->user_type == 'agency'
                 ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'     // rectangle
                 : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
@@ -403,20 +403,21 @@ class ChargeReportController extends MainController
         }
 
         $grid->column('created_at', __('shipping date'));
-        // $grid->tools(function (Grid\Tools $tools) {
-        //     $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
-        //     $query = http_build_query([
-        //         'from_date' => request('from_date'),
-        //         'to_date' => request('to_date'),
-        //         'trx' => request('trx'),
-        //         'status' => request('status'),
-        //         'method' => request('method'),
-        //         'uuid' => $uuid,
-        //     ]);
+        if (request("name") == "host" || request("name") == null) {
+            $grid->tools(function (Grid\Tools $tools) {
+                $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+                $query = http_build_query([
+                    'from_date' => request('from_date'),
+                    'to_date' => request('to_date'),
+                    'filter_type' => request('filter_type'),
+                    'filtering' => request('filtering'),
+                    'name' => request("name"),
+                ]);
 
-        //     $tools->append('<a href="' . url('/admin/exchange-coin-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
-        //         <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
-        // });
+                $tools->append('<a href="' . url('/admin/exchange-charge-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+                <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            });
+        }
 
         $this->extendGrid($grid);
         return $grid;
