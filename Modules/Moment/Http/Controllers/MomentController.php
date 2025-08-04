@@ -53,11 +53,6 @@ class MomentController extends Controller
     public function store(Request $request)
     {
         $contacts = $request->contacts ?? '';
-
-        if (Common::isUserBannedFromRoute(Auth::id(), 'moment')) {
-            return Common::apiResponse(1, __('banned_from_action'),[],377 );
-        }
-
         // Delegate to the service layer
         $result = $this->momentService->createMoment($contacts, $request);
 

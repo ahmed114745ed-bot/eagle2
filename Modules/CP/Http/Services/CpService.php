@@ -163,8 +163,8 @@ class CpService
     {
         $vip = OVip::find($vipId);
         if ($vip) {
-            UserCommon::addVipToUser($userOne, $vip, $expire);
-            UserCommon::addVipToUser($userTwo, $vip, $expire);
+            UserCommon::addVipToUser($userOne, $vip, $expire, true);
+            UserCommon::addVipToUser($userTwo, $vip, $expire, true);
         }
     }
 
