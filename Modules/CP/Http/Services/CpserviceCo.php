@@ -57,6 +57,18 @@ class CpserviceCo
             return Common::apiResponse(0, "انت في علاقة مع هذا المستخدم");
         }
 
+        if ($cpRelation->relations_number == 0) {
+            
+            $existing = $this->cpRepository->getCpsByUserAndRelation($user->id, $cpRelation->id)
+                ->whereIn('status', [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+                ->first();
+        
+            if ($existing) {
+                return Common::apiResponse(0, 'لا يمكنك إرسال هذه العلاقة إلا لمستخدم واحد فقط، لديك طلب مفعّل أو قيد الانتظار.');
+            }
+        }
+        
+
         $cpCount = $this->cpRepository->getCpCount($user->id);
 
         if ($cpCount >= 15) {
