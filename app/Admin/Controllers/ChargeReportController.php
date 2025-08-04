@@ -25,7 +25,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class ChargeReportController extends MainController
 {
     public $permission_name = 'charger-reports';
-     use HasResourceActions;
+    use HasResourceActions;
 
     public function index(Content $content)
     {
@@ -221,18 +221,32 @@ class ChargeReportController extends MainController
 
             $filter->disableIdFilter();
             $filter->expand();
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $input = $this->input;
-                    $query->whereHas('receiver', function ($q) use ($input) {
-                        $q->where('id', $input)
-                            ->orWhere('name', 'like', "%$input%");
-                    });
-                }, __('agency'));
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function () {}, __('Type'), 'filter_type')
+                    ->select([
+                        'user'     => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ])->default('shipping');
             });
-
-
+            $filter->column(1 / 2, function ($filter) {
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        $input = $this->input;
+                        $type  = request('filter_type');
+                        if ($type == 'user') {
+                            $query->whereHas('receiverUser', function ($q) use ($input) {
+                                $q->where('uuid', $input)
+                                    ->orWhere('name', 'like', "%$input%");
+                            });
+                        } else {
+                            $query->whereHas('receiver', function ($q) use ($input) {
+                                $q->where('id', $input)
+                                    ->orWhere('name', 'like', "%$input%");
+                            });
+                        }
+                    }, __('Receiver UUID or Shipping Agency ID'));
+                });
+            });
 
 
             $filter->column(1 / 2, function ($filter) {
@@ -404,7 +418,7 @@ class ChargeReportController extends MainController
 
 
         $grid->column('created_at', __('shipping date'));
-         $this->extendGrid($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -672,7 +686,7 @@ class ChargeReportController extends MainController
         $grid->column('return', __('Return'))->display(function () {
             return (new \App\Admin\Actions\ReturnDiAction($this->id))->render();
         });
-         $this->extendGrid($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -775,7 +789,7 @@ class ChargeReportController extends MainController
         });
         $grid->column('created_at', __('shipping date'));
 
-       $this->extendGrid($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
