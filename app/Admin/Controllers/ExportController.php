@@ -10,6 +10,7 @@ use App\Admin\Extensions\WalletExportUser;
 use App\Admin\Extensions\WalletExportAgency;
 use App\Admin\Extensions\AgencyMangerExporter;
 use App\Admin\Extensions\ChargeAgencyExporter;
+use App\Admin\Extensions\ExchangeDiamondExporter;
 
 
 class ExportController extends Controller
@@ -81,5 +82,19 @@ class ExportController extends Controller
         $fileName = 'wallet_agencies.csv';
 
         return Excel::download($export, $fileName);
+    }
+
+    public function exchangeDiamondExcel()
+    {
+
+        $from_date = request('from_date');
+        $to_date = request('to_date');
+        $uuid = request('uuid');
+
+        return Excel::download(
+            new ExchangeDiamondExporter($uuid, $from_date, $to_date),
+            'exchange_diamonds.csv'
+        );
+
     }
 }
