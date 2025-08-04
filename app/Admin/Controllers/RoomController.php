@@ -509,45 +509,55 @@ class RoomController extends MainController
             // Append custom CSS (once only)
             static $appended = false;
             if (!$appended) {
-                $html .= <<<CSS
-                    <style>
+                $html .= '
+                <style>
                     .image-container {
                         display: flex;
                         justify-content: start;
                         align-items: center;
-                        gap: -10px;
+                        gap: -10px; /* Overlap the images slightly */
                         padding: 8px 0;
                         overflow-y: overlay;
                         width: 218px;
                         padding-right: 16px;
                     }
+    
                     .image-wrapper {
                         display: inline-block;
                         position: relative;
-                        margin-right: -12px;
+                            margin-right: -12px;
                     }
+    
                     .image-wrapper img {
                         width: 40px;
                         height: 40px;
                         border-radius: 50%;
                         object-fit: cover;
-                        border: 2px solid #fff;
-                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                        border: 2px solid #fff; /* White border for better contrast */
+                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
                         transition: transform 0.3s ease, box-shadow 0.3s ease;
                         cursor: pointer;
                     }
+    
                     .image-wrapper img:hover {
-                        transform: scale(1.2);
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                        transform: scale(1.2); /* Slightly enlarge image on hover */
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
                     }
-                    </style>
-                    CSS;
-                                $appended = true;
-                            }
-                    
+    
+                    /* Optional: If you want to add a tooltip style for the images */
+                    .image-wrapper img[title] {
+                        cursor: pointer; /* Change cursor to indicate interactivity */
+                    }
+    
+                    .image-wrapper img[title]:hover {
+                        opacity: 0.8; /* Slight opacity change on hover */
+                    }
+                </style>';
+    
                             return $html;
-                        });
+            }});
     }
+
     
 
 
