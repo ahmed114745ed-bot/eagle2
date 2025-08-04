@@ -86,7 +86,7 @@ class RoomController extends MainController
             $giftQuery->whereDate('created_at', '<=', request('end_at'));
         }
         $gifts = $giftQuery->orderByDesc('created_at')->paginate(15);
-        $totalDiamonds = $room->gifts()->sum('giftPrice');
+        $totalDiamonds = $giftQuery->sum('giftPrice');
 
         // 3. Visitors, Microphone, Blacklist, Pagination
         // Mic positions
@@ -247,363 +247,252 @@ class RoomController extends MainController
      *
      * @return Grid
      */
+
     protected function grid()
     {
         $grid = new Grid(new Room);
-
-        $filterType = request('filter', 'all'); // Fetch from query string
-
+        $filterType = request('filter', 'all');
         $user = auth()->user();
-        $grid->header(function () use ($filterType) {
-            $tabs = [
-                'all'       => __('All'),
-                // 'trend'     => __('Trend'),
-                'popular'   => __('Popular'),
-                'last_create' => __('New'),
-                'pk'        => __('PK'),
-                //  'boss'      => __('Boss'),
-                //'friends'   => 'Friends',
-                //'following' => 'Following',
-                "close_room"     => __('close room'),
-                "hide_room"      => __('hide room'),
-                'country'    => __('countries'),
-                // 'recently'  => __('Recently'),
-                // 'interested' => __('Interested'),
-                // 'nearby'    => __('Nearby'),
+    
+        $grid->header(fn () => $this->buildTabsHeader($filterType));
+    
+        $this->setupBaseModel($grid, $user);
+        $this->applyFilterType($grid, $filterType, $user);
+        $this->setupFilters($grid);
+        $this->defineGridColumns($grid);    
+        $grid->disableRowSelector();
+        $grid->disableCreateButton();
+        $grid->disableExport();
+    
+        $this->extendGrid($grid);
+        $this->setupPinModalScript();
 
-                // 'party'     => __('Party'),
-                // 'festival'  => __('Festival'),
-                // 'top_gift'  => __('Top Gift'),
-            ];
-
-            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-            foreach ($tabs as $key => $label) {
-                $active = $filterType === $key ? 'active' : '';
-                $url = request()->fullUrlWithQuery(['filter' => $key]);
-                $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
-            }
-            $html .= '</ul></div>';
-
-            $html .= <<<HTML
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const tabLinks = document.querySelectorAll('.tab-link');
-                                const loader = document.getElementById('tab-loading');
-
-                                tabLinks.forEach(function (tab) {
-                                    tab.addEventListener('click', function (e) {
-                                        e.preventDefault();
-                                        loader.style.display = 'block';
-                                        tabLinks.forEach(t => t.style.pointerEvents = 'none');
-                                        setTimeout(() => {
-                                            window.location.href = tab.getAttribute('href');
-                                        }, 300);
-                                    });
-                                });
-                            });
-                        </script>
-                        HTML;
-
-            return $html;
-        });
-
-
-
-
-
-
-
-
-
+        return $grid;
+    }
+    
+    protected function buildTabsHeader(string $filterType): string
+    {
+        $tabs = [
+            'all'         => __('All'),
+            'popular'     => __('Popular'),
+            'last_create' => __('New'),
+            'pk'          => __('PK'),
+            'close_room'  => __('close room'),
+            'hide_room'   => __('hide room'),
+            'country'     => __('countries'),
+        ];
+    
+        $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+        foreach ($tabs as $key => $label) {
+            $active = $filterType === $key ? 'active' : '';
+            $url = request()->fullUrlWithQuery(['filter' => $key]);
+            $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
+        }
+        $html .= '</ul></div>';
+    
+        $html .= <<<HTML
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const tabLinks = document.querySelectorAll('.tab-link');
+                    const loader = document.getElementById('tab-loading');
+                    tabLinks.forEach(function (tab) {
+                        tab.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            loader.style.display = 'block';
+                            tabLinks.forEach(t => t.style.pointerEvents = 'none');
+                            setTimeout(() => {
+                                window.location.href = tab.getAttribute('href');
+                            }, 300);
+                        });
+                    });
+                });
+            </script>
+        HTML;
+    
+        return $html;
+    }
+    
+    protected function setupBaseModel(Grid $grid, $user): void
+    {
         $grid->model()
-            ->select('*', \DB::raw("CASE room_status
-                WHEN 1 THEN 100
-                WHEN 2 THEN 10
-                ELSE 80
-            END AS status_priority"))
+            ->select('*', \DB::raw("CASE room_status WHEN 1 THEN 100 WHEN 2 THEN 10 ELSE 80 END AS status_priority"))
             ->with('owner.profile', 'owner:uuid,id,name')
             ->withCount('roomVisitors')
             ->whereHas('owner')
             ->orderByDesc('status_priority')
-        ;
-
-        $grid->model()
             ->orderByDesc('pin');
-
-        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
-        if ($topRooms) {
-            $grid->model()->orderByDesc('room_visitors_count');
+    
+        if ((settings()->get('make_rooms_top') ?? 0) == 1) {
+            $grid->model()->orderByRaw('is_top = 1 DESC');
         }
-
+    
+        $grid->model()->orderByDesc('room_visitors_count');
+    }
+    
+    protected function applyFilterType(Grid $grid, string $filterType, $user): void
+    {
         switch ($filterType) {
             case 'boss':
-                $roomIds = EnteredRoom::query()
-                    ->where('uid', $user->id)
-                    ->orderByDesc('entered_at')
-                    ->pluck('rid')
-                    ->toArray();
-                $grid->model()->orderByDesc('pin')->whereIn('id', $roomIds);
+                $roomIds = EnteredRoom::query()->where('uid', $user->id)->orderByDesc('entered_at')->pluck('rid')->toArray();
+                $grid->model()->whereIn('id', $roomIds);
                 break;
-
             case 'trend':
-                $grid->model()->orderByDesc('top_room')
-                    ->orderByDesc('pin')
-                    ->orderByDesc('room_visitors_count')
-                    ->orderByDesc('session');
+                $grid->model()->orderByDesc('top_room')->orderByDesc('pin')->orderByDesc('room_visitors_count')->orderByDesc('session');
                 break;
-
             case 'popular':
-                $grid->model()->orderByDesc('top_room')
-                    ->orderByDesc('pin')
-                    ->orderByDesc('room_visitors_count');
+                $grid->model()->orderByDesc('top_room')->orderByDesc('pin')->orderByDesc('room_visitors_count');
                 break;
-
             case 'last_create':
-                $grid->model()->whereDate('created_at', '>=', Carbon::now()->subDays(3))
-                    ->orderByDesc('pin')
-                    ->orderByDesc('id');
+                $grid->model()->whereDate('created_at', '>=', now()->subDays(3))->orderByDesc('pin')->orderByDesc('id');
                 break;
-
             case 'pk':
                 $grid->model()->has('lastPk')->orderByDesc('pin');
                 break;
-
             case 'party':
-                $grid->model()->whereHas('roomCategory', function ($query) {
-                    $query->where('type', 'party');
-                })->orderByDesc('pin');
+                $grid->model()->whereHas('roomCategory', fn($q) => $q->where('type', 'party'))->orderByDesc('pin');
                 break;
-
             case 'festival':
             case 'recently':
-                $grid->model()
-                    ->orderByDesc('pin')
-                    ->orderByDesc('top_room')
-                    ->orderByDesc('room_visitors_count')
-                    ->orderByDesc('session');
+                $grid->model()->orderByDesc('pin')->orderByDesc('top_room')->orderByDesc('room_visitors_count')->orderByDesc('session');
                 break;
-
             case 'interested':
-                $roomTypes = EnteredRoom::query()
-                    ->where('uid', $user->id)
-                    ->where('entered_at', '>=', Carbon::now()->subDay())
-                    ->with('room')
-                    ->get()
-                    ->pluck('room.room_type')
-                    ->unique();
-                $grid->model()->whereIn('room_type', $roomTypes)
-                    ->orderByDesc('pin')
-                    ->orderByDesc('top_room')
-                    ->orderByDesc('session');
+                $roomTypes = EnteredRoom::query()->where('uid', $user->id)->where('entered_at', '>=', now()->subDay())->with('room')->get()->pluck('room.room_type')->unique();
+                $grid->model()->whereIn('room_type', $roomTypes)->orderByDesc('pin')->orderByDesc('top_room')->orderByDesc('session');
                 break;
-
-            /* case 'following':
-                    $grid->model()->whereIn('uid', $user->followeds_ids())
-                        ->orderByDesc('top_room')
-                        ->orderByDesc('room_visitors_count')
-                        ->orderByDesc('session');
-                    break;
-
-                case 'friends':
-                    $grid->model()->whereIn('uid', $user->friends_ids())
-                        ->orderByDesc('top_room')
-                        ->orderByDesc('room_visitors_count')
-                        ->orderByDesc('session');
-                    break; */
-
             case 'nearby':
-                $userLat  = $user->lat;
-                $userLong = $user->long;
                 $grid->model()->selectRaw(
-                    'rooms.*,
-                    (6371 * acos(cos(radians(?)) * cos(radians(owner.lat))
-                    * cos(radians(owner.long) - radians(?)) + sin(radians(?))
-                    * sin(radians(owner.lat)))) AS distance',
-                    [$userLat, $userLong, $userLat]
-                )
-                    ->join('users as owner', 'rooms.uid', '=', 'owner.id')
-                    ->orderByDesc('pin')
-                    ->orderBy('distance');
+                    'rooms.*, (6371 * acos(cos(radians(?)) * cos(radians(owner.lat)) * cos(radians(owner.long) - radians(?)) + sin(radians(?)) * sin(radians(owner.lat)))) AS distance',
+                    [$user->lat, $user->long, $user->lat]
+                )->join('users as owner', 'rooms.uid', '=', 'owner.id')->orderByDesc('pin')->orderBy('distance');
                 break;
-
             case 'top_gift':
-                $grid->model()
-                    ->withSum('gifts as total_gift_exp', 'giftPrice')
-                    ->orderByDesc('total_gift_exp');
+                $grid->model()->withSum('gifts as total_gift_exp', 'giftPrice')->orderByDesc('total_gift_exp');
                 break;
-
             case 'close_room':
                 $grid->model()->whereHas('bans');
                 break;
             case 'hide_room':
-                $grid->model()
-                    ->whereHas('owner')
-                    ->whereHas('owner.packs', function ($q) {
-                        $q->where('type', 16)
-                            ->where('is_used', 1)
-                            ->where(function ($q) {
-                                $q->where('expire', 0)
-                                    ->orWhere('expire', '>=', now()->timestamp);
-                            });
+                $grid->model()->whereHas('owner')->whereHas('owner.packs', function ($q) {
+                    $q->where('type', 16)->where('is_used', 1)->where(function ($q) {
+                        $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
                     });
+                });
                 break;
             case 'country':
-                $grid->model()
-                    ->join('users', 'rooms.uid', '=', 'users.id') // assuming `owner_id` in rooms
-                    ->join('countries', 'users.country_id', '=', 'countries.id')
-                    ->orderBy('countries.id');
+                $grid->model()->join('users', 'rooms.uid', '=', 'users.id')->join('countries', 'users.country_id', '=', 'countries.id')->orderBy('countries.id');
                 break;
-
             default:
-                $grid->model()
-                    ->orderByDesc('pin')
-                    ->orderByDesc('hour_hot');
-                //                $grid->model()->orderByDesc('rooms.pin')
-                //                    ->orderByDesc('rooms.top_room')
-                //                    ->orderByDesc('session')
-                //                    ->orderByDesc('count_room_socket');
+                $grid->model()->orderByDesc('pin')->orderByDesc('hour_hot');
                 break;
         }
+    }
+    
+    protected function setupFilters(Grid $grid): void
+    {
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
-                    $query->whereHas('owner', function ($query) use ($input) {
-                        $query->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%");
-                    });
+                    $query->whereHas('owner', fn($q) => $q->where('name', 'like', "%$input%")
+                        ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
-
+    
                 $filter->where(function ($query) {
                     if ($this->input) {
-                        $query->whereHas('owner', function ($query) {
-                            $query->where('country_id', $this->input);
-                        });
+                        $query->whereHas('owner', fn($q) => $q->where('country_id', $this->input));
                     }
-                }, __('Country'))->select(
-                    Country::query()->pluck('name', 'id')
-                );
-
-                //                $filter->equal('room_status', __('Room Status'))->select([
-                //                    1 => __('Active'),
-                //                    0 => __('Inactive'),
-                //                    2 => __('Closed'),
-                //                    3 => __('Banned'),
-                //                    4 => __('Closed'),
-                //                ]);
+                }, __('Country'))->select(Country::query()->pluck('name', 'id'));
             });
         });
-
+    }
+    
+    protected function defineGridColumns($grid)
+    {
         $grid->disableRowSelector();
-
+    
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
         });
-
+    
         $grid->id(__('ID'));
-
+    
         $grid->column('room_name', __('room'))->display(function ($name) {
             $path = @$this->room_cover;
             $id = @$this->id;
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-
-            // Fallback if image doesn't exist
+    
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-
+    
             return "
-        <div style='display: flex; align-items: center; gap: 10px;'>
-            <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-            <div>
-                <span style='cursor: pointer;'>$name</span><br>
-                <span style='cursor: pointer;'>ID: $id</span>
-            </div>
-        </div>
-    ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+                    <div>
+                        <span style='cursor: pointer;'>$name</span><br>
+                        <span style='cursor: pointer;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
         });
-
+    
         $grid->column('owner.name', __('room owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $id = @$this->owner->id;
             $path = @$this->owner?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
+    
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
+    
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
-
+    
             return "<a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                    <strong>$name</strong><br>
-                    <span style='color: #aaa; font-size: smaller;'>ID: $id</span><br>
-                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>ID: $id</span><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
                 </div>
-            </div>
-        ";
+            ";
         });
-
-
-        //     $grid->column('pin', __('Pin'))->display(function ($pin) {
-        //         $roomId = $this->id;
-        //         $isPinned = $pin ? 'true' : 'false';
-        //         $pinIcon = $pin ? 'fa-check-circle' : 'fa-thumb-tack';
-        //         $pinColor = $pin ? 'text-success' : 'text-muted';
-
-        //         return <<<HTML
-        // <button class="btn btn-sm {$pinColor} pin-room-btn"
-        //         data-room="{$roomId}"
-        //         data-pinned="{$isPinned}">
-        //     <i class="fa {$pinIcon}"></i>
-        // </button>
-        // HTML;
-        //     });
-        /*         $grid->column(__('status'))->display(function () {
-            return (new \App\Admin\Actions\RoomAction(
-                $this->id,
-                $this->room_status,
-                $this->top_room,
-                $this->is_afk,
-                $this->pin
-            ))->render();
-        }); */
-
+    
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
             $maxRoomAdmin = Common::getConfig('max_room_admin');
             return count($this->admins) . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
+    
         $grid->column('count_room_socket', __('Number of users'));
-
+    
         $grid->column(__('microphone'))->display(function () {
             $ids = explode(',', $this->microphone);
             $cachedUsers = User::whereIn('id', $ids)
                 ->with(['profile:user_id,avatar'])
                 ->get(['id', 'name']);
-
+    
             if ($cachedUsers->isEmpty()) {
                 return '';
             }
-
+    
             $html = '<div class="image-container">';
-
+    
             foreach ($cachedUsers as $user) {
                 $path = $user->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                 $username = htmlspecialchars($user->name ?? 'Unknown');
-                $userUrl = route('admin.users.show', $user->id); // Assuming you have a route like this
-
+                $userUrl = route('admin.users.show', $user->id);
+    
                 $html .= '
                     <div class="image-wrapper" onclick="window.location.href=\'' . $userUrl . '\'">
                         <img src="' . $url . '"
@@ -614,87 +503,64 @@ class RoomController extends MainController
                                     transition: transform 0.3s ease;"/>
                     </div>';
             }
-
+    
             $html .= '</div>';
-
-            // CSS for styling
-            $html .= '
-            <style>
-                .image-container {
-                    display: flex;
-                    justify-content: start;
-                    align-items: center;
-                    gap: -10px; /* Overlap the images slightly */
-                    padding: 8px 0;
-                    overflow-y: overlay;
-                    width: 218px;
-                    padding-right: 16px;
-                }
-
-                .image-wrapper {
-                    display: inline-block;
-                    position: relative;
-                        margin-right: -12px;
-                }
-
-                .image-wrapper img {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    object-fit: cover;
-                    border: 2px solid #fff; /* White border for better contrast */
-                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
-                    cursor: pointer;
-                }
-
-                .image-wrapper img:hover {
-                    transform: scale(1.2); /* Slightly enlarge image on hover */
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
-                }
-
-                /* Optional: If you want to add a tooltip style for the images */
-                .image-wrapper img[title] {
-                    cursor: pointer; /* Change cursor to indicate interactivity */
-                }
-
-                .image-wrapper img[title]:hover {
-                    opacity: 0.8; /* Slight opacity change on hover */
-                }
-            </style>';
-
-            return $html;
-        });
-
-        $permissionName = $this->permission_name;
-
-        $grid->actions(function ($action) use ($permissionName) {
-            $action->disableDelete();
-            if (Admin::user()->can('delete-' . $permissionName) || Admin::user()->can('*')) {
-                $action->add(new RoomDeleteAction());
-            }
-            //            $action->disableView();
-            $pin = $action->row->pin;
-            $model = $action->row;
-            // إضافة الفعل مع تمرير الـ pin
-            if (Admin::user()->can('pin-switch-' . $permissionName) || Admin::user()->can('*')) {
-
-                $action->add(new RoomPinAction($action->row->id, $pin));
-            }
-            if (Admin::user()->can('close-switch-' . $permissionName) || Admin::user()->can('*')) {
-
-                $action->add(new CloseRoomAction($model->id));
-            }
-        });
-
-        $grid->disableCreateButton();
-        $grid->disableExport();
-        $this->extendGrid($grid);
-
-        $this->setupPinModalScript();
-
-        return $grid;
+    
+            // Append custom CSS (once only)
+            static $appended = false;
+            if (!$appended) {
+                $html .= '
+                <style>
+                    .image-container {
+                        display: flex;
+                        justify-content: start;
+                        align-items: center;
+                        gap: -10px; /* Overlap the images slightly */
+                        padding: 8px 0;
+                        overflow-y: overlay;
+                        width: 218px;
+                        padding-right: 16px;
+                    }
+    
+                    .image-wrapper {
+                        display: inline-block;
+                        position: relative;
+                            margin-right: -12px;
+                    }
+    
+                    .image-wrapper img {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                        border: 2px solid #fff; /* White border for better contrast */
+                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+                        transition: transform 0.3s ease, box-shadow 0.3s ease;
+                        cursor: pointer;
+                    }
+    
+                    .image-wrapper img:hover {
+                        transform: scale(1.2); /* Slightly enlarge image on hover */
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
+                    }
+    
+                    /* Optional: If you want to add a tooltip style for the images */
+                    .image-wrapper img[title] {
+                        cursor: pointer; /* Change cursor to indicate interactivity */
+                    }
+    
+                    .image-wrapper img[title]:hover {
+                        opacity: 0.8; /* Slight opacity change on hover */
+                    }
+                </style>';
+    
+                            return $html;
+            }});
     }
+
+    
+
+
 
     public function updatePinStatus($id, Request $request)
     {

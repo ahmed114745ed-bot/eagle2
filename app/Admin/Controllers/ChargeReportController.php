@@ -20,10 +20,12 @@ use Encore\Admin\Layout\Column;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Log;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class ChargeReportController extends MainController
 {
     public $permission_name = 'charger-reports';
+    use HasResourceActions;
 
     public function index(Content $content)
     {
@@ -37,16 +39,6 @@ class ChargeReportController extends MainController
                     $column->append($box);
                 });
             }));
-
-
-        //        return parent::index($content
-        //            ->title(trans("Reports"))
-        //            ->row(function (Row $row) {
-        //                $row->column(12, $this->tabsComponent());
-        //            })
-        //            ->row(function (Row $row) {
-        //                $row->column(12, $this->grid());
-        //            }));
     }
 
     private function combinedContent()
@@ -104,7 +96,6 @@ class ChargeReportController extends MainController
         $grid->model()->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
-            // $grid->model()->where('charger_type', "dash")->where('agency_id', '!=', null);
             $grid->model()->where('charger_type', "dash");
         } elseif (request("name") == "host") {
 
@@ -215,22 +206,35 @@ class ChargeReportController extends MainController
             }
         ");
         $grid->filter(function (Grid\Filter $filter) {
-
-
             $filter->disableIdFilter();
             $filter->expand();
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $input = $this->input;
-                    $query->whereHas('receiver', function ($q) use ($input) {
-                        $q->where('id', $input)
-                            ->orWhere('name', 'like', "%$input%");
-                    });
-                }, __('agency'));
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function () {}, __('Type'), 'filter_type')
+                    ->select([
+                        'user'     => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ])->default('shipping');
             });
 
-
+            $filter->column(1 / 2, function ($filter) {
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        $input = $this->input;
+                        $type  = request('filter_type');
+                        if ($type == 'user') {
+                            $query->whereHas('receiverUser', function ($q) use ($input) {
+                                $q->where('uuid', $input)
+                                    ->orWhere('name', 'like', "%$input%");
+                            });
+                        } else {
+                            $query->whereHas('receiver', function ($q) use ($input) {
+                                $q->where('id', $input)
+                                    ->orWhere('name', 'like', "%$input%");
+                            });
+                        }
+                    }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
+                });
+            });
 
 
             $filter->column(1 / 2, function ($filter) {
@@ -315,7 +319,7 @@ class ChargeReportController extends MainController
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-            //  $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
             $imageStyle = $this->user_type == 'agency'
                 ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'     // rectangle
                 : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
@@ -333,6 +337,7 @@ class ChargeReportController extends MainController
             </div>
         ";
         });
+
         if (request("name") == "dash") {
             $grid->column('agency_id', __('Agency'))->display(function () {
                 if (!$this->agency) {
@@ -365,7 +370,6 @@ class ChargeReportController extends MainController
             });
         }
 
-
         $grid->column('usd', __('amount $'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
@@ -376,7 +380,6 @@ class ChargeReportController extends MainController
                 </div>
             ";
         });
-
 
         $image = asset('images/coin.png');
         $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
@@ -399,10 +402,24 @@ class ChargeReportController extends MainController
             });
         }
 
-
-
         $grid->column('created_at', __('shipping date'));
+        if (request("name") == "host" || request("name") == null) {
+            $grid->tools(function (Grid\Tools $tools) {
+                $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+                $query = http_build_query([
+                    'from_date' => request('from_date'),
+                    'to_date' => request('to_date'),
+                    'filter_type' => request('filter_type'),
+                    'filtering' => request('filtering'),
+                    'name' => request("name"),
+                ]);
 
+                $tools->append('<a href="' . url('/admin/exchange-charge-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+                <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            });
+        }
+
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -412,13 +429,11 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
-        $grid->model()
-            // ->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
-            ->orderByDesc('created_at');
+        $grid->model()->orderByDesc('created_at');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-
+            $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
                 $filter->equal('trx', __('trx_no'));
@@ -565,6 +580,21 @@ class ChargeReportController extends MainController
         });
 
         $grid->column('created_at', __('shipping date'));
+        $this->extendGrid($grid);
+        $grid->tools(function (Grid\Tools $tools) {
+            $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+            $query = http_build_query([
+                'from_date' => request('from_date'),
+                'to_date' => request('to_date'),
+                'trx' => request('trx'),
+                'status' => request('status'),
+                'method' => request('method'),
+                'uuid' => $uuid,
+            ]);
+
+            $tools->append('<a href="' . url('/admin/exchange-coin-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+                <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        });
 
         return $grid;
     }
@@ -572,7 +602,6 @@ class ChargeReportController extends MainController
 
     protected function in_app_purchas()
     {
-        // dd(request('uuid'));
 
         $grid = new Grid(new CoinLog());
         $grid->disableRowSelector();
@@ -631,9 +660,6 @@ class ChargeReportController extends MainController
              </div>
          ";
         });
-        // $grid->column ('obtained_coins',__ ('amount'))->display (function ($coin){
-        //     return number_format($coin);
-        //  });
 
         $grid->column('obtained_coins', __('amount'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -670,6 +696,7 @@ class ChargeReportController extends MainController
         $grid->column('return', __('Return'))->display(function () {
             return (new \App\Admin\Actions\ReturnDiAction($this->id))->render();
         });
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -678,6 +705,26 @@ class ChargeReportController extends MainController
         $grid = new Grid(new ExchangeLog());
         $grid->disableRowSelector();
         $grid->model()->orderByDesc('created_at')->where('status', 1);
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($from = request('from_date')) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                        $query->whereDate('created_at', '>=', $start);
+                    }
+                }, __('From Date'), 'from_date')->date();
+
+                $filter->where(function ($query) {
+                    if ($to = request('to_date')) {
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
+                        $query->whereDate('created_at', '<=', $end);
+                    }
+                }, __('To Date'), 'to_date')->date();
+            });
+        });
+
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -751,43 +798,27 @@ class ChargeReportController extends MainController
             }
         });
         $grid->column('created_at', __('shipping date'));
+        $grid->tools(function (Grid\Tools $tools) {
+            $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+            $query = http_build_query([
+                'from_date' => request('from_date'),
+                'to_date' => request('to_date'),
+                'uuid' => $uuid,
+            ]);
 
+            $tools->append('<a href="' . url('/admin/exchange-diamond-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+            <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        });
 
+        $this->extendGrid($grid);
         return $grid;
     }
 
     private function tabsComponent()
     {
         return view('admin.grid.common.report.charge')->render();
-
-        $content = new Row();
-
-        $box = (new Box(
-            title: __('Fields'),
-            content: view('admin.grid.common.report.charge')
-        ))->collapsable();
-        //        $content->column(12, $box);
-        //        $content->column(12, $box);
-        //        $box = (new Box(
-        //            title: __('Details'),
-        //            content: view('admin.grid.common.report.show-statistics-for-charge')
-        //        ))->collapsable();
-        //        $content->column(12, $box);
-
-
-        return $box;
     }
 
-    // public function showChargeReports(Content $content, $agency_id)
-    // {
-    //     if (!request()->has('scope')) {
-    //         return redirect()->to(url()->current() . '?scope=dash');
-    //     }
-
-    //     return $content
-    //         ->title(__('Charge Reports'))
-    //         ->body($this->customGrid($agency_id));
-    // }
 
     public function showChargeReports(Content $content, $agency_id)
     {
@@ -929,8 +960,6 @@ class ChargeReportController extends MainController
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
-                // $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
 
                 $imageStyle = $this->charger_type == 'agency'
                     ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'     // rectangle

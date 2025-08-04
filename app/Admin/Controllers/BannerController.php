@@ -9,7 +9,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class BannerController extends MainController
+class   BannerController extends MainController
 {
     /**
      * Title for current resource.

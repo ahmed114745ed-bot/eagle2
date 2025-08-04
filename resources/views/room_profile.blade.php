@@ -387,7 +387,7 @@
                                 <a href="{{ admin_url('users/' . $gift->sender->id) }}" target="_blank"
                                    class="d-flex align-items-center text-decoration-none">
                                     <img
-                                        src="{{ getImagePath($gift->sender->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                        src="{{ getImagePath($gift->sender->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
                                         width="40" height="40"
                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <div>
@@ -400,7 +400,7 @@
                                 <a href="{{ admin_url('users/' . $gift->receiver->id) }}" target="_blank"
                                    class="d-flex align-items-center text-decoration-none">
                                     <img
-                                        src="{{ getImagePath($gift->receiver->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                        src="{{ getImagePath($gift->receiver->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
                                         width="40" height="40"
                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <div>
@@ -475,7 +475,7 @@
                                    style="display: inline-flex; align-items: center; text-decoration: none;">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <img
-                                            src="{{ getImagePath($visitor->user->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                            src="{{ getImagePath($visitor->user->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
                                             width="40" height="40"
                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                         <div>
@@ -581,7 +581,7 @@
                                 @if($pk->team1Boss)
                                     <a href="{{ admin_url('users/' . $pk->team1Boss->id) }}" class="team-boss">
                                         <img
-                                            src="{{ getImagePath($pk->team1Boss->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                            src="{{ getImagePath($pk->team1Boss->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
                                             class="boss-avatar">
                                         <span>{{ $pk->team1Boss->name }}</span>
                                     </a>
@@ -602,7 +602,7 @@
                                 @if($pk->team2Boss)
                                     <a href="{{ admin_url('users/' . $pk->team2Boss->id) }}" class="team-boss">
                                         <img
-                                            src="{{ getImagePath($pk->team2Boss->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                            src="{{ getImagePath($pk->team2Boss->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
                                             class="boss-avatar">
                                         <span>{{ $pk->team2Boss->name }}</span>
                                     </a>
@@ -764,7 +764,7 @@
                             <a href="{{ admin_url('users/' . $box->user->id) }}" target="_blank"
                                class="d-flex align-items-center text-decoration-none">
                                 <img
-                                    src="{{ getImagePath($box->user->profile->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                    src="{{ getImagePath($box->user->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
                                     width="40" height="40"
                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                 <div>

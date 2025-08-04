@@ -194,7 +194,7 @@ class RewardLevelIntervalController extends MainController
                     break;
                 case 'coins':
                     if (empty($form->target3) || !is_numeric($form->target3)) $errors[] = __('coins') . ' ' . __('is required and must be numeric');
-                    $form->expir = null;
+                    $form->expire = null;
                     break;
                 case 'achievement':
                     if (!$form->target4) $errors[] = __('image') . ' ' . __('is required');
