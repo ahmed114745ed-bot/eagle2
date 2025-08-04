@@ -89,7 +89,7 @@ class GiftLogSummaryController extends AdminController
             'users_no_agency' => __('User without agency'),
         ];
     
-        $html = '<div class="nav-tabs-custom" style="margin-bottom:20px; z-index: -4;position: absolute;"><ul class="nav nav-tabs">';
+        $html = '<div class="nav-tabs-custom" style="margin-bottom:20px;"><ul class="nav nav-tabs">';
         foreach ($tabs as $key => $label) {
             $isActive = $key === $active ? 'active' : '';
             $url = request()->fullUrlWithQuery(['filter' => $key]);
