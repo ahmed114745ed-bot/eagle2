@@ -1139,6 +1139,95 @@ class Common
         Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
     }
 
+    public static function handelVipCp($vip, $user, $expire,  $userVip)
+    {
+        if ($userVip->is_used) {
+            $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
+        }
+
+        $type = $vip->privilegs()->pluck('type')->toArray();
+        if (!empty($type)) {
+            foreach ($type as $wareType) {
+                $isSetWare = Ware::query()
+                    ->where('get_type', 1)
+                    ->where('level', $vip->level)
+                    ->where('type', $wareType)
+                    ->first();
+
+                if (!$isSetWare) {
+                    $typesArr = [
+                        1 => 'Gemstone',
+                        3 => 'Card Scroll',
+                        4 => 'Avatar Frame',
+                        5 => 'Bubble Frame',
+                        6 => 'Entering Special Effects',
+                        7 => 'Microphone Aperture',
+                        8 => 'Badge',
+                        9 => 'NoKick',
+                        10 => 'Icon',
+                        11 => 'intro animation',
+                        12 => 'maple',
+                        13 => 'hide country',
+                        14 => 'vip gifts',
+                        15 => 'no pan',
+                        19 => 'profile visitors hide in',
+                        20 => 'hide last active',
+                        28 => 'profile frame',
+                        29 => 'being kicked',
+                        30 => 'anti ban',
+                    ];
+
+                    $typeName = $typesArr[$wareType] ?? 'Unknown Type';
+                    Ware::create([
+                        'get_type' => 1,
+                        'type' => $wareType,
+                        'name' => $typeName  ?? 'VIP Ware',
+                        'name_en' => $typeName ?? 'VIP Ware',
+                        'title' => $typeName ?? '',
+                        'title_en' => $typeName ?? '',
+                        'level' => $vip->level,
+                        'price' =>  0,
+                        'enable' => 1,
+                        'expire' => $expire,
+                        'show_img' =>  '1.png',
+                        'img2' =>  '',
+                        'key' =>  '',
+                        'key_json' => '',
+                        'image_type' => 'png',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                        'is_active_for_vip' => 1
+                    ]);
+                } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
+                    $isSetWare->update([
+                        'is_active_for_vip' => 1,
+                        'enable' => 1,
+                    ]);
+                }
+            }
+        }
+
+        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
+            ->where('level', $vip->level)
+            ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
+        foreach ($wares as $ware) {
+            if (in_array($ware->type, [4, 5, 6])) {
+                self::userDress($ware, $user, $userVip->is_used);
+                self::unUsePack($type, $user);
+            }
+        }
+
+        $userVip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->where('id', '!=', $userVip->id)->update(['is_used' => 0]);
+        $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->orderBy('level', 'desc')->first();
+        if ($uvip) {
+            $user->update(['vip' => $uvip->id]);
+        }
+    }
+
     public static function syncUserDressesFromVip(User $user, array $types)
     {
         $dressMap = [
@@ -2251,7 +2340,7 @@ class Common
             ->whereHas('banType', function ($query) use ($routeName, $method) {
                 $query->where('route', $routeName)
                       ->where(function ($q) use ($method) {
-                          $q->whereNull('method') 
+                          $q->whereNull('method')
                             ->orWhere('method', strtoupper($method));
                       });
             })
@@ -2260,7 +2349,7 @@ class Common
 
     }
 
- 
+
 
     public static function bannedResponse(): JsonResponse
     {

@@ -340,6 +340,10 @@ Route::group(
             ExportController::class,
             'usersSallaryTargets'
         ])->name('custom-export-users');
+        Route::get('/exchange-diamond-history', [
+            ExportController::class,
+            'exchangeDiamondExcel'
+        ])->name('exchange-diamond-history');
         Route::get('/wallet-export-users', [
             ExportController::class,
             'walletExportUser'
