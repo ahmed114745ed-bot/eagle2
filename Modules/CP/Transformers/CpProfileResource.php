@@ -29,16 +29,16 @@ class CpProfileResource extends JsonResource
 
         $currentLevel = CpLevel::find($this->level_id);
         $nextLevel    = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
-        
+
         $nextLevelPercentage = 0;
         $ratio = 0;
-        
+
         if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
-        
+
             $currentExp = $this->di;
             $startExp   = $currentLevel->exp;
             $endExp     = $nextLevel->exp;
-        
+
             $ratio = round(min((($currentExp - $startExp) / ($endExp - $startExp)) * 100, 100), 2);
         } else {
             $ratio = 100;

@@ -68,7 +68,10 @@ class CpService
         if (!$cp) return false;
 
         $newDi = $cp->di + $diamonds;
+        info('new di', ['new di' => $newDi]);
+        info('cp_relation_id', ['cp_relation_id' => $cp->cp_relation_id]);
         $level = $this->getLevel($cp->cp_relation_id, $newDi);
+        info('level', ['level' => $level]);
         if ($level) {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi,
@@ -92,6 +95,10 @@ class CpService
 
 
     //////////////////////////////////////////// assign gift ///////////////////////////////////////////////////////////////////
+
+    /**
+     * @throws \Throwable
+     */
     protected function assignGifts($level, $cp)
     {
         // Check if the CP has already taken the gift for the level
@@ -130,6 +137,9 @@ class CpService
         })->get();
     }
 
+    /**
+     * @throws \Throwable
+     */
     protected function distributeRewards($rewards, $userOne, $userTwo)
     {
         foreach ($rewards as $reward) {
@@ -159,12 +169,15 @@ class CpService
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
     protected function assignVip($vipId, $expire, $userOne, $userTwo)
     {
         $vip = OVip::find($vipId);
         if ($vip) {
-            UserCommon::addVipToUser($userOne, $vip, $expire, true);
-            UserCommon::addVipToUser($userTwo, $vip, $expire, true);
+            UserCommon::addVipToCpUser($userOne, $vip, $expire);
+            UserCommon::addVipToCpUser($userTwo, $vip, $expire);
         }
     }
 

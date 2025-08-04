@@ -347,7 +347,7 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expir, $isCp = false)
+    public static function addVipToUser(User $user, OVip $vip, $expire)
     {
         DB::beginTransaction();
 
@@ -357,12 +357,12 @@ class UserCommon
         $vipp->user_id = $user->id;
         $vipp->vip_id = $vip->id;
         $vipp->level = $vip->level;
-        $vipp->expire = now()->addDay($expir)->timestamp;
+        $vipp->expire = now()->addDay($expire)->timestamp;
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;
         $vipp->save();
-        Common::handelVip($vip, $user, $expir, $vipp, $isCp);
+        Common::handelVip($vip, $user, $expire, $vipp);
         DB::commit();
 
         Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
@@ -371,7 +371,37 @@ class UserCommon
         $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
         Common::send_firebase_notification($tokens_notfacion, $title, $body);
         //            CustomNotification::vips($user, $expir, $vip->img);
+    }
 
+    /**
+     * @throws \Throwable
+     */
+    public static function addVipToCpUser(User $user, OVip $vip, $expire): void
+    {
+        DB::beginTransaction();
+
+        $vipp = new UserVip();
+        $vipp->type = 1;
+        $vipp->sender_id = 0;
+        $vipp->user_id = $user->id;
+        $vipp->vip_id = $vip->id;
+        $vipp->level = $vip->level;
+        $vipp->expire = null;
+        $vipp->qty = 1;
+        $vipp->price = 0;
+        $vipp->total = 0;
+        $vip->is_used = 0;
+        $vip->days = $expire;
+        $vipp->save();
+        Common::handelVipCp($vip, $user, $expire, $vipp);
+        DB::commit();
+
+        Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
+        $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $title = config('app.name_ar');
+        $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
+        Common::send_firebase_notification($tokens_notfacion, $title, $body);
+        //            CustomNotification::vips($user, $expir, $vip->img);
     }
 
     public static function addWareToUser(User $user, Ware $ware, $expir)
