@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\GiftLogSummaryController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -316,6 +317,7 @@ Route::group(
                 'show' => 'charges-details.show'
             ]
         ]);
+        
         Route::resource('commissions', 'CommissionController', [
 
             'names' => [
@@ -586,6 +588,8 @@ Route::group(
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });
+        Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
+
     }
 
 
