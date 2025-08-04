@@ -57,13 +57,9 @@ class LevelGiftController extends MainController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        // العثور على النموذج بناءً على المعرف
         $model = CpLevelGift::findOrFail($id);
-
-        // تحميل النموذج
         $form = $this->form()->edit($id);
 
-        // تعبئة حقل coins بالقيمة الموجودة في item_id إذا كان النوع "coins"
         if ($model->type == 'coins') {
             $form->coins = (int) $model->item_id; // تعيين قيمة coins
         }
@@ -144,7 +140,7 @@ class LevelGiftController extends MainController
                 ->load('item_id', admin_url('wares-by-type')); // AJAX load
 
             $form->select('item_id', __('wares'))
-                ->options([]) // loaded via ->load()
+                ->options([]) 
                 ->attribute(['data-image-select' => 1]);
 
 
@@ -200,6 +196,8 @@ class LevelGiftController extends MainController
 
         $form->saving(function (Form $form) {
             unset($form->type_ware);
+            $form->ignore('type_ware');
+           
             if ($form->type == 'ware') {
                 $ware = Ware::find($form->item_id);
                 if ($ware) {
