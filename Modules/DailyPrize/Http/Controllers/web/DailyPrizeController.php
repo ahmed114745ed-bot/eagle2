@@ -121,29 +121,29 @@ class DailyPrizeController extends MainController
             });
         }
 
-//        if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->gift_type == 'ware') {
-                    $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? $ware?->show_img;
-                } elseif ($this->gift_type == 'vip') {
-                    $vips = OVip::find($this->target);
-                    $path = $vips?->img;
-                } elseif ($this->gift_type == 'achievement') {
-                    $path = $this->target;
-                } else {
-                    $path = 'coin.png';
-                }
+        //        if (!request()->filled('_export_')) {
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->gift_type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? $ware?->show_img;
+            } elseif ($this->gift_type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips?->img;
+            } elseif ($this->gift_type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = 'coin.png';
+            }
 
-                if (request()->filled('_export_')) {
-                    return '=IMAGE("' . getImagePath($path) . '","flag",1)';
-                }
+            if (request()->filled('_export_')) {
+                return '=IMAGE("' . getImagePath($path) . '","flag",1)';
+            }
 
-                /** @var Gift $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
-            });
-//        }
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        //        }
 
         $grid->column('expire', __('expire'));
         Admin::script("
@@ -154,6 +154,19 @@ class DailyPrizeController extends MainController
         $grid->actions(function ($actions) {
 
             $actions->disableView();
+        });
+
+        $grid->tools(function (Grid\Tools $tools) {
+            $url = url('admin/daily-gift-types');
+            $backText = __('back');
+            $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                        <i class="fa fa-arrow-left"></i> {$backText}
+                    </a>
+                </div>
+            HTML;
+            $tools->append($customButtonHTML);
         });
 
         return $grid;
