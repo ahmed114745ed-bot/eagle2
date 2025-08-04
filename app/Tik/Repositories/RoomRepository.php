@@ -110,6 +110,10 @@ class RoomRepository extends AbstractRepository
                         ->orWhere('expire', '>=', now()->timestamp);
                 });
         })
+        ->where(function ($query) {
+            $query->whereHas('roomVisitors')
+                ->orWhere('pin', 1);
+        })
         ->where('room_status', 1);
 
         // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
