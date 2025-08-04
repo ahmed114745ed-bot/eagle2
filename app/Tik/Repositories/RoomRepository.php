@@ -123,7 +123,13 @@ class RoomRepository extends AbstractRepository
 //                    ->orWhere(fn($q) => $q->where('pin', 1))
 //                    ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
 //            });
+
             $result->orderByRaw('is_top = 1 DESC');
+        }else {
+            $result->where(function ($query) {
+                $query->whereHas('roomVisitors')
+                    ->orWhere('pin', 1);
+            });
         }
         $result->orderByDesc('room_visitors_count');
 
