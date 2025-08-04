@@ -141,17 +141,17 @@ class CpService
         foreach ($rewards as $reward) {
             switch ($reward->type) {
                 case 'coins':
-                    $this->assignCoins($reward, $userOne, $userTwo);
+                    $this->assignCoins($reward->item_id, $userOne, $userTwo);
                     break;
                 case 'vip':
                     $this->assignVip($reward, $reward->expire, $userOne, $userTwo);
                     break;
                 case 'ware':
-                    $ware = Ware::find($reward);
+                    $ware = Ware::find($reward->item_id);
                     if ($ware) $this->assignWare($ware, $reward, $userOne, $userTwo);
                     break;
                 case 'achievement':
-                    $this->assignAchievement($reward, $reward->expire, $userOne, $userTwo);
+                    $this->assignAchievement($reward->item_id, $reward->expire, $userOne, $userTwo);
                     break;
             }
         }
