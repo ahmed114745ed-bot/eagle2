@@ -62,6 +62,9 @@ class CpService
         return $checkIfExistCp->id;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function upgradeLevelAndExp(?object $cp, $diamonds = null): bool
     {
         if (!$cp) return false;
@@ -141,7 +144,7 @@ class CpService
         foreach ($rewards as $reward) {
             switch ($reward->type) {
                 case 'coins':
-                    $this->assignCoins($reward->item_id, $userOne, $userTwo);
+                    $this->assignCoins($reward, $userOne, $userTwo);
                     break;
                 case 'vip':
                     $this->assignVip($reward, $reward->expire, $userOne, $userTwo);
@@ -151,17 +154,26 @@ class CpService
                     if ($ware) $this->assignWare($ware, $reward, $userOne, $userTwo);
                     break;
                 case 'achievement':
-                    $this->assignAchievement($reward->item_id, $reward->expire, $userOne, $userTwo);
+                    $this->assignAchievement($reward, $reward->expire, $userOne, $userTwo);
                     break;
             }
         }
     }
 
-    protected function assignCoins($amount, $userOne, $userTwo)
+    protected function assignCoins($reward, $userOne, $userTwo): void
     {
+        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
+        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
+        $vipGender = $reward->gender;
+        $amount = $reward->item_id;
+
         if ($amount) {
-            $userOne->increment('di', $amount);
-            $userTwo->increment('di', $amount);
+            if ($vipGender == $userOneGender || $vipGender == 'all'){
+                $userOne->increment('di', $amount);
+            }
+            if ($vipGender == $userTwoGender || $vipGender == 'all') {
+                $userTwo->increment('di', $amount);
+            }
         }
     }
 
@@ -191,8 +203,13 @@ class CpService
         $this->genderForReward($ware, $reward, $userOne, $userTwo);
     }
 
-    protected function assignAchievement($itemId, $expire, $userOne, $userTwo)
+    protected function assignAchievement($reward, $expire, $userOne, $userTwo)
     {
+        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
+        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
+        $vipGender = $reward->gender;
+        $itemId = $reward->item_id;
+
         // Handle different formats of $expire
         if (is_numeric($expire)) {
             // Assume it's a timestamp (seconds or milliseconds)
@@ -214,8 +231,12 @@ class CpService
             'end_at'       => $dateTimestamp,
         ];
 
-        UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
-        UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
+        if ($vipGender == $userOneGender || $vipGender == 'all'){
+            UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
+        }
+        if ($vipGender == $userTwoGender || $vipGender == 'all') {
+            UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
+        }
     }
 
     protected function genderForReward($ware, $reward, $userOne, $userTwo)
