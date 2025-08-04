@@ -169,7 +169,7 @@ class FixedTargetService
         // logger('agency_usd Achieved:', [$agency_usd]);
         // logger('percentageAchieved Achieved:', [$percentageAchieved]);
         // logger(' Achieved:', [$agency_usd * $percentageAchieved]);
-        logger(' Achieved: user', [ $t]);
+//        logger(' Achieved: user', [ $t]);
 
         try {
             $values = [

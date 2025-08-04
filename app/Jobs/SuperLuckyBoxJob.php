@@ -34,7 +34,7 @@ class SuperLuckyBoxJob implements ShouldQueue
         $this->boxUse = BoxUse::with(['user', 'room.owner'])
             ->findOrFail($boxUseId);
 
-        LogHelper::info('this is box ', $this->boxUse);
+//        LogHelper::info('this is box ', $this->boxUse);
     }
 
     public function handle(): void

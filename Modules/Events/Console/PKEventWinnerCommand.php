@@ -33,8 +33,7 @@ class PKEventWinnerCommand extends Command
         $this->processEventParticipants($pkEvent, 'receiver', 'pk-star');
         $this->processEventParticipants($pkEvent, 'roomowner', 'pk-room');
 
-        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
-
+//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 
     protected function getCurrentPkEvent()
@@ -99,7 +98,7 @@ class PKEventWinnerCommand extends Command
 
             switch ($reward->type) {
                 case "coins":
-               
+
                     $amountBefore = $user->di;
                     UserCoinLogHelper::logByType(
                         $user->id,
@@ -107,11 +106,11 @@ class PKEventWinnerCommand extends Command
                         $amountBefore,
                         UserCoinLogType::PK,
                     );
-                    
+
                     $user->di += $reward->target;
                     $user->save();
 
-                  
+
                     break;
                 case "vip":
                     $vip = OVip::find($reward->target);

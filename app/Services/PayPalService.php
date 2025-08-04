@@ -86,8 +86,6 @@ class PayPalService
 //    {
 //        sleep(29);
 //        $orderId = $request->query('token');
-//        info('token-'.$this->getAccessToken());
-//        info('orderId-'.$orderId);
 //        if (! $orderId) {
 //            return response()->json([
 //                'status'  => 'error',
@@ -103,7 +101,6 @@ class PayPalService
 //
 //        $response = Http::withHeaders($headers)->post($url, null);
 //
-//        info($response);
 //        if ($response->failed()) {
 //            return response()->json([
 //                'status'  => 'error',

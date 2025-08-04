@@ -22,8 +22,6 @@ class UsersJoinedAgencyController extends MainController
     public $permission_name = 'agency-join-logs';
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         return parent::index($content
             ->title(trans('Agency join logs'))
             ->body($this->grid()));
@@ -67,9 +65,9 @@ class UsersJoinedAgencyController extends MainController
                 if (!$this->user) {
                     return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                   
+
                             <span style=' cursor: pointer;'>Unknown </span>
-                        
+
                 </div>
             ";
                 }
@@ -99,9 +97,9 @@ class UsersJoinedAgencyController extends MainController
                 if (!$this->agency) {
                     return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                   
+
                             <span style=' cursor: pointer;'>Unknown </span>
-                        
+
                 </div>
             ";
                 }
@@ -127,9 +125,9 @@ class UsersJoinedAgencyController extends MainController
             $name = __($name);
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                   
+
                             <span style=' cursor: pointer;'>{$name} </span>
-                        
+
                 </div>
             ";
         });

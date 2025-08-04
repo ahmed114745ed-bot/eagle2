@@ -1086,7 +1086,12 @@
 "cant it owner": "You cannot transfer the agency owner",
 "frozen_agency_by_admin":"The agency has been frozen by the admin.",
 "profit" : "Profit",
-"loss" : "Loss"
+"loss" : "Loss",
+"Agency": "Agency",
+":name has been removed from administrators.": ":name has been removed from administrators.",
+"User": "User",
+"banned_from_action":"You are banned from performing this action."
+
 
 
 

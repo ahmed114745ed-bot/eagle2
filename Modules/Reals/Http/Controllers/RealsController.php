@@ -59,6 +59,8 @@ class RealsController extends Controller
      */
     public function getUserReals($user_id = null)
     {
+    
+
         try {
             if ($user_id == null) {
                 $user = Auth::user();

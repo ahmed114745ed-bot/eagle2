@@ -73,7 +73,7 @@ class WeeklyStarWinner extends Command
 
                             $entry->sender->di+=$reward->target;
                             $entry->sender->save();
-        
+
                         }elseif ($reward->type == "vip"){
                             $vip=OVip::query()->find($reward->target);
                             UserCommon::addVipToUser($entry->sender,$vip,$reward->expire);
@@ -107,7 +107,6 @@ class WeeklyStarWinner extends Command
 
             }
         }
-        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
-
+//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 }

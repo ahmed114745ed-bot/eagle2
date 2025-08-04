@@ -86,16 +86,14 @@ trait UserSalaryTrait
                     if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
                         try {
                             $app_feature = Cache::get('host_agency');
-                            
+
                             if ($app_feature) {
 
                                 $targetService = new FixedTargetService($user, month: $month, year: $year);
                                 $targetService->calculateTarget();
                             }
-
-                            $this->info("User ID {$user->id} processed.");
                         } catch (\Throwable $e) {
-                           
+
                             $this->error("Failed user ID {$user->id}");
                         }
                     }

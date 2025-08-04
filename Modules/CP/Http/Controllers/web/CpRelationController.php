@@ -74,7 +74,6 @@ class CpRelationController extends MainController
                 'bro' => trans('bro'),
                 'lovely' => trans('lovely'),
                 'solution' => trans('solution'),
-
             ]);
         });
         $grid->column('id', __('Id'));
@@ -100,11 +99,6 @@ class CpRelationController extends MainController
                 }
             });
         }
-        // $grid->column('الاجرائات')->display(function (){
-        //     $url1 = url('admin/cp-levels/' . $this->id);
-        //     $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>المستويات (levels)</a>";
-        //     return $button1;
-        // });
         return $grid;
     }
 
@@ -139,10 +133,8 @@ class CpRelationController extends MainController
         $this->disableFormTools($form);
 
         $form->text('title', __('title'))->rules('required');
-        // $form->textarea('description', __('description'));
         $form->image('image', __('Img'));
         $form->number('price', __('price'))->rules('required|min:1');
-        // $form->number('relations_number', __('relations_number'))->default(0)->min(0);
         $form->switch('relations_number', __('relations number'))->default(0)->rules('required')->help(__("admin.relations_help"));
 
         $form->select('type', __('Type'))->options([

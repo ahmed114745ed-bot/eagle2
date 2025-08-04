@@ -53,7 +53,6 @@ class MomentController extends Controller
     public function store(Request $request)
     {
         $contacts = $request->contacts ?? '';
-
         // Delegate to the service layer
         $result = $this->momentService->createMoment($contacts, $request);
 
