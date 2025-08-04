@@ -72,7 +72,7 @@ class CpService
         if ($level) {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi,
-                'level_id' => $level->level
+                'level_id' => $level->id
             ]);
             if ($level->level) $this->assignGifts($level->level, $cp);
         } else {
