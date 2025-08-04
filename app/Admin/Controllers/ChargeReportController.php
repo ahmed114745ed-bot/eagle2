@@ -446,7 +446,7 @@ class ChargeReportController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-
+            $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
                 $filter->equal('trx', __('trx_no'));
@@ -594,17 +594,20 @@ class ChargeReportController extends MainController
 
         $grid->column('created_at', __('shipping date'));
         $this->extendGrid($grid);
-        //    $grid->tools(function (Grid\Tools $tools) {
-        //         $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
-        //         $query = http_build_query([
-        //             'from_date' => request('from_date'),
-        //             'to_date' => request('to_date'),
-        //             'uuid' => $uuid,
-        //         ]);
+        $grid->tools(function (Grid\Tools $tools) {
+            $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+            $query = http_build_query([
+                'from_date' => request('from_date'),
+                'to_date' => request('to_date'),
+                'trx' => request('trx'),
+                'status' => request('status'),
+                'method' => request('method'),
+                'uuid' => $uuid,
+            ]);
 
-        //         $tools->append('<a href="' . url('/admin/exchange-diamond-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
-        //         <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
-        //     });
+            $tools->append('<a href="' . url('/admin/exchange-coin-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+                <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        });
 
         return $grid;
     }
