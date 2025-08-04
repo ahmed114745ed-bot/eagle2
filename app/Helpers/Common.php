@@ -28,7 +28,10 @@ use App\Models\UserVip;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserSallary;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
@@ -2242,13 +2245,29 @@ class Common
     }
 
 
-    public static function isUserBannedFromRoute(string $uuid, string $routeName): bool
+    public static function isUserBannedFromRoute(string $uuid, string $routeName, string $method)
     {
-        return Ban::where('uid', $uuid)
-            ->whereHas('banType', function ($query) use ($routeName) {
-                $query->where('route', $routeName);
+        $isBanned =  Ban::where('uid', $uuid)
+            ->whereHas('banType', function ($query) use ($routeName, $method) {
+                $query->where('route', $routeName)
+                      ->where(function ($q) use ($method) {
+                          $q->whereNull('method') 
+                            ->orWhere('method', strtoupper($method));
+                      });
             })
             ->exists();
+        return $isBanned ? self::bannedResponse() : null;
+
     }
+
+ 
+
+    public static function bannedResponse(): JsonResponse
+    {
+        return Common::apiResponse(1, __('banned_from_action'),[],377 );
+
+    }
+
+
 
 }
