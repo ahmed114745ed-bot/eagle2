@@ -30,11 +30,7 @@ class CpListResource extends JsonResource
         $currentLevel = CpLevel::find($this->level_id);
         $nextLevel = CpLevel::where("cp_relation_id",  $currentLevel?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
 
-        dd([
-            'di' => $this->di,
-            'currentLevelExp' => $currentLevel ?? null,
-            'nextLevelExp' => $nextLevel ?? null,
-        ]);
+
         $ratio = 0;
     
         
