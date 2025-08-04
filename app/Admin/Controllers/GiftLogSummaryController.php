@@ -50,7 +50,6 @@ class GiftLogSummaryController extends AdminController
             $query->select('room_id', DB::raw('SUM(giftPrice) as total'))
                 ->whereNotNull('room_id')
                 ->whereHas('room', function ($q) {
-                    $q->whereNull('deleted_at');
                 })
                 ->groupBy('room_id');
         })
@@ -58,7 +57,6 @@ class GiftLogSummaryController extends AdminController
             $query->select('agency_id', DB::raw('SUM(giftPrice) as total'))
                 ->whereNotNull('agency_id')
                 ->whereHas('agency', function ($q) {
-                    $q->whereNull('deleted_at');
                 })
                 ->groupBy('agency_id');
         })
@@ -66,7 +64,6 @@ class GiftLogSummaryController extends AdminController
             $query->select('receiver_id', DB::raw('SUM(giftPrice) as total'))
                 ->whereNull('agency_id')
                 ->whereHas('receiver', function ($q) {
-                    $q->whereNull('deleted_at');
                 })
                 ->groupBy('receiver_id');
         });
