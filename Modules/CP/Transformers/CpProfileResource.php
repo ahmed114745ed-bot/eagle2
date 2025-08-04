@@ -29,15 +29,14 @@ class CpProfileResource extends JsonResource
         $frame = $dress_1_data ?: $dress_1_fallback;
 
         $currentLevel = CpLevel::find($this->level_id);
-        $nextLevel = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
+        $nextLevel = CpLevel::where("cp_relation_id",  $currentLevel->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
 
         $ratio = 0;
-
+        
 
         if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
 
             $currentExp = $this->di;
-            $currentLevelExp = $currentLevel->exp ?? 0;
             $nextLevelExp = $nextLevel->exp ?? $currentExp;
             $ratio = round(min(($currentExp / $nextLevelExp) * 100, 100), 2);            
         } else {
