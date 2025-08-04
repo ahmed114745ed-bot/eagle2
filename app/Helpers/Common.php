@@ -756,6 +756,7 @@ class Common
             ],
         ];
 
+        info('icon', [$icon]);
         if ($icon) {
             $payload['notification']['icon'] = $icon;
         }
