@@ -716,9 +716,7 @@ class Common
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
-
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-
 
             SendFirebaseNotificationJob::dispatch(
                 tokens: $tokens,
@@ -758,9 +756,10 @@ class Common
             ],
         ];
 
-        if (!empty($icon)) {
-            $payload['notification']['icon'] = $icon;
-        }
+//        info('icon', [$icon]);
+//        if ($icon) {
+//            $payload['notification']['icon'] = $icon;
+//        }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
@@ -785,6 +784,7 @@ class Common
 
         $result = json_decode($result);
 
+        info('result', ['result' => $result]);
         //remove group with $key if is group
         if ($result  && $isGroup) {
             self::removeGroupName($key, $token, $tokens, $api_access_key);

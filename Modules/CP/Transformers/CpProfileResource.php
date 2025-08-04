@@ -17,6 +17,7 @@ class CpProfileResource extends JsonResource
     public function toArray($request)
     {
         $loginUserId = request('user_id') ?? Auth::id();
+
         if ($this->user_one_id == $loginUserId) {
             $user = $this->toUser;
         } else {
@@ -26,27 +27,22 @@ class CpProfileResource extends JsonResource
         $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'img2');
         $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
         $frame = $dress_1_data ?: $dress_1_fallback;
-
+        dd([
+            'di' => $this->di,
+            'currentLevelExp' => $currentLevel ?? null,
+            'nextLevelExp' => $nextLevel ?? null,
+        ]);
         $currentLevel = CpLevel::find($this->level_id);
-        $nextLevel = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
-        info('current level', ['current level' => $currentLevel]);
-        info('next level', ['next level' => $nextLevel]);
+        $nextLevel = CpLevel::where("cp_relation_id",  $currentLevel?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
 
-        $nextLevelPercentage = 0;
         $ratio = 0;
-
-        info('condition');
-        info($currentLevel);
-        info($nextLevel);
-        info($nextLevel->exp);
-        info($currentLevel->exp);
+    
+        
         if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
 
             $currentExp = $this->di;
-            $startExp   = $currentLevel->exp;
-            $endExp     = $nextLevel->exp;
-
-            $ratio = round(min((($currentExp - $startExp) / ($endExp - $startExp)) * 100, 100), 2);
+            $nextLevelExp = $nextLevel->exp ?? $currentExp;
+            $ratio = round(min(($currentExp / $nextLevelExp) * 100, 100), 2);            
         } else {
             $ratio = 100;
         }

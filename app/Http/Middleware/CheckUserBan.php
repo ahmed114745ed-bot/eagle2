@@ -21,7 +21,7 @@ class CheckUserBan
         $routePath = $route ; 
 
         if (Common::isUserBannedFromRoute($userId, $routePath, $method)) {
-            return Common::bannedResponse();
+            return Common::apiResponse(1, __('banned_from_action'),[],377 );
         }
     
         return $next($request);
