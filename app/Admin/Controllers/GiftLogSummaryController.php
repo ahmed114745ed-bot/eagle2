@@ -33,7 +33,16 @@ class GiftLogSummaryController extends AdminController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->between('created_at', __('Date and Time'))->datetime();
+            if (request('filter') === 'rooms') {
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->equal('id', __('room'))
+                        ->select()
+                        ->ajax(route('admin.filter-rooms'));
+                });
+            }
+            $filter->column(1 / 2, function ($filter) {
+                $filter->between('created_at', __('Date and Time'))->datetime();
+            });
         });
 
 
