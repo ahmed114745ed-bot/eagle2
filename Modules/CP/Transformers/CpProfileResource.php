@@ -30,10 +30,10 @@ class CpProfileResource extends JsonResource
 
         $currentLevel = CpLevel::find($this->level_id);
         $nextLevel = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
-    
+
         $ratio = 0;
 
-     
+
         if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
 
             $currentExp = $this->di;
