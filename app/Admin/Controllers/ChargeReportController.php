@@ -418,6 +418,18 @@ class ChargeReportController extends MainController
 
 
         $grid->column('created_at', __('shipping date'));
+        // $grid->tools(function (Grid\Tools $tools) {
+        //     $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+        //     $query = http_build_query([
+        //         'from_date' => request('from_date'),
+        //         'to_date' => request('to_date'),
+        //         'uuid' => $uuid,
+        //     ]);
+
+        //     $tools->append('<a href="' . url('/admin/exchange-diamond-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+        //     <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        // });
+
         $this->extendGrid($grid);
         return $grid;
     }
@@ -582,6 +594,18 @@ class ChargeReportController extends MainController
 
         $grid->column('created_at', __('shipping date'));
         $this->extendGrid($grid);
+        //    $grid->tools(function (Grid\Tools $tools) {
+        //         $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+        //         $query = http_build_query([
+        //             'from_date' => request('from_date'),
+        //             'to_date' => request('to_date'),
+        //             'uuid' => $uuid,
+        //         ]);
+
+        //         $tools->append('<a href="' . url('/admin/exchange-diamond-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+        //         <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        //     });
+
         return $grid;
     }
 
@@ -788,6 +812,17 @@ class ChargeReportController extends MainController
             }
         });
         $grid->column('created_at', __('shipping date'));
+        $grid->tools(function (Grid\Tools $tools) {
+            $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+            $query = http_build_query([
+                'from_date' => request('from_date'),
+                'to_date' => request('to_date'),
+                'uuid' => $uuid,
+            ]);
+
+            $tools->append('<a href="' . url('/admin/exchange-diamond-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+            <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        });
 
         $this->extendGrid($grid);
         return $grid;
@@ -796,35 +831,8 @@ class ChargeReportController extends MainController
     private function tabsComponent()
     {
         return view('admin.grid.common.report.charge')->render();
-
-        $content = new Row();
-
-        $box = (new Box(
-            title: __('Fields'),
-            content: view('admin.grid.common.report.charge')
-        ))->collapsable();
-        //        $content->column(12, $box);
-        //        $content->column(12, $box);
-        //        $box = (new Box(
-        //            title: __('Details'),
-        //            content: view('admin.grid.common.report.show-statistics-for-charge')
-        //        ))->collapsable();
-        //        $content->column(12, $box);
-
-
-        return $box;
     }
 
-    // public function showChargeReports(Content $content, $agency_id)
-    // {
-    //     if (!request()->has('scope')) {
-    //         return redirect()->to(url()->current() . '?scope=dash');
-    //     }
-
-    //     return $content
-    //         ->title(__('Charge Reports'))
-    //         ->body($this->customGrid($agency_id));
-    // }
 
     public function showChargeReports(Content $content, $agency_id)
     {
