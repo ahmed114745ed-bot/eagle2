@@ -86,7 +86,7 @@ class RoomController extends MainController
             $giftQuery->whereDate('created_at', '<=', request('end_at'));
         }
         $gifts = $giftQuery->orderByDesc('created_at')->paginate(15);
-        $totalDiamonds = $room->gifts()->sum('giftPrice');
+        $totalDiamonds = $giftQuery->sum('giftPrice');
 
         // 3. Visitors, Microphone, Blacklist, Pagination
         // Mic positions
