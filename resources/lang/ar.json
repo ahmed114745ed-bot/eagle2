@@ -3530,9 +3530,20 @@
 "User Missing/Deleted": "المستخدم مفقود أو تم حذفه",
 "loss" : "خسارة",
 ":name has been removed from administrators.": ":name تم إزالته من المسؤولين",
-"Agency": "وكالة",
-"User": "مستخدم",
-"banned_from_action":"تم حظرك من تنفيذ هذا الإجراء."
+"banned_from_action":"تم حظرك من تنفيذ هذا الإجراء.",
+"Gift Summary": "ملخص الهدايا",
+"Total Gifts": "إجمالي الهدايا",
+"Date Range": "نطاق التاريخ",
+"Filter": "فلترة",
+"User without agency": "مستخدم بدون وكالة",
+"No Data": "لا توجد بيانات",
+"Hide Room": "إخفاء الغرفة",
+"Countries": "الدول",
+"Microphone": "الميكروفون",
+"Search by name or numId": "ابحث بالاسم أو رقم المعرف",
+"From": "من",
+"To": "إلى",
+"Date and Time": "التاريخ والوقت"
 
 
 
