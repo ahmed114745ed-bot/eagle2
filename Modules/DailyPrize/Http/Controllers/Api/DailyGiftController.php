@@ -82,7 +82,7 @@ class DailyGiftController extends Controller
 
         $type = $dailyGift->gift_type;
         $target = $dailyGift->target;
-        $expire = $dailyGift->expir;
+        $expire = $dailyGift->expire;
         DailyGiftCount::query()->updateOrCreate([
             'user_id' => $user->id,
 
@@ -118,7 +118,7 @@ class DailyGiftController extends Controller
     public function assignGiftToUser(mixed $type, \App\Models\Admin|\Illuminate\Contracts\Auth\Authenticatable|null $user, mixed $target, mixed $expire): void
     {
         if ($type == "coins") {
-      
+
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
                 $user->id,
@@ -126,7 +126,7 @@ class DailyGiftController extends Controller
                 $amountBefore,
                 UserCoinLogType::DAILY_GIFT,
             );
-            
+
             $user->di += $target;
             $user->save();
         } elseif ($type == "vip") {
