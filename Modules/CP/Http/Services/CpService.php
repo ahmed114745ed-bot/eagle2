@@ -68,7 +68,10 @@ class CpService
         if (!$cp) return false;
 
         $newDi = $cp->di + $diamonds;
+        info('new di', ['new di' => $newDi]);
+        info('cp_relation_id', ['cp_relation_id' => $cp->cp_relation_id]);
         $level = $this->getLevel($cp->cp_relation_id, $newDi);
+        info('level', ['level' => $level]);
         if ($level) {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi,

@@ -28,9 +28,7 @@ class CpProfileResource extends JsonResource
         $frame = $dress_1_data ?: $dress_1_fallback;
 
         $currentLevel = CpLevel::find($this->level_id);
-        $nextLevel = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
-        info('current level', ['current level' => $currentLevel]);
-        info('next level', ['next level' => $nextLevel]);
+        $nextLevel    = CpLevel::where("id", ">", $this->level_id)->orderBy('id')->first();
 
         $nextLevelPercentage = 0;
         $ratio = 0;
