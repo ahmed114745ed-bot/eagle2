@@ -285,35 +285,26 @@ class RoomController extends MainController
             $html .= '</ul></div>';
 
             $html .= <<<HTML
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const tabLinks = document.querySelectorAll('.tab-link');
-                                const loader = document.getElementById('tab-loading');
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const tabLinks = document.querySelectorAll('.tab-link');
+                        const loader = document.getElementById('tab-loading');
 
-                                tabLinks.forEach(function (tab) {
-                                    tab.addEventListener('click', function (e) {
-                                        e.preventDefault();
-                                        loader.style.display = 'block';
-                                        tabLinks.forEach(t => t.style.pointerEvents = 'none');
-                                        setTimeout(() => {
-                                            window.location.href = tab.getAttribute('href');
-                                        }, 300);
-                                    });
-                                });
+                        tabLinks.forEach(function (tab) {
+                            tab.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                loader.style.display = 'block';
+                                tabLinks.forEach(t => t.style.pointerEvents = 'none');
+                                setTimeout(() => {
+                                    window.location.href = tab.getAttribute('href');
+                                }, 300);
                             });
-                        </script>
-                        HTML;
-
+                        });
+                    });
+                </script>
+                HTML;
             return $html;
         });
-
-
-
-
-
-
-
-
 
         $grid->model()
             ->select('*', \DB::raw("CASE room_status
@@ -332,8 +323,9 @@ class RoomController extends MainController
 
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
         if ($topRooms) {
-            $grid->model()->orderByDesc('room_visitors_count');
+            $grid->model()->orderByRaw('is_top = 1 DESC');
         }
+        $grid->model()->orderByDesc('room_visitors_count');
 
         switch ($filterType) {
             case 'boss':
@@ -449,7 +441,7 @@ class RoomController extends MainController
                 break;
             case 'country':
                 $grid->model()
-                    ->join('users', 'rooms.uid', '=', 'users.id') // assuming `owner_id` in rooms
+                    ->join('users', 'rooms.uid', '=', 'users.id')  // assuming `owner_id` in rooms
                     ->join('countries', 'users.country_id', '=', 'countries.id')
                     ->orderBy('countries.id');
                 break;
