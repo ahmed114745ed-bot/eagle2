@@ -107,5 +107,8 @@ class DailyGift extends Model
         self::created(function ($model) {
             \App\Facades\RedisService::update('daily-gift-count', DailyGift::count());
         });
+        self::updated(function ($model) {
+            \App\Facades\RedisService::update('daily-gift-count', DailyGift::count());
+        });
     }
 }
