@@ -66,7 +66,7 @@ class DailyGiftsController extends Controller
             'target2'    => 'nullable|exists:o_vips,id',
             'target3'    => 'nullable|integer',
             'target4'    => 'nullable|file',
-            'expir' => 'required|numeric'
+            'expire' => 'required|numeric'
         ]);
         $result = DailyGift::where('type', $type)->findOrFail($id);
 
@@ -74,7 +74,7 @@ class DailyGiftsController extends Controller
             'order' => $request->order,
             'gift_type' => $request->gift_type,
             'target' => $request->target,
-            'expir' => $request->expir
+            'expire' => $request->expire
         ]);
 
         return Common::apiResponse(true, 'Success');

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Http\UploadedFile;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
 use Encore\Admin\Admin;
@@ -56,13 +57,9 @@ class LevelGiftController extends MainController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        // العثور على النموذج بناءً على المعرف
         $model = CpLevelGift::findOrFail($id);
-
-        // تحميل النموذج
         $form = $this->form()->edit($id);
 
-        // تعبئة حقل coins بالقيمة الموجودة في item_id إذا كان النوع "coins"
         if ($model->type == 'coins') {
             $form->coins = (int) $model->item_id; // تعيين قيمة coins
         }
@@ -113,7 +110,7 @@ class LevelGiftController extends MainController
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                             <i class="fa fa-arrow-left"></i> الرجوع إلى levels
                         </a>
-                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->level} </label>
+                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->cp_relation_id} </label>
                     </div>
                 HTML;
             $tools->append($customButtonHTML);
@@ -143,7 +140,7 @@ class LevelGiftController extends MainController
                 ->load('item_id', admin_url('wares-by-type')); // AJAX load
 
             $form->select('item_id', __('wares'))
-                ->options([]) // loaded via ->load()
+                ->options([]) 
                 ->attribute(['data-image-select' => 1]);
 
 
@@ -199,6 +196,8 @@ class LevelGiftController extends MainController
 
         $form->saving(function (Form $form) {
             unset($form->type_ware);
+            $form->ignore('type_ware');
+           
             if ($form->type == 'ware') {
                 $ware = Ware::find($form->item_id);
                 if ($ware) {
@@ -214,7 +213,11 @@ class LevelGiftController extends MainController
             } elseif ($form->type == 'coins') {
                 $form->item_id = $form->coins;
             } elseif ($form->type == 'achievement') {
-                $form->item_id = $form->achievement;
+
+                if ($form->achievement instanceof UploadedFile) {
+                    $url = Common::upload('cp', $form->achievement);
+                }
+                $form->item_id = $url ?? '';
             }
         });
 

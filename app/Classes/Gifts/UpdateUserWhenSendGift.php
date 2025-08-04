@@ -65,48 +65,44 @@ class UpdateUserWhenSendGift
 //         }
 
 //         $values['received_level'] = $receivedUser->received_level;
-        // \Log::info('receivedUser',['receivedUser->id' =>$receivedUser->id]);
         // $logValues = [
         //     'salary_is_updated' => 1,
         //     'monthly_diamond_received' => 'monthly_diamond_received + ' . $totalCoins,
         //     'total_diamond_received' => 'total_diamond_received + ' . $totalCoins,
         // ];
-        
-        // // \Log::info('values', ['values' => $logValues]);
+
         // User::where('id', $receivedUser->id)->lockForUpdate()
         //     ->update($values);
         // $receivedUser->save();
         // $receivedUser->enableSaving = true;
-        // \Log::info('receivedUser',['receivedUser' =>$receivedUser]);
-
 
         // return $receivedUser;
 
         DB::transaction(function () use ($totalCoins, $receivedUser) {
 
             $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
-    
+
             $user->salary_is_updated = true;
             $user->monthly_diamond_received += $totalCoins;
             $user->total_diamond_received += $totalCoins;
-    
+
             if ($user->type_user == 0 && $user->agency_id == 0) {
                 $user->exchange_diamonds += $totalCoins;
             }
-    
+
             $lastReceivedLevel = $user->total_received_level;
-    
+
             try {
                 (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
-    
+
                 if ($user->total_received_level > $lastReceivedLevel) {
                     dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
                 }
             } catch (\Exception $e) {
             }
-    
+
             $user->save();
-    
+
         });
     }
     public function updateUsers(int $totalCoins, array $userIds)
@@ -121,7 +117,7 @@ class UpdateUserWhenSendGift
                 ->whereIn('id', $userIds)
                 ->lockForUpdate()
                 ->get();
-    
+
             foreach ($users as $user) {
                 DB::table('users')->where('id', $user->id)->update([
                     'monthly_diamond_received' => $user->monthly_diamond_received + $totalCoins,

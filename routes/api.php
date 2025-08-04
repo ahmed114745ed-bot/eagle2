@@ -598,11 +598,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->values()
                     ->toArray();
 
-                logger()->info('Kreait - Successfully  tokens from topic.', [
-                    'tokens' => $tokens,
-                    'ids'    => $idArray,
-                ]);
-
                 return Common::send_firebase_notification($tokens, $title, $body);
             });
 
@@ -648,9 +643,7 @@ Route::get('/public-official-test/{ids}', function ($ids) {
     $fromUser = null;
 
     $idArray = explode(',', $ids);
-    logger()->info('[sendOfficialMessage] Bulk insert idArray', [
-        'idArray' => $idArray,
-    ]);
+
     $users = User::whereIn('id', $idArray)
         ->get();
 

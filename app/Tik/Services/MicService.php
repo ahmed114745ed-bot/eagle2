@@ -105,11 +105,6 @@ class MicService
 
         $mic = implode(',', $base_mic);
 
-        // \Log::info('shami test go_microphone_hand', [
-        //     'microphoneold' => $mic_arr,
-        //     '$room->microphone_only_users' => $room->microphone_only_users,
-        //     'mic' => $mic,
-        // ]);
         $this->updateMicAndPK($room, $mic);
         //Remove mic sequence
         Common::delMicHand($user->id);
@@ -130,14 +125,13 @@ class MicService
 
     public function handleCpLovely($user, $room, $position)
     {
+//        Log::info("🚀 [CP] handleCpLovely called", [
+//            'user_id' => $user->id,
+//            'room_id' => $room->id,
+//            'position' => $position,
+//            'mode' => $room->mode,
+//        ]);
 
-        Log::info("🚀 [CP] handleCpLovely called", [
-            'user_id' => $user->id,
-            'room_id' => $room->id,
-            'position' => $position,
-            'mode' => $room->mode,
-        ]);
-    
         $existingCps = Cp::where(function ($query) use ($user) {
             $query->where("user_one_id", $user->id)
                 ->orWhere("user_two_id", $user->id);
@@ -156,39 +150,37 @@ class MicService
 
         $userSeats = $this->getUserNearby($position, mode: $room->mode);
 
-        Log::info("📍 [CP] Nearby positions", [
-            'position' => $position,
-            'neighbors' => $userSeats,
-        ]);
-    
+//        Log::info("📍 [CP] Nearby positions", [
+//            'position' => $position,
+//            'neighbors' => $userSeats,
+//        ]);
 
         $micSeats = array_map(function ($v) {
             return is_numeric($v) ? (int)$v : null;
         }, explode(',', $room->microphone));
-    
-        foreach ($userSeats as $neighborPosition) {     
+
+        foreach ($userSeats as $neighborPosition) {
 
             $userOtherId = $micSeats[$neighborPosition] ?? null;
 
-            Log::info("👥 [CP] Checking neighbor", [
-                'neighbor_position' => $neighborPosition,
-                'user_other_id' => $userOtherId,
-            ]);
-       
+//            Log::info("👥 [CP] Checking neighbor", [
+//                'neighbor_position' => $neighborPosition,
+//                'user_other_id' => $userOtherId,
+//            ]);
 
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
-                Log::info("💖 [CP] CP found with neighbor", [
-                    'user_id' => $user->id,
-                    'user_other_id' => $userOtherId,
-                ]);
+//                Log::info("💖 [CP] CP found with neighbor", [
+//                    'user_id' => $user->id,
+//                    'user_other_id' => $userOtherId,
+//                ]);
                 $this->handleCpRoomHistory($user, $room, $position, $neighborPosition, $userOtherId);
                 $this->sendCpLovelyMessage($room, $user);
-    
+
                 return true;
             }
         }
-        Log::info("📩 [CP] No nearby CPs found, sending lovely message anyway", []);
+//        Log::info("📩 [CP] No nearby CPs found, sending lovely message anyway", []);
 
         $this->sendCpLovelyMessage($room, $user);
 
@@ -198,21 +190,21 @@ class MicService
     public function getUserNearby($index, $mode, $rowSize = 4)
     {
         $neighbors = [];
-    
+
         $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
         $rowEnd = $rowStart + $rowSize - 1;
-    
+
         if ($index - 1 >= $rowStart) {
             $neighbors[] = $index - 1;
         }
-    
+
         if ($index + 1 <= $rowEnd) {
             $neighbors[] = $index + 1;
         }
-    
+
         return $neighbors;
     }
-    
+
 
 
     public function sendCpLovelyMessage($room, $user)
@@ -332,7 +324,6 @@ class MicService
         $microphone = explode(',', $room->microphone);
         $mainMicrophone = explode(',', $room->main_microphone);
         $original = explode(',', $room->getOriginal('microphone'));
-        //   Log::info('goMicrophoneHand',['goMicrophoneHand'=> $original]);
         if (!$microphone || !in_array($user->id, $microphone)) {
             return 0;
         }
@@ -362,7 +353,6 @@ class MicService
 
         // Save to DB
         $result = implode(',', $final);
-        // Log::info('goMicrophoneHand',['final'=> $result]);
         $this->updateMicAndPK($room, $result);
 
         // Clear mic timer and leave CP
@@ -410,10 +400,10 @@ class MicService
 
         // $microphone = $room->getOriginal('microphone');
         $microphone = $room->all_microphone;
-        logger('microphone:', [$microphone]);
+//        logger('microphone:', [$microphone]);
 
         $microphone = $this->micType($type, $microphone, $position);
-        logger(' end microphone:', [$microphone]);
+//        logger(' end microphone:', [$microphone]);
 
         $this->updateMic($room, $microphone);
         return $room;
@@ -444,7 +434,7 @@ class MicService
 
         $microphone = explode(',', $microphone);
         $current = $microphone[$position] ?? '0';
-        logger(' explode microphone:', [$microphone]);
+//        logger(' explode microphone:', [$microphone]);
 
         $user = '0';
         $status = '0';
@@ -472,7 +462,7 @@ class MicService
         } else {
             $microphone[$position] = $status;
         }
-        logger('implode microphone:', [implode(',', $microphone)]);
+//        logger('implode microphone:', [implode(',', $microphone)]);
 
         return implode(',', $microphone);
         // $microphone = explode(',', $microphone);

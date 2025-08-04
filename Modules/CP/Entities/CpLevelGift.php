@@ -47,6 +47,9 @@ class CpLevelGift extends Model
             if ($model->type_ware) {
                 unset($model->type_ware);
             }
+            unset($model->attributes['type_ware']);
+
         });
     }
 }
+

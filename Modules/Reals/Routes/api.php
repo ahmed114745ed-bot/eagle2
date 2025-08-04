@@ -18,10 +18,10 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan'])-
     function (){
 
         Route::prefix('/')->middleware("appFeatureEnable:reel")->group(function (){
-            Route::get('reals/user/{user_id?}', 'RealsController@getUserReals');
+            Route::get('reals/user/{user_id?}', 'RealsController@getUserReals')->middleware('ban.user.actions:reals/user');;
             Route::get('reals/my-reals', 'RealsController@getMyReals');
             Route::get('reals/user-followers', 'RealsController@getUserFollowersReals');
-            Route::apiResource('/reals', 'RealsController');
+            Route::apiResource('/reals', 'RealsController')->middleware('ban.user.actions:reals');;
             Route::post('reals-update/{id}', 'RealsController@update');
             Route::apiResource('reals/{real_id}/comment', 'RealsUserCommentController', [
                 'names' => [

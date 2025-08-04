@@ -28,17 +28,17 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
     public function handle()
     {
-       
-       
+
+
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
-    
+
         foreach ($this->tokens as $token) {
             $notification = [
                 'title' => $this->title,
                 'body'  => $this->body,
             ];
-    
+
             $userData = [];
             if ($this->user) {
                 $userData = [
@@ -49,7 +49,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
                     'image'          => $this->user->profile->avatar ?? '',
                 ];
             }
-    
+
             $dataPayload = [
                 'click_action'       => 'FLUTTER_NOTIFICATION_CLICK',
                 'message-type'       => (string) ($this->messageType ?? ''),
@@ -58,35 +58,35 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 'id'                 => $this->id,
                 'notification_type'  => $this->notification_type,
             ];
-            
+
             foreach ($this->data as $key => $value) {
                 $dataPayload[$key] = is_array($value) ? json_encode($value) : (string) $value;
             }
-            
+
             if (!empty($userData)) {
                 $dataPayload['user'] = json_encode($userData); // ✅ user أيضاً لازم يكون نص
             }
-            
+
             $payload = [
                 'token'        => $token,
                 'notification' => $notification,
                 'data'         => $dataPayload,
             ];
-    
+
             if (isset($this->data['image'])) {
                 $payload['notification']['image'] = $this->data['image'];
             }
-    
+
             $headers = [
                 'Authorization' => 'Bearer ' . $api_access_key,
                 'Content-Type'  => 'application/json',
             ];
-    
+
             $response = Http::withHeaders($headers)->post(
                 "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
                 ['message' => $payload]
             );
-    
+
             \Log::info('FCM Response', [
                 'token'  => $token,
                 'status' => $response->status(),
@@ -94,5 +94,5 @@ class SendFirebaseNotificationJob implements ShouldQueue
             ]);
         }
     }
-    
+
 }

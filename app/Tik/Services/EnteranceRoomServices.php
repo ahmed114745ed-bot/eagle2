@@ -140,8 +140,6 @@ class EnteranceRoomServices
     //////////////////////////////////////////////////////room visitors//////////////////////////////////////////
     public function updateRoomCountFromZego(Request $request)
     {
-        Log::info('Zego req',[ 'key' =>$request->all()]);
-
         //        $app_secert='a23b121a64ee9fab4567a2d75d00269d';
         //        if (!$this->checkSignature($app_secert,$request->signature, $request->timestamp, $request->nonce)) {
         //            return response()->json(['status' => 'success'], 200);
@@ -162,8 +160,6 @@ class EnteranceRoomServices
         }
 
         $visitors = $this->updateRoomVisitorsBasedOnEvent($event, $room, $user->id);
-
-        Log::info('visitors',[ 'key' =>$visitors]);
 
         if ($event == 'room_login'){
             $this->addUserToVisitors($room->id, $user->id);

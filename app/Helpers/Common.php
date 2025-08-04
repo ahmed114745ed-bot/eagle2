@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
+use App\Models\Ban;
 use App\Models\Pk;
 use App\Models\UserCoinLog;
 use Illuminate\Log\Logger;
@@ -28,7 +29,10 @@ use App\Models\UserVip;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserSallary;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
@@ -713,9 +717,7 @@ class Common
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
-
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
-
 
             SendFirebaseNotificationJob::dispatch(
                 tokens: $tokens,
@@ -755,9 +757,10 @@ class Common
             ],
         ];
 
-        if (!empty($icon)) {
-            $payload['notification']['icon'] = $icon;
-        }
+//        info('icon', [$icon]);
+//        if ($icon) {
+//            $payload['notification']['icon'] = $icon;
+//        }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
@@ -782,6 +785,7 @@ class Common
 
         $result = json_decode($result);
 
+        info('result', ['result' => $result]);
         //remove group with $key if is group
         if ($result  && $isGroup) {
             self::removeGroupName($key, $token, $tokens, $api_access_key);
@@ -899,10 +903,10 @@ class Common
 
         $result = $messaging->subscribeToTopic($topic, $registrationTokens);
 
-        logger()->info('✅ Kreait Topic Subscribe', [
-            'topic' => $topic,
-            'result' => $result,
-        ]);
+//        logger()->info('✅ Kreait Topic Subscribe', [
+//            'topic' => $topic,
+//            'result' => $result,
+//        ]);
 
         return $result;
     }
@@ -916,11 +920,11 @@ class Common
 
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-            logger()->info('✅ Unsubscribe from FCM topic result', [
-                'topic'          => $topic,
-                'tokensCount'    => count($registrationTokens),
-                'response'       => $response,
-            ]);
+//            logger()->info('✅ Unsubscribe from FCM topic result', [
+//                'topic'          => $topic,
+//                'tokensCount'    => count($registrationTokens),
+//                'response'       => $response,
+//            ]);
 
             // تحليل النتائج (اختياري)
             $result = $response[$topic->value()] ?? [];
@@ -942,7 +946,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
+//            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -1136,6 +1140,95 @@ class Common
         Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]); */
     }
 
+    public static function handelVipCp($vip, $user, $expire,  $userVip)
+    {
+        if ($userVip->is_used) {
+            $vipTypes = $vip->privilegs()->pluck('type')->filter()->unique()->toArray();
+        }
+
+        $type = $vip->privilegs()->pluck('type')->toArray();
+        if (!empty($type)) {
+            foreach ($type as $wareType) {
+                $isSetWare = Ware::query()
+                    ->where('get_type', 1)
+                    ->where('level', $vip->level)
+                    ->where('type', $wareType)
+                    ->first();
+
+                if (!$isSetWare) {
+                    $typesArr = [
+                        1 => 'Gemstone',
+                        3 => 'Card Scroll',
+                        4 => 'Avatar Frame',
+                        5 => 'Bubble Frame',
+                        6 => 'Entering Special Effects',
+                        7 => 'Microphone Aperture',
+                        8 => 'Badge',
+                        9 => 'NoKick',
+                        10 => 'Icon',
+                        11 => 'intro animation',
+                        12 => 'maple',
+                        13 => 'hide country',
+                        14 => 'vip gifts',
+                        15 => 'no pan',
+                        19 => 'profile visitors hide in',
+                        20 => 'hide last active',
+                        28 => 'profile frame',
+                        29 => 'being kicked',
+                        30 => 'anti ban',
+                    ];
+
+                    $typeName = $typesArr[$wareType] ?? 'Unknown Type';
+                    Ware::create([
+                        'get_type' => 1,
+                        'type' => $wareType,
+                        'name' => $typeName  ?? 'VIP Ware',
+                        'name_en' => $typeName ?? 'VIP Ware',
+                        'title' => $typeName ?? '',
+                        'title_en' => $typeName ?? '',
+                        'level' => $vip->level,
+                        'price' =>  0,
+                        'enable' => 1,
+                        'expire' => $expire,
+                        'show_img' =>  '1.png',
+                        'img2' =>  '',
+                        'key' =>  '',
+                        'key_json' => '',
+                        'image_type' => 'png',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                        'is_active_for_vip' => 1
+                    ]);
+                } elseif ($isSetWare->is_active_for_vip == 0 || $isSetWare->enable == 0) {
+                    $isSetWare->update([
+                        'is_active_for_vip' => 1,
+                        'enable' => 1,
+                    ]);
+                }
+            }
+        }
+
+        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)
+            ->where('level', $vip->level)
+            ->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
+        foreach ($wares as $ware) {
+            if (in_array($ware->type, [4, 5, 6])) {
+                self::userDress($ware, $user, $userVip->is_used);
+                self::unUsePack($type, $user);
+            }
+        }
+
+        $userVip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->where('id', '!=', $userVip->id)->update(['is_used' => 0]);
+        $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->orderBy('level', 'desc')->first();
+        if ($uvip) {
+            $user->update(['vip' => $uvip->id]);
+        }
+    }
+
     public static function syncUserDressesFromVip(User $user, array $types)
     {
         $dressMap = [
@@ -1166,18 +1259,18 @@ class Common
 
             if ($column) {
                 $updateData[$column] = '1';
-                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
+//                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
             }
         }
 
         if (!empty($updateData)) {
             $success = $user->update($updateData);
 
-            logger()->info('✅ تم تحديث الحقول:', [
-                'user_id' => $user->id,
-                'success' => $success,
-                'updated_fields' => $updateData
-            ]);
+//            logger()->info('✅ تم تحديث الحقول:', [
+//                'user_id' => $user->id,
+//                'success' => $success,
+//                'updated_fields' => $updateData
+//            ]);
         }
     }
 
@@ -1360,19 +1453,19 @@ class Common
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
-            logger()->info('[sendOfficialMessage] Bulk insert success', [
-                'id' => $id,
-            ]);
+//            logger()->info('[sendOfficialMessage] Bulk insert success', [
+//                'id' => $id,
+//            ]);
         }
 
         if (!empty($data)) {
             OfficialMessage::insert($data);
-            logger()->info('[sendOfficialMessage] Bulk insert success', [
-                'user_ids' => $userIds,
-            ]);
+//            logger()->info('[sendOfficialMessage] Bulk insert success', [
+//                'user_ids' => $userIds,
+//            ]);
         }
 
-        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
+//        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
 
 
         // OfficialMessage::query()->create(
@@ -2238,5 +2331,31 @@ class Common
             }
         }
     }
+
+
+    public static function isUserBannedFromRoute(string $uuid, string $routeName, string $method)
+    {
+        $isBanned =  Ban::where('uid', $uuid)
+            ->whereHas('banType', function ($query) use ($routeName, $method) {
+                $query->where('route', $routeName)
+                      ->where(function ($q) use ($method) {
+                          $q->whereNull('method')
+                            ->orWhere('method', strtoupper($method));
+                      });
+            })
+            ->exists();
+        return $isBanned ? self::bannedResponse() : null;
+
+    }
+
+
+
+    public static function bannedResponse(): JsonResponse
+    {
+        return Common::apiResponse(1, __('banned_from_action'),[],377 );
+
+    }
+
+
 
 }

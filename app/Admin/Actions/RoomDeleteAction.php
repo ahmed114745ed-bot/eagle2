@@ -27,7 +27,6 @@ class RoomDeleteAction extends RowAction
         ];
         $json = json_encode($d);
 
-        info('zego');
         Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
 
         $room->delete();

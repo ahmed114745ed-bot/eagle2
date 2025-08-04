@@ -1839,7 +1839,6 @@ class RoomController extends Controller
 
     private function updateMicrophone($room_uid, $user_id)
     {
-
         $user = User::query()->find($user_id);
         if (!$user) return;
         $result  = Common::go_microphone_hand($room_uid, $user_id);
