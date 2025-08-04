@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
+use App\Models\Ban;
 use App\Models\Pk;
 use App\Models\UserCoinLog;
 use App\Models\Vip;
@@ -2238,6 +2239,16 @@ class Common
                 throw new \Exception(__('api_responses.frozen_agency_by_admin'));
             }
         }
+    }
+
+
+    public static function isUserBannedFromRoute(string $uuid, string $routeName): bool
+    {
+        return Ban::where('uid', $uuid)
+            ->whereHas('banType', function ($query) use ($routeName) {
+                $query->where('route', $routeName);
+            })
+            ->exists();
     }
 
 }

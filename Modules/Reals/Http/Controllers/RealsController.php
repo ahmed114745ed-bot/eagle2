@@ -59,6 +59,11 @@ class RealsController extends Controller
      */
     public function getUserReals($user_id = null)
     {
+    
+        if (Common::isUserBannedFromRoute(Auth::id(), 'reals/user')) {
+            return Common::apiResponse(1, __('banned_from_action'),[],377 );
+        }
+
         try {
             if ($user_id == null) {
                 $user = Auth::user();
@@ -121,6 +126,10 @@ class RealsController extends Controller
     public function store(RealStore $request)
     {
         $user = $request->user();
+
+        if (Common::isUserBannedFromRoute($user->id, 'reals')) {
+            return Common::apiResponse(1, __('banned_from_action'),[],377 );
+        }
         $real = $this->realsService->create($request->all(), Auth::id());
         (new UpgradeLevelServices())->uploadReel($user);
         return Common::apiResponse(1, 'success', new RealsResource($real));
