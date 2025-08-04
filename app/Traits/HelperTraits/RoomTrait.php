@@ -218,8 +218,6 @@ trait RoomTrait
         $mainMicrophone = $room->main_microphone;
         $baseMic = $room->all_microphone;
         // $baseMic = $room->getOriginal('microphone');
-        logger('baseMic:', [$baseMic]);
-
 
 
         $microphone = explode(',', $microphone);
@@ -238,8 +236,7 @@ trait RoomTrait
         if ($microphone[$position] > 0){
             $baseMic[$position] = $mainMicrophone[$position];
         }
-
-        logger('baseMic:', [$baseMic]);
+        
 
         $result = DB::table('rooms')->where('uid',$uid)->update(['microphone'=>implode(',', $baseMic)]);
         $room = Room::query ()->where ('uid',$uid)->first ();

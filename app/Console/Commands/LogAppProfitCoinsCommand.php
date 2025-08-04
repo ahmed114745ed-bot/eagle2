@@ -6,7 +6,7 @@ use App\Helpers\Common;
 use App\Models\CoinGameUser;
 use App\Models\GiftLog;
 use App\Models\UserCoinLog;
-use App\Models\UserLuckyGift;
+use Modules\LuckyBox\Entities\UserLuckyGift;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
