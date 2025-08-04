@@ -2,22 +2,23 @@
 
 namespace Modules\LuckyBox\Http\Controllers;
 
-use App\Enums\UserCoinLogType;
-use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
-
 use App\Models\Room;
 use App\Models\User;
+
 use App\Enums\TypeBox;
 use App\Helpers\Common;
 use App\Jobs\OpenBoxJob;
-
 use App\Models\RoomVisitor;
 use Illuminate\Http\Request;
+
 use App\Facades\RedisService;
+use App\Jobs\NormalBoxRtmJob;
+use App\Enums\UserCoinLogType;
+
+use App\Helpers\UserCoinLogHelper;
 
 use App\Jobs\TestSuperLuckyBoxJob;
-
 use Modules\LuckyBox\Entities\Box;
 use App\Facades\CustomNotification;
 use App\Http\Controllers\Controller;
@@ -31,6 +32,7 @@ use Modules\LuckyBox\Http\Resources\BoxResource;
 class BoxController extends Controller
 {
     public function __construct(private BoxService $boxService) {}
+
     public function index()
     {
         $normal = Box::query()->where('type', 0)->orderByDesc('id')->get();
@@ -94,86 +96,18 @@ class BoxController extends Controller
         dispatch(new TestSuperLuckyBoxJob($request->all()))->onQueue('test-super-lucky-box');
     }
 
-    public function pick3(Request $request)
-    {
-        $user = $request->user();
-        $userId = $user->id;
 
-        if (!$request->bid) return Common::apiResponse(0, 'missing params', null, 422);
-
-        $keyBoxUse  = 'BoxUse_' . $request->bid;
-        $box_use = RedisService::getUnSerialize($keyBoxUse);
-
-        if (!$box_use || $box_use['not_used_num'] == 0 || $box_use['unused_coins'] == 0) {
-            return Common::apiResponse(0, __("api.box_not_found"), null, 404);
-        }
-        if ($box_use['users_num'] != $box_use['used_num']) {
-
-            if (($box_use['not_used_num'] == 1)) {
-                $box_use['not_used_num'] = 0;
-                $fin = 1;
-            } else {
-                $fin = 0;
-                $box_use['not_used_num'] -= 1;
-            }
-
-            $giftService = new LuckyBoxServices();
-            $coins = $giftService->getCoins($fin, $box_use['unused_coins'], $box_use['not_used_num']);
-
-            //            put user in redis
-            $data = [
-                'box_uses_id' => $request->bid,
-                'user_id' => $userId,
-                'coins' => $coins,
-                'room_uid' => $box_use['room_uid'],
-                'room_id' => $box_use['room_id'],
-                'type' => $box_use['type'],
-                'box_uses_owner_id' => $box_use['user_id'],
-                'image' => $box_use['image'],
-                'label' => $box_use['label']
-            ];
-            /*$key  = 'LuckyBox_' . $request->bid . '_' . $data['user_id'] . '_' . $data['room_id'] . '_' . $data['type'];
-            $retrievedData = RedisService::getUnSerialize($key);*/
-            //
-            if (UserBoxGift::where(['user_id' => $userId, 'box_uses_id' => true])->exists()) {
-                return Common::apiResponse(0, 'used it before', null, 403);
-            }
-            //
-            //            RedisService::updateUnSerialize($key, $data);
-
-            UserBoxGift::query()->create($data);
-
-            $box_use['used_coins'] += $coins;
-            $box_use['used_num'] += 1;
-            $box_use['unused_coins'] -= $coins;
-            //update box use in redis
-            RedisService::updateUnSerialize($keyBoxUse, $box_use);
-            dispatch(new OpenBoxJob($request->bid, $userId, $user->name))->onQueue('luckyBox');
-
-            /*if ($fin == 1 ){
-                dispatch(new OpenBoxJob($request->bid, $userId, $user->name))->onQueue('luckyBox');
-            }*/
-
-
-            User::query()->find($userId)->increment('di', $coins);
-
-            return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => $coins], 200);
-        } else {
-            return Common::apiResponse(1, 'لم يحصل ال مستخدم علي مكسب', ['is_win' => false, 'coins' => 0], 200);
-        }
-    }
 
 
     public function pickBox(Request $request)
     {
         $user = $request->user();
-        $userId = $user->id;
         $timestamp = Carbon::now()->timestamp;
 
         if (!$request->bid) return Common::apiResponse(0, 'missing params', null, 422);
 
         $keyBoxUse  = 'BoxUse_' . $request->bid;
-        $box_use =  BoxUse::find($request->bid);
+        $box_use =  BoxUse::with('userBoxGifts', 'user', 'box')->find($request->bid);
         if (!$box_use) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
@@ -181,20 +115,16 @@ class BoxController extends Controller
             return Common::apiResponse(0, __("box closed"), null, 404);
         }
 
-        $box = Box::where('id', $box_use['box_id'])->first();
-        // dd($box_use['box_id'],$box);
-
-        if ($box->type == 0) // normal
+        if ($box_use->box->type == 0) // normal
         {
-            return $this->normalBox($box_use, $keyBoxUse, $user, $request);
+            return $this->normalBox($box_use,  $user, $request);
         } else {  // super
             return  $this->superBox($box_use, $user, $keyBoxUse, $request->bid);
         }
     }
 
-    public function normalBox($box_use, $keyBoxUse, $user, $request)
+    public function normalBox($box_use,  $user, $request)
     {
-
 
         if ($box_use->users_num != $box_use->used_num) {
 
@@ -222,7 +152,7 @@ class BoxController extends Controller
                 'label' => $box_use->label,
             ];
 
-            if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => true])->exists()) {
+            if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => $request->bid])->exists()) {
                 return Common::apiResponse(0, 'used it before', null, 403);
             }
 
@@ -232,63 +162,26 @@ class BoxController extends Controller
             $box_use->used_num += 1;
             $box_use->unused_coins -= $coins;
             $box_use->save();
-            //update box use in redis
-
-            // RedisService::updateUnSerialize($keyBoxUse, $box_use);
-            dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
+           // dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
-                $user->id ,
+                $user->id,
                 $coins,
                 $amountBefore,
                 UserCoinLogType::LUCK_BOX,
             );
             $user->increment('di', $coins);
-            $countWinners =  UserBoxGift::query()->where('box_uses_id', $request->bid)->count();
+            $countWinners =  $box_use->userBoxGifts()->count();
+
             if ($countWinners == $box_use['users_num']) {
-                $this->closeNormalBox($request->bid);
+                dispatch(new NormalBoxRtmJob($box_use->id))->onQueue('test-super-lucky-box');
             }
-            return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => $coins], 200);
+            return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => (int) $coins], 200);
         } else {
             return Common::apiResponse(1, 'لم يحصل ال مستخدم علي مكسب', ['is_win' => false, 'coins' => 0], 200);
         }
     }
 
-    public function closeNormalBox($userBoxId)
-    {
-        $userBox = BoxUse::find($userBoxId);
-        $user = User::where('id', $userBox->user_id)->first();
-        $user->increment('di', $userBox->unused_coins);
-        $userBox->is_closed = true;
-        $userBox->save();
-
-        $room = Room::withoutAppends()->where('uid', $userBox->room_uid)->select('id')->first();
-        $c = BoxUse::query()->where('room_uid', $userBox->room_uid)->where('not_used_num', '>', 0)->count();
-        $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
-        $userWinner = UserBoxGift::where('box_uses_id', $userBox)->pluck('user_id')->toArray();
-        $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
-        //info('normal box room visitor inside the room : ' . json_encode($usersRoomVisit));
-
-
-        CustomNotification::closeLuckyBox($user, $userBox?->image, 0);
-
-        foreach ($usersRoomVisit as $userRoomVisit) {
-
-            $m = [
-                "messageContent" => [
-                    "message" => "hideluckybox",
-                    "ownerBoxId" => @$owner->id,
-                    "ownerBoxName" => @$owner->name,
-                    "boxCoins" => $userBox->coins,
-                    "boxId" => $userBox->id,
-                    "boxType" => $userBox->type == 1 ? 'super' : 'normal',
-                    "numOfBoxes" => $c
-                ]
-            ];
-            $json = json_encode($m);
-            Common::sendToZego('SendCustomCommand', @$room->id, @$userRoomVisit->user_id, $json);
-        }
-    }
 
     public function superBox($box_use, $user, $keyBoxUse, $bosUserId)
     {

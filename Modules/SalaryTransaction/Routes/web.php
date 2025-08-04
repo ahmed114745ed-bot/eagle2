@@ -17,7 +17,7 @@ Route::group(
             'adminIp',
             // 'adminGeneralBan',
             'multiLanguage',
-            'agencyFeature'
+            'web-agency-feature'
         ],
         'as' => config('admin.route.prefix') . '.',
     ],

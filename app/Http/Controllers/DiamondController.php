@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Jobs\CalculateUserTargetJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
@@ -93,25 +94,21 @@ public function calculateSalaryV2()
 {
     $month =request()->month ?? now()->month;
     $year =request()->year ?? now()->year;
-    Log::info('user',['test'=>$year ]);
 
-     User::query()
-            ->where('agency_id', '!=', 0)
-            // ->where('salary_is_updated', 1)
-            ->where('type_user', '!=', 0)
-            ->chunk(500, function ($users) use($month, $year){
-                foreach ($users as $user) {
-                    try {
-                        Log::info('user',['test'=>$user->id ]);
+    User::query()
+    ->where('agency_id', '!=', 0)
+    // ->where('salary_is_updated', 1)
+    ->where('type_user', '!=', 0)
+    ->chunk(500, function ($users) use($month, $year){
+        foreach ($users as $user) {
+            try {
+                CalculateUserTargetJob::dispatch($user, $month, $year)->onQueue('calculate-target');
 
-                        $targetService = new FixedTargetV2Service($user, month: $month, year: $year);
-                        $targetService->calculateTarget();
-                    } catch (\Throwable $e) {
-                        dd($e->getMessage());
-                        // $this->error("Failed user ID {$user->id}");
-                    }
-                }
-            });
+            } catch (\Throwable $e) {
+                dd($e->getMessage());
+            }
+        }
+    });
 
     return response()->json([
         'status' => true,

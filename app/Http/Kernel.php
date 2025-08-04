@@ -11,6 +11,7 @@ use App\Http\Middleware\AdminIpMiddleware;
 use App\Http\Middleware\UserBanMiddleware;
 use App\Http\Middleware\GeneralBanMiddleware;
 use App\Http\Middleware\AdminGeneralBanMiddleware;
+use App\Http\Middleware\WebAgencyFeatureEnable;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Modules\SalaryTransaction\Http\Middleware\EnsureAgencyFeatureEnabled;
 use Modules\ServerControl\Http\Middleware\ConfigMiddleware;
@@ -104,6 +105,8 @@ class Kernel extends HttpKernel
         'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
         'timezone' => \App\Http\Middleware\SetUserTimezone::class,
         'agencyFeature' => EnsureAgencyFeatureEnabled::class,
+        'web-agency-feature' => WebAgencyFeatureEnable::class,
+        'ban.user.actions' => \App\Http\Middleware\CheckUserBan::class,
 
     ];
 }

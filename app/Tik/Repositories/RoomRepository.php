@@ -87,7 +87,6 @@ class RoomRepository extends AbstractRepository
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
 
         $result = $this->model->withLuckyBoxFlag($user->id)->with([
-            'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
             'lastPk',
             'background',
@@ -124,8 +123,15 @@ class RoomRepository extends AbstractRepository
 //                    ->orWhere(fn($q) => $q->where('pin', 1))
 //                    ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
 //            });
-            $result->orderByDesc('room_visitors_count');
+
+            $result->orderByRaw('is_top = 1 DESC');
+        }else {
+            $result->where(function ($query) {
+                $query->whereHas('roomVisitors')
+                    ->orWhere('pin', 1);
+            });
         }
+        $result->orderByDesc('room_visitors_count');
 
         $result->orderByDesc('hour_hot');
 

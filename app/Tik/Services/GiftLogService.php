@@ -81,10 +81,10 @@ class GiftLogService
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
         try {
-           
+
             $sendPrice = (int)($totalPrice);
             $amountBefore = $user->di;
-           
+
             UserCoinLogHelper::logByType(
                 $user->id,
                 -abs($sendPrice),
@@ -104,7 +104,6 @@ class GiftLogService
 
         //update family level to the sender user
 
-
         if (is_array($receiversIds) && count($receiversIds) > 1) {
             $to_id = $receiversIds[0];
             $to    = 'الغرفة';
@@ -113,7 +112,6 @@ class GiftLogService
             $to    = @$receivedUsers->first()->name;
         }
 
-
         $fromName = $user->name;
         $sendGiftServices = new SendGiftService();
 
@@ -121,7 +119,6 @@ class GiftLogService
             $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1 || !$request->has('to_zego')));
         //send to zego if pk not null
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
-
 
         $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
         $cpIds = [];
@@ -144,13 +141,9 @@ class GiftLogService
             dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))->onQueue('default');
         }
 
-
         $realPrice = (int)($number * $gift->price);
-        //  Log::info('realPrice',['realPrice' =>$realPrice]);
 
         $price = ceil($realPrice);
-
-        // Log::info('price',['price' =>$price]);
 
         $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
 
@@ -159,8 +152,6 @@ class GiftLogService
         }
 
         $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
-
-
 
         if ($room->mode != '1' && $room->mode != '2') {
             $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
@@ -195,7 +186,6 @@ class GiftLogService
 
         CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
 
-
         $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
         try {
             Utils::unwrap($promises);
@@ -207,8 +197,6 @@ class GiftLogService
         if ($totalPrice > $totalGiftPrice) {
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
-
-
 
         return Common::apiResponse(1, $message);
     }

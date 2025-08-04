@@ -24,7 +24,7 @@ class UserBanMiddleware
         $message = UserHandling::getUserBanType($user->original_uuid, $request);
 
         if ($message) {
-            return  Common::apiResponse(0, $message, null, 422);
+            return  Common::apiResponse(0, $message, null, 377);
         }
         return $next($request);
     }

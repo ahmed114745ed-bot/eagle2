@@ -72,7 +72,7 @@ class VersionController extends Controller
                 //intro - frames - extradata - emoji
             ],
             'enable_chat'  => settings()->get('chat_status') == "on",
-            'reel_status' => (bool)$reelSettings?->value ?? false,
+            'reel_status' => (bool)($reelSettings?->value ?? true),
         ];
 
         //update current version for user

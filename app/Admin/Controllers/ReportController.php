@@ -19,8 +19,6 @@ class ReportController extends MainController
 
     public function index(Content $content)
     {
-        checkAgencyFeature();
-
         $name = request('name', 'users');
 
         $title = match ($name) {

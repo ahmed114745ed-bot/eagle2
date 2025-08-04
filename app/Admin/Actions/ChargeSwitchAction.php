@@ -27,15 +27,11 @@ class ChargeSwitchAction extends RowAction
 
     public function handle(Model $model)
     {
-        Log::info(['before_transfer_salary' => $model->transfer_salary, 'mode_id' => $model->id]);
-
         User::where("id", $model->id)->update([
             'transfer_salary' => DB::raw('NOT transfer_salary')
         ]);
 
         $model->refresh(); // ✅ الحل هنا
-
-        Log::info(['after_transfer_salary' => $model->transfer_salary, 'mode_id' => $model->id]);
 
         $message = $model->transfer_salary
             ? __('Disable Transfer Salary!')

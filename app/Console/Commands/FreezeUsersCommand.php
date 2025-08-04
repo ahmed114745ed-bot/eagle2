@@ -32,9 +32,9 @@ class FreezeUsersCommand extends Command
                 ->whereIn('id', $userIds)
                 ->update(['transfer_salary' => 1]);
 
-            $this->info('Set transfer_salary=1 for these users: ' . $userIds->implode(', '));
+//            $this->info('Set transfer_salary=1 for these users: ' . $userIds->implode(', '));
         } else {
-            $this->info('No users matched the criteria.');
+//            $this->info('No users matched the criteria.');
         }
         return 0;
     }

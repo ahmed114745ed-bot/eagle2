@@ -26,15 +26,10 @@ class BaishunGameController extends Controller
 
     public function changeBalance(Request $request)
     {
-        LogHelper::info('Change Balance Request:', $request->all());
-
-
         $errorExists = $this->checkWallet($request);
         if ($errorExists) return response()->json($errorExists);
 
         $id = $this->findUserByToken($request->code ?? $request->ss_token);
-       
-
 
         if (!$id) {
             $responseArray = [
@@ -76,7 +71,7 @@ class BaishunGameController extends Controller
                 $amountBefore = $user->di;
 
                 $helperAmount = $request->currency_diff > 0 ? $request->currency_diff : 0;
-             
+
                 UserCoinLogHelper::logByType(
                     $user->id,
                     $request->currency_diff,
@@ -85,7 +80,7 @@ class BaishunGameController extends Controller
                     null,
                     $helperAmount
                 );
-              
+
 
                 DB::table('users')->where('id', $id)->update([
                     'di' => DB::raw('di + ' . (int) $request->currency_diff)
