@@ -12,17 +12,21 @@ class GiftLogSummaryController extends AdminController
 {
     public function index(Content $content)
     {
+
         return $content
             ->title(__('Gift Summary'))
             ->description(__('Rooms - Agencies - Users without agency'))
-            ->body($this->grid());
+            ->row(function ($row )  {
+                $row->column(12, $this->buildTabs(request()->input('filter', 'rooms')));
+                $row->column(12, $this->grid());
+            });
     }
     
     protected function grid()
     {
         $grid = new Grid(new GiftLog());
         $filter = request()->input('filter', 'rooms');
-    
+       
         $this->applyModelFilter($grid, $filter);
         $this->addColumns($grid, $filter);
     
@@ -31,9 +35,7 @@ class GiftLogSummaryController extends AdminController
             $filter->between('created_at', __('Date and Time'))->datetime();
         });
     
-        $grid->header(function () use ($filter) {
-            return $this->buildTabs($filter);
-        });
+      
     
         $grid->disableCreateButton();
         $grid->disableActions();
