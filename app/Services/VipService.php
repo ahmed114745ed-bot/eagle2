@@ -95,7 +95,6 @@ class VipService
         $this->packRepository->deleteExpirePack();
         $this->packRepository->unUseOldPack($user_id);
 
-
         $data = [
             'type' => $type,
             'sender_id' => $sender_id,
@@ -139,7 +138,7 @@ class VipService
         }
         $this->userVipRepository->update($data, $user_vip->id);
         if ($isUsed) $this->userVipRepository->updateTrueIsUsedForUser($user->id);
-        
+
         $user_vip = $this->userVipRepository->findByIdWithOVip($request->vip_id);
 
         $vip = $user_vip->OVip;
@@ -159,7 +158,7 @@ class VipService
     }
 
 
-    
+
 
     public function sendVip($request)
     {

@@ -42,19 +42,15 @@ class MallService
             if (!$userVipLevel) return Common::apiResponse(0, __("api.buyVip", ['level' => $ware->level]), null, 404);
         }
 
-        $pack        = $this->packRepository->userPack($user->id, $ware->id);
+        $pack = $this->packRepository->userPack($user->id, $ware->id);
 
         $totalPrice = $ware->price * $quantity;
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
-       
 
         if ($pack) {
-
             return  $this->updatePack($user, $pack, $ware, $quantity, $totalPrice, 'buy');
         } else {
             try {
-
-
                 // no pack so create it
                 $data = [
                     'user_id'   => $user->id,
@@ -130,7 +126,7 @@ class MallService
                 UserCoinLogType::PACK,
                 $ware->name
             );
-            
+
             $this->service($auth, $ware->exp, $totalPrice, 'send');
 
             DB::commit();

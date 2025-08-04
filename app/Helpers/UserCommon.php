@@ -347,7 +347,7 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expir)
+    public static function addVipToUser(User $user, OVip $vip, $expir, $isCp = false)
     {
         DB::beginTransaction();
 
@@ -362,7 +362,7 @@ class UserCommon
         $vipp->price = 0;
         $vipp->total = 0;
         $vipp->save();
-        Common::handelVip($vip, $user, $expir, $vipp);
+        Common::handelVip($vip, $user, $expir, $vipp, $isCp);
         DB::commit();
 
         Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
@@ -419,11 +419,11 @@ class UserCommon
     }
 
     public static function addChargeLevel($userId, $amount)
-    { 
+    {
         $user = User::where("id", $userId)->first();
         $user->total_charge_coins += $amount;
         $user->save();
-        
+
         $chargeUserExp = $user->total_charge_coins + $user->sub_charger_level;
         $level = Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->orderByDesc("exp")->first();
         if ($level) {
