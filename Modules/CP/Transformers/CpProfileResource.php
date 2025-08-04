@@ -35,6 +35,11 @@ class CpProfileResource extends JsonResource
         $nextLevelPercentage = 0;
         $ratio = 0;
 
+        info('condition');
+        info($currentLevel);
+        info($nextLevel);
+        info($nextLevel->exp);
+        info($currentLevel->exp);
         if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
 
             $currentExp = $this->di;
