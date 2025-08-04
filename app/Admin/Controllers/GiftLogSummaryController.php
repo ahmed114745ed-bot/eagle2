@@ -46,21 +46,30 @@ class GiftLogSummaryController extends AdminController
     protected function applyModelFilter(Grid $grid, string $filter): void
     {
         $grid->model()
-            ->when($filter === 'rooms', function ($query) {
-                $query->select('room_id', DB::raw('SUM(giftPrice) as total'))
-                    ->whereNotNull('room_id')
-                    ->groupBy('room_id');
-            })
-            ->when($filter === 'agencies', function ($query) {
-                $query->select('agency_id', DB::raw('SUM(giftPrice) as total'))
-                    ->whereNotNull('agency_id')
-                    ->groupBy('agency_id');
-            })
-            ->when($filter === 'users_no_agency', function ($query) {
-                $query->select('receiver_id', DB::raw('SUM(giftPrice) as total'))
-                    ->whereNull('agency_id')
-                    ->groupBy('receiver_id');
-            });
+        ->when($filter === 'rooms', function ($query) {
+            $query->select('room_id', DB::raw('SUM(giftPrice) as total'))
+                ->whereNotNull('room_id')
+                ->whereHas('room', function ($q) {
+                    $q->whereNull('deleted_at');
+                })
+                ->groupBy('room_id');
+        })
+        ->when($filter === 'agencies', function ($query) {
+            $query->select('agency_id', DB::raw('SUM(giftPrice) as total'))
+                ->whereNotNull('agency_id')
+                ->whereHas('agency', function ($q) {
+                    $q->whereNull('deleted_at');
+                })
+                ->groupBy('agency_id');
+        })
+        ->when($filter === 'users_no_agency', function ($query) {
+            $query->select('receiver_id', DB::raw('SUM(giftPrice) as total'))
+                ->whereNull('agency_id')
+                ->whereHas('receiver', function ($q) {
+                    $q->whereNull('deleted_at');
+                })
+                ->groupBy('receiver_id');
+        });
     }
     
     protected function addColumns(Grid $grid, string $filter): void
