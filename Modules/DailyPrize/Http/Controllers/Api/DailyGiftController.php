@@ -42,25 +42,30 @@ class DailyGiftController extends Controller
 
         $currentDay = $this->getCurrentDay();
 
-        $result = DailyGiftCount::query()->where('user_id', $user->id)->first();
 
         $check_received = DailyGiftCount::query()->where('user_id', $user->id)->where("day_count", $currentDay)->first();
         $data = [
             'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
-            'gift'          => $this->getWeekGifts(),
+            'gift'          => $this->getWeekGifts($currentDay),
             'is_received'   => $check_received != null ? true : false,
         ];
         return Common::apiResponse(1, '', $data);
     }
 
-    public function getWeekGifts()
+    public function getWeekGifts(int $currentDay): array
     {
+        $DAYS_IN_WEEK = 7;
+        $currentWeek = $currentDay % $DAYS_IN_WEEK;
+
+        $startDay = 1 + ($DAYS_IN_WEEK * $currentWeek);
+        $endDay = $startDay + $DAYS_IN_WEEK - 1;
+
         $gifts = [];
 
-        for ($day = 1; $day <= 7; $day++) {
+        for ($day = $startDay; $day <= $endDay; $day++) {
             $gifts[] = [
-                'day' => $day,
-                'gift' => $this->getGift($day) ?? (object)[],
+                'day'  => $day,
+                'gift' => $this->dailyPrizeService->getGift($day) ?? (object) [],
             ];
         }
 
@@ -158,10 +163,5 @@ class DailyGiftController extends Controller
         return true;
     }
 
-    public function getGift($currentDay)
-    {
 
-        $data = $this->dailyPrizeService->getDayGift($currentDay);
-        return  $data != null ? new WeeklyStarGift($data) : null;
-    }
 }

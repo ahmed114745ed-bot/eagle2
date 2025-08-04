@@ -6,6 +6,7 @@ use App\Facades\RedisService;
 use Carbon\Carbon;
 use Modules\DailyPrize\Entities\DailyGift;
 use Modules\DailyPrize\Entities\DailyGiftCount;
+use Modules\DailyPrize\Transformers\WeeklyStarGift;
 
 class DailyPrizeService
 {
@@ -67,6 +68,35 @@ class DailyPrizeService
     {
         $count = RedisService::get('daily-gift-count');
         return intval($count ?? 28);
+    }
+
+    public function getWeekGifts(int $currentDay): array
+    {
+        $DAYS_IN_WEEK = 7;
+
+        // Determine which week the current day falls into
+        $currentWeek = intdiv($currentDay - 1, $DAYS_IN_WEEK); // Subtract 1 to make day 1-based
+
+        $startDay = 1 + ($currentWeek * $DAYS_IN_WEEK);
+        $endDay = $startDay + $DAYS_IN_WEEK - 1;
+
+        $gifts = [];
+
+        for ($day = $startDay; $day <= $endDay; $day++) {
+            $gifts[] = [
+                'day'  => $day,
+                'gift' => $this->getGift($day) ?? (object) [],
+            ];
+        }
+
+        return $gifts;
+    }
+
+    public function getGift($currentDay)
+    {
+
+        $data = $this->getDayGift($currentDay);
+        return  $data != null ? new WeeklyStarGift($data) : null;
     }
 
 }
