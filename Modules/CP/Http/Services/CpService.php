@@ -54,7 +54,6 @@ class CpService
             })
             ->first();
 
-
         if (!$checkIfExistCp) {
             return false;
         }
@@ -145,7 +144,7 @@ class CpService
                     $this->assignCoins($reward->item_id, $userOne, $userTwo);
                     break;
                 case 'vip':
-                    $this->assignVip($reward->item_id, $reward->expire, $userOne, $userTwo);
+                    $this->assignVip($reward, $reward->expire, $userOne, $userTwo);
                     break;
                 case 'ware':
                     $ware = Ware::find($reward->item_id);
@@ -169,12 +168,20 @@ class CpService
     /**
      * @throws \Throwable
      */
-    protected function assignVip($vipId, $expire, $userOne, $userTwo)
+    protected function assignVip($reward, $expire, $userOne, $userTwo)
     {
+        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
+        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
+        $vipGender = $reward->gender;
+        $vipId = $reward->item_id;
         $vip = OVip::find($vipId);
         if ($vip) {
-            UserCommon::addVipToCpUser($userOne, $vip, $expire);
-            UserCommon::addVipToCpUser($userTwo, $vip, $expire);
+            if ($vipGender == $userOneGender || $vipGender == 'all'){
+                UserCommon::addVipToCpUser($userOne, $vip, $expire);
+            }
+            if ($vipGender == $userTwoGender || $vipGender == 'all') {
+                UserCommon::addVipToCpUser($userTwo, $vip, $expire);
+            }
         }
     }
 
