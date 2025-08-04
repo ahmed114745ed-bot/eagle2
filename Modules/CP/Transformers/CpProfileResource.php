@@ -17,6 +17,7 @@ class CpProfileResource extends JsonResource
     public function toArray($request)
     {
         $loginUserId = request('user_id') ?? Auth::id();
+
         if ($this->user_one_id == $loginUserId) {
             $user = $this->toUser;
         } else {
@@ -38,11 +39,7 @@ class CpProfileResource extends JsonResource
             $currentExp = $this->di;
             $currentLevelExp = $currentLevel->exp ?? 0;
             $nextLevelExp = $nextLevel->exp ?? $currentExp;
-
-            $earnedInThisLevel = $currentExp - $currentLevelExp;
-            $totalForThisLevel = max($nextLevelExp - $currentLevelExp, 1);
-            $ratio = round(min(($earnedInThisLevel / $totalForThisLevel) * 100, 100), 2);
-
+            $ratio = round(min(($currentExp / $nextLevelExp) * 100, 100), 2);            
         } else {
             $ratio = 100;
         }
