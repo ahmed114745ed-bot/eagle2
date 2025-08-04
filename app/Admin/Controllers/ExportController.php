@@ -10,6 +10,7 @@ use App\Admin\Extensions\WalletExportUser;
 use App\Admin\Extensions\WalletExportAgency;
 use App\Admin\Extensions\AgencyMangerExporter;
 use App\Admin\Extensions\ChargeAgencyExporter;
+use App\Admin\Extensions\ExchangeChargeExport;
 use App\Admin\Extensions\ExchangeCoinExporter;
 use App\Admin\Extensions\ExchangeDiamondExporter;
 
@@ -104,6 +105,20 @@ class ExportController extends Controller
         return Excel::download(
             new ExchangeCoinExporter($uuid, $from_date, $to_date, $trx, $status, $method),
             'exchange_coins.csv'
+        );
+    }
+
+    public function exchangeChargeExcel()
+    {
+        $from_date = request('from_date');
+        $to_date = request('to_date');
+        $filtering = request('filtering');
+        $name = request('name');
+        $type = request('filter_type');
+
+        return Excel::download(
+            new ExchangeChargeExport($name, $from_date, $to_date, $filtering,$type),
+            'exchange_charges.csv'
         );
     }
 }

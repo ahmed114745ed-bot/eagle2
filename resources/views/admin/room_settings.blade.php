@@ -323,6 +323,9 @@
                         <label>{{ __('Total Gift Price:') }}</label>
                         <input class="form-control" type="number" name="total_gift_price"
                                value="{{ $settings['total_gift_price'] ?? '' }}">
+                                <label>{{ __('special bar coin') }}</label>
+                        <input class="form-control" type="number" name="special_bar_coin"
+                               value="{{ $settings['special_bar_coin'] ?? '' }}">
 
                         <button type="submit">{{ __('save') }}</button>
                     </div>
