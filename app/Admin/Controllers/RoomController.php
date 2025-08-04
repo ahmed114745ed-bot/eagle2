@@ -280,7 +280,6 @@ class RoomController extends MainController
             'close_room'  => __('close room'),
             'hide_room'   => __('hide room'),
             'country'     => __('countries'),
-            'closed'      => __('Closed'),
         ];
     
         $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
