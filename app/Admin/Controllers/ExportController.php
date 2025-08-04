@@ -10,13 +10,12 @@ use App\Admin\Extensions\WalletExportUser;
 use App\Admin\Extensions\WalletExportAgency;
 use App\Admin\Extensions\AgencyMangerExporter;
 use App\Admin\Extensions\ChargeAgencyExporter;
+use App\Admin\Extensions\ExchangeCoinExporter;
 use App\Admin\Extensions\ExchangeDiamondExporter;
 
 
 class ExportController extends Controller
 {
-
-
     public function usersSallaryTargets()
     {
         $export = new UserExporter();
@@ -24,13 +23,9 @@ class ExportController extends Controller
 
         return Excel::download($export, $fileName);
     }
+
     public function usersAgencyTargets()
     {
-        // $export = new AgencyExporter();
-        // $fileName = 'agency_target_salary.csv';
-
-        // return Excel::download($export, $fileName);
-
         $month = request('month');
         $year = request('year');
         $id = request('id');
@@ -40,6 +35,7 @@ class ExportController extends Controller
             'agency_report.csv'
         );
     }
+
     public function agencyMangerExport()
     {
         $userId = request('user_id'); // استقبلناه بشكل مسطح من الرابط
@@ -49,6 +45,7 @@ class ExportController extends Controller
 
         return Excel::download($export, $fileName);
     }
+
     public function chargeAgencies()
     {
         $uuid = request('owner')['uuid'] ?? null;
@@ -59,7 +56,6 @@ class ExportController extends Controller
 
         return Excel::download($export, $fileName);
     }
-
 
     public function walletExportUser()
     {
@@ -86,7 +82,6 @@ class ExportController extends Controller
 
     public function exchangeDiamondExcel()
     {
-
         $from_date = request('from_date');
         $to_date = request('to_date');
         $uuid = request('uuid');
@@ -95,6 +90,20 @@ class ExportController extends Controller
             new ExchangeDiamondExporter($uuid, $from_date, $to_date),
             'exchange_diamonds.csv'
         );
+    }
 
+    public function exchangeCoinExcel()
+    {
+        $from_date = request('from_date');
+        $to_date = request('to_date');
+        $uuid = request('uuid');
+        $trx = request('trx');
+        $status = request('status');
+        $method = request('method');
+
+        return Excel::download(
+            new ExchangeCoinExporter($uuid, $from_date, $to_date, $trx, $status, $method),
+            'exchange_coins.csv'
+        );
     }
 }

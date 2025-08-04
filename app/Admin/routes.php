@@ -342,6 +342,10 @@ Route::group(
             ExportController::class,
             'exchangeDiamondExcel'
         ])->name('exchange-diamond-history');
+        Route::get('/exchange-coin-history', [
+            ExportController::class,
+            'exchangeCoinExcel'
+        ])->name('exchange-coin-history');
         Route::get('/wallet-export-users', [
             ExportController::class,
             'walletExportUser'
