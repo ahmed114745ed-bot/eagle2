@@ -756,7 +756,7 @@ class Common
             ],
         ];
 
-        if (!empty($icon)) {
+        if ($icon) {
             $payload['notification']['icon'] = $icon;
         }
         if (isset($userData) && is_array($userData)) {
