@@ -3529,9 +3529,10 @@
 "Unknown User": "مستخدم غير معروف",
 "User Missing/Deleted": "المستخدم مفقود أو تم حذفه",
 "loss" : "خسارة",
-    ":name has been removed from administrators.": ":name تم إزالته من المسؤولين",
-    "Agency": "وكالة",
-"User": "مستخدم"
+":name has been removed from administrators.": ":name تم إزالته من المسؤولين",
+"Agency": "وكالة",
+"User": "مستخدم",
+"banned_from_action":"تم حظرك من تنفيذ هذا الإجراء."
 
 
 

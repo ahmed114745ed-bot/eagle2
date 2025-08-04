@@ -108,13 +108,13 @@ class LevelGiftController extends MainController
         $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($vip, $charge_event_id) {
-            $url = url('admin/cp-levels/' . $charge_event_id);
+            $url = url('admin/cp-levels/' . $vip->cp_relation_id);
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                             <i class="fa fa-arrow-left"></i> الرجوع إلى levels
                         </a>
-                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->level} </label>
+                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->cp_relation_id} </label>
                     </div>
                 HTML;
             $tools->append($customButtonHTML);
