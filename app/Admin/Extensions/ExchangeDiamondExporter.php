@@ -60,7 +60,7 @@ class ExchangeDiamondExporter  implements FromCollection, WithHeadings
 
             $arr[] = [
                 'id' => $exchange->id,
-                'charger' => @$exchange->user->name ?? '' . 'uuid:' . @$exchange->user->uuid ?? '',
+                'charger' => (@$exchange->user->name ?? '') . ' uuid: ' . (@$exchange->user->uuid ?? ''),
                 'diamonds' => $exchange->diamonds . ' 💎',
                 'amount' => $exchange->value,
                 'status' => $exchange->status == 1 ? __('Success') : __('Failed'),

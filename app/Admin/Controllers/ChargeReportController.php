@@ -594,17 +594,17 @@ class ChargeReportController extends MainController
 
         $grid->column('created_at', __('shipping date'));
         $this->extendGrid($grid);
-    //    $grid->tools(function (Grid\Tools $tools) {
-    //         $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
-    //         $query = http_build_query([
-    //             'from_date' => request('from_date'),
-    //             'to_date' => request('to_date'),
-    //             'uuid' => $uuid,
-    //         ]);
+        //    $grid->tools(function (Grid\Tools $tools) {
+        //         $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+        //         $query = http_build_query([
+        //             'from_date' => request('from_date'),
+        //             'to_date' => request('to_date'),
+        //             'uuid' => $uuid,
+        //         ]);
 
-    //         $tools->append('<a href="' . url('/admin/exchange-diamond-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
-    //         <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
-    //     });
+        //         $tools->append('<a href="' . url('/admin/exchange-diamond-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+        //         <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        //     });
 
         return $grid;
     }
@@ -743,15 +743,7 @@ class ChargeReportController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    // Manually extract input from request
-                    $uuid = request()->input('user.uuid') ?? request()->input('user')['uuid'] ?? null;
-                    if ($uuid) {
-                        $query->whereHas('user', function ($q) use ($uuid) {
-                            $q->where('uuid', $uuid);
-                        });
-                    }
-                }, 'charger')->placeholder('charger');
+                $filter->equal('user.uuid', __('charger'));
             });
 
             $filter->disableIdFilter();
