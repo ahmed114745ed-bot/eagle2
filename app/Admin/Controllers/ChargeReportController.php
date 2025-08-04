@@ -403,20 +403,20 @@ class ChargeReportController extends MainController
         }
 
         $grid->column('created_at', __('shipping date'));
-        $grid->tools(function (Grid\Tools $tools) {
-            $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
-            $query = http_build_query([
-                'from_date' => request('from_date'),
-                'to_date' => request('to_date'),
-                'trx' => request('trx'),
-                'status' => request('status'),
-                'method' => request('method'),
-                'uuid' => $uuid,
-            ]);
+        // $grid->tools(function (Grid\Tools $tools) {
+        //     $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
+        //     $query = http_build_query([
+        //         'from_date' => request('from_date'),
+        //         'to_date' => request('to_date'),
+        //         'trx' => request('trx'),
+        //         'status' => request('status'),
+        //         'method' => request('method'),
+        //         'uuid' => $uuid,
+        //     ]);
 
-            $tools->append('<a href="' . url('/admin/exchange-coin-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
-                <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
-        });
+        //     $tools->append('<a href="' . url('/admin/exchange-coin-history') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
+        //         <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+        // });
 
         $this->extendGrid($grid);
         return $grid;
