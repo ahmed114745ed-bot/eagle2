@@ -713,6 +713,7 @@ class Common
             'body'         => $body,
             //            'sound'        => 'default',
         ];
+        info('im in notification');
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
