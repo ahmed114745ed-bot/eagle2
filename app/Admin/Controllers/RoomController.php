@@ -943,6 +943,12 @@ class RoomController extends MainController
             ->with('profile:user_id,avatar')
             ->get(['id', 'name', 'uuid']);
 
+        $users = $users->map(function ($user) {
+            $avatar = $user->profile->avatar ?? null;
+            $user->avatar_url = getImagePath($avatar);
+            return $user;
+        });
+
         return response()->json($users);
     }
 
