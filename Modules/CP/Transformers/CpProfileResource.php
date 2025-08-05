@@ -29,7 +29,7 @@ class CpProfileResource extends JsonResource
         $frame = $dress_1_data ?: $dress_1_fallback;
  
         $currentLevel = CpLevel::find($this->level_id);
-        $nextLevel = CpLevel::where("cp_relation_id",  $currentLevel?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
+        $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
         $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
 
 
@@ -39,7 +39,7 @@ class CpProfileResource extends JsonResource
             '$this->level_id' => $this->level_id,
             'currentLevel' => $currentLevel,
             'nextLevel' => $nextLevel,
-            '$currentLevel?->cp_relation_id' => $currentLevel?->cp_relation_id,
+            '$currentLevel?->cp_relation_id' => $this?->cp_relation_id,
             'currentExp' => $currentExp,
             'nextExp' => $nextLevel?->exp ?? null,
             'conditionResult' => 
@@ -47,7 +47,6 @@ class CpProfileResource extends JsonResource
                 $nextLevel &&
                 $nextLevel->exp > $currentExp,
         ]);
-        
         if (
             ($currentLevel || $currentLevel === 0) &&
             $nextLevel &&

@@ -28,7 +28,7 @@ class CpListResource extends JsonResource
         $frame = $dress_1_data ?: $dress_1_fallback;
  
         $currentLevel = CpLevel::find($this->level_id);
-        $nextLevel = CpLevel::where("cp_relation_id",  $currentLevel?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
+        $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
         $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
 
 
@@ -38,7 +38,7 @@ class CpListResource extends JsonResource
             '$this->level_id' => $this->level_id,
             'currentLevel' => $currentLevel,
             'nextLevel' => $nextLevel,
-            '$currentLevel?->cp_relation_id' => $currentLevel?->cp_relation_id,
+            '$currentLevel?->cp_relation_id' => $this?->cp_relation_id,
             'currentExp' => $currentExp,
             'nextExp' => $nextLevel?->exp ?? null,
             'conditionResult' => 
