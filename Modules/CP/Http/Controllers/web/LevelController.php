@@ -123,6 +123,10 @@ class LevelController extends MainController
                 return number_format($value);
             });
         }
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+         
+        });        
         return $grid;
     }
 
