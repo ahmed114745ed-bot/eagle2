@@ -42,7 +42,7 @@ class CpListResource extends JsonResource
             'currentExp' => $currentExp,
             'nextExp' => $nextLevel?->exp ?? null,
             'conditionResult' => 
-                ($currentLevel || $currentLevel === 0) &&
+                ($currentLevel ||  $this->level_id === 0) &&
                 $nextLevel &&
                 $nextLevel->exp > $currentExp,
         ]);
@@ -50,7 +50,7 @@ class CpListResource extends JsonResource
         if (
             ($currentLevel || $currentLevel === 0) &&
             $nextLevel &&
-            $nextLevel->exp > ($currentLevel?->exp ?? 0)
+            $nextLevel->exp > $currentExp
         ) {
             dd('all passed');
         
