@@ -35,25 +35,11 @@ class CpProfileResource extends JsonResource
 
         $ratio = 0;
     
-        dd([
-            '$this->level_id' => $this->level_id,
-            'currentLevel' => $currentLevel,
-            'nextLevel' => $nextLevel,
-            '$currentLevel?->cp_relation_id' => $this?->cp_relation_id,
-            'currentExp' => $currentExp,
-            'nextExp' => $nextLevel?->exp ?? null,
-            'conditionResult' => 
-                ($currentLevel || $this->level_id === 0) &&
-                $nextLevel &&
-                $nextLevel->exp > $currentExp,
-        ]);
         if (
             ($currentLevel || $this->level_id === 0) &&
             $nextLevel &&
             $nextLevel->exp > $currentExp
         ) {
-            dd('all passed');
-        
             $currentExp = $this->di;
             $nextLevelExp = $nextLevel->exp ?? $currentExp;
             $ratio = round(min(($currentExp / $nextLevelExp) * 100, 100), 2);            
