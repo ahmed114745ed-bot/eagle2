@@ -570,7 +570,10 @@ class ChargeReportController extends MainController
         });
 
         $grid->column('trx', __('trx'));
-
+        // $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
+        //     $paymentCoin = PaymentCoin::find($value);
+        //     return $paymentCoin ? __($paymentCoin->title) : '';
+        // });
         $grid->column('method', __('type'));
 
         $grid->column('status', __('Status'))->display(function () {

@@ -40,10 +40,13 @@ class CpListResource extends JsonResource
             $nextLevel->exp > $currentExp
         ) {
           
+            $currentExp = $currentLevel->exp;
+            $nextExp = $nextLevel->exp;
         
-            $currentExp = $this->di;
-            $nextLevelExp = $nextLevel->exp ?? $currentExp;
-            $ratio = round(min(($currentExp / $nextLevelExp) * 100, 100), 2);            
+            $progress = max(0, $this->di - $currentExp); 
+            $required = $nextExp - $currentExp;      
+        
+            $ratio = round(min(($progress / $required) * 100, 100), 2);                    
         } else {
             $ratio = 100;
         }

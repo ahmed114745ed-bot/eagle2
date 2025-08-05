@@ -368,7 +368,8 @@ Route::get('/send-notification/{id}', function ($id) {
     //     ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
     // );
 
-    Common::send_firebase_notification($notificationToken, $title, $body);
+    Common::send_firebase_notification($notificationToken, $title, $body, '', [], 'vip');
+
     return "notifaction send successfully!";
 });
 
