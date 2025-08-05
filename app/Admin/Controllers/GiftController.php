@@ -232,10 +232,14 @@ class GiftController extends MainController
             ->when(6, function () use ($form) {
 
                 $type = old('type', $form->model()->type ?? null);
-                $form->number('luckyGift.win_probability', __('win probability'))
-                    ->min(1)->max(100)
-                    ->placeholder(__('Enter win probability'))
-                    ->attribute(['id' => 'win_probability']);
+                $form->text('luckyGift.win_probability', __('win probability'))
+                    ->placeholder(__('Enter win probability (1–100)'))
+                    ->attribute([
+                        'id' => 'win_probability',
+                        'inputmode' => 'numeric',     // mobile-friendly numeric keyboard
+                        'pattern' => '[0-9]*',        // restrict input to digits
+                        'maxlength' => 3              // max 3 digits (for up to 100)
+                    ]);
 
                 $probabilityTimes1 = \Cache::get('probability_times_1', []);
                 $probabilityTimes2 = \Cache::get('probability_times_2', []);
@@ -367,6 +371,14 @@ class GiftController extends MainController
                 }
             }
         });
+
+        Admin::script(<<<JS
+    document.getElementById('win_probability').addEventListener('input', function (e) {
+        let val = parseInt(this.value, 10);
+        if (val > 100) this.value = 100;
+        if (val < 1) this.value = 1;
+    });
+    JS);
         return $form;
     }
 }
