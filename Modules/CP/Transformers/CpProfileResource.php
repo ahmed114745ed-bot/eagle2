@@ -40,9 +40,13 @@ class CpProfileResource extends JsonResource
             $nextLevel &&
             $nextLevel->exp > $currentExp
         ) {
-            $currentExp = $this->di;
-            $nextLevelExp = $nextLevel->exp ?? $currentExp;
-            $ratio = round(min(($currentExp / $nextLevelExp) * 100, 100), 2);            
+            $currentExp = $currentLevel->exp;
+            $nextExp = $nextLevel->exp;
+        
+            $progress = max(0, $this->di - $currentExp); 
+            $required = $nextExp - $currentExp;      
+        
+            $ratio = round(min(($progress / $required) * 100, 100), 2);          
         } else {
             $ratio = 100;
         }

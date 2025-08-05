@@ -27,20 +27,33 @@ class CpDataResource extends JsonResource
         $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
         $frame = $dress_1_data ?: $dress_1_fallback;
 
-        $nextLevel = CpLevel::where("level", ">", $this->level_id)->first();
-        $ratio = 0;
-        if ($nextLevel) {
-            $nextLevelPercentage = $nextLevel->level;
-            $ratio = $this->di / $nextLevel->exp;
-        } else {
-            $nextLevelPercentage = 0;
-        }
+        $currentLevel = CpLevel::find($this->level_id);
+        $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
+        $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
 
+        $ratio = 0;
+    
+        if (
+            ($currentLevel || $currentLevel === 0) &&
+            $nextLevel &&
+            $nextLevel->exp > $currentExp
+        ) {
+          
+            $currentExp = $currentLevel->exp;
+            $nextExp = $nextLevel->exp;
+        
+            $progress = max(0, $this->di - $currentExp); 
+            $required = $nextExp - $currentExp;      
+        
+            $ratio = round(min(($progress / $required) * 100, 100), 2);                    
+        } else {
+            $ratio = 100;
+        }
 
         return [
             'id'        => $this->id,
-            'level'     => $this->level_id,
-            'next_level'     => $nextLevelPercentage,
+            'level'     => $currentLevel?->level ?? 0,
+            'next_level'     =>  $nextLevel?->level ?? 0,
             'di'        => $this->di,
             'ratio' => $ratio,
             "user"      => [
