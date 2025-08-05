@@ -207,9 +207,9 @@ class AdminPermissionRefact extends Seeder
                 'name' => 'Agency System',
                 'sort' => 13,
                 'permissions' => [
-                   
+
                     ['key' => 'salary', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
-                    
+
                 ],
             ],
             [
@@ -400,6 +400,15 @@ class AdminPermissionRefact extends Seeder
                 'sort' => 32,
                 'permissions' => [
                     ['key' => 'user-parent', 'except' => ['edit', 'delete', 'show'], 'additional' => []],
+                ],
+            ],
+            [
+                'name' => 'tribe events',
+                'sort' => 32,
+                'permissions' => [
+                    ['key' => 'tribe-periods', 'except' => [], 'additional' => []],
+                    ['key' => 'tribe-tops', 'except' => [], 'additional' => []],
+                    ['key' => 'tribe-rewards', 'except' => [], 'additional' => []],
                 ],
             ],
 
