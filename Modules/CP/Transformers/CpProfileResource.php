@@ -36,11 +36,11 @@ class CpProfileResource extends JsonResource
         $ratio = 0;
 
         info($currentLevel);
-        if ($currentLevel->exists()){
+        if (!empty($currentLevel)){
             info('exists');
         }
         if (
-            ($currentLevel || $this->level_id === 0) &&
+            (!empty($currentLevel) || $this->level_id === 0) &&
             $nextLevel &&
             $nextLevel->exp > $currentExp
         ) {
