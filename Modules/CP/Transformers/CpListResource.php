@@ -54,7 +54,7 @@ class CpListResource extends JsonResource
         return [
             'id'        => $this->id,
             'level'     => $currentLevel?->level ?? 0,
-            'next_level'     => $nextLevel,
+            'next_level'     =>  $nextLevel?->level ?? 0,
             'di'        => $this->di,
             'ratio' => $ratio,
             "user"      => [
