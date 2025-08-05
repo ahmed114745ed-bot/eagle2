@@ -38,13 +38,13 @@ class CpserviceCo
     {
         $cpRelation = $this->cpRepository->getCpRelationById($request->cp_relation_id);
         if (!$cpRelation) {
-            return Common::apiResponse(0, 'لا يوجد cp relations');
+            return Common::apiResponse(0, __('There is no CP relation.'));
         }
 
         if ($cpRelation->type == 'solution') {
             $findRelationBetweenUsers = $this->cpRepository->findCpBetweenUsers($user->id, $request->user_id);
             if (!$findRelationBetweenUsers) {
-                return Common::apiResponse(0, 'لا يوجد cp relations بين المستخدمين');
+                return Common::apiResponse(0, __('There is no CP relation between the users.'));
             }
         }
 
@@ -54,7 +54,7 @@ class CpserviceCo
         }
 
         if ($existingCp && in_array($existingCp->status, [CpStatus::ACTIVE->value, CpStatus::RESTORED->value]) && $cpRelation->type != 'solution') {
-            return Common::apiResponse(0, "انت في علاقة مع هذا المستخدم");
+            return Common::apiResponse(0, __('You are already in a relation with this user.'));
         }
 
         if ($cpRelation->relations_number == 0) {
@@ -70,7 +70,7 @@ class CpserviceCo
 
         $cpCount = $this->cpRepository->getCpCount($user->id);
         if ($cpCount >= 15) {
-            return Common::apiResponse(0, 'لقد تعديت العدد المسموح به!');
+            return Common::apiResponse(0, __('You have exceeded the allowed number of requests!'));
         }
 
         if ($cpRelation->cp_one == 1) {
@@ -82,18 +82,18 @@ class CpserviceCo
             }
 
             if ($existingCptwo) {
-                return Common::apiResponse(0, 'قام بارسال طلب cp  لك اقبله');
+                return Common::apiResponse(0, __('They have already sent a CP request to you, please accept it.'));
             }
         }
 
         $countRequestUserOne = $this->cpRepository->countExistingCpSameRelation($user->id, $request->cp_relation_id);
         if (($cpRelation->relations_number == 0) && ($countRequestUserOne > $cpRelation->relations_number) && $cpRelation->type != 'solution') {
-            return Common::apiResponse(0, ' cp لقد تخطيت طلب ');
+            return Common::apiResponse(0, __('You have exceeded the number of CP requests for this relation.'));
         }
 
         $otherUserCp = $this->cpRepository->checkExistingSecondUserCp($request->user_id, $request->cp_relation_id);
         if (($cpRelation->relations_number == 0) && $otherUserCp && $cpRelation->type != 'solution') {
-            return Common::apiResponse(0, 'لا يمكن تقديم cp هذا المستخدم فى علاقة');
+            return Common::apiResponse(0, __('This user is already in a CP relation.'));
         }
 
         DB::beginTransaction();
@@ -106,7 +106,7 @@ class CpserviceCo
             } else {
                 if ($user->di < $cpRelation->price) {
                     DB::rollBack();
-                    return Common::apiResponse(0, 'لا يوجد رصيد كافي من الكوينات برجاء الشحن!');
+                    return Common::apiResponse(0, __('You do not have enough coins, please recharge!'));
                 }
 
                 UserCoinLogHelper::logByType(
@@ -193,7 +193,7 @@ class CpserviceCo
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
-            return Common::apiResponse(0, 'حدث خطأ أثناء معالجة الطلب');
+            return Common::apiResponse(0, __('An error occurred while processing the request.'));
         }
     }
 
