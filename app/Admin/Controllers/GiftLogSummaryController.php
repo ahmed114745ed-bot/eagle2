@@ -2,25 +2,26 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\GiftLog;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Encore\Admin\Grid;
+use App\Models\GiftLog;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use App\Admin\Controllers\MainController;
 
-class GiftLogSummaryController extends AdminController
+class GiftLogSummaryController extends MainController
 {
+    public $permission_name = 'gift-logs';
     public function index(Content $content)
     {
 
-        return $content
+        return parent::index($content
             ->title(__('Gift Summary'))
             ->description(__('Rooms - Agencies - Users without agency'))
             ->row(function ($row) {
                 $row->column(12, $this->buildTabs(request()->input('filter', 'rooms')));
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
     protected function grid()
