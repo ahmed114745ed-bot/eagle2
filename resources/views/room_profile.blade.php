@@ -938,7 +938,8 @@
                             <div class="member-item">
                                 <a href="{{ admin_url('users') }}/${user.id}"
                                    class="member-info" target="_blank">
-                                    <img src="{{ getImagePath($user->profile?->avatar) }}" class="member-avatar">
+                                    <img src="${user.profile?.avatar || '{{ asset("images/businessman-icon.jpg") }}'}"
+                                         class="member-avatar">
                                     <div class="member-details">
                                         <div class="member-name">${user.name}</div>
                                         <div class="member-id">
@@ -1001,7 +1002,8 @@
                             <div class="member-item">
                                 <a href="{{ admin_url('users') }}/${user.id}"
                                    class="member-info" target="_blank">
-                                    <img src="{{ getImagePath($user->profile?->avatar) }}" class="member-avatar">
+                                    <img src="${user.profile?.avatar || '{{ asset("images/businessman-icon.jpg") }}'}"
+                                         class="member-avatar">
                                     <div class="member-details">
                                         <div class="member-name">${user.name}</div>
                                         <div class="member-id">
