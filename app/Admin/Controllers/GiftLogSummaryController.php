@@ -35,7 +35,7 @@ class GiftLogSummaryController extends AdminController
             $filter->expand();
             if (request('filter') === 'rooms') {
                 $filter->column(1 / 2, function ($filter) {
-                    $filter->equal('id', __('room'))
+                    $filter->equal('room_id', __('room'))
                         ->select()
                         ->ajax(route('admin.filter-rooms'));
                 });
