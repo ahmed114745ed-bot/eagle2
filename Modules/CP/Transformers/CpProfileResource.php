@@ -49,7 +49,7 @@ class CpProfileResource extends JsonResource
 
         return [
             'id'        => $this->id,
-            'level'     => $currentLevel?->level,
+            'level'     => $currentLevel?->level ?? 0,
             'next_level'     =>  $nextLevel?->level ?? 0,
             'di'        => $this->di,
             'ratio' => $ratio,
