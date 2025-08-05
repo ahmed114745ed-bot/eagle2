@@ -98,7 +98,8 @@ class RoomRepository extends AbstractRepository
             'owner.enabledMedals',
             'owner.country',
             'owner.eligiblePacks.ware',
-            'owner.medals.achievementLevel.achievement'
+            'owner.medals.achievementLevel.achievement',
+            'boxUse'
         ])
         ->withCount('roomVisitors')
         ->whereHas('owner')
