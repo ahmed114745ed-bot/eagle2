@@ -24,6 +24,11 @@ class Charge extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function returnCharge()
+    {
+        return $this->hasOne(ReturnCharge::class, 'charge_id');
+    }
+
     public function sender()
     {
         if ($this->charger_type === 'agency') {
