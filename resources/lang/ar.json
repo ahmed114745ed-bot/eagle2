@@ -3427,6 +3427,12 @@
 "Charged to": "شُحِنَ إلى",
 "special bar coin": "عملة الشريط المميز",
   "Charged from": "شُحِنَ من",
+  "Gift Logs": "سجلات الهدايا",
+  "charger uuid": "معرّف الشاحن",
+"Sender uuid": "معرّف المُرسل",
+"recipient uuid": "معرّف المستلم",
+
+"Browse gift logs": "تصفح سجلات الهدايا",
  "total transfer dollars": "إجمالي الدولارات المحولة",
 "total transfer coins": "إجمالي الكوينات المحولة",
 "created by": "أنشئ بواسطة",
@@ -3544,13 +3550,38 @@
 "Search by name or numId": "ابحث بالاسم أو رقم المعرف",
 "From": "من",
 "To": "إلى",
-"Date and Time": "التاريخ والوقت"
+"Date and Time": "التاريخ والوقت",
+  "Tribe Tops": "أفضل القبائل",
+  "Tribe Periods": "فترات القبيلة",
+  "Tribe Period": "فترة القبيلة",
+  "Tribe Rewards": "مكافآت القبيلة",
+  "Target Type": "نوع الهدف",
+  "Target ID": "معرّف الهدف",
+  "Expire Days": "أيام الانتهاء",
 
+  "tribe events": "فعاليات القبيلة",
+  "Browse tribe rewards": "تصفح مكافآت القبيلة",
+  "Create tribe rewards": "إنشاء مكافآت القبيلة",
+  "Delete tribe rewards": "حذف مكافآت القبيلة",
+  "Edit tribe rewards": "تعديل مكافآت القبيلة",
+  "Show tribe rewards": "عرض مكافآت القبيلة",
+  "Browse tribe tops": "تصفح أفضل القبائل",
+  "Create tribe tops": "إنشاء أفضل القبائل",
+  "Delete tribe tops": "حذف أفضل القبائل",
+  "Edit tribe tops": "تعديل أفضل القبائل",
+  "Show tribe tops": "عرض أفضل القبائل",
+  "Browse tribe periods": "تصفح فترات القبيلة",
+  "Create tribe periods": "إنشاء فترات القبيلة",
+  "Delete tribe periods": "حذف فترات القبيلة",
+  "Edit tribe periods": "تعديل فترات القبيلة",
+  "Show tribe periods": "عرض فترات القبيلة",
+  "Select all tribe events": "تحديد جميع فعاليات القبيلة",
 
-
-
-
-
+  "Congratulations!": "تهانينا!",
+  "Your agency has received rewards from the event!": "لقد حصلت وكالتك على مكافآت من الفعالية!",
+  "One or more users are not eligible or do not belong to this agency.": "مستخدم واحد أو أكثر غير مؤهل أو لا ينتمي إلى هذه الوكالة.",
+  "Not enough available quantity for this reward.": "ليست هناك كمية كافية متاحة لهذه المكافأة.",
+  "This reward has expired.": "انتهت صلاحية هذه المكافأة."
 
 
 

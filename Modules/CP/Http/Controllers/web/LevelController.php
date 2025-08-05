@@ -40,10 +40,25 @@ class LevelController extends MainController
 
     public function show($id, Content $content)
     {
-        $relation_id = request()->route('relation_id');
-        return parent::show($id, $content
-            ->title(trans('cp-relations'))
-            ->body($this->detail($id, $relation_id)));
+        $url = url('/admin/cp-relations'); // Define your button URL
+
+        $buttonHTML = <<<HTML
+        <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+            <i class="fa fa-arrow-left"></i> رجوع
+        </a>
+        HTML;
+        return $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
+            ->breadcrumb(
+                ['text' => trans('admin.eventGift')]
+            )
+            ->row($buttonHTML)
+            ->row($this->grid());
+        // $relation_id = request()->route('relation_id');
+        // return parent::show($id, $content
+        //     ->title(trans('cp-relations'))
+        //     ->body($this->detail($id, $relation_id)));
     }
 
     /**
@@ -108,6 +123,10 @@ class LevelController extends MainController
                 return number_format($value);
             });
         }
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+         
+        });        
         return $grid;
     }
 

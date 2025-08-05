@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class UserVip extends Model
 {
@@ -13,6 +14,11 @@ class UserVip extends Model
     protected $table = 'users_vips';
 
     protected $guarded = ['id'];
+
+    public function senderable(): MorphTo
+    {
+        return $this->morphTo(null, 'sender_type', 'sender_id');
+    }
 
     public function OVip()
     {
