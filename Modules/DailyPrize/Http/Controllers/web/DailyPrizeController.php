@@ -121,31 +121,31 @@ class DailyPrizeController extends MainController
             });
         }
 
-//        if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->gift_type == 'ware') {
-                    $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? $ware?->show_img;
-                } elseif ($this->gift_type == 'vip') {
-                    $vips = OVip::find($this->target);
-                    $path = $vips?->img;
-                } elseif ($this->gift_type == 'achievement') {
-                    $path = $this->target;
-                } else {
-                    $path = 'coin.png';
-                }
+        //        if (!request()->filled('_export_')) {
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->gift_type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? $ware?->show_img;
+            } elseif ($this->gift_type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips?->img;
+            } elseif ($this->gift_type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = 'coin.png';
+            }
 
-                if (request()->filled('_export_')) {
-                    return '=IMAGE("' . getImagePath($path) . '","flag",1)';
-                }
+            if (request()->filled('_export_')) {
+                return '=IMAGE("' . getImagePath($path) . '","flag",1)';
+            }
 
-                /** @var Gift $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
-            });
-//        }
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        //        }
 
-        $grid->column('expir', __('expire'));
+        $grid->column('expire', __('expire'));
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');
@@ -154,6 +154,19 @@ class DailyPrizeController extends MainController
         $grid->actions(function ($actions) {
 
             $actions->disableView();
+        });
+
+        $grid->tools(function (Grid\Tools $tools) {
+            $url = url('admin/daily-gift-types');
+            $backText = __('back');
+            $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                        <i class="fa fa-arrow-left"></i> {$backText}
+                    </a>
+                </div>
+            HTML;
+            $tools->append($customButtonHTML);
         });
 
         return $grid;
@@ -174,7 +187,7 @@ class DailyPrizeController extends MainController
         $show->field('order', __('Order'));
         $show->field('gift_type', __('Gift type'));
         $show->field('target', __('Target'));
-        $show->field('expir', __('Expir'));
+        $show->field('expire', __('Expire'));
 
         return $show;
     }
@@ -225,11 +238,11 @@ class DailyPrizeController extends MainController
             ])
             ->when('ware', function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'));
-                $form->number('expir', __('expire'));
+                $form->number('expire', __('expire'));
             })
             ->when('vip', function () use ($form) {
                 $form->belongsTo('target2', OVips::class, trans('vips'));
-                $form->number('expir', __('expire'));
+                $form->number('expire', __('expire'));
             })
             ->when('coins', function () use ($form) {
                 $form->number('target3', __('coins'));
@@ -238,7 +251,7 @@ class DailyPrizeController extends MainController
                 $form->image('target4', __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
                 });
-                $form->number('expir', __('expire'));
+                $form->number('expire', __('expire'));
             })
             ->rules('required');
 
@@ -249,19 +262,19 @@ class DailyPrizeController extends MainController
             switch ($type) {
                 case 'ware':
                     if (!$form->target1) $errors[] = __('wares') . ' ' . __('is required');
-                    if (empty($form->expir) || !is_numeric($form->expir)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
                     break;
                 case 'vip':
                     if (!$form->target2) $errors[] = __('vips') . ' ' . __('is required');
-                    if (empty($form->expir) || !is_numeric($form->expir)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
                     break;
                 case 'coins':
                     if (empty($form->target3) || !is_numeric($form->target3)) $errors[] = __('coins') . ' ' . __('is required and must be numeric');
-                    $form->expir = null;
+                    $form->expire = null;
                     break;
                 case 'achievement':
                     if (!$form->target4) $errors[] = __('image') . ' ' . __('is required');
-                    if (empty($form->expir) || !is_numeric($form->expir)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
                     break;
             }
 
@@ -291,7 +304,7 @@ class DailyPrizeController extends MainController
                 break;
             case 'coins':
                 $data['target'] = $data['target3'] ?? null;
-                $data['expir'] = null; // No expiry for coins
+                $data['expire'] = null; // No expiry for coins
                 break;
             case 'achievement':
                 if (request()->hasFile('target4')) {
@@ -317,7 +330,7 @@ class DailyPrizeController extends MainController
             'order' => $data['order'],
             'gift_type' => $data['gift_type'],
             'target' => $data['target'],
-            'expir' => $data['expir'] ?? null,
+            'expire' => $data['expire'] ?? null,
         ]);
 
         admin_toastr(__('admin.save_succeeded'));

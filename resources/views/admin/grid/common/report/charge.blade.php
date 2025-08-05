@@ -44,6 +44,8 @@
         $isStripe = request()->name == 'stripe';
         $isStripeNew = request()->name == 'stripenew';
         $isInApp = request()->name == 'in-app-purchas';
+        $isExchange =request()->name == 'exchange';
+        $isHost =request()->name == 'host';
 
         // Anonymous function to get user based on UUID
         $getUserByUuid = function ($uuid) {
@@ -75,18 +77,15 @@
             return 0; // Default return value
         };
 
-           if($isDashboard)
+           if($isDashboard || $isStripe || $isHost)
            {
               $fields =  ['dollar' => __('total transfer dollars'), 'coins' => __('total transfer coins')];
-           }else{
-              $fields = $isApp
-            ? ['receiver' => __('Total recharge to recharge agencies'), 'sender' => __('Total recharge from recharge agencies')]
-            : [
-                'receiver' => __('admin.receiver'),
-                'sender' => __('admin.sender'),
-                'gameCoins' => __('admin.gameCoins'),
-                'luckyGiftCoin' => __('admin.luckyGiftCoin')
-            ];
+           }elseif ($isExchange) {
+             $fields =  ['diamonds' => __('total diamonds'), 'coins' => __('total coins')];
+           }
+           else{
+              $fields = ['receiver' => __('Total recharge to recharge agencies'), 'sender' => __('Total recharge from recharge agencies')];
+            
            }
 
        
@@ -118,22 +117,30 @@
                                 $value = \App\Models\Charge::where('charger_id', $user?->id)->sum('amount');
                             }
                             
-                        } elseif ($name === 'gameCoins') {
-                            $coinResult = \App\Models\CoinGameUser::select(
-                                \DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as sum_type_1"),
-                                \DB::raw("SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as sum_type_0")
-                            )->where('user_id', $user?->id)->first();
-                            $value = ($coinResult->sum_type_1 ?? 0) - ($coinResult->sum_type_0 ?? 0);
-                        } elseif ($name === 'luckyGiftCoin') {
-                            $giftResult = \Modules\LuckyBox\Entities\UserLuckyGift::select(
-                                \DB::raw("SUM(CASE WHEN type = 1 THEN value ELSE 0 END) as sum_type_1"),
-                                \DB::raw("SUM(CASE WHEN type = 0 THEN value ELSE 0 END) as sum_type_0")
-                            )->where('user_id', $user?->id)->first();
-                            $value = ($giftResult->sum_type_1 ?? 0) - ($giftResult->sum_type_0 ?? 0);
-                        }elseif ($name === 'dollar') {
-                            $value = \App\Models\Charge::where('charger_type', 'dash')->sum('usd');
+                        }  elseif ($name === 'dollar') {
+                            if($isDashboard){
+                                $value = \App\Models\Charge::where('charger_type', 'dash')->sum('usd');
+                            }elseif ($isHost) {
+                                $value = \App\Models\Charge::where('charger_type', 'host_agency')->sum('usd');
+                            } else{
+                                $value = DB::table('coin_logs')->join('coins', 'coin_logs.coin_id', '=', 'coins.id')->sum('coins.usd');
+                            } 
+                           
                         }elseif ($name === 'coins') {
-                            $value = \App\Models\Charge::where('charger_type', 'dash')->sum('amount');
+                            if($isDashboard){
+                             $value = \App\Models\Charge::where('charger_type', 'dash')->sum('amount');
+                            }elseif ($isExchange) {
+                              $value = \App\Models\ExchangeLog::sum('value');
+
+                            }elseif ($isHost) {
+                                $value = \App\Models\Charge::where('charger_type', 'host_agency')->sum('amount');
+                            }
+                            else{
+                                $value = \App\Models\CoinLog::where('status', 1)->sum('obtained_coins');
+                            }
+                            
+                        }elseif ($name === 'diamonds') {
+                            $value = \App\Models\ExchangeLog::sum('diamonds');
                         }
                     @endphp
                     <input type="text" class="form-control" name="{{ $name }}" id="{{ $name }}" value="{{ $value }}" readonly>

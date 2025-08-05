@@ -14,7 +14,7 @@ use App\Models\Admin as AdminModel;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
 
-class BannerController extends MainController
+class   BannerController extends MainController
 {
     /**
      * Title for current resource.

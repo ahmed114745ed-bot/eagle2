@@ -108,5 +108,7 @@ class Kernel extends HttpKernel
         'timezone' => \App\Http\Middleware\SetUserTimezone::class,
         'agencyFeature' => EnsureAgencyFeatureEnabled::class,
         'web-agency-feature' => WebAgencyFeatureEnable::class,
+        'ban.user.actions' => \App\Http\Middleware\CheckUserBan::class,
+
     ];
 }

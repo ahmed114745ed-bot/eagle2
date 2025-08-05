@@ -1084,8 +1084,10 @@
 "profit" : "Profit",
 "loss" : "Loss",
 "Agency": "Agency",
-    ":name has been removed from administrators.": ":name has been removed from administrators.",
-    "User": "User"
+":name has been removed from administrators.": ":name has been removed from administrators.",
+"User": "User",
+"banned_from_action":"You are banned from performing this action."
+
 
 
 

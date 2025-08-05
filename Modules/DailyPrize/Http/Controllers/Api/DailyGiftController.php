@@ -42,25 +42,30 @@ class DailyGiftController extends Controller
 
         $currentDay = $this->getCurrentDay();
 
-        $result = DailyGiftCount::query()->where('user_id', $user->id)->first();
 
         $check_received = DailyGiftCount::query()->where('user_id', $user->id)->where("day_count", $currentDay)->first();
         $data = [
             'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
-            'gift'          => $this->getWeekGifts(),
+            'gift'          => $this->getWeekGifts($currentDay),
             'is_received'   => $check_received != null ? true : false,
         ];
         return Common::apiResponse(1, '', $data);
     }
 
-    public function getWeekGifts()
+    public function getWeekGifts(int $currentDay): array
     {
+        $DAYS_IN_WEEK = 7;
+        $currentWeek = $currentDay % $DAYS_IN_WEEK;
+
+        $startDay = 1 + ($DAYS_IN_WEEK * $currentWeek);
+        $endDay = $startDay + $DAYS_IN_WEEK - 1;
+
         $gifts = [];
 
-        for ($day = 1; $day <= 7; $day++) {
+        for ($day = $startDay; $day <= $endDay; $day++) {
             $gifts[] = [
-                'day' => $day,
-                'gift' => $this->getGift($day) ?? (object)[],
+                'day'  => $day,
+                'gift' => $this->dailyPrizeService->getGift($day) ?? (object) [],
             ];
         }
 
@@ -82,7 +87,7 @@ class DailyGiftController extends Controller
 
         $type = $dailyGift->gift_type;
         $target = $dailyGift->target;
-        $expire = $dailyGift->expir;
+        $expire = $dailyGift->expire;
         DailyGiftCount::query()->updateOrCreate([
             'user_id' => $user->id,
 
@@ -118,15 +123,15 @@ class DailyGiftController extends Controller
     public function assignGiftToUser(mixed $type, \App\Models\Admin|\Illuminate\Contracts\Auth\Authenticatable|null $user, mixed $target, mixed $expire): void
     {
         if ($type == "coins") {
-      
-            $amountBefore = $user->di;
-            UserCoinLogHelper::logByType(
+
+            $amountBefore =  Common::getCurrentBalance($user->id);
+            UserCoinLogHelper::log(
                 $user->id,
                  $target,
                 $amountBefore,
                 UserCoinLogType::DAILY_GIFT,
             );
-            
+
             $user->di += $target;
             $user->save();
         } elseif ($type == "vip") {
@@ -158,10 +163,5 @@ class DailyGiftController extends Controller
         return true;
     }
 
-    public function getGift($currentDay)
-    {
 
-        $data = $this->dailyPrizeService->getDayGift($currentDay);
-        return  $data != null ? new WeeklyStarGift($data) : null;
-    }
 }

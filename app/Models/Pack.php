@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pack extends Model
@@ -23,6 +24,11 @@ class Pack extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function senderable(): MorphTo
+    {
+        return $this->morphTo(null, 'sender_type', 'sender_id');
     }
 
     public function sender()

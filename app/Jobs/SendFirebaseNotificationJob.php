@@ -87,11 +87,11 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 ['message' => $payload]
             );
 
-//            \Log::info('FCM Response', [
-//                'token'  => $token,
-//                'status' => $response->status(),
-//                'body'   => $response->body(),
-//            ]);
+            \Log::info('FCM Response', [
+                'token'  => $token,
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
         }
     }
 

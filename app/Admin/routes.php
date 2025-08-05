@@ -66,6 +66,7 @@ use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\DeleteAccountController;
+use App\Admin\Controllers\Filter\FilterController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
@@ -74,6 +75,7 @@ use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
+use App\Admin\Controllers\GiftLogSummaryController;
 use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
@@ -316,6 +318,7 @@ Route::group(
                 'show' => 'charges-details.show'
             ]
         ]);
+
         Route::resource('commissions', 'CommissionController', [
 
             'names' => [
@@ -338,6 +341,18 @@ Route::group(
             ExportController::class,
             'usersSallaryTargets'
         ])->name('custom-export-users');
+        Route::get('/exchange-diamond-history', [
+            ExportController::class,
+            'exchangeDiamondExcel'
+        ])->name('exchange-diamond-history');
+        Route::get('/exchange-charge-history', [
+            ExportController::class,
+            'exchangeChargeExcel'
+        ])->name('exchange-charge-history');
+        Route::get('/exchange-coin-history', [
+            ExportController::class,
+            'exchangeCoinExcel'
+        ])->name('exchange-coin-history');
         Route::get('/wallet-export-users', [
             ExportController::class,
             'walletExportUser'
@@ -434,6 +449,8 @@ Route::group(
         Route::resource('exchanges', 'ExchangeController');
 
         Route::get('filter-agencies', App\Admin\Controllers\Filter\AgencyController::class)->name('filter-agencies');
+        Route::get('filter-rooms', [FilterController::class, 'rooms'])->name('filter-rooms');
+
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
         Route::resource('charges-reports', 'ChargeReportController');
         Route::get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
@@ -582,6 +599,7 @@ Route::group(
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });
+        Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
     }
 
 

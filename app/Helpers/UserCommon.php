@@ -347,7 +347,7 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expir)
+    public static function addVipToUser(User $user, OVip $vip, $expir, $sender = null)
     {
         DB::beginTransaction();
 
@@ -357,12 +357,13 @@ class UserCommon
         $vipp->user_id = $user->id;
         $vipp->vip_id = $vip->id;
         $vipp->level = $vip->level;
-        $vipp->expire = now()->addDay($expir)->timestamp;
+        $vipp->expire = now()->addDay($expire)->timestamp;
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;
+        $vipp->senderable()->associate($sender);
         $vipp->save();
-        Common::handelVip($vip, $user, $expir, $vipp);
+        Common::handelVip($vip, $user, $expir, $vipp, $sender);
         DB::commit();
 
         Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
@@ -371,10 +372,40 @@ class UserCommon
         $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
         Common::send_firebase_notification($tokens_notfacion, $title, $body);
         //            CustomNotification::vips($user, $expir, $vip->img);
-
     }
 
-    public static function addWareToUser(User $user, Ware $ware, $expir)
+    /**
+     * @throws \Throwable
+     */
+    public static function addVipToCpUser(User $user, OVip $vip, $expire): void
+    {
+        DB::beginTransaction();
+
+        $vipp = new UserVip();
+        $vipp->type = 1;
+        $vipp->sender_id = 0;
+        $vipp->user_id = $user->id;
+        $vipp->vip_id = $vip->id;
+        $vipp->level = $vip->level;
+        $vipp->expire = null;
+        $vipp->qty = 1;
+        $vipp->price = 0;
+        $vipp->total = 0;
+        $vip->is_used = 0;
+        $vip->days = $expire;
+        $vipp->save();
+        Common::handelVipCp($vip, $user, $expire, $vipp);
+        DB::commit();
+
+        Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
+        $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $title = config('app.name_ar');
+        $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
+        Common::send_firebase_notification($tokens_notfacion, $title, $body);
+        //            CustomNotification::vips($user, $expir, $vip->img);
+    }
+
+    public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)
     {
         $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
         if ($pack) {
@@ -410,7 +441,9 @@ class UserCommon
             $arr['num'] = 1; //$qty;
             $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
             $arr['is_read'] = 1;
-            Pack::query()->create($arr);
+            $pack = Pack::query()->create($arr);
+            $pack->senderable()->associate($sender);
+            $pack->save();
             DB::commit();
             //            \App\Helpers\CustomNotification::wareVip($user, $expir, $ware->name, $ware->show_img??'');
         } catch (\Exception $exception) {
@@ -419,11 +452,11 @@ class UserCommon
     }
 
     public static function addChargeLevel($userId, $amount)
-    { 
+    {
         $user = User::where("id", $userId)->first();
         $user->total_charge_coins += $amount;
         $user->save();
-        
+
         $chargeUserExp = $user->total_charge_coins + $user->sub_charger_level;
         $level = Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->orderByDesc("exp")->first();
         if ($level) {
