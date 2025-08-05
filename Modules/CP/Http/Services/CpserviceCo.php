@@ -40,67 +40,67 @@ class CpserviceCo
         if (!$cpRelation) {
             return Common::apiResponse(0, 'لا يوجد cp relations');
         }
-    
+
         if ($cpRelation->type == 'solution') {
             $findRelationBetweenUsers = $this->cpRepository->findCpBetweenUsers($user->id, $request->user_id);
             if (!$findRelationBetweenUsers) {
                 return Common::apiResponse(0, 'لا يوجد cp relations بين المستخدمين');
             }
         }
-    
+
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && $existingCp->status == CpStatus::PENDING->value && $cpRelation->type != 'solution') {
             return Common::apiResponse(0, "لقد قمت بارسال طلب cp من قبل ");
         }
-    
+
         if ($existingCp && in_array($existingCp->status, [CpStatus::ACTIVE->value, CpStatus::RESTORED->value]) && $cpRelation->type != 'solution') {
             return Common::apiResponse(0, "انت في علاقة مع هذا المستخدم");
         }
-    
+
         if ($cpRelation->relations_number == 0) {
             $existing = $this->cpRepository
                 ->getCpsByUserAndRelation($user->id, $cpRelation->id)
                 ->whereIn('status', [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
                 ->first();
-    
+
             if ($existing) {
-                return Common::apiResponse(0, 'لا يمكنك إرسال هذه العلاقة إلا لمستخدم واحد فقط، لديك طلب مفعّل أو قيد الانتظار.');
+                return Common::apiResponse(0, 'لا يمكنك إرسال هذه العلاقة إلا لمستخدم واحد فقط');
             }
         }
-    
+
         $cpCount = $this->cpRepository->getCpCount($user->id);
         if ($cpCount >= 15) {
             return Common::apiResponse(0, 'لقد تعديت العدد المسموح به!');
         }
-    
+
         if ($cpRelation->cp_one == 1) {
             $existingCpOne = $this->cpRepository->checkExistingCpOne($user->id, $cpRelation->id);
             $existingCptwo = $this->cpRepository->checkExistingCpOne($request->user_id, $cpRelation->id);
-    
+
             if ($existingCpOne) {
                 return Common::apiResponse(0, 'لقد قمت بارسال طلب cp من قبل ');
             }
-    
+
             if ($existingCptwo) {
                 return Common::apiResponse(0, 'قام بارسال طلب cp  لك اقبله');
             }
         }
-    
+
         $countRequestUserOne = $this->cpRepository->countExistingCpSameRelation($user->id, $request->cp_relation_id);
         if (($cpRelation->relations_number == 0) && ($countRequestUserOne > $cpRelation->relations_number) && $cpRelation->type != 'solution') {
             return Common::apiResponse(0, ' cp لقد تخطيت طلب ');
         }
-    
+
         $otherUserCp = $this->cpRepository->checkExistingSecondUserCp($request->user_id, $request->cp_relation_id);
         if (($cpRelation->relations_number == 0) && $otherUserCp && $cpRelation->type != 'solution') {
             return Common::apiResponse(0, 'لا يمكن تقديم cp هذا المستخدم فى علاقة');
         }
-    
+
         DB::beginTransaction();
-    
+
         try {
             $userRelation = $this->cpRepository->getUserRelationAvailable($user->id, $request->cp_relation_id);
-    
+
             if ($userRelation) {
                 $this->cpRepository->decrementUserRelationCount($userRelation);
             } else {
@@ -108,20 +108,20 @@ class CpserviceCo
                     DB::rollBack();
                     return Common::apiResponse(0, 'لا يوجد رصيد كافي من الكوينات برجاء الشحن!');
                 }
-    
+
                 UserCoinLogHelper::logByType(
                     $user->id,
                     -abs($cpRelation->price),
                     $user->di,
                     UserCoinLogType::CP,
                 );
-    
+
                 $user->di -= $cpRelation->price;
                 $user->save();
             }
-    
+
             $stoppedRelation = $this->cpRepository->findStoppedRelationBetweenTwoUsers($user->id, $request->user_id, $cpRelation->type);
-    
+
             if ($stoppedRelation) {
                 $stoppedRelation->status = CpStatus::PENDING->value;
                 $stoppedRelation->save();
@@ -134,7 +134,7 @@ class CpserviceCo
                     "price"          => $cpRelation->price,
                 ]);
             }
-    
+
             $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
             if (!$chatRoom) {
                 $chatRoom = ChatRoom::create([
@@ -144,9 +144,9 @@ class CpserviceCo
                 $user->current_room_chat = $chatRoom->id;
                 $user->save();
             }
-    
+
             $user2 = User::find($request->user_id);
-    
+
             $data = [
                 'id'     => $cp_request->id,
                 'title'  => $cpRelation->description,
@@ -154,7 +154,7 @@ class CpserviceCo
                 'image'  => $cpRelation->image,
                 'status' => 0
             ];
-    
+
             $chatMessageData = [
                 'chat_room_id' => $chatRoom->id,
                 'user_id'      => $user->id,
@@ -162,41 +162,41 @@ class CpserviceCo
                 'type'         => 'CP',
                 'status'       => 'sent',
             ];
-    
+
             if ($user2->online == 1 && $user2->current_room_chat == $chatRoom->id) {
                 $chatMessageData['status'] = 'seen';
             } elseif ($user2->online == 1) {
                 $chatMessageData['status'] = 'received';
             }
-    
+
             $chatMessage = ChatMessage::create($chatMessageData);
-    
+
             CustomNotification::makeCp($user2, $user, $cpRelation->type);
-    
+
             DB::commit();
-    
+
             $message_resource = new ChatMessageResource($chatMessage);
             $room_resource = new ChatRoomResourcePusher($chatRoom);
-    
+
             $chatuser = ($chatRoom->user_id == $user->id) ? User::find($chatRoom->user_id2) : User::find($chatRoom->user_id);
-    
+
             try {
                 event(new OpenChat($room_resource->toResponse(request())->getData()->data, $chatuser, $chatRoom));
             } catch (\Throwable $th) {
                 return $th->getMessage();
             }
-    
+
             event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
             event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
-    
-            return Common::apiResponse(1, 'تم إرسال الطلب');
+
+            return Common::apiResponse(1, __('request sent'));
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
             return Common::apiResponse(0, 'حدث خطأ أثناء معالجة الطلب');
         }
     }
-    
+
 
 
     public function getRequestCp($user)
