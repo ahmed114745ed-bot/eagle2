@@ -40,7 +40,6 @@ class CpListResource extends JsonResource
             $nextLevel->exp > $currentExp
         ) {
           
-            $currentExp = $currentLevel->exp;
             $nextExp = $nextLevel->exp;
         
             $progress = max(0, $this->di - $currentExp); 

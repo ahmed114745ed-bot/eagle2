@@ -262,7 +262,7 @@ class WareTabController extends MainController
 
         $form->select('get_type', trans('get_type'))->options(
             translate(GET_TYPE_WARE_TYPES)
-        )->default(4)->when('6', function (Form $form) {
+        )->default(6)->when('6', function (Form $form) {
             $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
         });
 
