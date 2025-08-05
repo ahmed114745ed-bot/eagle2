@@ -34,7 +34,7 @@ class CpListResource extends JsonResource
         $ratio = 0;
     
         
-        if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
+        if ($currentLevel || $currentLevel == 0  && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
 
             $currentExp = $this->di;
             $nextLevelExp = $nextLevel->exp ?? $currentExp;
@@ -46,7 +46,7 @@ class CpListResource extends JsonResource
 
         return [
             'id'        => $this->id,
-            'level'     => $this->level_id,
+            'level'     => $currentLevel?->level,
             'next_level'     => $nextLevel,
             'di'        => $this->di,
             'ratio' => $ratio,
