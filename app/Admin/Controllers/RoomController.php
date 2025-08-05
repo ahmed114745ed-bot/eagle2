@@ -253,23 +253,23 @@ class RoomController extends MainController
         $grid = new Grid(new Room);
         $filterType = request('filter', 'all');
         $user = auth()->user();
-    
+
         $grid->header(fn () => $this->buildTabsHeader($filterType));
-    
+
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
         $this->setupFilters($grid);
-        $this->defineGridColumns($grid);    
+        $this->defineGridColumns($grid);
         $grid->disableRowSelector();
         $grid->disableCreateButton();
         $grid->disableExport();
-    
+
         $this->extendGrid($grid);
         $this->setupPinModalScript();
 
         return $grid;
     }
-    
+
     protected function buildTabsHeader(string $filterType): string
     {
         $tabs = [
@@ -281,7 +281,7 @@ class RoomController extends MainController
             'hide_room'   => __('hide room'),
             'country'     => __('countries'),
         ];
-    
+
         $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
         foreach ($tabs as $key => $label) {
             $active = $filterType === $key ? 'active' : '';
@@ -289,7 +289,7 @@ class RoomController extends MainController
             $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
         }
         $html .= '</ul></div>';
-    
+
         $html .= <<<HTML
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
@@ -308,10 +308,10 @@ class RoomController extends MainController
                 });
             </script>
         HTML;
-    
+
         return $html;
     }
-    
+
     protected function setupBaseModel(Grid $grid, $user): void
     {
         $grid->model()
@@ -321,14 +321,14 @@ class RoomController extends MainController
             ->whereHas('owner')
             ->orderByDesc('status_priority')
             ->orderByDesc('pin');
-    
+
         if ((settings()->get('make_rooms_top') ?? 0) == 1) {
             $grid->model()->orderByRaw('is_top = 1 DESC');
         }
-    
+
         $grid->model()->orderByDesc('room_visitors_count');
     }
-    
+
     protected function applyFilterType(Grid $grid, string $filterType, $user): void
     {
         switch ($filterType) {
@@ -386,7 +386,7 @@ class RoomController extends MainController
                 break;
         }
     }
-    
+
     protected function setupFilters(Grid $grid): void
     {
         $grid->filter(function (Grid\Filter $filter) {
@@ -398,7 +398,7 @@ class RoomController extends MainController
                     $query->whereHas('owner', fn($q) => $q->where('name', 'like', "%$input%")
                         ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
-    
+
                 $filter->where(function ($query) {
                     if ($this->input) {
                         $query->whereHas('owner', fn($q) => $q->where('country_id', $this->input));
@@ -407,29 +407,29 @@ class RoomController extends MainController
             });
         });
     }
-    
+
     protected function defineGridColumns($grid)
     {
         $grid->disableRowSelector();
-    
+
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
         });
-    
+
         $grid->id(__('ID'));
-    
+
         $grid->column('room_name', __('room'))->display(function ($name) {
             $path = @$this->room_cover;
             $id = @$this->id;
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-    
+
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-    
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
@@ -440,21 +440,21 @@ class RoomController extends MainController
                 </div>
             ";
         });
-    
+
         $grid->column('owner.name', __('room owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $id = @$this->owner->id;
             $path = @$this->owner?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-    
+
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-    
+
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
-    
+
             return "<a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -466,33 +466,33 @@ class RoomController extends MainController
                 </div>
             ";
         });
-    
+
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
             $maxRoomAdmin = Common::getConfig('max_room_admin');
             return count($this->admins) . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
-    
+
         $grid->column('count_room_socket', __('Number of users'));
-    
+
         $grid->column(__('microphone'))->display(function () {
             $ids = explode(',', $this->microphone);
             $cachedUsers = User::whereIn('id', $ids)
                 ->with(['profile:user_id,avatar'])
                 ->get(['id', 'name']);
-    
+
             if ($cachedUsers->isEmpty()) {
                 return '';
             }
-    
+
             $html = '<div class="image-container">';
-    
+
             foreach ($cachedUsers as $user) {
                 $path = $user->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                 $username = htmlspecialchars($user->name ?? 'Unknown');
                 $userUrl = route('admin.users.show', $user->id);
-    
+
                 $html .= '
                     <div class="image-wrapper" onclick="window.location.href=\'' . $userUrl . '\'">
                         <img src="' . $url . '"
@@ -503,9 +503,9 @@ class RoomController extends MainController
                                     transition: transform 0.3s ease;"/>
                     </div>';
             }
-    
+
             $html .= '</div>';
-    
+
             // Append custom CSS (once only)
             static $appended = false;
             if (!$appended) {
@@ -521,13 +521,13 @@ class RoomController extends MainController
                         width: 218px;
                         padding-right: 16px;
                     }
-    
+
                     .image-wrapper {
                         display: inline-block;
                         position: relative;
                             margin-right: -12px;
                     }
-    
+
                     .image-wrapper img {
                         width: 40px;
                         height: 40px;
@@ -538,27 +538,27 @@ class RoomController extends MainController
                         transition: transform 0.3s ease, box-shadow 0.3s ease;
                         cursor: pointer;
                     }
-    
+
                     .image-wrapper img:hover {
                         transform: scale(1.2); /* Slightly enlarge image on hover */
                         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
                     }
-    
+
                     /* Optional: If you want to add a tooltip style for the images */
                     .image-wrapper img[title] {
                         cursor: pointer; /* Change cursor to indicate interactivity */
                     }
-    
+
                     .image-wrapper img[title]:hover {
                         opacity: 0.8; /* Slight opacity change on hover */
                     }
                 </style>';
-    
+
                             return $html;
             }});
     }
 
-    
+
 
 
 
@@ -744,7 +744,7 @@ class RoomController extends MainController
         $form->text('room_name', __('room name'));
         $form->image('room_cover', __('room cover'));
         $form->text('room_intro', __('room intro'));
-        $form->number('room_pass', __('room pass'));
+        $form->text('room_pass', __('room pass'))->rules('nullable|integer|digits:6');
         $form->hidden('is_afk', __('owner in'));
         $form->select('room_class')->options(function () {
             $options = [];
