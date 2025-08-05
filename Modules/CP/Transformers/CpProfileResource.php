@@ -36,8 +36,10 @@ class CpProfileResource extends JsonResource
         $ratio = 0;
     
         dd([
+            '$this->level_id' => $this->level_id,
             'currentLevel' => $currentLevel,
             'nextLevel' => $nextLevel,
+            '$currentLevel?->cp_relation_id' => $currentLevel?->cp_relation_id,
             'currentExp' => $currentExp,
             'nextExp' => $nextLevel?->exp ?? null,
             'conditionResult' => 
