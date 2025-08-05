@@ -29,10 +29,21 @@ class CpListResource extends JsonResource
  
         $currentLevel = CpLevel::find($this->level_id);
         $nextLevel = CpLevel::where("cp_relation_id",  $currentLevel?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
+        $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
 
 
         $ratio = 0;
     
+        dd([
+            'currentLevel' => $currentLevel,
+            'nextLevel' => $nextLevel,
+            'currentExp' => $currentExp,
+            'nextExp' => $nextLevel?->exp ?? null,
+            'conditionResult' => 
+                ($currentLevel || $currentLevel === 0) &&
+                $nextLevel &&
+                $nextLevel->exp > $currentExp,
+        ]);
         
         if (
             ($currentLevel || $currentLevel === 0) &&
@@ -47,6 +58,8 @@ class CpListResource extends JsonResource
         } else {
             $ratio = 100;
         }
+
+
 
 
         return [
