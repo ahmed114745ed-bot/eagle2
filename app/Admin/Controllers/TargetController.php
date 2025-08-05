@@ -568,7 +568,7 @@ class TargetController extends MainController
 
 
 
-        Request::replace($data);
+        \request()->replace($data);
         return $this->form()->update($id);
     }
 
@@ -596,7 +596,7 @@ class TargetController extends MainController
         unset($data['moment1']);
         unset($data['moment2']);
         unset($data['moment3']);
-        Request::replace($data);
+        request()->replace($data);
 
         //        Target::create($data);
         return $this->form()->store();
