@@ -3428,6 +3428,10 @@
 "special bar coin": "عملة الشريط المميز",
   "Charged from": "شُحِنَ من",
   "Gift Logs": "سجلات الهدايا",
+  "charger uuid": "معرّف الشاحن",
+"Sender uuid": "معرّف المُرسل",
+"recipient uuid": "معرّف المستلم",
+
 "Browse gift logs": "تصفح سجلات الهدايا",
  "total transfer dollars": "إجمالي الدولارات المحولة",
 "total transfer coins": "إجمالي الكوينات المحولة",

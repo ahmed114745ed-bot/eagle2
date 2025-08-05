@@ -405,10 +405,9 @@ class ChargeReportController extends MainController
         $grid->column('created_at', __('shipping date'));
         if (request("name") == "host" || request("name") == null) {
             $grid->tools(function (Grid\Tools $tools) {
-                $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
                 $query = http_build_query([
-                    'from_date' => request('from_date'),
-                    'to_date' => request('to_date'),
+                    'from_date' => request('from_date') ? convertArabicToEnglishNumbers(request('from_date')) : '',
+                    'to_date' => request('from_date') ? convertArabicToEnglishNumbers(request('to_date')) : '',
                     'filter_type' => request('filter_type'),
                     'filtering' => request('filtering'),
                     'name' => request("name"),
@@ -584,8 +583,8 @@ class ChargeReportController extends MainController
         $grid->tools(function (Grid\Tools $tools) {
             $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
             $query = http_build_query([
-                'from_date' => request('from_date'),
-                'to_date' => request('to_date'),
+                'from_date' => request('from_date') ? convertArabicToEnglishNumbers(request('from_date')) : '',
+                'to_date' => request('from_date') ? convertArabicToEnglishNumbers(request('to_date')) : '',
                 'trx' => request('trx'),
                 'status' => request('status'),
                 'method' => request('method'),
@@ -801,8 +800,8 @@ class ChargeReportController extends MainController
         $grid->tools(function (Grid\Tools $tools) {
             $uuid = request('uuid') ?? (request('user')['uuid'] ?? null);
             $query = http_build_query([
-                'from_date' => request('from_date'),
-                'to_date' => request('to_date'),
+                'from_date' => request('from_date') ? convertArabicToEnglishNumbers(request('from_date')) : '',
+                'to_date' => request('from_date') ? convertArabicToEnglishNumbers(request('to_date')) : '',
                 'uuid' => $uuid,
             ]);
 
