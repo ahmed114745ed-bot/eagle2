@@ -71,8 +71,6 @@ class CpProfileService
             return $cp->id === $mainCp->id;
         }) : $data;
 
-        info('remain cps', ['remain cp', $remainingCps]);
-
         $result = [
             'seats' => $seats,
             'wares' => $ware,
