@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\TribeReward\Jobs\AgencyTribeRewardJob;
+use Modules\TribeReward\Jobs\CleanExpiredAgencyRewardsJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -111,6 +113,9 @@ class Kernel extends ConsoleKernel
 
        $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
+        $schedule->job(new AgencyTribeRewardJob())->days(15);
+        $schedule->job(new CleanExpiredAgencyRewardsJob())->daily();
+        //    $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Extensions;
 
+use Carbon\Carbon;
 use App\Models\Charge;
 use App\Helpers\Common;
 use App\Models\CoinLog;
@@ -48,7 +49,7 @@ class ExchangeChargeExport implements FromCollection, WithHeadings
         $name = $this->name;
         $type = $this->type;
 
-        $query = Charge::with('receiver', 'receiverUser','receiveragency','admin','senderShippingAgency','senderAgency', 'senderUser');
+        $query = Charge::with('receiver', 'receiverUser', 'receiveragency', 'admin', 'senderShippingAgency', 'senderAgency', 'senderUser');
         if ($name === 'host') {
             $query->where('charger_type', 'host_agency');
         } else {
@@ -56,18 +57,18 @@ class ExchangeChargeExport implements FromCollection, WithHeadings
         }
 
 
-        if ($type === 'user') {
+        if ($type === 'user' && isset($filtering)) {
 
             $query->whereHas('receiverUser', function ($q) use ($filtering) {
                 $q->where('uuid',  $filtering)->orWhere('name', 'like', "%$filtering%");
             });
-        } else {
+        } elseif ($type != 'user' && isset($filtering)) {
             $query->whereHas('receiver', function ($q) use ($filtering) {
                 $q->where('id',  $filtering)->orWhere('name', 'like', "%$filtering%");
             });
         }
         if ($start && $end) {
-            $query->whereBetween('created_at', [$start, $end]);
+            $query->whereBetween('created_at', [Carbon::parse($start)->startOfDay(), Carbon::parse($end)->endOfDay()]);
         }
 
         $exchanges = $query->get();
@@ -84,8 +85,10 @@ class ExchangeChargeExport implements FromCollection, WithHeadings
             if ($name === 'host') {
                 $arr[] = [
                     'id' => $exchange->id,
-                    'sender' => (@$senderName ?? '') . ' uuid: ' . (@$senderUuid ?? ''),
-                    'recipient' => (@$nameReceiver ?? '') . ' uuid: ' . (@$uuidReceiver ?? ''),
+                    'sender' => (@$senderName ?? ''),
+                    'sender uuid ' => (@$senderUuid ?? ''),
+                    'recipient' => (@$nameReceiver ?? ''),
+                    'recipient uuid' => (@$uuidReceiver ?? ''),
                     'amount' => number_format($exchange->usd) . '💲',
                     'coins' => $exchange->amount,
                     'date' => $exchange->created_at,
@@ -94,8 +97,10 @@ class ExchangeChargeExport implements FromCollection, WithHeadings
             } else {
                 $arr[] = [
                     'id' => $exchange->id,
-                    'sender' => (@$senderName ?? '') . ' uuid: ' . (@$senderUuid ?? ''),
-                    'recipient' => (@$nameReceiver ?? '') . ' uuid: ' . (@$uuidReceiver ?? ''),
+                    'sender' => (@$senderName ?? ''),
+                    'sender uuid' => (@$senderUuid ?? ''),
+                    'recipient' => (@$nameReceiver ?? ''),
+                    'recipient uuid'=> (@$uuidReceiver ?? ''),
                     'amount' => number_format($exchange->usd) . '💲',
                     'coins' => $exchange->amount,
                     'status' => $exchange->amount >= 1 ? __('Increment') : __('Decrement'),
@@ -115,7 +120,9 @@ class ExchangeChargeExport implements FromCollection, WithHeadings
         $headings = [
             __("id", [], 'ar'),
             __('Sender', [], 'ar'),
+            __('Sender uuid', [], 'ar'),
             __('recipient', [], 'ar'),
+            __('recipient uuid', [], 'ar'),
             __('amount', [], 'ar'),
             __('Coins', [], 'ar'),
         ];
