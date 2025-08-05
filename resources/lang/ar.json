@@ -3582,6 +3582,7 @@
   "Not enough available quantity for this reward.": "ليست هناك كمية كافية متاحة لهذه المكافأة.",
 
     "You have already sent a CP request before.": "لقد قمت بارسال طلب cp من قبل",
+    "You can only send this relation to one user only.": "لا يمكنك إرسال هذه العلاقة إلا لمستخدم واحد فقط",
 
     "This reward has expired.": "انتهت صلاحية هذه المكافأة."
 

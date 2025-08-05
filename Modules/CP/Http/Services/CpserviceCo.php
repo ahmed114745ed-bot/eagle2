@@ -64,7 +64,7 @@ class CpserviceCo
                 ->first();
 
             if ($existing) {
-                return Common::apiResponse(0, 'لا يمكنك إرسال هذه العلاقة إلا لمستخدم واحد فقط');
+                return Common::apiResponse(0, 'You can only send this relation to one user only.');
             }
         }
 
