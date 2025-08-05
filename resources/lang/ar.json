@@ -3580,7 +3580,20 @@
   "Your agency has received rewards from the event!": "لقد حصلت وكالتك على مكافآت من الفعالية!",
   "One or more users are not eligible or do not belong to this agency.": "مستخدم واحد أو أكثر غير مؤهل أو لا ينتمي إلى هذه الوكالة.",
   "Not enough available quantity for this reward.": "ليست هناك كمية كافية متاحة لهذه المكافأة.",
-  "This reward has expired.": "انتهت صلاحية هذه المكافأة."
+
+    "You have already sent a CP request before.": "لقد قمت بارسال طلب cp من قبل",
+    "You can only send this relation to one user only.": "لا يمكنك إرسال هذه العلاقة إلا لمستخدم واحد فقط",
+    "There is no CP relation.": "لا يوجد cp relations",
+    "There is no CP relation between the users.": "لا يوجد cp relations بين المستخدمين",
+    "You are already in a relation with this user.": "انت في علاقة مع هذا المستخدم",
+    "You have exceeded the allowed number of requests!": "لقد تعديت العدد المسموح به!",
+    "They have already sent a CP request to you, please accept it.": "قام بارسال طلب cp  لك اقبله",
+    "You have exceeded the number of CP requests for this relation.": "cp لقد تخطيت طلب",
+    "This user is already in a CP relation.": "لا يمكن تقديم cp هذا المستخدم فى علاقة",
+    "You do not have enough coins, please recharge!": "لا يوجد رصيد كافي من الكوينات برجاء الشحن!",
+    "An error occurred while processing the request.": "حدث خطأ أثناء معالجة الطلب",
+
+    "This reward has expired.": "انتهت صلاحية هذه المكافأة."
 
 
 
