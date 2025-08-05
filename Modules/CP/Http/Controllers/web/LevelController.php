@@ -153,7 +153,10 @@ class LevelController extends MainController
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
-
+        $form->saved(function (Form $form) {
+            admin_toastr('تم الحفظ بنجاح', 'success');
+            return redirect('/admin/cp-levels?relation_id=' . $form->model()->cp_relation_id);
+        });
         return $form;
     }
 
