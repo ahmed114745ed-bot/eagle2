@@ -32,8 +32,13 @@ class CpProfileResource extends JsonResource
         $nextLevel = CpLevel::where("cp_relation_id",  $currentLevel?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
        
         $ratio = 0;
-        if ($currentLevel || $currentLevel == 0 && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
-
+        if (
+            ($currentLevel || $currentLevel === 0) &&
+            $nextLevel &&
+            $nextLevel->exp > ($currentLevel?->exp ?? 0)
+        ) {
+            dd('all passed');
+        
             $currentExp = $this->di;
             $nextLevelExp = $nextLevel->exp ?? $currentExp;
             $ratio = round(min(($currentExp / $nextLevelExp) * 100, 100), 2);            
