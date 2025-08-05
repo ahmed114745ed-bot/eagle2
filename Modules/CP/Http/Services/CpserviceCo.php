@@ -50,7 +50,7 @@ class CpserviceCo
 
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && ($existingCp->status == CpStatus::PENDING->value)  && $cpRelation->type != 'solution') {
-            return Common::apiResponse(0, "لقد قمت بارسال  طلب cp من قبل ");
+            return Common::apiResponse(0, "    تم إرسال طلبك من قبل برجاء الانتظار لقبول طلبك");
         }
 
         if ($existingCp && ($existingCp->status == CpStatus::ACTIVE->value  || $existingCp->status == CpStatus::RESTORED->value) && $cpRelation->type != 'solution') {
