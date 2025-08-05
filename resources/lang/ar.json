@@ -3580,7 +3580,10 @@
   "Your agency has received rewards from the event!": "لقد حصلت وكالتك على مكافآت من الفعالية!",
   "One or more users are not eligible or do not belong to this agency.": "مستخدم واحد أو أكثر غير مؤهل أو لا ينتمي إلى هذه الوكالة.",
   "Not enough available quantity for this reward.": "ليست هناك كمية كافية متاحة لهذه المكافأة.",
-  "This reward has expired.": "انتهت صلاحية هذه المكافأة."
+
+    "You have already sent a CP request before.": "لقد قمت بارسال طلب cp من قبل",
+
+    "This reward has expired.": "انتهت صلاحية هذه المكافأة."
 
 
 
