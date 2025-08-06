@@ -103,6 +103,7 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
+        $grid->model()->with('bdSalaries');
 
         $grid->column('id', __('Id'));
         // $grid->column('username', __('username'));
