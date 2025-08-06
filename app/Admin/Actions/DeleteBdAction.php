@@ -28,14 +28,7 @@ class DeleteBdAction extends RowAction
             $this->agencyCount = Agency::where('bd_id', $model->app_id)->count();
             return parent::setModel($model);
         }
-        public function confirm()
-        {
-            if ($this->agencyCount > 0) {
-                return "This BD has {$this->agencyCount} agencies. If you delete it, agencies will be transferred to the default BD, and salaries deleted. Are you sure?";
-            }
     
-            return 'Are you sure you want to delete this BD?';
-        }
     
         public function handle(Model $model, Request $request)
         {
@@ -61,5 +54,14 @@ class DeleteBdAction extends RowAction
             return $this->response()->success('BD deleted successfully.')->refresh();
         }
     
+
+
+  
+
+    
+        public function dialog()
+        {
+            $this->confirm(__('dashboard.chickDelete'),'',[]);
+        }
        
 }
