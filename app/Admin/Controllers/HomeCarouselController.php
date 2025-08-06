@@ -134,7 +134,7 @@ class HomeCarouselController extends MainController
             })->when('link', function (Form $form) {
                 $form->url('url', trans('url'))->rules('required|url');
             })->when('event', function (Form $form) {
-                $form->select('event_type', trans('events'))->options(['event' => __('events'), 'pk_event' => __('pk_event'), 'weekly_star' => __('weekly_star'), 'charge_event' => __('charge_event'), 'event_period' => __('event_period')])->when('event', function (Form $form) {
+                $form->select('event_type', trans('events'))->options(['event' => __('events'), 'pk_event' => __('pk_event'), 'weekly_star' => __('weekly_star'), 'charge_event' => __('charge_event'), 'event_period' => __('event_period'), 'cp' => __('cp')])->when('event', function (Form $form) {
                     $form->url('url', trans('url'));
                 });
             });
