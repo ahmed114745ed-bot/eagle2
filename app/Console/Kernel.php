@@ -2,8 +2,11 @@
 
 namespace App\Console;
 
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\TribeReward\Jobs\AgencyTribeRewardJob;
+use Modules\TribeReward\Jobs\CleanExpiredAgencyRewardsJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -111,6 +114,16 @@ class Kernel extends ConsoleKernel
 
        $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
+        $schedule->job(new AgencyTribeRewardJob())
+            ->daily()->when(function (){
+                $startDate = Carbon::create(2025, 1, 1);
+                $today = Carbon::today();
+
+                return $startDate->diffInDays($today) % 15 === 0;
+            });
+
+        $schedule->job(new CleanExpiredAgencyRewardsJob())->daily();
+        //    $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }
 

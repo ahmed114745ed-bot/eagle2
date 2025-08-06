@@ -25,7 +25,7 @@ Route::group(
         $router->resource('cp-relations', CpRelationController::class);
         $router->resource ('weekly-cp',WeeklyCpController::class);
         $router->resource ('cp-reports',CpReportRelationController::class);
-       
+
 
         Route::prefix('cp-levels/{relation_id}')->group(function () {
             Route::get('/', [LevelController::class, 'index'])->name('cp-levels.index');

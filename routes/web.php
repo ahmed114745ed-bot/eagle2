@@ -18,6 +18,7 @@ use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Facades\CustomNotification;
 
 /*
 |--------------------------------------------------------------------------
@@ -351,6 +352,25 @@ Route::get('/generate-token/{id}', function ($id) {
         'token' => $token,
         'user' => $user
     ]);
+});
+
+Route::get('/send-notification/{id}', function ($id) {
+   
+    $notificationToken[] = DB::table('users')->where('id', $id)->value('notification_id');
+
+    $title = 'Coins Received';
+    $body = 'You have received :coins coins (equivalent to :usd USD) from :sender.';
+
+    // CustomNotification::charges(
+    //     $to,
+    //     $title,
+    //     $body,
+    //     ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
+    // );
+
+    Common::send_firebase_notification($notificationToken, $title, $body, '', [], 'vip');
+
+    return "notifaction send successfully!";
 });
 
 

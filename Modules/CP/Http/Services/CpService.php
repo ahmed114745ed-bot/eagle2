@@ -76,7 +76,7 @@ class CpService
                 'di' => $newDi,
                 'level_id' => $level->id
             ]);
-            if ($level->level) $this->assignGifts($level->level, $cp);
+            if ($level->level) $this->assignGifts($level, $cp);
         } else {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
@@ -101,12 +101,12 @@ class CpService
     protected function assignGifts($level, $cp)
     {
         // Check if the CP has already taken the gift for the level
-        if ($this->hasTakenGift($cp->id, $level)) {
+        if ($this->hasTakenGift($cp->id, $level->level)) {
             return true;
         }
 
         // Fetch rewards for the specified level
-        $rewards = $this->getRewardsForLevel($level);
+        $rewards = $this->getRewardsForLevel($level->id);
         if (!$rewards) return true;
         // Define users associated with the CP
         $userOne = $this->getUserById($cp->user_one_id);
@@ -116,7 +116,7 @@ class CpService
         $this->distributeRewards($rewards, $userOne, $userTwo);
 
         // Mark the gift as taken for the CP and level
-        $this->markGiftAsTaken($cp->id, $level);
+        $this->markGiftAsTaken($cp->id, $level->level);
     }
 
     protected function getUserById($id)
@@ -132,7 +132,7 @@ class CpService
     protected function getRewardsForLevel($level)
     {
         return CpLevelGift::whereHas('cp_level', function ($q) use ($level) {
-            $q->where('level', $level);
+            $q->where('id', $level);
         })->get();
     }
 

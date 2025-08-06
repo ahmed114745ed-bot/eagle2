@@ -140,9 +140,25 @@ class LevelGiftController extends MainController
                 ->load('item_id', admin_url('wares-by-type')); // AJAX load
 
             $form->select('item_id', __('wares'))
-                ->options([]) 
+                ->options(function ($id) {
+                    if (!$id) return [];
+
+                    $ware = \App\Models\Ware::find($id);
+                    if (!$ware) return [];
+
+                    return [$ware->id => "{$ware->name}_{$ware->id}"];
+                })
                 ->attribute(['data-image-select' => 1]);
 
+
+            Admin::script(<<<SCRIPT
+                $(function () {
+                    let itemSelected = $('select[name="item_id"]').val();
+                    if (itemSelected) {
+                        $('select[name="type_ware"]').trigger('change');
+                    }
+                });
+            SCRIPT);
 
             Admin::script(<<<'JS'
                 $(function () {
@@ -197,7 +213,7 @@ class LevelGiftController extends MainController
         $form->saving(function (Form $form) {
             unset($form->type_ware);
             $form->ignore('type_ware');
-           
+
             if ($form->type == 'ware') {
                 $ware = Ware::find($form->item_id);
                 if ($ware) {
@@ -228,6 +244,7 @@ class LevelGiftController extends MainController
     public function getWaresByType(Request $request)
     {
         $type = $request->get('q');
+        info($type);
         $wares = Ware::where('type', $type)->get();
 
         $data = [];
