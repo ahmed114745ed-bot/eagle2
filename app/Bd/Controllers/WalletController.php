@@ -442,7 +442,8 @@ class WalletController extends MainController
             throw new \Exception(__('it_agency_freez_charge'));
         }
         if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
-            return Common::apiResponse(0, __('not_verified_agency'), 403);
+            throw new \Exception(__('not_verified_agency'));
+
         }
 
         $rate = Common::getCoinsValue('shipping_coins');
