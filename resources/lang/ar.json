@@ -3593,7 +3593,8 @@
     "You do not have enough coins, please recharge!": "لا يوجد رصيد كافي من الكوينات برجاء الشحن!",
     "An error occurred while processing the request.": "حدث خطأ أثناء معالجة الطلب",
 
-    "This reward has expired.": "انتهت صلاحية هذه المكافأة."
+    "This reward has expired.": "انتهت صلاحية هذه المكافأة.",
+    "box num ended": "تم انتهاء العدد المسموح للبوكس"
 
 
 
