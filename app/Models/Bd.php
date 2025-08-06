@@ -51,9 +51,10 @@ class Bd extends Model
 
     public function getNetSallaryAttribute()
     {
-        return $this->bdSalaries()
-            ->selectRaw('SUM(salary - cut_amount) as net_salary')
-            ->value('net_salary');
+        $userSallary = $this->bdSalaries()
+        ->sum(DB::raw('salary - cut_amount'));
+
+       return floor($userSallary);
     }
 
     protected static function booted(): void
