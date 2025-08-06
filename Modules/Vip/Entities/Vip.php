@@ -15,16 +15,7 @@ class Vip extends Model
     public static $useCache = true;
 
 
-    protected $fillable = [
-        'type',
-        'img',
-        'exp',
-        'level',
-        'di',
-        'co',
-        'name_en',
-        'name_ar',
-    ];
+    protected $guarded = ['id'];
 
     public static function getCached(): Collection
     {
