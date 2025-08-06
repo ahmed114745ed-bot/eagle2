@@ -129,6 +129,7 @@ class GiftLogService
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
             } catch (\Exception $e) {
+                info($e->getMessage());
                 return Common::apiResponse(0, $e->getMessage());
             }
         }
