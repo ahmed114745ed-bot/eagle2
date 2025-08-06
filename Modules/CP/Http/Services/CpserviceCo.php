@@ -50,7 +50,7 @@ class CpserviceCo
 
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && $existingCp->status == CpStatus::PENDING->value && $cpRelation->type != 'solution') {
-            return Common::apiResponse(0, "You have already sent a CP request before.");
+            return Common::apiResponse(0, __("You have already sent a CP request before."));
         }
 
         if ($existingCp && in_array($existingCp->status, [CpStatus::ACTIVE->value, CpStatus::RESTORED->value]) && $cpRelation->type != 'solution') {
@@ -64,7 +64,7 @@ class CpserviceCo
                 ->first();
 
             if ($existing) {
-                return Common::apiResponse(0, 'You can only send this relation to one user only.');
+                return Common::apiResponse(0, __('You can only send this relation to one user only.'));
             }
         }
 
@@ -78,7 +78,7 @@ class CpserviceCo
             $existingCptwo = $this->cpRepository->checkExistingCpOne($request->user_id, $cpRelation->id);
 
             if ($existingCpOne) {
-                return Common::apiResponse(0, 'You have already sent a CP request before.');
+                return Common::apiResponse(0, __('You have already sent a CP request before.'));
             }
 
             if ($existingCptwo) {
@@ -122,7 +122,7 @@ class CpserviceCo
 
             $stoppedRelation = $this->cpRepository->findStoppedRelationBetweenTwoUsers($user->id, $request->user_id, $cpRelation->type);
 
-            if ($stoppedRelation) {
+            if ($stoppedRelation && $stoppedRelation->updated_at >= now()->subMonth()) {
                 $stoppedRelation->status = CpStatus::PENDING->value;
                 $stoppedRelation->save();
                 $cp_request = $stoppedRelation;
@@ -257,7 +257,6 @@ class CpserviceCo
                 $cp->price += $cp->cpRelation->price;
                 $cp->save();
             } else {
-
                 $this->cpRepository->updateCpStatus($cp, 1);
             }
             CustomNotification::cpAction($user2, $user, 1);
