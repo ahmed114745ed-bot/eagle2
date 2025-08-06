@@ -116,7 +116,7 @@ class CpService
         $this->distributeRewards($rewards, $userOne, $userTwo);
 
         // Mark the gift as taken for the CP and level
-        $this->markGiftAsTaken($cp->id, $level);
+        $this->markGiftAsTaken($cp->id, $level->level);
     }
 
     protected function getUserById($id)
