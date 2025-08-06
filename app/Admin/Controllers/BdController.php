@@ -200,6 +200,10 @@ class BdController extends MainController
             return truncateAndTrim($this->net_salary, 2);
         });
 
+        $grid->column('total_cut', __('Cut amount'))->display(function () {
+            return truncateAndTrim($this->total_cut, 2);
+        });
+
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
