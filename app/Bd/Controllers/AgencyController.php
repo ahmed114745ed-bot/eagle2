@@ -399,7 +399,7 @@ class AgencyController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+            $showUrl = $this->owner ? bd_url("users/profile/{$this->owner->id}") : 0;
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image

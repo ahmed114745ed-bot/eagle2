@@ -97,7 +97,11 @@ class UserRepository extends Repository
 
     public function user_bd2($key, $page, $perPage)
     {
-        return Bd::selectRaw('concat(COALESCE(name, ""), " - ", id) as name, id')
+        return Bd::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
+                    ->where(function ($query) use ($key) {
+                        
+                            $query->orWhere('id', 'like', '%' . $key . '%');
+                    })
                    ->paginate($perPage, ['*'], 'page', $page);
     }
 

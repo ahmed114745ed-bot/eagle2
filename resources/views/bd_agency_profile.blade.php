@@ -968,7 +968,7 @@
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                     $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                     $username = htmlspecialchars($user->name ?? 'Unknown');
-                                    $userUrl = route('admin.users.show', $user->id);
+                                    $userUrl = route('bd.user.profile', $user->id);
                                     $exp = number_format($log->exp);
                             @endphp
 
@@ -1008,7 +1008,7 @@
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                     $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                     $username = htmlspecialchars($user->name ?? 'Unknown');
-                                    $userUrl = route('admin.users.show', $user->id);
+                                    $userUrl = route('bd.user.profile', $user->id);
                             @endphp
 
                             <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }}">
@@ -1566,7 +1566,7 @@
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                             $username = htmlspecialchars($user->name ?? 'Unknown');
-                                            $userUrl = route('admin.users.show', $user->id);
+                                            $userUrl = route('bd.user.profile', $user->id);
                                             $exp = number_format($log->exp);
                                     @endphp
 
@@ -1605,7 +1605,7 @@
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                             $username = htmlspecialchars($user->name ?? 'Unknown');
-                                            $userUrl = route('admin.users.show', $user->id);
+                                            $userUrl = route('bd.user.profile', $user->id);
                                             $exp = number_format($log->exp);
                                     @endphp
 
