@@ -44,6 +44,10 @@ class Bd extends Model
     {
         return $this->bdSalaries()->sum('salary');
     }
+    public function getTotalCutAttribute()
+    {
+        return $this->bdSalaries()->sum('cut_amount');
+    }
 
     public function getNetSallaryAttribute()
     {
