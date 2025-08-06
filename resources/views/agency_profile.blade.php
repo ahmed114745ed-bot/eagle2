@@ -1279,7 +1279,7 @@
                                                         </td>
                                             <td>{{ $member->getLiveTimeThisMonth() }}</td>
                                             <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                            <td>{{ $member->salary_by_agency ?? 0 }}</td>
+                                            <td>{{ $member->salary_by_latest_join ?? 0 }}</td>
                                             <td>
                                                 @if($isOwner)
                                                     <span class="role-badge owner">{{ __('Owner') }}</span>
