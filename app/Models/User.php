@@ -1648,6 +1648,7 @@ class User extends Authenticatable
             ->latestOfMany('join_date');
     }
 
+
     public function lastSallary()
     {
         $join = $this->latestJoin()->first();
@@ -1665,6 +1666,24 @@ class User extends Authenticatable
             })
             ->latestOfMany();
     }
+
+    public function getSalaryByLatestJoinAttribute()
+    {
+        $latestJoin = $this->latestJoin;
+
+        if (!$latestJoin) {
+            return 0;
+        }
+
+        $userSalary = UserSallary::query()
+            ->where('user_id', $this->id)
+            ->where('user_agency_id', $latestJoin->agency_id)
+            ->orderByDesc('id')
+            ->sum(DB::raw('sallary - cut_amount'));
+
+        return floor($userSalary * 100) / 100;
+    }
+
 
     public function type16Packs()
     {
