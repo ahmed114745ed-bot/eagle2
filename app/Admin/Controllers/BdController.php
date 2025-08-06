@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\BdChargeSwitchAction;
 use App\Models\Bd;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -214,11 +215,18 @@ class BdController extends MainController
                 $actions->add(new \App\Admin\Actions\DeleteBdAction());
             }
 
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new BdChargeSwitchAction());
+            }
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
+
+    
+
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
+
 
                 $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
             });
@@ -260,7 +268,9 @@ class BdController extends MainController
         // $form->switch('default', __('set_as_default'))
         //     ->help(__('make_bd_default'));
 
+        $form->hidden('transfer_salary', __('transfer_salary'));
 
+        
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];

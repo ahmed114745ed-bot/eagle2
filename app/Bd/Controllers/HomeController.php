@@ -25,11 +25,11 @@ class HomeController extends Controller
 
     public function index(Content $content)
     {
-        $appID = Auth::user()->app_id;
+        $appID = Auth::user()->id;
         $agencyCount = Agency::where('bd_id', $appID)->count();
 
-        $salaryData = \App\Models\BDSallary::where('bd_id', $appID)
-            ->selectRaw('COALESCE(SUM(sallary),0) AS total_sallary, COALESCE(SUM(cut_amount),0) AS total_cut')
+        $salaryData = \App\Models\BdSalary::where('bd_id', $appID)
+            ->selectRaw('COALESCE(SUM(salary),0) AS total_sallary, COALESCE(SUM(cut_amount),0) AS total_cut')
             ->first();
         $finalSalary = round($salaryData->total_sallary - $salaryData->total_cut, 2);
 

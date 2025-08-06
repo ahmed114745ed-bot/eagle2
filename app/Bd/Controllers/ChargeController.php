@@ -43,7 +43,7 @@ class ChargeController extends MainController
 
         $grid->model()->where('charger_type', 'bd')
             ->with('receiverUser', 'receiveragency')
-            ->where('charger_id', Auth::user()->app_id);
+            ->where('charger_id', Auth::user()->id);
 
 
 

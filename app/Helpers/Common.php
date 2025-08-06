@@ -2131,8 +2131,20 @@ class Common
                     'id_image' => $owner?->specialId?->ware?->show_img ?? '',
                     'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
                 ];
-
+                
             case 'bd':
+                $bd = $resource->bd;
+                return [
+                    'name' => $bd->name ?? '',
+                    'image' => $bd->avatar ?? '',
+                    'uuid' => $bd->id ?? '',
+                    'id' => $bd->id ?? '',
+                    'type' => 'bd',
+                    'url' => $bd ? url("admin/usersBd/{$bd->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
             case 'user':
                 $user = $resource->senderUser;
                 $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
@@ -2219,6 +2231,7 @@ class Common
     {
         return [
             'admin',
+            'bd',
             'senderUser',
             'senderUser.profile',
             'senderAgency',

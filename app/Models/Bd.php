@@ -67,8 +67,8 @@ class Bd extends Model
                 ->first();
 
             if ($defaultBd) {
-                Agency::where('bd_id', $bd->app_id)
-                    ->update(['bd_id' => $defaultBd->app_id]);
+                Agency::where('bd_id', $bd->id)
+                    ->update(['bd_id' => $defaultBd->id]);
             } else {
                 throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
             }
@@ -94,7 +94,7 @@ class Bd extends Model
                 Agency::where(function ($query) {
                     $query->whereNull('bd_id')
                         ->orWhere('bd_id', 0);
-                })->update(['bd_id' => $model->app_id]);
+                })->update(['bd_id' => $model->id]);
             }
         });
 
@@ -104,8 +104,35 @@ class Bd extends Model
                 Agency::where(function ($query) {
                     $query->whereNull('bd_id')
                         ->orWhere('bd_id', 0);
-                })->update(['bd_id' => $model->app_id]);
+                })->update(['bd_id' => $model->id]);
             }
         });
+    }
+
+
+    public function incrementCutAmountInBdSallary(int $amount)
+    {
+        $lastBdSalary = $this->bdSalaries()->latest()->first();
+
+        if ($lastBdSalary) {
+            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
+            $lastBdSalary->update(['cut_amount' => $newAmount]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function bdSalaries()
+    {
+        return $this->hasMany(BdSalary::class, 'bd_id');
+    }
+    public function getBdSalaryAttribute()
+    {
+        $userSallary = $this->bdSalaries()
+            ->sum(DB::raw('salary - cut_amount'));
+
+        return floor($userSallary);
     }
 }
