@@ -2135,7 +2135,7 @@ class Common
             case 'bd':
                 $bd = $resource->bd;
                 return [
-                    'name' => $bd->name ?? '',
+                    'name' => $bd->username ?? '',
                     'image' => $bd->avatar ?? '',
                     'uuid' => $bd->id ?? '',
                     'id' => $bd->id ?? '',
