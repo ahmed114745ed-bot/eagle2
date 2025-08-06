@@ -1160,7 +1160,7 @@
         </div>
         @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-            <div class="tab-content active" id="members-tab">
+        <div class="tab-content active" id="members-tab">
 
                 <div class="card">
                     <div class="card-header">
