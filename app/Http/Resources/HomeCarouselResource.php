@@ -36,7 +36,7 @@ class HomeCarouselResource extends JsonResource
             'id'         => $this->id,
             'img'        => $this->img ?:'',
             'type'   => $this->type ?? '',
-            'url'        => ($this->type == 'link' || $this->event_type == 'event')? ($this->url ?? '') :( ($this->event_type == 'pk_event'||$this->event_type == 'weekly_star' ||$this->event_type == 'charge_event' ||$this->event_type =='event_period')? ($urlEvent->url ?? ''):''),
+            'url'        => ($this->type == 'link' || $this->event_type == 'event')? ($this->url ?? '') :( ($this->event_type == 'pk_event'||$this->event_type == 'weekly_star' ||$this->event_type == 'charge_event' ||$this->event_type =='event_period' ||$this->event_type =='weekly_cp')? ($urlEvent->url ?? ''):''),
             'isLocked'   =>   $roomPass != '' || $roomPass != null,
             'owner_id'   =>  $this->owner_id ?? 0,
             'avatar' => $avatar ?? "profile/g0lEsx7Joe.jpg",
