@@ -138,13 +138,23 @@ class MallController extends Controller
                 }
             }
         }
-        $expireUserVips = UserVip::where('expire', '<', Carbon::now()->timestamp)->where('expire', '!=', 0)->where('expire', '!=', null)->with('packs')->get();
+        
+        $expireUserVips = UserVip::where('expire', '<', Carbon::now()->timestamp)
+            ->whereHas('packs', function ($q) {
+                $q->where(function ($query) {
+                    $query->where('expire', '>', Carbon::now()->timestamp)
+                        ->orWhere('expire', 0);
+                });
+            })
+            ->where('expire', '!=', 0)
+            ->whereNotNull('expire')
+            ->with('packs')
+            ->get();
 
-        if ($expireUserVips) {
-            foreach ($expireUserVips as $userVip) {
-                $userVip->packs()->update(['expire' => $userVip->expire]);
-            }
+        foreach ($expireUserVips as $userVip) {
+            $userVip->packs()->update(['expire' => $userVip->expire]);
         }
+
 
         return 'done';
     }
