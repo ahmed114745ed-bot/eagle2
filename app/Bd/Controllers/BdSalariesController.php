@@ -166,7 +166,8 @@ class BdSalariesController extends AdminController
         $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
             return number_format($value, 2);
         });
-        
+        $grid->disableRowSelector();
+
         // $grid->column('total_diamond', __('Total Diamond'))->display(function ($value) {
         //     return number_format($value, 2);
         // });
