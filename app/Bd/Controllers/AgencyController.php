@@ -229,14 +229,13 @@ class AgencyController extends MainController
             ->get();
         // });
 
-        $sumTargets =
-            Cache::remember("agency_{$id}_targets_sum_{$month}_{$year}", 600, function () use ($agencyId, $month, $year) {
-                return
-                    UserSallary::where('user_agency_id', $agencyId)
-                    ->where('month', now()->month)
-                    ->where('year', now()->year)
-                    ->sum('target_diamonds');
-            });
+        $sumTargets = GiftLog::where('agency_id', $agencyId)
+        ->whereBetween('created_at', [
+            Carbon::now()->startOfMonth(),
+            Carbon::now()->endOfMonth(),
+        ])
+        ->sum('giftPrice');
+        
 
         return $content
             ->title(__('agency profile'))
@@ -466,7 +465,7 @@ class AgencyController extends MainController
                 $query->whereHas('owner', function ($subQuery) {
                     $subQuery->where('uuid', 'like', "%{$this->input}%");
                 });
-            }, __('UUID'))->placeholder(__('search for agency or host by UUID'));
+            }, __('UUID'))->placeholder(__('search for host by UUID'));
         });
 
         Admin::style("

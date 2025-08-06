@@ -497,7 +497,7 @@ class AgencyController extends MainController
                 $query->whereHas('owner', function ($subQuery) {
                     $subQuery->where('uuid', 'like', "%{$this->input}%");
                 });
-            }, __('UUID'))->placeholder(__('search for agency or host by UUID'));
+            }, __('UUID'))->placeholder(__('search for host by UUID'));
         });
 
         Admin::style("
