@@ -138,12 +138,12 @@ class MallController extends Controller
                 }
             }
         }
-        
+
         $expireUserVips = UserVip::where('expire', '<', Carbon::now()->timestamp)
             ->whereHas('packs', function ($q) {
                 $q->where(function ($query) {
                     $query->where('expire', '>', Carbon::now()->timestamp)
-                        ->orWhere('expire', 0);
+                        ->orWhere('expire', 0)->orWhere('expire', null);
                 });
             })
             ->where('expire', '!=', 0)
