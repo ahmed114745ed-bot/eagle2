@@ -25,7 +25,7 @@ class Bd extends Model
 
     public function agencies()
     {
-        return $this->hasMany(Agency::class, 'bd_id', 'app_id');
+        return $this->hasMany(Agency::class, 'bd_id', 'id');
     }
 
     public function transactions()
@@ -39,19 +39,15 @@ class Bd extends Model
         return $this->agencies()->count();
     }
 
-    public function salaries()
-    {
-        return $this->hasMany(BDSallary::class, 'bd_id', 'app_id');
-    }
 
     public function getTotalSalaryAttribute()
     {
-        return $this->salaries()->sum('sallary');
+        return $this->bdSalaries()->sum('salary');
     }
 
     public function getNetSallaryAttribute()
     {
-        return $this->salaries()->sum(DB::raw('sallary - cat_amount'));
+        return $this->bdSalaries()->sum(DB::raw('salary - cat_amount'));
     }
 
     protected static function booted(): void

@@ -193,11 +193,11 @@ class BdController extends MainController
 
 
         $grid->column('total_salary', __('total proft'))->display(function () {
-            return number_format($this->total_salary, 2);
+            return truncateAndTrim($this->total_salary, 2);
         });
 
         $grid->column('net_salary', __('Net Salary'))->display(function () {
-            return number_format($this->net_salary, 2);
+            return truncateAndTrim($this->net_salary, 2);
         });
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
