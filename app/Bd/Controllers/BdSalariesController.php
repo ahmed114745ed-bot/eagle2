@@ -82,10 +82,9 @@ class BdSalariesController extends AdminController
             agency_id, 
             month,
             year,
-                SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
-                SUM(CAST(user_sallary AS DECIMAL(15,4))) as total_user_sallary, 
-                SUM(CAST(agency_sallary AS DECIMAL(15,4))) as total_agency_sallary, 
-                COUNT(*) as count
+            SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
+            SUM(CAST(user_sallary AS DECIMAL(15,4))) as total_user_sallary, 
+            SUM(CAST(agency_sallary AS DECIMAL(15,4))) as total_agency_sallary, 
             COUNT(*) as count
         ')
         ->groupBy('agency_id', 'month', 'year');
