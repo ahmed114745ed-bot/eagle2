@@ -64,11 +64,20 @@ class ChargeController extends MainController
             $filter->between('created_at', __('تاريخ الإنشاء'))->date();
         });
 
+        $grid->column('amount', __('Amount'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . truncateAndTrim($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
 
+                </div>
+            ";
+        });
 
 
         // $grid->column('id', __('Id'));
-        $grid->column('amount', __('Amount'));
+        // $grid->column('amount', __('Amount'));
         // $grid->column('amount_type', __('Amount type'));
 
         $grid->column('user_id', __('receiver'))->display(function () {
@@ -146,6 +155,11 @@ class ChargeController extends MainController
             $tools->append($button);
         });
         $grid->disableRowSelector();
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+          
+                $actions->disableDelete();
+          
+        });
         return $grid;
     }
 

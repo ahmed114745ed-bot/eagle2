@@ -429,6 +429,9 @@ class WalletController extends MainController
             throw new \Exception(__('api_responses.freez_charge'));
         }
 
+        if ($from->transfer_salary == 1) {
+            throw new \Exception(__('api_responses.freeze_transfer_charger'));
+        }
         if (!is_numeric($usd) || $usd <= 0) {
             throw new \Exception(__('This value is not allowed'));
         }
