@@ -25,7 +25,6 @@ class AgencyTribeRewardJob implements ShouldQueue
      */
     public function handle(): void
     {
-
         DB::beginTransaction();
         try {
             $period = TribePeriod::where('end_date', '<', now())
