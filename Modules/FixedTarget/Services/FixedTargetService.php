@@ -74,13 +74,7 @@ class FixedTargetService
     {
         $user           = $this->user;
         $month_received = $user->monthly_diamond_received;
-        /*     $agency=Agency::find($user->agency_id);
-        if ($this->userTargetType == TargetType::FIXED) {
-            if ($agency->users->where("type_user",1)->sum("monthly_diamond_received") >= $agency->monthly_target) {
-                $user = $this->calculateFixedTarget($month_received, $user);
-            }
-        } else {*/
-
+  
         $user = $this->calculateRegularTarget($month_received, $user);
         //        }
         $user->salary_is_updated = false;
@@ -255,12 +249,9 @@ class FixedTargetService
      */
     public function calculateRegularTarget($month_received, User $user): User
     {
-        // \Log::info('$$user->agency_id ',['$$user->agency_id '=>$user->agency_id ]);
         if ($user->agency_id != 0 && @$user->type_user != 3) {
             $target = $this->targetInstance->getTarget($month_received);
 
-            // \Log::info('$target',['$target'=>$target]);
-            // \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
                 $hours = 0;
                 $days  = 0;

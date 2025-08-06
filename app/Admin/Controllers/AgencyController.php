@@ -631,7 +631,7 @@ class AgencyController extends MainController
                 $row->width(12)->select('bd_id', __('app bd id'))->options(function ($value) {
                     $ops2 = [];
                     foreach (User::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                        $ops2[$user->id] = $user->id . '_' . $user->name;
                     }
                     return $ops2;
                 })->ajax('/api/search/users-bd2', 'id', 'name');

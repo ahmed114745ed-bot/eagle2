@@ -3,6 +3,7 @@
 namespace App\Repositories\User;
 
 use App\Models\Agency;
+use App\Models\Bd;
 use App\Models\Follow;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
@@ -96,21 +97,8 @@ class UserRepository extends Repository
 
     public function user_bd2($key, $page, $perPage)
     {
-        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
-            ->where('is_bd', 1)
-            ->where(function ($query) {
-                $query->where('agency_id', 0)
-                    ->orWhereNull('agency_id');
-            })
-            // ->where('type_user', 0)
-            ->whereDoesntHave('hostAgency', function ($query) {
-                $query->where('type', 1);
-            })
-            ->where(function ($query) use ($key) {
-                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
-                    ->orWhere('id', 'like', '%' . $key . '%');
-            })
-            ->paginate($perPage, ['*'], 'page', $page);
+        return Bd::selectRaw('concat(COALESCE(name, ""), " - ", id) as name, id')
+                   ->paginate($perPage, ['*'], 'page', $page);
     }
 
 

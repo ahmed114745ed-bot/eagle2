@@ -346,7 +346,7 @@ class AgencyController extends MainController
                 $query->select('id', 'name', 'uuid');
             }])
             // ->where('Host_agency',  1)
-            ->where('bd_id',  Auth::user()->app_id)
+            ->where('bd_id',  Auth::user()->id)
             ->orderByDesc('id');
 
         if (request("active") == true) {
@@ -705,8 +705,8 @@ class AgencyController extends MainController
     JS);
 
         $form->saving(function (Form $form) {
-            $form->input('bd_id', Auth::user()->app_id);
-            $form->model()->bd_id = Auth::user()->app_id;
+            $form->input('bd_id', Auth::user()->id);
+            $form->model()->bd_id = Auth::user()->id;
             $appOwnerId = $form->input('app_owner_id');
             // $Host_agency = $form->input('Host_agency');
 
@@ -792,7 +792,7 @@ class AgencyController extends MainController
 
 
         });
-        Agency::where('id', $form->model()->id)->update(['bd_id' => Auth::user()->app_id]);
+        Agency::where('id', $form->model()->id)->update(['bd_id' => Auth::user()->id]);
 
         $form->saved(function (Form $form) {
             $checkAgencyUser = UsersJoinedAgency::where([
