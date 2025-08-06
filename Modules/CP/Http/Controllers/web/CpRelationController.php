@@ -100,6 +100,7 @@ class CpRelationController extends MainController
                 }
             });
         }
+        
         return $grid;
     }
 
