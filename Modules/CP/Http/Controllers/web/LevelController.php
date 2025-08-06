@@ -125,8 +125,8 @@ class LevelController extends MainController
         }
         $grid->actions(function ($actions) {
             $actions->disableView();
-         
-        });        
+
+        });
         return $grid;
     }
 
@@ -167,7 +167,7 @@ class LevelController extends MainController
         $form->hidden('cp_relation_id')->value($relation_id);
         $form->textarea('name_ar', __('name_ar'));
         $form->textarea('name_en', __('name_en'));
-        $form->number('level', __('Level'))->required();
+        $form->number('level', __('Level'))->rules('required|integer|min:1');
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
