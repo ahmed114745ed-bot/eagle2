@@ -375,7 +375,7 @@ class WalletController extends MainController
             $amountBefore =  Common::getCurrentBalance($receiver->id);
             UserCoinLogHelper::logByType(
                 $receiver->id,
-                $amount,
+                $coins,
                 $amountBefore,
                 UserCoinLogType::BD_CHARGES,
             );
