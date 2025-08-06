@@ -122,6 +122,7 @@ class CpserviceCo
 
             $stoppedRelation = $this->cpRepository->findStoppedRelationBetweenTwoUsers($user->id, $request->user_id, $cpRelation->type);
 
+            info($stoppedRelation);
             if ($stoppedRelation) {
                 $stoppedRelation->status = CpStatus::PENDING->value;
                 $stoppedRelation->save();
@@ -257,7 +258,6 @@ class CpserviceCo
                 $cp->price += $cp->cpRelation->price;
                 $cp->save();
             } else {
-
                 $this->cpRepository->updateCpStatus($cp, 1);
             }
             CustomNotification::cpAction($user2, $user, 1);
