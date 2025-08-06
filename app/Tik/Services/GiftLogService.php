@@ -120,7 +120,6 @@ class GiftLogService
         //send to zego if pk not null
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
 
-        info('part 1');
         $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
         $cpIds = [];
         //check type of cp
@@ -129,11 +128,9 @@ class GiftLogService
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
             } catch (\Exception $e) {
-                info($e->getMessage());
                 return Common::apiResponse(0, $e->getMessage());
             }
         }
-        info('part 2');
 
         if ($room->lastPk != null) {
 
@@ -148,18 +145,13 @@ class GiftLogService
 
         $price = ceil($realPrice);
 
-        info('part 3');
-
         $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
-        info('part 4');
 
         foreach ($receivedUsers as $receivedUser) {
             $updateUserWhenSendGift->update($price, $receivedUser);
         }
-        info('part 5');
 
         $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
-        info('part 6');
 
         if ($room->mode != '1' && $room->mode != '2') {
             $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
@@ -190,13 +182,9 @@ class GiftLogService
                 Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
             }
         }
-        info('part 7');
-
         (new RoomAchievementTargetService)->roomTarget($room);
-        info('part 8');
 
         CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
-        info('part 9');
 
         $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
         try {
@@ -205,12 +193,10 @@ class GiftLogService
         }
 
         $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
-        info('part 10');
 
         if ($totalPrice > $totalGiftPrice) {
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
-        info('part 11');
 
         return Common::apiResponse(1, $message);
     }
