@@ -156,15 +156,15 @@ class BdSalariesController extends AdminController
     
         $grid->column('total_bd_sallary', trans('totalBd'))->display(function ($value) {
           
-            return number_format($value, 2);
+            return truncateAndTrim($value, 2);
         });
         
         $grid->column('total_agency_sallary', __('Total Agency Sallary'))->display(function ($value) {
-            return number_format($value, 2);
+            return truncateAndTrim($value, 2);
         });
         
         $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
-            return number_format($value, 2);
+            return truncateAndTrim($value, 2);
         });
         $grid->disableRowSelector();
 
