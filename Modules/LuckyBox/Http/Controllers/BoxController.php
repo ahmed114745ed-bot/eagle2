@@ -178,7 +178,7 @@ class BoxController extends Controller
             }
             return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => (int) $coins], 200);
         } else {
-            return Common::apiResponse(1, 'لم يحصل ال مستخدم علي مكسب', ['is_win' => false, 'coins' => 0], 200);
+            return Common::apiResponse(0, __('box num ended'), ['is_win' => false, 'coins' => 0], 403);
         }
     }
 
