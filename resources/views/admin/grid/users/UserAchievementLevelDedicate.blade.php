@@ -293,7 +293,9 @@
                             return {
                                 id: user.id,
                                 text: user.name || '',
-                                image: user.profile_image ? '{{ asset('') }}' + user.profile_image : '{{ asset('images/default-user.png') }}'
+                                image: user.profile_image 
+                            ? '{{ getImagePath('') }}' + user.profile_image 
+                            : '{{ asset('images/default-user.png') }}'
                             };
                         }),
                         pagination: {
