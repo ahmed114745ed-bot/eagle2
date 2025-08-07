@@ -784,7 +784,6 @@ class Common
 
         $result = json_decode($result);
 
-        info('result', ['result' => $result]);
         //remove group with $key if is group
         if ($result  && $isGroup) {
             self::removeGroupName($key, $token, $tokens, $api_access_key);

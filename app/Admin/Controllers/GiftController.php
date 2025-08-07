@@ -248,7 +248,7 @@ class GiftController extends MainController
 
                 $type = old('type', $form->model()->type ?? null);
                 $form->number('luckyGift.win_probability', __('win probability'))
-                    ->min(10)->max(100)
+                    ->min(1)->max(100)
                     ->placeholder(__('Enter win probability'))
                     ->attribute(['id' => 'win_probability']);
 

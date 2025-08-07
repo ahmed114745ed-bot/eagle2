@@ -2,8 +2,9 @@
 
 namespace App\Admin\Extensions;
 
-use App\Models\ExchangeLog;
+use Carbon\Carbon;
 
+use App\Models\ExchangeLog;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
@@ -15,6 +16,7 @@ class ExchangeDiamondExporter  implements FromCollection, WithHeadings
     protected $headings = [
         "id",
         "charger",
+        'uuid',
         'diamonds',
         'amount',
         'status',
@@ -48,7 +50,7 @@ class ExchangeDiamondExporter  implements FromCollection, WithHeadings
             });
         }
         if ($start && $end) {
-            $query->whereBetween('created_at', [$start, $end]);
+            $query->whereBetween('created_at', [Carbon::parse($start)->startOfDay(), Carbon::parse($end)->endOfDay()]);
         }
 
         $exchanges = $query->get();
@@ -60,7 +62,8 @@ class ExchangeDiamondExporter  implements FromCollection, WithHeadings
 
             $arr[] = [
                 'id' => $exchange->id,
-                'charger' => (@$exchange->user->name ?? '') . ' uuid: ' . (@$exchange->user->uuid ?? ''),
+                'charger' => (@$exchange->user->name ?? ''),
+                'uuid' => (@$exchange->user->uuid ?? ''),
                 'diamonds' => $exchange->diamonds . ' 💎',
                 'amount' => $exchange->value,
                 'status' => $exchange->status == 1 ? __('Success') : __('Failed'),
@@ -78,6 +81,7 @@ class ExchangeDiamondExporter  implements FromCollection, WithHeadings
         return [
             __("id", [], 'ar'),
             __('charger', [], 'ar'),
+            __('charger uuid', [], 'ar'),
             __('diamonds', [], 'ar'),
             __('amount', [], 'ar'),
             __('status', [], 'ar'),

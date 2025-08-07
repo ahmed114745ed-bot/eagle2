@@ -509,7 +509,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
                 Route::get('admins/{id}', [AgencyController::class, 'admin']);
-                Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']);
+                Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']);//target
                 Route::get('stars/{id}', [AgencyController::class, 'star']);
                 Route::get('heroes/{id}', [AgencyController::class, 'heroes']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);

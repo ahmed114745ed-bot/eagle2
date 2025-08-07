@@ -69,7 +69,7 @@ class ExchangeCoinExporter implements FromCollection, WithHeadings
             });
         }
         if ($start && $end) {
-            $query->whereBetween('created_at', [$start, $end]);
+            $query->whereBetween('created_at', [Carbon::parse($start)->startOfDay(), Carbon::parse($end)->endOfDay()]);
         }
 
         $exchanges = $query->get();
@@ -81,7 +81,8 @@ class ExchangeCoinExporter implements FromCollection, WithHeadings
 
             $arr[] = [
                 'id' => $exchange->id,
-                'charger' => (@$exchange->user->name ?? '') . ' uuid: ' . (@$exchange->user->uuid ?? ''),
+                'charger' => (@$exchange->user->name ?? ''),
+                'uuid' =>(@$exchange->user->uuid ?? ''),
                 'dollar' =>  number_format(@$exchange->coin->usd ?? 0) . '💲',
                 'amount' => number_format($exchange->obtained_coins),
                 'trx' => $exchange->trx,
@@ -101,6 +102,7 @@ class ExchangeCoinExporter implements FromCollection, WithHeadings
         return [
             __("id", [], 'ar'),
             __('charger', [], 'ar'),
+            __('charger uuid', [], 'ar'),
             __('dollar', [], 'ar'),
             __('amount', [], 'ar'),
             __('trx', [], 'ar'),

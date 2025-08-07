@@ -14,6 +14,7 @@ return[
 'accept' => 'Are you sure you want to add user in this agency',
 'refuse' => 'Are you sure you want to refuse this user to join agency',
 'yes' => 'yes',
+'returnCharge' => "Are you sure you want to return coin to agency? ",
 
 'deleteShipping' => 'If the agency is deleted, the coins and dollars will be lost',
 'cancel' => 'cancel',

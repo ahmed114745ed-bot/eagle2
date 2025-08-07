@@ -2,6 +2,7 @@
 
 namespace Modules\CP\Http\Controllers\web;
 
+use Encore\Admin\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -99,6 +100,7 @@ class CpRelationController extends MainController
                 }
             });
         }
+        
         return $grid;
     }
 
@@ -135,14 +137,40 @@ class CpRelationController extends MainController
         $form->text('title', __('title'))->rules('required');
         $form->image('image', __('Img'));
         $form->number('price', __('price'))->rules('required|min:1');
-        $form->switch('relations_number', __('relations number'))->default(0)->rules('required')->help(__("admin.relations_help"));
 
         $form->select('type', __('Type'))->options([
             'bro' => __('bro'),
             'friend' => __('friend'),
             'lovely' => __('lovely'),
             'solution' => __('solution'),
-        ])->default(0)->rules('required'); // Set the default type to "Friend"        
+        ])->default(0)->rules('required')->when('!=', 'solution', function ($form){
+            $form->switch('relations_number', __('relations number'))->default(0)->rules('required')->help(__("admin.relations_help"));
+        });
+
+        $form->saving(function (Form $form) {
+            if ($form->type == 'solution') {
+                $form->relations_number = 1;
+            }
+        });
+
+        Admin::script(<<<'JS'
+        function toggleRelationSwitch() {
+            const type = $('select[name="type"]').val();
+            const switchField = $('input[name="relations_number"]').closest('.form-group');
+
+            if (type === 'solution') {
+                switchField.hide();
+            } else {
+                switchField.show();
+            }
+        }
+
+        $(document).ready(function () {
+            toggleRelationSwitch();
+            $('select[name="type"]').on('change', toggleRelationSwitch);
+        });
+    JS);
+
         return $form;
     }
 }

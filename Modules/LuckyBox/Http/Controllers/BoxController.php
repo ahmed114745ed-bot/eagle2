@@ -173,12 +173,12 @@ class BoxController extends Controller
             $user->increment('di', $coins);
             $countWinners =  $box_use->userBoxGifts()->count();
 
-            if ($countWinners == $box_use['users_num']) {
+            if ($box_use->not_used_num == 0) {
                 dispatch(new NormalBoxRtmJob($box_use->id))->onQueue('test-super-lucky-box');
             }
             return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => (int) $coins], 200);
         } else {
-            return Common::apiResponse(1, 'لم يحصل ال مستخدم علي مكسب', ['is_win' => false, 'coins' => 0], 200);
+            return Common::apiResponse(0, __('box num ended'), ['is_win' => false, 'coins' => 0], 403);
         }
     }
 
