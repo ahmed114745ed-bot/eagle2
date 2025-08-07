@@ -80,6 +80,7 @@ class CoreWalletTransactionController extends MainController
             return \Carbon\Carbon::parse($val)->format('Y-m-d H:i');
         })->sortable();
         $grid->disableCreateButton();
+        $grid->disableActions();
         return $grid;
     }
 
