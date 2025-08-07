@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BdSalaryMigrationController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -402,5 +403,7 @@ Route::get('get-setting/{key}', function ($key) {
 
 // In your web.php
 Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
+
+Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
 
 

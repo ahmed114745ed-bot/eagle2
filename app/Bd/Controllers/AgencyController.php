@@ -665,7 +665,7 @@ class AgencyController extends MainController
                 $row->width(12)->switch('status', __('status'));
                 $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                // $row->width(12)->hidden('Host_agency')->default(1);
+                $row->width(12)->hidden('bd_id')->default(Auth::id());
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
                     // $row->width(12)->hidden('Shipping_agency')->default(0);
@@ -673,26 +673,18 @@ class AgencyController extends MainController
             });
         } else {
             $form->tools(function (Form\Tools $tools) {
-                $tools->disableDelete(); // ✅ disable delete button
-                // $tools->disableView(); // optional: disable view
-                // $tools->disableList(); // optional: disable list
+                $tools->disableDelete();
+            
             });
             $form->row(function ($row) {
 
-
-                // if (request()->route('form')->isEditing()) {
-                //     $row->hidden('agency_manger_id', __('app manger id'));
-                // }
 
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
                 $row->width(12)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                // $row->width(12)->hidden('Host_agency')->default(1);
-
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    // $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
                 }
             });
         }
@@ -762,10 +754,11 @@ class AgencyController extends MainController
     JS);
 
    
-        Agency::where('id', $form->model()->id)->update(['bd_id' => Auth::user()->id]);
-
+        $form->saving(function (Form $form) {
+        
+                $form->bd_id = Auth::id();
+        });
     
-        // Add this to your admin view
         $form->footer(function ($footer) {
             $footer->disableEditingCheck();
             $footer->disableCreatingCheck();

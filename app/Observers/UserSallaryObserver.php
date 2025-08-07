@@ -15,6 +15,7 @@ class UserSallaryObserver
 {
     public function updated(UserSallary $userSalary)
     {
+        
         $this->updateOrCreateAgencySallary($userSalary);
     }
 
@@ -27,20 +28,28 @@ class UserSallaryObserver
 
     public function creating(UserSallary $userSalary)
     {
+        $originalDbValue = $userSalary->getOriginal('dB');
+
 
         if (!$userSalary->extras) $userSalary->extras = '';
         $this->updateOrCreateAgencySallary($userSalary);
         $this->updateBdHostSallary($userSalary);
+        app()->singleton('originalDbValue', fn () => $originalDbValue);
 
     }
 
     public function updating(UserSallary $userSalary)
     {
+        $originalDbValue = $userSalary->getOriginal('dB');
+
         if (!$userSalary->extras) $userSalary->extras = '';
 
         if ($userSalary->isDirty('sallary') && $userSalary->sallary > 0) {
             dispatch(new SendCustomOfficialMessageToUser($userSalary->user_id, NotificationType::TARGET))->onQueue('notification');
         }
+        app()->singleton('originalDbValue', fn () => $originalDbValue);
+
+
     }
 
     public function updateOrCreateAgencySallary(UserSallary $userSalary): void
@@ -86,13 +95,14 @@ class UserSallaryObserver
         $agency = Agency::find($userSallary->user_agency_id);
 
         if ($agency && $agency->bd_id && $agency->status == 1) {
+            $oldDbValue = app()->has('originalDbValue') ? app('originalDbValue') : $userSallary->getOriginal('dB');
+
             BdAgencyHostSallaryService::storeOrUpdate([
                 'bd_id'     => $agency->bd_id,
                 'user_id'   => $userSallary->user_id,
                 'agency_id' => $agency->id,
                 'amount'    => $userSallary->dB ?? 0,
-                'sallary' => $userSallary->sallary ?? 0,
-                'agency_sallary' => $userSallary->agency_sallary ?? 0,
+                'oldDbValue'   => $oldDbValue,
                 'month'     => $userSallary->month,
                 'year'      => $userSallary->year,
             ]);
