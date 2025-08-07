@@ -1669,15 +1669,17 @@ class User extends Authenticatable
 
     public function getSalaryByLatestJoinAttribute()
     {
-        $latestJoin = $this->latestJoin;
-
-        if (!$latestJoin) {
+        $join = $this->latestJoin()->first();
+        if (!$join) {
             return 0;
         }
-
+        $start = $join->join_date;
+        $end = $join->leave_date ?? now()->endOfMonth();
+       
         $userSalary = UserSallary::query()
             ->where('user_id', $this->id)
-            ->where('user_agency_id', $latestJoin->agency_id)
+            ->where('user_agency_id', $this->agency_id)
+            ->whereBetween('created_at', [$start, $end])->orWhereBetween('updated_at', [$start, $end ])
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
 
