@@ -2,6 +2,7 @@
 
 namespace Modules\Chat\Http\Resources;
 
+use App\Helpers\Common;
 use Modules\Chat\Entities\ChatMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -22,6 +23,8 @@ class ChatRoomResource extends JsonResource
         }
 
         $total_undread_message = ChatMessage::where('chat_room_id', $this->id)->where('user_id', 'not Like', $user->id)->where('status', 'not Like', 'seen')->count();
+        $hasColor = Common::hasInPack($user2, 18, true);
+
         return [
             'user_id'             => @$user2->id,
             'name'                => @$user2->name,
@@ -30,6 +33,7 @@ class ChatRoomResource extends JsonResource
             'chat_id'             => $this->id,
             'unread_message'      => $total_undread_message,
             'last_message'        => @new ChatMessageResource($this->messages[0]),
+            'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
         ];
     }
 }
