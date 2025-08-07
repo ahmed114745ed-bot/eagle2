@@ -439,8 +439,10 @@ class UserCommon
             $arr['get_type'] = $ware->get_type;
             $arr['target_id'] = $ware->id;
             $arr['num'] = 1; //$qty;
-            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
+//            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
             $arr['is_read'] = 1;
+            $arr['days'] = $ware->expire;
+
             $pack = Pack::query()->create($arr);
             $pack->senderable()->associate($sender);
             $pack->save();
