@@ -162,16 +162,15 @@ class CpService
 
     protected function assignCoins($reward, $userOne, $userTwo): void
     {
-        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
-        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
-        $vipGender = $reward->gender;
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
         $amount = $reward->item_id;
 
         if ($amount) {
-            if ($vipGender == $userOneGender || $vipGender == 'all'){
+            if ($rewardGender == $userOneGender || $rewardGender == 'all'){
                 $userOne->increment('di', $amount);
             }
-            if ($vipGender == $userTwoGender || $vipGender == 'all') {
+            if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
                 $userTwo->increment('di', $amount);
             }
         }
@@ -182,16 +181,15 @@ class CpService
      */
     protected function assignVip($reward, $expire, $userOne, $userTwo)
     {
-        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
-        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
-        $vipGender = $reward->gender;
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
         $vipId = $reward->item_id;
         $vip = OVip::find($vipId);
         if ($vip) {
-            if ($vipGender == $userOneGender || $vipGender == 'all'){
+            if ($rewardGender == $userOneGender || $rewardGender == 'all'){
                 UserCommon::addVipToCpUser($userOne, $vip, $expire);
             }
-            if ($vipGender == $userTwoGender || $vipGender == 'all') {
+            if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
                 UserCommon::addVipToCpUser($userTwo, $vip, $expire);
             }
         }
@@ -199,15 +197,20 @@ class CpService
 
     protected function assignWare($ware, $reward, $userOne, $userTwo)
     {
-        // Assign the ware based on gender requirements
-        $this->genderForReward($ware, $reward, $userOne, $userTwo);
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
+        if ($rewardGender == $userOneGender || $rewardGender == 'all') {
+            UserCommon::addWareToUser($userOne, $ware, $reward->expire);
+        }
+        if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
+            UserCommon::addWareToUser($userTwo, $ware, $reward->expire);
+        }
     }
 
     protected function assignAchievement($reward, $expire, $userOne, $userTwo)
     {
-        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
-        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
-        $vipGender = $reward->gender;
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
         $itemId = $reward->item_id;
 
         // Handle different formats of $expire
@@ -231,33 +234,21 @@ class CpService
             'end_at'       => $dateTimestamp,
         ];
 
-        if ($vipGender == $userOneGender || $vipGender == 'all'){
+        if ($rewardGender == $userOneGender || $rewardGender == 'all'){
             UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
         }
-        if ($vipGender == $userTwoGender || $vipGender == 'all') {
+        if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
             UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
         }
     }
 
-    protected function genderForReward($ware, $reward, $userOne, $userTwo)
+    public function getGenders($userOne, $userTwo, $reward): array
     {
-        if ($reward->gender === 'male') {
-            $this->assignWareToUserByGender($ware, $reward->expire, $userOne, 1);
-            $this->assignWareToUserByGender($ware, $reward->expire, $userTwo, 1);
-        } elseif ($reward->gender === 'female') {
-            $this->assignWareToUserByGender($ware, $reward->expire, $userOne, 2);
-            $this->assignWareToUserByGender($ware, $reward->expire, $userTwo, 2);
-        } else {
-            UserCommon::addWareToUser($userOne, $ware, $reward->expire);
-            UserCommon::addWareToUser($userTwo, $ware, $reward->expire);
-        }
-    }
+        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
+        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
+        $rewardGender = $reward->gender;
 
-    protected function assignWareToUserByGender($ware, $expire, $user, $gender)
-    {
-        if ($user->profile?->gender === $gender) {
-            UserCommon::addWareToUser($user, $ware, $expire);
-        }
+        return [$userOneGender, $userTwoGender, $rewardGender];
     }
 
     protected function markGiftAsTaken($cpId, $level)
