@@ -105,7 +105,7 @@ class BdSalariesController extends AdminController
         $grid->disableCreateButton();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-        
+            $filter->disableIdFilter();
             $filter->equal('month', __('Month'))->select([
                 1 => __('January'),
                 2 => __('February'),
@@ -127,6 +127,10 @@ class BdSalariesController extends AdminController
                 $years[$i] = $i;
             }
             $filter->equal('year', __('Year'))->select($years);
+
+            $filter->equal('agency_id', __('Agency'))->select(
+                \App\Models\Agency::where('bd_id',Auth::id())->pluck('name', 'id')->toArray()
+            );
         });
         
         $grid->column('agency.name', trans('agency'))->display(function () {

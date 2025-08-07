@@ -278,7 +278,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     ">
       <div class="modal-header" style="background-color: var(--primary-color); color: var(--text-secondary-color);">
                     <h5 class="modal-title" id="modalDescriptionTitle"></h5>
-                    <button type="button" class="close" data-dismiss="modal" style="color: var(--text-secondary-color);">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" onclick="closeChargeModal()" style="color: var(--text-secondary-color);">&times;</button>
                 </div>
                 <form id="chargeForm" class="transferForm" method="POST" action="{{ route('bd.wallet.charge') }}">
     @csrf
