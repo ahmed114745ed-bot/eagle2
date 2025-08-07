@@ -15,19 +15,27 @@ class UserRepository extends Repository
 {
     public function search($key, $family, $perPage, $currentPage)
     {
-        return User::query()->where(function ($query) use ($key) {
-            $query->where('name', 'like', '%' . $key . '%')
-                ->orWhere('uuid', 'like', '%' . $key . '%')
-                ->orWhere('id', 'like', '%' . $key . '%')
-                ->orWhere('special_id', 'like', '%' . $key . '%');
-        })->when(isset($family), function ($query) {
-            $query->where(function ($query) {
-                $query->where('family_id', null)->orWhere('family_id', 0);
-            });
-        })
-            ->select(['id', DB::raw('concat(name , " - ", uuid) as name')])
+        return User::query()
+            ->join('profiles', 'profiles.user_id', '=', 'users.id')
+            ->where(function ($query) use ($key) {
+                $query->where('users.name', 'like', '%' . $key . '%')
+                    ->orWhere('users.uuid', 'like', '%' . $key . '%')
+                    ->orWhere('users.id', 'like', '%' . $key . '%')
+                    ->orWhere('users.special_id', 'like', '%' . $key . '%');
+            })
+            ->when(isset($family), function ($query) {
+                $query->where(function ($query) {
+                    $query->where('users.family_id', null)->orWhere('users.family_id', 0);
+                });
+            })
+            ->select([
+                'users.id',
+                DB::raw('concat(users.name, " - ", users.uuid) as name'),
+                'profiles.avatar',
+            ])
             ->paginate($perPage, ['*'], 'page', $currentPage);
     }
+
 
     public function searchWithPage($key, $page, $perPage)
     {
