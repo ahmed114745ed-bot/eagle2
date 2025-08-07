@@ -110,7 +110,7 @@ class LevelGiftController extends MainController
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                             <i class="fa fa-arrow-left"></i> الرجوع إلى levels
                         </a>
-                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->cp_relation_id} </label>
+                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->level} </label>
                     </div>
                 HTML;
             $tools->append($customButtonHTML);
@@ -143,7 +143,7 @@ class LevelGiftController extends MainController
                 ->options(function ($id) {
                     if (!$id) return [];
 
-                    $ware = \App\Models\Ware::find($id);
+                    $ware = Ware::find($id);
                     if (!$ware) return [];
 
                     return [$ware->id => "{$ware->name}_{$ware->id}"];
@@ -179,20 +179,21 @@ class LevelGiftController extends MainController
                         });
                     });
                 });
-                JS);
+            JS);
 
 
             $form->hidden('sub_type');
         })
             ->when("vip", function () use ($form) {
-                $form->select('item_id', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    $ops = [];
-                    foreach ($vips as $vip) {
-                        $ops[$vip->id] = $vip->name;
-                    }
-                    return $ops;
-                });
+                $form->select('item_id', trans('vips'))
+                    ->options(function ($id) {
+                        // Fallback for default value
+                        if (!$id) return [];
+                        $vip = OVip::find($id);
+                        if (!$vip) return [];
+                        return [$vip->id => $vip->name];
+                    })
+                    ->load('item_id', admin_url('vips-by-type'));
             })
             ->when("coins", function () use ($form) {
                 $form->number("coins", __("coins"));
@@ -244,7 +245,6 @@ class LevelGiftController extends MainController
     public function getWaresByType(Request $request)
     {
         $type = $request->get('q');
-        info($type);
         $wares = Ware::where('type', $type)->get();
 
         $data = [];
@@ -255,6 +255,23 @@ class LevelGiftController extends MainController
                 'id'   => $ware->id,
                 'text' => $text,
                 'image' =>  getImagePath($ware->show_img),
+            ];
+        }
+
+        return response()->json($data);
+    }
+
+    public function getVipsByType(Request $request)
+    {
+        $q = $request->get('q');
+        // If you want to filter by $q, add where clauses.
+        $vips = OVip::select('id', 'name')->get();
+
+        $data = [];
+        foreach ($vips as $vip) {
+            $data[] = [
+                'id'   => $vip->id,
+                'text' => $vip->name,
             ];
         }
 

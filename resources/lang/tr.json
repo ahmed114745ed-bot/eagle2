@@ -3247,7 +3247,10 @@
     "This user is already in a CP relation.": "Bu kullanıcı zaten bir CP ilişkisi içinde.",
     "You do not have enough coins, please recharge!": "Yeterli jetonunuz yok, lütfen yükleme yapın!",
     "An error occurred while processing the request.": "İstek işlenirken bir hata oluştu.",
-
+    "Coin Reward": "Madeni Para Ödülü",
+    "You have received :coin coin.": ":coin madeni para aldınız.",
+    "Achievement Reward": "Başarı Ödülü",
+    "You have received a new achievement.": "Yeni bir başarı kazandınız.",
     "Reel Comments": "Video Yorumları"
 
 

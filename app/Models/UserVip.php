@@ -27,7 +27,7 @@ class UserVip extends Model
 
     public function packs()
     {
-        return $this->hasMany(Pack::class, 'vip_user_id');
+        return $this->hasMany(Pack::class, 'vip_user_id', 'id');
     }
     public function admin()
     {

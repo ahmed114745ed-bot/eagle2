@@ -2828,7 +2828,10 @@
     "This user is already in a CP relation.": "यह उपयोगकर्ता पहले से ही एक CP संबंध में है।",
     "You do not have enough coins, please recharge!": "आपके पास पर्याप्त सिक्के नहीं हैं, कृपया रिचार्ज करें!",
     "An error occurred while processing the request.": "अनुरोध को संसाधित करते समय एक त्रुटि हुई।",
-
+    "Coin Reward": "सिक्का पुरस्कार",
+    "You have received :coin coin.": "आपको :coin सिक्के मिले हैं।",
+    "Achievement Reward": "उपलब्धि पुरस्कार",
+    "You have received a new achievement.": "आपको एक नई उपलब्धि मिली है।",
     "Reel Comments": "रील्स टिप्पणियाँ"
 
 
