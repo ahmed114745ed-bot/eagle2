@@ -357,7 +357,7 @@ class UserCommon
         $vipp->user_id = $user->id;
         $vipp->vip_id = $vip->id;
         $vipp->level = $vip->level;
-        $vipp->expire = now()->addDay($expire)->timestamp;
+        $vipp->expire = now()->addDay($expir)->timestamp;
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;

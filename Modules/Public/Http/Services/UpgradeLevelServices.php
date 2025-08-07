@@ -17,6 +17,7 @@ use Modules\Public\Jobs\RewardWinnerLevel;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
+use Modules\Public\Jobs\RewardWinnerLevelInterval;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
 
@@ -86,7 +87,7 @@ class UpgradeLevelServices
             $user->sender_level = $senderLevel;
             $hadNotRewards = $this->hadNotRewards($user->id, $user->total_sender_level);
             if ($hadNotRewards) {
-                dispatch(new RewardWinnerLevel($user->id, $senderLevel, 2))->onQueue('level_rewards');
+                dispatch(new RewardWinnerLevelInterval($user->id, $senderLevel, 2))->onQueue('level_rewards');
             }
         }
     }
