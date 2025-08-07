@@ -32,8 +32,8 @@ class ChatRoomResource extends JsonResource
             'in_room'             => @$user2->now_room_uid ? true : false,
             'chat_id'             => $this->id,
             'unread_message'      => $total_undread_message,
-            'last_message'        => @new ChatMessageResource($this->messages[0]),
             'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
+            'last_message'        => @new ChatMessageResource($this->messages[0]),
         ];
     }
 }
