@@ -69,7 +69,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
         $this->app->bind(UserRepoInterface::class, UserRepo::class);
         $this->app->singleton(RedisService::class);
-        $this->app->singleton(UserHandling::class);
         $this->app->singleton(CustomNotification::class);
         $this->app->singleton(RoomHelper::class);
         $this->app->singleton(ManagerHelper::class);
