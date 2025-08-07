@@ -94,8 +94,8 @@ class AppServiceProvider extends ServiceProvider
             $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
 
             return [
-                'start' => $firstDay->copy()->setTimezone('UTC'),
-                'end' => $firstDay->copy()->endOfMonth()->setTimezone('UTC'),
+                 $firstDay->copy()->setTimezone('UTC'),
+                 $firstDay->copy()->endOfMonth()->setTimezone('UTC'),
             ];
         });
     }
