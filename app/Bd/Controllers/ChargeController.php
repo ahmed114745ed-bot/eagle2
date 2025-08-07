@@ -66,6 +66,9 @@ class ChargeController extends MainController
 
         $grid->column('amount', __('Amount'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            if (request()->filled('_export_')) {
+                return $coin ?? 0;
+            }
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . truncateAndTrim($coin) . "</span>
