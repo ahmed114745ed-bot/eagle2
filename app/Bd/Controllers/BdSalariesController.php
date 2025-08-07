@@ -79,15 +79,27 @@ class BdSalariesController extends AdminController
         ->where('bd_id', $appID)
         ->with('agency')
         ->selectRaw('
-            agency_id, 
-            month,
-            year,
-            SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
-            SUM(CAST(user_sallary AS DECIMAL(15,4))) as total_user_sallary, 
-            SUM(CAST(agency_sallary AS DECIMAL(15,4))) as total_agency_sallary, 
-            COUNT(*) as count
-        ')
-        ->groupBy('agency_id', 'month', 'year');
+        agency_id, 
+        month,
+        year,
+        SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
+        COUNT(*) as count,
+        (
+            SELECT SUM(CAST(sallary AS DECIMAL(15,4))) 
+            FROM user_sallaries 
+            WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
+                AND month = bd_agency_host_sallaries.month 
+                AND year = bd_agency_host_sallaries.year
+        ) as total_user_sallary,
+        (
+            SELECT SUM(CAST(agency_sallary AS DECIMAL(15,4))) 
+            FROM user_sallaries 
+            WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
+                AND month = bd_agency_host_sallaries.month 
+                AND year = bd_agency_host_sallaries.year
+        ) as total_agency_sallary
+    ')
+    ->groupBy('agency_id', 'month', 'year');
             
         $grid->disableActions();
         $grid->disableCreateButton();
@@ -159,11 +171,11 @@ class BdSalariesController extends AdminController
             return truncateAndTrim($value);
         });
         
-        $grid->column('total_agency_sallary', __('Total Agency Sallary'))->display(function ($value) {
+        $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
             return truncateAndTrim($value);
         });
         
-        $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
+        $grid->column('total_agency_sallary', __('Total Agency Sallary'))->display(function ($value) {
             return truncateAndTrim($value);
         });
         $grid->disableRowSelector();

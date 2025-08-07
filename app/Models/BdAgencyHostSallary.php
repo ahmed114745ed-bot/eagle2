@@ -14,8 +14,7 @@ class BdAgencyHostSallary extends Model
         'user_id',
         'agency_id',
         'amount',
-        'user_sallary',
-        'agency_sallary',
+        'salary',
         'month',
         'year',
         'bd_user_id'
@@ -34,5 +33,12 @@ class BdAgencyHostSallary extends Model
     public function agency()
     {
         return $this->belongsTo(Agency::class);
+    }
+
+    public function userSallaries()
+    {
+        return $this->hasMany(UserSallary::class, 'user_agency_id', 'agency_id')
+            ->whereColumn('month', 'bd_agency_host_sallaries.month')
+            ->whereColumn('year', 'bd_agency_host_sallaries.year');
     }
 }

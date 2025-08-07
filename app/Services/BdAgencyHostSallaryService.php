@@ -15,20 +15,6 @@ class BdAgencyHostSallaryService
         self::storeOrUpdateBdSalary($data['bd_id'], $data['month'], $data['year'], $total);
     }
 
-    protected static function storeSallaryLine(array $data): void
-    {
-        $bdUserId = self::getBdAppId($data['bd_id']);
-    
-        if (self::hasSameSalaryWithAnotherBd($data)) {
-            return; 
-        }
-    
-        $attributes = self::buildAttributes($data, $bdUserId);
-        $values = self::buildValues($data);
-    
-        BdAgencyHostSallary::updateOrCreate($attributes, $values);
-    }
-    
 
     protected static function calculateTotalSallary(int $bdId, int $month, int $year): float
     {
@@ -64,21 +50,59 @@ class BdAgencyHostSallaryService
         }
     }
 
-    protected static function getBdAppId(int $bdId): int
+
+
+    protected static function storeSallaryLine(array $data): void
     {
-        return Bd::find($bdId)?->app_id ?? 0;
+        $bdUserId = self::getBdAppId($data['bd_id']);
+    
+        $latestRecord = self::getLatestSallaryRecord($data);
+    
+        if (self::shouldSkipInsert($latestRecord, $data)) {
+            return;
+        }
+    
+        $amount = floatval($data['amount']);
+        $oldDbValue = floatval($data['oldDbValue'] ?? 0);
+    
+        $difference = $amount - $oldDbValue;
+    
+        if ($difference <= 0.00001) {
+            return;
+        }
+    
+        $attributes = self::buildAttributes($data, $bdUserId);
+        $newSalary = Self::getOldSalary($data['bd_id']);
+        $values = self::buildValues($data, $difference,$newSalary);
+    
+        BdAgencyHostSallary::create(array_merge($attributes, $values));
     }
     
-    protected static function hasSameSalaryWithAnotherBd(array $data): bool
+
+
+    protected static function getLatestSallaryRecord(array $data): ?BdAgencyHostSallary
     {
         return BdAgencyHostSallary::where('user_id', $data['user_id'])
             ->where('agency_id', $data['agency_id'])
             ->where('month', $data['month'])
             ->where('year', $data['year'])
-            ->where('bd_id', '!=', $data['bd_id'])
-            ->where('user_sallary', $data['sallary'])
-            ->where('agency_sallary', $data['agency_sallary'])
-            ->exists();
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    protected static function shouldSkipInsert(?BdAgencyHostSallary $latestRecord, array $data): bool
+    {
+        if (!$latestRecord) {
+            return false;
+        }
+    
+        $newAmount = floatval($data['amount']);
+        $oldAmount = floatval($data['oldDbValue'] ?? 0);
+    
+        $sameAmount = $latestRecord->amount == ($newAmount - $oldAmount);
+        $sameBd = intval($latestRecord->bd_id) === intval($data['bd_id']);
+    
+        return $sameAmount && $sameBd;
     }
 
     protected static function buildAttributes(array $data, int $bdUserId): array
@@ -92,15 +116,32 @@ class BdAgencyHostSallaryService
             'year'        => $data['year'],
         ];
     }
-
-    protected static function buildValues(array $data): array
+    protected static function buildValues(array $data, float $difference,$newSalary): array
     {
         return [
-            'amount'           => $data['amount'],
-            'user_sallary'     => $data['sallary'],
-            'agency_sallary'   => $data['agency_sallary'],
+            'amount' => $difference,
+            'salary' => $newSalary + $difference,
+
         ];
     }
+
+
+    protected static function getBdAppId(int $bdId): int
+    {
+        return Bd::find($bdId)?->app_id ?? 0;
+    }
+
+    
+    
+    protected static function getOldSalary(int $bdId): float
+    {
+        return BdAgencyHostSallary::where('bd_id', $bdId)
+            ->orderByDesc('id')
+            ->value('salary') ?? 0;
+    }
+    
+
+
 
 
 
