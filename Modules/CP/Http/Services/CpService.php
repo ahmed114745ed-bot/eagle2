@@ -166,13 +166,16 @@ class CpService
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
 
         $amount = $reward->item_id;
-        $title = 'Coin Reward';
-        $body = 'You have received :coin coin.';
+        $title = __('Coin Reward');
+        $body = __('You have received :coin coin.');
 
         if ($amount) {
             if ($rewardGender == $userOneGender || $rewardGender == 'all'){
                 $userOne->increment('di', $amount);
-                CustomNotification::charges($userOne, $title, $body, ['coin' => $amount]);
+                Common::sendOfficialMessage($userOne->id, $title, $body);
+                $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
+                Common::send_firebase_notification($tokens_notfacion, $title, $body);
+//                CustomNotification::charges($userOne, $title, $body, ['coin' => $amount]);
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
                 $userTwo->increment('di', $amount);
@@ -239,16 +242,22 @@ class CpService
             'end_at'       => $dateTimestamp,
         ];
 
-        $title = 'Achievement Reward';
-        $body = 'You have received a new achievement.';
+        $title = __('Achievement Reward');
+        $body = __('You have received a new achievement.');
 
         if ($rewardGender == $userOneGender || $rewardGender == 'all'){
             UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
-            CustomNotification::charges($userOne, $title, $body);
+            Common::sendOfficialMessage($userOne->id, $title, $body);
+            $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
+            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+//            CustomNotification::charges($userOne, $title, $body);
         }
         if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
             UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
-            CustomNotification::charges($userTwo, $title, $body);
+            Common::sendOfficialMessage($userTwo->id, $title, $body);
+            $tokens_notfacion[] = DB::table('users')->where('id', $userTwo->id)->value('notification_id');
+            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+//            CustomNotification::charges($userTwo, $title, $body);
         }
     }
 
