@@ -671,9 +671,7 @@ class AgencyService
         }
 
         $timezone = getTimezone();
-        $month = 8;
-        $year = 2025;
-        $firstDay = \Carbon\Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
+        $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
         $nowInTimezone = Carbon::now($timezone);
 
 
@@ -712,12 +710,12 @@ class AgencyService
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
           //$data->day = Carbon::parse($data->date)->day;
-          $data->day = \Carbon\Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
+          $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
             return $data;
         });
         $dailyTimes = $dailyTimes->map(function ($data) use ($timezone){
            // $data->day = Carbon::parse($data->date)->day;
-            $data->day = \Carbon\Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
+            $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
             return $data;
         });
 
