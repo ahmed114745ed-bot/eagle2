@@ -668,9 +668,15 @@ class AgencyService
         if (!$joinRecord) {
             $joinRecord =  null;
         }
-        $startOfMonth = Carbon::create($year, $month, 1);
-        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
+        $timezone = getTimezone();
+        $month = 8;
+        $year = 2025;
+        $firstDay = \Carbon\Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
+        $nowInTimezone = Carbon::now($timezone);
 
+
+        $startOfMonth = $firstDay->copy()->setTimezone('UTC');
+        $endOfMonth = $firstDay->copy()->endOfMonth()->setTimezone('UTC');
 
 
         if ($joinRecord) {
@@ -691,8 +697,8 @@ class AgencyService
 
         $reportStart = 1;
 
-        $isThisMonth = $month == now()->month && $year == now()->year;
-        $endDay = $isThisMonth ? now()->day : $endOfMonth->day;
+        $isThisMonth = $month === $nowInTimezone->month && $year === $nowInTimezone->year;
+        $endDay = $isThisMonth ? $nowInTimezone->day : $endOfMonth->day;
 
         // $startDate = Carbon::create($year, $month, $reportStart)->startOfDay();
         // $endDate = Carbon::create($year, $month, $endDay)->endOfDay();
