@@ -697,9 +697,6 @@ class AgencyService
         }
 
 
-        // $startOfMonth = Common::applyTimezoneToDateValue($startOfMonth);
-        // $endOfMonth = Common::applyTimezoneToDateValue($endOfMonth);
-
 
         $reportStart = 1;
 
@@ -715,12 +712,12 @@ class AgencyService
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
           //$data->day = Carbon::parse($data->date)->day;
-          $data->day = Carbon::parse($data->date, $timezone)->day;
+          $data->day = \Carbon\Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
             return $data;
         });
         $dailyTimes = $dailyTimes->map(function ($data) use ($timezone){
            // $data->day = Carbon::parse($data->date)->day;
-            $data->day = Carbon::parse($data->date, $timezone)->day;
+            $data->day = \Carbon\Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
             return $data;
         });
 
