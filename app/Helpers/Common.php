@@ -716,6 +716,7 @@ class Common
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
+            info('many tokens');
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
 
             SendFirebaseNotificationJob::dispatch(
