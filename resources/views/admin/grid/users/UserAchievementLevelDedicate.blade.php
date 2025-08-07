@@ -293,8 +293,8 @@
                             return {
                                 id: user.id,
                                 text: user.name || '',
-                                image: user.profile_image 
-                            ? '{{ getImagePath('') }}' + user.profile_image 
+                                image: user.profile.avatar 
+                            ? '{{ getImagePath('') }}' + user.profile.avatar
                             : '{{ asset('images/default-user.png') }}'
                             };
                         }),
