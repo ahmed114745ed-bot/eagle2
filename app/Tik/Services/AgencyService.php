@@ -671,12 +671,13 @@ class AgencyService
         }
 
         $timezone = getTimezone();
-        $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
+//        $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
         $nowInTimezone = Carbon::now($timezone);
 
 
-        $startOfMonth = $firstDay->copy()->setTimezone('UTC');
-        $endOfMonth = $firstDay->copy()->endOfMonth()->setTimezone('UTC');
+        [$startOfMonth, $endOfMonth] = Carbon::startAndEndOfMonthUTC($year, $month, $timezone);
+        /*$startOfMonth = $firstDay->copy()->setTimezone('UTC');
+        $endOfMonth = $firstDay->copy()->endOfMonth()->setTimezone('UTC');*/
 
 
         if ($joinRecord) {
