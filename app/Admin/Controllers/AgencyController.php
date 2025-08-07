@@ -628,7 +628,7 @@ class AgencyController extends MainController
         $form->display('ID');
         if (!$form->isEditing()) {
             $form->row(function ($row) {
-                $row->width(12)->select('bd_id', __('app bd id'))->options(function ($value) {
+                $row->width(12)->select('bd_id', __('bd id'))->options(function ($value) {
                     $ops2 = [];
                     foreach (User::Where('id', $value)->get() as $user) {
                         $ops2[$user->id] = $user->id . '_' . $user->name;
@@ -658,6 +658,15 @@ class AgencyController extends MainController
 
 
             $form->row(function ($row) {
+
+                $row->width(12)->select('bd_id', __('bd id'))->options(function ($value) {
+                    $ops2 = [];
+                    foreach (User::Where('id', $value)->get() as $user) {
+                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                    }
+                    return $ops2;
+                })->ajax('/api/search/users-bd2', 'id', 'name');
+
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
                     $ops2 = [];
                     foreach (User::Where('id', $value)->get() as $user) {
