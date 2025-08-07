@@ -18,6 +18,7 @@ class BdAgencyHostSallary extends Model
         'agency_sallary',
         'month',
         'year',
+        'bd_user_id'
     ];
 
     public function bd()

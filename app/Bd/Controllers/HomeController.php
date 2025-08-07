@@ -31,7 +31,7 @@ class HomeController extends Controller
         $salaryData = \App\Models\BdSalary::where('bd_id', $appID)
             ->selectRaw('COALESCE(SUM(salary),0) AS total_sallary, COALESCE(SUM(cut_amount),0) AS total_cut')
             ->first();
-        $finalSalary = round($salaryData->total_sallary - $salaryData->total_cut, 2);
+        $finalSalary = truncateAndTrim($salaryData->total_sallary - $salaryData->total_cut, 2);
 
         $finalWallet = '';
         return $content
