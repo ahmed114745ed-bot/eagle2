@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Models\Bd;
 use App\Models\BdAgencyHostSallary;
 use App\Models\BdSalary;
 
@@ -8,6 +9,7 @@ class BdAgencyHostSallaryService
 {
     public static function storeOrUpdate(array $data): void
     {
+
         self::storeSallaryLine($data);
         $total = self::calculateTotalSallary($data['bd_id'], $data['month'], $data['year']);
         self::storeOrUpdateBdSalary($data['bd_id'], $data['month'], $data['year'], $total);
@@ -17,6 +19,7 @@ class BdAgencyHostSallaryService
     {
         $attributes = [
             'bd_id'     => $data['bd_id'],
+            'bd_user_id'     => self::getBdAppId($data['bd_id']),
             'user_id'   => $data['user_id'],
             'agency_id' => $data['agency_id'],
             'month'     => $data['month'],
@@ -64,5 +67,11 @@ class BdAgencyHostSallaryService
                 'year'   => $year,
             ]);
         }
+    }
+
+    protected static function getBdAppId(int $bdId)
+    {
+        $bd = Bd::find($bdId);
+        return $bd?->app_id ?? 0;
     }
 }

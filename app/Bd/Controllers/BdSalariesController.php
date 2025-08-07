@@ -45,7 +45,7 @@ class BdSalariesController extends AdminController
         $totalCut =$netSalary->total_cut;
         $total_sallary =$netSalary->total_sallary;
         $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
-        $finalSalary = round($finalSalary,2);
+        $finalSalary = truncateAndTrim($finalSalary,2);
             return $content
                 ->header(trans('admin.index'))
                 ->description(trans('admin.description'))
@@ -54,8 +54,8 @@ class BdSalariesController extends AdminController
             $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalSalary]));
         })
         ->row(function (Row $row) use ($total_sallary, $totalCut ) {
-            $row->column(6, new InfoBox(__('total_sallary'), 'money', 'green', '', round($total_sallary ,2) . ' 💰' ));
-            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', 'charges', round($totalCut,2)));
+            $row->column(6, new InfoBox(__('total_sallary'), 'money', 'green', '', truncateAndTrim($total_sallary ,2) . ' 💰' ));
+            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', 'charges', truncateAndTrim($totalCut,2)));
         })
 
         ->row(function ($row) {
