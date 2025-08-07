@@ -3600,7 +3600,8 @@
     "This user is already in a CP relation.": "لا يمكن تقديم cp هذا المستخدم فى علاقة",
     "You do not have enough coins, please recharge!": "لا يوجد رصيد كافي من الكوينات برجاء الشحن!",
     "An error occurred while processing the request.": "حدث خطأ أثناء معالجة الطلب",
-
+    "congratulation": "تهانينا",
+    "You have received a new VIP level as a gift":"لقد حصلت على مستوى VIP جديد كهدية",
     "This reward has expired.": "انتهت صلاحية هذه المكافأة.",
     "box num ended": "تم انتهاء العدد المسموح للبوكس"
 

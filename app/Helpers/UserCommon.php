@@ -365,13 +365,7 @@ class UserCommon
         $vipp->save();
         Common::handelVip($vip, $user, $expire, $vipp, $sender);
         DB::commit();
-
-        Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
-        $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-        $title = config('app.name_ar');
-        $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
-        Common::send_firebase_notification($tokens_notfacion, $title, $body);
-        //            CustomNotification::vips($user, $expir, $vip->img);
+        CustomNotification::addUserLevel($user);
     }
 
     /**
@@ -439,7 +433,7 @@ class UserCommon
             $arr['get_type'] = $ware->get_type;
             $arr['target_id'] = $ware->id;
             $arr['num'] = 1; //$qty;
-//            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
+            //            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
             $arr['is_read'] = 1;
             $arr['days'] = $ware->expire;
 
