@@ -441,6 +441,13 @@ class UserCommon
             $pack->senderable()->associate($sender);
             $pack->save();
             DB::commit();
+            Common::sendOfficialMessage($user->id, __('congratulations'), __('لقد حصلت على اهداء'));
+            (new UserCounterServices)->eventUser($user, 'official-messages');
+
+            $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+            $title = config('app.name_ar');
+            $body = __('لقد حصلت على اهداء') . $user->name;
+            Common::send_firebase_notification($tokens_notfacion, $title, $body);
             //            \App\Helpers\CustomNotification::wareVip($user, $expir, $ware->name, $ware->show_img??'');
         } catch (\Exception $exception) {
             DB::rollBack();
