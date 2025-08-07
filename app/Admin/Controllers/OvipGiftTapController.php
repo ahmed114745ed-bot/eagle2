@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\FileService;
 use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -362,53 +363,15 @@ class OvipGiftTapController extends MainController
                     $form->image_type1 = $ext;
                 }
 
-                if ($form->img2 instanceof UploadedFile) {
+                $img2 = $form->img2;
+                $wareId = $form->model()->id;
+                if ($img2 instanceof UploadedFile) {
+                    /** @var FileService $fileService*/
+                    $fileService = app(new FileService());
+                    $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
 
-                    $allowedExtensions = ['svga', 'svg', 'mp4', 'alpha', 'vap', 'png'];
-
-                    $ext = strtolower($form->img2->guessExtension());
-                    $originalExt = strtolower($form->img2->getClientOriginalExtension());
-
-                    if ($ext === 'zz' && $originalExt === 'svga') {
-                        $ext = 'svga';
-                    }
-
-                    if ($ext === 'gif' && $originalExt === 'gif') {
-                        $ext = 'png';
-                    }
-
-                    if ($ext === 'mp4') {
-                        $urlVideo = upload($form->img2);
-
-                        $videoPath = getDriverUrl() . '/' . $urlVideo;
-
-                        $wareId = $form->model()->id;
-
-                        (new FfmpegService())->extractByDuration($videoPath, $wareId);
-
-                        $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
-
-                        $response = Http::attach(
-                            'image',
-                            Storage::disk('gcs')->get($imagePath),
-                            $wareId . '.jpg'
-                        )->post('https://utd-test.utdsoftware.com/api/analyze-media');
-
-                        $responseData = $response->json();
-
-                        if ($response->successful() && isset($responseData['data']['video_type'])) {
-                            $ext = strtolower($responseData['data']['video_type']);
-                        }
-                    }
-
-                    if (!in_array($ext, $allowedExtensions)) {
-                        throw ValidationException::withMessages([
-                            'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
-                        ]);
-                    } else {
-                        $form->input('detected_profile_frame_type', $ext);
-                        $form->profile_frame_type = $ext;
-                    }
+                    $form->input('detected_profile_frame_type', $ext);
+                    $form->profile_frame_type = $ext;
                 }
             });
         }
