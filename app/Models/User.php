@@ -1673,16 +1673,16 @@ class User extends Authenticatable
         if (!$join) {
             return 0;
         }
+    
         $start = $join->join_date;
-        $end = $join->leave_date ?? now()->endOfMonth();
-       
+        $end =  now();
+    
         $userSalary = UserSallary::query()
             ->where('user_id', $this->id)
             ->where('user_agency_id', $this->agency_id)
-            ->whereBetween('created_at', [$start, $end])->orWhereBetween('updated_at', [$start, $end ])
-            ->orderByDesc('id')
-            ->sum(DB::raw('sallary - cut_amount'));
+            ->whereBetween('created_at', [$start, $end])
 
+            ->sum(DB::raw('sallary - cut_amount'));
         return floor($userSalary * 100) / 100;
     }
 
