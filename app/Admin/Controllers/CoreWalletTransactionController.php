@@ -2,14 +2,15 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\AdminUser;
-use App\Models\CoreWallets;
-use App\Models\CoreWalletTransaction;
-use Encore\Admin\Controllers\AdminController;
+use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Models\AdminUser;
+use App\Models\CoreWallets;
+use Encore\Admin\Layout\Content;
+use App\Models\CoreWalletTransaction;
+use Encore\Admin\Controllers\AdminController;
 
 class CoreWalletTransactionController extends MainController
 {
@@ -21,18 +22,19 @@ class CoreWalletTransactionController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
+            ->title(trans('core wallet transactions'))
             ->body($this->grid()));
     }
 
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->body($this->detail($id)));
     }
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->body($this->form()->edit($id)));
     }
 
@@ -40,18 +42,35 @@ class CoreWalletTransactionController extends MainController
     protected function grid()
     {
         $grid = new Grid(new CoreWalletTransaction());
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($from = request('from_date')) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                        $query->whereDate('created_at', '>=', $start);
+                    }
+                }, __('From Date'), 'from_date')->date();
+
+                $filter->where(function ($query) {
+                    if ($to = request('to_date')) {
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
+                        $query->whereDate('created_at', '<=', $end);
+                    }
+                }, __('To Date'), 'to_date')->date();
+            });
+        });
 
         $grid->model()->latest();
         $grid->column('id', __('#'));
         $grid->column('from_wallet', __('From Wallet'))->display(function ($val) {
-            return    ucfirst(str_replace('_', ' ', optional(CoreWallets::find($val))->name)) ;
-
-
+            return    ucfirst(str_replace('_', ' ', optional(CoreWallets::find($val))->name));
         });
         $grid->column('to_wallet', __('To Wallet'))->display(function ($val) {
-            return    ucfirst(str_replace('_', ' ', optional(CoreWallets::find($val))->name)) ;
+            return    ucfirst(str_replace('_', ' ', optional(CoreWallets::find($val))->name));
         });
-        $grid->column('amount', __('Amount'))->display(function ($val) {
+        $grid->column('amount', __('coins'))->display(function ($val) {
             return $val;
         });
         $grid->column('admin_id', __('By'))->display(function ($val) {
