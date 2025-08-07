@@ -3603,6 +3603,12 @@
     "congratulation": "تهانينا",
     "You have received a new VIP level as a gift":"لقد حصلت على مستوى VIP جديد كهدية",
     "This reward has expired.": "انتهت صلاحية هذه المكافأة.",
+
+    "Coin Reward": "مكافأة العملات",
+    "You have received :coin coin.": "لقد حصلت على :coin عملة.",
+    "Achievement Reward": "مكافأة الإنجاز",
+    "You have received a new achievement.": "لقد حصلت على إنجاز جديد.",
+
     "box num ended": "تم انتهاء العدد المسموح للبوكس"
 
 
