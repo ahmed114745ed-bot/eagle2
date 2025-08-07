@@ -2,6 +2,7 @@
 
 namespace App\Bd\Controllers;
 
+use App\Models\Charge;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -79,9 +80,6 @@ class AgencyController extends MainController
 
     public function profile($id, req $request, Content $content)
     {
-        // if (! Admin::user()->can('*')) {
-        //     Permission::check('show-' . $this->permission_name);
-        // }
 
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
@@ -89,19 +87,14 @@ class AgencyController extends MainController
         $user = Auth::user();
 
         $agency = Agency::query()
-                // ->where('bd_id' ,$user->app_id )
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
                 ->find($id);
-      
-
         if (!$agency) {
             $agency =  ShippingAgency::query()
-                    // ->where('bd_id' ,$user->app_id )
                     ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                    ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
-                    ->find($id);
-           
+                    ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
+                    ->find($id); 
         }
 
         if (!$agency) {
@@ -112,6 +105,10 @@ class AgencyController extends MainController
     
             session()->flash('error', $error);
             throw new \Exception(__('Agency not found'));
+        }
+        if ($agency->type == 2) {
+          
+            return self::shippingProfile($agency, $request, $content);
         }
 
 
@@ -254,6 +251,67 @@ class AgencyController extends MainController
                 'tab',
                 'sumTargets',
                 'imageUrl'
+            ));
+    }
+
+    public static function shippingProfile(ShippingAgency $agency ,req $request,  Content $content)
+    {
+        $tab = $request->input('tab', 'charges');
+
+        $agencyId = $agency->id;
+        $charges = null;
+        $resiveds = null;
+
+        switch ($tab) {
+            case 'charges':
+                $charges = Charge::where('charger_type', 'agency')
+                    ->where('charger_id', $agencyId);
+
+                $relations = [];
+
+                if ($request->has('filter_by') && $request->filter_by !== null && $request->filter_by !== '') {
+                    $charges->where('user_type', $request->filter_by);
+                    $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
+                }
+                if ($request->has('filter_id') && $request->filter_id !== null && $request->filter_id !== '') {
+                    $charges->where('user_id', $request->filter_id);
+                }
+
+                if (!empty($relations)) {
+                    $charges->with($relations);
+                }
+
+                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
+                break;
+
+            case 'resived':
+                $resiveds = Charge::where('user_id', $agencyId)
+                    ->where('user_type', 'agency');
+
+                if ($request->has('sender_type') && $request->sender_type !== null && $request->sender_type !== '') {
+                    $resiveds->where('charger_type', $request->sender_type);
+                }
+                if ($request->has('sender_id') && $request->sender_id !== null && $request->sender_id !== '') {
+                    $resiveds->where('charger_id', $request->sender_id);
+                }
+
+                $resiveds = $resiveds->with(['sender'])
+                    ->latest()
+                    ->paginate(10, ['*'], 'resived_page');
+                break;
+        }
+
+        $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
+        $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');
+
+        return $content->title(__('agency profile'))
+            ->view('bd_shippingAgencyProfile', compact(
+                'agency',
+                'resiveds',
+                'charges',
+                'tab',
+                'totalReceive',
+                'totalSend'
             ));
     }
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
