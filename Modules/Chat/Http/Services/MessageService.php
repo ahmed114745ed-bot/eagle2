@@ -96,8 +96,7 @@ class MessageService
 
     private function processGifFile($file, $chatRoom, $message, $user)
     {
-        $fileName = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
-        $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $fileName, 'gif');
+        $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file->getClientOriginalName(), 'gif');
 
         $message->type = 'gif';
         $message->message = null;
