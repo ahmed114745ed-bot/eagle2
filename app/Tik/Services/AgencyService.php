@@ -654,6 +654,7 @@ class AgencyService
 
     public function dailyReport($user, $month, $year, $agencyId = null)
     {
+         $timezone = Common::timeZone();
         $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
         $joinedAgency = $member ??  $owner;
@@ -668,17 +669,23 @@ class AgencyService
         if (!$joinRecord) {
             $joinRecord =  null;
         }
-        $startOfMonth = Carbon::create($year, $month, 1);
-        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
+        // $startOfMonth = Carbon::create($year, $month, 1);
+        // $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
+        $startOfMonth = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->startOfDay();
+    $endOfMonth = Carbon::create($year, $month, 1, 0, 0, 0, $timezone)->endOfMonth()->endOfDay();
 
 
 
         if ($joinRecord) {
-            $joinedDate = Carbon::parse($joinRecord->join_date);
+            // $joinedDate = Carbon::parse($joinRecord->join_date);
 
-            $leaveDate = $joinRecord->leave_date
-                ? Carbon::parse($joinRecord->leave_date)
-                : $endOfMonth;
+            // $leaveDate = $joinRecord->leave_date
+            //     ? Carbon::parse($joinRecord->leave_date)
+            //     : $endOfMonth;
+            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone)->startOfDay();
+        $leaveDate = $joinRecord->leave_date
+            ? Carbon::parse($joinRecord->leave_date, $timezone)->endOfDay()
+            : $endOfMonth;
         } else {
             $joinedDate = null;
             $leaveDate = $endOfMonth;
@@ -691,8 +698,10 @@ class AgencyService
 
         $reportStart = 1;
 
-        $isThisMonth = $month == now()->month && $year == now()->year;
-        $endDay = $isThisMonth ? now()->day : $endOfMonth->day;
+        // $isThisMonth = $month == now()->month && $year == now()->year;
+        // $endDay = $isThisMonth ? now()->day : $endOfMonth->day;
+        $isThisMonth = $month == now($timezone)->month && $year == now($timezone)->year;
+    $endDay = $isThisMonth ? now($timezone)->day : $endOfMonth->day;
 
         // $startDate = Carbon::create($year, $month, $reportStart)->startOfDay();
         // $endDate = Carbon::create($year, $month, $endDay)->endOfDay();
@@ -702,12 +711,14 @@ class AgencyService
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
-        $dailyDiamonds = $dailyDiamonds->map(function ($data) {
-            $data->day = Carbon::parse($data->date)->day;
+        $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
+          //$data->day = Carbon::parse($data->date)->day;
+          $data->day = Carbon::parse($data->date, $timezone)->day;
             return $data;
         });
-        $dailyTimes = $dailyTimes->map(function ($data) {
-            $data->day = Carbon::parse($data->date)->day;
+        $dailyTimes = $dailyTimes->map(function ($data) use ($timezone){
+           // $data->day = Carbon::parse($data->date)->day;
+            $data->day = Carbon::parse($data->date, $timezone)->day;
             return $data;
         });
 
