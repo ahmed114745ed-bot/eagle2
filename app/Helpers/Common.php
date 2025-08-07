@@ -716,6 +716,7 @@ class Common
         if (count($tokens) == 1) {
             $token = $tokens[0];
         } else {
+            info('many tokens');
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
 
             SendFirebaseNotificationJob::dispatch(
@@ -784,6 +785,8 @@ class Common
 
         $result = json_decode($result);
 
+        info($body);
+        info('result', ['result' => $result]);
         //remove group with $key if is group
         if ($result  && $isGroup) {
             self::removeGroupName($key, $token, $tokens, $api_access_key);
