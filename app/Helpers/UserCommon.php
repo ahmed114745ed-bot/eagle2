@@ -391,8 +391,8 @@ class UserCommon
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;
-        $vip->is_used = 0;
-        $vip->days = $expire;
+        $vipp->is_used = 0;
+        $vipp->days = $expire;
         $vipp->save();
         Common::handelVipCp($vip, $user, $expire, $vipp);
         DB::commit();
