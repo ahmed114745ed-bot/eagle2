@@ -785,7 +785,7 @@ class Common
 
         $result = json_decode($result);
 
-        info($title);
+        info($body);
         info('result', ['result' => $result]);
         //remove group with $key if is group
         if ($result  && $isGroup) {
