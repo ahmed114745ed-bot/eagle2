@@ -274,9 +274,9 @@
 
 <script>
     $(document).ready(function() {
-        $('#user_id').select2({
+      $('#user_id').select2({
             ajax: {
-                url: '{{ route('search.users') }}',
+                url: '{{ route("search.users") }}',
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
@@ -293,9 +293,9 @@
                             return {
                                 id: user.id,
                                 text: user.name || '',
-                                image: user.profile.avatar 
-                            ? '{{ getImagePath('') }}' + user.profile.avatar
-                            : '{{ asset('images/default-user.png') }}'
+                                image: user.avatar
+                                    ? "{{ getImagePath('') }}" + user.avatar
+                                    : "{{ asset('images/default-user.png') }}"
                             };
                         }),
                         pagination: {
@@ -307,7 +307,7 @@
             },
             templateResult: formatUser,
             templateSelection: formatUserSelection,
-            placeholder: '{{ __('admin.searchUsers') }}',
+            placeholder: '{{ __("admin.searchUsers") }}',
             minimumInputLength: 1
         });
 
@@ -333,6 +333,7 @@
                 '</div>'
             );
         }
+
 
         $('#achievement_id').change(function() {
             var achievementId = $(this).val();
