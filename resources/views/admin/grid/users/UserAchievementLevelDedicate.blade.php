@@ -293,9 +293,8 @@
                             return {
                                 id: user.id,
                                 text: user.name || '',
-                                image: user.avatar
-                                    ? "{{ getImagePath('') }}" + user.avatar
-                                    : "{{ asset('images/default-user.png') }}"
+                                image: user.avatar? "{{ getImagePath('__PATH__') }}".replace('__PATH__', user.avatar)
+                                                : "{{ asset('images/default-user.png') }}",
                             };
                         }),
                         pagination: {
