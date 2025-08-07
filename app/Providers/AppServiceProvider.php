@@ -68,10 +68,11 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
         $this->app->bind(UserRepoInterface::class, UserRepo::class);
-        $this->app->singleton(RedisService::class);
-        $this->app->singleton(CustomNotification::class);
-        $this->app->singleton(RoomHelper::class);
-        $this->app->singleton(ManagerHelper::class);
+        $this->app->bind('RedisService', fn ($app) => new RedisService());
+        $this->app->bind('UserHandling', fn ($app) => new UserHandling());
+        $this->app->bind('CustomNotification', fn ($app) => new CustomNotification());
+        $this->app->bind('RoomHelper', fn ($app) => new RoomHelper());
+        $this->app->bind('ManagerHelper', fn ($app) => new ManagerHelper());
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
 
         $this->defineCarbonMacros();
