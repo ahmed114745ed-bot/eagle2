@@ -98,6 +98,13 @@ trait EventModel
     }
 
 
+//    public function scopePreviousEvent(Builder $query)
+//    {
+//        return $query
+//            ->whereDate('end_date', '<', now(getTimezone())->toDateString())
+//            ->orderByDesc('end_date');
+//    }
+
     public function scopeEndToday(Builder $query)
     {
         $timezone = getTimezone(); // e.g., "Africa/Cairo"

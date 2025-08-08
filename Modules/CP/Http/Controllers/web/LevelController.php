@@ -179,6 +179,30 @@ class LevelController extends MainController
     public function update($id)
     {
         $id = request('id');
+        $request = request();
+
+        if ($request->ajax() && $request->has('_editable')) {
+            $field = $request->input('name');
+            $value = $request->input('value');
+
+            $allowedFields = ['level', 'exp'];
+
+            if (in_array($field, $allowedFields)) {
+                $model = CpLevel::findOrFail($id);
+                $model->$field = $value;
+                $model->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => __('Updated successfully'),
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => __('Field not allowed to be edited.'),
+                ]);
+            }
+        }
 
         Parent::update($id);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\FileService;
 use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -370,7 +371,10 @@ class WareTabController extends MainController
         if (request('type') != 18) {
             $form->saving(function (Form $form) {
                 $hasShowImg = $form->show_img || $form->model()->show_img;
-                $hasImg2 = $form->img2 || $form->model()->img2;
+                $img2 = $form->img2;
+                $wareId = $form->model()->id;
+
+                $hasImg2 = $img2 || $form->model()->img2;
 
                 if (!$hasShowImg && !$hasImg2) {
                     $error = new MessageBag([
@@ -395,55 +399,15 @@ class WareTabController extends MainController
                     $form->image_type1 = $ext;
                 }
 
-                if ($form->img2 instanceof UploadedFile) {
+                if ($img2 instanceof UploadedFile) {
+                    /** @var FileService $fileService*/
+                    $fileService = app( FileService::class);
+                    $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
 
-                    $allowedExtensions = ['svga', 'mp4', 'alpha', 'vap', 'png'];
-
-                    $ext = strtolower($form->img2->guessExtension());
-                    $originalExt = strtolower($form->img2->getClientOriginalExtension());
-
-                    if ($ext === 'zz' && $originalExt === 'svga') {
-                        $ext = 'svga';
-                    }
-
-                    if ($ext === 'gif' && $originalExt === 'gif') {
-                        $ext = 'png';
-                    }
-
-                    if ($ext === 'mp4') {
-                        $urlVideo = upload($form->img2);
-
-
-                        $videoPath = getDriverUrl() . '/' . $urlVideo;
-
-                        $wareId = $form->model()->id;
-
-                        (new FfmpegService())->extractByFrame($videoPath, $wareId);
-
-                        $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $wareId . '.jpg';
-
-                        $response = Http::attach(
-                            'image',
-                            Storage::disk('gcs')->get($imagePath),
-                            $wareId . '.jpg'
-                        )->post('https://utd-test.utdsoftware.com/api/analyze-media');
-
-                        $responseData = $response->json();
-
-                        if ($response->successful() && isset($responseData['data']['video_type'])) {
-                            $ext = strtolower(explode('-', $responseData['data']['video_type'])[0]);
-                        }
-                    }
-
-                    if (!in_array($ext, $allowedExtensions)) {
-                        throw ValidationException::withMessages([
-                            'img2' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
-                        ]);
-                    } else {
-                        $form->input('detected_profile_frame_type', $ext);
-                        $form->profile_frame_type = $ext;
-                    }
+                    $form->input('detected_profile_frame_type', $ext);
+                    $form->profile_frame_type = $ext;
                 }
+
             });
         }
         $form->saving(function (Form $form) {
@@ -476,6 +440,8 @@ class WareTabController extends MainController
         });
         return $form;
     }
+
+
 
     private function tabsComponentEdit($id, $currentType)
     {

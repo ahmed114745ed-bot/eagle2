@@ -55,6 +55,7 @@ Route::group(
             Route::delete('/{id}', [WeeklyCpGiftController::class, 'destroy'])->where('id', '[0-9]+');
         });
         Route::get('wares-by-type', [LevelGiftController::class, 'getWaresByType']);
+        Route::get('vips-by-type', [LevelGiftController::class, 'getVipsByType']);
 
     }
 );

@@ -3541,6 +3541,7 @@
 "Relationship Suspended":"علاقة موقوفة",
 "Returned":"عودة",
 "Awaiting Return":"منتظر العودة",
+"Gift a Badge": "أهدِ شارة",
 "relation type":"نوع العلاقة",
 ":name has been removed from administrators.": ":name تم إزالته من المسؤولين",
 "banned_from_action":"تم حظرك من تنفيذ هذا الإجراء.",
@@ -3599,8 +3600,16 @@
     "This user is already in a CP relation.": "لا يمكن تقديم cp هذا المستخدم فى علاقة",
     "You do not have enough coins, please recharge!": "لا يوجد رصيد كافي من الكوينات برجاء الشحن!",
     "An error occurred while processing the request.": "حدث خطأ أثناء معالجة الطلب",
-
+    "congratulation": "تهانينا",
+    "You have received a new VIP level as a gift":"لقد حصلت على مستوى VIP جديد كهدية",
     "This reward has expired.": "انتهت صلاحية هذه المكافأة.",
+    "core wallet transactions":"معاملات المحفظة الأساسية",
+
+    "Coin Reward": "مكافأة العملات",
+    "You have received :coin coin.": "لقد حصلت على :coin عملة.",
+    "Achievement Reward": "مكافأة الإنجاز",
+    "You have received a new achievement.": "لقد حصلت على إنجاز جديد.",
+
     "box num ended": "تم انتهاء العدد المسموح للبوكس"
 
 
