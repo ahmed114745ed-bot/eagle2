@@ -18,6 +18,7 @@ use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Facades\CustomNotification;
 
 /*
 |--------------------------------------------------------------------------
@@ -353,35 +354,23 @@ Route::get('/generate-token/{id}', function ($id) {
     ]);
 });
 
-Route::get('/update-user-sallary', function ($id) {
-    $month = now()->month;
-    $year = now()->year;
-     User::query()
-            ->where('agency_id', '!=', 0)
-            ->where('salary_is_updated', 1)
-            ->where('type_user', '!=', 0)
-            ->chunk(500, function ($users) use($month, $year){
-                foreach ($users as $user) {
-                    $cacheKey = 'cache-data-mystore-' . $user->id;
+Route::get('/send-notification/{id}', function ($id) {
 
-                    if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
-                        try {
-                            $app_feature = Cache::get('host_agency');
-                            
-                            if ($app_feature) {
+    $notificationToken[] = DB::table('users')->where('id', $id)->value('notification_id');
 
-                                $targetService = new FixedTargetService($user, month: $month, year: $year);
-                                $targetService->calculateTarget();
-                            }
+    $title = 'Coins Received';
+    $body = 'You have received :coins coins (equivalent to :usd USD) from :sender.';
 
-                            $this->info("User ID {$user->id} processed.");
-                        } catch (\Throwable $e) {
-                           
-                            $this->error("Failed user ID {$user->id}");
-                        }
-                    }
-                }
-            });
+    // CustomNotification::charges(
+    //     $to,
+    //     $title,
+    //     $body,
+    //     ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
+    // );
+
+    Common::send_firebase_notification($notificationToken, $title, $body, '', [], 'vip');
+
+    return "notifaction send successfully!";
 });
 
 

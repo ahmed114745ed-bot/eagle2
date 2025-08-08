@@ -25,7 +25,7 @@ Route::group(
         $router->resource('cp-relations', CpRelationController::class);
         $router->resource ('weekly-cp',WeeklyCpController::class);
         $router->resource ('cp-reports',CpReportRelationController::class);
-       
+
 
         Route::prefix('cp-levels/{relation_id}')->group(function () {
             Route::get('/', [LevelController::class, 'index'])->name('cp-levels.index');
@@ -55,6 +55,7 @@ Route::group(
             Route::delete('/{id}', [WeeklyCpGiftController::class, 'destroy'])->where('id', '[0-9]+');
         });
         Route::get('wares-by-type', [LevelGiftController::class, 'getWaresByType']);
+        Route::get('vips-by-type', [LevelGiftController::class, 'getVipsByType']);
 
     }
 );

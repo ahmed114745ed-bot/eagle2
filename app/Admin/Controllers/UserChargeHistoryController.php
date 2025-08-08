@@ -32,7 +32,7 @@ class UserChargeHistoryController extends AdminController
                 $row->column(12, $this->gridTabs()); // <-- Tab buttons
             })
             ->row(function ($row) use ($user_id) {
-                $row->column(12, $this->customGrid($user_id)); 
+                $row->column(12, $this->customGrid($user_id));
             });
     }
     protected function gridTabs()
@@ -72,33 +72,33 @@ class UserChargeHistoryController extends AdminController
     {
         $grid = new Grid(new Charge());
         $grid->disableRowSelector();
-    
+
         $scope = request('scope');
         $model = $grid->model()->with(Common::chargerRelationsQuery());
-           
-    
+
+
         if ($scope === 'charge-to') {
             $model->where('charger_id', $userId)
-                  ->where('charger_type', 'user');
+                ->where('charger_type', 'user');
         } else {
             $model->where('user_id', $userId)
-                  ->where('user_type', 'user');
+                ->where('user_type', 'user');
         }
-    
+
         $model->orderByDesc('created_at');
-        
+
         $grid->column('id', __('ID'));
-    
+
         if ($scope === 'charge-to') {
             $grid->column('admin.name', __('receiver'))->display(function () {
-                return UserChargeHistoryController::renderUserInfo(Common::getReceiverInfo($this), $this->charger_type ,$this->user_type);
+                return UserChargeHistoryController::renderUserInfo(Common::getReceiverInfo($this), $this->charger_type, $this->user_type);
             });
         } else {
             $grid->column('charger_id', __('charger'))->display(function () {
                 return UserChargeHistoryController::renderUserInfo(Common::getChargerInfo($this), $this->charger_type, $this->user_type);
             });
         }
-    
+
         $grid->column('amount', __('Coins'))->display(function () {
             return UserChargeHistoryController::renderCoinColumn($this->amount);
         });
@@ -106,22 +106,31 @@ class UserChargeHistoryController extends AdminController
         $grid->column('usd', __('USD'))->display(function () {
             return UserChargeHistoryController::renderUsdColumn($this->usd);
         });
-                
-     
-    
+
+
+
         $grid->column('created_at', __('charge date'));
-    
+        if ($scope === 'charge-to') {
+            $grid->column('return', __('return'))->display(function () {
+                if ($this->returnCharge) {
+                    return '<span class="label label-success">Returned</span>'; // ✅ show text
+                } else {
+                    return (new \App\Admin\Actions\ReturnChargeAction($this->id))->render();
+                }
+            });
+        }
+
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="/admin/reset-salary" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>');
         });
-    
+
         $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableActions();
-    
+
         return $grid;
     }
-    
+
     protected static function renderUserInfo($userInfo, $chargerType, $userType)
     {
         if (empty($userInfo['name']) && empty($userInfo['uuid'])) {
@@ -129,25 +138,25 @@ class UserChargeHistoryController extends AdminController
                         <span style='cursor: pointer;'>Unknown</span>
                     </div>";
         }
-    
+
         $defaultImage = asset("images/businessman-icon.jpg");
         $url = getImagePath($userInfo['image']) ?? $defaultImage;
         if (!isImageExists($url)) {
             $url = $defaultImage;
         }
-    
+
         $imageStyle = $chargerType === 'agency'
-            ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'   
-            : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;'; 
-    
+            ? 'width: 40px; height: 40px; object-fit: cover; border-radius: 0;'
+            : 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
+
         $image = "<img src='{$url}' alt='User Image' style='{$imageStyle}'>";
-    
+
         $translatedType = $userType === 'agency'
-            ? __('Agency') 
-            : __('User');  
-    
+            ? __('Agency')
+            : __('User');
+
         $nameWithType = "{$userInfo['name']} ";
-    
+
         return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
@@ -161,13 +170,13 @@ class UserChargeHistoryController extends AdminController
             </div>
         ";
     }
-    
-    
+
+
     public static function renderCoinColumn($coin): string
     {
         $coinIcon = asset('images/coin.jpg');
         $coin = number_format($coin);
-    
+
         return "
             <div style='display: flex; align-items: center; gap: 5px;'>
                 <span>{$coin}</span>
@@ -188,7 +197,4 @@ class UserChargeHistoryController extends AdminController
             </div>
         ";
     }
-
-    
-    
 }

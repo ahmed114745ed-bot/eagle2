@@ -2,6 +2,7 @@
 
 namespace Modules\CP\Http\Services;
 
+use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\OVip;
@@ -76,7 +77,7 @@ class CpService
                 'di' => $newDi,
                 'level_id' => $level->id
             ]);
-            if ($level->level) $this->assignGifts($level->level, $cp);
+            if ($level->level) $this->assignGifts($level, $cp);
         } else {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
@@ -101,12 +102,12 @@ class CpService
     protected function assignGifts($level, $cp)
     {
         // Check if the CP has already taken the gift for the level
-        if ($this->hasTakenGift($cp->id, $level)) {
+        if ($this->hasTakenGift($cp->id, $level->level)) {
             return true;
         }
 
         // Fetch rewards for the specified level
-        $rewards = $this->getRewardsForLevel($level);
+        $rewards = $this->getRewardsForLevel($level->id);
         if (!$rewards) return true;
         // Define users associated with the CP
         $userOne = $this->getUserById($cp->user_one_id);
@@ -116,7 +117,7 @@ class CpService
         $this->distributeRewards($rewards, $userOne, $userTwo);
 
         // Mark the gift as taken for the CP and level
-        $this->markGiftAsTaken($cp->id, $level);
+        $this->markGiftAsTaken($cp->id, $level->level);
     }
 
     protected function getUserById($id)
@@ -132,7 +133,7 @@ class CpService
     protected function getRewardsForLevel($level)
     {
         return CpLevelGift::whereHas('cp_level', function ($q) use ($level) {
-            $q->where('level', $level);
+            $q->where('id', $level);
         })->get();
     }
 
@@ -162,17 +163,23 @@ class CpService
 
     protected function assignCoins($reward, $userOne, $userTwo): void
     {
-        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
-        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
-        $vipGender = $reward->gender;
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
         $amount = $reward->item_id;
+        $title = __('Coin Reward');
+        $body = __('You have received :coin coin.');
 
         if ($amount) {
-            if ($vipGender == $userOneGender || $vipGender == 'all'){
+            if ($rewardGender == $userOneGender || $rewardGender == 'all'){
                 $userOne->increment('di', $amount);
+                Common::sendOfficialMessage($userOne->id, $title, $body);
+                $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
+                Common::send_firebase_notification($tokens_notfacion, $title, $body);
+//                CustomNotification::charges($userOne, $title, $body, ['coin' => $amount]);
             }
-            if ($vipGender == $userTwoGender || $vipGender == 'all') {
+            if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
                 $userTwo->increment('di', $amount);
+                CustomNotification::charges($userTwo, $title, $body, ['coin' => $amount]);
             }
         }
     }
@@ -182,16 +189,15 @@ class CpService
      */
     protected function assignVip($reward, $expire, $userOne, $userTwo)
     {
-        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
-        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
-        $vipGender = $reward->gender;
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
         $vipId = $reward->item_id;
         $vip = OVip::find($vipId);
         if ($vip) {
-            if ($vipGender == $userOneGender || $vipGender == 'all'){
+            if ($rewardGender == $userOneGender || $rewardGender == 'all'){
                 UserCommon::addVipToCpUser($userOne, $vip, $expire);
             }
-            if ($vipGender == $userTwoGender || $vipGender == 'all') {
+            if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
                 UserCommon::addVipToCpUser($userTwo, $vip, $expire);
             }
         }
@@ -199,15 +205,20 @@ class CpService
 
     protected function assignWare($ware, $reward, $userOne, $userTwo)
     {
-        // Assign the ware based on gender requirements
-        $this->genderForReward($ware, $reward, $userOne, $userTwo);
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
+        if ($rewardGender == $userOneGender || $rewardGender == 'all') {
+            UserCommon::addWareToUser($userOne, $ware, $reward->expire);
+        }
+        if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
+            UserCommon::addWareToUser($userTwo, $ware, $reward->expire);
+        }
     }
 
     protected function assignAchievement($reward, $expire, $userOne, $userTwo)
     {
-        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
-        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
-        $vipGender = $reward->gender;
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
         $itemId = $reward->item_id;
 
         // Handle different formats of $expire
@@ -231,33 +242,32 @@ class CpService
             'end_at'       => $dateTimestamp,
         ];
 
-        if ($vipGender == $userOneGender || $vipGender == 'all'){
+        $title = __('Achievement Reward');
+        $body = __('You have received a new achievement.');
+
+        if ($rewardGender == $userOneGender || $rewardGender == 'all'){
             UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
+            Common::sendOfficialMessage($userOne->id, $title, $body);
+            $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
+            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+//            CustomNotification::charges($userOne, $title, $body);
         }
-        if ($vipGender == $userTwoGender || $vipGender == 'all') {
+        if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
             UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
+            Common::sendOfficialMessage($userTwo->id, $title, $body);
+            $tokens_notfacion[] = DB::table('users')->where('id', $userTwo->id)->value('notification_id');
+            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+//            CustomNotification::charges($userTwo, $title, $body);
         }
     }
 
-    protected function genderForReward($ware, $reward, $userOne, $userTwo)
+    public function getGenders($userOne, $userTwo, $reward): array
     {
-        if ($reward->gender === 'male') {
-            $this->assignWareToUserByGender($ware, $reward->expire, $userOne, 1);
-            $this->assignWareToUserByGender($ware, $reward->expire, $userTwo, 1);
-        } elseif ($reward->gender === 'female') {
-            $this->assignWareToUserByGender($ware, $reward->expire, $userOne, 2);
-            $this->assignWareToUserByGender($ware, $reward->expire, $userTwo, 2);
-        } else {
-            UserCommon::addWareToUser($userOne, $ware, $reward->expire);
-            UserCommon::addWareToUser($userTwo, $ware, $reward->expire);
-        }
-    }
+        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
+        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
+        $rewardGender = $reward->gender;
 
-    protected function assignWareToUserByGender($ware, $expire, $user, $gender)
-    {
-        if ($user->profile?->gender === $gender) {
-            UserCommon::addWareToUser($user, $ware, $expire);
-        }
+        return [$userOneGender, $userTwoGender, $rewardGender];
     }
 
     protected function markGiftAsTaken($cpId, $level)

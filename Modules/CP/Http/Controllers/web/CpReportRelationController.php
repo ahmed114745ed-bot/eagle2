@@ -84,31 +84,32 @@ class CpReportRelationController extends MainController
                 return "$image<br>$name <br>
             <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
             });
-        $grid->column("di", __("di"));
+        $grid->column("di", __("coins"));
+         $grid->column("level_id", __("level"));
         $grid->column("price", __("price"));
-        $grid->column("cpRelation.type", __("cpRelation"))->display(function ($type) {
+        $grid->column("cpRelation.type", __("relation type"))->display(function ($type) {
             return __($type);
         });
-        $grid->column("level_id", __("level"));
         $grid->column("status", __("status"))
             ->display(function ($status) {
                 switch ($status) {
                     case 0:
-                        return "<span style='color: blue;'>منتظر</span>";
+                        return "<span style='color: blue;'>".__('Pending')."</span>";
                     case 1:
-                        return "<span style='color: blue;'>موافق</span>";
+                        return "<span style='color: blue;'>".__('Approved')."</span>";
                     case 2:
-                        return "<span style='color: red;'>مرفوض</span>";
+                        return "<span style='color: red;'>".__('Rejected')."</span>";
                     case 3:
-                        return "<span style='color: red;'>علاقة موقوفة</span>";
+                        return "<span style='color: red;'>".__('Relationship Suspended')."</span>";
                     case 4:
-                        return "<span style='color: green;'>عودة</span>";
+                        return "<span style='color: green;'>".__('Returned')."</span>";
                     case 5:
-                        return "<span style='color: blue;'>منتظر العودة</span>";
+                        return "<span style='color: blue;'>".__('Awaiting Return')."</span>";
                     default:
                         return $status; // Display as it is for other cases
                 }
             })->style('font-weight: bold;');
+             $grid->disableRowSelector();
         return $grid;
     }
 
