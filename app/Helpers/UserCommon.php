@@ -347,7 +347,7 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expire)
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null)
     {
         DB::beginTransaction();
 
@@ -361,16 +361,11 @@ class UserCommon
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;
+        $vipp->senderable()->associate($sender);
         $vipp->save();
-        Common::handelVip($vip, $user, $expire, $vipp);
+        Common::handelVip($vip, $user, $expire, $vipp, $sender);
         DB::commit();
-
-        Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
-        $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-        $title = config('app.name_ar');
-        $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
-        Common::send_firebase_notification($tokens_notfacion, $title, $body);
-        //            CustomNotification::vips($user, $expir, $vip->img);
+        CustomNotification::addUserLevel($user);
     }
 
     /**
@@ -390,8 +385,8 @@ class UserCommon
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;
-        $vip->is_used = 0;
-        $vip->days = $expire;
+        $vipp->is_used = 0;
+        $vipp->days = $expire;
         $vipp->save();
         Common::handelVipCp($vip, $user, $expire, $vipp);
         DB::commit();
@@ -404,7 +399,7 @@ class UserCommon
         //            CustomNotification::vips($user, $expir, $vip->img);
     }
 
-    public static function addWareToUser(User $user, Ware $ware, $expir)
+    public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)
     {
         $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
         if ($pack) {
@@ -438,10 +433,21 @@ class UserCommon
             $arr['get_type'] = $ware->get_type;
             $arr['target_id'] = $ware->id;
             $arr['num'] = 1; //$qty;
-            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
+            //            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
             $arr['is_read'] = 1;
-            Pack::query()->create($arr);
+            $arr['days'] = $ware->expire;
+
+            $pack = Pack::query()->create($arr);
+            $pack->senderable()->associate($sender);
+            $pack->save();
             DB::commit();
+            Common::sendOfficialMessage($user->id, __('congratulations'), __('لقد حصلت على اهداء'));
+            (new UserCounterServices)->eventUser($user, 'official-messages');
+
+            $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+            $title = config('app.name_ar');
+            $body = __('لقد حصلت على اهداء') . $user->name;
+            Common::send_firebase_notification($tokens_notfacion, $title, $body);
             //            \App\Helpers\CustomNotification::wareVip($user, $expir, $ware->name, $ware->show_img??'');
         } catch (\Exception $exception) {
             DB::rollBack();

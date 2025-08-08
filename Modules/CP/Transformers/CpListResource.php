@@ -28,26 +28,35 @@ class CpListResource extends JsonResource
         $frame = $dress_1_data ?: $dress_1_fallback;
  
         $currentLevel = CpLevel::find($this->level_id);
-        $nextLevel = CpLevel::where("cp_relation_id",  $currentLevel?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
+        $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
+        $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
 
 
         $ratio = 0;
     
+        if (
+            ($currentLevel || $currentLevel === 0) &&
+            $nextLevel &&
+            $nextLevel->exp > $currentExp
+        ) {
+          
+            $nextExp = $nextLevel->exp;
         
-        if ($currentLevel && $nextLevel && $nextLevel->exp > $currentLevel->exp) {
-
-            $currentExp = $this->di;
-            $nextLevelExp = $nextLevel->exp ?? $currentExp;
-            $ratio = round(min(($currentExp / $nextLevelExp) * 100, 100), 2);            
+            $progress = max(0, $this->di - $currentExp); 
+            $required = $nextExp - $currentExp;      
+        
+            $ratio = round(min(($progress / $required) * 100, 100), 2);                    
         } else {
             $ratio = 100;
         }
 
 
+
+
         return [
             'id'        => $this->id,
-            'level'     => $this->level_id,
-            'next_level'     => $nextLevel,
+            'level'     => $currentLevel?->level ?? 0,
+            'next_level'     =>  $nextLevel?->level ?? 0,
             'di'        => $this->di,
             'ratio' => $ratio,
             "user"      => [

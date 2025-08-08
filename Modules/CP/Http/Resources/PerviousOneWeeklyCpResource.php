@@ -6,13 +6,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PerviousOneWeeklyCpResource extends JsonResource
 {
-    
-    
+
+
     public function toArray($request)
     {
-       
+
         return [
-            
+
             'id' => $this?->id ?? 0,
             'user_one_id' => $this?->userOne->id ?? 0,
             'user_one_name' => $this?->userOne->name ?? '',
@@ -22,8 +22,6 @@ class PerviousOneWeeklyCpResource extends JsonResource
             'user_two_image' => $this?->userTwo->profile->avatar ?? '',
             'total_gift_price' =>numToString(intval( $this?->total_price ?? 0)) ,
             'level' => @$this?->level ?? 0,
-
-
         ];
     }
 }

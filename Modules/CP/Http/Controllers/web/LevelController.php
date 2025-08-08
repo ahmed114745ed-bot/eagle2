@@ -40,10 +40,25 @@ class LevelController extends MainController
 
     public function show($id, Content $content)
     {
-        $relation_id = request()->route('relation_id');
-        return parent::show($id, $content
-            ->title(trans('cp-relations'))
-            ->body($this->detail($id, $relation_id)));
+        $url = url('/admin/cp-relations'); // Define your button URL
+
+        $buttonHTML = <<<HTML
+        <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+            <i class="fa fa-arrow-left"></i> رجوع
+        </a>
+        HTML;
+        return $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
+            ->breadcrumb(
+                ['text' => trans('admin.eventGift')]
+            )
+            ->row($buttonHTML)
+            ->row($this->grid());
+        // $relation_id = request()->route('relation_id');
+        // return parent::show($id, $content
+        //     ->title(trans('cp-relations'))
+        //     ->body($this->detail($id, $relation_id)));
     }
 
     /**
@@ -108,6 +123,10 @@ class LevelController extends MainController
                 return number_format($value);
             });
         }
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+
+        });
         return $grid;
     }
 
@@ -148,7 +167,7 @@ class LevelController extends MainController
         $form->hidden('cp_relation_id')->value($relation_id);
         $form->textarea('name_ar', __('name_ar'));
         $form->textarea('name_en', __('name_en'));
-        $form->number('level', __('Level'))->required();
+        $form->number('level', __('Level'))->rules('required|integer|min:1');
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
@@ -160,6 +179,30 @@ class LevelController extends MainController
     public function update($id)
     {
         $id = request('id');
+        $request = request();
+
+        if ($request->ajax() && $request->has('_editable')) {
+            $field = $request->input('name');
+            $value = $request->input('value');
+
+            $allowedFields = ['level', 'exp'];
+
+            if (in_array($field, $allowedFields)) {
+                $model = CpLevel::findOrFail($id);
+                $model->$field = $value;
+                $model->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => __('Updated successfully'),
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => __('Field not allowed to be edited.'),
+                ]);
+            }
+        }
 
         Parent::update($id);
     }

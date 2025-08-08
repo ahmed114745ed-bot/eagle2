@@ -110,7 +110,7 @@ class LevelGiftController extends MainController
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                             <i class="fa fa-arrow-left"></i> الرجوع إلى levels
                         </a>
-                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->cp_relation_id} </label>
+                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->level} </label>
                     </div>
                 HTML;
             $tools->append($customButtonHTML);
@@ -140,9 +140,25 @@ class LevelGiftController extends MainController
                 ->load('item_id', admin_url('wares-by-type')); // AJAX load
 
             $form->select('item_id', __('wares'))
-                ->options([]) 
+                ->options(function ($id) {
+                    if (!$id) return [];
+
+                    $ware = Ware::find($id);
+                    if (!$ware) return [];
+
+                    return [$ware->id => "{$ware->name}_{$ware->id}"];
+                })
                 ->attribute(['data-image-select' => 1]);
 
+
+            Admin::script(<<<SCRIPT
+                $(function () {
+                    let itemSelected = $('select[name="item_id"]').val();
+                    if (itemSelected) {
+                        $('select[name="type_ware"]').trigger('change');
+                    }
+                });
+            SCRIPT);
 
             Admin::script(<<<'JS'
                 $(function () {
@@ -163,23 +179,28 @@ class LevelGiftController extends MainController
                         });
                     });
                 });
-                JS);
+            JS);
 
 
             $form->hidden('sub_type');
         })
             ->when("vip", function () use ($form) {
-                $form->select('item_id', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    $ops = [];
-                    foreach ($vips as $vip) {
-                        $ops[$vip->id] = $vip->name;
-                    }
-                    return $ops;
-                });
+                $form->select('item_id', trans('vips'))
+                    ->options(OVip::pluck('name', 'id'));
+//                $form->select('item_id', trans('vips'))
+//                    ->options(function ($id) {
+//                        if (!$id) return [];
+//                        $vip = OVip::find($id);
+//                        if (!$vip) return [];
+//                        return [$vip->id => $vip->name];
+//                    })
+//                    ->load('item_id', admin_url('vips-by-type'));
             })
             ->when("coins", function () use ($form) {
-                $form->number("coins", __("coins"));
+                $form->number("coins", __("coins"))
+                    ->default(function ($form) {
+                        return $form->model()->type === 'coins' ? (int) $form->model()->item_id : null;
+                    });
             })
             ->when("achievement", function () use ($form) {
                 $form->image("achievement", __('image'))->name(function ($file) {
@@ -197,7 +218,7 @@ class LevelGiftController extends MainController
         $form->saving(function (Form $form) {
             unset($form->type_ware);
             $form->ignore('type_ware');
-           
+
             if ($form->type == 'ware') {
                 $ware = Ware::find($form->item_id);
                 if ($ware) {
@@ -238,6 +259,23 @@ class LevelGiftController extends MainController
                 'id'   => $ware->id,
                 'text' => $text,
                 'image' =>  getImagePath($ware->show_img),
+            ];
+        }
+
+        return response()->json($data);
+    }
+
+    public function getVipsByType(Request $request)
+    {
+        $q = $request->get('q');
+        // If you want to filter by $q, add where clauses.
+        $vips = OVip::select('id', 'name')->get();
+
+        $data = [];
+        foreach ($vips as $vip) {
+            $data[] = [
+                'id'   => $vip->id,
+                'text' => $vip->name,
             ];
         }
 
