@@ -19,12 +19,20 @@ use Modules\Public\Http\Services\UserCounterServices;
 
 class CustomNotification
 {
-    public function appName($lang)
+    public static function appName($lang)
     {
         $locale = $lang ?? app()->getLocale();
         return $locale == 'ar' ? Cache::get('app_title_ar') : Cache::get('app_title_en');
     }
 
+    public  static function addUserLevel($user)
+    {
+        Common::sendOfficialMessage($user->id, __('congratulation'), __('You have received a new VIP level as a gift'));
+        $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $title = self::appName($user->lan);
+        $body = __('You have received a new VIP level as a gift') . $user->name;
+        Common::send_firebase_notification($tokens_notfacion, $title, $body);
+    }
     public function senderLevel(int $userId)
     {
         $user = User::withoutAppends()->where('id', $userId)->first();
@@ -146,12 +154,12 @@ class CustomNotification
         $body_ar = __('api.accept_agency', ['name' => $agency->name],  'ar');
         $body_en = __('api.accept_agency', ['name' => $agency->name],  'en');
         $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
-//        logger()->info('Firebase tokens_notification : ', [
-//            'tokens_notification' => $tokens_notification,
-//            'user' => $user
-//        ]);
+        //        logger()->info('Firebase tokens_notification : ', [
+        //            'tokens_notification' => $tokens_notification,
+        //            'user' => $user
+        //        ]);
         $result = Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody);
-//        logger()->info('Firebase Send acceptAgency Result: ', ['result' => $result]);
+        //        logger()->info('Firebase Send acceptAgency Result: ', ['result' => $result]);
 
         Common::sendOfficialMessage($user->id, title: $body_en, content: $agency->name, titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
@@ -166,12 +174,12 @@ class CustomNotification
         $data['image'] = getDriverUrl() . '/' . $user->profile->avatar;
         $data['user_id'] = $agency->app_owner_id;
         $icon = $data['image'];
-//        logger()->info('Firebase tokens_notification : ', [
-//            'tokens_notification' => $tokens_notification,
-//            'user' => $user
-//        ]);
+        //        logger()->info('Firebase tokens_notification : ', [
+        //            'tokens_notification' => $tokens_notification,
+        //            'user' => $user
+        //        ]);
         $result = Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'agency-reject-request');
-//        logger()->info('Firebase Send rejectAgency Result: ', ['result' => $result]);
+        //        logger()->info('Firebase Send rejectAgency Result: ', ['result' => $result]);
 
         Common::sendOfficialMessage($user->id, title: $body_en, content: $agency->name, titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
@@ -202,13 +210,13 @@ class CustomNotification
         $data['image'] = $agency->img;
         $data['agency_id'] = $agency->id;
         $icon = $agency->img;
-//        logger()->info('Firebase tokens_notification : ', [
-//            'tokens_notification' => $tokens_notification,
-//            'user' => $user
-//        ]);
+        //        logger()->info('Firebase tokens_notification : ', [
+        //            'tokens_notification' => $tokens_notification,
+        //            'user' => $user
+        //        ]);
 
         $result =  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-add-admin');
-//        logger()->info('Firebase Send Result: ', ['result' => $result]);
+        //        logger()->info('Firebase Send Result: ', ['result' => $result]);
 
         Common::sendOfficialMessage($user->id, image: $agency->img, title: $body_en, content: $agency->name, titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
@@ -224,12 +232,12 @@ class CustomNotification
         $data['image'] = $agency->img;
         $data['agency_id'] = $agency->id;
         $icon = $agency->img;
-//        logger()->info('Firebase tokens_notification : ', [
-//            'tokens_notification' => $tokens_notification,
-//            'user' => $user
-//        ]);
+        //        logger()->info('Firebase tokens_notification : ', [
+        //            'tokens_notification' => $tokens_notification,
+        //            'user' => $user
+        //        ]);
         $result =  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon, $data, messageType: 'agency-remove-admin');
-//        logger()->info('Firebase Send Result: ', ['result' => $result]);
+        //        logger()->info('Firebase Send Result: ', ['result' => $result]);
         Common::sendOfficialMessage($user->id, image: $agency->img, title: $body_en, content: $agency->name, titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V2;
 
+use Carbon\Carbon;
 use App\Models\Ware;
 use App\Helpers\Common;
 use App\Models\UserVip;
@@ -127,15 +128,34 @@ class MallController extends Controller
     public function updateExpireUserVip()
     {
         $userVips = UserVip::where('expire', 0)->with('packs')->get();
-
-        foreach ($userVips as $userVip) {
-            $expires = $userVip->packs->pluck('expire')->filter(function ($value) {
-                return $value !== null && $value != 0;
-            });
-            if ($expires->isNotEmpty()) {
-                $userVip->update(['expire' => $expires->first()]);
+        if ($userVips) {
+            foreach ($userVips as $userVip) {
+                $expires = $userVip->packs->pluck('expire')->filter(function ($value) {
+                    return $value !== null && $value != 0;
+                });
+                if ($expires->isNotEmpty()) {
+                    $userVip->update(['expire' => $expires->first()]);
+                }
             }
         }
+
+        $expireUserVips = UserVip::where('expire', '<', Carbon::now()->timestamp)
+            ->whereHas('packs', function ($q) {
+                $q->where(function ($query) {
+                    $query->where('expire', '>', Carbon::now()->timestamp)
+                        ->orWhere('expire', 0)->orWhere('expire', null);
+                });
+            })
+            ->where('expire', '!=', 0)
+            ->whereNotNull('expire')
+            ->with('packs')
+            ->get();
+
+        foreach ($expireUserVips as $userVip) {
+            $userVip->packs()->update(['expire' => $userVip->expire]);
+        }
+
+
         return 'done';
     }
 }
