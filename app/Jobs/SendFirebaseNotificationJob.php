@@ -82,16 +82,11 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 'Content-Type'  => 'application/json',
             ];
 
-            $response = Http::withHeaders($headers)->post(
+            Http::withHeaders($headers)->post(
                 "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
                 ['message' => $payload]
             );
 
-            \Log::info('FCM Response', [
-                'token'  => $token,
-                'status' => $response->status(),
-                'body'   => $response->body(),
-            ]);
         }
     }
 
