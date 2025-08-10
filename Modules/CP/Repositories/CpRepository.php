@@ -216,10 +216,10 @@ class CpRepository
         return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
         ->whereNotNull("cp_id")
         ->with(['cp' => function ($query) use ($relationType) {
-            $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id') 
-                ->whereHas("relation", function ($q) use ($relationType) {
-                    $q->where('type', $relationType);
-                })
+            $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id')
+//                ->whereHas("relation", function ($q) use ($relationType) {
+//                    $q->where('type', $relationType);
+//                })
                 ->with(['relation']);
         }])
         ->when($type, function ($query) use ($type) {
