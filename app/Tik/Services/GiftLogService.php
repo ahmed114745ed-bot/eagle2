@@ -12,12 +12,10 @@ use App\Helpers\Common;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
-use Illuminate\Support\Facades\Log;
 use App\Classes\Gifts\SendGiftService;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
-use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Tik\Repositories\GiftRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
@@ -28,7 +26,6 @@ use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
-use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
 class GiftLogService
 {

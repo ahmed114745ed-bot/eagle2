@@ -24,7 +24,7 @@ class RankingResource extends JsonResource
                 "name"      => $this->cp?->fromUser?->name,
                 "image"     => $this->cp?->fromUser?->profile?->avatar,
                 "gender"    => $this->cp?->fromUser?->profile?->gender,
-             
+
             ],
             "userTwo"      => [
                 "id"        => $this->cp?->toUser?->id,
@@ -32,8 +32,6 @@ class RankingResource extends JsonResource
                 "name"      => $this->cp?->toUser?->name,
                 "image"     => $this->cp?->toUser?->profile?->avatar,
                 "gender"    => $this->cp?->toUser?->profile?->gender,
-            
-
             ]
         ];
     }

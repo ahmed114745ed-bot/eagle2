@@ -7,8 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-
-
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
             --secondary-color: {{ config('themes.secondaryColor') }};
@@ -23,8 +21,6 @@
             --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
             --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
             --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
-
-
             --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
             --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
             --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);

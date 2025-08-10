@@ -7,16 +7,10 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\OVip;
 use App\Models\User;
-use App\Models\Vip;
 use App\Models\Ware;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Modules\Achievement\Entities\AchievementLevel;
-use Modules\Achievement\Entities\UserAchievement;
 use Modules\Achievement\Entities\UserAchievementLevel;
-use Modules\Achievement\Enums\TargetType;
 use Modules\CP\Entities\Cp as EntitiesCp;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
@@ -39,6 +33,9 @@ class CpService
         return $cpIds;
     }
 
+    /**
+     * @throws \Throwable
+     */
     protected function processGiftForReceiver(User $sender, User $receiver, int $giftId, int $giftPrice)
     {
         $checkIfExistCp = EntitiesCp::where(function ($query) use ($sender, $receiver) {
@@ -71,13 +68,15 @@ class CpService
         if (!$cp) return false;
 
         $newDi = $cp->di + $diamonds;
-        $level = $this->getLevel($cp->cp_relation_id, $newDi);
-        if ($level) {
-            DB::table('cps')->where('id', $cp->id)->update([
-                'di' => $newDi,
-                'level_id' => $level->id
-            ]);
-            if ($level->level) $this->assignGifts($level, $cp);
+        $levels = $this->getLevels($cp->cp_relation_id, $newDi);
+        if (!empty($levels)) {
+            foreach ($levels as $level){
+                DB::table('cps')->where('id', $cp->id)->update([
+                    'di' => $newDi,
+                    'level_id' => $level->id
+                ]);
+                if ($level->level) $this->assignGifts($level, $cp);
+            }
         } else {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
@@ -92,7 +91,10 @@ class CpService
         return CpLevel::query()->where('cp_relation_id', $cpRelationId)->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }
 
-
+    public function getLevels(int $cpRelationId, int $totalCoins)
+    {
+        return CpLevel::query()->where('cp_relation_id', $cpRelationId)->where('exp', '<=', $totalCoins)->get();
+    }
 
     //////////////////////////////////////////// assign gift ///////////////////////////////////////////////////////////////////
 
@@ -167,7 +169,7 @@ class CpService
 
         $amount = $reward->item_id;
         $title = __('Coin Reward');
-        $body = __('You have received :coin coin.');
+        $body = __('You have received :coin coin.', ['coin' => $amount]);
 
         if ($amount) {
             if ($rewardGender == $userOneGender || $rewardGender == 'all'){
@@ -179,7 +181,10 @@ class CpService
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
                 $userTwo->increment('di', $amount);
-                CustomNotification::charges($userTwo, $title, $body, ['coin' => $amount]);
+                Common::sendOfficialMessage($userOne->id, $title, $body);
+                $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
+                Common::send_firebase_notification($tokens_notfacion, $title, $body);
+//                CustomNotification::charges($userTwo, $title, $body, ['coin' => $amount]);
             }
         }
     }
