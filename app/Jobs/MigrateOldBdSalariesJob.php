@@ -52,6 +52,7 @@ class MigrateOldBdSalariesJob implements ShouldQueue
                             'user_sallary' => $userSallary->sallary,
                             'agency_sallary' => $userSallary->agency_sallary,
                             'bd_user_id' => $bdAppId,
+                            'created_at'     => $userSallary->created_at,
                         ]
                     );
                 }
