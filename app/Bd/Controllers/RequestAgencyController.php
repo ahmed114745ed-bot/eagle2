@@ -77,7 +77,7 @@ class RequestAgencyController extends AdminController
     {
         $grid = new Grid(new Agency());
         $grid->model()
-            ->where('bd_id', Auth::user()->app_id)
+            ->where('bd_id', Auth::user()->id)
             ->where('status', 0)->orderByDesc("id")
             ->whereHas('additionalInfo', function ($query) {
                 $query->where('status', 0);

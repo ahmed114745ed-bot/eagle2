@@ -134,6 +134,13 @@ class Charge extends Model
         return $this->belongsTo(Admin::class, 'charger_id');
     }
 
+
+    public function bd()
+    {
+        return $this->belongsTo(Bd::class, 'charger_id');
+    }
+
+
     protected static function booted()
     {
         self::saved(function ($model) {

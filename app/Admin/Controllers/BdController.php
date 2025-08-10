@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\BdChargeSwitchAction;
 use App\Models\Bd;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -102,6 +103,7 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
+        $grid->model()->with('bdSalaries');
 
         $grid->column('id', __('Id'));
         // $grid->column('username', __('username'));
@@ -192,11 +194,17 @@ class BdController extends MainController
 
 
         $grid->column('total_salary', __('total proft'))->display(function () {
-            return number_format($this->total_salary, 2);
+            return truncateAndTrim($this->total_salary, 2);
         });
 
-        $grid->column('net_salary', __('Net Salary'))->display(function () {
-            return number_format($this->net_salary, 2);
+        $grid->column('current_balance', __('Current Balance'))->display(function () {
+            $total = floatval($this->total_salary);
+            $cut   = floatval($this->total_cut);
+            return truncateAndTrim($total - $cut, 2);
+        });
+
+        $grid->column('total_cut', __('Cut amount'))->display(function () {
+            return truncateAndTrim($this->total_cut, 2);
         });
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
@@ -214,11 +222,18 @@ class BdController extends MainController
                 $actions->add(new \App\Admin\Actions\DeleteBdAction());
             }
 
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new BdChargeSwitchAction());
+            }
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
+
+    
+
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
+
 
                 $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
             });
@@ -260,7 +275,9 @@ class BdController extends MainController
         // $form->switch('default', __('set_as_default'))
         //     ->help(__('make_bd_default'));
 
+        $form->hidden('transfer_salary', __('transfer_salary'));
 
+        
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
