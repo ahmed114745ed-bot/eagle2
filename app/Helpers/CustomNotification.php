@@ -19,7 +19,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 
 class CustomNotification
 {
-    public function appName($lang)
+    public static function appName($lang)
     {
         $locale = $lang ?? app()->getLocale();
         return $locale == 'ar' ? Cache::get('app_title_ar') : Cache::get('app_title_en');

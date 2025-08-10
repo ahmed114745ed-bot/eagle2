@@ -186,17 +186,21 @@ class LevelGiftController extends MainController
         })
             ->when("vip", function () use ($form) {
                 $form->select('item_id', trans('vips'))
-                    ->options(function ($id) {
-                        // Fallback for default value
-                        if (!$id) return [];
-                        $vip = OVip::find($id);
-                        if (!$vip) return [];
-                        return [$vip->id => $vip->name];
-                    })
-                    ->load('item_id', admin_url('vips-by-type'));
+                    ->options(OVip::pluck('name', 'id'));
+//                $form->select('item_id', trans('vips'))
+//                    ->options(function ($id) {
+//                        if (!$id) return [];
+//                        $vip = OVip::find($id);
+//                        if (!$vip) return [];
+//                        return [$vip->id => $vip->name];
+//                    })
+//                    ->load('item_id', admin_url('vips-by-type'));
             })
             ->when("coins", function () use ($form) {
-                $form->number("coins", __("coins"));
+                $form->number("coins", __("coins"))
+                    ->default(function ($form) {
+                        return $form->model()->type === 'coins' ? (int) $form->model()->item_id : null;
+                    });
             })
             ->when("achievement", function () use ($form) {
                 $form->image("achievement", __('image'))->name(function ($file) {

@@ -403,6 +403,10 @@ class UserCommon
     public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)
     {
         $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
+
+        $title = __('congratulations');
+        $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
+
         if ($pack) {
             if ($pack->expire == 0) return '';
             if ($pack->expire > now()->timestamp) {
@@ -412,13 +416,13 @@ class UserCommon
                         $pack->expire += $expir ? ($expir * 86400) : ($ware->expire * 86400);
                         $pack->save();
                         DB::commit();
-                        Common::sendOfficialMessage($user->id, __('congratulations'), __('لقد حصلت على اهداء'));
+
+                        Common::sendOfficialMessage($user->id, $title, $body);
                         (new UserCounterServices)->eventUser($user, 'official-messages');
 
                         $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-                        $title = config('app.name_ar');
-                        $body = __('لقد حصلت على اهداء') . $user->name;
                         Common::send_firebase_notification($tokens_notfacion, $title, $body);
+
                     } catch (\Exception $exception) {
                         DB::rollBack();
                     }
@@ -442,14 +446,12 @@ class UserCommon
             $pack->senderable()->associate($sender);
             $pack->save();
             DB::commit();
-            Common::sendOfficialMessage($user->id, __('congratulations'), __('لقد حصلت على اهداء'));
+
+            Common::sendOfficialMessage($user->id, $title, $body);
             (new UserCounterServices)->eventUser($user, 'official-messages');
 
             $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-            $title = config('app.name_ar');
-            $body = __('لقد حصلت على اهداء') . $user->name;
             Common::send_firebase_notification($tokens_notfacion, $title, $body);
-            //            \App\Helpers\CustomNotification::wareVip($user, $expir, $ware->name, $ware->show_img??'');
         } catch (\Exception $exception) {
             DB::rollBack();
         }
