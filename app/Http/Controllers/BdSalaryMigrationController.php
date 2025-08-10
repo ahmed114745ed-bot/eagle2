@@ -14,7 +14,7 @@ class BdSalaryMigrationController extends Controller
        public function migrate()
     {
    
-        MigrateOldBdSalariesJob::dispatch()->onQueue('bd_salary_migrations');
+            MigrateOldBdSalariesJob::dispatchSync();
     
             return response()->json([
                 'status' => true,
