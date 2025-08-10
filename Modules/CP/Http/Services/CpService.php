@@ -139,7 +139,7 @@ class CpService
                     $this->assignCoins($reward->item_id, $userOne, $userTwo);
                     break;
                 case 'vip':
-                    $this->assignVip($reward->item_id, $reward->expire, $userOne, $userTwo);
+                    $this->assignVip($reward, $reward->expire, $userOne, $userTwo);
                     break;
                 case 'ware':
                     $ware = Ware::find($reward->item_id);
@@ -160,12 +160,19 @@ class CpService
         }
     }
 
-    protected function assignVip($vipId, $expire, $userOne, $userTwo)
+    protected function assignVip($reward, $expire, $userOne, $userTwo)
     {
+        [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
+
+        $vipId = $reward->item_id;
         $vip = OVip::find($vipId);
         if ($vip) {
-            VipCommon::createUserVip($vip,$userOne,  $expire);
-            VipCommon::createUserVip( $vip,$userTwo, $expire);
+            if ($rewardGender == $userOneGender || $rewardGender == 'all'){
+                VipCommon::createUserVip($vip,$userOne,  $expire);
+            }
+            if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
+                VipCommon::createUserVip( $vip,$userTwo, $expire);
+            }
         }
     }
 
@@ -216,4 +223,14 @@ class CpService
             'level' => $level,
         ]);
     }
+
+    public function getGenders($userOne, $userTwo, $reward): array
+    {
+        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
+        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
+        $rewardGender = $reward->gender;
+
+        return [$userOneGender, $userTwoGender, $rewardGender];
+    }
+
 }
