@@ -112,7 +112,7 @@ class Kernel extends ConsoleKernel
         //     ->appendOutputTo(storage_path('logs/stop-transfer-salary.log'))
         //     ->runInBackground();
 
-       $schedule->command('log:app-profit-coins')->everyTenMinutes();
+       /*$schedule->command('log:app-profit-coins')->everyTenMinutes();
 
         $schedule->job(new AgencyTribeRewardJob())
             ->daily()->when(function (){
@@ -122,7 +122,7 @@ class Kernel extends ConsoleKernel
                 return $startDate->diffInDays($today) % 15 === 0;
             });
 
-        $schedule->job(new CleanExpiredAgencyRewardsJob())->daily();
+        $schedule->job(new CleanExpiredAgencyRewardsJob())->daily();*/
         //    $schedule->command('log:app-profit-coins')->everyTenMinutes();
 
     }
