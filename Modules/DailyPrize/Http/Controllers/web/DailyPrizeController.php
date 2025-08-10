@@ -107,7 +107,7 @@ class DailyPrizeController extends MainController
                             : __('Not Found');
 
                     case 'vip':
-                        $vip = \App\Models\OVip::find($this->target);
+                        $vip = \Modules\Vip\Entities\OVip::find($this->target);
                         return $vip
                             ? __('name') . ': ' . $vip->name . ', ' . __('id') . ': ' . $vip->id
                             : __('Not Found');

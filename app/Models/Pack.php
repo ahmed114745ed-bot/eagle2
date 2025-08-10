@@ -6,6 +6,7 @@ use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Vip\Entities\UserVip;
 
 class Pack extends Model
 {

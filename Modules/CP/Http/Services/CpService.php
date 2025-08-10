@@ -20,6 +20,7 @@ use Modules\CP\Entities\Cp as EntitiesCp;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
 use Modules\CP\Entities\CpLevelTakeGift;
+use Modules\Vip\Helpers\VipCommon;
 
 class CpService
 {
@@ -163,8 +164,8 @@ class CpService
     {
         $vip = OVip::find($vipId);
         if ($vip) {
-            UserCommon::addVipToUser($userOne, $vip, $expire);
-            UserCommon::addVipToUser($userTwo, $vip, $expire);
+            VipCommon::createUserVip($vip,$userOne,  $expire);
+            VipCommon::createUserVip( $vip,$userTwo, $expire);
         }
     }
 

@@ -6,7 +6,7 @@ use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\RoomGame;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

@@ -3,7 +3,7 @@
 namespace Modules\Vip\Repositories;
 
 use App\Models\Pack;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Tik\Repositories\AbstractRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;

@@ -23,7 +23,7 @@ use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
 use App\Models\Setting;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserSallary;

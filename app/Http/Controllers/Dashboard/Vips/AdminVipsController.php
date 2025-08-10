@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Vips\AdminVipsResource;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\vip_prev;
 use Modules\Vip\Entities\VipPrivilege;
 use App\Traits\Dashboard\DashBoardTrait;
@@ -95,6 +95,7 @@ class AdminVipsController extends Controller
                     ...$uniqueAttributes,
                     'type'   => 1,
                     'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
+                    'days'    => $request->days ?? 1,
                     'qty'    => 1,
                     'price'  => 0,
                     'total'  => 0,

@@ -8,7 +8,7 @@ use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;

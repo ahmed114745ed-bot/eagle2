@@ -10,7 +10,7 @@ use App\Models\OfficialMessage;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserLevelLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Illuminate\Support\Facades\Cache;

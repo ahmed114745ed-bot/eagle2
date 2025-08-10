@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Encore\Admin\Actions\Action;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
