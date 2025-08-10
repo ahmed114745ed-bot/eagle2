@@ -56,7 +56,11 @@ class MigrateOldBdSalariesJob implements ShouldQueue
                         ]
                     );
                 }
-
+                $currentSalary = BdSalary::where('bd_id', $bdId)
+                    ->where('month', $month)
+                    ->where('year', $year)
+                    ->value('salary') ?? 0;
+            
                 BdSalary::updateOrCreate(
                     [
                         'bd_id' => $bdId,
@@ -64,7 +68,7 @@ class MigrateOldBdSalariesJob implements ShouldQueue
                         'year' => $year,
                     ],
                     [
-                        'salary' => $bdSalary->sallary,
+                        'salary' => $currentSalary + $bdSalary->sallary,
                         'cut_amount' => $bdSalary->cut_amount,
                     ]
                 );
