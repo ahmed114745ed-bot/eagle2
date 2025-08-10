@@ -943,7 +943,6 @@ class UserController extends MainController
             ],
             'email' => ['nullable', 'email'],
         ]);
-
         $data = [
             'name' => $request->name,
             'uuid' => $request->uuid,
