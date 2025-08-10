@@ -931,7 +931,6 @@ class UserController extends MainController
 
     public function updateUsers(Request $request)
     {
-
         $user = User::find($request->id);
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -940,7 +939,7 @@ class UserController extends MainController
                 Rule::unique('users', 'uuid')->ignore($user->id),
             ],
             'phone' => [
-                'required',
+                'nullable',
                 Rule::unique('users', 'phone')->ignore($user->id),
             ],
             'email' => ['nullable', 'email'],

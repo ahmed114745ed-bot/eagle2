@@ -32,9 +32,9 @@ class AgencyUsersTargetResource extends JsonResource
             ->where('agency_id', $this->agency_id)
             ->latest('join_date')
             ->first();
+        $timezone = getTimezone();
+        [$startOfMonth, $endOfMonth] = Carbon::startAndEndOfMonthUTC($year, $month, $timezone);
 
-        $startOfMonth = Carbon::create($year, $month, 1)->startOfDay();
-        $endOfMonth = Carbon::create($year, $month)->endOfMonth()->endOfDay();
 
         $joinedDate = $joinRecord ? Carbon::parse($joinRecord->join_date)->startOfDay() : $startOfMonth;
         $leaveDate = $joinRecord && $joinRecord->leave_date
@@ -91,8 +91,7 @@ class AgencyUsersTargetResource extends JsonResource
             ->where('receiver_id', $this->id)
             ->whereHas('sender')
             ->with('sender')
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
             ->selectRaw("sum(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')->orderByRaw("exp desc")->limit(3)
             ->get()
