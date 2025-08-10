@@ -185,9 +185,6 @@ class CpService
         }
     }
 
-    /**
-     * @throws \Throwable
-     */
     protected function assignVip($reward, $expire, $userOne, $userTwo)
     {
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
@@ -278,4 +275,5 @@ class CpService
             'level' => $level,
         ]);
     }
+
 }
