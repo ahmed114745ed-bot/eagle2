@@ -17,7 +17,7 @@ use GuzzleHttp\Client;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
 use GuzzleHttp\Psr7\Request;
@@ -358,7 +358,8 @@ class UserCommon
         $vipp->user_id = $user->id;
         $vipp->vip_id = $vip->id;
         $vipp->level = $vip->level;
-        $vipp->expire = now()->addDay($expire)->timestamp;
+        $vipp->expire = now()->addDay($expir)->timestamp;
+        $vipp->days = $expir;
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;
@@ -397,7 +398,6 @@ class UserCommon
         $title = config('app.name_ar');
         $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
         Common::send_firebase_notification($tokens_notfacion, $title, $body);
-        //            CustomNotification::vips($user, $expir, $vip->img);
     }
 
     public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)

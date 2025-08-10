@@ -7,7 +7,7 @@ use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -70,6 +70,7 @@ class DedicateVipController extends Controller
                             ...$uniqueAttributes,
                             'type'   => 1,
                             'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
+                            'days'    => $request->days ?? 1,
                             'qty'    => 1,
                             'price'  => 0,
                             'total'  => 0,

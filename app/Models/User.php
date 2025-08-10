@@ -31,6 +31,7 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
 use App\Models\Config as ConfigModel;
+use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
 /**
  * @method static withoutAppends()

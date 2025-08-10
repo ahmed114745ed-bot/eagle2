@@ -6,7 +6,7 @@ use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Services\Api\VipService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

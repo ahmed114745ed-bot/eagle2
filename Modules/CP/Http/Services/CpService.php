@@ -21,6 +21,7 @@ use Modules\CP\Entities\Cp as EntitiesCp;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
 use Modules\CP\Entities\CpLevelTakeGift;
+use Modules\Vip\Helpers\VipCommon;
 
 class CpService
 {
@@ -200,6 +201,8 @@ class CpService
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
                 UserCommon::addVipToCpUser($userTwo, $vip, $expire);
             }
+            VipCommon::createUserVip($vip,$userOne,  $expire);
+            VipCommon::createUserVip( $vip,$userTwo, $expire);
         }
     }
 

@@ -9,7 +9,7 @@ use App\Models\UsersJoinedAgency;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\FamilyUser;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;

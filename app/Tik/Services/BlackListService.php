@@ -3,7 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Models\Pack;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Tik\Repositories\BlackLisRepository;
 use Modules\Events\Entities\WinnerReward;
 use App\Http\Resources\UserReportResource;

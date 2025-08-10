@@ -23,5 +23,6 @@
     "Tasks": true,
     "Wallet": true,
     "LuckyBox": true,
-    "TribeReward": true
+    "TribeReward": true,
+    "Vip": true
 }

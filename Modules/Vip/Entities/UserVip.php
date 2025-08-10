@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace Modules\Vip\Entities;
 
+use App\Models\Admin;
+use App\Models\Pack;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Modules\Vip\Entities\OVip;
 
 class UserVip extends Model
 {

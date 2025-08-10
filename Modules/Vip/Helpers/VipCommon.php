@@ -2,25 +2,59 @@
 
 namespace Modules\Vip\Helpers;
 
-use App\Models\OVip;
+use App\Helpers\Common;
+use Illuminate\Support\Facades\DB;
+use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\Ware;
 
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user): UserVip
+    public static function createUserVip(OVip $vip, User $user, int $expire): bool
     {
-        return UserVip::create([
-            'user_id' => $user->id,
-            'vip_id'  => $vip->id,
-            'level'   => $vip->level,
-            'expire'  => null,
-            'is_used' => 0,
-        ]);
+        try {
+            DB::transaction(function () use ($vip, $user, $expire) {
+                $vipp = UserVip::create([
+                    'type'      => 1,
+                    'sender_id' => 0,
+                    'user_id'   => $user->id,
+                    'vip_id'    => $vip->id,
+                    'level'     => $vip->level,
+                    'expire'    => now()->addDays($expire)->timestamp,
+                    'days'      => $expire,
+                    'qty'       => 1,
+                    'price'     => $vip->price,
+                    'total'     => 0,
+                    'is_used'   => 0,
+                ]);
+    
+                Common::sendOfficialMessage(
+                    $user->id,
+                    __('congratulations'),
+                      __('vip_gift_message')
+                );
+    
+                $tokens_notification = [
+                    DB::table('users')->where('id', $user->id)->value('notification_id')
+                ];
+    
+                Common::send_firebase_notification(
+                    $tokens_notification,
+                    config('app.name_ar'),
+                    __('vip_gift_message') . $user->name
+                );
+            });
+    
+            return true;
+        } catch (\Throwable $e) {
+            // Log::error($e->getMessage());
+            return false;
+        }
     }
+    
     
     public static function handleVipActivation(UserVip $userVip): void
     {

@@ -8,7 +8,7 @@ use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
@@ -127,6 +127,7 @@ class DedicateAction extends RowAction
                             ...$uniqueAttributes,
                             'type'   => 1,
                             'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
+                            'days'    => $request->days ?? 1,
                             'qty'    => 1,
                             'price'  => 0,
                             'total'  => 0,

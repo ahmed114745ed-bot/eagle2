@@ -12,7 +12,7 @@ use App\Models\Config;
 use App\Helpers\Common;
 use App\Models\BanType;
 use App\Models\GiftLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\LiveTime;
 use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
@@ -80,6 +80,8 @@ class UserHandling
                     'price' => 0,
                     'total' => 0,
                     'type_send' => $type,
+                    'days'    => $vip->expire ?? 1,
+
                 ]
             );
             // VipCommon::handelVip($vip, $user, null, userVip: $userVip);

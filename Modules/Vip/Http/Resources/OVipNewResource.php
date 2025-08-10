@@ -2,7 +2,7 @@
 
 namespace Modules\Vip\Http\Resources;
 
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
 
