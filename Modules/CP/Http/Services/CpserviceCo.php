@@ -289,6 +289,7 @@ class CpserviceCo
 
         $data = $this->cpRepository->getCpRanking($relationType, $type);
 
+        info('ranking data', ['ranking data' => $data]);
         $first = $data->take(3);
         $second = $data->skip(3);
         $user = request()->user();
