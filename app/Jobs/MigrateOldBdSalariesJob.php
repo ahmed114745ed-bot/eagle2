@@ -74,6 +74,8 @@ class MigrateOldBdSalariesJob implements ShouldQueue
         } catch (\Throwable $e) {
             DB::rollBack();
             logger()->error('MigrateBdSalariesJob error: ' . $e->getMessage());
+            throw $e;
+
         }
     }
 
