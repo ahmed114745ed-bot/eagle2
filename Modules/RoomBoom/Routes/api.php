@@ -1,7 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
-use Modules\TribeReward\Http\Controllers\Api\TribeController;
+use Modules\RoomBoom\Http\Controllers\Api\RoomBoomLevelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,15 +13,9 @@ use Modules\TribeReward\Http\Controllers\Api\TribeController;
 |
 */
 
-
 Route::group([
-    'prefix' => 'tribes',
+    'prefix' => 'boom_levels',
     'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization']
 ], function (){
-    Route::get('general', [TribeController::class, 'index']);
-    Route::get('ranking', [TribeController::class, 'agencyRanking']);
-    Route::get('rewards', [TribeController::class, 'agencyRewards']);
+    Route::get('', [RoomBoomLevelController::class, 'index']);
 });
-
-Route::post('agencies/rewards/{id}/send', [TribeController::class, 'sendUserRewards'])
-    ->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization']);
