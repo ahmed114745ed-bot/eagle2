@@ -1091,6 +1091,7 @@
 ":name has been removed from administrators.": ":name has been removed from administrators.",
 "User": "User",
     "You have received :coin coin.": "You have received :coin coin.",
+    "You have received a gift: :ware": "You have received a gift: :ware",
     "banned_from_action":"You are banned from performing this action."
 
 

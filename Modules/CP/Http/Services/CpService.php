@@ -39,6 +39,9 @@ class CpService
         return $cpIds;
     }
 
+    /**
+     * @throws \Throwable
+     */
     protected function processGiftForReceiver(User $sender, User $receiver, int $giftId, int $giftPrice)
     {
         $checkIfExistCp = EntitiesCp::where(function ($query) use ($sender, $receiver) {
