@@ -196,13 +196,11 @@ class CpService
         $vip = OVip::find($vipId);
         if ($vip) {
             if ($rewardGender == $userOneGender || $rewardGender == 'all'){
-                UserCommon::addVipToCpUser($userOne, $vip, $expire);
+                VipCommon::createUserVip($vip,$userOne,  $expire);
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-                UserCommon::addVipToCpUser($userTwo, $vip, $expire);
+                VipCommon::createUserVip( $vip,$userTwo, $expire);
             }
-            VipCommon::createUserVip($vip,$userOne,  $expire);
-            VipCommon::createUserVip( $vip,$userTwo, $expire);
         }
     }
 
