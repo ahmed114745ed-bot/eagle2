@@ -17,18 +17,20 @@ class CleanGiftLogsJob  implements ShouldQueue
 
     public function handle()
     {
-        $users = User::select('id', 'monthly_diamond_received')->get();
+        $users = User::select('id', 'monthly_diamond_received', 'agency_id')->get();
     
         foreach ($users as $user) {
             $monthlyReceived = $user->monthly_diamond_received;
     
-            $allGiftLogs = DB::table('gift_logs')
-                ->join('gifts', 'gift_logs.giftId', '=', 'gifts.id')
-                ->where('gift_logs.receiver_id', $user->id)
-                ->whereMonth('gift_logs.created_at', now()->month)
-                ->whereYear('gift_logs.created_at', now()->year)
-                ->orderBy('gift_logs.created_at', 'asc')
-                ->select('gift_logs.*', 'gifts.type as gift_type')
+            $allGiftLogs = DB::table('gift_logs as gl')
+                ->join('gifts as g', 'gl.giftId', '=', 'g.id')
+                ->join('users as u', 'gl.receiver_id', '=', 'u.id')
+                ->where('gl.receiver_id', $user->id)
+                ->where('u.agency_id', $user->agency_id) // التحقق من تطابق الوكالة
+                ->where('gl.created_at', '>=', '2025-07-31 21:00:00')
+                ->where('gl.created_at', '<',  '2025-08-30 21:00:00')
+                ->orderBy('gl.created_at', 'asc')
+                ->select('gl.*', 'g.type as gift_type')
                 ->get();
     
             $total = 0;
@@ -64,15 +66,24 @@ class CleanGiftLogsJob  implements ShouldQueue
                     ->update(['giftPrice' => $partialNewValue]);
             }
     
-            $deleted = DB::table('gift_logs')
-                ->join('gifts', 'gift_logs.giftId', '=', 'gifts.id')
-                ->where('gift_logs.receiver_id', $user->id)
-                ->where('gifts.type', 6)
-                ->whereMonth('gift_logs.created_at', now()->month)
-                ->whereYear('gift_logs.created_at', now()->year)
-                ->whereNotIn('gift_logs.id', $keepIdsType6)
+            $deleted = DB::table('gift_logs as gl')
+                ->join('gifts as g', 'gl.giftId', '=', 'g.id')
+                ->join('users as u', 'gl.receiver_id', '=', 'u.id')
+                ->where('gl.receiver_id', $user->id)
+                ->where('u.agency_id', $user->agency_id) // تطابق الوكالة
+                ->where('g.type', 6)
+                ->where('gl.created_at', '>=', '2025-07-31 21:00:00')
+                ->where('gl.created_at', '<',  '2025-08-30 21:00:00')
+                ->whereNotIn('gl.id', $keepIdsType6)
                 ->delete();
+    
+            Log::info("Gift logs cleanup for user {$user->id}", [
+                'monthly_received' => $monthlyReceived,
+                'total_kept'       => $total,
+                'records_deleted'  => $deleted
+            ]);
         }
     }
+    
     
 }
