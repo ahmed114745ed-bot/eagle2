@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Jobs\CleanGiftLogsJob;
 use App\Models\Cp;
 use App\Models\Pk;
 use Carbon\Carbon;
@@ -661,5 +662,16 @@ class GiftLogController extends Controller
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
+    }
+
+
+    public function cleanGiftLogsForAllUsers()
+    {
+        CleanGiftLogsJob::dispatch();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Gift logs cleanup job has been dispatched for all users.'
+        ]);
     }
 }
