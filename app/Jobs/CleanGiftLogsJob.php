@@ -68,12 +68,7 @@ class CleanGiftLogsJob  implements ShouldQueue
                 ->whereNotIn('id', $keepIds)
                 ->delete();
         
-            Log::info("Gift logs cleanup for user {$user->id}", [
-                'monthly_received' => $monthlyReceived,
-                'total_kept' => $total,
-                'records_deleted' => $deleted,
-                'partial_updated' => $partialUpdateId
-            ]);
+   
         }
         
     }
