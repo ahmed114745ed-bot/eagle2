@@ -70,7 +70,6 @@ class CpService
         if (!$cp) return false;
 
         $newDi = $cp->di + $diamonds;
-//        $level = $this->getLevel($cp->cp_relation_id, $newDi);
         $levels = $this->getLevels($cp->cp_relation_id, $newDi);
         if (!empty($levels)) {
             foreach ($levels as $level){
@@ -80,11 +79,6 @@ class CpService
                 ]);
                 if ($level->level) $this->assignGifts($level, $cp);
             }
-//            DB::table('cps')->where('id', $cp->id)->update([
-//                'di' => $newDi,
-//                'level_id' => $level->id
-//            ]);
-//            if ($level->level) $this->assignGifts($level, $cp);
         } else {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi

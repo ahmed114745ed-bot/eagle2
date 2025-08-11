@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\BdSalaryMigrationController;
+use App\Admin\Controllers\GiftLogSummaryController;
+use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -407,3 +409,4 @@ Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkControl
 Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
 
 
+Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
