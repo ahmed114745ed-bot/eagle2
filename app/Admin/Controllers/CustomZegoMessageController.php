@@ -86,7 +86,7 @@ class CustomZegoMessageController extends AdminController
 
                 $zigoData = [
                     'user_id'      => $user->id,
-                    'user_image'   => @$user->avatar->image ?? '',
+                    'user_image'   => @$user->profile->avatar ?? '',
                     'gift_image'   => @$gift->img ?? '',
                     'owner_id'     => $user->id,
                     'user_name'    => $user->name ?? '',
