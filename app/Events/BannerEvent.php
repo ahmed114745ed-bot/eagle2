@@ -22,12 +22,12 @@ class BannerEvent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new Channel('banner');
+        return new Channel('banner.event');
     }
 
     public function broadcastAs()
     {
-        return 'banner';
+        return 'banner.event';
     }
 
     public function broadcastWith()
