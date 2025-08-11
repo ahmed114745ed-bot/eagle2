@@ -58,7 +58,7 @@ class CleanGiftLogsJob  implements ShouldQueue
                                 }
                             }
                             return true; 
-                        }, 'gl_id');
+                        }, 'id');
 
                     // تعديل السجل الجزئي
                     if ($partialUpdateId && $partialNewValue !== null) {
