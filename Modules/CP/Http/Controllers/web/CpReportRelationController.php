@@ -85,7 +85,7 @@ class CpReportRelationController extends MainController
             <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
             });
         $grid->column("di", __("coins"));
-         $grid->column("level_id", __("level"));
+         $grid->column("level.level", __("level"));
         $grid->column("price", __("price"));
         $grid->column("cpRelation.type", __("relation type"))->display(function ($type) {
             return __($type);
