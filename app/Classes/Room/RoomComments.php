@@ -37,6 +37,7 @@ class RoomComments
             $ms = [
                 'messageContent' => [
                     'msg' => 'yellowBanner',
+                    'event' => 'room.comment.event',
                     'uId' => $user->id,
                     'umsg' => $data['message'],
                     'oid' => @$room->uid,
