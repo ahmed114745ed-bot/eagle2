@@ -106,7 +106,7 @@ class CpReportRelationController extends MainController
                     case 5:
                         return "<span style='color: blue;'>".__('Awaiting Return')."</span>";
                     default:
-                        return $status; // Display as it is for other cases
+                        return $status;
                 }
             })->style('font-weight: bold;');
              $grid->disableRowSelector();
