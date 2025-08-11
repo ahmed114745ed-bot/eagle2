@@ -41,15 +41,15 @@ class CleanGiftLogsJob  implements ShouldQueue
                                     if ($total + $log->giftPrice <= $monthlyReceived) {
                                         $total += $log->giftPrice;
                                         if ($log->gift_type == 6) {
-                                            $keepIdsType6[] = $log->gl_id;
+                                            $keepIdsType6[] = $log->id;
                                         }
                                     } else {
                                         $needed = $monthlyReceived - $total;
                                         $total += $needed;
                                         if ($log->gift_type == 6) {
-                                            $partialUpdateId = $log->gl_id;
+                                            $partialUpdateId = $log->id;
                                             $partialNewValue = $needed;
-                                            $keepIdsType6[] = $log->gl_id;
+                                            $keepIdsType6[] = $log->id;
                                         }
                                         return false; // توقف بعد الوصول للرصد المطلوب
                                     }
@@ -57,7 +57,7 @@ class CleanGiftLogsJob  implements ShouldQueue
                                     return false; // توقف إذا اكتفينا
                                 }
                             }
-                            return true; // أكمل إذا لم نصل بعد للحد
+                            return true; 
                         }, 'gl_id');
 
                     // تعديل السجل الجزئي
