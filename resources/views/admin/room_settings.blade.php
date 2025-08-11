@@ -327,6 +327,18 @@
                         <input class="form-control" type="number" name="special_bar_coin"
                                value="{{ $settings['special_bar_coin'] ?? '' }}">
 
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Use Zego') }}</span>
+                            <!-- Hidden Fallback -->
+                            <input type="hidden" name="use_zego" value="0">
+                            <label class="switch">
+                                <input type="checkbox" id="use_zego"
+                                       name="use_zego" value="1"
+                                    {{ isset($settings['use_zego']) && $settings['use_zego'] == 1 ? 'checked' : '' }}>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
                         <button type="submit">{{ __('save') }}</button>
                     </div>
                 </form>
@@ -340,6 +352,11 @@
 
 
         <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var reelHiddenValue = document.getElementById('host_reel_value').value;
+                document.getElementById('use_zego').checked = (reelHiddenValue === '1');
+            });
+
             function toggleNumberInput(checkbox) {
                 const numberContainer = document.getElementById('numberInputContainer');
                 const switchValue = document.getElementById('switch_value');

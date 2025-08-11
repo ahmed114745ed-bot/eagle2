@@ -3604,12 +3604,16 @@
     "You have received a new VIP level as a gift":"لقد حصلت على مستوى VIP جديد كهدية",
     "This reward has expired.": "انتهت صلاحية هذه المكافأة.",
     "core wallet transactions":"معاملات المحفظة الأساسية",
-
     "Coin Reward": "مكافأة العملات",
     "You have received :coin coin.": "لقد حصلت على :coin عملة.",
     "Achievement Reward": "مكافأة الإنجاز",
     "You have received a new achievement.": "لقد حصلت على إنجاز جديد.",
     "You have received a gift: :ware": "لقد حصلت على إهداء :ware",
+    "Use Zego": "استخدام زيجو",
+    "stope": "متوقف",
+    "restored": "تمت الاستعادة",
+    "restore": "استعادة",
+    "restore_binding": "استعادة الربط",
 
     "box num ended": "تم انتهاء العدد المسموح للبوكس"
 

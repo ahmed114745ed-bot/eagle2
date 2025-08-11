@@ -20,14 +20,15 @@ enum UserCoinLogType: string
     case WEEKLY_STAR = 'weekly_star';
     case CHARGE_EVENT = 'charge_event';
     case LUCK_BOX = 'lucky_box';
-    
     case COIN_GAME = 'coin_game';
     case LUCKY_GIFT = 'lucky_gift';
     case CASHBACK = 'cashback';
     case VIP = 'vip';
     case PACK = 'packs';
     case GIFT = 'gifts';
+    case RETURN_CHAGE = 'return_charge';
 
+    
     public function meta(): array
     {
         return match ($this) {
@@ -149,6 +150,12 @@ enum UserCoinLogType: string
                 'item_name' => 'gift',
                 'queue_job' => \App\Jobs\LogUserCoinProfit::class,
             ],
+            self::RETURN_CHAGE => [
+                'sub_type' => 'return_charges',
+                'item_name' => 'return_charges',
+                'queue_job' => null,
+            ],
         };
     }
 }
+
