@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\GiftLogSummaryController;
+use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -404,3 +406,4 @@ Route::get('get-setting/{key}', function ($key) {
 Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
 
 
+Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
