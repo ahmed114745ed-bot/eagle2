@@ -37,6 +37,7 @@ class LuckyGiftService
     public function sendLuckyGift2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
 
+
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
         $ownerId  = $data['owner_id'];
@@ -242,10 +243,11 @@ class LuckyGiftService
         }
         $sendGiftServices = new SendGiftService();
 
-        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds  );
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $totalPrice, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds  );
         /***********************************************/
 
         return  $responseData;
+    
     }
 
 
