@@ -141,7 +141,7 @@ class BaishunGameController extends Controller
 
             $d = [
                 "messageContent" => [
-                    "message" => "SBG",
+                    "message" => "baishun.game.event",
                     'uImage'  => $user->profile?->avatar ?? 0,
                     'uName'   => $user->name ?? '',
                     'uId'     => $user->id ?? 0,

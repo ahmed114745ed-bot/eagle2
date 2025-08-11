@@ -19,10 +19,7 @@ class BannerEvent implements ShouldBroadcast
     public function __construct($data)
     {
         $this->data = $data;
-        info('construct');
-        info($data);
-        info($data['messageContent']['msg']);
-        $this->channel = $data['messageContent']['msg'] ?? $data['messageContent']['message'];
+        $this->channel = $data['messageContent']['event'];
     }
 
     public function broadcastOn()
