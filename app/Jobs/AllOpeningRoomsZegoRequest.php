@@ -2,7 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Events\BannerEvent;
+use App\Events\RoomEvent;
+use App\Events\SuperLuckyBox;
 use App\Helpers\Common;
+use App\Models\Config;
 use App\Models\Room;
 use GuzzleHttp\Promise\Utils;
 use Illuminate\Bus\Queueable;
@@ -56,6 +60,7 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
             if ($r->id == $this->roomID) continue;
             Common::sendToZego('SendCustomCommand', $r->id, $this->senderId, $this->json);
         }*/
+        $useZego = Config::where('name', 'use_zego')->value('value');
 
         $rooms = Cache::remember('allRooms', 60, function (){
             return Room::withoutAppends()->where('room_status', 1)->where(function ($q) {
@@ -67,8 +72,12 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
 
         $chunk = $rooms->chunk(15);
         foreach ($chunk as $roomIds) {
-            $promises = Common::sendToZegoWithArrayOfRooms('SendCustomCommand', $roomIds->toArray(), $this->senderId, $this->json, exceptRoomId: $this->isExceptRoom ? $this->roomID : null);
-            Utils::unwrap($promises);
+            if ($useZego){
+                $promises = Common::sendToZegoWithArrayOfRooms('SendCustomCommand', $roomIds->toArray(), $this->senderId, $this->json, exceptRoomId: $this->isExceptRoom ? $this->roomID : null);
+                Utils::unwrap($promises);
+            } else{
+                event(new BannerEvent(json_decode($this->json, true)));
+            }
         }
     }
 

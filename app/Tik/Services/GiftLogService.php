@@ -12,12 +12,11 @@ use App\Helpers\Common;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
-use Illuminate\Support\Facades\Log;
 use App\Classes\Gifts\SendGiftService;
+use Illuminate\Support\Facades\DB;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
-use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Tik\Repositories\GiftRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
@@ -28,7 +27,6 @@ use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
-use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
 class GiftLogService
 {
@@ -44,6 +42,8 @@ class GiftLogService
 
     public function sendGift($request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+        return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
+
         $data    = $request;
         $user    = $request->user();
         $userId  = $user->id;
@@ -61,7 +61,6 @@ class GiftLogService
         $numberOfGift = $number * count($receiversIds);
         $totalPrice = $gift->price * $numberOfGift;
         $totalPriceForOnlyReceiver = $gift->price * $number;
-
         // if user didn't have inf coins throw exception
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
 
@@ -197,9 +196,12 @@ class GiftLogService
         if ($totalPrice > $totalGiftPrice) {
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
-
         return Common::apiResponse(1, $message);
-    }
+
+     });
+    
+}
+
 
     private function gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUser, $receiversIds, $room, $ownerId, $number)
     {
