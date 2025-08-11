@@ -15,23 +15,29 @@ class BannerEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public array $data;
+    public array $channel;
     public function __construct($data)
     {
         $this->data = $data;
+        info('construct');
+        info($data);
+        $this->channel = $data['msg'] ?? $data['message'];
     }
 
     public function broadcastOn()
     {
-        return new Channel('banner.event');
+        info($this->channel);
+        return new Channel($this->channel);
     }
 
     public function broadcastAs()
     {
-        return 'banner.event';
+        return $this->channel;
     }
 
     public function broadcastWith()
     {
+        info($this->data);
         return $this->data;
     }
 }
