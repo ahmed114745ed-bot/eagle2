@@ -24,6 +24,7 @@ class BannerEvent implements ShouldBroadcast
 
     public function broadcastOn()
     {
+        info($this->channel);
         return new Channel($this->channel);
     }
 
@@ -34,6 +35,7 @@ class BannerEvent implements ShouldBroadcast
 
     public function broadcastWith()
     {
+        info($this->data);
         return $this->data;
     }
 }
