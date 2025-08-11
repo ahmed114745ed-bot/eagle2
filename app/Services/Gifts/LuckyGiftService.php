@@ -230,7 +230,7 @@ class LuckyGiftService
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
         return  $responseData;
-    
+
     }
 
 
@@ -541,7 +541,7 @@ class LuckyGiftService
     {
         $zigoData = [
             'user_id'      => $userId,
-            'user_image'   => @$user->avatar->image ?? '',
+            'user_image'   => @$user->profile->avatar ?? '',
             'gift_image'   => @$gift->img ?? '',
             'owner_id'     => $ownerId,
             'user_name'    => $user->name ?? '',
