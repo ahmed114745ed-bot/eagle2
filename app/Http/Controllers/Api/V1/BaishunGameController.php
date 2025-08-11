@@ -151,6 +151,7 @@ class BaishunGameController extends Controller
                 ]
             ];
 
+            info('im in game');
             $json = json_encode($d);
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
         }
