@@ -19,12 +19,14 @@ class BannerEvent implements ShouldBroadcast
     public function __construct($data)
     {
         $this->data = $data;
+        info('construct');
+        info($data);
+        info($data['messageContent']['msg']);
         $this->channel = $data['messageContent']['msg'] ?? $data['messageContent']['message'];
     }
 
     public function broadcastOn()
     {
-        info($this->channel);
         return new Channel($this->channel);
     }
 
@@ -35,7 +37,6 @@ class BannerEvent implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        info($this->data);
         return $this->data;
     }
 }
