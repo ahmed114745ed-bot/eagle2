@@ -72,14 +72,10 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
 
         $chunk = $rooms->chunk(15);
         foreach ($chunk as $roomIds) {
-            info($this->json);
-            info($useZego);
             if ($useZego){
-                info('zego');
                 $promises = Common::sendToZegoWithArrayOfRooms('SendCustomCommand', $roomIds->toArray(), $this->senderId, $this->json, exceptRoomId: $this->isExceptRoom ? $this->roomID : null);
                 Utils::unwrap($promises);
             } else{
-                info('no zego');
                 event(new BannerEvent(json_decode($this->json, true)));
             }
         }
