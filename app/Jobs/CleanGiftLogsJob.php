@@ -18,73 +18,73 @@ class CleanGiftLogsJob  implements ShouldQueue
     public function handle()
 {
 
+    User::select('id', 'monthly_diamond_received', 'agency_id')->where('agency_id','!=' ,0)
+    ->chunk(500, function ($users) {
+        foreach ($users as $user) {
+            $monthlyLimit = $user->monthly_diamond_received;
 
-    User::select('id', 'monthly_diamond_received', 'agency_id')
-        ->chunk(500, function ($users) {
-            foreach ($users as $user) {
-                $monthlyReceived = $user->monthly_diamond_received;
+            // جلب سجلات الهدايا بجميع الأنواع وترتيبها حسب تاريخ الإنشاء (قد تختار asc أو desc حسب المنطق)
+            $giftLogs = DB::table('gift_logs as gl')
+                ->join('gifts as g', 'gl.giftId', '=', 'g.id')
+                ->where('gl.receiver_id', $user->id)
+                ->where('gl.created_at', '>=', '2025-07-31 21:00:00')
+                ->where('gl.created_at', '<', '2025-08-30 21:00:00')
+                ->orderBy('gl.created_at', 'asc')  // الأقدم أولاً للحذف أو التعديل
+                ->select('gl.id', 'gl.giftPrice', 'g.type as gift_type')
+                ->get();
 
-                $allGiftLogs = DB::table('gift_logs as gl')
-                    ->join('gifts as g', 'gl.giftId', '=', 'g.id')
-                    ->join('users as u', 'gl.receiver_id', '=', 'u.id')
-                    ->where('gl.receiver_id', $user->id)
-                    ->where('u.agency_id', $user->agency_id)
-                    ->where('gl.created_at', '>=', '2025-07-31 21:00:00')
-                    ->where('gl.created_at', '<',  '2025-08-30 21:00:00')
-                    ->orderBy('gl.created_at', 'asc')
-                    ->select('gl.*', 'g.type as gift_type')
-                    ->cursor();
-                    
+            $total = $giftLogs->sum('giftPrice');
 
-                $total = 0;
-                $keepIdsType6 = [];
-                $partialUpdateId = null;
-                $partialNewValue = null;
+            if ($total <= $monthlyLimit) {
+                // الرصيد مساوي أو أكبر، لا حاجة لحذف
+                Log::info("No deletion needed for user {$user->id}, total gifts {$total} within limit {$monthlyLimit}");
+                continue;
+            }
 
-                foreach ($allGiftLogs as $log) {
-                    if ($total < $monthlyReceived) {
-                        if ($total + $log->giftPrice <= $monthlyReceived) {
-                            $total += $log->giftPrice;
+            // حذف سجلات النوع 6 أولا حتى ينخفض المجموع
+            $remainingToRemove = $total - $monthlyLimit;
 
-                        } else {
-                            $needed = $monthlyReceived - $total;
-                            $total += $needed;
-                            if ($log->gift_type == 6) {
-                                $partialUpdateId = $log->id;
-                                $partialNewValue = $needed;
-                                $keepIdsType6[] = $log->id;
-                            }
-                            break;
-                        }
+            // سجلات النوع 6 فقط
+            $type6Logs = $giftLogs->where('gift_type', 6);
+
+            foreach ($type6Logs as $log) {
+                if ($remainingToRemove <= 0) break;
+
+                if ($log->giftPrice <= $remainingToRemove) {
+                    // حذف كامل للسجل
+                    DB::table('gift_logs')->where('id', $log->id)->delete();
+                    $remainingToRemove -= $log->giftPrice;
+                } else {
+                    // تعديل جزئي للسجل (تخفيض giftPrice)
+                    $newPrice = $log->giftPrice - $remainingToRemove;
+                    DB::table('gift_logs')->where('id', $log->id)->update(['giftPrice' => $newPrice]);
+                    $remainingToRemove = 0;
+                }
+            }
+
+            if ($remainingToRemove > 0) {
+                // باقي الحذف من الأنواع الأخرى
+                $otherLogs = $giftLogs->where('gift_type', '!=', 6);
+
+                foreach ($otherLogs as $log) {
+                    if ($remainingToRemove <= 0) break;
+
+                    if ($log->giftPrice <= $remainingToRemove) {
+                        // حذف كامل للسجل
+                        DB::table('gift_logs')->where('id', $log->id)->delete();
+                        $remainingToRemove -= $log->giftPrice;
                     } else {
-                        break;
+                        // تعديل جزئي للسجل (تخفيض giftPrice)
+                        $newPrice = $log->giftPrice - $remainingToRemove;
+                        DB::table('gift_logs')->where('id', $log->id)->update(['giftPrice' => $newPrice]);
+                        $remainingToRemove = 0;
                     }
                 }
-
-                if ($partialUpdateId && $partialNewValue !== null) {
-                    DB::table('gift_logs')
-                        ->where('id', $partialUpdateId)
-                        ->update(['giftPrice' => $partialNewValue]);
-                }
-
-                $deleted = DB::table('gift_logs as gl')
-                    ->join('gifts as g', 'gl.giftId', '=', 'g.id')
-                    ->join('users as u', 'gl.receiver_id', '=', 'u.id')
-                    ->where('gl.receiver_id', $user->id)
-                    ->where('u.agency_id', $user->agency_id)
-                    ->where('g.type', 6)
-                    ->where('gl.created_at', '>=', '2025-07-31 21:00:00')
-                    ->where('gl.created_at', '<',  '2025-08-30 21:00:00')
-                    ->whereNotIn('gl.id', $keepIdsType6)
-                    ->delete();
-
-                Log::info("Gift logs cleanup for user {$user->id}", [
-                    'monthly_received' => $monthlyReceived,
-                    'total_kept'       => $total,
-                    'records_deleted'  => $deleted
-                ]);
             }
-        });
+
+            Log::info("Cleanup for user {$user->id} done, reduced by " . ($total - $monthlyLimit));
+        }
+    });
 }
 
     
