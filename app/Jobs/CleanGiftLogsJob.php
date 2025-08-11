@@ -18,18 +18,7 @@ class CleanGiftLogsJob  implements ShouldQueue
     public function handle()
 {
 
-    DB::table('gift_logs as gl')
-        ->join('gifts as g', 'gl.giftId', '=', 'g.id')
-        ->where('gl.created_at', '>=', '2025-07-31 21:00:00')
-        ->where('gl.created_at', '<',  '2025-08-30 21:00:00')
-        ->update([
-            'giftPrice' => DB::raw("
-                CASE 
-                    WHEN g.type = 6 THEN g.price * gl.giftNum * 0.1
-                    ELSE g.price * gl.giftNum
-                END
-            ")
-        ]);
+
     User::select('id', 'monthly_diamond_received', 'agency_id')
         ->chunk(500, function ($users) {
             foreach ($users as $user) {
@@ -56,9 +45,7 @@ class CleanGiftLogsJob  implements ShouldQueue
                     if ($total < $monthlyReceived) {
                         if ($total + $log->giftPrice <= $monthlyReceived) {
                             $total += $log->giftPrice;
-                            if ($log->gift_type == 6) {
-                                $keepIdsType6[] = $log->id;
-                            }
+
                         } else {
                             $needed = $monthlyReceived - $total;
                             $total += $needed;
