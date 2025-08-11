@@ -18,58 +18,70 @@ class CleanGiftLogsJob  implements ShouldQueue
     public function handle()
     {
         $users = User::select('id', 'monthly_diamond_received')->get();
-
+    
         foreach ($users as $user) {
             $monthlyReceived = $user->monthly_diamond_received;
-        
-            $giftLogs = DB::table('gift_logs')
-                ->where('receiver_id', $user->id)
-                ->where('type', 6)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->orderBy('created_at', 'asc')
+    
+            $allGiftLogs = DB::table('gift_logs')
+                ->join('gifts', 'gift_logs.giftId', '=', 'gifts.id')
+                ->where('gift_logs.receiver_id', $user->id)
+                ->whereMonth('gift_logs.created_at', now()->month)
+                ->whereYear('gift_logs.created_at', now()->year)
+                ->orderBy('gift_logs.created_at', 'asc')
+                ->select('gift_logs.*', 'gifts.type as gift_type')
                 ->get();
-        
+    
             $total = 0;
-            $keepIds = [];
+            $keepIdsType6 = [];
             $partialUpdateId = null;
             $partialNewValue = null;
-        
-            foreach ($giftLogs as $log) {
-                if ($total + $log->giftPrice < $monthlyReceived) {
-                    $keepIds[] = $log->id;
-                    $total += $log->giftPrice;
-                } elseif ($total < $monthlyReceived) {
-                    // نأخذ جزء من هذا السجل
-                    $needed = $monthlyReceived - $total;
-                    $partialUpdateId = $log->id;
-                    $partialNewValue = $needed;
-                    $total += $needed;
-                    $keepIds[] = $log->id;
-                    break;
+    
+            foreach ($allGiftLogs as $log) {
+                if ($total < $monthlyReceived) {
+                    if ($total + $log->giftPrice <= $monthlyReceived) {
+                        $total += $log->giftPrice;
+                        // احتفظ بالسجل إذا كان النوع 6
+                        if ($log->gift_type == 6) {
+                            $keepIdsType6[] = $log->id;
+                        }
+                    } else {
+                        // نحتاج فقط جزء من هذا السجل
+                        $needed = $monthlyReceived - $total;
+                        $total += $needed;
+                        if ($log->gift_type == 6) {
+                            $partialUpdateId = $log->id;
+                            $partialNewValue = $needed;
+                            $keepIdsType6[] = $log->id;
+                        }
+                        break;
+                    }
                 } else {
                     break;
                 }
             }
-        
-            // تحديث السجل الجزئي
+    
             if ($partialUpdateId && $partialNewValue !== null) {
                 DB::table('gift_logs')
                     ->where('id', $partialUpdateId)
                     ->update(['giftPrice' => $partialNewValue]);
             }
-        
-            // حذف الباقي
+    
             $deleted = DB::table('gift_logs')
-                ->where('receiver_id', $user->id)
-                ->where('type', 6)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->whereNotIn('id', $keepIds)
+                ->join('gifts', 'gift_logs.giftId', '=', 'gifts.id')
+                ->where('gift_logs.receiver_id', $user->id)
+                ->where('gifts.type', 6)
+                ->whereMonth('gift_logs.created_at', now()->month)
+                ->whereYear('gift_logs.created_at', now()->year)
+                ->whereNotIn('gift_logs.id', $keepIdsType6)
                 ->delete();
-        
-   
+    
+            Log::info("Gift logs cleanup for user {$user->id}", [
+                'monthly_received' => $monthlyReceived,
+                'total_after_cleanup' => $total,
+                'partial_updated' => $partialUpdateId ? ['id' => $partialUpdateId, 'new_value' => $partialNewValue] : null,
+                'records_deleted' => $deleted
+            ]);
         }
-        
     }
+    
 }
