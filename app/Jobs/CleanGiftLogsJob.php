@@ -28,13 +28,13 @@ class CleanGiftLogsJob  implements ShouldQueue
                     $partialNewValue = null;
 
                     DB::table('gift_logs as gl')
-                        ->join('gifts as g', 'gl.giftId', '=', 'g.id')
-                        ->join('users as u', 'gl.receiver_id', '=', 'u.id')
-                        ->where('gl.receiver_id', $user->id)
-                        ->where('u.agency_id', $user->agency_id)
-                        ->whereBetween('gl.created_at', ['2025-07-31 21:00:00', '2025-08-30 21:00:00'])
-                        ->orderBy('gl.id', 'asc')
-                        ->select('gl.id as gl_id', 'gl.*', 'g.type as gift_type')
+                            ->join('gifts as g', 'gl.giftId', '=', 'g.id')
+                            ->join('users as u', 'gl.receiver_id', '=', 'u.id')
+                            ->where('gl.receiver_id', $user->id)
+                            ->where('u.agency_id', $user->agency_id)
+                            ->whereBetween('gl.created_at', ['2025-07-31 21:00:00', '2025-08-30 21:00:00'])
+                            ->orderBy('gl_id', 'asc')
+                            ->select('gl.id as gl_id', 'gl.*', 'g.type as gift_type')
                         ->chunkById(500, function ($logs) use ($monthlyReceived, &$total, &$keepIdsType6, &$partialUpdateId, &$partialNewValue) {
                             foreach ($logs as $log) {
                                 if ($total < $monthlyReceived) {
@@ -58,7 +58,7 @@ class CleanGiftLogsJob  implements ShouldQueue
                                 }
                             }
                             return true; 
-                        }, 'id');
+                        }, 'gl_id');
 
                     // تعديل السجل الجزئي
                     if ($partialUpdateId && $partialNewValue !== null) {
