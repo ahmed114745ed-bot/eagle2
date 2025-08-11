@@ -23,12 +23,14 @@ class CleanGiftLogsJob  implements ShouldQueue
             $monthlyReceived = $user->monthly_diamond_received;
         
             $giftLogs = DB::table('gift_logs')
-                ->where('receiver_id', $user->id)
-                ->where('type', 6)
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->orderBy('created_at', 'asc')
-                ->get();
+            ->join('gifts', 'gift_logs.giftId', '=', 'gifts.id')
+            ->where('gift_logs.receiver_id', $user->id)
+            ->where('gifts.type', 6)
+            ->whereMonth('gift_logs.created_at', now()->month)
+            ->whereYear('gift_logs.created_at', now()->year)
+            ->orderBy('gift_logs.created_at', 'asc')
+            ->select('gift_logs.*') 
+            ->get();
         
             $total = 0;
             $keepIds = [];
