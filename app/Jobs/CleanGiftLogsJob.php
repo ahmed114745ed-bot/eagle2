@@ -40,12 +40,10 @@ class CleanGiftLogsJob  implements ShouldQueue
                 if ($total < $monthlyReceived) {
                     if ($total + $log->giftPrice <= $monthlyReceived) {
                         $total += $log->giftPrice;
-                        // احتفظ بالسجل إذا كان النوع 6
                         if ($log->gift_type == 6) {
                             $keepIdsType6[] = $log->id;
                         }
                     } else {
-                        // نحتاج فقط جزء من هذا السجل
                         $needed = $monthlyReceived - $total;
                         $total += $needed;
                         if ($log->gift_type == 6) {
@@ -74,13 +72,6 @@ class CleanGiftLogsJob  implements ShouldQueue
                 ->whereYear('gift_logs.created_at', now()->year)
                 ->whereNotIn('gift_logs.id', $keepIdsType6)
                 ->delete();
-    
-            Log::info("Gift logs cleanup for user {$user->id}", [
-                'monthly_received' => $monthlyReceived,
-                'total_after_cleanup' => $total,
-                'partial_updated' => $partialUpdateId ? ['id' => $partialUpdateId, 'new_value' => $partialNewValue] : null,
-                'records_deleted' => $deleted
-            ]);
         }
     }
     
