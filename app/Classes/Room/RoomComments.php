@@ -58,7 +58,6 @@ class RoomComments
             ];
             $json = json_encode($ms);
 
-
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
 
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $data['room_id']), 'heavyProcessing');

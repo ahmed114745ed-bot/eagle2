@@ -38,8 +38,8 @@ class CoinService
     public function buyCoins($user, $request)
     {
         $coin = $this->coinRepository->findById($request->coin_id);
-        $paymentMethod = $coin->paymentCoin->type;
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
+        $paymentMethod = $coin->paymentCoin->type;
         $trx = rand(111111111111111111, 999999999999999999);
         // DB::beginTransaction();
         try {
@@ -123,7 +123,7 @@ class CoinService
             }
         } catch (\Exception $exception) {
             //  DB::rollBack();
-            return Common::apiResponse(0, 'fail', null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
 

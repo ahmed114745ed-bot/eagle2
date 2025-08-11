@@ -28,56 +28,6 @@ class UpdateUserWhenSendGift
     {
 
 
-//         $receivedUser->enableSaving = false;
-
-
-//         $values = [
-//             'salary_is_updated' => 1,
-//             'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
-//             'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
-
-//         ];
-
-//         // add is salary updated
-//         $receivedUser->salary_is_updated = true;
-//         //update monthly diamond for received user
-//         $receivedUser->monthly_diamond_received += $totalCoins;
-//         $receivedUser->total_diamond_received   += $totalCoins;
-//         // update levels
-//         if ($receivedUser->type_user == 0 && $receivedUser->agency_id == 0) {
-//             $values['exchange_diamonds'] =  DB::raw('exchange_diamonds + ' . $totalCoins);
-// //            $receivedUser->exchange_diamonds += $totalCoins;
-//         }
-
-
-
-//         $lastReceivedLevel = $receivedUser->total_received_level;
-
-//         try {
-
-//             (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($receivedUser);
-
-//             if ($receivedUser->total_received_level > $lastReceivedLevel) {
-//                 dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
-//             }
-
-//         } catch (\Exception $e) {
-//         }
-
-//         $values['received_level'] = $receivedUser->received_level;
-        // $logValues = [
-        //     'salary_is_updated' => 1,
-        //     'monthly_diamond_received' => 'monthly_diamond_received + ' . $totalCoins,
-        //     'total_diamond_received' => 'total_diamond_received + ' . $totalCoins,
-        // ];
-
-        // User::where('id', $receivedUser->id)->lockForUpdate()
-        //     ->update($values);
-        // $receivedUser->save();
-        // $receivedUser->enableSaving = true;
-
-        // return $receivedUser;
-
         DB::transaction(function () use ($totalCoins, $receivedUser) {
 
             $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
