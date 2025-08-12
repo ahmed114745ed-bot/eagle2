@@ -14,6 +14,7 @@ use App\Models\BanType;
 use App\Models\GiftLog;
 use App\Models\UserVip;
 use App\Models\LiveTime;
+use App\Models\RealtimeProject;
 use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,7 @@ class UserHandling
             LiveTime::query()->where('uid', $uid)->whereDate('created_at', today())->where('end_time', null)->orderByDesc('id')->first();
 
         if ($timer) {
+            $second = (time() - $timer->start_time);
             $hours           = round((time() - $timer->start_time) / (60 * 60), 2);
             $timer->end_time = time();
             $timer->hours    = $hours;
@@ -40,7 +42,7 @@ class UserHandling
             $user_hours =
                 LiveTime::query()->where('uid', $uid)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->whereDay('created_at', '=', Carbon::now()->day)->sum('hours');
 
-
+            $this->realtimeProject($second);
             $hours = (int)$user_hours;
             $num = \Cache::get('hours_days') ?? 2;
 
@@ -52,6 +54,19 @@ class UserHandling
             ", ['id' => $uid]);
             }
         }
+    }
+
+    public function realtimeProject($second)
+    {
+        $realtimeProject = RealtimeProject::where('type', 'audio')->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)->first();
+        if (!$realtimeProject) {
+            $realtimeProject = RealtimeProject::create([
+                'type' => 'audio',
+            ]);
+        };
+        $realtimeProject->used += $second;
+        $realtimeProject->save();
     }
 
     public function checkIfUserHostByIds(array $userIds): array
@@ -108,7 +123,7 @@ class UserHandling
         $user_sallaries = UserSallary::query()
             ->where([
                 'user_id' => $user->id,
-            ])->where('user_agency_id',$agencyId)
+            ])->where('user_agency_id', $agencyId)
             ->orderBy('id', 'desc')
             ->take(2)
             ->get();
@@ -142,9 +157,9 @@ class UserHandling
         if ($agencyUserJoined) {
             $agencyUserJoined->leave_date = now();
             $agencyUserJoined->status = 'kick off';
-            if ($isApp){
+            if ($isApp) {
                 $agencyUserJoined->kicked_by_app = auth()->id();
-            }else{
+            } else {
                 $agencyUserJoined->kicked_by_admin = auth()->id();
             }
             $agencyUserJoined->save();
