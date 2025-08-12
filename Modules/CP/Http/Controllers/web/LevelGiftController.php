@@ -142,13 +142,8 @@ class LevelGiftController extends MainController
                 "coins" => __('coins'),
                 "achievement" => __('achievement')
             ])
-            
-            ->when('ware', function () use ($form) {
-                $this->addWareFields($form);
-            })
-            ->when('vip', function () use ($form) {
-                $this->addVipFields($form);
-            })
+            ->when("ware", fn() => $this->addWareFields($form, 'ware_'))
+            ->when("vip", fn() => $this->addVipFields($form, 'vip_'))
             ->when("coins", fn() => $this->addCoinsFields($form))
             ->when("achievement", fn() => $this->addAchievementFields($form));
     
@@ -159,19 +154,6 @@ class LevelGiftController extends MainController
             'female' => __('Female')
         ])->required();
     
-
-    \Encore\Admin\Admin::script(<<<'JS'
-    $('select[name="type"]').on('change', function() {
-        let type = $(this).val();
-        if (type !== 'ware') {
-            $('select[name="item_id"]').val(null).trigger('change');
-            $('#ware-image-preview').empty();
-        }
-        if (type !== 'vip') {
-            $('select[name="item_id"]').val(null).trigger('change');
-        }
-    });
-    JS);
         $form->saving(fn($form) => $this->handleSaving($form));
     
         return $form;
