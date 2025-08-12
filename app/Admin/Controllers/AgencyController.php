@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Facades\UserHandling;
+use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -637,7 +638,7 @@ class AgencyController extends MainController
                 })->ajax('/api/search/users-bd2', 'id', 'name');
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
                     $ops2 = [];
-                    foreach (User::Where('id', $value)->get() as $user) {
+                    foreach (Bd::Where('id', $value)->get() as $user) {
                         $ops2[$user->id] = $user->uuid . '_' . $user->name;
                     }
                     return $ops2;
@@ -661,8 +662,8 @@ class AgencyController extends MainController
 
                 $row->width(12)->select('bd_id', __('bd id'))->options(function ($value) {
                     $ops2 = [];
-                    foreach (User::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                    foreach (Bd::Where('id', $value)->get() as $user) {
+                        $ops2[$user->id] = $user->id . '_' . $user->username;
                     }
                     return $ops2;
                 })->ajax('/api/search/users-bd2', 'id', 'name');
@@ -670,7 +671,7 @@ class AgencyController extends MainController
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
                     $ops2 = [];
                     foreach (User::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                        $ops2[$user->id] = $user->uuid . '_' . $user->username;
                     }
                     return $ops2;
                 })->ajax('/api/search/users3', 'id', 'name')->rules('required');

@@ -960,7 +960,7 @@
              <a class="btn btn-success btn-back" href="{{ url('download-charge-agency/' . $agency?->id) }}">
             {{ __('Export to Excel') }}
         </a>
-           <button class="btn-back" onclick="window.location.href='{{ url()->previous() }}'">
+           <button class="btn-back" onclick="window.location.href='{{ bd_url('/charges') }}'">
                 {{ __('Go Back') }} <i class="fas fa-arrow-left"></i>
             </button>
 

@@ -305,7 +305,7 @@ class AgencyController extends MainController
         $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');
 
         return $content->title(__('agency profile'))
-            ->view('bd_shippingAgencyProfile', compact(
+            ->view('bd_shipping_agency_profile', compact(
                 'agency',
                 'resiveds',
                 'charges',
