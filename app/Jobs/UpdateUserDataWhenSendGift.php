@@ -72,9 +72,19 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $price = $number * ($gift->price * 0.1);
 
         $cpId = Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
+        \Log::info('  CP:', [
+            'user_id' => $user->id,
+            'cpId' => $cpId?->id
+        ]);
         $cpIds = [];
         if ($cpId != null) {
-            $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $gift?->id, $price);
+            \Log::info('   CP', [
+                'cpId' => $cpId->id
+            ]);
+            $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $gift->id, $price);
+            \Log::info(' CP IDs  :', [
+                'cpIds' => $cpIds
+            ]);
         }
         
         $sendGiftServices = new SendGiftService();
