@@ -32,4 +32,10 @@ class Gift extends Model
     {
         return $this->hasOne(OVip::class,'id','vip_level');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_gifts')
+            ->withPivot('quantity');
+    }
 }
