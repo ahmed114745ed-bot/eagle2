@@ -58,11 +58,15 @@ class UserHandling
 
     public function realtimeProject($second)
     {
-        $realtimeProject = RealtimeProject::where('type', 'audio')->whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)->first();
+        $month = Carbon::now()->month;
+        $year = Carbon::now()->year;
+        $realtimeProject = RealtimeProject::where('type', 'audio')->where('month', $month)
+            ->where('year', $year)->first();
         if (!$realtimeProject) {
             $realtimeProject = RealtimeProject::create([
                 'type' => 'audio',
+                'month' => $month,
+                'year' => $year,
             ]);
         };
         $realtimeProject->used += $second;

@@ -18,7 +18,7 @@ class RealTimeProjectMonthlyCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'users:realtime-project';
+    protected $signature = 'realtime-project';
 
     /**
      * The console command description.
@@ -44,44 +44,29 @@ class RealTimeProjectMonthlyCommand extends Command
      */
     public function handle()
     {
+        $month = now()->month;
+        $year = now()->year;
 
         // Get projects for current month and year
-        $realtimeProjects = RealtimeProject::whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)
+        $realtimeProjects = RealtimeProject::where('month', $month)
+            ->where('year', $year)
             ->get();
-
 
         if ($realtimeProjects->isEmpty()) {
 
-            $previousMonth = Carbon::now()->subMonth();
-
-            $realtimeProjects = RealtimeProject::whereMonth('created_at', $previousMonth->month)
-                ->whereYear('created_at', $previousMonth->year)
+            $previousMonth = now()->subMonth();
+            $previousMonthProjects = RealtimeProject::where('month', $previousMonth->month)
+                ->where('year', $year)
                 ->get();
 
-            $realtimeAudio = $realtimeProjects->where('type', 'audio')->first();
-            $realtimeVideo = $realtimeProjects->where('type', 'video')->first();
+            foreach (['audio', 'video'] as $type) {
+                $previous = $previousMonthProjects->where('type', $type)->first();
 
-            if ($realtimeAudio) {
                 RealtimeProject::create([
-                    'type' => 'audio',
-                    'balance' => $realtimeAudio->balance - $realtimeAudio->used,
-                ]);
-            }else{
-                RealtimeProject::create([
-                    'type' => 'audio',
-                ]);
-            }
-
-
-            if ($realtimeVideo) {
-                RealtimeProject::create([
-                    'type' => 'video',
-                    'balance' => $realtimeVideo->balance - $realtimeVideo->used,
-                ]);
-            }else{
-                RealtimeProject::create([
-                    'type' => 'video',
+                    'type' => $type,
+                    'month' => $month,
+                    'year' => $year,
+                    'balance' => $previous ? ($previous->balance - $previous->used) : null,
                 ]);
             }
         }
