@@ -230,21 +230,6 @@ class LuckyGiftService
 
 
 
-        /***********************************************/
-        $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
-        $cpIds = [];
-        if ($cpId != null) {
-            try {
-                $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPrice);
-            } catch (\Exception $e) {
-                return Common::apiResponse(0, $e->getMessage());
-            }
-        }
-        $sendGiftServices = new SendGiftService();
-
-        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds  );
-        /***********************************************/
-
         return  $responseData;
     }
 
