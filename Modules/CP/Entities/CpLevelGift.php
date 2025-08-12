@@ -47,7 +47,15 @@ class CpLevelGift extends Model
             if ($model->type_ware) {
                 unset($model->type_ware);
             }
+            if ($model->ware_item_id) {
+                unset($model->ware_item_id);
+            }            
+            if ($model->vip_item_id) {
+                unset($model->vip_item_id);
+            }
             unset($model->attributes['type_ware']);
+            unset($model->attributes['ware_item_id']);
+            unset($model->attributes['vip_item_id']);
 
         });
     }

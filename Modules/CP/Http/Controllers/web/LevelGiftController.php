@@ -159,6 +159,10 @@ class LevelGiftController extends MainController
         return $form;
     }
     
+    protected function addVipFields($form ,$prefix = '')
+    {
+        $form->belongsTo($prefix.'item_id', OVips::class, __('vips'));
+    }
 
     protected function addWareFields($form ,$prefix = '')
     {
@@ -166,7 +170,7 @@ class LevelGiftController extends MainController
             ->options(getTranslatedUsedWare())
             ->load('items.item_id', admin_url('wares-by-type'));
 
-        $form->belongsTo('item_id', Wares::class, __('Ware'), function ($form) {
+        $form->belongsTo($prefix.'item_id', Wares::class, __('Ware'), function ($form) {
             $form->select('id', __('wares'))
                 ->options(function ($id) {
                     if (!$id) return [];
@@ -186,11 +190,7 @@ class LevelGiftController extends MainController
         $form->hidden('sub_type');
     }
 
-    protected function addVipFields($form ,$prefix = '')
-    {
-        $form->belongsTo('item_id', OVips::class, __('vips'))->required();
-    }
-
+ 
     protected function addCoinsFields($form)
     {
         $form->number("coins", __("coins"))
@@ -264,9 +264,20 @@ class LevelGiftController extends MainController
 
     protected function handleSaving($form)
     {
+
+        if ($form->ware_item_id) {
+            $form->item_id = intval($form->ware_item_id);
+            $form->model()->item_id =  intval($form->ware_item_id);
+
+        }
+
+        if ($form->vip_item_id) {
+            $form->item_id = intval($form->vip_item_id);
+            $form->model()->item_id =  intval($form->vip_item_id);
+
+        }
         unset($form->type_ware);
         $form->ignore('type_ware');
-
         if ($form->type == 'ware') {
             $ware = Ware::find($form->item_id);
             if ($ware) {
@@ -282,6 +293,9 @@ class LevelGiftController extends MainController
             }
             $form->item_id = $url ?? '';
         }
+
+        
+
     }
 
 
