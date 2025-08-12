@@ -14,13 +14,7 @@ class WaresByType extends Selectable
 
     public function make()
     {
-        $type = request('type_ware');
-
-        if ($type) {
-            $this->grid->model()->where('type', $type);
-        } else {
-            $this->grid->model()->whereIn('type', []);
-        }
+  
 
         $this->column('id', __('ID'));
         $this->column('name', __('Name'));
@@ -33,6 +27,8 @@ class WaresByType extends Selectable
             4 => trans('Avatar Frame'),
             5 => trans('Bubble Frame'),
             6 => trans('Entering Special Effects'),
+            28 => __('profile frame'),
+
         ]);
 
         $this->filter(function (Filter $filter) {
@@ -42,6 +38,8 @@ class WaresByType extends Selectable
                     4 => trans('Avatar Frame'),
                     5 => trans('Bubble Frame'),
                     6 => trans('Entering Special Effects'),
+                    28 => __('profile frame'),
+
                 ]);
             });
         });

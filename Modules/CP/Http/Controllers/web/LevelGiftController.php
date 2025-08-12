@@ -167,9 +167,9 @@ class LevelGiftController extends MainController
 
     protected function addWareFields($form ,$prefix = '')
     {
-        $form->select('type_ware', __('Type wares'))
-            ->options(getTranslatedUsedWare())
-            ->load('items.item_id', admin_url('wares-by-type'), 'type_ware');
+        // $form->select('type_ware', __('Type wares'))
+        //     ->options(getTranslatedUsedWare())
+        //     ->load('items.item_id', admin_url('wares-by-type'), 'type_ware');
 
         $form->belongsTo($prefix.'item_id', WaresByType::class, __('Ware'), function ($form) {
             $form->select('id', __('wares'))
