@@ -667,7 +667,8 @@ class GiftLogController extends Controller
 
     public function cleanGiftLogsForAllUsers()
     {
-        CleanGiftLogsJob::dispatchSync();
+        CleanGiftLogsJob::dispatch()->onQueue('clean_gift_logs');
+
 
         return response()->json([
             'status' => 'success',
