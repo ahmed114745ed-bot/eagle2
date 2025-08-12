@@ -91,7 +91,9 @@ class LevelGiftController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this?->type == "ware") {
-                return @$this?->ware?->name;
+
+                return  self::renderWareWithImage($this?->ware);
+
             } elseif ($this?->type == "vip") {
                 return @$this?->vip?->name;
             } elseif ($this?->type == "coins") {
@@ -101,6 +103,8 @@ class LevelGiftController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+
+ 
         $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($vip, $charge_event_id) {
@@ -306,4 +310,29 @@ class LevelGiftController extends MainController
 
         return response()->json($data);
     }
+
+    public static function renderWareWithImage($ware)
+    {
+        $imageUrl = @$ware?->show_img;
+
+        if ($imageUrl) {
+            return sprintf(
+                '<div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="%s" alt="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;">
+                    <span style="font-size: 14px; color: ;">%s</span>
+                </div>',
+                getImagePath($imageUrl),
+                e(@$ware?->name)
+            );
+        }
+
+        return sprintf(
+            '<span style="font-size: 14px; color:;">%s</span>',
+            e(@$ware?->name)
+        );
+    }
+
 }
+
+
+
