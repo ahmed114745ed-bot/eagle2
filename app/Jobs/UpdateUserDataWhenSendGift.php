@@ -71,14 +71,9 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
 
         $price = $number * ($gift->price * 0.1);
 
-        $hasCpRelation = Cp::where(function ($query) use ($user) {
-            $query->where('user_one_id', $user->id)
-                  ->orWhere('user_two_id', $user->id);
-        })
-        ->whereIn('status', [1, 4])
-        ->exists();
+        $cpId = Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
         $cpIds = [];
-        if ($hasCpRelation) {
+        if ($cpId != null) {
             $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $gift?->id, $price);
         }
         
