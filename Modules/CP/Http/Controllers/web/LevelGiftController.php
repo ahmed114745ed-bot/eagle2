@@ -7,6 +7,7 @@ use App\Models\OVip;
 use App\Models\Ware;
 use App\Selectables\OVips;
 use App\Selectables\Wares;
+use App\Selectables\WaresByType;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Illuminate\Http\Request;
@@ -170,7 +171,7 @@ class LevelGiftController extends MainController
             ->options(getTranslatedUsedWare())
             ->load('items.item_id', admin_url('wares-by-type'), ['type_ware']);
 
-        $form->belongsTo($prefix.'item_id', Wares::class, __('Ware'), function ($form) {
+        $form->belongsTo($prefix.'item_id', WaresByType::class, __('Ware'), function ($form) {
             $form->select('id', __('wares'))
                 ->options(function ($id) {
                     if (!$id) return [];
