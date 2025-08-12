@@ -7,8 +7,11 @@ use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
 use App\Models\Cp;
+use App\Models\GiftLog;
 use App\Models\User;
 use App\Helpers\Common;
+use Carbon\Carbon;
+use DB;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
@@ -26,6 +29,9 @@ use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
+use Modules\RoomBoom\Entities\RoomBoom;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
+use Modules\RoomBoom\Entities\TotalRoomGift;
 
 class GiftLogService
 {
@@ -142,7 +148,9 @@ class GiftLogService
 
         $price = ceil($realPrice);
 
-        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
+        $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
+
+        $sendGiftServices->roomBoom($room->id, $totalPrice, $roomBoomUuid);
 
         foreach ($receivedUsers as $receivedUser) {
             $updateUserWhenSendGift->update($price, $receivedUser);
