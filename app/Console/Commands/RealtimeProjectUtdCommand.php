@@ -44,25 +44,45 @@ class RealtimeProjectUtdCommand extends Command
     {
         $month = Carbon::now()->month;
         $year = Carbon::now()->year;
-        $url = config('utd_url');
-        $projectId = config('project_id');
-        $fullUrl = $url . $projectId . '/realtime-projects';
-        $response =  Http::get($fullUrl);
+        $url = config('app.utd_url');
+        $fullUrl = $url . 'realtime-projects';
+        $baseUrl =  config('app.url');
+        $data = [
+            'base_url' => $baseUrl,
+        ];
+        $response =  Http::get($fullUrl, $data);
 
         if ($response->successful()) {
             $data = $response->json();
-            foreach ($data as $realtimeProject) {
-                $realtime =     RealtimeProject::where(['month' => $month, 'year' => $year, 'type', $realtimeProject->type])->first();
-                if (!$realtime) {
-                    $realtime =   RealtimeProject::create(['month' => $month, 'year' => $year, 'type', $realtimeProject->type]);
+
+            if (!empty($data['data'])) {
+                foreach ($data['data'] as $realtimeProject) {
+                    // Fix where syntax
+                    $realtime = RealtimeProject::where([
+                        'month' => $month,
+                        'year' => $year,
+                        'type'  => $realtimeProject['type'], // or ->type if it's an object
+                    ])->first();
+
+                    if (!$realtime) {
+                        $realtime = RealtimeProject::create([
+                            'month' => $month,
+                            'year'  => $year,
+                            'type'  => $realtimeProject['type'],
+                        ]);
+                    }
+
+                    $realtime->balance = $realtimeProject['balance'];
+                    $realtime->save();
+
+                    // Merge array values instead of +=
+                    $payload = array_merge($data, [
+                        'type' => $realtime->type,
+                        'used' => $realtime->used,
+                    ]);
+                    $updateUrl = $url . 'realtime-projects/update';
+                    Http::post($updateUrl, $payload);
                 }
-                $realtime->balance += $realtimeProject->balance;
-                $realtime->save();
-                $data = [
-                    'type' => $realtime->type,
-                    'used' => $realtime->used,
-                ];
-                Http::post($fullUrl, $data);
             }
         }
     }
