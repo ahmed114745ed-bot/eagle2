@@ -168,7 +168,7 @@ class LevelGiftController extends MainController
     {
         $form->select('type_ware', __('Type wares'))
             ->options(getTranslatedUsedWare())
-            ->load('items.item_id', admin_url('wares-by-type'));
+            ->load('items.item_id', admin_url('wares-by-type'), ['type_ware']);
 
         $form->belongsTo($prefix.'item_id', Wares::class, __('Ware'), function ($form) {
             $form->select('id', __('wares'))
@@ -179,7 +179,7 @@ class LevelGiftController extends MainController
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id') 
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
