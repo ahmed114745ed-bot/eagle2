@@ -88,7 +88,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         }
 
         $sendGiftServices = new SendGiftService();
-        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0 , cpId: $cpIds);
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0 , cpIds: $cpIds);
 
     }
 
