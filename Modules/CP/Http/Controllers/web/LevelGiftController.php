@@ -149,41 +149,66 @@ class LevelGiftController extends MainController
                     return [$ware->id => "{$ware->name}_{$ware->id}"];
                 })
                 ->attribute(['data-image-select' => 1]);
+                $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
 
-
-            Admin::script(<<<SCRIPT
-                $(function () {
-                    let itemSelected = $('select[name="item_id"]').val();
-                    if (itemSelected) {
-                        $('select[name="type_ware"]').trigger('change');
-                    }
-                });
-            SCRIPT);
-
-            Admin::script(<<<'JS'
-                $(function () {
-                    function formatWithImage(option) {
-                        if (!option.id) return option.text;
-
-                        let img = option.image
-                            ? `<img src="${option.image}" style="width:30px;height:30px;border-radius:4px;margin-right:6px;">`
-                            : '';
-                        return $(`<span>${img}${option.text}</span>`);
-                    }
-
-                    $('select[data-image-select]').each(function () {
-                        $(this).select2({
+                Admin::script(<<<'JS'
+                    $(function () {
+                        function formatWithImage(option) {
+                            if (!option.id) return option.text;
+                            let img = option.image ? `<img src="${option.image}" style="width:30px;height:30px;border-radius:4px;margin-right:6px;">` : '';
+                            return $(`<span>${img}${option.text}</span>`);
+                        }
+            
+                        let $itemSelect = $('select[data-image-select]');
+            
+                        $itemSelect.select2({
+                            ajax: {
+                                delay: 250,
+                                url: $('select[name="type_ware"]').data('load-url') || $('select[name="type_ware"]').attr('data-load-url'),
+                                data: function(params) {
+                                    return {
+                                        type_ware: $('select[name="type_ware"]').val(),
+                                        q: params.term
+                                    };
+                                },
+                                processResults: function (data) {
+                                    return { results: data };
+                                }
+                            },
                             templateResult: formatWithImage,
                             templateSelection: formatWithImage,
                             escapeMarkup: function (m) { return m; }
                         });
+            
+                        $itemSelect.on('select2:select', function (e) {
+                            let data = e.params.data;
+                            
+                            $('#ware-image-preview').html(
+                                data.image
+                                    ? `<img src="${data.image}" style="max-width:150px;max-height:150px;border:1px solid #ccc;border-radius:4px;">`
+                                    : ''
+                            );
+                        });
+            
+                        // إذا فيه قيمة محفوظة، نحمل بياناتها ونظهر المعاينة
+                        let initialId = $itemSelect.val();
+                        if (initialId) {
+                            $.getJSON($itemSelect.data('load-url') || $itemSelect.attr('data-load-url'), { id: initialId }, function (data) {
+                                if (data && data.length > 0) {
+                                    let item = data[0];
+                                    let option = new Option(item.text, item.id, true, true);
+                                    $itemSelect.append(option).trigger('change');
+                                    if (item.image) {
+                                        $('#ware-image-preview').html(`<img src="${item.image}" style="max-width:150px;max-height:150px;border:1px solid #ccc;border-radius:4px;">`);
+                                    }
+                                }
+                            });
+                        }
                     });
-                });
-            JS);
-
-
-            $form->hidden('sub_type');
-        })
+                JS);
+            
+                $form->hidden('sub_type');
+            })
             ->when("vip", function () use ($form) {
                 $form->select('item_id', trans('vips'))
                     ->options(OVip::pluck('name', 'id'));
