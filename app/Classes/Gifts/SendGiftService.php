@@ -49,14 +49,14 @@ class SendGiftService
         DB::table('gift_logs')->insert($data);
     }
 
-    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null)
+    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null , $sourceType = null)
     {
         if ($totalPrice == null) $totalPrice = $gift->price * $number;
         $roomBoomUuid = (string) Str::uuid();
         $data = [];
         foreach ($receivedUsers as $receivedUser) {
             $cpId = @$cpIds[$receivedUser->id] ?? null;
-            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId);
+            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId , sourceType: $sourceType);
             $info['room_boom_uuid'] = $roomBoomUuid;
             $data[] = $info;
         }
@@ -399,7 +399,7 @@ class SendGiftService
      * @param mixed $isPlay
      * @return array
      */
-    public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null): array
+    public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null ,$sourceType = null): array
     {
         $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
         $info['giftId']       = $gift->id;
@@ -425,6 +425,8 @@ class SendGiftService
         $info['cp_id']   = $cpId;
         $info['room_id']   = $room->id;
         $info['room_gift_status'] = $appFeatureStatus ?? false;
+        $info['source_type']  = $sourceType;
+
 
 
 

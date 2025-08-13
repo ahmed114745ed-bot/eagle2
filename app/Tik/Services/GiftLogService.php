@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 
+use App\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
@@ -10,6 +11,7 @@ use App\Models\Cp;
 use App\Models\GiftLog;
 use App\Models\User;
 use App\Helpers\Common;
+use App\Models\UserGift;
 use Carbon\Carbon;
 use DB;
 use GuzzleHttp\Promise\Utils;
@@ -53,6 +55,9 @@ class GiftLogService
         $ownerId = $data['owner_id'];
         $giftId  = $data['id'];
         $number  = $data['num'];
+        $type  = $data['type'];
+        $sourceType = GiftSourceType::fromType($type)->value;
+        
 
         //get the gift data from id in the parameter
         $gift = $this->giftRepository->findById($giftId);
@@ -66,7 +71,11 @@ class GiftLogService
         $totalPriceForOnlyReceiver = $gift->price * $number;
 
         // if user didn't have inf coins throw exception
-        if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+        $check = $this->checkGiftAvailability($user, $gift, $number, $type,$totalPrice);
+        if ($check) {
+            return $check; 
+        }
+
 
         // Get Room Data
         $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status');
@@ -85,18 +94,23 @@ class GiftLogService
         //decrement the user coins
         try {
 
-            $sendPrice = (int)($totalPrice);
-            $amountBefore = $user->di;
+            if ($type && $type !== 'bag'  ){
+                $sendPrice = (int)($totalPrice);
+                $amountBefore = $user->di;
 
-            UserCoinLogHelper::logByType(
-                $user->id,
-                -abs($sendPrice),
-                $amountBefore,
-                UserCoinLogType::GIFT,
-                $gift?->name
-            );
+                UserCoinLogHelper::logByType(
+                    $user->id,
+                    -abs($sendPrice),
+                    $amountBefore,
+                    UserCoinLogType::GIFT,
+                    $gift?->name
+                );
 
-            $updateUserWhenSendGift->send($sendPrice, $user);
+                $updateUserWhenSendGift->send($sendPrice, $user);
+            }else{
+
+                $updateUserWhenSendGift->removeUserGift( $user,$giftId,$number);
+            }
         } catch (NotInfMoneyException $e) {
             return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
         }
@@ -148,7 +162,7 @@ class GiftLogService
 
         $price = ceil($realPrice);
 
-        $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
+        $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
         $sendGiftServices->roomBoom($room->id, $totalPrice, $roomBoomUuid);
 
@@ -187,9 +201,9 @@ class GiftLogService
                 Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
             }
         }
-        (new RoomAchievementTargetService)->roomTarget($room);
+        // (new RoomAchievementTargetService)->roomTarget($room);
 
-        CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
+        // CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
 
         $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
         try {
@@ -204,6 +218,33 @@ class GiftLogService
         }
 
         return Common::apiResponse(1, $message);
+    }
+
+
+    private function checkGiftAvailability($user, $gift, $number, $type, $totalPrice)
+    {
+      
+
+        if ($type == 'bag') {
+          
+               $existingGiftCount = UserGift::where('user_id', $user->id)
+                    ->where('gift_id', $gift->id)
+                    ->where(function($query) {
+                        $query->where('expire', 0)
+                              ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()'); 
+                    })->first();
+
+                if ( $existingGiftCount && $existingGiftCount->quantity < $number) {
+                    return Common::apiResponse(0, 'Receiver has reached maximum allowed gifts', null, 407);
+                }
+           
+            return null; 
+        }
+
+        if ($user->di < $totalPrice) {
+            return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+        }
+        return null;
     }
 
     private function gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUser, $receiversIds, $room, $ownerId, $number)
