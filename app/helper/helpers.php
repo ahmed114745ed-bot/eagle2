@@ -738,7 +738,7 @@ if (!function_exists('bd_url')) {
 
         $secure = $secure ?? (config('bd.https') || config('bd.secure'));
 
-        if (app()->environment('production') ) {
+        if (strtolower(app()->environment()) === 'production') {
             return secure_url($base . '/' . trim($path, '/'), $parameters, $secure);
         }
 
