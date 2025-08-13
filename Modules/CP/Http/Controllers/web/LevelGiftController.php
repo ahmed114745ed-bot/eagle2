@@ -5,6 +5,9 @@ namespace Modules\CP\Http\Controllers\web;
 use Modules\Vip\Entities\Vip;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
+use App\Selectables\OVips;
+use App\Selectables\Wares;
+use App\Selectables\WaresByType;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Illuminate\Http\Request;
@@ -91,7 +94,9 @@ class LevelGiftController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this?->type == "ware") {
-                return @$this?->ware?->name;
+
+                return  self::renderWareWithImage($this?->ware);
+
             } elseif ($this?->type == "vip") {
                 return @$this?->vip?->name;
             } elseif ($this?->type == "coins") {
@@ -101,6 +106,8 @@ class LevelGiftController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+
+ 
         $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($vip, $charge_event_id) {
@@ -126,125 +133,173 @@ class LevelGiftController extends MainController
     protected function form()
     {
         $form = new Form(new CpLevelGift());
-
+    
         $form->hidden('vip_id')->value(request('cp_level_id'));
-
-        $form->select('type', trans('type'))->options([
-            "ware" => __('ware'),
-            "vip" => __('vip'),
-            "coins" => __('coins'),
-            "achievement" => __('achievement')
-        ])->when("ware", function () use ($form) {
-            $form->select('type_ware', trans('type wares'))
-                ->options(getTranslatedUsedWare())
-                ->load('item_id', admin_url('wares-by-type')); // AJAX load
-
-            $form->select('item_id', __('wares'))
-                ->options(function ($id) {
-                    if (!$id) return [];
-
-                    $ware = Ware::find($id);
-                    if (!$ware) return [];
-
-                    return [$ware->id => "{$ware->name}_{$ware->id}"];
-                })
-                ->attribute(['data-image-select' => 1]);
-
-
-            Admin::script(<<<SCRIPT
-                $(function () {
-                    let itemSelected = $('select[name="item_id"]').val();
-                    if (itemSelected) {
-                        $('select[name="type_ware"]').trigger('change');
-                    }
-                });
-            SCRIPT);
-
-            Admin::script(<<<'JS'
-                $(function () {
-                    function formatWithImage(option) {
-                        if (!option.id) return option.text;
-
-                        let img = option.image
-                            ? `<img src="${option.image}" style="width:30px;height:30px;border-radius:4px;margin-right:6px;">`
-                            : '';
-                        return $(`<span>${img}${option.text}</span>`);
-                    }
-
-                    $('select[data-image-select]').each(function () {
-                        $(this).select2({
-                            templateResult: formatWithImage,
-                            templateSelection: formatWithImage,
-                            escapeMarkup: function (m) { return m; }
-                        });
-                    });
-                });
-            JS);
-
-
-            $form->hidden('sub_type');
-        })
-            ->when("vip", function () use ($form) {
-                $form->select('item_id', trans('vips'))
-                    ->options(OVip::pluck('name', 'id'));
-//                $form->select('item_id', trans('vips'))
-//                    ->options(function ($id) {
-//                        if (!$id) return [];
-//                        $vip = OVip::find($id);
-//                        if (!$vip) return [];
-//                        return [$vip->id => $vip->name];
-//                    })
-//                    ->load('item_id', admin_url('vips-by-type'));
-            })
-            ->when("coins", function () use ($form) {
-                $form->number("coins", __("coins"))
-                    ->default(function ($form) {
-                        return $form->model()->type === 'coins' ? (int) $form->model()->item_id : null;
-                    });
-            })
-            ->when("achievement", function () use ($form) {
-                $form->image("achievement", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
-            });
-
+    
+        $form->select('type', trans('type'))
+            ->options([
+                "ware" => __('ware'),
+                "vip" => __('vip'),
+                "coins" => __('coins'),
+                "achievement" => __('achievement')
+            ])
+            ->when("ware", fn() => $this->addWareFields($form, 'ware_'))
+            ->when("vip", fn() => $this->addVipFields($form, 'vip_'))
+            ->when("coins", fn() => $this->addCoinsFields($form))
+            ->when("achievement", fn() => $this->addAchievementFields($form));
+    
         $form->number('expire', __('expire'));
         $form->select('gender', __('gender'))->options([
             'all' => __('all'),
             'male' => __('Male'),
             'female' => __('Female')
         ])->required();
-
-        $form->saving(function (Form $form) {
-            unset($form->type_ware);
-            $form->ignore('type_ware');
-
-            if ($form->type == 'ware') {
-                $ware = Ware::find($form->item_id);
-                if ($ware) {
-                    if ($ware?->type == 4) {
-                        $form->sub_type = 'bubble';
-                    } elseif ($ware?->type == 5) {
-                        $form->sub_type = 'intro';
-                    } elseif ($ware?->type == 6) {
-                        $form->sub_type = 'frame';
-                    }
-                }
-            } elseif ($form->type == 'vip') {
-            } elseif ($form->type == 'coins') {
-                $form->item_id = $form->coins;
-            } elseif ($form->type == 'achievement') {
-
-                if ($form->achievement instanceof UploadedFile) {
-                    $url = Common::upload('cp', $form->achievement);
-                }
-                $form->item_id = $url ?? '';
-            }
-        });
-
-
+    
+        $form->saving(fn($form) => $this->handleSaving($form));
+    
         return $form;
     }
+    
+    protected function addVipFields($form ,$prefix = '')
+    {
+        $form->belongsTo($prefix.'item_id', OVips::class, __('vips'));
+    }
+
+    protected function addWareFields($form ,$prefix = '')
+    {
+        // $form->select('type_ware', __('Type wares'))
+        //     ->options(getTranslatedUsedWare())
+        //     ->load('items.item_id', admin_url('wares-by-type'), 'type_ware');
+
+        $form->belongsTo($prefix.'item_id', WaresByType::class, __('Ware'), function ($form) {
+            $form->select('id', __('wares'))
+                ->options(function ($id) {
+                    if (!$id) return [];
+                    $ware = Ware::find($id);
+                    return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+                })
+                ->attribute([
+                    'data-image-select' => 1,
+                    'data-load-url' => admin_url('wares-by-id') 
+                ]);
+
+            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
+
+            $this->addWareJs();
+        });
+
+        $form->hidden('sub_type');
+    }
+
+ 
+    protected function addCoinsFields($form)
+    {
+        $form->number("coins", __("coins"))
+            ->default(fn($form) => $form->model()->type === 'coins'
+                ? (int) $form->model()->item_id
+                : null
+            );
+    }
+
+    protected function addAchievementFields($form)
+    {
+        $form->image("achievement", __('image'))
+            ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
+            ->disk('gcs');
+    }
+    protected function addWareJs()
+    {
+        \Encore\Admin\Admin::script(<<<'JS'
+            function formatWithImage(option) {
+                if (!option.id) return option.text;
+                let img = option.image 
+                    ? `<img src="${option.image}" style="width:130px;height:100px;border-radius:4px;margin-right:6px;">` 
+                    : '';
+                return $(`<span>${img}${option.text}</span>`);
+            }
+
+            let $select = $('select[data-image-select]');
+
+            $select.select2({
+                ajax: {
+                    delay: 250,
+                    url: $select.data('load-url'),
+                    data: function(params) {
+                        return { q: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    }
+                },
+                templateResult: formatWithImage,
+                templateSelection: formatWithImage,
+                escapeMarkup: function (m) { return m; }
+            });
+
+            $select.on('select2:select', function (e) {
+                let data = e.params.data;
+                $('#ware-image-preview').html(
+                    data.image
+                        ? `<img src="${data.image}" style="max-width:150px;max-height:150px;border:1px solid #ccc;border-radius:4px;">`
+                        : ''
+                );
+            });
+
+            let initialId = $select.val();
+            if (initialId) {
+                $.getJSON($select.data('load-url'), { id: initialId }, function (data) {
+                    if (data && data.length > 0) {
+                        let item = data[0];
+                        let option = new Option(item.text, item.id, true, true);
+                        $select.append(option).trigger('change');
+                        if (item.image) {
+                            $('#ware-image-preview').html(
+                                `<img src="${item.image}" style="max-width:150px;max-height:150px;border:1px solid #ccc;border-radius:4px;">`
+                            );
+                        }
+                    }
+                });
+            }
+        JS);
+    }
+
+    protected function handleSaving($form)
+    {
+
+        if ($form->ware_item_id) {
+            $form->item_id = intval($form->ware_item_id);
+            $form->model()->item_id =  intval($form->ware_item_id);
+
+        }
+
+        if ($form->vip_item_id) {
+            $form->item_id = intval($form->vip_item_id);
+            $form->model()->item_id =  intval($form->vip_item_id);
+
+        }
+        unset($form->type_ware);
+        $form->ignore('type_ware');
+        if ($form->type == 'ware') {
+            $ware = Ware::find($form->item_id);
+            if ($ware) {
+                if ($ware->type == 4) $form->sub_type = 'bubble';
+                elseif ($ware->type == 5) $form->sub_type = 'intro';
+                elseif ($ware->type == 6) $form->sub_type = 'frame';
+            }
+        } elseif ($form->type == 'coins') {
+            $form->item_id = $form->coins;
+        } elseif ($form->type == 'achievement') {
+            if ($form->achievement instanceof UploadedFile) {
+                $url = Common::upload('cp', $form->achievement);
+            }
+            $form->item_id = $url ?? '';
+        }
+
+        
+
+    }
+
+
 
     public function getWaresByType(Request $request)
     {
@@ -281,4 +336,29 @@ class LevelGiftController extends MainController
 
         return response()->json($data);
     }
+
+    public static function renderWareWithImage($ware)
+    {
+        $imageUrl = @$ware?->show_img;
+
+        if ($imageUrl) {
+            return sprintf(
+                '<div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="%s" alt="" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;">
+                    <span style="font-size: 14px; color: ;">%s</span>
+                </div>',
+                getImagePath($imageUrl),
+                e(@$ware?->name)
+            );
+        }
+
+        return sprintf(
+            '<span style="font-size: 14px; color:;">%s</span>',
+            e(@$ware?->name)
+        );
+    }
+
 }
+
+
+

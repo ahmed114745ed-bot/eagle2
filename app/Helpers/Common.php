@@ -2061,7 +2061,7 @@ class Common
                 ->first();
 
             if ($hostAgency && $hostAgency->is_frozen) {
-                throw new \Exception(__('api_responses.frozen_agency_by_admin'));
+                throw new \Exception(__('frozen_agency_by_admin'));
             }
         }
     }

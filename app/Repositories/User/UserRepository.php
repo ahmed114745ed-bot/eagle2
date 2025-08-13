@@ -62,7 +62,7 @@ class UserRepository extends Repository
     {
 
         return User::selectRaw('CONCAT(COALESCE(name, ""), " - ", COALESCE(NULLIF(special_id, ""), uuid)) as name, id')
-          ->where(function ($query) {
+            ->where(function ($query) {
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');
             })

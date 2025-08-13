@@ -149,9 +149,6 @@ class EnteranceRoomServices
         $userId = $request->user_account;
         Log::info('zego req 2',['req' => $request->all()]);
 
-
-
-
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
 
