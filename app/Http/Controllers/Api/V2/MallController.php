@@ -13,6 +13,7 @@ use App\Http\Resources\WareResource;
 use App\Http\Resources\WareResourceAll;
 use App\Http\Resources\WarePaddingResource;
 use App\Http\Resources\BestWareSaleResource;
+use App\Models\Pack;
 use Modules\Public\Http\Services\UserCounterServices;
 
 
@@ -128,6 +129,7 @@ class MallController extends Controller
     public function updateExpireUserVip()
     {
         $userVips = UserVip::where('expire', 0)->with('packs')->get();
+        
         if ($userVips) {
             foreach ($userVips as $userVip) {
                 $expires = $userVip->packs->pluck('expire')->filter(function ($value) {
@@ -135,6 +137,8 @@ class MallController extends Controller
                 });
                 if ($expires->isNotEmpty()) {
                     $userVip->update(['expire' => $expires->first()]);
+                }else{
+                    $userVip->delete();
                 }
             }
         }
@@ -154,6 +158,9 @@ class MallController extends Controller
         foreach ($expireUserVips as $userVip) {
             $userVip->packs()->update(['expire' => $userVip->expire]);
         }
+
+        Pack::whereNull('vip_user_id')->where('get_type',1)->delete();
+        Pack::whereNull('expire')->where('days',0)->delete();
 
 
         return 'done';
