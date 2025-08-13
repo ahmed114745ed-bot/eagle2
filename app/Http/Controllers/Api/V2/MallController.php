@@ -127,8 +127,8 @@ class MallController extends Controller
 
     public function updateExpireUserVip()
     {
-        $userVips = UserVip::where('expire', 0)->with('packs')->where('id',31)->first();
-        dd($userVips,$userVips->packs);
+        $userVips = UserVip::where('expire', 0)->with('packs')->get();
+        
         if ($userVips) {
             foreach ($userVips as $userVip) {
                 $expires = $userVip->packs->pluck('expire')->filter(function ($value) {
@@ -136,6 +136,8 @@ class MallController extends Controller
                 });
                 if ($expires->isNotEmpty()) {
                     $userVip->update(['expire' => $expires->first()]);
+                }else{
+                    $userVip->delete();
                 }
             }
         }
