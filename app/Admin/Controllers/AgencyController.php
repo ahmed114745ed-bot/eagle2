@@ -784,10 +784,18 @@ class AgencyController extends MainController
                         'agency_id' => $form->model()->id,
                         'monthly_diamond_received' => 0,
 
-                    ]);
+               ]);
             }
-      
-        
+
+            if (!$form->model()->exists) {
+                User::where('id', intval($form->input('app_owner_id')))->update([
+                    'type_user' => 2,
+                    'is_host' => 1,
+                    'agency_id' => $form->model()->id,
+                    'monthly_diamond_received' => 0,
+                ]);
+            }
+
 
 
 
