@@ -11,6 +11,6 @@ class RoomBoomLevelRepository
     {
         return RoomBoomLevel::with(['roomBoomRewards' => function ($query) {
             $query->orderBy('priority');
-        }])->orderBy('level')->get();
+        },'roomBooms'])->orderBy('level')->get();
     }
 }

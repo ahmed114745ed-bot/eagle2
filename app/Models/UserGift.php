@@ -9,5 +9,5 @@ class UserGift extends Model
 {
     use HasFactory;
     protected $table = 'user_gifts';
-    protected $guarded = ['*'];
+    protected $fillable = ['gift_id', 'user_id', 'quantity', 'expire'];
 }

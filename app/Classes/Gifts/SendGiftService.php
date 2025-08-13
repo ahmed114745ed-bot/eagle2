@@ -21,6 +21,7 @@ use App\Jobs\SendCustomOfficialMessageToUser;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\TotalRoomGift;
+use Modules\RoomBoom\Jobs\RoomBoomRewardJob;
 use Str;
 
 class SendGiftService
@@ -96,14 +97,17 @@ class SendGiftService
         if ($currentLevel) {
             $existingBoom = RoomBoom::where('room_boom_level_id', $currentLevel->id)
                 ->where('total_room_gift_id', $totalRoomGift->id)
-                ->exists();
+                ->first();
 
             if (!$existingBoom) {
-                RoomBoom::create([
+                $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->value('id');
+
+                $existingBoom = RoomBoom::create([
                     'total_room_gift_id' => $totalRoomGift->id,
                     'room_boom_level_id' => $currentLevel->id,
                     'started_at' => Carbon::now(),
                     'total_gifts_value' => $newTotal,
+                    'trigger_gift_id' => $giftLogId
                 ]);
             }
 
@@ -117,6 +121,8 @@ class SendGiftService
                 'room_boom_level' => $currentLevel->level,
                 'start_boom_ranking' => $startBoomRanking
             ]);
+            $existingBoom->total_gifts_value = $newTotal;
+            $existingBoom->save();
         } else {
             $nextLevel = RoomBoomLevel::where('min_target', '>', $newTotal)
                 ->orderBy('min_target', 'asc')
@@ -138,10 +144,14 @@ class SendGiftService
 
         foreach ($openBooms as $openBoom) {
             $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
+            $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->value('id');
+
             if ($boomLevel && $newTotal >= $boomLevel->target) {
                 $openBoom->ended_at = Carbon::now();
                 $openBoom->total_gifts_value = $newTotal;
+                $openBoom->final_gift_id = $giftLogId;
                 $openBoom->save();
+                dispatch(new RoomBoomRewardJob($openBoom->id));
             }
         }
 
