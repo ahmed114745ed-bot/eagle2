@@ -276,6 +276,7 @@ class GiftLogController extends Controller
             'owner_id' => 'required',
             'toUid'    => 'required',
             'num'      => 'required|integer|min:1',
+            'type'      => 'nullable',
         ]);
 
         if ($validator->fails()) {
