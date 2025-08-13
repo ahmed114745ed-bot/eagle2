@@ -766,13 +766,11 @@ class AgencyController extends MainController
 
 
             if ($modelExists &&  $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
-                //   Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
 
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
 
-                // Admin::where('username', $user->uuid)->delete();
                 $user->update([
                     'type_user' => 0,
                     'agency_id' => 0,
@@ -780,63 +778,16 @@ class AgencyController extends MainController
                     'is_host' => 0,
                 ]);
 
-                // if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
-                //     User::find($newOwnerId)->update([
-                //         'type_user' => 2,
-                //         'agency_id' => $form->model()->id,
-                //         'monthly_diamond_received' => 0,
-                //         'is_host' => 1,
-                //     ]);
-                // } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
-                //     User::find($newOwnerId)->update([
-                //         'type_user' => 4,
-                //         'agency_id' => $form->model()->id,
-                //         'monthly_diamond_received' => 0,
-                //         'is_host' => 1,
-                //     ]);
-                // } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
-                //     User::find($newOwnerId)->update([
-                //         'type_user' => 3,
-                //         'agency_id' => $form->model()->id,
-                //         'monthly_diamond_received' => 0,
-                //         'is_host' => 1,
-                //     ]);
-                // }
+               User::where('id', intval($appOwnerId))->update([
+                        'type_user' => 2,
+                        'is_host' => 1,
+                        'agency_id' => $form->model()->id,
+                        'monthly_diamond_received' => 0,
+
+                    ]);
             }
-
-
-
-            // if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
-
-            //     session()->flash('show_alert', 'Your alert message');
-            //     return redirect()->back();
-            // }
-
-
-
-
-            // if ($Host_agency == 'on' || $Host_agency == 1) {
-            //     $host += 2;
-            // }
-
-            // if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
-            //     $host += 3;
-            // }
-            // if ($host > 3) {
-            //     $host = 4;
-            // }
-            // if ($appOwnerId) {
-            // $newType = intval($host);
-            /*// Reset diamond only when agency created
-            if (!$modelExists) $values['monthly_diamond_received'] = 0;*/
-            User::where('id', intval($appOwnerId))->update([
-                'type_user' => 2,
-                'is_host' => 1,
-                'agency_id' => $form->model()->id,
-                'monthly_diamond_received' => 0,
-
-            ]);
-            // }
+      
+        
 
 
 
