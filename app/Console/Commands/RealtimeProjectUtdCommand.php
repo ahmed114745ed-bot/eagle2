@@ -47,10 +47,14 @@ class RealtimeProjectUtdCommand extends Command
         $url = config('app.utd_url');
         $fullUrl = $url . 'realtime-projects';
         $baseUrl =  config('app.url');
+        $encryptKey = config('app.encrypt_key');
         $dataRequest = [
             'base_url' => $baseUrl,
         ];
-        $response =  Http::get($fullUrl, $dataRequest);
+        $encryptedPayload = urlencode($this->encryptArray($dataRequest, $encryptKey));
+        $response =  Http::get($fullUrl, [
+            'payload' => $encryptedPayload
+        ]);
 
         if ($response->successful()) {
             $data = $response->json();
@@ -81,9 +85,18 @@ class RealtimeProjectUtdCommand extends Command
                         'used' => $realtime->used,
                     ]);
                     $updateUrl = $url . 'realtime-projects/update';
-                    $response =   Http::post($updateUrl, $payload);
+                    $encryptedPayload = $this->encryptArray($payload, $encryptKey);
+                    $response =   Http::post($updateUrl,  [
+                        'payload' => $encryptedPayload
+                    ]);
                 }
             }
         }
+    }
+
+    public static function encryptArray(array $data, string $key): string
+    {
+        $iv = substr($key, 0, 16); // 16 bytes for AES-256-CBC
+        return openssl_encrypt(json_encode($data), 'AES-256-CBC', $key, 0, $iv);
     }
 }
