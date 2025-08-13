@@ -21,6 +21,7 @@ use App\Jobs\SendCustomOfficialMessageToUser;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\TotalRoomGift;
+use Modules\RoomBoom\Jobs\RoomBoomRewardJob;
 use Str;
 
 class SendGiftService
@@ -150,6 +151,7 @@ class SendGiftService
                 $openBoom->total_gifts_value = $newTotal;
                 $openBoom->final_gift_id = $giftLogId;
                 $openBoom->save();
+                dispatch(new RoomBoomRewardJob($openBoom->id));
             }
         }
 

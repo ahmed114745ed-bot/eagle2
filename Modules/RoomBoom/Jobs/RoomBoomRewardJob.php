@@ -7,6 +7,7 @@ use App\Helpers\UserCommon;
 use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
+use App\Models\UserGift;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Bus\Queueable;
@@ -43,7 +44,7 @@ class RoomBoomRewardJob implements ShouldQueue
         $rewardItems = [];
         foreach ($rewards as $reward) {
             for ($i = 0; $i < $reward->quantity; $i++) {
-                $rewardItems[] = $reward;
+                $rewardItems[] = $reward->toArray();
             }
         }
 
@@ -61,6 +62,7 @@ class RoomBoomRewardJob implements ShouldQueue
         $assignments = [];
         $assignedUserIds = [];
 
+        info($rewardItems[0]);
         foreach ($topContributorIds as $i => $userId) {
             if (!isset($rewardItems[$i])) break;
             $reward = $rewardItems[$i];             //first user will take first reward ordered by priority and quantity
@@ -86,11 +88,11 @@ class RoomBoomRewardJob implements ShouldQueue
     public function distributeBoomRewards($userId, $reward): void
     {
         $user = User::find($userId);
-        $expire = $reward->expire_days;
-        if ($reward->target_type === 'ware') {
+        $expire = $reward['expire_days'];
+        if ($reward['target_type'] == 'ware') {
             UserCommon::addWareToUser($user, $reward, $expire);
         }
-        if ($reward->target_type === 'achieve') {
+        if ($reward['target_type'] == 'achieve') {
             $target = $reward->target;
             $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
             $title = __('Achievement Reward');
@@ -100,6 +102,27 @@ class RoomBoomRewardJob implements ShouldQueue
                 'custom_image' => $target,
                 'end_at' => $dateTimestamp,
             ]);
+            Common::sendOfficialMessage($user->id, $title, $body);
+            $token = DB::table('users')->where('id', $user->id)->value('notification_id');
+            if ($token) {
+                Common::send_firebase_notification([$token], $title, $body);
+            }
+        }
+
+        if ($reward['target_type'] == 'gift') {
+            $target = $reward['target'];
+            $title = __('Gift Reward');
+            $body = __('You have received a new gift.');
+
+            $data = [
+                'gift_id' => $target,
+                'user_id' => $userId,
+                'quantity' => $reward['quantity'],
+            ];
+            if ($expire){
+                $data['expire'] = $expire;
+            }
+            UserGift::create($data);
             Common::sendOfficialMessage($user->id, $title, $body);
             $token = DB::table('users')->where('id', $user->id)->value('notification_id');
             if ($token) {

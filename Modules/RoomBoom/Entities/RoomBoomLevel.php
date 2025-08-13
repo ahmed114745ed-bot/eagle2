@@ -13,4 +13,9 @@ class RoomBoomLevel extends Model
     {
         return $this->hasMany(RoomBoomReward::class);
     }
+
+    public function roomBooms(): HasMany
+    {
+        return $this->hasMany(RoomBoom::class);
+    }
 }
