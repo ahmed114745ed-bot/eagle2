@@ -160,6 +160,7 @@ class MallController extends Controller
         }
 
         Pack::whereNull('vip_user_id')->where('get_type',1)->delete();
+        Pack::where('expire',0)->where('days',0)->delete();
 
 
         return 'done';
