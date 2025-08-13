@@ -25,6 +25,7 @@ use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
+use App\Models\RealtimeProject;
 use App\Tik\Services\EnteranceRoomServices;
 use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
@@ -228,18 +229,23 @@ class EnteranceController extends Controller
 
     public function enter_room(Request $request): JsonResponse
     {
+        $user = $request->user();
+        $realtimeProject =  Common::checkRealTime('audio');
 
         $room_pass = $request['room_pass'];
         // $owner_id = $request['owner_id'];
-        $user = $request->user();
+
         $room_id = $request->input('room_id');
 
-        if (!$room_id ) {
+        if (!$room_id) {
             return Common::apiResponse(0, __('Please provide either owner_id or room_id.'));
         }
 
         $room = Room::findOrFail($room_id);
         $owner_id = $room->uid;
+        if (!$realtimeProject) {
+            return Common::apiResponse(0, __('you can not enter room now '));
+        }
 
 
         $ban = Common::ifRoomHasband($owner_id);

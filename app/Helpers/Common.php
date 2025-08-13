@@ -71,6 +71,7 @@ use Illuminate\Support\Facades\Notification;
 use Modules\Charizma\Entities\ExtraDataInRoom;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
+use App\Models\RealtimeProject;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
@@ -756,10 +757,10 @@ class Common
             ],
         ];
 
-//        info('icon', [$icon]);
-//        if ($icon) {
-//            $payload['notification']['icon'] = $icon;
-//        }
+        //        info('icon', [$icon]);
+        //        if ($icon) {
+        //            $payload['notification']['icon'] = $icon;
+        //        }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
@@ -901,10 +902,10 @@ class Common
 
         $result = $messaging->subscribeToTopic($topic, $registrationTokens);
 
-//        logger()->info('✅ Kreait Topic Subscribe', [
-//            'topic' => $topic,
-//            'result' => $result,
-//        ]);
+        //        logger()->info('✅ Kreait Topic Subscribe', [
+        //            'topic' => $topic,
+        //            'result' => $result,
+        //        ]);
 
         return $result;
     }
@@ -918,11 +919,11 @@ class Common
 
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-//            logger()->info('✅ Unsubscribe from FCM topic result', [
-//                'topic'          => $topic,
-//                'tokensCount'    => count($registrationTokens),
-//                'response'       => $response,
-//            ]);
+            //            logger()->info('✅ Unsubscribe from FCM topic result', [
+            //                'topic'          => $topic,
+            //                'tokensCount'    => count($registrationTokens),
+            //                'response'       => $response,
+            //            ]);
 
             // تحليل النتائج (اختياري)
             $result = $response[$topic->value()] ?? [];
@@ -944,7 +945,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-//            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
+            //            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -1259,18 +1260,18 @@ class Common
 
             if ($column) {
                 $updateData[$column] = '1';
-//                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
+                //                logger()->info("✅ وضع 1 في الحقل $column للمستخدم {$user->id}");
             }
         }
 
         if (!empty($updateData)) {
             $success = $user->update($updateData);
 
-//            logger()->info('✅ تم تحديث الحقول:', [
-//                'user_id' => $user->id,
-//                'success' => $success,
-//                'updated_fields' => $updateData
-//            ]);
+            //            logger()->info('✅ تم تحديث الحقول:', [
+            //                'user_id' => $user->id,
+            //                'success' => $success,
+            //                'updated_fields' => $updateData
+            //            ]);
         }
     }
 
@@ -1453,19 +1454,19 @@ class Common
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
-//            logger()->info('[sendOfficialMessage] Bulk insert success', [
-//                'id' => $id,
-//            ]);
+            //            logger()->info('[sendOfficialMessage] Bulk insert success', [
+            //                'id' => $id,
+            //            ]);
         }
 
         if (!empty($data)) {
             OfficialMessage::insert($data);
-//            logger()->info('[sendOfficialMessage] Bulk insert success', [
-//                'user_ids' => $userIds,
-//            ]);
+            //            logger()->info('[sendOfficialMessage] Bulk insert success', [
+            //                'user_ids' => $userIds,
+            //            ]);
         }
 
-//        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
+        //        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
 
 
         // OfficialMessage::query()->create(
@@ -2340,24 +2341,31 @@ class Common
         $isBanned =  Ban::where('uid', $uuid)
             ->whereHas('banType', function ($query) use ($routeName, $method) {
                 $query->where('route', $routeName)
-                      ->where(function ($q) use ($method) {
-                          $q->whereNull('method')
+                    ->where(function ($q) use ($method) {
+                        $q->whereNull('method')
                             ->orWhere('method', strtoupper($method));
-                      });
+                    });
             })
             ->exists();
         return $isBanned ? self::bannedResponse() : null;
-
     }
 
 
 
     public static function bannedResponse(): JsonResponse
     {
-        return Common::apiResponse(1, __('banned_from_action'),[],377 );
-
+        return Common::apiResponse(1, __('banned_from_action'), [], 377);
     }
 
+    public static function checkRealTime($type)
+    {
+        $realTime = RealtimeProject::filterByMonthYearType($type)->first();
 
+        if (!$realTime) {
+            return false; // No record found
+        }
 
+        $balance = $realTime->balance - $realTime->used;
+        return $balance > 0;
+    }
 }
