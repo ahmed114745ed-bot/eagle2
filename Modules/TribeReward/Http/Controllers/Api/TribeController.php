@@ -31,6 +31,10 @@ class TribeController extends Controller
     {
         $agencyRanks = $this->tribeService->agencyRanking();
 
+        if (! $agencyRanks){
+            return Common::apiResponse(true, '', [], 200);
+        }
+
         return Common::apiResponse(true, '', AgencyRankingResource::collection($agencyRanks), 200);
     }
 

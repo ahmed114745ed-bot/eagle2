@@ -25,7 +25,9 @@ class TribeService
     public function agencyRanking()
     {
         $perPage = request('per_page', 10);
-        $tribePeriod = TribePeriod::where('end_date', '<', now())->orderBy('end_date', 'desc')->firstOrFail();
+        $tribePeriod = TribePeriod::where('end_date', '<', now())->orderBy('end_date', 'desc')->first();
+
+        if (! $tribePeriod) return false;
 
         return GiftLog::whereHas('agency')
             ->selectRaw('agency_id, SUM(giftPrice) as total_exp')
