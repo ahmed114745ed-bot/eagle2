@@ -19,7 +19,7 @@ class TribeService
     {
         return TribePeriod::with('tribeTops.tribeRewards')->where('end_date', '<', now())
             ->orderBy('end_date', 'desc')
-            ->firstOrFail();
+            ->get();
     }
 
     public function agencyRanking()
