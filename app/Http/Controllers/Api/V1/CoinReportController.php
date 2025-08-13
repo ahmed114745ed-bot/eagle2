@@ -34,6 +34,12 @@ class CoinReportController extends Controller
         return Common::apiResponse(1, '', $data, 200);
     }
 
+    public function shippingCoinReport()
+    {
+        $data = $this->rechargeCoins();
+        return Common::apiResponse(1, '', $data, 200);
+    }
+
     public function givinCoins()
     {
         $user = auth()->user();

@@ -535,9 +535,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             // coins reports
             Route::get('/coin-reports', [CoinReportController::class, 'index']);
+            Route::get('shipping-agency/coin-reports', [CoinReportController::class, 'shippingCoinReport']);
             Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
             // end coin report
             Route::post('un_hide', [\App\Http\Controllers\Api\V1\HomeController::class, 'un_hide']);
+
+
 
 
             Route::prefix('banners')->group(function () {
