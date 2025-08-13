@@ -25,7 +25,7 @@ class TribeController extends Controller
         $tribePeriod = $this->tribeService->index();
 
         if (!$tribePeriod){
-            return Common::apiResponse(true, '', [], 200);
+            return Common::apiResponse(true, '', null, 200);
         }
 
         return Common::apiResponse(true, '', TribePeriodResource::make($tribePeriod), 200);
