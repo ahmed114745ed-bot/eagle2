@@ -118,35 +118,11 @@ class SendGiftService
                 'start_boom_ranking' => $startBoomRanking
             ]);
         } else {
-            $todayActiveBoom = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
-                ->whereNull('ended_at')
-                ->orderByDesc('started_at')
-                ->first();
-
-            $updatedGiftLog = false;
-
-            if ($todayActiveBoom) {
-                $boomLevel = RoomBoomLevel::find($todayActiveBoom->room_boom_level_id);
-
-                if ($boomLevel) {
-                    if ($newTotal >= $boomLevel->target) {
-                        GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
-                            'room_boom_level' => $boomLevel->level,
-                            'start_boom_ranking' => 1
-                        ]);
-                        $updatedGiftLog = true;
-                    }
-
-                    $todayActiveBoom->ended_at = Carbon::now();
-                    $todayActiveBoom->save();
-                }
-            }
-
             $nextLevel = RoomBoomLevel::where('min_target', '>', $newTotal)
                 ->orderBy('min_target', 'asc')
                 ->first();
 
-            if ($nextLevel && !$updatedGiftLog) {
+            if ($nextLevel) {
                 GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
                     'room_boom_level' => $nextLevel->level,
                     'start_boom_ranking' => 0
@@ -164,6 +140,7 @@ class SendGiftService
             $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
             if ($boomLevel && $newTotal >= $boomLevel->target) {
                 $openBoom->ended_at = Carbon::now();
+                $openBoom->total_gifts_value = $newTotal;
                 $openBoom->save();
             }
         }
