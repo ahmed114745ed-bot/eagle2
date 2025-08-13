@@ -123,22 +123,10 @@ class SendGiftService
                 ->orderByDesc('started_at')
                 ->first();
 
-            info($todayActiveBoom);
             $updatedGiftLog = false;
 
             if ($todayActiveBoom) {
                 $boomLevel = RoomBoomLevel::find($todayActiveBoom->room_boom_level_id);
-
-//                if ($boomLevel && $newTotal >= $boomLevel->target) {
-//                    GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
-//                        'room_boom_level' => $boomLevel->level,
-//                        'start_boom_ranking' => 1
-//                    ]);
-//                    $updatedGiftLog = true;
-//
-//                    $todayActiveBoom->ended_at = Carbon::now();
-//                    $todayActiveBoom->save();
-//                }
 
                 if ($boomLevel) {
                     if ($newTotal >= $boomLevel->target) {
@@ -164,12 +152,6 @@ class SendGiftService
                     'start_boom_ranking' => 0
                 ]);
             }
-
-//            if ($nextLevel && !isset($boomLevel) || ($boomLevel && $newTotal < $boomLevel->target)) {
-//                GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
-//                    'room_boom_level' => $nextLevel->level,
-//                ]);
-//            }
         }
 
         $totalRoomGift->current_total = $newTotal;
