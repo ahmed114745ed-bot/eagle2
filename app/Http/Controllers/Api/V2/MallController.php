@@ -13,6 +13,7 @@ use App\Http\Resources\WareResource;
 use App\Http\Resources\WareResourceAll;
 use App\Http\Resources\WarePaddingResource;
 use App\Http\Resources\BestWareSaleResource;
+use App\Models\Pack;
 use Modules\Public\Http\Services\UserCounterServices;
 
 
@@ -157,6 +158,8 @@ class MallController extends Controller
         foreach ($expireUserVips as $userVip) {
             $userVip->packs()->update(['expire' => $userVip->expire]);
         }
+
+        Pack::whereNull('vip_user_id')->where('get_type',1)->delete();
 
 
         return 'done';
