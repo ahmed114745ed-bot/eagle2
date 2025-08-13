@@ -23,23 +23,25 @@ class CoinReportController extends Controller
 
     public function index()
     {
-        $type = request("type") ?? "givin";
-        if ($type == "givin") {
-            $data = $this->givinCoins();
-        }elseif ($type == "receving") {
-            $data = $this->receivingCoins();
-        }elseif ($type == "recharge") {
+        $type = request('type', 'givin');
+        $class = request('class', 'user');
+
+        if ($class === 'user') {
+            $data = match ($type) {
+                'givin'    => $this->givinCoins(),
+                'receving' => $this->receivingCoins(),
+                'recharge' => $this->rechargeCoins(),
+                default    => [],
+            };
+        } elseif ($class === 'shipping') {
             $data = $this->rechargeCoins();
+        } else {
+            $data = [];
         }
+
         return Common::apiResponse(1, '', $data, 200);
     }
-
-    public function shippingCoinReport()
-    {
-        $data = $this->rechargeCoins();
-        return Common::apiResponse(1, '', $data, 200);
-    }
-
+    
     public function givinCoins()
     {
         $user = auth()->user();
