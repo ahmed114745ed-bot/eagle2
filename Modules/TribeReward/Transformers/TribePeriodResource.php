@@ -9,7 +9,7 @@ class TribePeriodResource extends JsonResource
 {
     public function toArray($request)
     {
-        $rewards = [];
+        $rewards = (object)[];
         foreach ($this->tribeTops as $top) {
             $range = ($top->min == $top->max)
                 ? "top {$top->min}"
