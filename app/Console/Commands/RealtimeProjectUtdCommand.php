@@ -47,10 +47,10 @@ class RealtimeProjectUtdCommand extends Command
         $url = config('app.utd_url');
         $fullUrl = $url . 'realtime-projects';
         $baseUrl =  config('app.url');
-        $data = [
+        $dataRequest = [
             'base_url' => $baseUrl,
         ];
-        $response =  Http::get($fullUrl, $data);
+        $response =  Http::get($fullUrl, $dataRequest);
 
         if ($response->successful()) {
             $data = $response->json();
@@ -76,12 +76,12 @@ class RealtimeProjectUtdCommand extends Command
                     $realtime->save();
 
                     // Merge array values instead of +=
-                    $payload = array_merge($data, [
+                    $payload = array_merge($dataRequest, [
                         'type' => $realtime->type,
                         'used' => $realtime->used,
                     ]);
                     $updateUrl = $url . 'realtime-projects/update';
-                    Http::post($updateUrl, $payload);
+                    $response =   Http::post($updateUrl, $payload);
                 }
             }
         }
