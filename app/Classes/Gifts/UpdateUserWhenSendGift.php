@@ -9,6 +9,7 @@ use App\Jobs\LogUserCoinProfit;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
 use Modules\Vip\Entities\Vip;
+use App\Models\UserGift;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Modules\Public\Http\Services\UpgradeLevelServices;
@@ -132,6 +133,24 @@ class UpdateUserWhenSendGift
         $senderUser->enableSaving = true;
 
         return $senderUser;
+    }
+
+    public function removeUserGift(User $user, int $giftId, int $number)
+    {
+        $userGift = UserGift::where('user_id', $user->id)
+            ->where('gift_id', $giftId)
+            ->first();
+
+        if (!$userGift) {
+            return;
+        }
+        $userGift->quantity -= $number;
+
+        if ($userGift->quantity > 0) {
+            $userGift->save(); 
+        } else {
+            $userGift->delete();
+        }
     }
 
     public function getSenderLevel($totalDiamondSend, $totalDiamond, int $subSenderLevel)

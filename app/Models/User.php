@@ -1785,4 +1785,12 @@ class User extends Authenticatable
     {
         return $this->packs?->where('type', 28)->where('is_used', 1)->first()?->ware;
     }
+    public function myGifts()
+    {
+        return $this->belongsToMany(Gift::class, 'user_gifts')
+                    ->withPivot('quantity', 'expire')
+                    ->withTimestamps();
+    }
 }
+
+

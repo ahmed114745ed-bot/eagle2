@@ -18,6 +18,10 @@ use App\Classes\Enums\NotificationType;
 use App\Services\RoomCalculationService;
 use Illuminate\Database\Eloquent\Collection;
 use App\Jobs\SendCustomOfficialMessageToUser;
+use Modules\RoomBoom\Entities\RoomBoom;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
+use Modules\RoomBoom\Entities\TotalRoomGift;
+use Str;
 
 class SendGiftService
 {
@@ -45,16 +49,103 @@ class SendGiftService
         DB::table('gift_logs')->insert($data);
     }
 
-    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null)
+    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null , $sourceType = null)
     {
         if ($totalPrice == null) $totalPrice = $gift->price * $number;
+        $roomBoomUuid = (string) Str::uuid();
         $data = [];
         foreach ($receivedUsers as $receivedUser) {
             $cpId = @$cpIds[$receivedUser->id] ?? null;
-            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId);
+            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId , sourceType: $sourceType);
+            $info['room_boom_uuid'] = $roomBoomUuid;
             $data[] = $info;
         }
         DB::table('gift_logs')->insert($data);
+
+        return $roomBoomUuid;
+    }
+
+    public function roomBoom($roomId, $totalPrice, $roomBoomUuid)
+    {
+        $todayStart = Carbon::today();
+
+        $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
+            ->where('created_at', '>=', $todayStart)
+            ->first();
+
+        if ($totalRoomGift) {
+            $currentTotal = $totalRoomGift->current_total;
+            $newTotal = $currentTotal + $totalPrice;
+        } else {
+            $currentTotal = GiftLog::where('room_id', $roomId)
+                ->where('created_at', '>=', $todayStart)
+                ->sum(DB::raw('giftPrice'));
+
+            $totalRoomGift = TotalRoomGift::create([
+                'room_id' => $roomId,
+                'current_total' => $currentTotal,
+            ]);
+            $newTotal = $currentTotal;
+        }
+
+        $currentLevel = RoomBoomLevel::where('min_target', '<=', $newTotal)
+            ->where('target', '>=', $newTotal)
+            ->orderBy('level')
+            ->first();
+
+        if ($currentLevel) {
+            $existingBoom = RoomBoom::where('room_boom_level_id', $currentLevel->id)
+                ->where('total_room_gift_id', $totalRoomGift->id)
+                ->exists();
+
+            if (!$existingBoom) {
+                RoomBoom::create([
+                    'total_room_gift_id' => $totalRoomGift->id,
+                    'room_boom_level_id' => $currentLevel->id,
+                    'started_at' => Carbon::now(),
+                    'total_gifts_value' => $newTotal,
+                ]);
+            }
+
+            if ($currentTotal >= $currentLevel->min_target) {
+                $startBoomRanking = 1;
+            } else {
+                $startBoomRanking = 0;
+            }
+
+            GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
+                'room_boom_level' => $currentLevel->level,
+                'start_boom_ranking' => $startBoomRanking
+            ]);
+        } else {
+            $nextLevel = RoomBoomLevel::where('min_target', '>', $newTotal)
+                ->orderBy('min_target', 'asc')
+                ->first();
+
+            if ($nextLevel) {
+                GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
+                    'room_boom_level' => $nextLevel->level,
+                    'start_boom_ranking' => 0
+                ]);
+            }
+        }
+
+        $totalRoomGift->current_total = $newTotal;
+
+        $openBooms = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
+            ->whereNull('ended_at')
+            ->get();
+
+        foreach ($openBooms as $openBoom) {
+            $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
+            if ($boomLevel && $newTotal >= $boomLevel->target) {
+                $openBoom->ended_at = Carbon::now();
+                $openBoom->total_gifts_value = $newTotal;
+                $openBoom->save();
+            }
+        }
+
+        $totalRoomGift->save();
     }
 
     public function calculate($uid, $toUid, $total)
@@ -308,7 +399,7 @@ class SendGiftService
      * @param mixed $isPlay
      * @return array
      */
-    public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null): array
+    public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null ,$sourceType = null): array
     {
         $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
         $info['giftId']       = $gift->id;
@@ -334,6 +425,8 @@ class SendGiftService
         $info['cp_id']   = $cpId;
         $info['room_id']   = $room->id;
         $info['room_gift_status'] = $appFeatureStatus ?? false;
+        $info['source_type']  = $sourceType;
+
 
 
 
