@@ -540,6 +540,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('un_hide', [\App\Http\Controllers\Api\V1\HomeController::class, 'un_hide']);
 
 
+
+
             Route::prefix('banners')->group(function () {
                 Route::get('/', [\App\Http\Controllers\BannerController::class, 'index2']);
                 // Route::get('/', [\App\Http\Controllers\BannerController::class, 'index']);

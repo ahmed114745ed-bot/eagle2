@@ -70,7 +70,12 @@ class CpService
         if (!$cp) return false;
 
         $newDi = $cp->di + $diamonds;
-        $levels = $this->getLevels($cp->cp_relation_id, $newDi);
+        $levels = $this->getEligibleLevels(
+            $cp->cp_relation_id,
+            $newDi,
+            $cp->level_id
+        );
+       
         if (!empty($levels)) {
             foreach ($levels as $level){
                 DB::table('cps')->where('id', $cp->id)->update([
@@ -86,6 +91,16 @@ class CpService
         }
 
         return true;
+    }
+
+    public function getEligibleLevels(int $cpRelationId, int $totalCoins, int $currentLevelId)
+    {
+        return CpLevel::query()
+            ->where('cp_relation_id', $cpRelationId)
+            ->where('id', '>', $currentLevelId) 
+            ->where('exp', '<=', $totalCoins)   
+            ->orderBy('exp')                   
+            ->get();
     }
 
     public function getLevel(int $cpRelationId, int $totalCoins)
@@ -109,6 +124,7 @@ class CpService
         if ($this->hasTakenGift($cp->id, $level->level)) {
             return true;
         }
+        
 
         // Fetch rewards for the specified level
         $rewards = $this->getRewardsForLevel($level->id);
