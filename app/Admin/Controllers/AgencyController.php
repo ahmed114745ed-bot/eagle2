@@ -663,7 +663,7 @@ class AgencyController extends MainController
                 $row->width(12)->select('bd_id', __('bd id'))->options(function ($value) {
                     $ops2 = [];
                     foreach (Bd::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->id . '_' . $user->name;
+                        $ops2[$user->id] = $user->id . '_' . $user->username;
                     }
                     return $ops2;
                 })->ajax('/api/search/users-bd2', 'id', 'name');
