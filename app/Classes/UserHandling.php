@@ -14,8 +14,9 @@ use App\Models\BanType;
 use App\Models\GiftLog;
 use App\Models\UserVip;
 use App\Models\LiveTime;
-use App\Models\RealtimeProject;
 use App\Models\UserSallary;
+use App\Models\TimeEnterRoom;
+use App\Models\RealtimeProject;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Modules\AgencyApp\Entities\AgencyUserJob;
@@ -42,7 +43,6 @@ class UserHandling
             $user_hours =
                 LiveTime::query()->where('uid', $uid)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->whereDay('created_at', '=', Carbon::now()->day)->sum('hours');
 
-            $this->realtimeProject($second);
             $hours = (int)$user_hours;
             $num = \Cache::get('hours_days') ?? 2;
 
@@ -53,6 +53,18 @@ class UserHandling
                 WHERE id = :id
             ", ['id' => $uid]);
             }
+        }
+    }
+
+    public function calcTimeRoomEntered($uid, $roomId)
+    {
+        $timer = TimeEnterRoom::query()->where('user_id', $uid)->where('room_id', $roomId->id)->whereDate('created_at', today())->where('end_time', null)->orderByDesc('id')->first();
+        if ($timer) {
+            $second = (time() - $timer->start_time);
+            $timer->end_time = time();
+            $timer->seconds    =  $second;
+            $timer->save();
+            $this->realtimeProject($second);
         }
     }
 
