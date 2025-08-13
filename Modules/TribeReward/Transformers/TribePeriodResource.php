@@ -9,7 +9,7 @@ class TribePeriodResource extends JsonResource
 {
     public function toArray($request)
     {
-        $rewards = (object)[];
+        $rewards = [];
         foreach ($this->tribeTops as $top) {
             $range = ($top->min == $top->max)
                 ? "top {$top->min}"
@@ -33,7 +33,7 @@ class TribePeriodResource extends JsonResource
         return [
             'role' => 'Top Agency Leader',
             'end_time' => $this->end_date,
-            'rewards' => $rewards,
+            'rewards' => !empty($rewards) ? $rewards : (object)[],
             'remainingTime' => $timeComponents,
         ];
     }
