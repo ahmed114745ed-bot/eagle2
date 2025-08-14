@@ -15,7 +15,7 @@ class CpSeeder extends Seeder
      */
     public function run(): void
     {
-        $giftLogs = GiftLog::take(100)->get();
+        $giftLogs = GiftLog::take(200)->get();
         CP::query()->update([
             'status' => 1,
             'cp_relation_id' => 12
@@ -52,6 +52,7 @@ class CpSeeder extends Seeder
                 $giftLog->update([
                     'cp_id' => $cp->id,
                     'created_at' => now(),
+                    'giftPrice' => rand(30000, 100000),
                     'sender_id' => $cp->user_one_id,
                     'receiver_id' => $cp->user_two_id, // assuming this exists
                 ]);
