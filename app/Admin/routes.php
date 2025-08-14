@@ -443,7 +443,7 @@ Route::group(
             // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
             // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
             // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-        });
+     
         Route::resource('vip_privilege', 'VipPrivilegeController');
         // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
         // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
@@ -606,3 +606,5 @@ Route::group(
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });
 Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
+
+});
