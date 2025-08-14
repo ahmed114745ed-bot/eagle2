@@ -76,6 +76,7 @@ class CpService
 
         info($levels);
         if (!empty($levels)) {
+            info('im here');
             foreach ($levels as $level){
                 DB::table('cps')->where('id', $cp->id)->update([
                     'di' => $newDi,
