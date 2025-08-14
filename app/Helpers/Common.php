@@ -6,6 +6,7 @@ use App\Jobs\SendFirebaseNotificationJob;
 use App\Jobs\SendFirebaseTopicNotificationJob;
 use App\Models\Ban;
 use App\Models\Pk;
+use App\Models\UserCoinLog;
 use Illuminate\Log\Logger;
 use Modules\Vip\Entities\Vip;
 use App\Models\Pack;
