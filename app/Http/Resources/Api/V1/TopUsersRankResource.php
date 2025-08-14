@@ -11,13 +11,9 @@ class TopUsersRankResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => @$this->name ?? '', // both
-            'notice' => @$this->notice ?? '',
-            'owner_id' => @$this->app_owner_id??0,
-            'owner_name' => @$this->owner->name  ?? '',
-            'phone' => @$this->phone ?? 0,
-            'img' => $this->owner->profile->avatar ?? '',
-            'user_count' => $this->userCount ?? 0,
+            'name' => @$this->name ?? '',
+            'uuid' => @$this->uuid,
+            'img' => $this->profile->avatar ?? '',
             'total_gift' => $this->total_gift ?? 0,
         ];
     }

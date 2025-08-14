@@ -135,23 +135,42 @@ class UpdateUserWhenSendGift
         return $senderUser;
     }
 
-    public function removeUserGift(User $user, int $giftId, int $number)
+    public function sendFromBagAndRemoveGift(int $totalCoins, User $senderUser, int $giftId, int $number)
     {
-        $userGift = UserGift::where('user_id', $user->id)
+        $senderUser->enableSaving = false;
+        $senderUser->monthly_diamond_send += $totalCoins;
+        $senderUser->total_diamond_send   += $totalCoins;
+        $lastSenderUser = $senderUser->total_sender_level;
+
+
+        $userGift = UserGift::where('user_id', $senderUser->id)
             ->where('gift_id', $giftId)
             ->first();
 
-        if (!$userGift) {
-            return;
-        }
-        $userGift->quantity -= $number;
+        if ($userGift) {
+            $userGift->quantity -= $number;
 
-        if ($userGift->quantity > 0) {
-            $userGift->save(); 
-        } else {
-            $userGift->delete();
+            if ($userGift->quantity > 0) {
+                $userGift->save();
+            } else {
+                $userGift->delete();
+            }
         }
+
+        (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
+        if ($senderUser->total_sender_level > $lastSenderUser) {
+            dispatch(new SendCustomOfficialMessageToUser(
+                $senderUser->id,
+                NotificationType::SENDER_LEVEL
+            ))->onQueue('notification');
+        }
+
+        $senderUser->save();
+        $senderUser->enableSaving = true;
+
+        return $senderUser;
     }
+
 
     public function getSenderLevel($totalDiamondSend, $totalDiamond, int $subSenderLevel)
     {

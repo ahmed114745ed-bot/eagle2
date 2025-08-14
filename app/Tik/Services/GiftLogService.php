@@ -94,9 +94,9 @@ class GiftLogService
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
         try {
+            $sendPrice = (int)($totalPrice);
 
             if ( $type !== 'bag'  ){
-                $sendPrice = (int)($totalPrice);
                 $amountBefore = $user->di;
 
                 UserCoinLogHelper::logByType(
@@ -109,8 +109,8 @@ class GiftLogService
 
                 $updateUserWhenSendGift->send($sendPrice, $user);
             }else{
-
-                $updateUserWhenSendGift->removeUserGift( $user,$giftId,$number);
+                
+                $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
             }
         } catch (NotInfMoneyException $e) {
             return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
