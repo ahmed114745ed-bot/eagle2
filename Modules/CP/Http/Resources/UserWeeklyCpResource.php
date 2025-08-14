@@ -28,7 +28,7 @@ class UserWeeklyCpResource extends JsonResource
         }
 
         return [
-            'totalGiftNum' => numToString((int) ($this->data['cp_relation'] ?? 0)) ?: '0',
+            'totalGiftNum' => numToString((int) ($this->data['total_price'] ?? 0)) ?: '0',
             'user_id' => $this->id,
             'uuid' => $this->uuid ?? 0,
             'name' => $this->name ?? '',
