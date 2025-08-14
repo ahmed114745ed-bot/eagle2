@@ -1079,7 +1079,7 @@
             </div>
             <div class="card">
             <div class="card-body">
-                <form action="{{ url('admin/agencies/' . $agency->id) }}" class="form-horizontal member-form" method="GET" pjax-container>
+                <form action="{{ url('bd/agencies/profile/' . $agency->id) }}" class="form-horizontal member-form" method="GET" pjax-container>
                     <input type="hidden" name="tab" value="members">
                     <input type="hidden" name="members_page" value="{{ request()->get('members_page', 1) }}">
 
@@ -1107,7 +1107,7 @@
                             <button type="submit" class="btn btn-info btn-sm me-2">
                                 <i class="fa fa-search"></i> {{__('Search')}}
                             </button>
-                            <a href="{{ url('admin/agencies/' . $agency->id. '?'.'tab=members' ) }}" class="btn btn-default btn-sm">
+                            <a href="{{ url('bd/agencies/profile/' . $agency->id. '?'.'tab=members' ) }}" class="btn btn-default btn-sm">
                                 <i class="fa fa-undo"></i> {{__('Reset')}}
                             </a>
                         </div>
@@ -1496,7 +1496,7 @@
 
                         <div class="card-target-filter-phone ">
                             <!-- Filter Form -->
-                            <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                            <form method="GET" action="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                 class="filter-form">
                                 <div class="row">
                                     <input type="hidden" name="tab" value="targets">
@@ -1533,7 +1533,7 @@
                                             <i class="fas fa-filter"></i> {{ __('Apply') }}
                                         </button>
                                         @if(request()->has('month') || request()->has('year'))
-                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                                            <a href="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                                 class="btn btn-outline-secondary ml-2" title="Reset filters">
                                                 <i class="fas fa-times"></i>
                                             </a>
@@ -1570,7 +1570,7 @@
 
 
                         <div class="card-target-filter">
-                            <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                            <form method="GET" action="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                 class="filter-form">
                                 <div class="row">
                                     <input type="hidden" name="tab" value="targets">
@@ -1607,7 +1607,7 @@
                                             <i class="fas fa-filter"></i> {{ __('Apply') }}
                                         </button>
                                         @if(request()->has('month') || request()->has('year'))
-                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                                            <a href="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                                 class="btn btn-outline-secondary ml-2" title="Reset filters">
                                                 <i class="fas fa-times"></i>
                                             </a>
