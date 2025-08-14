@@ -13,9 +13,9 @@ class WeeklyCpService
 
     public function perviousCpWinners()
     {
-        
+
         $perviousWeeklyCpWinners = $this->weeklyCpRepository->perviousWeeklyCpWinners(limit:5);
-        
+
         if (!$perviousWeeklyCpWinners) throw new \Exception('there is not weekly cp');
         return $perviousWeeklyCpWinners;
     }
@@ -55,6 +55,10 @@ class WeeklyCpService
         $weeklyCp = $this->weeklyCpRepository->currentWeeklyCp();
         if (!$weeklyCp) throw new \Exception('there is not weekly cp now');
         $giftIds  = $weeklyCp->gifts->pluck('id')->toArray();
-        return  $this->weeklyCpRepository->userDetails($giftIds, $weeklyCp, $user->id);
+        return  [
+            'total_price' => $this->weeklyCpRepository->userDetails($giftIds, $weeklyCp, $user->id),
+            'cp_relation' => $this->weeklyCpRepository->userCP($user->id)
+
+        ];
     }
 }

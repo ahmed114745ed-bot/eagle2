@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\CoinLogReportsController;
+use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -310,6 +312,7 @@ Route::group(
         Route::resource('offers', OfferController::class);
         Route::resource('payment-gateways', PaymentGetWayController::class);
         Route::resource('payment-coins', PaymentCoinController::class);
+        Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
         Route::resource('charges', 'ChargeController');
         Route::resource('charges-details', 'ChargesDetailsController', [
 
@@ -403,6 +406,9 @@ Route::group(
             Route::put('/{id}', [CoinController::class, 'update'])->name('coins.update');
             Route::delete('/{id}', [CoinController::class, 'destroy'])->name('coins.destroy');
         });
+
+        Route::resource('coin-logs-reports', CoinLogReportsController::class);
+
 
         Route::resource('usersBd', BdController::class);
 

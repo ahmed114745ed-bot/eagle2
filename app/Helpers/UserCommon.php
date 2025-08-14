@@ -262,27 +262,11 @@ class UserCommon
         $vip = OVip::query()->first();
         $user_vip_check = UserVip::query()->where('user_id', $user->id)->where('level', '>=', $vip->level)->first();
         $expire = $vip->expire;
-        if ($expire == 0) {
-            $ex = 0;
-        } else {
-            $ex = now()->addDays($expire)->timestamp;
-        }
+  
 
         if (!$user_vip_check) {
-            $userVip = UserVip::query()->create(
-                [
-                    'type' => 0,
-                    'sender_id' => 0,
-                    'user_id' => $user->id,
-                    'vip_id' => $vip->id,
-                    'level' => $vip->level,
-                    'expire' => $ex,
-                    'qty' => 1,
-                    'price' => $vip->price,
-                    'total' => 0
-                ]
-            );
-            // VipCommon::handelVip($vip, $user, null, userVip: $userVip);
+            VipCommon::createUserVip($vip ,$user ,$vip->expire , null,'',);
+
         }
     }
 
@@ -352,45 +336,9 @@ class UserCommon
     {
         DB::beginTransaction();
 
-        $vipp = new UserVip();
-        $vipp->type = 1;
-        $vipp->sender_id = 0;
-        $vipp->user_id = $user->id;
-        $vipp->vip_id = $vip->id;
-        $vipp->level = $vip->level;
-        $vipp->expire = now()->addDay($expir)->timestamp;
-        $vipp->days = $expir;
-        $vipp->qty = 1;
-        $vipp->price = 0;
-        $vipp->total = 0;
-        $vipp->senderable()->associate($sender);
-        $vipp->save();
-        Common::handelVip($vip, $user, $expire, $vipp, $sender);
-        DB::commit();
-        CustomNotification::addUserLevel($user);
-    }
+   
+        VipCommon::createUserVip($vip ,$user ,$expir , null ,'',);
 
-    /**
-     * @throws \Throwable
-     */
-    public static function addVipToCpUser(User $user, OVip $vip, $expire): void
-    {
-        DB::beginTransaction();
-
-        $vipp = new UserVip();
-        $vipp->type = 1;
-        $vipp->sender_id = 0;
-        $vipp->user_id = $user->id;
-        $vipp->vip_id = $vip->id;
-        $vipp->level = $vip->level;
-        $vipp->expire = null;
-        $vipp->qty = 1;
-        $vipp->price = 0;
-        $vipp->total = 0;
-        $vipp->is_used = 0;
-        $vipp->days = $expire;
-        $vipp->save();
-        Common::handelVipCp($vip, $user, $expire, $vipp);
         DB::commit();
 
         Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
