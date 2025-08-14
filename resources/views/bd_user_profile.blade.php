@@ -1432,7 +1432,7 @@
             <div class="box-body p-3">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form method="GET" action="{{ url('bd/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                        <form method="GET" action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
                             <input type="hidden" name="tab" value="salary">
                             <div class="row">
                                 <div class="col-md-6">
@@ -1482,7 +1482,7 @@
                                                 </button>
                                             </div>
                                             <div class="btn-group pull-left" style="margin-left: 10px;">
-                                                <a href="{{ url('bd/users/' . $user->id. '?'.'tab=salary') }}"
+                                                <a href="{{ url('bd/users/profile/' . $user->id. '?'.'tab=salary') }}"
                                                    class="btn btn-default btn-sm">
                                                     <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
                                                 </a>
@@ -1678,7 +1678,7 @@
                                 <button type="submit" class="btn btn-info btn-sm me-2">
                                     <i class="fa fa-search"></i> {{__('Search')}}
                                 </button>
-                                <a href="{{ url('bd/users/' . $user->id. '?tab=user-agency') }}" class="btn btn-default btn-sm">
+                                <a href="{{ url('bd/users/profile/' . $user->id. '?tab=user-agency') }}" class="btn btn-default btn-sm">
                                     <i class="fa fa-undo"></i> {{__('Reset')}}
                                 </a>
                             </div>
@@ -2184,7 +2184,7 @@
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{ url('bd/users/' . $id) }}" target="_blank"
+                                    <a href="{{ url('bd/users/profile/' . $id) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $image }}" width="40" height="40"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2196,7 +2196,7 @@
                                 </td>
                                 <td>
                                     @if(!empty($giftSLog->room))
-                                        <a href="{{ url('bd/users/' . $ownerRoom) }}" target="_blank"
+                                        <a href="{{ url('bd/users/profile/' . $ownerRoom) }}" target="_blank"
                                            class="d-flex align-items-center text-decoration-none">
                                             <img src="{{ $url }}"
                                                  width="30" height="30"
