@@ -122,19 +122,9 @@ class DedicateAction extends RowAction
                 ];
                 $userVip = UserVip::query()->where($uniqueAttributes)->first();
                 if (!$userVip) {
-                    UserVip::query()->create(
-                        [
-                            ...$uniqueAttributes,
-                            'type'   => 1,
-                            'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
-                            'days'    => $request->days ?? 1,
-                            'qty'    => 1,
-                            'price'  => 0,
-                            'total'  => 0,
-                            'is_used'  => $is_used,
-                            'dash_user_id'  => \auth()->user()->id,
-                        ]
-                    );
+
+                    VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id() );
+
                 } else {
                     $userVip->qty++;
                     if($userVip->expire > now()->timestamp){
