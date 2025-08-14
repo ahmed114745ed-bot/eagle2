@@ -95,7 +95,7 @@ class GiftLogService
         //decrement the user coins
         try {
 
-            if ($type && $type !== 'bag'  ){
+            if ( $type !== 'bag'  ){
                 $sendPrice = (int)($totalPrice);
                 $amountBefore = $user->di;
 
