@@ -21,6 +21,7 @@ use App\Jobs\SendCustomOfficialMessageToUser;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\TotalRoomGift;
+use Modules\RoomBoom\Jobs\EndBoomPusherJob;
 use Modules\RoomBoom\Jobs\EndBoomZegoJob;
 use Modules\RoomBoom\Jobs\RoomBoomRewardJob;
 use Str;
@@ -167,7 +168,8 @@ class SendGiftService
 
                 dispatch(new RoomBoomRewardJob($openBoom->id))->delay(now()->addSeconds(30));
 
-                dispatch(new EndBoomZegoJob($currentLevel, $newTotal, $giftLog->sender_id, $room));
+                dispatch(new EndBoomPusherJob($currentLevel, $newTotal, $giftLog->sender_id, $room));
+                dispatch(new EndBoomZegoJob($currentLevel, $room))->delay(now()->addSeconds(20));
             }
         }
 
