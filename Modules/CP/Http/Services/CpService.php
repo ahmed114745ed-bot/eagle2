@@ -119,9 +119,8 @@ class CpService
     protected function assignGifts($level, $cp)
     {
         // Check if the CP has already taken the gift for the level
-        info($cp->id);
-        info($level->level);
-        info('hasTakenGift');
+        info('hasTakenGift'.$cp->id);
+        info('hasTakenGift'.$level->level);
         if ($this->hasTakenGift($cp->id, $level->level)) {
             return true;
         }
@@ -138,9 +137,8 @@ class CpService
         $this->distributeRewards($rewards, $userOne, $userTwo);
 
         // Mark the gift as taken for the CP and level
-        info($cp->id);
-        info($level->level);
-        info('markGiftAsTaken');
+        info('markGiftAsTaken'.$cp->id);
+        info('markGiftAsTaken'.$level->level);
         $this->markGiftAsTaken($cp->id, $level->level);
     }
 
