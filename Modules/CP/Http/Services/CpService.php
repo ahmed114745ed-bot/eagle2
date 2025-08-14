@@ -98,7 +98,7 @@ class CpService
             ->where('cp_relation_id', $cpRelationId)
 //            ->where('id', '>', $currentLevelId)
             ->where('exp', '<=', $totalCoins)
-            ->orderBy('exp')
+//            ->orderBy('exp')
             ->get();
     }
 
