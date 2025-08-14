@@ -67,8 +67,10 @@ class SendGiftService
         return $roomBoomUuid;
     }
 
-    public function roomBoom($roomId, $roomUid,$totalPrice, $roomBoomUuid)
+    public function roomBoom($room, $totalPrice, $roomBoomUuid)
     {
+        $roomId = $room->id;
+        $roomUid = $room->uid;
         $todayStart = Carbon::today();
 
         $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
@@ -155,17 +157,17 @@ class SendGiftService
 
         foreach ($openBooms as $openBoom) {
             $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
-            $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->value('id');
+            $giftLog = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->first(['id', 'sender_id']);
 
             if ($boomLevel && $newTotal >= $boomLevel->target) {
                 $openBoom->ended_at = Carbon::now();
                 $openBoom->total_gifts_value = $newTotal;
-                $openBoom->final_gift_id = $giftLogId;
+                $openBoom->final_gift_id = $giftLog->id;
                 $openBoom->save();
 
                 dispatch(new RoomBoomRewardJob($openBoom->id));
 
-                dispatch(new EndBoomZegoJob($currentLevel, $roomId, $roomUid));
+                dispatch(new EndBoomZegoJob($currentLevel, $room, $newTotal, $giftLog->sender_id));
             }
         }
 
