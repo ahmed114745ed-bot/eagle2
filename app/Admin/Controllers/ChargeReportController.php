@@ -205,10 +205,11 @@ class ChargeReportController extends MainController
                 }
             }
         ");
+        if ($charger_type != "shipping-agency-activity") {
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             $filter->expand();
-            $filter->column(1 / 4, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function () {}, __('Type'), 'filter_type')
                     ->select([
                         'user'     => 'User',
@@ -245,6 +246,7 @@ class ChargeReportController extends MainController
                 $filter->where(function ($query) {}, __('To Date'), 'to_date')->date();
             });
         });
+    }
         $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();

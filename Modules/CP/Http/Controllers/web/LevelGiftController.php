@@ -167,12 +167,9 @@ class LevelGiftController extends MainController
 
     protected function addWareFields($form ,$prefix = '')
     {
-        // $form->select('type_ware', __('Type wares'))
-        //     ->options(getTranslatedUsedWare())
-        //     ->load('items.item_id', admin_url('wares-by-type'), 'type_ware');
-
-        $form->belongsTo($prefix.'item_id', WaresByType::class, __('Ware'), function ($form) {
-            $form->select('id', __('wares'))
+        $form->belongsTo('item_id', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
+            $form->setElementName($prefix . 'item_id')
+                ->select('id', __('wares'))
                 ->options(function ($id) {
                     if (!$id) return [];
                     $ware = Ware::find($id);
@@ -180,15 +177,14 @@ class LevelGiftController extends MainController
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id') 
+                    'data-load-url' => admin_url('wares-by-id')
                 ]);
-
+        
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
-
+        
             $this->addWareJs();
         });
-
-        $form->hidden('sub_type');
+        
     }
 
  

@@ -59,5 +59,16 @@ class CpLevelGift extends Model
 
         });
     }
+
+    public function ware_item()
+    {
+        return $this->belongsTo(Ware::class, 'ware_item_id');
+    }
+    
+    public function vip_item()
+    {
+        return $this->belongsTo(OVip::class, 'vip_item_id');
+    }
+    
 }
 
