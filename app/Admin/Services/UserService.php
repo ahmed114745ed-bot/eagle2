@@ -2,7 +2,7 @@
 
 namespace App\Admin\Services;
 
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 
 class UserService
 {
