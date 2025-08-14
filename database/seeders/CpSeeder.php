@@ -16,7 +16,10 @@ class CpSeeder extends Seeder
     public function run(): void
     {
         $giftLogs = GiftLog::take(100)->get();
-        CP::query()->update(['status' => 1]);
+        CP::query()->update([
+            'status' => 1,
+            'cp_relation_id' => 12
+        ]);
         $Cps = Cp::get();
 
         foreach ($giftLogs as $index => $giftLog) {
