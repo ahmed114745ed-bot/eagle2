@@ -15,6 +15,7 @@ class RoomBoomResource extends JsonResource
             'started_at' => $this->started_at,
             'ended_at' => $this->ended_at,
             'total_gifts_value' => $this->total_gifts_value,
+            'level' => $this->roomBoomLevel ? $this->roomBoomLevel->level : null,
         ];
     }
 }

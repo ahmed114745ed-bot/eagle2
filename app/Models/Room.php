@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Modules\LuckyBox\Traits\RoomBoxes;
+use Modules\RoomBoom\Entities\TotalRoomGift;
 
 /**
  * @method static withoutAppends()
@@ -305,5 +306,10 @@ class Room extends Model
     protected function getAdminsAttribute()
     {
         return explode(',', $this->room_admin);
+    }
+
+    public function totalRoomGifts(): HasMany
+    {
+        return $this->hasMany(TotalRoomGift::class, 'room_id');
     }
 }
