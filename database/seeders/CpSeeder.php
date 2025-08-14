@@ -7,6 +7,7 @@ use App\Models\Follow;
 use App\Models\GiftLog;
 use Illuminate\Database\Seeder;
 use Modules\CP\Entities\Cp;
+use Modules\Events\Entities\WeeklyStar;
 
 class CpSeeder extends Seeder
 {
@@ -16,16 +17,18 @@ class CpSeeder extends Seeder
     public function run(): void
     {
         $giftLogs = GiftLog::take(200)->get();
+        $giftLogsLast = GiftLog::take(200)->orderByDesc('id')->get();
         CP::query()->update([
             'status' => 1,
             'cp_relation_id' => 12
         ]);
+        $weeklyCp = WeeklyStar::find(22);
 
         // Get 20 random users first
         $userIds = User::inRandomOrder()->limit(20)->pluck('id')->toArray();
 
         // Make sure we have at least 20 users
-        
+
 
         // Loop 10 times (because each CP will take 2 users from the 20)
         for ($i = 0; $i < 10; $i++) {
@@ -37,7 +40,7 @@ class CpSeeder extends Seeder
                 'user_two_id'    => $userTwo,
                 'status'         => 1,
                 'cp_relation_id' => 12,
-                
+
             ]);
         }
 
@@ -55,6 +58,16 @@ class CpSeeder extends Seeder
                     'giftPrice' => rand(30000, 100000),
                     'sender_id' => $cp->user_one_id,
                     'receiver_id' => $cp->user_two_id, // assuming this exists
+                ]);
+
+                $giftLogsLast->update([
+                    'cp_id' => $cp->id,
+                    'giftId' => 412,
+                    'created_at' => \Carbon\Carbon::parse($weeklyCp->start_date)->toDateString(),
+                    'giftNum' => rand(1, 10),
+                    'giftPrice' => rand(30000, 100000),
+                    'sender_id' => $cp->user_one_id,
+                    'receiver_id' => $cp->user_two_id,
                 ]);
             }
         }
