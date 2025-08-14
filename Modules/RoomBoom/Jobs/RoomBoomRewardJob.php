@@ -44,7 +44,9 @@ class RoomBoomRewardJob implements ShouldQueue
         $rewardItems = [];
         foreach ($rewards as $reward) {
             for ($i = 0; $i < $reward->quantity; $i++) {
-                $rewardItems[] = $reward->toArray();
+                $item = $reward->toArray();
+                $item['quantity'] = 1;
+                $rewardItems[] = $item;
             }
         }
 
@@ -66,6 +68,24 @@ class RoomBoomRewardJob implements ShouldQueue
             if (!isset($rewardItems[$i])) break;
             $reward = $rewardItems[$i];             //first user will take first reward ordered by priority and quantity
             $this->distributeBoomRewards($userId, $reward);
+
+            $assignedUserIds[] = $userId;
+            $assignments[] = $reward;
+        }
+
+        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
+            ->where('room_boom_level', $level->level)
+            ->where('start_boom_ranking', 1)
+            ->orderByDesc('created_at')
+            ->value('sender_id');
+
+        if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
+            $randomReward = $rewards->random();
+            info($randomReward);
+            $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
+
+            $assignedUserIds[] = $lastTriggerSenderId;
+            $assignments[] = $randomReward;
         }
 
         $numAssigned = count($assignments);

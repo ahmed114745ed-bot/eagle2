@@ -34,6 +34,7 @@ use App\Http\Services\RoomAchievementTargetService;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\TotalRoomGift;
+use Modules\RoomBoom\Services\RoomBoomGiftService;
 
 class GiftLogService
 {
@@ -164,7 +165,7 @@ class GiftLogService
 
         $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
-        $sendGiftServices->roomBoom($room, $totalPrice, $roomBoomUuid);
+        (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
 
         foreach ($receivedUsers as $receivedUser) {
             $updateUserWhenSendGift->update($price, $receivedUser);
