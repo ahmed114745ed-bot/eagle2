@@ -1658,7 +1658,7 @@
         <div class="box-body p-3">
             <div class="card mb-4">
                 <div class="card-body">
-                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
+                    <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
                         <input type="hidden" name="tab" value="user-agency">
 
                         <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
@@ -1740,7 +1740,7 @@
                                                 $url = $defaultImage;
                                             }
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
+                                            $kickedByUrl = url("bd/users/profile/" . ($kickedBy->id) ?? 0);
                                         }
 
                                         if ($userJoinAgency->kicked_by_admin){
@@ -1821,7 +1821,7 @@
         <div class="box-body p-3">
             <div class="card mb-4">
                 <div class="card-body">
-                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
+                    <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
                         <input type="hidden" name="tab" value="user-coins">
                         <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
 
@@ -2054,7 +2054,7 @@
 
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
+                        <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
                             <input type="hidden" name="tab" value="gift-log">
                             <input type="hidden" name="gift_type" value="{{ $giftType }}">
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
