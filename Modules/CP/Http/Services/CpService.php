@@ -297,13 +297,6 @@ class CpService
         ]);
     }
 
-    public function getGenders($userOne, $userTwo, $reward): array
-    {
-        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
-        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
-        $rewardGender = $reward->gender;
 
-        return [$userOneGender, $userTwoGender, $rewardGender];
-    }
 
 }
