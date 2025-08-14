@@ -13,22 +13,25 @@ use App\Models\Ware;
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user, int $expire): bool
+    public static function createUserVip(OVip $vip, User $user, int $expire ,$dashUserId = 0 ,$typeSend = '' ,$qty = 1, $senderId = 0 , $total = 0): bool
     {
         try {
-            DB::transaction(function () use ($vip, $user, $expire) {
+            DB::transaction(function () use ($vip, $user, $expire ,$dashUserId ,$typeSend ,$senderId,$qty,$total) {
                 $vipp = UserVip::create([
                     'type'      => 1,
-                    'sender_id' => 0,
+                    'sender_id' => $senderId,
                     'user_id'   => $user->id,
                     'vip_id'    => $vip->id,
                     'level'     => $vip->level,
-                    'expire'    => now()->addDays($expire)->timestamp,
+                    'expire'    => null,
                     'days'      => $expire,
-                    'qty'       => 1,
+                    'qty'       => $qty,
                     'price'     => $vip->price,
-                    'total'     => 0,
+                    'total'     => $total,
                     'is_used'   => 0,
+                    'dash_user_id'   =>$dashUserId,
+                    'type_send' =>$typeSend
+                    
                 ]);
     
                 Common::sendOfficialMessage(

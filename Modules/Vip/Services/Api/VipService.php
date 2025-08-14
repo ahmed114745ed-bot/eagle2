@@ -253,21 +253,12 @@ class VipService
                     ];
                     $this->userVipRepository->update($updateData, $userVip->id);
                 } else {
-                    $userVip = $this->userVipRepository->create([
-                        'type'      => $type,
-                        'sender_id' => $sender_id,
-                        'user_id'   => $user_id,
-                        'vip_id'    => $vip->id,
-                        'level'     => $vip->level,
-                        'expire'    => $ex,
-                        'qty'       => $qty,
-                        'price'     => $vip->price,
-                        'total'     => $total,
-                        'is_used'   => 1,
-                    ]);
-                }
 
-                // VipCommon::handelVip($vip, $user, null, $userVip);
+                    VipCommon::createUserVip($vip ,$user ,($expire * $qty)  , null ,'',$qty ,$sender_id ,$total);
+
+                }               
+
+
                 VipCommon::handleVipActivation($userVip);
                 
                 DB::commit();
@@ -306,22 +297,8 @@ class VipService
                 $from->decrement('di', $total);
                 $this->packRepository->deleteExpirePack();
 
-                $data = [
-                    'type'      => $type,
-                    'sender_id' => $sender_id,
-                    'user_id'   => $user_id,
-                    'vip_id'    => $vip->id,
-                    'level'     => $vip->level,
-                    'expire'    => $ex,
-                    'qty'       => $qty,
-                    'price'     => $vip->price,
-                    'total'     => $total,
-                    'is_used'   => 0,
-                ];
-
-                $vipRecord = $this->userVipRepository->create($data);
-
-                // VipCommon::handelVip($vip, $user, null, $vipRecord);
+              
+                VipCommon::createUserVip($vip ,$user ,($expire * $qty)  , null ,'',$qty ,$sender_id,$total);
 
                 DB::commit();
 
