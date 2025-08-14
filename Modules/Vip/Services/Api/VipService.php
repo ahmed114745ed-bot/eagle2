@@ -96,19 +96,7 @@ class VipService
         $this->packRepository->deleteExpirePack();
         $this->packRepository->unUseOldPack($user_id);
 
-        $this->userVipRepository->create([
-            'type'      => $request->type ?? 0,
-            'sender_id' => $sender_id,
-            'user_id'   => $user_id,
-            'vip_id'    => $vip->id,
-            'level'     => $vip->level,
-            'expire'    => null,
-            'qty'       => $qty,
-            'price'     => $vip->price,
-            'total'     => $total,
-            'is_used'   => 0,
-            'days'      => $vip->expire,
-        ]);
+        VipCommon::createUserVip($vip ,$user , $vip->expire  , null ,'',$qty ,$sender_id,$total);
 
         $countWares = $this->wareRepository->countWareByLevel($vip->level);
 

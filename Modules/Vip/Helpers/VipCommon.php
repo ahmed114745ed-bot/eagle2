@@ -26,14 +26,18 @@ class VipCommon
                     'expire'    => null,
                     'days'      => $expire,
                     'qty'       => $qty,
-                    'price'     => $vip->price,
+                    'price'     => $vip?->price,
                     'total'     => $total,
                     'is_used'   => 0,
-                    'dash_user_id'   =>$dashUserId,
+                    'dash_user_id'   =>$dashUserId ?? 0,
                     'type_send' =>$typeSend
                     
                 ]);
-    
+              
+
+            });
+
+
                 Common::sendOfficialMessage(
                     $user->id,
                     __('congratulations'),
@@ -49,11 +53,10 @@ class VipCommon
                     config('app.name_ar'),
                     __('vip_gift_message') . $user->name
                 );
-            });
     
             return true;
         } catch (\Throwable $e) {
-            // Log::error($e->getMessage());
+            \Log::error($e->getMessage());
             return false;
         }
     }
