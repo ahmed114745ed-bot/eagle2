@@ -27,6 +27,7 @@ class UserRelationsResource extends JsonResource
     {
 
         $pass_status = false;
+        $isHideCountry = $this->getPackWithType(13);
 
         $now_room = @$this->room;
 
@@ -67,7 +68,7 @@ class UserRelationsResource extends JsonResource
                 'gender' => @$this->profile->gender ?? 1,
                 'country'=> @$this->profile->country?:'',
             ],
-            'country'=> new CountryResource(@$this->resource),
+            'country'              => !$isHideCountry ? (new CountryResource(@$this->resource) ?? (object)[]) : (object)[],
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'       => @$this->dress_1,
             'now_room'             =>  new NowRoomResource($this)

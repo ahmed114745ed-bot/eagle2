@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use App\Models\OVip;
-use App\Models\Vip;
+use Modules\Vip\Entities\OVip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
 use App\Models\Pack;
 use App\Models\Room;
@@ -17,7 +17,7 @@ use GuzzleHttp\Client;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
 use GuzzleHttp\Psr7\Request;
@@ -34,6 +34,7 @@ use App\Models\AgencyMangerPullingOut;
 use App\Traits\HelperTraits\InfoTrait;
 use App\Traits\HelperTraits\RoomTrait;
 use App\Traits\HelperTraits\ZegoTrait;
+use Modules\Vip\Helpers\VipCommon;
 use Twilio\Rest\Client as TwilioClint;
 
 use App\Http\Resources\CountryResource;
@@ -281,7 +282,7 @@ class UserCommon
                     'total' => 0
                 ]
             );
-            Common::handelVip($vip, $user, null, userVip: $userVip);
+            // VipCommon::handelVip($vip, $user, null, userVip: $userVip);
         }
     }
 
@@ -357,38 +358,14 @@ class UserCommon
         $vipp->user_id = $user->id;
         $vipp->vip_id = $vip->id;
         $vipp->level = $vip->level;
-        $vipp->expire = now()->addDay($expire)->timestamp;
+        $vipp->expire = now()->addDay($expir)->timestamp;
+        $vipp->days = $expir;
         $vipp->qty = 1;
         $vipp->price = 0;
         $vipp->total = 0;
         $vipp->senderable()->associate($sender);
         $vipp->save();
-        Common::handelVip($vip, $user, $expire, $vipp, $sender);
-        DB::commit();
-        CustomNotification::addUserLevel($user);
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    public static function addVipToCpUser(User $user, OVip $vip, $expire): void
-    {
-        DB::beginTransaction();
-
-        $vipp = new UserVip();
-        $vipp->type = 1;
-        $vipp->sender_id = 0;
-        $vipp->user_id = $user->id;
-        $vipp->vip_id = $vip->id;
-        $vipp->level = $vip->level;
-        $vipp->expire = null;
-        $vipp->qty = 1;
-        $vipp->price = 0;
-        $vipp->total = 0;
-        $vipp->is_used = 0;
-        $vipp->days = $expire;
-        $vipp->save();
-        Common::handelVipCp($vip, $user, $expire, $vipp);
+        // VipCommon::handelVip($vip, $user, $expir, $vipp);
         DB::commit();
 
         Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
@@ -396,7 +373,6 @@ class UserCommon
         $title = config('app.name_ar');
         $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
         Common::send_firebase_notification($tokens_notfacion, $title, $body);
-        //            CustomNotification::vips($user, $expir, $vip->img);
     }
 
     public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)

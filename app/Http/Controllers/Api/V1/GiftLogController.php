@@ -269,7 +269,7 @@ class GiftLogController extends Controller
     {
         $close_open_gifts = settings()->get('close_open_gifts');
         if ($close_open_gifts == 1) {
-            return Common::apiResponse(0, __('Send gift stopped by admin')); // TODO @m2led targm
+            return Common::apiResponse(0, __('Send gift stopped by admin')); 
         }
         //update when send the gift
         $validator = Validator::make($request->all(), [
