@@ -912,8 +912,9 @@ use App\Models\Vip;
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('zego token') }}</h4>
                                         </div>
+                                        <br>
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-10">
                                                 <div class="form-group">
                                                     <label
                                                         for="zego_server_secret">{{ __('zego token') }}:</label>
