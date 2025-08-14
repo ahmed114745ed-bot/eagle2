@@ -3347,8 +3347,8 @@ use Modules\Vip\Entities\Vip;
                         {{-- Primary Color --}}
                         <div class="col-md-6">
                             <label>{{ __('Primary Color') }}</label>
-                            <input type="color" name="primary_color"
-                                   value="{{ data_get($settings, 'primary_color', '#32e5ac') }}"
+                            <input type="color" name="app_primary_color"
+                                   value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}"
                                    class="form-control">
                         </div>
 
