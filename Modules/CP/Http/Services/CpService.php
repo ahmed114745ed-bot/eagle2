@@ -74,9 +74,7 @@ class CpService
             $cp->level_id
         );
 
-        info($levels);
-        if (!empty($levels)) {
-            info('im here');
+        if (!$levels->isEmpty()) {
             foreach ($levels as $level){
                 DB::table('cps')->where('id', $cp->id)->update([
                     'di' => $newDi,
@@ -85,8 +83,6 @@ class CpService
                 if ($level->level) $this->assignGifts($level, $cp);
             }
         } else {
-            info($cp->id);
-            info($newDi);
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
             ]);
@@ -99,7 +95,7 @@ class CpService
     {
         return CpLevel::query()
             ->where('cp_relation_id', $cpRelationId)
-//            ->where('id', '>', $currentLevelId)
+            ->where('id', '>', $currentLevelId)
             ->where('exp', '<=', $totalCoins)
             ->orderBy('exp')
             ->get();
