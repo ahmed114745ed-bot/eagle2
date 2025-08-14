@@ -1531,7 +1531,7 @@
                                         }
 
                                         $image = handleShowImageWithTypes($user->id, $url, 40, 40);
-                                        $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+                                        $profileUrl = route('bd.agency.profile', ['id' => @$agency->id ?? 0]);
 
                                         $extras = json_decode($salary->extras, true);
                                         $moment = $extras['moment'] ?? [];
