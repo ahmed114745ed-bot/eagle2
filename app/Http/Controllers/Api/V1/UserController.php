@@ -113,8 +113,8 @@ class UserController extends Controller
             ->where(function ($q) {
                 $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
             });
-//        if ($dress != null) $pack->where('target_id', $dress);
-//        return $pack;
+        //        if ($dress != null) $pack->where('target_id', $dress);
+        //        return $pack;
     }
     public function image_intro($id)
     {
@@ -125,7 +125,7 @@ class UserController extends Controller
         $pack = self::checkPack($user->id, 6, $user->dress_3);
         $pack = $pack->pluck('target_id');
 
-//        if (!$pack) return Common::apiResponse(false, 'active product not found', 400);
+        //        if (!$pack) return Common::apiResponse(false, 'active product not found', 400);
         $ware = Ware::query()
             ->whereIn('id', $pack)
             ->where('type', 6)
@@ -177,7 +177,7 @@ class UserController extends Controller
 
         if (now()->month == $month && now()->year == $year) {
             $cacheKey = 'cache-data-my-store-' . $user->id;
-            if (Cache::add($cacheKey, true, now()->addSeconds(30)))  {
+            if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
                 $targetService = new FixedTargetService($user);
                 ($targetService)->calculateTarget();
             }
@@ -203,7 +203,7 @@ class UserController extends Controller
         //        $shared = Common::getConfig('shared') ?? '1234';
         $now = now();
 
-        $ban = Ban::where('ban_type_id',7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
+        $ban = Ban::where('ban_type_id', 7)->whereNotNull('ban_type_id')->where('uid', $user->original_uuid)
             ->with('banType')->where('type', 'action')->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")->first();
 
         $data = [
@@ -651,18 +651,51 @@ class UserController extends Controller
         return Common::apiResponse(1, 'account deleted successfully');
     }
 
+    // public function zegoCredential()
+    // {
+    //     $ZegoEncreyptkey = config('app.zego_credential');
+    //     $keys = Common::getConfFromKey(['app_sign', 'zego_app_id', 'youtube_key']);
+    //     $data = $keys->mapWithKeys(function ($item) {
+    //         return [$item['name'] => $item['name'] == 'zego_app_id' ? (int)$item['value'] : $item['value']];
+    //     });
+
+    //     $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
+
+    //     return Common::apiResponse(1, '', $encryptedData);
+    // }
+
     public function zegoCredential()
     {
         $ZegoEncreyptkey = config('app.zego_credential');
-        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id', 'youtube_key']);
-        $data = $keys->mapWithKeys(function ($item) {
-            return [$item['name'] => $item['name'] == 'zego_app_id' ? (int)$item['value'] : $item['value']];
-        });
 
-        $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
+        // Map request keys to zegoData keys
+        $zegoMap = [
+            'zego_server_secret' => 'zego_server_secret',
+            'zego_app_id'        => 'zego_app_id',
+            'app_sign'           => 'zego_app_sign',
+        ];
+
+        // Build the data array from zegoData()
+        $data = [];
+        foreach ($zegoMap as $requestKey => $zegoKey) {
+            $data[$requestKey] = Common::zegoData($zegoKey);
+        }
+
+        // Convert to JSON string for encryption
+        $dataString = json_encode($data);
+
+        // Encrypt the JSON string
+        $encryptedData = openssl_encrypt(
+            $dataString,
+            'AES-256-CBC',
+            $ZegoEncreyptkey,
+            0,
+            substr($ZegoEncreyptkey, 0, 16) // IV must be 16 bytes
+        );
 
         return Common::apiResponse(1, '', $encryptedData);
     }
+
 
     public function switchAccountAnonymous(Request $request)
     {
