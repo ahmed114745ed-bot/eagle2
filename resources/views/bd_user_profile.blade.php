@@ -1309,7 +1309,7 @@
                                     <td>{{ $packs->firstItem() + $index }}</td>
                                     <td>
                                         @if ($admin)
-                                            <a href="{{ $url ?? '#' }}" target="_blank"
+                                            <a href="{{ $url ?? '#' }}"  
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ $image }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -1776,7 +1776,7 @@
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
                                             @if(!empty($kickedBy) && !empty($kickedBy->id))
-                                                <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
+                                                <a href="{{ $kickedByUrl ?? '#' }}"  
                                                    style="display: inline-flex; align-items: center; text-decoration: none;">
                                                     {!! $kickedByImage !!}
                                                     <span>{{ $kickedByName }} ({{ $kickedByUuid }})</span>
@@ -1988,7 +1988,7 @@
                             <tr>
                                 <td>{{ @$charge->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{  '#' }}" target="_blank"
+                                    <a href="{{  '#' }}"  
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ getImagePath( $image) }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2184,7 +2184,7 @@
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{ url('bd/users/profile/' . $id) }}" target="_blank"
+                                    <a href="{{ url('bd/users/profile/' . $id) }}"  
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $image }}" width="40" height="40"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2196,7 +2196,7 @@
                                 </td>
                                 <td>
                                     @if(!empty($giftSLog->room))
-                                        <a href="{{ url('bd/users/profile/' . $ownerRoom) }}" target="_blank"
+                                        <a href="{{ url('bd/users/profile/' . $ownerRoom) }}"  
                                            class="d-flex align-items-center text-decoration-none">
                                             <img src="{{ $url }}"
                                                  width="30" height="30"
@@ -2252,7 +2252,7 @@
                                 @if($giftType == 'receiver')
                                     <td>
                                         @if ($giftSLog->agency_id)
-                                            <a href="{{ url('bd/agencies/profile/' . $agencyId) }}" target="_blank"
+                                            <a href="{{ url('bd/agencies/profile/' . $agencyId) }}"  
                                                class="d-flex align-items-center text-decoration-none">
                                                 <img src="{{ $agencyImage }}"
                                                      width="50" height="30"
