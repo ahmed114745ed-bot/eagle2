@@ -73,7 +73,7 @@ class CpService
             $newDi,
             $cp->level_id
         );
-       
+
         if (!empty($levels)) {
             foreach ($levels as $level){
                 DB::table('cps')->where('id', $cp->id)->update([
@@ -95,9 +95,9 @@ class CpService
     {
         return CpLevel::query()
             ->where('cp_relation_id', $cpRelationId)
-            ->where('id', '>', $currentLevelId) 
-            ->where('exp', '<=', $totalCoins)   
-            ->orderBy('exp')                   
+            ->where('id', '>', $currentLevelId)
+            ->where('exp', '<=', $totalCoins)
+            ->orderBy('exp')
             ->get();
     }
 
@@ -119,10 +119,13 @@ class CpService
     protected function assignGifts($level, $cp)
     {
         // Check if the CP has already taken the gift for the level
+        info($cp->id);
+        info($level->level);
+        info('hasTakenGift');
         if ($this->hasTakenGift($cp->id, $level->level)) {
             return true;
         }
-        
+
 
         // Fetch rewards for the specified level
         $rewards = $this->getRewardsForLevel($level->id);
@@ -135,6 +138,9 @@ class CpService
         $this->distributeRewards($rewards, $userOne, $userTwo);
 
         // Mark the gift as taken for the CP and level
+        info($cp->id);
+        info($level->level);
+        info('markGiftAsTaken');
         $this->markGiftAsTaken($cp->id, $level->level);
     }
 
