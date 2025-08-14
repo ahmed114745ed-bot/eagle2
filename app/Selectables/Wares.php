@@ -41,6 +41,7 @@ class Wares extends Selectable
                     4 => trans('Avatar Frame'),
                     5 => trans('Bubble Frame'),
                     6 => trans('Entering Special Effects'),
+                    28 => trans('profile frame'),
                 ]);
             });
         });
