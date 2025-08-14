@@ -15,7 +15,7 @@ class CpSeeder extends Seeder
      */
     public function run(): void
     {
-        $giftLogs = GiftLog::take(100)->get();
+        $giftLogs = GiftLog::take(200)->get();
         CP::query()->update([
             'status' => 1,
             'cp_relation_id' => 12
@@ -25,9 +25,7 @@ class CpSeeder extends Seeder
         $userIds = User::inRandomOrder()->limit(20)->pluck('id')->toArray();
 
         // Make sure we have at least 20 users
-        if (count($userIds) < 20) {
-            throw new \Exception('Not enough users to create CPs.');
-        }
+        
 
         // Loop 10 times (because each CP will take 2 users from the 20)
         for ($i = 0; $i < 10; $i++) {
@@ -51,7 +49,10 @@ class CpSeeder extends Seeder
             if ($cp) {
                 $giftLog->update([
                     'cp_id' => $cp->id,
+                    'giftId' => 416,
                     'created_at' => now(),
+                    'giftNum' => rand(1, 10),
+                    'giftPrice' => rand(30000, 100000),
                     'sender_id' => $cp->user_one_id,
                     'receiver_id' => $cp->user_two_id, // assuming this exists
                 ]);
