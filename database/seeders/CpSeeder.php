@@ -17,7 +17,7 @@ class CpSeeder extends Seeder
     public function run(): void
     {
         $giftLogs = GiftLog::take(200)->get();
-        $giftLogsLast = GiftLog::take(200)->orderByDesc('id')->get();
+        $giftLogsLast = GiftLog::take(50)->orderByDesc('id')->get();
         CP::query()->update([
             'status' => 1,
             'cp_relation_id' => 12
@@ -60,7 +60,16 @@ class CpSeeder extends Seeder
                     'receiver_id' => $cp->user_two_id, // assuming this exists
                 ]);
 
-                $giftLogsLast->update([
+            }
+        }
+
+
+        foreach ($giftLogsLast as $index => $giftLog) {
+            $cp = $Cps[$index % $Cps->count()] ?? null;
+
+            if ($cp) {
+
+                $giftLog->update([
                     'cp_id' => $cp->id,
                     'giftId' => 412,
                     'created_at' => \Carbon\Carbon::parse($weeklyCp->start_date)->toDateString(),
