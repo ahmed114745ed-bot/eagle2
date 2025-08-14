@@ -2,7 +2,7 @@
 
 namespace Modules\Events\Transformers;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
 

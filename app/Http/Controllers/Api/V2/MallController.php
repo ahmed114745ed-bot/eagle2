@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V2;
 use Carbon\Carbon;
 use App\Models\Ware;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
 use App\Tik\Services\MallService;
 use App\Http\Controllers\Controller;

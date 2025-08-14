@@ -22,4 +22,10 @@ class CoinLog extends Model
     {
         return $this->belongsTo(Coin::class, 'coin_id');
     }
+
+
+    public function shippingAgency()
+    {
+        return $this->belongsTo(ShippingAgency::class, 'user_id');
+    }
 }

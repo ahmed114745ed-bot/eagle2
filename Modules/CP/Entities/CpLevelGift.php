@@ -2,7 +2,7 @@
 
 namespace Modules\CP\Entities;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -47,9 +47,28 @@ class CpLevelGift extends Model
             if ($model->type_ware) {
                 unset($model->type_ware);
             }
+            if ($model->ware_item_id) {
+                unset($model->ware_item_id);
+            }            
+            if ($model->vip_item_id) {
+                unset($model->vip_item_id);
+            }
             unset($model->attributes['type_ware']);
+            unset($model->attributes['ware_item_id']);
+            unset($model->attributes['vip_item_id']);
 
         });
     }
+
+    public function ware_item()
+    {
+        return $this->belongsTo(Ware::class, 'ware_item_id');
+    }
+    
+    public function vip_item()
+    {
+        return $this->belongsTo(OVip::class, 'vip_item_id');
+    }
+    
 }
 

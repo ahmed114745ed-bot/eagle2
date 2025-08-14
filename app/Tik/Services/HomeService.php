@@ -9,7 +9,6 @@ use App\Models\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
-use App\Tik\Repositories\OvipRepository;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
@@ -17,8 +16,9 @@ use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
 use App\Tik\Repositories\GiftLogRepository;
-use App\Tik\Repositories\UserVipRepository;
 use App\Tik\Repositories\LiveTimeRepository;
+use Modules\Vip\Repositories\OvipRepository;
+use Modules\Vip\Repositories\UserVipRepository;
 
 
 class HomeService
@@ -135,7 +135,7 @@ class HomeService
 
         // Check if the ware exists when enabling the privilege
         if ($isAvailable && !Ware::where('type', $privilegeId)->exists()) {
-            throw new \Exception('not found');
+            throw new Exception('not found');
         }
 
         // Ensure the user has the pack before updating
@@ -145,7 +145,7 @@ class HomeService
         if(!$isAvailable) $packQuery->where('is_used', true);
 
         if (!$packQuery->exists()) {
-            throw new \Exception(__('api.notWare'));
+            throw new Exception(__('api.notWare'));
         }
 
         // Fetch the specific pack with VIP level and expiration check
@@ -163,7 +163,7 @@ class HomeService
             'is_used' => $isAvailable,
             'using' => 1,
         ]);
-
+      
 
 
         return true;

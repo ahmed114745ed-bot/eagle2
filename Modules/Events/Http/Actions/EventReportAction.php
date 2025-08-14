@@ -3,7 +3,7 @@
 namespace Modules\Events\Http\Actions;
 
 use App\Models\Pack;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Encore\Admin\Actions\Action;
 use Illuminate\Http\Request;
 use Modules\Achievement\Entities\UserAchievementLevel;

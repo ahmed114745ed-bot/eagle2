@@ -60,7 +60,7 @@ class UserRepository extends Repository
     public function searchUserAgency($key, $page, $perPage)
     {
 
-        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+        return User::selectRaw('CONCAT(COALESCE(name, ""), " - ", COALESCE(NULLIF(special_id, ""), uuid)) as name, id')
             ->where(function ($query) {
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');

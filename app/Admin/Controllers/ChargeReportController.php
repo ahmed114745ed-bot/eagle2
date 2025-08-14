@@ -184,13 +184,13 @@ class ChargeReportController extends MainController
                 $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $from = request('from_date');
-                    }, __('From Date'), 'from_date')->date();
+                    }, __('From Date'), 'from_date')->date()->default(convertArabicToEnglishNumbers(request('from_date')));
                 });
 
                 $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $to = request('to_date');
-                    }, __('To Date'), 'to_date')->date();
+                    }, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
                 });
             });
         }
@@ -206,47 +206,46 @@ class ChargeReportController extends MainController
             }
         ");
         if ($charger_type != "shipping-agency-activity") {
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->disableIdFilter();
-            $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function () {}, __('Type'), 'filter_type')
-                    ->select([
-                        'user'     => 'User',
-                        'shipping' => 'Shipping Agency',
-                    ])->default('shipping');
-            });
+            $grid->filter(function (Grid\Filter $filter) {
+                $filter->disableIdFilter();
+                $filter->expand();
+                $filter->column(1 /4, function ($filter) {
+                    $filter->where(function () {}, __('Type'), 'filter_type')
+                        ->select([
+                            'user'     => 'User',
+                            'shipping' => 'Shipping Agency',
+                        ])->default('shipping');
+                });
 
-            $filter->column(1 / 2, function ($filter) {
+                $filter->column(3 / 4, function ($filter) {
+                        $filter->where(function ($query) {
+                            $input = $this->input;
+                            $type  = request('filter_type');
+                            if ($type == 'user') {
+                                $query->whereHas('receiverUser', function ($q) use ($input) {
+                                    $q->where('uuid', $input)
+                                        ->orWhere('name', 'like', "%$input%");
+                                });
+                            } else {
+                                $query->whereHas('receiver', function ($q) use ($input) {
+                                    $q->where('id', $input)
+                                        ->orWhere('name', 'like', "%$input%");
+                                });
+                            }
+                        }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
+                    });
+                
+
+
                 $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        $input = $this->input;
-                        $type  = request('filter_type');
-                        if ($type == 'user') {
-                            $query->whereHas('receiverUser', function ($q) use ($input) {
-                                $q->where('uuid', $input)
-                                    ->orWhere('name', 'like', "%$input%");
-                            });
-                        } else {
-                            $query->whereHas('receiver', function ($q) use ($input) {
-                                $q->where('id', $input)
-                                    ->orWhere('name', 'like', "%$input%");
-                            });
-                        }
-                    }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
+                    $filter->where(function ($query) {}, __('From Date'), 'from_date')->date()->default(convertArabicToEnglishNumbers(request('from_date')));
+                });
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {}, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
                 });
             });
-
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {}, __('From Date'), 'from_date')->date();
-            });
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {}, __('To Date'), 'to_date')->date();
-            });
-        });
-    }
+        }
         $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();

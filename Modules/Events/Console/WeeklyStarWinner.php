@@ -5,7 +5,7 @@ namespace Modules\Events\Console;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCommon;
 use App\Models\GiftLog;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Carbon\Carbon;
 use Illuminate\Console\Command;

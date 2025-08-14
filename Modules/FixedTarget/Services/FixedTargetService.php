@@ -262,13 +262,13 @@ class FixedTargetService
             // \Log::info('$target',['$target'=>$target]);
             // \Log::info('$this->joinDate',['$this->joinDate'=>$this->joinDate]);
             if ($target) {
-                $hours = 0;
-                $days  = 0;
+
+
                 $times = $this->getUserLiveTime($user);
-                if ($times) {
-                    $hours = $times->hnum;
-                    $days  = $user->monthly_days;
-                }
+                $hours = $times?->hnum ?? 0;     
+                $days = $times ? $user->monthly_days : 0;
+
+
 
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
@@ -305,13 +305,12 @@ class FixedTargetService
 
                 $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db, $percentageAchieved);
             }else{
-                $hours = 0;
-                $days  = 0;
+
                 $times = $this->getUserLiveTime($user);
-                if ($times) {
-                    $hours = $times->hnum;
-                    $days  = $user->monthly_days;
-                }
+                $hours = $times?->hnum ?? 0;     
+                $days = $times ? $user->monthly_days : 0;
+
+
                  UserSallary::updateOrCreate(
                     [
                         'user_id' => $user->id ,
@@ -323,8 +322,8 @@ class FixedTargetService
                     [
                         'agency_sallary' => 0,
                         'sallary' => 0,
-                        'achieved_hours' =>   $hours,
-                        'achieved_days' =>  $days,
+                        'achieved_hours' =>   $hours ?? 0,
+                        'achieved_days' =>  $days ?? 0,
                         'achieved_diamond' =>  $month_received,
                         'app_profit' => 0,
                         'dB' =>  0,

@@ -3,8 +3,8 @@
 namespace Modules\Public\Http\Services;
 
 use App\Http\Controllers\Api\V1\Auth\LoginController;
-use App\Models\Vip;
-use App\Models\OVip;
+use Modules\Vip\Entities\Vip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;

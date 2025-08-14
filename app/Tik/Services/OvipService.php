@@ -4,9 +4,9 @@ namespace App\Tik\Services;
 
 use Exception;
 use App\Helpers\Common;
-use App\Tik\Repositories\OvipRepository;
-use App\Tik\Repositories\WareRepository;
-use App\Tik\Repositories\VipPrivilegeRepository;
+use  Modules\Vip\Repositories\OvipRepository;
+use  Modules\Vip\Repositories\VipPrivilegeRepository;
+use App\Tik\Repositoris\WareRepository;
 
 
 class OvipService
