@@ -49,6 +49,7 @@ class CpSeeder extends Seeder
             if ($cp) {
                 $giftLog->update([
                     'cp_id' => $cp->id,
+                    'giftId' => 416,
                     'created_at' => now(),
                     'giftNum' => rand(1, 10),
                     'giftPrice' => rand(30000, 100000),
