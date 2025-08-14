@@ -2,7 +2,7 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Selectables\Wares;
 use Encore\Admin\Form;

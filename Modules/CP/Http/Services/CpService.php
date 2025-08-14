@@ -5,8 +5,9 @@ namespace Modules\CP\Http\Services;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,7 @@ use Modules\CP\Entities\Cp as EntitiesCp;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
 use Modules\CP\Entities\CpLevelTakeGift;
+use Modules\Vip\Helpers\VipCommon;
 
 class CpService
 {
@@ -204,9 +206,6 @@ class CpService
         }
     }
 
-    /**
-     * @throws \Throwable
-     */
     protected function assignVip($reward, $expire, $userOne, $userTwo)
     {
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
@@ -215,10 +214,10 @@ class CpService
         $vip = OVip::find($vipId);
         if ($vip) {
             if ($rewardGender == $userOneGender || $rewardGender == 'all'){
-                UserCommon::addVipToCpUser($userOne, $vip, $expire);
+                VipCommon::createUserVip($vip,$userOne,  $expire);
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-                UserCommon::addVipToCpUser($userTwo, $vip, $expire);
+                VipCommon::createUserVip( $vip,$userTwo, $expire);
             }
         }
     }
@@ -297,4 +296,14 @@ class CpService
             'level' => $level,
         ]);
     }
+
+    public function getGenders($userOne, $userTwo, $reward): array
+    {
+        $userOneGender = $userOne->profile->gender == 1 ? 'male' : 'female';
+        $userTwoGender = $userTwo->profile->gender == 1 ? 'male' : 'female';
+        $rewardGender = $reward->gender;
+
+        return [$userOneGender, $userTwoGender, $rewardGender];
+    }
+
 }

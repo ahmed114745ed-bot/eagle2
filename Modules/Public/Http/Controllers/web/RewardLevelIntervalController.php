@@ -3,7 +3,8 @@
 namespace Modules\Public\Http\Controllers\web;
 
 
-use App\Models\OVip;
+use App\Admin\Controllers\MainController;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

@@ -1360,7 +1360,7 @@ namespace App\Models{
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
- * @property-read \App\Models\OVip|null $vip
+ * @property-read \Modules\Vip\Entities\OVip|null $vip
  * @property-read \App\Models\Ware|null $ware
  * @method static \Illuminate\Database\Eloquent\Builder|CoinTargetGift newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CoinTargetGift newQuery()
@@ -3156,7 +3156,7 @@ namespace App\Models{
 	class NowpaymentOrder extends \Eloquent {}
 }
 
-namespace App\Models{
+namespace Modules\Vip\Entities{
 /**
  * 
  *
@@ -3171,7 +3171,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $expire
  * @property int|null $exp
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\VipPrivilege> $privilegs
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Vip\Entities\VipPrivilege> $privilegs
  * @property-read int|null $privilegs_count
  * @property-read \App\Models\Ware|null $wareIcon
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ware> $wares
@@ -4314,7 +4314,8 @@ namespace App\Models{
  * @property int $sort_num
  * @property int|null $game_id
  * @property int|null $total_diamond
- * @property \App\Models\Vip|null $level
+ * @property \Modules\Vip\Entities\OVip;
+|null $level
  * @property int|null $exp
  * @property int|null $level_id
  * @property int $total_game_coins
@@ -5511,7 +5512,7 @@ namespace App\Models{
  * @property int $is_bd
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PaymentGateway> $AgencypaymentGateways
  * @property-read int|null $agencypayment_gateways_count
- * @property-read \App\Models\UserVip|null $UserVip
+ * @property-read \Modules\Vip\Entities\UserVip|null $UserVip
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\LiveTime> $UserliveTime
  * @property-read int|null $userlive_time_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\AgencyApp\Entities\AdditionalInfo> $additionalInfo
@@ -5613,7 +5614,7 @@ namespace App\Models{
  * @property-read mixed $uuid_v2
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GiftLog> $giftLogsSender
  * @property-read int|null $gift_logs_sender_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserVip> $haveVip
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Vip\Entities\UserVip> $haveVip
  * @property-read int|null $have_vip_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\History> $history
  * @property-read int|null $history_count
@@ -5704,17 +5705,18 @@ namespace App\Models{
  * @property-read int|null $type16_packs_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UsersJoinedAgency> $userAgencyJoined
  * @property-read int|null $user_agency_joined_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserVip> $userHaveVip
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Vip\Entities\UserVip> $userHaveVip
  * @property-read int|null $user_have_vip_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Pack> $userPacks
  * @property-read int|null $user_packs_count
  * @property-read \App\Models\UserSallary|null $userSalary
  * @property-read \App\Models\UserSallary|null $userSallary
  * @property-read \App\Models\UserSetting|null $userSetting
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserVip> $userVips
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Vip\Entities\UserVip> $userVips
  * @property-read int|null $user_vips_count
  * @property-read \App\Models\Family|null $user_family
- * @property-read \App\Models\Vip|null $vipImage
+ * @property-read \Modules\Vip\Entities\OVip;
+|null $vipImage
  * @property-read \App\Models\UserWallet|null $wallet
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WalletTransactionBackup> $walletTransactionBackups
  * @property-read int|null $wallet_transaction_backups_count
@@ -6571,7 +6573,7 @@ namespace App\Models{
 	class UserUnionTj extends \Eloquent {}
 }
 
-namespace App\Models{
+namespace Modules\Vip\Entities{
 /**
  * 
  *
@@ -6593,7 +6595,7 @@ namespace App\Models{
  * @property int $num_used
  * @property int $using
  * @property int|null $days
- * @property-read \App\Models\OVip|null $OVip
+ * @property-read \Modules\Vip\Entities\OVip|null $OVip
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Pack> $packs
  * @property-read int|null $packs_count
  * @method static \Illuminate\Database\Eloquent\Builder|UserVip newModelQuery()

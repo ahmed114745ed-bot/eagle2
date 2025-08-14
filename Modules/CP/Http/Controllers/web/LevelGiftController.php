@@ -2,8 +2,8 @@
 
 namespace Modules\CP\Http\Controllers\web;
 
-use App\Helpers\Common;
-use App\Models\OVip;
+use Modules\Vip\Entities\Vip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Selectables\OVips;
 use App\Selectables\Wares;

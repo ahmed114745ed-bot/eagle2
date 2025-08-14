@@ -12,9 +12,12 @@ class PaymentCoinRepository extends AbstractRepository
         parent::__construct(new PaymentCoin());
     }
 
-    public function index()
+    public function index($type = 'user')
     {
-        return $this->model->with('coins')->where('status',true)->get();
+        return $this->model->with('coins')
+                           ->where('package_type',$type)
+                           ->where('status',true)
+                           ->get();
     }
 
     public function findById($paymentCoinId)
