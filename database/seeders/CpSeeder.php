@@ -16,14 +16,17 @@ class CpSeeder extends Seeder
     public function run(): void
     {
         $giftLogs = GiftLog::take(28)->get();
-        $Cps = Cp::get();
+        $Cps = Cp::whereIn('status', [1, 4])->get();
 
         foreach ($giftLogs as $index => $giftLog) {
-            $cp = $Cps[$index % $Cps->count()] ?? null; // Assign each GiftLog a unique Cp
+            $cp = $Cps[$index % $Cps->count()] ?? null;
+
             if ($cp) {
                 $giftLog->update([
                     'cp_id' => $cp->id,
-                    'created_at' => now()
+                    'created_at' => now(),
+                    'sender_id' => $cp->user_one_id,
+                    'receiver_id' => $cp->user_two_id, // assuming this exists
                 ]);
             }
         }
