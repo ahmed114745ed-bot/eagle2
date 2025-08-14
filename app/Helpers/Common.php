@@ -71,6 +71,7 @@ use Illuminate\Support\Facades\Notification;
 use Modules\Charizma\Entities\ExtraDataInRoom;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
+use App\Models\UserCoinLog;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
