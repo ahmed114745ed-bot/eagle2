@@ -27,6 +27,8 @@ class AgencySettingsController extends MainController
             Permission::check('browse-' . $this->permission_name);
         }
 
+        $tab = request('firsttab');
+       
         // $hours =  settings()->get('hours');
         // $days =  settings()->get('days');
         // $moments =  settings()->get('moments');
@@ -50,7 +52,7 @@ class AgencySettingsController extends MainController
         $vars = compact(
             'hours', 'days', 'moments', 'reels', 'diamonds', 'transfer_salary',
             'stop_invite_code', 'stop_charge', 'make_rooms_top', 'make_gift_top', 'languages', 'configAll',
-            'hoursDays'
+            'hoursDays','tab'
         );
 
         $targetGrid = app(TargetController::class)
