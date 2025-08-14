@@ -84,6 +84,8 @@ class CpService
                 if ($level->level) $this->assignGifts($level, $cp);
             }
         } else {
+            info($cp->id);
+            info($newDi);
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
             ]);
@@ -98,7 +100,7 @@ class CpService
             ->where('cp_relation_id', $cpRelationId)
 //            ->where('id', '>', $currentLevelId)
             ->where('exp', '<=', $totalCoins)
-//            ->orderBy('exp')
+            ->orderBy('exp')
             ->get();
     }
 
