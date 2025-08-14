@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Charge;
+use App\Models\CoinLog;
 use Carbon\Carbon;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -505,6 +506,7 @@ class AppearChargerAgencyController extends MainController
         $agencyId = $agency->id;
         $charges = null;
         $resiveds = null;
+        $coinLogs = null;
 
         switch ($tab) {
             case 'charges':
@@ -543,6 +545,14 @@ class AppearChargerAgencyController extends MainController
                     ->latest()
                     ->paginate(10, ['*'], 'resived_page');
                 break;
+
+
+            case 'coinsLog':
+                $coinLogs = CoinLog::where('user_id', $agencyId)
+                    ->where('user_type', 'shipping_agency')
+                    ->latest()
+                    ->paginate(10, ['*'], 'resived_page');
+                break;     
         }
 
         $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
@@ -552,6 +562,7 @@ class AppearChargerAgencyController extends MainController
             ->view('shippingAgencyProfile', compact(
                 'agency',
                 'resiveds',
+                'coinLogs',
                 'charges',
                 'tab',
                 'totalReceive',

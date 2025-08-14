@@ -254,7 +254,7 @@
     "worth": "مستوي المتلقى",
    "worth": " المتلقى",
     "This payment method is currently unavailable. Please choose another one.": "طريقة الدفع هذه غير متاحة حالياً. يرجى اختيار طريقة أخرى.",
-
+    "Transaction Ref":"الرقم المرجعي",
     "Balance": "الرصيد",
     "sender_level": "مستوى المرسل",
     "Browse Categories": "قائمة الفئات",
@@ -3445,6 +3445,7 @@
 "Shipping Agencies": "وكالات الشحن",
 "it_agency_freez_charge" :" تم تجميد محفظه هذه الوكالة",
 "Users Coins Logs":"سجل عملات المستخدم",
+"Coins Logs":"سجل عملات ",
 "balance yet":"الرصيد بعد",
 "sub type":"النوع الفرعي",
 "ware": "سلعة",
