@@ -14,8 +14,6 @@ class WaresByType extends Selectable
 
     public function make()
     {
-  
-
         $this->column('id', __('ID'));
         $this->column('name', __('Name'));
         $this->column('show_img', __('Show Image'))->image('', 30);
@@ -43,6 +41,6 @@ class WaresByType extends Selectable
                 ]);
             });
         });
-    
+
     }
 }
