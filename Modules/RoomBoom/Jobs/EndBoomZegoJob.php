@@ -44,7 +44,7 @@ class EndBoomZegoJob implements ShouldQueue
             "room_mode"         => $this->room->mode,
             'roomBoomLevel'     => $this->currentLevel,
             'duration'          => 30,
-            'user_image'        => $user->profile->avatar
+            'user_image'        => $user->profile->avatar ?? '',
         ];
 
         event(new EndRoomBoomEvent($gift_data));
