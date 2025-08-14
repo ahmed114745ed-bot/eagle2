@@ -66,7 +66,7 @@ class SendGiftService
         return $roomBoomUuid;
     }
 
-    public function roomBoom($roomId, $totalPrice, $roomBoomUuid)
+    public function roomBoom($roomId, $roomUid,$totalPrice, $roomBoomUuid)
     {
         $todayStart = Carbon::today();
 
@@ -109,6 +109,16 @@ class SendGiftService
                     'total_gifts_value' => $newTotal,
                     'trigger_gift_id' => $giftLogId
                 ]);
+
+                $d = [
+                    "messageContent" => [
+                        "message" => "roomBoomStarted",
+                        'roomBoomLevel' => $currentLevel->id,
+                    ]
+                ];
+                $json = json_encode($d);
+
+                Common::sendToZego('SendCustomCommand', $roomId, $roomUid, $json);
             }
 
             if ($currentTotal >= $currentLevel->min_target) {
