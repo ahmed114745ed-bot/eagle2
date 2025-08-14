@@ -26,18 +26,22 @@ class CoinReportController extends MainController
 
     protected function grid()
     {
-        $name = "lucky_gift";
-        if (request("name") != null) {
-            $name = request("name");
+        $default = "lucky_gift";
+        $name = request("name") ?? $default;
+
+        if (!method_exists($this, $name)) {
+            $name = $default;
         }
+
         $grid = $this->{$name}();
-        $grid->disableexport();
+        $grid->disableExport();
         $grid->disableActions();
         $grid->disableCreateButton();
         $grid->disableColumnSelector();
 
         return $grid;
     }
+
 
     protected function lucky_gift()
     {
