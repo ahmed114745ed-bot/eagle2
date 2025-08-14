@@ -35,7 +35,7 @@ class UserWeeklyCpResource extends JsonResource
             'avatar' => $this->profile->avatar ?? '',
             'user' => $user ? [
                 'id' => $user->id ?? null,
-                'uid' => $user->uuid ?? null,
+                'uuid' => $user->uuid ?? null,
                 'name' => $user->name ?? '',
                 'image' => $user->avatar ?? '',
                 'gender' => (string) (($user->gender ?? '') === 'male' ? 1 : 0),
