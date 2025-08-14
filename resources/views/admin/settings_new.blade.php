@@ -3340,7 +3340,7 @@ use Modules\Vip\Entities\Vip;
 
             <div id="appSettings" class="settings-section">
                 <h3>{{ __('App Settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
 
