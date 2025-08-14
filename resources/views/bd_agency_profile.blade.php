@@ -907,7 +907,7 @@
 
             <div class="agency-avatar" style="border-radius: 50%;">
                 @php
-                $url =  url("admin/users/{$agency?->owner?->id}");
+                $url =  url("bd/users/profile/{$agency?->owner?->id}");
                 @endphp
             <a href="{{ $url }}">
                 <img src="{{ getImagePath($agency?->owner?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}" class="logo-img">
