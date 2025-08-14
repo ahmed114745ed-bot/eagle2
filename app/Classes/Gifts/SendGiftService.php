@@ -21,6 +21,7 @@ use App\Jobs\SendCustomOfficialMessageToUser;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\TotalRoomGift;
+use Modules\RoomBoom\Jobs\EndBoomZegoJob;
 use Modules\RoomBoom\Jobs\RoomBoomRewardJob;
 use Str;
 
@@ -173,6 +174,8 @@ class SendGiftService
                 Common::sendToZego('SendCustomCommand', $roomId, $roomUid, $json);
 
                 dispatch(new RoomBoomRewardJob($openBoom->id));
+
+                dispatch(new EndBoomZegoJob($currentLevel, $roomId, $roomUid));
             }
         }
 
