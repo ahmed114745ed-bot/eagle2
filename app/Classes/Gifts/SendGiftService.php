@@ -167,7 +167,7 @@ class SendGiftService
 
                 dispatch(new RoomBoomRewardJob($openBoom->id));
 
-                dispatch(new EndBoomZegoJob($currentLevel, $room, $newTotal, $giftLog->sender_id));
+                dispatch(new EndBoomZegoJob($currentLevel, $newTotal, $giftLog->sender_id, $room));
             }
         }
 

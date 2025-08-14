@@ -108,7 +108,7 @@ class GiftLogService
 
                 $updateUserWhenSendGift->send($sendPrice, $user);
             }else{
-                
+
                 $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
             }
         } catch (NotInfMoneyException $e) {
