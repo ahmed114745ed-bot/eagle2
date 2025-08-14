@@ -2302,7 +2302,7 @@
                     <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                             data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('bd.pack.free') }}" method="POST" id="add_form">
+                <form action="" method="POST" id="add_form">
                     @csrf
                     <div class="modal-body p-0">
                         <div class="rounded-top-lg py-3 ps-4 pe-6 bg-light">
