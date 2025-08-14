@@ -20,6 +20,29 @@ class CpSeeder extends Seeder
             'status' => 1,
             'cp_relation_id' => 12
         ]);
+
+        // Get 20 random users first
+        $userIds = User::inRandomOrder()->limit(20)->pluck('id')->toArray();
+
+        // Make sure we have at least 20 users
+        if (count($userIds) < 20) {
+            throw new \Exception('Not enough users to create CPs.');
+        }
+
+        // Loop 10 times (because each CP will take 2 users from the 20)
+        for ($i = 0; $i < 10; $i++) {
+            $userOne = $userIds[$i * 2];
+            $userTwo = $userIds[$i * 2 + 1];
+
+            CP::create([
+                'user_one_id'    => $userOne,
+                'user_two_id'    => $userTwo,
+                'status'         => 1,
+                'cp_relation_id' => 12,
+                
+            ]);
+        }
+
         $Cps = Cp::get();
 
         foreach ($giftLogs as $index => $giftLog) {
