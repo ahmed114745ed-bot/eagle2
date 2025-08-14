@@ -1502,26 +1502,36 @@ class Common
     }
 
 
-    public static function zegoData()
+    public static function zegoData($key = null)
     {
-        $zegoClientId = config('app.zego_client_id');
+        $zegoClientId = config('app.zego_client_id') ?? env('ZEGO_CLIENT_ID');
         $zego_token = Common::getConf('zego_token');
-        $data = decryptToArray($zego_token,  $zegoClientId);
-        return [
-            'app_id'        => $data['app_id'] ?? '',
-            'server_secret' => $data['server_secret'] ?? '',
-            'app_sign'      => $data['app_sign'] ?? '',
+
+        $data = decryptToArray($zego_token, $zegoClientId);
+
+        $zegoData = [
+            'zego_app_id'        => $data['app_id'] ?? '',
+            'zego_server_secret' => $data['server_secret'] ?? '',
+            'zego_app_sign'      => $data['app_sign'] ?? '',
         ];
+
+        // If a key is provided, return that specific value
+        if ($key) {
+            return $zegoData[$key] ?? null;
+        }
+
+        // Otherwise return all values
+        return $zegoData;
     }
     public static function sendToZegoWithArrayOfRooms($Action, array $RoomIds, $FromUserId, $MessageContent, ?int $exceptRoomId = null, $IsTest = 'false')
     {
         $client = new Client();
 
         $url = 'https://rtc-api.zego.im';
-        $AppId = self::getConf('zego_app_id');
+        $AppId = self::zegoData('zego_app_id');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
-        $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
@@ -1749,10 +1759,10 @@ class Common
         try {
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
-            $AppId            = self::getConf('zego_app_id');
+            $AppId            = self::zegoData('zego_app_id');
             $SignatureNonce   = self::getSignatureNonce();
             $Timestamp        = time();
-            $str              = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+            $str              = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
             $signature        = md5($str);
             $SignatureVersion = '2.0';
             $params           = [
