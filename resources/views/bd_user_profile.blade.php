@@ -1275,7 +1275,7 @@
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
                             <th>{{ __('expire') }}</th>
-                            <th>{{ __('action') }}</th>
+                            <!-- <th>{{ __('action') }}</th> -->
 
                         </tr>
                         </thead>
@@ -1329,8 +1329,8 @@
 
                                     </td>
                                     <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :'∞' }}</td>
-                                    <td>
-                                        <div class="d-flex">
+                                    <!-- <td> -->
+                                        <!-- <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
                                                     data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
@@ -1338,8 +1338,8 @@
                                             <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
-                                        </div>
-                                    </td>
+                                        </div> -->
+                                    <!-- </td> -->
                                 </tr>
                             @endforeach
                             </tbody>
@@ -1380,7 +1380,7 @@
                             <th>{{ __('expire') }}</th>
                             <th>{{ __('qty') }}</th>
                             <th>{{ __('total Price') }}</th>
-                            <th>{{ __('action') }}</th>
+                            <!-- <th>{{ __('action') }}</th> -->
 
                         </tr>
                         </thead>
@@ -1393,14 +1393,14 @@
                                     <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
-                                    <td>
+                                    <!-- <td>
                                         <div class="d-flex">
 
                                             <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
-                                    </td>
+                                    </td> -->
 
                                 </tr>
                             @endforeach
@@ -1755,7 +1755,7 @@
                                                 $url = $defaultImage;
                                             }
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
+                                            $kickedByUrl = '#';
                                         }
                                     }
                                     @endphp
@@ -1854,7 +1854,7 @@
                                 <button type="submit" class="btn btn-info btn-sm me-2">
                                     <i class="fa fa-search"></i> {{ __('Search') }}
                                 </button>
-                                <a href="{{ url('admin/users/' . $user->id. '?tab=user-coins') }}" class="btn btn-default btn-sm">
+                                <a href="{{ url('bd/users/profile/' . $user->id. '?tab=user-coins') }}" class="btn btn-default btn-sm">
                                     <i class="fa fa-undo"></i> {{ __('Reset') }}
                                 </a>
                             </div>
@@ -1988,7 +1988,7 @@
                             <tr>
                                 <td>{{ @$charge->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
+                                    <a href="{{  '#' }}" target="_blank"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ getImagePath( $image) }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2095,7 +2095,7 @@
                                     <button type="submit" class="btn btn-info btn-sm me-2">
                                         <i class="fa fa-search"></i> {{__('Search')}}
                                     </button>
-                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                    <a href="{{ url('bd/users/profile/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
                                         <i class="fa fa-undo"></i> {{__('Reset')}}
                                     </a>
                                 </div>
@@ -2241,7 +2241,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" target="_blank"
+                                    <a href="#" 
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
                                              width="30" height="30"
@@ -2252,7 +2252,7 @@
                                 @if($giftType == 'receiver')
                                     <td>
                                         @if ($giftSLog->agency_id)
-                                            <a href="{{ url('bd/agencies/' . $agencyId) }}" target="_blank"
+                                            <a href="{{ url('bd/agencies/profile/' . $agencyId) }}" target="_blank"
                                                class="d-flex align-items-center text-decoration-none">
                                                 <img src="{{ $agencyImage }}"
                                                      width="50" height="30"
