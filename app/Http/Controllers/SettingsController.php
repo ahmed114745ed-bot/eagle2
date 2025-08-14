@@ -146,7 +146,7 @@ class SettingsController extends Controller
         }
 
 // Primary Color
-        $data['primary_color'] = $request->primary_color;
+        $data['app_primary_color'] = $request->app_primary_color;
 
 // Bottom Nav
         $data['bottom_nav_bottom_color'] = $request->bottom_color;
