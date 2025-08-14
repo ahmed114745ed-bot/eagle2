@@ -957,9 +957,10 @@
                     </div> -->
                 </div>
             </div>
-             <a class="btn btn-success btn-back" href="{{ url('download-charge-agency/' . $agency?->id) }}">
-            {{ __('Export to Excel') }}
-        </a>
+            <a class="btn btn-success btn-back" 
+                href="{{ url('download-charge-agency/' . $agency?->id) . '?' . http_build_query(request()->all()) }}">
+                    {{ __('Export to Excel') }}
+                </a>
            <button class="btn-back" onclick="window.location.href='{{ bd_url('/charges') }}'">
                 {{ __('Go Back') }} <i class="fas fa-arrow-left"></i>
             </button>
