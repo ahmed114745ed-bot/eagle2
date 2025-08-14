@@ -262,7 +262,7 @@ class UserCommon
         $vip = OVip::query()->first();
         $user_vip_check = UserVip::query()->where('user_id', $user->id)->where('level', '>=', $vip->level)->first();
         $expire = $vip->expire;
-  
+
 
         if (!$user_vip_check) {
             VipCommon::createUserVip($vip ,$user ,$vip->expire , null,'',);
@@ -336,8 +336,8 @@ class UserCommon
     {
         DB::beginTransaction();
 
-   
-        VipCommon::createUserVip($vip ,$user ,$expir , null ,'',);
+
+        VipCommon::createUserVip($vip ,$user ,$expire , null ,'',);
 
         DB::commit();
 
