@@ -1275,7 +1275,7 @@
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
                             <th>{{ __('expire') }}</th>
-                            <th>{{ __('action') }}</th>
+                            <!-- <th>{{ __('action') }}</th> -->
 
                         </tr>
                         </thead>
@@ -1330,7 +1330,7 @@
                                     </td>
                                     <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :'∞' }}</td>
                                     <td>
-                                        <div class="d-flex">
+                                        <!-- <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
                                                     data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
@@ -1338,7 +1338,7 @@
                                             <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
-                                        </div>
+                                        </div> -->
                                     </td>
                                 </tr>
                             @endforeach
