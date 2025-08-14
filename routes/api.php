@@ -112,6 +112,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('/chatVideo', [StorageUploadController::class, 'chatVideo']);
     Route::get('/image-intro/{id}', [UserController::class, 'image_intro']);
     Route::get('colors', [ColorController::class, 'index']);
+    Route::get('colors/v2', [ColorController::class, 'appCollor']);
     Route::get('all-servers', [RegisterController::class, 'all_servers']);
 
     // v2
