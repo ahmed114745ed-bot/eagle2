@@ -1766,8 +1766,12 @@ class User extends Authenticatable
     public function myGifts()
     {
         return $this->belongsToMany(Gift::class, 'user_gifts')
-                    ->withPivot('quantity', 'expire')
-                    ->withTimestamps();
+            ->withPivot('quantity', 'expire')
+            ->withTimestamps()
+            ->where(function ($query) {
+                $query->where('user_gifts.expire', 0) 
+                      ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
+            });
     }
 }
 
