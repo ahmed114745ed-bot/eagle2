@@ -11,8 +11,8 @@ class RoomBoomLevelService
     {
     }
 
-    public function index(): Collection|array
+    public function index($id): Collection|array
     {
-        return $this->roomBoomLevelRepository->getLatestWithRewards();
+        return $this->roomBoomLevelRepository->getLatestWithRewards($id);
     }
 }

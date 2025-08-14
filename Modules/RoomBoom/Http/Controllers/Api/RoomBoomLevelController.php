@@ -14,9 +14,9 @@ class RoomBoomLevelController extends Controller
     {
     }
 
-    public function index(): JsonResponse
+    public function index($id): JsonResponse
     {
-        $roomBoomLevels = $this->roomBoomLevelService->index();
+        $roomBoomLevels = $this->roomBoomLevelService->index($id);
 
         return Common::apiResponse(true, '', RoomBoomLevelResource::collection($roomBoomLevels), 200);
     }

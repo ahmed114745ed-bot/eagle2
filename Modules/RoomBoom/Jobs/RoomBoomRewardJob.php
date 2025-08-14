@@ -62,7 +62,6 @@ class RoomBoomRewardJob implements ShouldQueue
         $assignments = [];
         $assignedUserIds = [];
 
-        info($rewardItems[0]);
         foreach ($topContributorIds as $i => $userId) {
             if (!isset($rewardItems[$i])) break;
             $reward = $rewardItems[$i];             //first user will take first reward ordered by priority and quantity

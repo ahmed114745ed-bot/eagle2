@@ -17,6 +17,6 @@ class RoomBoom extends Model
 
     public function totalRoomGift(): BelongsTo
     {
-        return $this->belongsTo(TotalRoomGift::class);
+        return $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
     }
 }

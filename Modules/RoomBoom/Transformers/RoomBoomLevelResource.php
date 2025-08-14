@@ -15,7 +15,7 @@ class RoomBoomLevelResource extends JsonResource
             'min_target' => $this->min_target,
             'target' => $this->target,
             'room_booms' => RoomBoomResource::collection($this->whenLoaded('roomBooms')),
-            'rewards' => RoomBoomRewardResource::collection($this->whenLoaded('roomBoomRewards'))
+            'rewards' => RoomBoomRewardResource::collection($this->whenLoaded('roomBoomRewards')),
         ];
     }
 }

@@ -59,7 +59,7 @@ class GiftLogService
         $number  = $data['num'];
         $type  = $data['type'];
         $sourceType = GiftSourceType::fromType($type)->value;
-        
+
 
         //get the gift data from id in the parameter
         $gift = $this->giftRepository->findById($giftId);
@@ -74,7 +74,7 @@ class GiftLogService
         // if user didn't have inf coins throw exception
         $check = $this->checkGiftAvailability($user, $gift, $number, $type,$totalPrice);
         if ($check) {
-            return $check; 
+            return $check;
         }
 
 
@@ -165,7 +165,7 @@ class GiftLogService
 
         $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
-        $sendGiftServices->roomBoom($room->id, $totalPrice, $roomBoomUuid);
+        $sendGiftServices->roomBoom($room->id, $room->uid, $totalPrice, $roomBoomUuid);
 
         foreach ($receivedUsers as $receivedUser) {
             $updateUserWhenSendGift->update($price, $receivedUser);
@@ -227,22 +227,22 @@ class GiftLogService
 
     private function checkGiftAvailability($user, $gift, $number, $type, $totalPrice)
     {
-      
+
 
         if ($type == 'bag') {
-          
+
                $existingGiftCount = UserGift::where('user_id', $user->id)
                     ->where('gift_id', $gift->id)
                     ->where(function($query) {
                         $query->where('expire', 0)
-                              ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()'); 
+                              ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
                     })->first();
 
                 if ( $existingGiftCount && $existingGiftCount->quantity < $number) {
                     return Common::apiResponse(0, 'Receiver has reached maximum allowed gifts', null, 407);
                 }
-           
-            return null; 
+
+            return null;
         }
 
         if ($user->di < $totalPrice) {

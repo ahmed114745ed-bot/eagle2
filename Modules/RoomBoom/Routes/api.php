@@ -17,5 +17,5 @@ Route::group([
     'prefix' => 'boom_levels',
     'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization']
 ], function (){
-    Route::get('', [RoomBoomLevelController::class, 'index']);
+    Route::get('{id}', [RoomBoomLevelController::class, 'index']);
 });
