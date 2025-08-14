@@ -136,6 +136,30 @@ class SettingsController extends Controller
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
             $data['background_color'] = $request->background_color;
+        } elseif ($request->background_type === 'image' && $request->hasFile('background_image')) {
+            $data['app_background'] = Common::upload('images', $request->file('background_image'));
+            $data['background_image'] = $data['app_background'];
+        } elseif ($request->background_type === 'gradient') {
+            $data['gradient_1'] = $request->gradient_1;
+            $data['gradient_2'] = $request->gradient_2;
+            $data['gradient_3'] = $request->gradient_3;
+        }
+
+// Primary Color
+        $data['primary_color'] = $request->primary_color;
+
+// Bottom Nav
+        $data['bottom_nav_bottom_color'] = $request->bottom_color;
+        $data['bottom_nav_active_color'] = $request->active_color;
+        $data['bottom_nav_inactive_color'] = $request->inactive_color;
+
+// Text & Button Colors
+        $data['text_header_color'] = $request->text_header_color;
+        $data['button_text_color'] = $request->button_text_color;
+
+        if ($request->background_type === 'color') {
+            $data['app_background'] = $request->background_color;
+            $data['background_color'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
             $data['images_background'] = Common::upload('images', $request->file('app_background_image'));

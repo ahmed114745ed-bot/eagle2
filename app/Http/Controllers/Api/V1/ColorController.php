@@ -13,7 +13,7 @@ class ColorController extends Controller
     {
 
         $settingBackGroundType  = Common::getSettingValue('background_type');
-        $data =[
+        /*$data =[
 
             'main_color' => Cache::get('app_primary_color') ??'',
             'secondary_colors' => Cache::get('app_second_color')??'',
@@ -27,8 +27,23 @@ class ColorController extends Controller
             'gradient_2' => $settingBackGroundType == 'gradient' ? (Cache::get('gradient_2') ?? ''): "",
             'gradient_3' => $settingBackGroundType == 'gradient' ? (Cache::get('gradient_3') ?? ''): "",
         ];
-        settings()->set('colors_updated_at', false);
-        settings()->set('ground_updated_at', false);
-        return Common::apiResponse (true,'',$data,200);
+        */
+        $config = [
+            "primary_color" => Cache::get('app_primary_color'),
+            "background" => [
+                "value" => $settingBackGroundType == 'color' ?Cache::get('background_color') : Cache::get('app_background'),
+                "type" => $settingBackGroundType
+            ],
+            "bottom_nav" => [
+                "bottom_color" => Cache::get('bottom_nav_bottom_color'),
+                "active_color" => Cache::get('bottom_nav_active_color'),
+                "inactive_color" => Cache::get('bottom_nav_inactive_color')
+            ],
+            "text_header_color" => Cache::get('text_header_color'),
+            "button_text_color" => Cache::get('button_text_color')
+        ];
+
+
+        return Common::apiResponse (true,'',$config,200);
     }
 }
