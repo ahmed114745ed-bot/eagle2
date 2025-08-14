@@ -1,0 +1,66 @@
+<?php
+
+namespace Modules\RoomBoom\Entities;
+
+use App\Helpers\Common;
+use App\Models\Gift;
+use App\Models\Ware;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+
+class RoomBoomReward extends Model
+{
+    protected $fillable = ['room_boom_level_id', 'target', 'target_type', 'priority', 'quantity', 'expire_days'];
+
+    public function ware(): HasOne
+    {
+        return $this->hasOne(Ware::class, 'id', 'target');
+    }
+
+    public function gift(): HasOne
+    {
+        return $this->hasOne(Gift::class, 'id', 'target');
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+        self::creating(function ($model) {
+            if ($model->target_type == 'ware') {
+                $model->target = request('target1', $model->target);
+            } elseif ($model->target_type == 'achievement') {
+                $file = request('target4', $model->target);
+
+                if ($file instanceof UploadedFile) {
+                    $url = Common::upload('events', $file);
+                }
+                $model->target = $url ?? '';
+            } elseif ($model->target_type == 'gift') {
+                $model->target = request('target5', $model->target);
+            }
+            unset($model->target1);
+            unset($model->target4);
+            unset($model->target5);
+        });
+
+        self::updating(function ($model) {
+            if ($model->target_type == 'ware') {
+                $model->target = request('target1', $model->target);
+            } elseif ($model->target_type == 'achievement') {
+                $file = request('target4', $model->target);
+                if ($file instanceof UploadedFile) {
+                    $url = Common::upload('events', $file);
+                    Storage::delete($model->target);
+                }
+                $model->target = $url ?? '';
+            } elseif ($model->target_type == 'gift') {
+                $model->target = request('target5', $model->target);
+            }
+            unset($model->target1);
+            unset($model->target4);
+            unset($model->target5);
+        });
+    }
+}
