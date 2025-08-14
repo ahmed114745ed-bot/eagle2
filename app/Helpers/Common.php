@@ -1501,6 +1501,18 @@ class Common
         }
     }
 
+
+    public static function zegoData()
+    {
+        $zegoClientId = config('app.zego_client_id');
+        $zego_token = Common::getConf('zego_token');
+        $data = decryptToArray($zego_token,  $zegoClientId);
+        return [
+            'app_id'        => $data['app_id'] ?? '',
+            'server_secret' => $data['server_secret'] ?? '',
+            'app_sign'      => $data['app_sign'] ?? '',
+        ];
+    }
     public static function sendToZegoWithArrayOfRooms($Action, array $RoomIds, $FromUserId, $MessageContent, ?int $exceptRoomId = null, $IsTest = 'false')
     {
         $client = new Client();

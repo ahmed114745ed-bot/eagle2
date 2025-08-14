@@ -99,6 +99,7 @@ return [
     'project_id' => env('PROJECT_ID', 3),
     'utd_url' => env('UTD_URL', 'http://127.0.0.1:8000/api/'),
     'encrypt_key' => env('ENCRYPT_KEY', '1234567894561236'),
+    'zego_client_id' => env('ZEGO_CLIENT', 'dSivPdxNGusejgGp'),
 
     'asset_url' => env('ASSET_URL', null),
 

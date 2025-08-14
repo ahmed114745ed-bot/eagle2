@@ -43,6 +43,7 @@ class SettingController extends MainController
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
+        $zego_token = Common::getConf('zego_token');
         return parent::index($content
             ->header(__('Settings'))
             ->description('')
@@ -50,6 +51,7 @@ class SettingController extends MainController
                 'pusher_app_secret',
                 'pusher_app_key',
                 'pusher_app_id',
+                'zego_token',
                 'pusher_app_cluster',
                 'settings',
                 'timezones',
