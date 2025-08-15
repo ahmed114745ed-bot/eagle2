@@ -162,9 +162,9 @@ class GiftLogService
 
         $price = ceil($realPrice);
 
-        $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
+//        $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
-        $sendGiftServices->roomBoom($room, $totalPrice, $roomBoomUuid);
+//        $sendGiftServices->roomBoom($room, $totalPrice, $roomBoomUuid);
 
         foreach ($receivedUsers as $receivedUser) {
             $updateUserWhenSendGift->update($price, $receivedUser);
