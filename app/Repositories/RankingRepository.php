@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use App\Models\GiftRanking;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Models\GiftLog;
 use App\Models\CoinGameUser;
@@ -61,6 +63,26 @@ class RankingRepository
             ->limit($limit)->get()->reject(function ($q) {
                 return $q->exp == 0;
             });
+    }
+
+    public function getUserRanking($class, $type, $perPage)
+    {
+        return GiftRanking::
+            query()
+            ->with(['ranker.packs.ware',
+                'medals.achievementLevel.achievement',
+                'mangerType',
+                'UserVip',
+                'senderLevel',
+                'receiverLevel',
+                'country',
+                'profile:user_id,avatar,age'
+                ])
+            ->when($type == 'roomOwner', fn($q) => $q->with('ownerRoom'))
+            ->where('role', $class)
+            ->where('ranker_type', User::class)
+            ->where('type', $type)
+            ->paginate($perPage);
     }
 
     public function getGiftLogsV2($class, $rel, $type, $limit, $keywords)

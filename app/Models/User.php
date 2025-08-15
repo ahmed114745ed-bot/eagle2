@@ -7,6 +7,7 @@ use App\Traits\FollowTrait;
 use App\Traits\MomentRelationshipTrait;
 use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
+use App\Traits\User\UserLevel;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,7 +39,7 @@ use Modules\Vip\Entities\Vip;
  */
 class User extends Authenticatable
 {
-    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait;
+    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -1770,7 +1771,7 @@ class User extends Authenticatable
             ->withPivot('quantity', 'expire')
             ->withTimestamps()
             ->where(function ($query) {
-                $query->where('user_gifts.expire', 0) 
+                $query->where('user_gifts.expire', 0)
                       ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
             });
     }

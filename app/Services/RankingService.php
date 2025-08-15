@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Helpers\UserLevelHelper;
+use App\Helpers\UserPackHelper;
 use App\Models\Pk;
 ;
 use App\Helpers\Common;
@@ -111,6 +113,107 @@ class RankingService
         $this->transformData($data, $class, $keywords, $rel);
 
         return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
+    }
+
+    public function getRanking22($class, $type, $user, $limit)
+    {
+        if ($class == 4) {
+            $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
+            $this->transformData($data, $class, 'user_id', 'user');
+            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+        } elseif ($class == 6) {
+            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            return $this->prepareResponse2($data, $user, $type, $user->id, $class);
+            return \App\Http\Resources\RankingResource::collection($data);
+        }
+
+        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+        $types = [
+            0 => 'daily',
+            1 => 'weekly',
+            2 => 'monthly'
+        ];
+        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
+        if ($class == 5) {
+            return $data;
+        }
+        $this->transformData3($data, $class, $keywords, $rel);
+
+        return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
+    }
+    protected function transformData3(&$data, $class, $key, $relation)
+    {
+
+        $data = $data->values()->map(function ($item, $key) use ($data) {
+            if ($key === 0) {
+                $item->exp_diff = 0;
+            } else {
+                $item->exp_diff = $data[$key - 1]->total_gifts - $item->total_gifts  + 1;
+            }
+            return $item;
+        });
+
+
+        $data = $data->map(function ($v) use ($key, $class, $relation) {
+            $achievement_images = [];
+            $user = $v->ranker;
+
+            if ($user == null) {
+                return null;
+            }
+
+            $color_name = UserPackHelper::getColorName($user);
+
+            if ($user->medals) {
+                foreach ($user->medals as $medal) {
+                    if ($medal->achievementLevel) {
+                        $achievementData = [
+                            'image' => @$medal->achievementLevel->valid_image,
+                            'title' => @$medal->achievementLevel?->achievement?->name ?? '',
+                            'created_at' => @$medal->created_at,
+                        ];
+                        $achievement_images[] = $achievementData;
+                    }
+                }
+            }
+
+            $v->user_id = $user->id;
+            $v->color_name = $color_name;
+
+            $value = $v->exp_diff;
+            $v->exp = numToString(ceil((float)$v->exp_diff));
+            $v->exp_int = ceil($value);
+
+            $value2 = $v->exp_diff;
+            $v->remaining = numToString(ceil($v->exp_diff));
+            $v->remaining_int = ceil($value2);
+
+            $v->name = $class == 3 ? (@$user->ownerRoom?->room_name ?? '') : $user->name;
+            $v->avatar = $class == 3 ? (@$user->ownerRoom?->room_cover ?? '') : $user->profile->avatar;
+            $v->frame = UserPackHelper::getFrameImage($user);
+            $v->frame_id = UserPackHelper::getFrameId($user);
+
+            $v->type_user =  intval(@$user->type_user) ?: 0;
+            $v->manger_type =  !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+
+            $v->vip_level = @$user->UserVip->level ?? 0;
+            $v->sender_level = @$user->total_sender_level;
+            $v->reciver_level = @$user->total_received_level;
+
+
+            $v->vip_level_img = @$user->UserVip?->OVip?->img ?? '';
+            $v->sender_level_img = UserLevelHelper::getSenderImage($user);
+            $v->reciver_level_img = UserLevelHelper::getReceiverImage($user);
+
+            $v->country = @$user->country;
+            $v->age = @$user->profile->age ?? 'P';
+            $v->achievement_images = $achievement_images;
+            $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
+            unset($v->ranker);
+            return $v;
+        })->reject(function ($v) {
+            return $v == null;
+        });
     }
 
     public function getRankingV2($class, $type, $user, $limit, $room_uid, $sent_to_owner)

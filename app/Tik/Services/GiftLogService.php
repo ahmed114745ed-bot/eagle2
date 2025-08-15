@@ -34,6 +34,7 @@ use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 
+
 class GiftLogService
 {
 
@@ -145,7 +146,7 @@ class GiftLogService
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
             } catch (\Exception $e) {
-                return Common::apiResponse(0, $e->getMessage());
+                 throw new \Exception('not found') ;
             }
         }
 
@@ -162,7 +163,7 @@ class GiftLogService
 
         $price = ceil($realPrice);
 
-//        $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
+        $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
 //        $sendGiftServices->roomBoom($room, $totalPrice, $roomBoomUuid);
 
@@ -216,7 +217,7 @@ class GiftLogService
         if ($totalPrice > $totalGiftPrice) {
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
-        return Common::apiResponse(1, $message);
+        return $message;
 
      });
 
