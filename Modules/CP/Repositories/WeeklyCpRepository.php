@@ -57,8 +57,10 @@ class WeeklyCpRepository
 
     public function topUser($giftIds, $weeklyCp)
     {
-        return GiftLog::whereIn('giftId', $giftIds)->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
-            ->groupBy('cp_id')->whereBetween('created_at', [
+        return GiftLog::whereIn('giftId', $giftIds)
+            ->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
+            ->groupBy('cp_id')
+            ->whereBetween('created_at', [
                 $weeklyCp->start_date,
                 $weeklyCp->end_date
             ])->whereHas('cps', function ($q) {

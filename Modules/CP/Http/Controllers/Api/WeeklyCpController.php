@@ -54,8 +54,7 @@ class WeeklyCpController extends Controller
     public function topOnePerviousWeeklyCp()
     {
         try {
-            $currentCp = $this->weeklyCpService->getCurrentWeeklyCp();
-            $data = $this->weeklyCpService->topOneCurrentWeeklyCp($currentCp);
+            $data = $this->weeklyCpService->topOneCurrentWeeklyCp();
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }

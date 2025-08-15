@@ -5,11 +5,12 @@ namespace App\Models;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\CP\Traits\CpGiftLog;
 use Modules\Moment\Entities\Moment;
 
 class GiftLog extends Model
 {
-    use TimestampsWithTimezone;
+    use TimestampsWithTimezone, CpGiftLog;
 
     protected $table = 'gift_logs';
 
@@ -45,15 +46,7 @@ class GiftLog extends Model
         return $this->belongsTo(Moment::class, 'moent_id');
     }
 
-    public function cps()
-    {
-        return $this->belongsTo(Cp::class, 'cp_id');
-    }
 
-    public function cp()
-    {
-        return $this->belongsTo(Cp::class, 'cp_id')->with('fromUser:id,uuid,name', 'toUser:id,uuid,name', 'level');
-    }
 
     public function agency()
     {
