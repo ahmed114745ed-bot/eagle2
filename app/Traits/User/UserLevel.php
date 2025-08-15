@@ -2,7 +2,8 @@
 
 namespace App\Traits\User;
 
-use App\Models\Vip;
+
+use Modules\Vip\Entities\Vip;
 
 trait UserLevel
 {
