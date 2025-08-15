@@ -12,7 +12,7 @@ class PerviousOneWeeklyCpResource extends JsonResource
     {
 
         $cp = $this->cp;
-        
+
         return [
 
             'id' => $cp?->id ?? 0,

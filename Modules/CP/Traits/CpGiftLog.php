@@ -2,6 +2,8 @@
 
 namespace Modules\CP\Traits;
 
+use Modules\CP\Entities\Cp;
+
 trait CpGiftLog
 {
     public function cps()
