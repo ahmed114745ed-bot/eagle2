@@ -129,9 +129,9 @@ class RankingService
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
         $types = [
-            0 => 'daily',
-            1 => 'weekly',
-            2 => 'monthly'
+            1 => 'daily',
+            2 => 'weekly',
+            3 => 'monthly'
         ];
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
         if ($class == 5) {
