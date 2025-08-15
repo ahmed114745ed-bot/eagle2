@@ -73,10 +73,10 @@ class RankingRepository
                     $q->with([
                         'packs.ware:id,name',
                         'mangerType:id,name',
-                        'UserVip:id,user_id,vip_level',
+                        'UserVip:id,user_id,expire,level,is_used',
                         'senderLevel:id,level,type,img',
                         'receiverLevel:id,level,type,img',
-                        'country:id,name,code',
+                        'country:id,name,iso,flag',
                         'profile:user_id,avatar,age'
                     ]);
                 },
