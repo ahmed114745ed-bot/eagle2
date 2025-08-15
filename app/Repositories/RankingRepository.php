@@ -65,24 +65,29 @@ class RankingRepository
             });
     }
 
-    public function getUserRanking($class, $type, $perPage)
+    public function getUserRanking(string $role, string $rankingType, int $perPage)
     {
-        return GiftRanking::
-            query()
-            ->with(['ranker.packs.ware',
-                'medals.achievementLevel.achievement',
-                'mangerType',
-                'UserVip',
-                'senderLevel',
-                'receiverLevel',
-                'country',
-                'profile:user_id,avatar,age'
-                ])
-            ->when($type == 'roomOwner', fn($q) => $q->with('ownerRoom'))
-            ->where('role', $class)
+        $query = GiftRanking::query()
+            ->with([
+                'ranker' => function ($q) {
+                    $q->with([
+                        'packs.ware:id,name',
+                        'mangerType:id,name',
+                        'UserVip:id,user_id,vip_level',
+                        'senderLevel:id,level,type,img',
+                        'receiverLevel:id,level,type,img',
+                        'country:id,name,code',
+                        'profile:user_id,avatar,age'
+                    ]);
+                },
+                'medals.achievementLevel.achievement:id,name,description',
+            ])
+            ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,owner_id,name'))
+            ->where('role', $role)
             ->where('ranker_type', User::class)
-            ->where('type', $type)
-            ->paginate($perPage);
+            ->where('type', $rankingType);
+
+        return $query->paginate($perPage);
     }
 
     public function getGiftLogsV2($class, $rel, $type, $limit, $keywords)
