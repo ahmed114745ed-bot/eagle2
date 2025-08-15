@@ -83,8 +83,8 @@ class UpgradeLevelServices
         $subSenderLevel = $user->sub_sender_level;
 
         $senderLevel = (new UpdateUserWhenSendGift())->getSenderLevel($user->total_sender_diamonds, 0, $subSenderLevel);
+        $user->sender_level = $senderLevel;
         if ($senderLevel > $oldSenderLevel) {
-            $user->sender_level = $senderLevel;
             $hadNotRewards = $this->hadNotRewards($user->id, $user->total_sender_level);
             if ($hadNotRewards) {
                 dispatch(new RewardWinnerLevelInterval($user->id, $senderLevel, 2))->onQueue('level_rewards');
