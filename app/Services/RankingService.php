@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\LogHelper;
 use App\Helpers\UserLevelHelper;
 use App\Helpers\UserPackHelper;
 use App\Models\Pk;
@@ -134,6 +135,8 @@ class RankingService
             3 => 'monthly'
         ];
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
+
+        LogHelper::info('this data ', $data);
         if ($class == 5) {
             return $data;
         }
