@@ -26,14 +26,7 @@ class CpProfileService
 
     public function getCpProfiles($userId)
     {
-        $result = [
-            'seats' => 3,
-            'wares' => null,
-            'main_cp' =>  null,
-            'remaining_cp' => []
-        ];
 
-        return Common::apiResponse(1, '', $result);
 
         $statuses = [1, 4];
         $vipCount = $this->packRepository->countUserVipPacks($userId);
@@ -75,7 +68,14 @@ class CpProfileService
             $ware = Ware::select('id', 'price', 'num')->where('type', 100)->where('get_type', 100)->where('num', 6)->first();
         }
         $mainCp = $data->firstWhere('relation.type', 'lovely') ?? null;
+        $result = [
+            'seats' => 3,
+            'wares' => null,
+            'main_cp' =>  null,
+            'remaining_cp' => []
+        ];
 
+        return Common::apiResponse(1, '', $result);
         $remainingCps = $mainCp ? $data->reject(function ($cp) use ($mainCp) {
             return $cp->id === $mainCp->id;
         }) : $data;
