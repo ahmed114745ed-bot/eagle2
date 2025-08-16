@@ -35,7 +35,14 @@ class CpProfileService
         elseif ($vipCount >= 2) $count =  10;
         else $count =  4;
         $data = $this->cpRepository->getUserCpProfiles($userId, $statuses, $count);
+        $result = [
+            'seats' => 3,
+            'wares' => null,
+            'main_cp' =>  null,
+            'remaining_cp' => []
+        ];
 
+        return Common::apiResponse(1, '', $result);
         $pack = Pack::where('user_id', Auth::id())
             ->where('type', 100)
             ->where(function ($q) {
@@ -68,14 +75,7 @@ class CpProfileService
             $ware = Ware::select('id', 'price', 'num')->where('type', 100)->where('get_type', 100)->where('num', 6)->first();
         }
         $mainCp = $data->firstWhere('relation.type', 'lovely') ?? null;
-        $result = [
-            'seats' => 3,
-            'wares' => null,
-            'main_cp' =>  null,
-            'remaining_cp' => []
-        ];
 
-        return Common::apiResponse(1, '', $result);
         $remainingCps = $mainCp ? $data->reject(function ($cp) use ($mainCp) {
             return $cp->id === $mainCp->id;
         }) : $data;
