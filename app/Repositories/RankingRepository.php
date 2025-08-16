@@ -87,7 +87,9 @@ class RankingRepository
                         ->where('picked', true)
                         ->with(['achievementLevel' => fn($q) => $q->select(['id','valid_image'])
                             ->with('achievement:id,name,type')
-                            ->whereHas(['achievement' => fn($q) => $q->where('type' != AchievementType::ROOM_TARGET->value)])
+                            ->whereHas('achievement', fn($q) =>
+                                $q->where('type', '!=', AchievementType::ROOM_TARGET->value)
+                            )
                         ])
                         ->limit(5),
                     ])
