@@ -74,7 +74,7 @@ class RankingRepository
 
                     $q->with([
                         'packs' => fn($q) => $q->select(['user_id', 'target_id', 'type'])
-                            ->whereIn('type', [4,18])
+                            ->whereIn('type', [4,18, 10])
                             ->where('is_used', true)
                             ->with('ware:id,name,img1,img2'),
                         'mangerType:id,name_ar,name_en,img',

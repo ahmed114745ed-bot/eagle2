@@ -8,6 +8,7 @@ use App\Helpers\UserPackHelper;
 use App\Models\Pk;
 ;
 use App\Helpers\Common;
+use App\Models\User;
 use App\Repositories\RankingRepository;
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
@@ -143,7 +144,7 @@ class RankingService
         }
         $this->transformData3($data, $class, $keywords, $rel);
 
-        return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
+        return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
     protected function transformData3(&$data, $class, $key, $relation)
     {
@@ -180,7 +181,7 @@ class RankingService
             }
 
             $v->user_id = $user->id;
-            $v->color_name = '';
+            $v->color_name = $color_name;
 
             $value = $v->total_gifts;
             $v->exp = numToString(ceil((float)$value));
@@ -208,7 +209,7 @@ class RankingService
             $v->reciver_level_img = UserLevelHelper::getReceiverImage($user);
 
             $v->country = @$user->country;
-            $v->age = @$user->profile->age ?? 'P';
+            $v->age = @$user->profile->age ?? '';
             $v->achievement_images = $achievement_images;
             $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
             unset($v->ranker);
@@ -430,7 +431,76 @@ class RankingService
             return $v == null;
         });
     }
+    protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
+    {
 
+
+        $achievement_images = [];
+
+        $kong['user_id']    = 0;
+        $kong['uuid']       = '';
+        $kong['exp']        = '0';
+        $kong['exp_int']        = 0;
+        $kong['remaining']        = '0';
+        $kong['remaining_int']        = 0;
+        $kong['name']       = '';
+        $kong['avatar']     = '';
+        $kong['frame']      = '';
+        $kong['frame_id']   = 0;
+        $kong['sender_img'] = '';
+        $kong['reseverimg'] = '';
+        $kong['vip_level']  =  0;
+        $kong['sender_level'] = 0;
+        $kong['reciver_level'] = 0;
+
+        $kong['vip_level_img'] = '';
+        $kong['sender_level_img'] = '';
+        $kong['reciver_level_img'] = '';
+        $kong['age'] = 0;
+
+        $kong['type_user'] = 0;
+        $kong['manger_type'] = null;
+        $kong['achievement_images'] = [];
+        $kong['color_name'] = '';
+
+
+
+        $data[0] = isset($data[0]) ? $data[0] : $kong;
+        $data[1] = isset($data[1]) ? $data[1] : $kong;
+        $data[2] = isset($data[2]) ? $data[2] : $kong;
+        //        if ($limit == 3) return $data;
+
+
+        $user->sort = $this->getUserSortValue($data, $userId);
+        $user->user_id = $user->id;
+
+        $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id', 'age');
+
+
+        $userData = $data->where($key, $user->id)->first();
+
+        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->exp ?? '0') : (@$userData->exp ?? '0');
+        $arr['user']['sender_img'] = UserLevelHelper::getSenderImage($user);
+        $arr['user']['vip_level']  = $user->UserVip->level;
+        $arr['user']['sender_level']  = $user->total_sender_level ?? '';
+        $arr['user']['reciver_level']  = $user->total_received_level ?? '';
+        $arr['user']['vip_level_img']  = UserPackHelper::getVipIcon($user);
+        $arr['user']['sender_level_img']  = UserLevelHelper::getSenderImage($user);
+        $arr['user']['reciver_level_img']  = UserLevelHelper::getReceiverImage($user);
+        $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
+        $arr['user']['country'] =  @$user->country;
+        $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+        $arr['user']['age'] = @$user->profile?->age ?? '';
+        $arr['user']['color_name'] = UserPackHelper::getColorName($user);
+        $arr['user']['achievement_images'] = $achievement_images;
+
+
+        $toArray = $data->toArray();
+        $countData = count($data);
+        $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
+        $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
+        return $arr;
+    }
 
     protected function prepareResponse2($data, $user)
     {
@@ -469,6 +539,7 @@ class RankingService
         $arr['other'] = \App\Http\Resources\RankingResource::collection($fromThird);
         return $arr;
     }
+
 
     protected function prepareResponse($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {

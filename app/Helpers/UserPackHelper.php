@@ -9,16 +9,9 @@ class UserPackHelper
 
     public static function getColorName(User $user) : string
     {
-        $first = $user->packs
+        return $user->packs
             ->where('type', 18)
-            ->first();
-        $ware = $first?->ware;
-        if ($user->id == 303) {
-            LogHelper::info('$first info ', $first);
-            LogHelper::info('$ware info ', $ware);
-        }
-
-        return $ware?->color ?? '';
+            ->first()?->ware?->color ?? '';
     }
 
     public static function getFrameImage(User $user) : string
@@ -31,6 +24,13 @@ class UserPackHelper
     {
         $ware = self::getFrameWare($user);
         return $ware?->id ?? 0;
+    }
+
+    public static function getVipIcon(User $user) : string
+    {
+        return $user->packs
+            ->where('type', 10)
+            ->first()?->ware?->show_img ?? '';
     }
 
     /**
