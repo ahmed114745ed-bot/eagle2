@@ -11,6 +11,7 @@ use App\Helpers\Common;
 use App\Repositories\RankingRepository;
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
+use Illuminate\Log\LogManager;
 use Modules\CP\Transformers\RankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
@@ -136,6 +137,7 @@ class RankingService
         ];
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
 
+        LogHelper::info('this data ', $data);
         if ($class == 5) {
             return $data;
         }
