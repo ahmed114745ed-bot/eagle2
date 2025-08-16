@@ -180,7 +180,7 @@ class RankingService
             }
 
             $v->user_id = $user->id;
-            $v->color_name = $color_name;
+            $v->color_name = '';
 
             $value = $v->total_gifts;
             $v->exp = numToString(ceil((float)$value));
