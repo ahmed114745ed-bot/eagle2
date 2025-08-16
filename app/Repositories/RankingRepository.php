@@ -70,8 +70,9 @@ class RankingRepository
         $query = GiftRanking::query()
             ->with([
                 'ranker' => function ($q) {
+
                     $q->with([
-                        'packs.ware:id,name',
+                        'packs.ware:id,name,img1,img2',
                         'mangerType:id,name_ar,name_en,img',
                         'UserVip:id,user_id,expire,level,is_used',
                         'senderLevel:id,level,type,img',
@@ -79,7 +80,7 @@ class RankingRepository
                         'country:id,name,iso,flag',
                         'profile:user_id,avatar,birthday',
                         'medals.achievementLevel.achievement:id,name,type',
-                    ]);
+                    ])->select(['id', 'name', 'sender_level', 'receiver_level', ]);
                 },
             ])
             ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,owner_id,name'))
