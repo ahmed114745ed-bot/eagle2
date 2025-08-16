@@ -16,7 +16,7 @@ trait UserLevel
 
     public function receiverLevel()
     {
-        return $this->belongsTo(Vip::class, 'receiver_level', 'level')
+        return $this->belongsTo(Vip::class, 'received_level', 'level')
             ->where('type', 1);
     }
 
