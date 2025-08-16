@@ -980,7 +980,7 @@ class RankingService
     {
         return $this->rankingRepo
             ->getUserRankingImages($type, $rankingType)
-            ->map(fn($item) => optional($item->ranker->ownerRoom->profile)->avatar)
+            ->map(fn($item) => optional($item->ranker->ownerRoom)->room_cover)
             ->filter()
             ->values()
             ->toArray();
