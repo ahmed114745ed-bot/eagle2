@@ -105,6 +105,26 @@ class RankingRepository
         return $query->paginate($perPage);
     }
 
+    public function getUserRankingImages(string $role, string $rankingType, int $limit = 3)
+    {
+        $query = GiftRanking::query()
+            ->with([
+                'ranker' => function ($q) use($role){
+                    $q->with([
+                        'profile:user_id,avatar',
+                    ])
+                        ->select(['id'])
+                        ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,uid,room_cover'));
+                },
+            ])
+            ->where('role', $role)
+            ->where('ranker_type', User::class)
+            ->where('type', $rankingType)
+            ->orderByDesc('total_gifts');
+
+        return $query->limit($limit)->get();
+    }
+
     public function getGiftLogsV2($class, $rel, $type, $limit, $keywords)
     {
         $query = GiftLog::query()->whereHas($rel)
