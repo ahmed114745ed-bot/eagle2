@@ -10,6 +10,7 @@ use App\Models\CoinGameUser;
 use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Achievement\Enums\AchievementType;
 
 class RankingRepository
 {
@@ -84,7 +85,10 @@ class RankingRepository
                         'profile:user_id,avatar,birthday',
                         'medals' => fn($q) => $q->select(['achievement_level_id', 'picked', 'custom_image','user_id'])
                         ->where('picked', true)
-                        ->with('achievementLevel.achievement:id,name,type')
+                        ->with(['achievementLevel' => fn($q) => $q->select(['id','valid_image'])
+                            ->with('achievement:id,name,type')
+                            ->whereHas(['achievement' => fn($q) => $q->where('type' != AchievementType::ROOM_TARGET->value)])
+                        ])
                         ->limit(5),
                     ])
                         ->select(['id', 'name', 'sender_level', 'received_level', ])
