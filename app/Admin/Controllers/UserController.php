@@ -16,7 +16,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
@@ -933,9 +933,9 @@ class UserController extends MainController
     {
         $user = User::find($request->id);
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['nullable', 'string', 'max:255'],
             'uuid' => [
-                'required',
+                'nullable',
                 Rule::unique('users', 'uuid')->ignore($user->id),
             ],
             'phone' => [
@@ -949,6 +949,7 @@ class UserController extends MainController
             'uuid' => $request->uuid,
             'email' => $request->email,
             'phone' => $request->phone,
+            'bio' => $request->bio,
         ];
         $user->update($data);
         $profileUser = Profile::where('user_id', $user->id)->first();

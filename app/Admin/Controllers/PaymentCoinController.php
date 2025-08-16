@@ -72,6 +72,7 @@ class PaymentCoinController extends MainController
     protected function grid()
     {
         $grid = new Grid(new PaymentCoin());
+        $grid->model()->where('package_type','user'); 
 
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
@@ -93,55 +94,6 @@ class PaymentCoinController extends MainController
         $grid->column('status', __("status"))->switch($status);
 
         $grid->column('custom_message', __('Custom Message'));
-        //            ->display(function () {
-        //            $fawryConfig = config('services.fawry');
-        //            $fawryCount = collect($fawryConfig)->every(function($value) {
-        //                return $value != null;
-        //            });
-        //
-        //            $payskyConfig = config('paysky');
-        //            $payskyCount = collect($payskyConfig)->every(function($value) {
-        //                return $value != null;
-        //            });
-        //
-        //            $stripeConfig = config('stripe');
-        //            $stripeCount = collect($stripeConfig)->every(function($value) {
-        //                return $value != null;
-        //            });
-        //
-        //            $opayConfig = config('nafezly-payments');
-        //            $opayCount = collect($opayConfig)->every(function($value) {
-        //                return $value != null;
-        //            });
-        //
-        //            $url = url('admin/settings?firsttab=paymentCredentialSettings');
-        //            $href = "<a href='{$url}'>". __('Please edit payment credential settings') ."</a>";
-        //            switch ($this->title){
-        //                case 'fawry':
-        //                    if (Config::get('is_fawry_active') != 1 || !$fawryCount) {
-        //                        return $href;
-        //                    }
-        //                    break;
-        //                case 'sky pay':
-        //                    if (Config::get('is_paysky_active') != 1 || !$payskyCount) {
-        //                        return $href;
-        //                    }
-        //                    break;
-        //                case 'stripe':
-        //                    if (Config::get('is_stripe_active') != 1 || !$stripeCount) {
-        //                        return $href;
-        //                    }
-        //                    break;
-        //                case 'opay':
-        //                    if (Config::get('is_opay_active') != 1 || !$opayCount) {
-        //                        return $href;
-        //                    }
-        //                    break;
-        //                default:
-        //                    return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
-        //            }
-        //            return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
-        //        });
         $grid->disableCreateButton();
         $this->extendGrid($grid);
         return $grid;
@@ -181,25 +133,8 @@ class PaymentCoinController extends MainController
             ->updateRules(['required', "unique:payment_coins,title,{{id}}"]);
 
         $form->image('photo', __('Photo'));
+        $form->hidden('package_type')->default('user');
 
-        //        $form->hasMany('settings', 'Fields', function ($form) {
-        //            $form->text('key', 'Input Name')
-        //                ->rules(function ($form) {
-        //                    $itemId = request()->route('items');
-        //                    $id = $form->model ? $form->model->id : null;
-        //
-        //                    return [
-        //                        'required',
-        //                        "unique:settings,key,$id,id,item_id,$itemId"
-        //                    ];
-        //                });
-        //            $form->text('value', 'Input Value')->required();
-        //            $form->select('input_type', 'Input Type')->options([
-        //                'input' => 'Input',
-        //                'file' => 'File',
-        //            ])->required();
-        //            $form->hidden('type')->default('payment');
-        //        });
 
         $status = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],

@@ -5,7 +5,7 @@ namespace Modules\DailyPrize\Http\Controllers\Api;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
@@ -78,11 +78,11 @@ class DailyGiftController extends Controller
 
         $dailyGift = $this->dailyPrizeService->getDayGift($currentDay);
         if (!$dailyGift) {
-            return Common::apiResponse(0, '  لا يوجد هديه اليوم ', []);
+            return Common::apiResponse(0, '  لا يوجد هديه اليوم ', [], 400);
         }
         $result = DailyGiftCount::query()->where('user_id', $user->id)->orderByDesc('id')->first();
         if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
-            return Common::apiResponse(0, 'لم يمر 24 ساعه لاستلام الهديه التاليه', []);
+            return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
         }
 
         $type = $dailyGift->gift_type;

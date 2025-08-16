@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Helpers\Common;
 use App\Models\BlackList;
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use Illuminate\Database\Eloquent\Model;
 
 class BlackListRepository

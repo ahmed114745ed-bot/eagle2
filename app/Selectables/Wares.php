@@ -14,7 +14,7 @@ class Wares extends Selectable
 
     public function make()
     {
-        $this->grid->model()->whereIn('type', [4, 5, 6]);
+        $this->grid->model()->whereIn('type', [4, 5, 6, 28]);
         $this->column('id');
         $this->column('name');
         $this->column('show_img', __('show_img'))->image('', 30);
@@ -25,10 +25,11 @@ class Wares extends Selectable
             return handleShowImageWithTypes($this->id, $url, 10, 10);
         });
         $this->column('type', __('type'))->select(
-            [ 
+            [
                 4 => trans('Avatar Frame'),
                 5 => trans('Bubble Frame'),
                 6 => trans('Entering Special Effects'),
+                28 => trans('profile frame'),
             ]
         );
 
@@ -37,10 +38,11 @@ class Wares extends Selectable
             $filter->column(1 / 2, function ($filter) {
 
                 $filter->equal('type', __('type'))->select([
-                   
+
                     4 => trans('Avatar Frame'),
                     5 => trans('Bubble Frame'),
                     6 => trans('Entering Special Effects'),
+                    28 => trans('profile frame'),
                 ]);
             });
         });

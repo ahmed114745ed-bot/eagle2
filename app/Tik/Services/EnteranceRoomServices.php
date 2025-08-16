@@ -154,9 +154,6 @@ class EnteranceRoomServices
         $roomId = $request->room_id;
         $userId = $request->user_account;
 
-
-
-
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
 

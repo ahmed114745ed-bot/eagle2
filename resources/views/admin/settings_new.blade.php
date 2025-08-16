@@ -22,7 +22,7 @@
 </html> -->
 
 @php
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 
     $selectedTimeZone = App\Models\Setting::where('key', 'timezone')->first();
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();
@@ -1416,7 +1416,7 @@ use App\Models\Vip;
 
             <div id="mobileLinks" class="settings-section">
                 <div class="form">
-                    
+
 
                     <div class="row mt-4">
                         <!-- android link -->
@@ -1435,11 +1435,11 @@ use App\Models\Vip;
                                                     <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
                                                     <input type="text"  name="android_link" value="{{ $settings['android_link'] ?? ''}}"
                                                         class="form-control">
-                                                   
+
                                                 </div>
                                             </div>
                                         </div>
-                                      
+
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
                                                 class="btn btn-primary">{{ __('Save') }}</button>
@@ -1467,11 +1467,11 @@ use App\Models\Vip;
                                                     <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
                                                     <input type="text"  name="ios_link" value="{{ $settings['ios_link'] ?? ''}}"
                                                         class="form-control">
-                                                   
+
                                                 </div>
                                             </div>
                                         </div>
-                                      
+
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
                                                 class="btn btn-primary">{{ __('Save') }}</button>
@@ -1499,11 +1499,11 @@ use App\Models\Vip;
                                                     <label for="wealth_exp" class="form-label">{{ __('link') }}</label>
                                                     <input type="text"  name="huawei_link" value="{{ $settings['huawei_link'] ?? ''}}"
                                                         class="form-control">
-                                                   
+
                                                 </div>
                                             </div>
                                         </div>
-                                      
+
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
                                                 class="btn btn-primary">{{ __('Save') }}</button>
@@ -3339,182 +3339,97 @@ use App\Models\Vip;
 
 
             <div id="appSettings" class="settings-section">
-                <h3>{{ __('App settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST"
-                    enctype="multipart/form-data">
+                <h3>{{ __('App Settings') }}</h3>
+                <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
+
+                        {{-- Primary Color --}}
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <div style="display: inline-flex; align-items: center; gap: 6px;">
-                                    <label for="primary_color">{{ __('Primary Color') }}</label>
-                                    <span onclick="reseting('app_primary_color', '#32e5ac')">
-                                        <i class="fa fa-repeat"></i>
-                                    </span>
+                            <label>{{ __('Primary Color') }}</label>
+                            <input type="color" name="app_primary_color"
+                                   value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}"
+                                   class="form-control">
+                        </div>
+
+                        {{-- Background Type --}}
+                        <div class="col-md-6">
+                            <label>{{ __('Background Type') }}</label>
+                            <select name="background_type" class="form-control" onchange="toggleBackgroundInput()">
+                                <option value="color" {{ data_get($settings, 'background_type') === 'color' ? 'selected' : '' }}>Color</option>
+                                <option value="image" {{ data_get($settings, 'background_type') === 'image' ? 'selected' : '' }}>Image</option>
+                                <option value="gradient" {{ data_get($settings, 'background_type') === 'gradient' ? 'selected' : '' }}>Gradient</option>
+                            </select>
+                        </div>
+
+                        {{-- Background Color --}}
+                        <div class="col-md-6" id="background_color_group"
+                             style="display: {{ data_get($settings, 'background_type') === 'color' ? 'block' : 'none' }};">
+                            <label>{{ __('Background Color') }}</label>
+                            <input type="color" name="background_color"
+                                   value="{{ data_get($settings, 'background_color', '#ffffff') }}"
+                                   class="form-control">
+                        </div>
+
+                        {{-- Background Image --}}
+                        <div class="col-md-6" id="background_image_group"
+                             style="display: {{ data_get($settings, 'background_type') === 'image' ? 'block' : 'none' }};">
+                            <label>{{ __('Background Image') }}</label>
+                            <input type="file" name="background_image" class="form-control">
+                            @if(data_get($settings, 'background_type') === 'image' && !empty(data_get($settings, 'app_background')))
+                                <div class="mt-2">
+                                    <img src="{{ getImagePath(data_get($settings, 'app_background')) }}" width="100" class="img-thumbnail">
                                 </div>
-                                <input type="color" id="app_primary_color" name="app_primary_color"
-                                    value="{{ $settings['app_primary_color'] ?? '#32e5ac' }}"
-                                    class="form-control">
-                            </div>
+                            @endif
                         </div>
 
+                        {{-- Bottom Nav --}}
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <div style="display: inline-flex; align-items: center; gap: 6px;">
-
-                                    <label for="second_color">{{ __('Second Color') }}</label>
-                                    <span onclick="reseting('app_second_color', '#003FA6')">
-                                        <i class="fa fa-repeat"></i>
-                                    </span>
-                                </div>
-                                <input type="color" id="app_second_color" name="app_second_color"
-                                    value="{{ $settings['app_second_color'] ?? '#003FA6' }}" class="form-control">
-                            </div>
+                            <label>{{ __('Bottom Nav Color') }}</label>
+                            <input type="color" name="bottom_color"
+                                   value="{{ data_get($settings, 'bottom_nav_bottom_color', '#ffffff') }}"
+                                   class="form-control">
                         </div>
-
-
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <div style="display: inline-flex; align-items: center; gap: 6px;">
-
-                                    <label for="white_color">{{ __('White Color') }}</label>
-                                    <span onclick="reseting('app_white_color', '#ffffff')">
-                                        <i class="fa fa-repeat"></i>
-                                    </span>
-                                </div>
-                                <input type="color" id="app_white_color" name="app_white_color"
-                                    value="{{ $settings['app_white_color'] ?? '#ffffff' }}" class="form-control">
-                            </div>
+                            <label>{{ __('Bottom Nav Active Color') }}</label>
+                            <input type="color" name="active_color"
+                                   value="{{ data_get($settings, 'bottom_nav_active_color', '#000000') }}"
+                                   class="form-control">
                         </div>
-
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <div style="display: inline-flex; align-items: center; gap: 6px;">
-
-                                    <label for="black_color">{{ __('Black Color') }}</label>
-                                    <span onclick="reseting('app_black_color', '#000000')">
-                                        <i class="fa fa-repeat"></i>
-                                    </span>
-                                </div>
-                                <input type="color" id="app_black_color" name="app_black_color"
-                                    value="{{ $settings['app_black_color'] ?? '#000000' }}" class="form-control">
-                            </div>
+                            <label>{{ __('Bottom Nav Inactive Color') }}</label>
+                            <input type="color" name="inactive_color"
+                                   value="{{ data_get($settings, 'bottom_nav_inactive_color', '#808080') }}"
+                                   class="form-control">
                         </div>
 
-
+                        {{-- Text Header Color --}}
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <div style="display: inline-flex; align-items: center; gap: 6px;">
-
-                                    <label for="grey_color">{{ __('Grey Color') }}</label>
-                                    <span onclick="reseting('app_grey_color','#a5a7a4')">
-                                        <i class="fa fa-repeat"></i>
-                                    </span>
-                                </div>
-                                <input type="color" id="app_grey_color" name="app_grey_color"
-                                    value="{{ $settings['app_grey_color'] ?? '#808080' }}" class="form-control">
-                            </div>
+                            <label>{{ __('Text Header Color') }}</label>
+                            <input type="color" name="text_header_color"
+                                   value="{{ data_get($settings, 'text_header_color', '#000000') }}"
+                                   class="form-control">
                         </div>
 
+                        {{-- Button Text Color --}}
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <div style="display: inline-flex; align-items: center; gap: 6px;">
-
-                                    <label for="yellow_color">{{ __('Yellow Color') }}</label>
-                                    <span onclick="reseting('app_yellow_color', '#FFAD38')">
-                                        <i class="fa fa-repeat"></i>
-                                    </span>
-                                </div>
-                                <input type="color" id="app_yellow_color" name="app_yellow_color"
-                                    value="{{ $settings['app_yellow_color'] ?? '#ffff00' }}" class="form-control">
-                            </div>
+                            <label>{{ __('Button Text Color') }}</label>
+                            <input type="color" name="button_text_color"
+                                   value="{{ data_get($settings, 'button_text_color', '#ffffff') }}"
+                                   class="form-control">
                         </div>
 
-
-
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <div style="display: inline-flex; align-items: center; gap: 6px;">
-                                    <label for="background_type">{{ __('Background Type') }}</label>
-                                    <span onclick="reseting('background_type', 'image')">
-                                        <i class="fa fa-repeat"></i>
-                                    </span>
-                                </div>
-                                <select id="background_type" name="background_type" class="form-control"
-                                    onchange="toggleBackgroundInput()">
-                                    <option value="color"
-                                        {{ @$settings['background_type'] === 'color' ? 'selected' : '' }}>
-                                        {{ __('Color') }}</option>
-                                    <option value="image"
-                                        {{ @$settings['background_type'] === 'image' ? 'selected' : '' }}>
-                                        {{ __('Image') }}</option>
-                                    <option value="gradient"
-                                        {{ ($settings['background_type'] ?? '') === 'gradient' ? 'selected' : '' }}>
-                                        {{ __('gradient') }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group" id="background_color_group"
-                                style="display: {{ ($settings['background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
-                                <label for="background_color">{{ __('Background Color') }}</label>
-                                <input type="color" id="background_color" name="background_color"
-                                    class="form-control" value="{{ $settings['background_color'] ?? '#ffffff' }}">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group" id="background_image_group"
-                                style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
-                                <label for="background_image">{{ __('Background Image') }}</label>
-                                <input type="file" id="background_image" name="app_background_image"
-                                    class="form-control">
-                                @if (!empty($settings['app_background']) && ($settings['background_type'] ?? '') === 'image')
-                                    <div class="mt-2">
-                                        <img src="{{ getImagePath($settings['app_background']) }}" width="100"
-                                            class="img-thumbnail">
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group" id="gradient_group"
-                                style="display: {{ ($settings['background_type'] ?? 'gradient') === 'gradient' ? 'block' : 'none' }};">
-                                <label for="box_background_color">{{ __('gradient First Color:') }}</label>
-                                <input type="color" id="graident_1" name="gradient_1"
-                                    value="{{ $settings['gradient_1'] ?? '#F8F9FA' }}"
-                                    style="background: {{ $settings['gradient_1'] ?? '#F8F9FA' }};"
-                                    title="لون التدرج">
-
-
-                                <label for="box_background_color">{{ __('gradient Second Color:') }}</label>
-                                <input type="color" id="gradient_2" name="gradient_2"
-                                    value="{{ $settings['gradient_2'] ?? '#F8F9FA' }}"
-                                    style="background: {{ $settings['gradient_2'] ?? '#F8F9FA' }};"
-                                    title="لون  التدرج">
-
-                                <label for="box_background_color">{{ __('gradient Third Color:') }}</label>
-                                <input type="color" id="gradient_3" name="gradient_3"
-                                    value="{{ $settings['gradient_3'] ?? '#F8F9FA' }}"
-                                    style="background: {{ $settings['gradient_3'] ?? '#F8F9FA' }};"
-                                    title="لون  التدرج">
-                            </div>
-
-                        </div>
                     </div>
 
                     <div class="col-12 d-flex gap-3 mt-3">
                         <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                        <button type="button" id="resetAppColors"
-                            class="btn btn-secondary">{{ __('Reset Colors') }}</button>
                     </div>
-
                 </form>
             </div>
+
+
+
+
             <div id="pusherSettings" class="settings-section">
                 <h3>{{ __('Real Time Setting') }}</h3>
 
@@ -4095,3 +4010,13 @@ use App\Models\Vip;
 
         </div>
 </body>
+
+
+<script>
+    function toggleBackgroundInput() {
+        let type = document.querySelector('[name="background_type"]').value;
+        document.getElementById('background_color_group').style.display = (type === 'color') ? 'block' : 'none';
+        document.getElementById('background_image_group').style.display = (type === 'image') ? 'block' : 'none';
+        document.getElementById('gradient_group').style.display = (type === 'gradient') ? 'block' : 'none';
+    }
+</script>

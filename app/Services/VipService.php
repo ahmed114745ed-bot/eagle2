@@ -10,14 +10,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
-use App\Tik\Repositories\VipRepository;
-use App\Tik\Repositories\OvipRepository;
+//use App\Tik\Repositories\VipRepository;
+//use App\Tik\Repositories\OvipRepository;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
-use App\Tik\Repositories\UserVipRepository;
+//use App\Tik\Repositories\UserVipRepository;
 use Illuminate\Database\Eloquent\Collection;
-use App\Tik\Repositories\VipPrivilegeRepository;
+use Modules\Vip\Repositories\OvipRepository;
+use Modules\Vip\Repositories\UserVipRepository;
+use Modules\Vip\Repositories\VipPrivilegeRepository;
+use Modules\Vip\Repositories\VipRepository;
+
+//use App\Tik\Repositories\VipPrivilegeRepository;
 
 class VipService
 {

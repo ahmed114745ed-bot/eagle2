@@ -13,11 +13,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Modules\CP\Entities\WeeklyCpGift;
 use Modules\CP\Entities\WeeklyCpWinner;
+use Modules\CP\Traits\CpWeeklyStar;
 use Modules\Events\Traits\EventModel;
 
 class WeeklyStar extends Model
 {
-    use EventModel, HasFactory, SoftDeletes, TimestampsWithTimezone;
+    use EventModel, HasFactory, SoftDeletes, TimestampsWithTimezone, CpWeeklyStar;
 
     protected $guarded = ['id'];
 
@@ -58,24 +59,7 @@ class WeeklyStar extends Model
         return $this->hasMany(WeeklyCpWinner::class, 'weekly_cp_id');
     }
 
-    //    public function scopeCurrentEvent(Builder $query)
-    //    {
-    //        $timezone = '-03:00';
-    //        $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
-    //
-    //        return $query->whereRaw("date(CONVERT_TZ(start_date, '+00:00', ?)) <= ?", [$timezone, date($nowDate)] ) // 27
-    //                     ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) >= ?", [$timezone, $nowDate] ); // 27
-    //    }
-    //
-    //
-    //    public function scopePreviousEvent(Builder $query)
-    //    {
-    //        $timezone = '-03:00';
-    //        $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
-    //
-    //        return $query->whereRaw("date(CONVERT_TZ(start_date, '+00:00', ?)) < ?", [$timezone, date($nowDate)] ) // 27
-    //                     ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) < ?", [$timezone, $nowDate] ); // 27
-    //    }
+
 
     public function scopeWeeklyStar(Builder $query)
     {
@@ -87,10 +71,6 @@ class WeeklyStar extends Model
         return $query->where('type', 'event_period');
     }
 
-    public function scopeWeeklyCP(Builder $query)
-    {
-        return $query->where('type', 'weekly_cp');
-    }
 
     protected static function boot()
     {
@@ -118,25 +98,6 @@ class WeeklyStar extends Model
         });
     }
 
-    //    public function getStartDateAttribute($value)
-    //    {
-    //        $date = self::convertArabicNumbers($value);
-    //        return Carbon::parse($date, '-03:00')->subDay()->startOfDay();
-    //
-    //    }
-    //    public function getEndDateAttribute($value)
-    //    {
-    //        return Carbon::parse($value)->subDay()->endOfDay();
-    //    }
-    //
-    //    public function getStartDateLocalAttribute()
-    //    {
-    //        return Carbon::parse($this->attributes['start_date'])->subDay()->toDateString();
-    //    }
-    //    public function getEndDateLocalAttribute($value)
-    //    {
-    //        return Carbon::parse($this->attributes['end_date'])->subDay()->toDateString();
-    //    }
 
     protected static function convertArabicNumbers($string)
     {

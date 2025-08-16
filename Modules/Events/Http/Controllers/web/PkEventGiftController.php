@@ -3,7 +3,7 @@
 namespace Modules\Events\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Services\AppFeatureService;
 use Encore\Admin\Form;

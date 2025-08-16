@@ -229,6 +229,8 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
+
+
         return  $responseData;
 
     }

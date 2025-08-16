@@ -7,6 +7,7 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Http\Traits\AchievementGift;
 use Modules\Moment\Entities\Moment;
+use Modules\Vip\Entities\OVip;
 
 class Gift extends Model
 {
@@ -32,6 +33,12 @@ class Gift extends Model
     public function vip()
     {
         return $this->hasOne(OVip::class,'id','vip_level');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_gifts')
+            ->withPivot('quantity');
     }
 
     protected static function boot()

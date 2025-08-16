@@ -11,7 +11,7 @@ use Modules\CP\Entities\CpRelation;
 use Modules\CP\Entities\UserRelationAvilable;
 use Modules\CP\Enums\CpStatus;
 
-/// todo remove rename import
+
 class CpRepository
 {
     public function getCpRelationById($id)
@@ -298,7 +298,11 @@ class CpRepository
 
     public function getUserCpProfiles($userId, $statuses, $count = 9)
     {
-        return Cp::with('relation:id,title,type', 'toUser', 'fromUser')
+        return Cp::with([
+            'cpRelation:id,title,type',
+            'toUser:id,name,dress_1,dress_2,dress_3',
+            'fromUser:id,name,dress_1,dress_2,dress_3',
+        ])
             ->whereHas("cpRelation", function ($q) {
                 $q->where('type', "!=", 'solution');
             })
@@ -311,6 +315,7 @@ class CpRepository
             ->take($count)
             ->get();
     }
+
 
     public function getByUser($userId)
     {

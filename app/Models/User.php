@@ -8,6 +8,7 @@ use App\Traits\MomentRelationshipTrait;
 use App\Traits\PaymentGetWayTrait;
 use App\Traits\PreventDeleteIfCreatedByDeveloper;
 use App\Traits\TimestampsWithTimezone;
+use App\Traits\User\UserLevel;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,16 +33,14 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
 use App\Models\Config as ConfigModel;
-
+use Modules\Vip\Entities\UserVip;
+use Modules\Vip\Entities\Vip;
 /**
  * @method static withoutAppends()
  */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, FollowTrait, PaymentGetWayTrait, SoftDeletes, AchievementUser, RealRelationshipTrait, MomentRelationshipTrait;
-    use SpecialId, ChatUserTrait, UserTransferTrait , PreventDeleteIfCreatedByDeveloper;
-    
-    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait;
+    use PreventDeleteIfCreatedByDeveloper, AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -1362,7 +1361,7 @@ class User extends Authenticatable
      */
     public function getUuidAttribute($value)
     {
-        $pack = $this->getLoadedPacks()
+        $pack = $this->packs
             ->where('ware.value', $this->special_id)
             ->first();
 
@@ -1767,4 +1766,16 @@ class User extends Authenticatable
     {
         return $this->packs?->where('type', 28)->where('is_used', 1)->first()?->ware;
     }
+    public function myGifts()
+    {
+        return $this->belongsToMany(Gift::class, 'user_gifts')
+            ->withPivot('quantity', 'expire')
+            ->withTimestamps()
+            ->where(function ($query) {
+                $query->where('user_gifts.expire', 0)
+                      ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
+            });
+    }
 }
+
+

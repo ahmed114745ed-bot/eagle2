@@ -268,23 +268,35 @@ class GiftLogController extends Controller
     public function gift_queue_cp(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $close_open_gifts = settings()->get('close_open_gifts');
+
         if ($close_open_gifts == 1) {
-            return Common::apiResponse(0, __('Send gift stopped by admin')); // TODO @m2led targm
+            return Common::apiResponse(0, __('Send gift stopped by admin'));
         }
-        //update when send the gift
+
+        // Update when sending the gift
         $validator = Validator::make($request->all(), [
             'id'       => 'required',
             'owner_id' => 'required',
             'toUid'    => 'required',
             'num'      => 'required|integer|min:1',
+            'type'     => 'nullable',
         ]);
 
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
-        return  $this->giftLogService->sendGift($request, $updateUserWhenSendGift);
+        try {
+            $message = $this->giftLogService->sendGift($request, $updateUserWhenSendGift);
+        } catch (\Exception $e) {
+            return Common::apiResponse(false, $e->getMessage());
+        }
+
+        settings()->set('gift_send', true);
+
+        return Common::apiResponse(true, $message);
     }
+
 
 
 

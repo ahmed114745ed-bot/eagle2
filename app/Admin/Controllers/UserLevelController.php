@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;

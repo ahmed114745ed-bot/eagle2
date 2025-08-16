@@ -6,7 +6,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\RoomVisitor;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
 use Illuminate\Support\Facades\Route;
@@ -249,6 +249,7 @@ Route::group(
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
@@ -357,7 +358,7 @@ Route::get('/generate-token/{id}', function ($id) {
 });
 
 Route::get('/send-notification/{id}', function ($id) {
-   
+
     $notificationToken[] = DB::table('users')->where('id', $id)->value('notification_id');
 
     $title = 'Coins Received';

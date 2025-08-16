@@ -106,6 +106,11 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/game-user-calc.log'))
             ->runInBackground();
 
+
+        $schedule->command('app:update-gift-rankings')
+            ->everyThirtySeconds()
+            ->runInBackground();
+
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()
         //     ->timezone(getTimezone())

@@ -2837,6 +2837,27 @@
     "restored": "पुनर्स्थापित",
     "restore": "पुनर्स्थापना",
     "restore_binding": "बाइंडिंग पुनर्स्थापित करें",
+    "It has not been 24 hours yet to receive the next gift.": "अगला उपहार प्राप्त करने के लिए अभी 24 घंटे पूरे नहीं हुए हैं।",
+
+    "Room Boom Levels": "रूम बूम स्तर",
+    "Room Boom Level": "रूम बूम स्तर",
+    "Edit Room Boom Level": "रूम बूम स्तर संपादित करें",
+    "Create Room Boom Level": "रूम बूम स्तर बनाएँ",
+    "min target": "न्यूनतम लक्ष्य",
+    "Updated At": "अद्यतन तिथि",
+    "Room Boom Rewards": "रूम बूम पुरस्कार",
+    "You can only have a maximum of 5 Room Boom Levels.": "आप अधिकतम 5 रूम बूम स्तर जोड़ सकते हैं।",
+    "room-boom-levels": "रूम-बूम-स्तर",
+    "Room Boom Reward": "रूम बूम पुरस्कार",
+    "Edit Room Boom Reward": "रूम बूम पुरस्कार संपादित करें",
+    "Create Room Boom Reward": "रूम बूम पुरस्कार बनाएँ",
+    "target type": "लक्ष्य प्रकार",
+    "You can only have a maximum of 7 gifts for this Room Boom Level.": "आप इस रूम बूम स्तर के लिए अधिकतम 7 उपहार जोड़ सकते हैं।",
+    "Created successfully": "सफलतापूर्वक बनाया गया",
+    "Deleted successfully": "सफलतापूर्वक हटाया गया",
+    "room-boom-rewards": "रूम-बूम-पुरस्कार",
+    "priority": "प्राथमिकता",
+
     "Reel Comments": "रील्स टिप्पणियाँ"
 
 
