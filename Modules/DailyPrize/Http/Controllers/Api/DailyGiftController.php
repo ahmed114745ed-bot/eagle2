@@ -125,7 +125,7 @@ class DailyGiftController extends Controller
         if ($type == "coins") {
 
             $amountBefore =  Common::getCurrentBalance($user->id);
-            UserCoinLogHelper::log(
+            UserCoinLogHelper::logByType(
                 $user->id,
                  $target,
                 $amountBefore,
