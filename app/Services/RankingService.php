@@ -137,8 +137,7 @@ class RankingService
             3 => 'monthly'
         ];
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
-
-        LogHelper::info('this data ', $data);
+        
         if ($class == 5) {
             return $data;
         }
