@@ -19,7 +19,32 @@ class LogApiRequestResponse
     {
         $startTime = microtime(true); // Start time in microseconds
 
-        $response = $next($request);
+        try {
+            $response = $next($request); // Process request
+        } catch (\Throwable $e) {
+            // Log exception for debug users
+            if (is_array($matchedIds) && in_array($userId, $matchedIds)) {
+                $log = [
+                    'user_id'   => $userId,
+                    'url'       => $request->fullUrl(),
+                    'method'    => $request->method(),
+                    'request_body' => $request->all(),
+                    'exception' => [
+                        'message' => $e->getMessage(),
+                        'file'    => $e->getFile(),
+                        'line'    => $e->getLine(),
+                        'trace'   => collect($e->getTrace())->take(10), // limit trace for readability
+                    ],
+                ];
+
+                Log::channel('custom_log')->error(
+                    "API Exception: ".$request->fullUrl()." $userId".PHP_EOL.
+                    json_encode($log, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                );
+            }
+
+            throw $e; // rethrow so Laravel can return error response
+        }
 
         $endTime = microtime(true); // End time
         $duration = round(($endTime - $startTime) * 1000, 2); // Duration in milliseconds
