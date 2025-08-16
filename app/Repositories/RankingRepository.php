@@ -67,6 +67,7 @@ class RankingRepository
 
     public function getUserRanking(string $role, string $rankingType, int $perPage)
     {
+        \Log::info($role . ' $rankingType ' . $rankingType. ' $perPage ' , $perPage);
         $query = GiftRanking::query()
             ->with([
                 'ranker' => function ($q) {
