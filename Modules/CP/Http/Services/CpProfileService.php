@@ -26,6 +26,15 @@ class CpProfileService
 
     public function getCpProfiles($userId)
     {
+        $result = [
+            'seats' => 3,
+            'wares' => null,
+            'main_cp' =>  null,
+            'remaining_cp' => []
+        ];
+
+        return Common::apiResponse(1, '', $result);
+
         $statuses = [1, 4];
         $vipCount = $this->packRepository->countUserVipPacks($userId);
 
@@ -67,15 +76,15 @@ class CpProfileService
         }
         $mainCp = $data->firstWhere('relation.type', 'lovely') ?? null;
 
-        /*$remainingCps = $mainCp ? $data->reject(function ($cp) use ($mainCp) {
+        $remainingCps = $mainCp ? $data->reject(function ($cp) use ($mainCp) {
             return $cp->id === $mainCp->id;
-        }) : $data;*/
+        }) : $data;
 
         $result = [
             'seats' => $seats,
             'wares' => $ware,
             'main_cp' => $mainCp ? new CpListResource($mainCp) : null,
-            'remaining_cp' => /*$remainingCps ? CpProfileResource::collection($remainingCps) :*/ []
+            'remaining_cp' => $remainingCps ? CpProfileResource::collection($remainingCps) : []
         ];
 
         return Common::apiResponse(1, '', $result);

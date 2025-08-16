@@ -308,7 +308,7 @@ class CpRepository
             })
             ->whereIn('status', $statuses)
             ->orderByDesc('di')
-            ->take(1)
+            ->take($count)
             ->get();
     }
 
