@@ -9,7 +9,7 @@ class UserPackHelper
 
     public static function getColorName(User $user) : string
     {
-        return $user->packs
+        return self::getPacks($user)
             ->where('type', 18)
             ->first()?->ware?->color ?? '';
     }
@@ -28,7 +28,7 @@ class UserPackHelper
 
     public static function getVipIcon(User $user) : string
     {
-        return $user->packs
+        return self::getPacks($user)
             ->where('type', 10)
             ->first()?->ware?->show_img ?? '';
     }
@@ -39,9 +39,18 @@ class UserPackHelper
      */
     public static function getFrameWare(User $user): mixed
     {
-        return $user->packs
+        return self::getPacks($user)
             ->where('type', 4)
             ->where('is_used', true)
             ->first()?->ware;
+    }
+
+    /**
+     * @param User $user
+     * @return \Illuminate\Database\Eloquent\Collection|mixed
+     */
+    public static function getPacks(User $user): mixed
+    {
+        return $user->relationLoaded('packs') ? $user->packs : $user->packs();
     }
 }
