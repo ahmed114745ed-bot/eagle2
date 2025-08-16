@@ -90,7 +90,7 @@ class UpdateUserWhenSendGift
         $totalDiamondReceived                  = $receivedUser->total_received_diamonds;
         $levelVip                     = $this->getLevel(1, $totalDiamondReceived);
         $receivedUser->received_level = $levelVip != null ? (@$levelVip->level - $receivedUser->sub_receiver_level) ?? 0 : 0;
-        if ($receivedUser->total_received_level > $lastReceivedLevel) {
+        if ($receivedUser->total_received_level != $lastReceivedLevel) {
             dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
         }
 
