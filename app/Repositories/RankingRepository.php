@@ -82,7 +82,10 @@ class RankingRepository
                         'receiverLevel:id,level,type,img',
                         'country:id,name,iso,flag',
                         'profile:user_id,avatar,birthday',
-                        'medals.achievementLevel.achievement:id,name,type',
+                        'medals' => fn($q) => $q->select(['achievement_level_id', 'picked', 'custom_image','user_id'])
+                        ->where('picked', true)
+                        ->with('achievementLevel.achievement:id,name,type')
+                        ->limit(5),
                     ])
                         ->select(['id', 'name', 'sender_level', 'received_level', ])
                         ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom'));
