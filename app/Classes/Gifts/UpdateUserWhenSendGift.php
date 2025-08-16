@@ -46,7 +46,7 @@ class UpdateUserWhenSendGift
             try {
                 (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
 
-                if ($user->total_received_level > $lastReceivedLevel) {
+                if ($user->total_received_level != $lastReceivedLevel) {
                     dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
                 }
             } catch (\Exception $e) {
@@ -124,7 +124,7 @@ class UpdateUserWhenSendGift
             throw new NotInfMoneyException();
         }
         (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
-        if ($senderUser->total_sender_level > $lastSenderUser) {
+        if ($senderUser->total_sender_level != $lastSenderUser) {
             dispatch(new SendCustomOfficialMessageToUser($senderUser->id, NotificationType::SENDER_LEVEL))->onQueue('notification');
         }
 
