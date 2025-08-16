@@ -65,7 +65,7 @@ class RankingRepository
             });
     }
 
-    public function getUserRanking(string $role, string $rankingType, int $perPage)
+    public function getUserRanking(string $role, string $rankingType, int $perPage = 10)
     {
         $query = GiftRanking::query()
             ->with([

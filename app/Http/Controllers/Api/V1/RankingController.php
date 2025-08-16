@@ -48,7 +48,7 @@ class RankingController extends Controller
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 
-        $limit = $request->is_home ? 3 : 20;
+        $limit = $request->is_home ? 3 : 10;
 
         $data = $this->rankingService->getRanking22($class, $type, $request->user(), $limit);
 
