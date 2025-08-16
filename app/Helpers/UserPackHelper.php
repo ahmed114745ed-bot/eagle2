@@ -9,6 +9,7 @@ class UserPackHelper
 
     public static function getColorName(User $user) : string
     {
+        LogHelper::info('User info ' , $user);
         return $user->packs
             ->where('type', 18)
             ->where('is_used', true)

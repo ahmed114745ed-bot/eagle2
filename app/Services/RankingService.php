@@ -170,14 +170,12 @@ class RankingService
 
             if ($user->medals) {
                 foreach ($user->medals as $medal) {
-                    if ($medal->achievementLevel) {
-                        $achievementData = [
-                            'image' => @$medal->achievementLevel->valid_image,
-                            'title' => @$medal->achievementLevel?->achievement?->name ?? '',
-                            'created_at' => @$medal->created_at,
-                        ];
-                        $achievement_images[] = $achievementData;
-                    }
+                    $achievementData = [
+                        'image' => @$medal->custom_image ?? @$medal->achievementLevel->valid_image,
+                        'title' => @$medal->achievementLevel?->achievement?->name ?? 'Reward',
+                        'created_at' => @$medal->created_at,
+                    ];
+                    $achievement_images[] = $achievementData;
                 }
             }
 
