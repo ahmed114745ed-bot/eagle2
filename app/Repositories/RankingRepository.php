@@ -77,7 +77,7 @@ class RankingRepository
                         'senderLevel:id,level,type,img',
                         'receiverLevel:id,level,type,img',
                         'country:id,name,iso,flag',
-                        'profile:user_id,avatar,age'
+                        'profile:user_id,avatar,birthday',
                     ]);
                 },
                 'medals.achievementLevel.achievement:id,name,description',
