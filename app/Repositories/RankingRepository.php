@@ -72,7 +72,7 @@ class RankingRepository
                 'ranker' => function ($q) {
                     $q->with([
                         'packs.ware:id,name',
-                        'mangerType:id,name',
+                        'mangerType:id,name_ar,name_en,img',
                         'UserVip:id,user_id,expire,level,is_used',
                         'senderLevel:id,level,type,img',
                         'receiverLevel:id,level,type,img',
