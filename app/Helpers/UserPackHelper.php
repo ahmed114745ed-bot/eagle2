@@ -11,7 +11,6 @@ class UserPackHelper
     {
         $first = $user->packs
             ->where('type', 18)
-            ->where('is_used', true)
             ->first();
         $ware = $first?->ware;
         if ($user->id == 303) {
