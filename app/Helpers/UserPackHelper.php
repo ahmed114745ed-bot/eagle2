@@ -9,11 +9,17 @@ class UserPackHelper
 
     public static function getColorName(User $user) : string
     {
-        LogHelper::info('User info ' , $user);
-        return $user->packs
+        $first = $user->packs
             ->where('type', 18)
             ->where('is_used', true)
-            ->first()?->ware?->color ?? '';
+            ->first();
+        $ware = $first?->ware;
+        if ($user->id == 303) {
+            LogHelper::info('$first info ', $first);
+            LogHelper::info('$ware info ', $ware);
+        }
+
+        return $ware?->color ?? '';
     }
 
     public static function getFrameImage(User $user) : string
