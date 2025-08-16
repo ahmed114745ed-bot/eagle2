@@ -1360,7 +1360,7 @@ class User extends Authenticatable
      */
     public function getUuidAttribute($value)
     {
-        $pack = $this->getLoadedPacks()
+        $pack = $this->packs
             ->where('ware.value', $this->special_id)
             ->first();
 
