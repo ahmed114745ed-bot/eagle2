@@ -79,7 +79,8 @@ class RankingController extends Controller
 
     public function topUserRanking()
     {
-        return $this->rankingService->topUser();
+        $todayTopUsers = $this->rankingService->getTodayTopUsers();
+        return Common::apiResponse(true, 'Success', $todayTopUsers);
     }
 
     public function oneRoomRanking(Request $request)

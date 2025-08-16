@@ -137,7 +137,7 @@ class RankingService
             3 => 'monthly'
         ];
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
-        
+
         if ($class == 5) {
             return $data;
         }
@@ -945,4 +945,45 @@ class RankingService
 
         return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
+
+    public function getTodayTopUsers()
+    {
+        $data = $this->cpRepository->getCpRankingWithOutRelation(1);
+        $cp_top_2 = $data->take(2);
+        $topGamer = $this->coinGameUserRepository->topThree();
+        return [
+            'sender'    => $this->getRankUserAvatars('sender', 'daily'),
+            'receiver'  => $this->getRankUserAvatars('receiver', 'daily'),
+            'room'      => $this->getRankRoomAvatars('roomOwner', 'daily'),
+            'top_cp' => array_values(RankingResource::collection($cp_top_2)->toArray(request())),
+            'top_gamer' => GameRankingResource::collection($topGamer),
+        ];
+    }
+
+    /**
+     * Extract user avatars from ranking results.
+     */
+    protected function getRankUserAvatars(string $type, string $rankingType): array
+    {
+        return $this->rankingRepo
+            ->getUserRankingImages($type, $rankingType)
+            ->map(fn($item) => optional($item->ranker->profile)->avatar)
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * Extract room avatars from ranking results.
+     */
+    protected function getRankRoomAvatars(string $type, string $rankingType): array
+    {
+        return $this->rankingRepo
+            ->getUserRankingImages($type, $rankingType)
+            ->map(fn($item) => optional($item->ranker->ownerRoom)->room_cover)
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
 }
