@@ -86,7 +86,8 @@ class RankingRepository
             ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,owner_id,name'))
             ->where('role', $role)
             ->where('ranker_type', User::class)
-            ->where('type', $rankingType);
+            ->where('type', $rankingType)
+            ->orderByDesc('total_gifts');
 
         return $query->paginate($perPage);
     }
