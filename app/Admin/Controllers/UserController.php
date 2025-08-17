@@ -912,7 +912,7 @@ class UserController extends MainController
         $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
             'uuid' => [
-                'nullable',
+                'sometimes',
                 Rule::unique('users', 'uuid')->ignore($user->id),
             ],
             'phone' => [
