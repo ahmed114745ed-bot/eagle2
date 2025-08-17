@@ -14,7 +14,9 @@ class AddVideoColumnToRoomBoomLevelsTable extends Migration
     public function up()
     {
         Schema::table('room_boom_levels', function (Blueprint $table) {
-            $table->string('video')->nullable();
+            if (! Schema::hasColumn('room_boom_levels', 'video')){
+                $table->string('video')->nullable();
+            }
         });
     }
 
