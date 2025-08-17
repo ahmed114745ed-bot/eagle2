@@ -28,55 +28,57 @@ class MigrateOldBdSalariesJob implements ShouldQueue
         try {
             foreach ($bdSalaries as $bdSalary) {
                 $bdAppId = $bdSalary->bd_id;
-                $bdId = self::getBdUserId($bdAppId);
+                $bdId    = self::getBdUserId($bdAppId);
                 $agencyId = $bdSalary->agency_id;
-                $month = $bdSalary->month;
-                $year = $bdSalary->year;
-
+                $month    = $bdSalary->month;
+                $year     = $bdSalary->year;
+    
+                // 1) حفظ الرواتب الخاصة بالمستخدمين (زي ما هو)
                 $userSalaries = UserSallary::where('user_agency_id', $agencyId)
                     ->where('month', $month)
                     ->where('year', $year)
                     ->get();
-
+    
                 foreach ($userSalaries as $userSallary) {
                     BdAgencyHostSallary::updateOrCreate(
                         [
-                            'bd_id' => $bdId,
+                            'bd_id'     => $bdId,
                             'agency_id' => $agencyId,
-                            'user_id' => $userSallary->user_id,
-                            'month' => $month,
-                            'year' => $year,
+                            'user_id'   => $userSallary->user_id,
+                            'month'     => $month,
+                            'year'      => $year,
                         ],
                         [
-                            'amount' => $userSallary?->dB ?? 0,
-                            'user_sallary' => $userSallary->sallary,
-                            'agency_sallary' => $userSallary->agency_sallary,
-                            'bd_user_id' => $bdAppId,
-                            'created_at'     => $userSallary->created_at,
+                            'amount'        => $userSallary?->dB ?? 0,
+                            'user_sallary'  => $userSallary->sallary,
+                            'agency_sallary'=> $userSallary->agency_sallary,
+                            'bd_user_id'    => $bdAppId,
+                            'created_at'    => $userSallary->created_at,
                         ]
                     );
                 }
-                $currentData = BdSalary::where('bd_id', $bdId)
+    
+                // 2) اجمع كل الرواتب لنفس الـ bd_id + الشهر + السنة
+                $totals = BDSallary::where('bd_id', $bdAppId)
                     ->where('month', $month)
                     ->where('year', $year)
+                    ->selectRaw('SUM(sallary) as total_salary, SUM(cut_amount) as total_cut')
                     ->first();
-                
-                $currentSalary = $currentData->salary ?? 0;
-                $currentCutAmount = $currentData->cut_amount ?? 0;
-                
+    
+                // 3) استبدال مباشر (بدون مضاعفة)
                 BdSalary::updateOrCreate(
                     [
                         'bd_id' => $bdId,
                         'month' => $month,
-                        'year' => $year,
+                        'year'  => $year,
                     ],
                     [
-                        'salary' => $currentSalary + $bdSalary->sallary,
-                        'cut_amount' => $currentCutAmount +$bdSalary->cut_amount ,
+                        'salary'     => $totals->total_salary ?? 0,
+                        'cut_amount' => $totals->total_cut ?? 0,
                     ]
                 );
             }
-
+    
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
