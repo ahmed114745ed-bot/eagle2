@@ -43,6 +43,6 @@ class WaresByType extends Selectable
                 ]);
             });
         });
-    
+
     }
 }

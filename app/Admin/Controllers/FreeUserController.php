@@ -12,7 +12,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\Country;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;

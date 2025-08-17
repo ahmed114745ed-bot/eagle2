@@ -1,0 +1,21 @@
+<?php
+
+use Modules\RoomBoom\Http\Controllers\Api\RoomBoomLevelController;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
+|
+*/
+
+Route::group([
+    'prefix' => 'boom_levels',
+    'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization']
+], function (){
+    Route::get('{id}', [RoomBoomLevelController::class, 'index']);
+});

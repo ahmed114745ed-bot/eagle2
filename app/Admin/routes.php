@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\CoinLogReportsController;
+use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -310,6 +312,7 @@ Route::group(
         Route::resource('offers', OfferController::class);
         Route::resource('payment-gateways', PaymentGetWayController::class);
         Route::resource('payment-coins', PaymentCoinController::class);
+        Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
         Route::resource('charges', 'ChargeController');
         Route::resource('charges-details', 'ChargesDetailsController', [
 
@@ -404,6 +407,9 @@ Route::group(
             Route::delete('/{id}', [CoinController::class, 'destroy'])->name('coins.destroy');
         });
 
+        Route::resource('coin-logs-reports', CoinLogReportsController::class);
+
+
         Route::resource('usersBd', BdController::class);
 
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
@@ -415,29 +421,29 @@ Route::group(
         // Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
 
-        Route::resource('ovip', 'OVipController');
-        Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
+        // Route::resource('ovip', 'OVipController');
+        // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
-        Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
+        // Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
         Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
         Route::prefix('ware-gift')->group(function () {
 
-            Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
-            Route::post('/{level}', [OvipGiftTapController::class, 'store']);
+            // Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
+            // Route::post('/{level}', [OvipGiftTapController::class, 'store']);
             // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
             // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
             // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
         });
-        Route::resource('ware-gifts', 'OvipGiftTapController');
-        Route::prefix('ware-gifts')->group(function () {
+        // Route::resource('ware-gifts', 'OvipGiftTapController');
+        // Route::prefix('ware-gifts')->group(function () {
 
 
-            Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-            Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-            Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-        });
+            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+       
         Route::resource('vip_privilege', 'VipPrivilegeController');
         // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
         // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
@@ -599,11 +605,5 @@ Route::group(
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });
-        Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
-    }
-
-
-
-
-
-);
+Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
+});

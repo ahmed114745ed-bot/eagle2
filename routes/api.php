@@ -266,6 +266,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
                 Route::get('/payment', [CoinController::class, 'paymentCoin']);
+                Route::get('user-report', [CoinController::class, 'userCoinReport']);
+                Route::get('shipping-agency-report', [CoinController::class, 'shippingAgencyCoinReport']);
             });
 
             Route::prefix('users')->group(function () {
@@ -438,7 +440,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             //start rankin
             Route::prefix('ranking')->group(function () {
-                Route::post('/', [RankingController::class, 'ranking']);
+                Route::post('/', [RankingController::class, 'ranking2']);
                 Route::post('/version2', [RankingController::class, 'rankingV2']);
                 Route::post('/room', [UserController::class, 'ranking_room']);
                 Route::get('/top_user_ranking', [RankingController::class, 'topUserRanking']);
@@ -454,17 +456,17 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end ranking
 
             // start vips
-            Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
-                Route::get('/list', [VipController::class, 'vipList']);
-                Route::get('/user/list', [VipController::class, 'vipUserList']);
-                Route::post('/buyVip', [VipController::class, 'buyVip']);
-                Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
-                Route::post('/use', [VipController::class, 'vip_use']);
-                Route::post('/use-pack', [VipController::class, 'pack_use']);
-                Route::post('/send-to-user', [VipController::class, 'vip_send']);
-            });
-            Route::get('levels/badges', [VipController::class, 'badges']);
-            Route::get('levels', [VipController::class, 'index']);
+            // Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
+            //     Route::get('/list', [VipController::class, 'vipList']);
+            //     Route::get('/user/list', [VipController::class, 'vipUserList']);
+            //     Route::post('/buyVip', [VipController::class, 'buyVip']);
+            //     Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
+            //     Route::post('/use', [VipController::class, 'vip_use']);
+            //     Route::post('/use-pack', [VipController::class, 'pack_use']);
+            //     Route::post('/send-to-user', [VipController::class, 'vip_send']);
+            // });
+            // Route::get('levels/badges', [VipController::class, 'badges']);
+            // Route::get('levels', [VipController::class, 'index']);
             Route::get('profile-frame-wares', [\App\Http\Controllers\Api\V1\WareController::class, 'profile_frame_wares']);
             // end vips
 

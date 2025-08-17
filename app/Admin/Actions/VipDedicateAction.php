@@ -3,15 +3,16 @@
 namespace App\Admin\Actions;
 
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Encore\Admin\Actions\Action;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
+use Modules\Vip\Helpers\VipCommon;
 
 class VipDedicateAction extends Action
 {
@@ -49,41 +50,8 @@ class VipDedicateAction extends Action
             $enableVipAuto = config('admin.isUsed_vip');
 
 
-            $is_used = $enableVipAuto === true ? 1 : 0;
-            $uniqueAttributes = [
-                'sender_id' => 0,
-                'user_id'   => $user->id,
-                'vip_id'    => $vip->id,
-                'level'     => $vip->level,
-            ];
+            VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id() );
 
-            //  $userVip = UserVip::query()->where($uniqueAttributes)->first();
-
-            // if (!$userVip) {
-            $userVip = UserVip::create([
-                ...$uniqueAttributes,
-                'type'   => 1,
-                'expire' => $is_used ? Carbon::now()->addDays($request->days ?: $vip->expire)->timestamp : null,
-                'qty'    => 1,
-                'price'  => 0,
-                'total'  => 0,
-                'is_used'  => $is_used,
-                'dash_user_id'  => auth()->id(),
-                'using' => $is_used,
-                'days' => $request->days,
-            ]);
-            // } else {
-            //     $userVip->qty++;
-            //     if ($userVip->expire > now()->timestamp) {
-            //         $userVip->expire += ($request->days * 86400);
-            //     } else {
-            //         $userVip->expire = now()->timestamp + ($request->days * 86400);
-            //     }
-            //     $userVip->is_used += $is_used;
-            //     $userVip->save();
-            // }
-
-            if ($is_used)  Common::handelVip($vip, $user, expire: $request->days ?? $vip->expire, userVip: $userVip);
 
             DB::commit();
 

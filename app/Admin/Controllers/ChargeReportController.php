@@ -184,13 +184,13 @@ class ChargeReportController extends MainController
                 $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $from = request('from_date');
-                    }, __('From Date'), 'from_date')->date()->default(request('from_date'));
+                    }, __('From Date'), 'from_date')->date()->default(convertArabicToEnglishNumbers(request('from_date')));
                 });
 
                 $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $to = request('to_date');
-                    }, __('To Date'), 'to_date')->date()->default(request('to_date'));
+                    }, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
                 });
             });
         }
@@ -209,7 +209,7 @@ class ChargeReportController extends MainController
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->disableIdFilter();
                 $filter->expand();
-                $filter->column(1 / 2, function ($filter) {
+                $filter->column(1 /4, function ($filter) {
                     $filter->where(function () {}, __('Type'), 'filter_type')
                         ->select([
                             'user'     => 'User',
@@ -217,8 +217,7 @@ class ChargeReportController extends MainController
                         ])->default('shipping');
                 });
 
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->column(1 / 2, function ($filter) {
+                $filter->column(3 / 4, function ($filter) {
                         $filter->where(function ($query) {
                             $input = $this->input;
                             $type  = request('filter_type');
@@ -235,15 +234,15 @@ class ChargeReportController extends MainController
                             }
                         }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
                     });
-                });
+                
 
 
                 $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {}, __('From Date'), 'from_date')->date()->default(request('from_date'));
+                    $filter->where(function ($query) {}, __('From Date'), 'from_date')->date()->default(convertArabicToEnglishNumbers(request('from_date')));
                 });
 
                 $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {}, __('To Date'), 'to_date')->date()->default(request('to_date'));
+                    $filter->where(function ($query) {}, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
                 });
             });
         }

@@ -4,21 +4,22 @@ namespace App\Classes;
 
 use Carbon\Carbon;
 use App\Models\Ban;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Config;
 use App\Helpers\Common;
 use App\Models\BanType;
 use App\Models\GiftLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\LiveTime;
 use App\Models\RealtimeProject;
 use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Modules\AgencyApp\Entities\AgencyUserJob;
+use Modules\Vip\Helpers\VipCommon;
 
 class UserHandling
 {
@@ -82,21 +83,9 @@ class UserHandling
         $vip = OVip::query()->whereLevel(2)->first();
 
         if ($vip) {
-            $userVip = UserVip::query()->create(
-                [
-                    'type' => 1,
-                    'sender_id' => 0,
-                    'user_id' => $user->id,
-                    'vip_id' => $vip->id,
-                    'level' => $vip->level,
-                    'expire' => Carbon::now()->addDays($vip->expire ?: 1)->timestamp,
-                    'qty' => 1,
-                    'price' => 0,
-                    'total' => 0,
-                    'type_send' => $type,
-                ]
-            );
-            Common::handelVip($vip, $user, null, userVip: $userVip);
+
+            VipCommon::createUserVip($vip ,$user ,$vip->expire , null ,$type);
+      
         }
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void

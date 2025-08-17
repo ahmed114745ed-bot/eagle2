@@ -22,7 +22,7 @@
 </html> -->
 
 @php
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 
     $selectedTimeZone = App\Models\Setting::where('key', 'timezone')->first();
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();
@@ -3340,15 +3340,15 @@ use App\Models\Vip;
 
             <div id="appSettings" class="settings-section">
                 <h3>{{ __('App Settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
 
                         {{-- Primary Color --}}
                         <div class="col-md-6">
                             <label>{{ __('Primary Color') }}</label>
-                            <input type="color" name="primary_color"
-                                   value="{{ data_get($settings, 'primary_color', '#32e5ac') }}"
+                            <input type="color" name="app_primary_color"
+                                   value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}"
                                    class="form-control">
                         </div>
 

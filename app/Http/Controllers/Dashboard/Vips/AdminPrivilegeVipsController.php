@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Dashboard\Vips;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Vips\AdminPrevilageVipsResource;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 

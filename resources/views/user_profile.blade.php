@@ -2380,12 +2380,12 @@
 
                                     <div class="col-lg-6 mb-3 form-group">
                                         <label class="form-label">{{ __('Name') }}</label>
-                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" required>
+                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" >
                                     </div>
 
                                     <div class="col-lg-6 mb-3 form-group">
                                         <label class="form-label">{{ __('uuid') }}</label>
-                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" required>
+                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" >
                                     </div>
 
                                     <div class="col-lg-6 mb-3 form-group">
@@ -2428,6 +2428,11 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                    </div>
+
+                                    <div class="mb-3 col-lg-12 form-group">
+                                        <label class="form-label">{{ __('bio') }}</label>
+                                        <textarea class="form-control"  cols="10" name="bio" rows="2">{{ old('bio', $user->bio ?? '') }}</textarea>
                                     </div>
                                 </div>
                             </div>

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Auth;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
