@@ -235,8 +235,6 @@ class RoomBoomRewardController extends MainController
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
-
-//            $this->addWareJs();
         });
     }
 
@@ -259,7 +257,7 @@ class RoomBoomRewardController extends MainController
         });
     }
 
-    protected function addAchievementFields($form)
+    protected function addAchievementFields($form): void
     {
         $form->image("target", __('image'))
             ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
