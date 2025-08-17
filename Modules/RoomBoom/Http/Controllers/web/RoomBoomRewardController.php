@@ -14,6 +14,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Validation\Rule;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\RoomBoomReward;
 
 class RoomBoomRewardController extends MainController
@@ -96,11 +97,25 @@ class RoomBoomRewardController extends MainController
             $this->extendGrid($grid);
         }
 
+        $grid->tools(function (Grid\Tools $tools) {
+            $label = __('Back');
+            $url   = admin_url('room_boom_levels');
+
+            $tools->append(
+                <<<HTML
+                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                        <i class="fa fa-arrow-left"></i> {$label}
+                    </a>
+                HTML
+            );
+        });
+
         return $grid;
     }
 
     protected function detail($id)
     {
+        $id = request()->route('id');
         $show = new Show(RoomBoomReward::findOrFail($id));
 
         $show->field('id', __('ID'));
@@ -246,7 +261,7 @@ class RoomBoomRewardController extends MainController
 
     protected function addAchievementFields($form)
     {
-        $form->image("achievement", __('image'))
+        $form->image("target", __('image'))
             ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
             ->disk('gcs');
     }
