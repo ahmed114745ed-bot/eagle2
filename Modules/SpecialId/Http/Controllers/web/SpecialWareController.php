@@ -85,7 +85,7 @@ class SpecialWareController extends  MainController
         // );
         $grid->column('value', __('value'))->display(function ($coin) {
             $icon = asset('images/coin.png'); // Ensure this path is correct
-            return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
+            return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
         });
         $grid->column('price', __('price'))->display(function ($coin) {
             $icon = asset('images/coin.png'); // Ensure this path is correct
@@ -93,7 +93,15 @@ class SpecialWareController extends  MainController
         });
         $grid->column('show_img', __('show_img'))->image('', 30);
         // $grid->column('color', __('color'));
-        $grid->expire(__('expire'));
+        $grid->column('expire', __('expire'))->display(function ($value) {
+
+            if (@$this->get_type == 6) {
+                return $value;
+            }
+            if ($this->get_type == 4) {
+                return '∞';
+            }
+        });
         if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
             $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
         }
@@ -150,12 +158,15 @@ class SpecialWareController extends  MainController
         $form = new Form(new Ware());
         $this->disableFormTools($form);
 
-        $form->select('get_type', trans('get_type'))->options(
-            [
-                4 => trans('purchase'),
-                6 => trans('limited time purchase'),
-            ]
-        )->default(4);
+        $form->select('get_type', trans('get_type'))
+            ->options(
+                [
+                    4 => trans('purchase'),
+                    6 => trans('limited time purchase'),
+                ]
+            )->when(6, function (Form $form) {
+                $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+            })->default(4);
         $form->hidden('type')->value(25);
         $form->text('value', __('value'))
             ->creationRules([
@@ -177,7 +188,6 @@ class SpecialWareController extends  MainController
                 //     }
                 // }
             ]);
-        $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
         if (!$form->isEditing()) {
@@ -202,16 +212,21 @@ class SpecialWareController extends  MainController
 
         $form->number('level', trans('level'));
         $form->text('key', trans('key'));
-        $form->image('show_img', trans('img'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->default('1.png')->rules('required');
-        $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        })->rules('required');
+        // $form->image('show_img', trans('img'))->name(function ($file) {
+        //     return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        // })->default('1.png')->rules('required');
+        // $form->file('img2', trans('svg'))->name(function ($file) {
+        //     return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        // })->rules('required');
         $form->color('color', trans('color'));
 
 
         $form->number('num', __('num'));
+        $form->saving(function (Form $form) {
+            if (request('get_type') == 4) {
+                $form->expire = 0;
+            }
+        });
 
 
         return $form;
