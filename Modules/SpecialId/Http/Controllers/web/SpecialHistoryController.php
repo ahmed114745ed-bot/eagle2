@@ -141,7 +141,7 @@ class SpecialHistoryController extends MainController
 
             $grid->column('ware.get_type', __('get_type'))->display(function ($status) {
 
-                if (@$this->ware->get_type && $request()->filled('_export_')) {
+                if (@$this->ware->get_type && request()->filled('_export_')) {
                     return $status == 4 ? trans('purchase') : trans('limited time purchase');
                 } else {
                     return '';

@@ -81,13 +81,14 @@ class DailyGiftController extends Controller
             return Common::apiResponse(0, '  لا يوجد هديه اليوم ', [], 400);
         }
         $result = DailyGiftCount::query()->where('user_id', $user->id)->orderByDesc('id')->first();
-        if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
-            return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
-        }
+        // if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
+        //     return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
+        // }
 
         $type = $dailyGift->gift_type;
         $target = $dailyGift->target;
         $expire = $dailyGift->expire;
+        $this->assignGiftToUser($type, $user, $target, $expire);
         DailyGiftCount::query()->updateOrCreate([
             'user_id' => $user->id,
 
@@ -101,8 +102,8 @@ class DailyGiftController extends Controller
             'gift_type' => $type,
             'target'    => $target,
         ]);
-        $this->assignGiftToUser($type, $user, $target, $expire);
-        return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', []);
+        
+        return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', [], 200);
     }
 
     public function getCurrentDay()
@@ -127,7 +128,7 @@ class DailyGiftController extends Controller
             $amountBefore =  Common::getCurrentBalance($user->id);
             UserCoinLogHelper::logByType(
                 $user->id,
-                 $target,
+                $target,
                 $amountBefore,
                 UserCoinLogType::DAILY_GIFT,
             );
@@ -136,11 +137,11 @@ class DailyGiftController extends Controller
             $user->save();
         } elseif ($type == "vip") {
             $vip = OVip::query()->find($target);
-            UserCommon::addVipToUser($user, $vip, $expire);
+            if ($vip) UserCommon::addVipToUser($user, $vip, $expire);
         } elseif ($type == "ware") {
 
             $ware = Ware::query()->find($target);
-            UserCommon::addWareToUser($user, $ware, $expire);
+            if ($ware) UserCommon::addWareToUser($user, $ware, $expire);
         } elseif ($type == "achievement") {
             $attributes = [
                 'user_id'      => $user->id,
@@ -162,6 +163,4 @@ class DailyGiftController extends Controller
         }
         return true;
     }
-
-
 }

@@ -117,7 +117,7 @@ class RewardTargetController extends MainController
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                             <i class="fa fa-arrow-left"></i> {$back}
                         </a>
-                        <label style="margin: 0;" { $gifts} : {$target->value} </label>
+                        <label style="margin: 0;" { $gifts} : {$target?->value} </label>
                     </div>
                 HTML;
             $tools->append($customButtonHTML);
@@ -161,7 +161,7 @@ class RewardTargetController extends MainController
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
             });
-        $form->number('expire', __('expire'));
+        $form->number('expire', __('expire'))->default(1);
         return $form;
 
        
