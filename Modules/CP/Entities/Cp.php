@@ -29,10 +29,10 @@ class Cp extends Model
         return $this->belongsTo(CpRelation::class, 'cp_relation_id');
     }
 
-    public function relation()
+    /*public function relation()
     {
         return $this->belongsTo(CpRelation::class, 'cp_relation_id');
-    }
+    }*/
 
     public function scopeRelation($query)
     {

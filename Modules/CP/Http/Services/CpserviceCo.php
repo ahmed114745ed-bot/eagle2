@@ -218,7 +218,7 @@ class CpserviceCo
         $cp = $this->cpRepository->findCpById($request->cp_id);
 
 
-        if ($cp->relation->type == 'solution') {
+        if ($cp?->relation?->type == 'solution') {
             if ($request->status == 1) {
                 $cpBetweenUsers = $this->cpRepository->findCpBetweenUsers($cp->user_one_id, $cp->user_two_id, 'solution');
                 $cpBetweenUsers->status = 3;
