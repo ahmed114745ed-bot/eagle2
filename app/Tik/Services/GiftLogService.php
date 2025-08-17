@@ -201,6 +201,7 @@ class GiftLogService
             }
         }
         // (new RoomAchievementTargetService)->roomTarget($room);
+            info('im here');
 
         // CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
 
@@ -212,7 +213,6 @@ class GiftLogService
 
         $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
-        info('im here');
         if ($totalPrice > $totalGiftPrice) {
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
