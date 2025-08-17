@@ -1360,12 +1360,26 @@ class User extends Authenticatable
      */
     public function getUuidAttribute($value)
     {
-        $pack = $this->packs
-            ->where('ware.value', $this->special_id)
-            ->first();
+        if ($this->relationLoaded('packs')) {
+            $pack = $this->packs
+                ->where('type', 25)
+                ->where('is_used', true)
+                ->where('ware.value', $this->special_id)
+                ->first();
+        } else {
+            $pack = $this->packs()
+                ->with('ware')
+                ->where('type', 25)
+                ->where('is_used', true)
+                ->whereHas('ware', fn ($q) => $q->where('value', $this->special_id))
+                ->first();
+        }
 
-        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
+        return ($this->special_id && $pack && $pack->is_used === 1)
+            ? $this->special_id
+            : $this->original_uuid;
     }
+
 
     // originalUuid
     public function getOriginalUuidAttribute()

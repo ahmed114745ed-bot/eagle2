@@ -100,8 +100,13 @@ class RewardTargetController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('expire', __('expire'));
-        $grid->column('created_at', __('Created at'));
+        $grid->column('expire', __('expire'))->display(function ($expire) {
+            if ($this->type == 'coins') {
+               return  '-';
+            }
+            return $expire ;
+        });
+                $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($target) {
             $url = url('admin/target-events');
@@ -112,7 +117,7 @@ class RewardTargetController extends MainController
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                             <i class="fa fa-arrow-left"></i> {$back}
                         </a>
-                        <label style="margin: 0;" { $gifts} : {$target->value} </label>
+                        <label style="margin: 0;" { $gifts} : {$target?->value} </label>
                     </div>
                 HTML;
             $tools->append($customButtonHTML);
@@ -156,7 +161,7 @@ class RewardTargetController extends MainController
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
             });
-        $form->number('expire', __('expire'));
+        $form->number('expire', __('expire'))->default(1);
         return $form;
     }
 }
