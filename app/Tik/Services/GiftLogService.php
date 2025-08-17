@@ -93,28 +93,25 @@ class GiftLogService
 
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
-        try {
-            $sendPrice = (int)($totalPrice);
+        $sendPrice = (int)($totalPrice);
 
-            if ( $type !== 'bag'  ){
-                $amountBefore = $user->di;
+        if ( $type !== 'bag'  ){
+            $amountBefore = $user->di;
 
-                UserCoinLogHelper::logByType(
-                    $user->id,
-                    -abs($sendPrice),
-                    $amountBefore,
-                    UserCoinLogType::GIFT,
-                    $gift?->name
-                );
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($sendPrice),
+                $amountBefore,
+                UserCoinLogType::GIFT,
+                $gift?->name
+            );
 
-                $updateUserWhenSendGift->send($sendPrice, $user);
-            }else{
+            $updateUserWhenSendGift->send($sendPrice, $user);
+        }else{
 
-                $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
-            }
-        } catch (NotInfMoneyException $e) {
-            return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+            $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
         }
+
         //increase room session
         $room->enableSaving = false;
         $room->session      += $totalPrice;
@@ -224,7 +221,9 @@ class GiftLogService
 }
 
 
-
+    /**
+     * @throws \Throwable
+     */
     private function checkGiftAvailability($user, $gift, $number, $type, $totalPrice)
     {
 
@@ -238,16 +237,19 @@ class GiftLogService
                               ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
                     })->first();
 
-                if ( $existingGiftCount && $existingGiftCount->quantity < $number) {
-                    return Common::apiResponse(0, 'Receiver has reached maximum allowed gifts', null, 407);
-                }
+
+               throw_if(( $existingGiftCount && $existingGiftCount->quantity < $number), \Exception::class, 'Receiver has reached maximum allowed gifts');
+
 
             return null;
         }
 
-        if ($user->di < $totalPrice) {
-            return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
-        }
+        throw_if(
+            $user->di < $totalPrice,
+            \Exception::class,
+            'Insufficient balance, please go to recharge!'
+        );
+        
         return null;
     }
 
