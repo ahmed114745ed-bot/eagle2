@@ -3647,7 +3647,12 @@
     "Delete room boom levels": "حذف مستويات روم بوم",
     "Edit room boom levels": "تعديل مستويات روم بوم",
     "Show room boom levels": "عرض مستوى روم بوم",
-    "The box time has ended": "تم انتهاء وقت الصندوق"
+    "The box time has ended": "تم انتهاء وقت الصندوق",
+    "invalid_data": "راجع البيانات المدخله",
+    "ware_not_found": "المنتج غير موجود",
+    "insufficient_di": "لم تملك القيمه من الكويز",
+    "all_chairs_purchased": "لقد قمت بشراء جميع الكراسى",
+    "added_successfully": "تم الاضافه بنجاح"
 
 
 
