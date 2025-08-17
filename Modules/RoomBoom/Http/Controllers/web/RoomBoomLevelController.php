@@ -51,15 +51,28 @@ class RoomBoomLevelController extends MainController
         $grid->column('level', __('level'));
         $grid->column('min_target', __('min target'));
         $grid->column('target', __('target'));
+        if (!request()->filled('_export_')) {
+            $grid->column('video', __('video'))->display(function ($path) {
+                $defaultImage = asset("images/image.png");
+
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
         if (Admin::user()->can('browse-room-boom-rewards') || Admin::user()->can('*')) {
-            $grid->column(__('Procedures'))->display(function () {
-                $url = url('admin/room_boom_rewards/' . $this->id);
-                $text = __('Room Boom Rewards');
-                return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
-            });
+            if (!request()->filled('_export_')) {
+                $grid->column(__('Procedures'))->display(function () {
+                    $url = url('admin/room_boom_rewards/' . $this->id);
+                    $text = __('Room Boom Rewards');
+                    return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
+                });
+            }
         }
         if (method_exists($this, 'extendGrid')) {
             $this->extendGrid($grid);
@@ -93,6 +106,9 @@ class RoomBoomLevelController extends MainController
         $form->number('level', __('level'))->rules('required|integer|min:1');
         $form->number('min_target', __('min target'))->required();
         $form->number('target', __('target'))->required();
+        $form->file('video', trans('video'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        })->default('1.png');
 
         $form->saving(function (Form $form) {
             if (!$form->model()->exists) {

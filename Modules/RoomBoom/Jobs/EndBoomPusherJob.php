@@ -41,7 +41,7 @@ class EndBoomPusherJob implements ShouldQueue
             "room_cover"        => $this->room->room_cover ?? '',
             "room_background"   => $this->room->final_room_image ?? '',
             "room_mode"         => $this->room->mode,
-            'roomBoomLevel'     => $this->currentLevel,
+            'roomBoomLevel'     => $this->currentLevel->level,
             'duration'          => 30,
             'user_image'        => $user->profile->avatar ?? '',
         ];
