@@ -244,43 +244,45 @@ class CpRepository
     public function getCpRanking($relationType, $type)
     {
         $query = GiftLog::query()
-        ->selectRaw('
-            cps.id as cp_id,
-            cps.di,
-            cps.level_id,
-            cps.user_one_id,
-            cps.user_two_id,
-            cps.cp_relation_id,
-            cp_relations.type as relation_type,
-            SUM(gift_logs.giftNum * gift_logs.giftPrice) as total_gifts
-        ')
-        ->join('cps', 'cps.id', '=', 'gift_logs.cp_id')
-        ->join('cp_relations', 'cp_relations.id', '=', 'cps.cp_relation_id')
-        ->whereNotNull('gift_logs.cp_id')
-        ->where('cp_relations.type', $relationType)
-        ->when($type, function ($query) use ($type) {
-            return match ($type) {
-                1 => $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]),
-                2 => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-                3 => $query->whereMonth('gift_logs.created_at', now()->month)
-                           ->whereYear('gift_logs.created_at', now()->year),
-                default => $query
-            };
-        })
-        ->groupBy(
-            'cps.id',
-            'cps.di',
-            'cps.level_id',
-            'cps.user_one_id',
-            'cps.user_two_id',
-            'cps.cp_relation_id',
-            'cp_relations.type'
-        )
-        ->orderByDesc('total_gifts')
-        ->limit(20);
-
-    return $query->get();
+            ->selectRaw('
+                cps.id as cp_id,
+                cps.di,
+                cps.level_id,
+                cps.user_one_id,
+                cps.user_two_id,
+                cps.cp_relation_id,
+                cp_relations.type as relation_type,
+                SUM(gift_logs.giftNum * gift_logs.giftPrice) as total_gifts
+            ')
+            ->join('cps', 'cps.id', '=', 'gift_logs.cp_id')
+            ->join('cp_relations', 'cp_relations.id', '=', 'cps.cp_relation_id')
+            ->whereNotNull('gift_logs.cp_id')
+            ->where('cp_relations.type', $relationType)
+            ->when($type, function ($query) use ($type) {
+                return match ($type) {
+                    1 => $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]),
+                    2 => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                    3 => $query->whereMonth('gift_logs.created_at', now()->month)
+                               ->whereYear('gift_logs.created_at', now()->year),
+                    4 => $query->where('gift_logs.created_at', '>=', now()->subDays(7)),
+                    default => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                };
+            })
+            ->groupBy(
+                'cps.id',
+                'cps.di',
+                'cps.level_id',
+                'cps.user_one_id',
+                'cps.user_two_id',
+                'cps.cp_relation_id',
+                'cp_relations.type'
+            )
+            ->orderByDesc('total_gifts')
+            ->limit(20);
+    
+        return $query->get();
     }
+    
     
 
 
