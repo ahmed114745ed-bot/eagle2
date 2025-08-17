@@ -1386,7 +1386,13 @@
                                 <tr>
                                     <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
                                     <td>{{ $userVip->level }}</td>
-                                    <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
+                                    <td>
+                                        {{ 
+                                            (!empty($userVip->expire) && $userVip->expire != '0') 
+                                                ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') 
+                                                : $userVip->days 
+                                        }}
+                                    </td> 
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
                                     <td>
