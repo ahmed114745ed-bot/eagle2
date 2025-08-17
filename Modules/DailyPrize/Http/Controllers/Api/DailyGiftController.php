@@ -84,26 +84,31 @@ class DailyGiftController extends Controller
         // if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
         //     return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
         // }
+        try {
 
-        $type = $dailyGift->gift_type;
-        $target = $dailyGift->target;
-        $expire = $dailyGift->expire;
-        $this->assignGiftToUser($type, $user, $target, $expire);
-        DailyGiftCount::query()->updateOrCreate([
-            'user_id' => $user->id,
+            $type = $dailyGift->gift_type;
+            $target = $dailyGift->target;
+            $expire = $dailyGift->expire;
+            $this->assignGiftToUser($type, $user, $target, $expire);
+            DailyGiftCount::query()->updateOrCreate([
+                'user_id' => $user->id,
 
-        ], [
-            'last_active' => now(),
-            'day_count' => $currentDay,
+            ], [
+                'last_active' => now(),
+                'day_count' => $currentDay,
 
-        ]);
-        DailyUserGift::create([
-            'user_id'   => $user->id,
-            'gift_type' => $type,
-            'target'    => $target,
-        ]);
-        
-        return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', [], 200);
+            ]);
+            DailyUserGift::create([
+                'user_id'   => $user->id,
+                'gift_type' => $type,
+                'target'    => $target,
+            ]);
+
+            return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', [], 200);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 
     public function getCurrentDay()
