@@ -326,8 +326,8 @@ class GiftLogService
         if ($totalPrice >= 2000) {
             $levels     = [
                 $user->total_sender_level,
-                $user->total_received_level,
-                $firstReceiver->total_received_level,
+                $user?->total_received_level,
+                $firstReceiver?->total_received_level,
                 $firstReceiver->total_sender_level,
             ];
             /*$levels     = Common::getLevels($levels);
