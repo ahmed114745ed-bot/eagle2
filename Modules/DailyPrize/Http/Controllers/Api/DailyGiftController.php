@@ -127,7 +127,7 @@ class DailyGiftController extends Controller
             $amountBefore =  Common::getCurrentBalance($user->id);
             UserCoinLogHelper::logByType(
                 $user->id,
-                 $target,
+                $target,
                 $amountBefore,
                 UserCoinLogType::DAILY_GIFT,
             );
@@ -136,11 +136,11 @@ class DailyGiftController extends Controller
             $user->save();
         } elseif ($type == "vip") {
             $vip = OVip::query()->find($target);
-            UserCommon::addVipToUser($user, $vip, $expire);
+            if ($vip) UserCommon::addVipToUser($user, $vip, $expire);
         } elseif ($type == "ware") {
 
             $ware = Ware::query()->find($target);
-            UserCommon::addWareToUser($user, $ware, $expire);
+            if ($ware) UserCommon::addWareToUser($user, $ware, $expire);
         } elseif ($type == "achievement") {
             $attributes = [
                 'user_id'      => $user->id,
@@ -162,6 +162,4 @@ class DailyGiftController extends Controller
         }
         return true;
     }
-
-
 }
