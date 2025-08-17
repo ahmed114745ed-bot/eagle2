@@ -38,18 +38,18 @@ class CpRepository
 
     public function findCpBetweenUsers($userOne, $userTwo, $type = null)
     {
-        return Cp::where(function ($q) use ($userOne, $userTwo) {
-            $q->where(function ($q) use ($userOne, $userTwo) {
-                $q->where('user_one_id', $userOne)->where('user_two_id', $userTwo);
+        return Cp::whereIn(DB::raw('(user_one_id, user_two_id)'), [
+            [$userOne, $userTwo],
+            [$userTwo, $userOne],
+        ])
+            ->whereHas('cpRelation', function ($q) use ($type) {
+                if ($type) {
+                    $q->where('type', $type);
+                } else {
+                    $q->where('type', '!=', 'solution');
+                }
             })
-                ->orWhere(function ($q) use ($userOne, $userTwo) {
-                    $q->where('user_one_id', $userTwo)->where('user_two_id', $userOne);
-                });
-        })
-            ->whereHas("cpRelation", function ($q) {
-                $q->where('type', '!=', 'solution');
-            })
-            ->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->whereIn('status', [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
     }
 
@@ -288,8 +288,8 @@ class CpRepository
         });
 }
 
-    
-    
+
+
 
 
     public function getCpRankingWithOutRelation(int $type)
