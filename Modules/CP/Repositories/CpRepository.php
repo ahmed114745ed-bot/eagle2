@@ -246,26 +246,25 @@ class CpRepository
         $cacheKey = "cp_ranking_{$relationType}_{$type}";
 
         return \Cache::remember($cacheKey, now()->addMinutes(5), function () use ($relationType, $type) {
-            $query = GiftLog::query()
-                ->select('cp_id')
-                ->selectRaw('SUM(giftNum * giftPrice) as total_gifts')
-                ->whereNotNull('cp_id')
+                $query = GiftLog::query()
+                ->select('gift_logs.cp_id')
+                ->selectRaw('SUM(gift_logs.giftNum * giftPrice) as total_gifts')
+                ->whereNotNull('gift_logs.cp_id')
                 ->whereHas('cp.relation', fn($q) => $q->where('type', $relationType))
                 ->when($type, function ($query) use ($type) {
                     return match ($type) {
-                        1 => $query->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()]),
-                        2 => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-                        3 => $query->whereMonth('created_at', now()->month)
-                                   ->whereYear('created_at', now()->year),
+                        1 => $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]),
+                        2 => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                        3 => $query->whereMonth('gift_logs.created_at', now()->month)
+                                ->whereYear('gift_logs.created_at', now()->year),
                         default => $query
                     };
                 })
-                ->groupBy('cp_id')
+                ->groupBy('gift_logs.cp_id')
                 ->orderByDesc('total_gifts')
-                ->limit(20)
-                ->get();
-    
-            return $query->load([
+                ->limit(20);
+        
+            return $query->get()->load([
                 'cp:id,di,level_id,user_one_id,user_two_id,cp_relation_id',
                 'cp.relation:id,type'
             ]);
