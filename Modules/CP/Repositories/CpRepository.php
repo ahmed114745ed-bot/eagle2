@@ -265,7 +265,7 @@ class CpRepository
                     3 => $query->whereMonth('gift_logs.created_at', now()->month)
                                ->whereYear('gift_logs.created_at', now()->year),
                     4 => $query->where('gift_logs.created_at', '>=', now()->subDays(7)),
-                    default => $query
+                    default => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
                 };
             })
             ->groupBy(
