@@ -4,6 +4,7 @@ namespace App\Admin\Services;
 
 
 
+use App\Helpers\UserLevelHelper;
 use Modules\Vip\Entities\Vip;
 
 class UserService
@@ -31,7 +32,7 @@ class UserService
         $levelImages = '';
 
         if (! $withoutLevels) {
-            // Cache these expensive DB calls in one place
+            /*// Cache these expensive DB calls in one place
             $senderAmount = $user->sender_level + $user->sub_sender_level;
             $receiverAmount = $user->received_level + $user->sub_receiver_level;
 
@@ -43,19 +44,19 @@ class UserService
                 ->keyBy(fn ($vip) => "{$vip->type}_{$vip->level}");
 
             $receiverLevel = $vipLevels["1_{$receiverAmount}"] ?? null;
-            $senderLevel = $vipLevels["2_{$senderAmount}"] ?? null;
+            $senderLevel = $vipLevels["2_{$senderAmount}"] ?? null;*/
 
-            $receiverImg = getImagePath($receiverLevel->img ?? null) ?? null;
-            $senderImg = getImagePath($senderLevel->img ?? null) ?? null;
+            $receiverImg = UserLevelHelper::getReceiverImage($user);
+            $senderImg = UserLevelHelper::getSenderImage($user);
 
             // Charge level
-            $chargeLevel = Vip::collectionBuilder()
+            /*$chargeLevel = Vip::collectionBuilder()
                 ->where('type', 5)
                 ->where('level', $user->total_charge_level)
                 ->orderByDesc('exp')
-                ->first();
+                ->first();*/
 
-            $chargerImg = getImagePath($chargeLevel->img ?? null) ?? null;
+            $chargerImg = /*getImagePath($chargeLevel->img ?? null) ??*/ null;
 
             // HTML rendering for levels
             foreach ([$receiverImg, $senderImg, $chargerImg] as $img) {

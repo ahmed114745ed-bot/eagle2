@@ -167,31 +167,8 @@ class UserController extends MainController
             'userSetting',
             'agency',
             'sameDeviceUsers',
-            'reals' => function ($q) {
-                $q->select('id', 'user_id');
-            },
-            'moments' => function ($q) {
-                $q->select('id', 'user_id');
-            },
-            'liveTime' => function ($q) {
-                $q->select('id', 'uid', 'hours');
-            },
-            'targets' => function ($q) {
-                $q->select(
-                    'id',
-                    'user_id',
-                    'add_month',
-                    'add_year',
-                    'target_usd',
-                    'target_agency_share',
-                    'user_diamonds',
-                    'user_hours',
-                    'user_days',
-                    'user_obtain',
-                    'updated_at'
-                )
-                    ->orderBy('created_at', 'desc');
-            }
+            'senderLevel',
+            'receiverLevel'
         ]);
 
         if (request()->online == 1) {
