@@ -51,7 +51,7 @@ class RoomBoomLevelController extends MainController
         $grid->column('level', __('level'));
         $grid->column('min_target', __('min target'));
         $grid->column('target', __('target'));
-        $grid->column('show_img', __('show_img'))->display(function ($path) {
+        $grid->column('video', __('video'))->display(function ($path) {
             $defaultImage = asset("images/image.png");
 
             $url = getImagePath($path) ?? $defaultImage;
