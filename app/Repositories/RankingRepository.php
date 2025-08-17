@@ -93,7 +93,7 @@ class RankingRepository
                         ])
                         ->limit(5),
                     ])
-                        ->select(['id', 'name', 'sender_level', 'received_level', 'uuid'])
+                        ->select(['id', 'name', 'sender_level', 'received_level', 'uuid', 'special_id'])
                         ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom'));
                 },
             ])
