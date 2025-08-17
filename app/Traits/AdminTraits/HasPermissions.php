@@ -16,6 +16,14 @@ trait HasPermissions
         return $this->roles()->with('permissions')->get()->pluck('permissions')->flatten()->merge($this->permissions);
     }
 
+    public function cachedPermissions()
+    {
+        return cache()->remember("admin_user_permissions_{$this->id}", 600, function () {
+            return $this->roles()->with('permissions')->get()
+                ->pluck('permissions')->flatten()->pluck('slug')->unique();
+        });
+    }
+
     /**
      * Check if user has permission.
      *
@@ -26,19 +34,19 @@ trait HasPermissions
      */
     public function can($ability, $arguments = []): bool
     {
-        if (empty($ability)) {
+        // Allow everything if wildcard
+        if ($ability === '*' || empty($ability)) {
             return true;
         }
 
+        // Super admin check
         if ($this->isAdministrator()) {
             return true;
         }
 
-        if ($this->permissions->pluck('slug')->contains($ability)) {
-            return true;
-        }
+        $permissions = $this->cachedPermissions();
 
-        return $this->roles->pluck('permissions')->flatten()->pluck('slug')->contains($ability);
+        return $permissions->contains($ability);
     }
 
     /**
