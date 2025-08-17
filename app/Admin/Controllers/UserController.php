@@ -160,16 +160,17 @@ class UserController extends MainController
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
 
-        // Optimize eager loading
-        $grid->model()->with([
-            'ownerRoom',
-            'profile',
-            'userSetting',
-            'agency',
-            'sameDeviceUsers',
-            'senderLevel',
-            'receiverLevel'
-        ]);
+        $grid->model(function ($model) {
+            $model->with([
+                'ownerRoom',
+                'profile',
+//                'userSetting',
+                'agency',
+                'sameDeviceUsers',
+                'senderLevel',
+                'receiverLevel'
+            ]);
+        });
 
         if (request()->online == 1) {
             $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)
