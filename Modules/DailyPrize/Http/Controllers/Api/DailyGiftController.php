@@ -88,6 +88,7 @@ class DailyGiftController extends Controller
         $type = $dailyGift->gift_type;
         $target = $dailyGift->target;
         $expire = $dailyGift->expire;
+        $this->assignGiftToUser($type, $user, $target, $expire);
         DailyGiftCount::query()->updateOrCreate([
             'user_id' => $user->id,
 
@@ -101,7 +102,7 @@ class DailyGiftController extends Controller
             'gift_type' => $type,
             'target'    => $target,
         ]);
-        $this->assignGiftToUser($type, $user, $target, $expire);
+        
         return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', [], 200);
     }
 
