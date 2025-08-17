@@ -15,13 +15,14 @@ class RoomBoomLevelResource extends JsonResource
         $data =  [
             'id' => $this->id,
             'level' => $this->level,
-            'min_target' => $this->min_target,
-            'target' => $this->video,
+            'min_target' => $this->whenHas('min_target'),
+            'target' => $this->whenHas('target'),
+            'video' => $this->video,
             'room_booms' => RoomBoomResource::collection($this->whenLoaded('roomBooms')),
             'rewards' => RoomBoomRewardResource::collection($this->whenLoaded('roomBoomRewards')),
         ];
 
-        $roomBoom = $this->whenLoaded('roomBooms')->first();
+        $roomBoom = $this->when($this->whenLoaded('roomBooms'), $this->roomBooms->first());
 
         if ($roomBoom && $roomBoom->ended_at) {
             $topContributors = GiftLog::select('sender_id', \DB::raw('SUM(giftPrice) as total_gift'))

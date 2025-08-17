@@ -28,6 +28,7 @@ use App\Observers\FamilyObserver;
 use App\Observers\FamilyUserObserver;
 use App\Observers\GiftObserver;
 use App\Observers\PKObserver;
+use App\Observers\RoomBoomLevelObserver;
 use App\Observers\RoomObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserSallaryObserver;
@@ -49,6 +50,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -228,6 +230,7 @@ class AppServiceProvider extends ServiceProvider
         Agency::observe(AgencyObserver::class);
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
         Vip::observe(VipObserver::class);
+        RoomBoomLevel::observe(RoomBoomLevelObserver::class);
     }
 
     protected function cacheLuckyGiftProbabilities(): void

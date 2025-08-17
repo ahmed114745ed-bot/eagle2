@@ -20,4 +20,11 @@ class RoomBoomLevelController extends Controller
 
         return Common::apiResponse(true, '', RoomBoomLevelResource::collection($roomBoomLevels), 200);
     }
+
+    public function getVideos(): JsonResponse
+    {
+        $roomBoomLevels = $this->roomBoomLevelService->getVideos();
+
+        return Common::apiResponse(true, '', RoomBoomLevelResource::collection($roomBoomLevels), 200);
+    }
 }

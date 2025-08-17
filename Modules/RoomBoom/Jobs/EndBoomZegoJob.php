@@ -29,8 +29,9 @@ class EndBoomZegoJob implements ShouldQueue
         $d = [
             "messageContent" => [
                 "message" => "roomBoomEnded",
-                'roomBoomLevel' => $this->currentLevel,
+                'roomBoomLevel' => $this->currentLevel->level,
                 'duration' => 10,
+                'video' => $this->currentLevel->video
             ]
         ];
         $json = json_encode($d);

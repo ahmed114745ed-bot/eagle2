@@ -51,24 +51,28 @@ class RoomBoomLevelController extends MainController
         $grid->column('level', __('level'));
         $grid->column('min_target', __('min target'));
         $grid->column('target', __('target'));
-        $grid->column('video', __('video'))->display(function ($path) {
-            $defaultImage = asset("images/image.png");
+        if (!request()->filled('_export_')) {
+            $grid->column('video', __('video'))->display(function ($path) {
+                $defaultImage = asset("images/image.png");
 
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
         if (Admin::user()->can('browse-room-boom-rewards') || Admin::user()->can('*')) {
-            $grid->column(__('Procedures'))->display(function () {
-                $url = url('admin/room_boom_rewards/' . $this->id);
-                $text = __('Room Boom Rewards');
-                return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
-            });
+            if (!request()->filled('_export_')) {
+                $grid->column(__('Procedures'))->display(function () {
+                    $url = url('admin/room_boom_rewards/' . $this->id);
+                    $text = __('Room Boom Rewards');
+                    return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
+                });
+            }
         }
         if (method_exists($this, 'extendGrid')) {
             $this->extendGrid($grid);
