@@ -283,14 +283,6 @@ class CpserviceCo
 
     public function getCpRanking()
     {
-
-
-           logger()->info('✅ type', [
-               'type'          => request("type"),
-               'relationType'    =>request("relationType"),
-           ]);
-  
-
         $relationType = request("relationType") ?? 'lovely';
     
         $type = request("type") ?? 1;
