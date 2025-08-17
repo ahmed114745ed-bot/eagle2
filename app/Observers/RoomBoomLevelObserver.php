@@ -17,7 +17,7 @@ class RoomBoomLevelObserver
     {
         $oldVideo = $roomBoomLevel->getOriginal('video');
 
-        if ($roomBoomLevel->video !== $oldVideo) {
+        if ($roomBoomLevel->video != $oldVideo) {
             settings()->set('room_boom_video_update_at', time());
         }
     }
