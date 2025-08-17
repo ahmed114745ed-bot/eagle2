@@ -243,10 +243,7 @@ class CpRepository
 
     public function getCpRanking($relationType, $type)
     {
-        $cacheKey = "cp_ranking_{$relationType}_{$type}";
-
-        return \Cache::remember($cacheKey, now()->addMinutes(5), function () use ($relationType, $type) {
-                $query = GiftLog::query()
+        $query = GiftLog::query()
                 ->select('gift_logs.cp_id')
                 ->selectRaw('SUM(gift_logs.giftNum * giftPrice) as total_gifts')
                 ->whereNotNull('gift_logs.cp_id')
@@ -263,12 +260,20 @@ class CpRepository
                 ->groupBy('gift_logs.cp_id')
                 ->orderByDesc('total_gifts')
                 ->limit(20);
-        
-            return $query->get()->load([
-                'cp:id,di,level_id,user_one_id,user_two_id,cp_relation_id',
-                'cp.relation:id,type'
-            ]);
-        });
+
+            $top = $query->get();
+
+            $cpIds = $top->pluck('cp_id');
+            $cps   = Cp::with('relation:id,type')
+                    ->select('id','di','level_id','user_one_id','user_two_id','cp_relation_id')
+                    ->whereIn('id', $cpIds)
+                    ->get()
+                    ->keyBy('id');
+
+            return $top->map(function ($row) use ($cps) {
+                $row->cp = $cps[$row->cp_id] ?? null;
+                return $row;
+            });
     }
     
 
