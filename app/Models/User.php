@@ -1363,14 +1363,14 @@ class User extends Authenticatable
         if ($this->relationLoaded('packs')) {
             $pack = $this->packs
                 ->where('type', 25)
-                ->where('is_enable', true)
+                ->where('is_using', true)
                 ->where('ware.value', $this->special_id)
                 ->first();
         } else {
             $pack = $this->packs()
                 ->with('ware')
                 ->where('type', 25)
-                ->where('is_enable', true)
+                ->where('is_using', true)
                 ->whereHas('ware', fn ($q) => $q->where('value', $this->special_id))
                 ->first();
         }
