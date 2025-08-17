@@ -51,8 +51,8 @@ class UserService
             $receiverLevel = $vipLevels["1_{$receiverAmount}"] ?? null;
             $senderLevel = $vipLevels["2_{$senderAmount}"] ?? null;*/
 
-            $receiverImg = UserLevelHelper::getReceiverImage($user);
-            $senderImg = UserLevelHelper::getSenderImage($user);
+            $receiverImg = getImagePath(UserLevelHelper::getReceiverImage($user));
+            $senderImg = getImagePath(UserLevelHelper::getSenderImage($user));
 
             // Charge level
             /*$chargeLevel = Vip::collectionBuilder()
