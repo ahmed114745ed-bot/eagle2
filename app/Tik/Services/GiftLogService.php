@@ -212,7 +212,7 @@ class GiftLogService
         $totalGiftPrice = Common::getConfig('total_gift_price') ?? 2000;
 
         if ($totalPrice > $totalGiftPrice) {
-//            $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
+            $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
         return $message;
 
