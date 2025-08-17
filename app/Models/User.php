@@ -1776,6 +1776,8 @@ class User extends Authenticatable
                       ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
             });
     }
+
+
 }
 
 

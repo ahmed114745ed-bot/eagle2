@@ -162,37 +162,15 @@ class UserController extends MainController
         $haveCoins = (request()->have_coins == 1);
 
         // Optimize eager loading
-        $grid->model()->with([
-            'ownerRoom',
+        $grid->model()
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id'])
+            ->with([
             'profile',
-            'userSetting',
             'agency',
-            'sameDeviceUsers',
-            'reals' => function ($q) {
-                $q->select('id', 'user_id');
-            },
-            'moments' => function ($q) {
-                $q->select('id', 'user_id');
-            },
-            'liveTime' => function ($q) {
-                $q->select('id', 'uid', 'hours');
-            },
-            'targets' => function ($q) {
-                $q->select(
-                    'id',
-                    'user_id',
-                    'add_month',
-                    'add_year',
-                    'target_usd',
-                    'target_agency_share',
-                    'user_diamonds',
-                    'user_hours',
-                    'user_days',
-                    'user_obtain',
-                    'updated_at'
-                )
-                    ->orderBy('created_at', 'desc');
-            }
+//            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
+            'senderLevel',
+            'receiverLevel',
+            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ]);
 
         if (request()->online == 1) {
