@@ -244,36 +244,42 @@ class CpRepository
     public function getCpRanking($relationType, $type)
     {
         $query = GiftLog::query()
-                ->select('gift_logs.cp_id')
-                ->selectRaw('SUM(gift_logs.giftNum * giftPrice) as total_gifts')
-                ->whereNotNull('gift_logs.cp_id')
-                ->whereHas('cp.relation', fn($q) => $q->where('type', $relationType))
-                ->when($type, function ($query) use ($type) {
-                    return match ($type) {
-                        1 => $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]),
-                        2 => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-                        3 => $query->whereMonth('gift_logs.created_at', now()->month)
-                                ->whereYear('gift_logs.created_at', now()->year),
-                        default => $query
-                    };
-                })
-                ->groupBy('gift_logs.cp_id')
-                ->orderByDesc('total_gifts')
-                ->limit(20);
+        ->selectRaw('
+            cps.id as cp_id,
+            cps.di,
+            cps.level_id,
+            cps.user_one_id,
+            cps.user_two_id,
+            cps.cp_relation_id,
+            cp_relations.type as relation_type,
+            SUM(gift_logs.giftNum * gift_logs.giftPrice) as total_gifts
+        ')
+        ->join('cps', 'cps.id', '=', 'gift_logs.cp_id')
+        ->join('cp_relations', 'cp_relations.id', '=', 'cps.cp_relation_id')
+        ->whereNotNull('gift_logs.cp_id')
+        ->where('cp_relations.type', $relationType)
+        ->when($type, function ($query) use ($type) {
+            return match ($type) {
+                1 => $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]),
+                2 => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                3 => $query->whereMonth('gift_logs.created_at', now()->month)
+                           ->whereYear('gift_logs.created_at', now()->year),
+                default => $query
+            };
+        })
+        ->groupBy(
+            'cps.id',
+            'cps.di',
+            'cps.level_id',
+            'cps.user_one_id',
+            'cps.user_two_id',
+            'cps.cp_relation_id',
+            'cp_relations.type'
+        )
+        ->orderByDesc('total_gifts')
+        ->limit(20);
 
-            $top = $query->get();
-
-            $cpIds = $top->pluck('cp_id');
-            $cps   = Cp::with('relation:id,type')
-                    ->select('id','di','level_id','user_one_id','user_two_id','cp_relation_id')
-                    ->whereIn('id', $cpIds)
-                    ->get()
-                    ->keyBy('id');
-
-            return $top->map(function ($row) use ($cps) {
-                $row->cp = $cps[$row->cp_id] ?? null;
-                return $row;
-            });
+    return $query->get();
     }
     
 
