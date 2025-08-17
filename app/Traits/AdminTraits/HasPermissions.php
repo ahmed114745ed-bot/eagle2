@@ -13,7 +13,23 @@ trait HasPermissions
      */
     public function allPermissions(): Collection
     {
-        return $this->roles()->with('permissions')->get()->pluck('permissions')->flatten()->merge($this->permissions);
+        return \Cache::rememberForever("user_permissions_{$this->id}", function () {
+            return $this->roles()
+                ->with('permissions:id,slug') // load only needed fields
+                ->get()
+                ->pluck('permissions')
+                ->flatten()
+                ->merge($this->permissions) // direct permissions
+                ->unique('id')
+                ->values();
+        });    }
+
+    public function cachedPermissions()
+    {
+        return cache()->remember("admin_user_permissions_{$this->id}", 600, function () {
+            return $this->roles()->with('permissions')->get()
+                ->pluck('permissions')->flatten()->pluck('slug')->unique();
+        });
     }
 
     /**
@@ -26,19 +42,20 @@ trait HasPermissions
      */
     public function can($ability, $arguments = []): bool
     {
-        if (empty($ability)) {
-            return true;
-        }
 
+        // Super admin check
         if ($this->isAdministrator()) {
             return true;
         }
 
-        if ($this->permissions->pluck('slug')->contains($ability)) {
+        $permissions = $this->cachedPermissions();
+
+        // Allow everything if wildcard
+        if ($permissions->contains('*') || empty($ability)) {
             return true;
         }
 
-        return $this->roles->pluck('permissions')->flatten()->pluck('slug')->contains($ability);
+        return $permissions->contains($ability);
     }
 
     /**
@@ -60,7 +77,7 @@ trait HasPermissions
      */
     public function isAdministrator(): bool
     {
-        return $this->isRole('administrator');
+        return $this->isRole('administrator') || $this->isRole('developer');
     }
 
     /**
@@ -106,16 +123,29 @@ trait HasPermissions
     }
 
     /**
+     * Clear cached permissions (after role/permission update).
+     */
+    public function forgetCachedPermissions(): void
+    {
+        \Cache::forget("admin_user_permissions_{$this->id}");
+        \Cache::forget("user_permissions_{$this->id}");
+    }
+
+    /**
      * Detach models from the relationship.
      *
      * @return void
      */
     protected static function bootHasPermissions()
     {
+        static::saved(function ($model) {
+            $model->forgetCachedPermissions();
+        });
+
         static::deleting(function ($model) {
             $model->roles()->detach();
-
             $model->permissions()->detach();
+            $model->forgetCachedPermissions();
         });
     }
 }

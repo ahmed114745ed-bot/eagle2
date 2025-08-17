@@ -17,14 +17,12 @@ use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Classes\Gifts\SendGiftService;
-use Illuminate\Support\Facades\DB;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
 use App\Tik\Repositories\GiftRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
-use Modules\CP\Http\Services\CpServices;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
@@ -35,6 +33,7 @@ use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 use Modules\RoomBoom\Services\RoomBoomGiftService;
+
 
 class GiftLogService
 {
@@ -147,7 +146,7 @@ class GiftLogService
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
             } catch (\Exception $e) {
-                return Common::apiResponse(0, $e->getMessage());
+                 throw new \Exception('not found') ;
             }
         }
 
@@ -218,10 +217,10 @@ class GiftLogService
         if ($totalPrice > $totalGiftPrice) {
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
-        return Common::apiResponse(1, $message);
+        return $message;
 
      });
-    
+
 }
 
 

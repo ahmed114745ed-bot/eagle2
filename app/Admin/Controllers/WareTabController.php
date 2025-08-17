@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\FileService;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;

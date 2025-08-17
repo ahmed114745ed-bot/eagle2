@@ -7,6 +7,7 @@ use App\Traits\FollowTrait;
 use App\Traits\MomentRelationshipTrait;
 use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
+use App\Traits\User\UserLevel;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,7 +39,7 @@ use Modules\Vip\Entities\Vip;
  */
 class User extends Authenticatable
 {
-    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait;
+    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -1359,12 +1360,26 @@ class User extends Authenticatable
      */
     public function getUuidAttribute($value)
     {
-        $pack = $this->getLoadedPacks()
-            ->where('ware.value', $this->special_id)
-            ->first();
+        if ($this->relationLoaded('packs')) {
+            $pack = $this->packs
+                ->where('type', 25)
+                ->where('is_used', true)
+                ->where('ware.value', $this->special_id)
+                ->first();
+        } else {
+            $pack = $this->packs()
+                ->with('ware')
+                ->where('type', 25)
+                ->where('is_used', true)
+                ->whereHas('ware', fn ($q) => $q->where('value', $this->special_id))
+                ->first();
+        }
 
-        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
+        return ($this->special_id && $pack && $pack->is_used === 1)
+            ? $this->special_id
+            : $this->original_uuid;
     }
+
 
     // originalUuid
     public function getOriginalUuidAttribute()
@@ -1791,10 +1806,12 @@ class User extends Authenticatable
             ->withPivot('quantity', 'expire')
             ->withTimestamps()
             ->where(function ($query) {
-                $query->where('user_gifts.expire', 0) 
+                $query->where('user_gifts.expire', 0)
                       ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
             });
     }
+
+
 }
 
 

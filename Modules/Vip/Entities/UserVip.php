@@ -8,11 +8,12 @@ use App\Models\User;
 use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Vip\Entities\OVip;
 
 class UserVip extends Model
 {
-    use TimestampsWithTimezone;
+    use TimestampsWithTimezone, SoftDeletes;
 
     protected $table = 'users_vips';
 

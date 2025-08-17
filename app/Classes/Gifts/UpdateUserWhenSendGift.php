@@ -46,7 +46,7 @@ class UpdateUserWhenSendGift
             try {
                 (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
 
-                if ($user->total_received_level > $lastReceivedLevel) {
+                if ($user->total_received_level != $lastReceivedLevel) {
                     dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
                 }
             } catch (\Exception $e) {
@@ -90,7 +90,7 @@ class UpdateUserWhenSendGift
         $totalDiamondReceived                  = $receivedUser->total_received_diamonds;
         $levelVip                     = $this->getLevel(1, $totalDiamondReceived);
         $receivedUser->received_level = $levelVip != null ? (@$levelVip->level - $receivedUser->sub_receiver_level) ?? 0 : 0;
-        if ($receivedUser->total_received_level > $lastReceivedLevel) {
+        if ($receivedUser->total_received_level != $lastReceivedLevel) {
             dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
         }
 
@@ -124,7 +124,7 @@ class UpdateUserWhenSendGift
             throw new NotInfMoneyException();
         }
         (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
-        if ($senderUser->total_sender_level > $lastSenderUser) {
+        if ($senderUser->total_sender_level != $lastSenderUser) {
             dispatch(new SendCustomOfficialMessageToUser($senderUser->id, NotificationType::SENDER_LEVEL))->onQueue('notification');
         }
 

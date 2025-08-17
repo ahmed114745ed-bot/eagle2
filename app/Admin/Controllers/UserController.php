@@ -161,38 +161,17 @@ class UserController extends MainController
         $haveCoins = (request()->have_coins == 1);
 
         // Optimize eager loading
-        $grid->model()->with([
-            'ownerRoom',
+        $grid->model()
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id'])
+            ->with([
             'profile',
-            'userSetting',
             'agency',
-            'sameDeviceUsers',
-            'reals' => function ($q) {
-                $q->select('id', 'user_id');
-            },
-            'moments' => function ($q) {
-                $q->select('id', 'user_id');
-            },
-            'liveTime' => function ($q) {
-                $q->select('id', 'uid', 'hours');
-            },
-            'targets' => function ($q) {
-                $q->select(
-                    'id',
-                    'user_id',
-                    'add_month',
-                    'add_year',
-                    'target_usd',
-                    'target_agency_share',
-                    'user_diamonds',
-                    'user_hours',
-                    'user_days',
-                    'user_obtain',
-                    'updated_at'
-                )
-                    ->orderBy('created_at', 'desc');
-            }
-        ]);
+            'userSetting',
+//            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
+            'senderLevel',
+            'receiverLevel',
+            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])->withCount('sameDeviceUsers');
 
         if (request()->online == 1) {
             $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)
@@ -255,7 +234,7 @@ class UserController extends MainController
 
 
 
-        $grid->column('agency', __('Agency'))
+        $grid->column('agency_id', __('Agency'))
             ->display(function () {
                 $agency = $this->agency;
                 if (! $agency) {
@@ -282,7 +261,7 @@ class UserController extends MainController
         ");
 
         $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
-            $count = $this->sameDeviceUsers()->count();
+            $count = $this->same_device_users_count;
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
 
@@ -932,9 +911,9 @@ class UserController extends MainController
     {
         $user = User::find($request->id);
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['nullable', 'string', 'max:255'],
             'uuid' => [
-                'required',
+                'sometimes',
                 Rule::unique('users', 'uuid')->ignore($user->id),
             ],
             'phone' => [
@@ -948,6 +927,7 @@ class UserController extends MainController
             'uuid' => $request->uuid,
             'email' => $request->email,
             'phone' => $request->phone,
+            'bio' => $request->bio,
         ];
         $user->update($data);
         $profileUser = Profile::where('user_id', $user->id)->first();

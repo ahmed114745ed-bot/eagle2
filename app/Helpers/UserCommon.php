@@ -262,7 +262,7 @@ class UserCommon
         $vip = OVip::query()->first();
         $user_vip_check = UserVip::query()->where('user_id', $user->id)->where('level', '>=', $vip->level)->first();
         $expire = $vip->expire;
-  
+
 
         if (!$user_vip_check) {
             VipCommon::createUserVip($vip ,$user ,$vip->expire , null,'',);
@@ -335,17 +335,13 @@ class UserCommon
     public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null)
     {
         DB::beginTransaction();
-
-   
-        VipCommon::createUserVip($vip ,$user ,$expir , null ,'',);
-
+        VipCommon::createUserVip($vip ,$user ,$expire , null ,'',);
         DB::commit();
-
-        Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
-        $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-        $title = config('app.name_ar');
-        $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
-        Common::send_firebase_notification($tokens_notfacion, $title, $body);
+        // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
+        // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        // $title = config('app.name_ar');
+        // $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
+        // Common::send_firebase_notification($tokens_notfacion, $title, $body);
     }
 
     public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)

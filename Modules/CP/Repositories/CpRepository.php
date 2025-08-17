@@ -11,7 +11,7 @@ use Modules\CP\Entities\CpRelation;
 use Modules\CP\Entities\UserRelationAvilable;
 use Modules\CP\Enums\CpStatus;
 
-/// todo remove rename import
+
 class CpRepository
 {
     public function getCpRelationById($id)
@@ -211,7 +211,7 @@ class CpRepository
         );
     }
 
-    public function getCpRanking($relationType, $type)
+    public function getCpRanking0($relationType, $type)
     {
         return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
         ->whereNotNull("cp_id")
@@ -241,41 +241,95 @@ class CpRepository
         ->get();
     }
 
-    public function getCpRankingWithOutRelation($type)
+    public function getCpRanking($relationType, $type)
+{
+    return GiftLog::query()
+        ->selectRaw('
+            cps.id as cp_id,
+            cps.di,
+            cps.level_id,
+            cps.user_one_id,
+            cps.user_two_id,
+            cps.cp_relation_id,
+            cp_relations.type as relation_type,
+            SUM(gift_logs.giftNum * gift_logs.giftPrice) as total_gifts
+        ')
+        ->join('cps', 'cps.id', '=', 'gift_logs.cp_id')
+        ->join('cp_relations', 'cp_relations.id', '=', 'cps.cp_relation_id')
+        ->whereNotNull('gift_logs.cp_id')
+        ->where('cp_relations.type', $relationType)
+        ->when($type, function ($query) use ($type) {
+            return match ($type) {
+                1 => $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]),
+                2 => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                3 => $query->whereMonth('gift_logs.created_at', now()->month)
+                           ->whereYear('gift_logs.created_at', now()->year),
+                default => $query
+            };
+        })
+        ->groupBy(
+            'cps.id',
+            'cps.di',
+            'cps.level_id',
+            'cps.user_one_id',
+            'cps.user_two_id',
+            'cps.cp_relation_id',
+            'cp_relations.type'
+        )
+        ->orderByDesc('total_gifts')
+        ->limit(20)
+        ->get()
+        ->map(function ($row) {
+            $cp = \App\Models\Cp::with(['level', 'fromUser.profile', 'toUser.profile'])->find($row->cp_id);
+            if ($cp) {
+                $cp->total_gifts = $row->total_gifts;
+            }
+            return $cp;
+        });
+}
+
+    
+    
+
+
+    public function getCpRankingWithOutRelation(int $type)
     {
-        return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
-            ->whereNotNull("cp_id")
-            ->with(['cp' => function ($query) {
-                $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id')
-                    ->with(['relation' => function ($query) {
-                        $query->select('id', 'type');
-                    }]);
-            }])
-            ->whereHas("cp.relation", function ($q) {
-                $q->whereNotNull('type');
-            })
-            ->when($type, function ($query) use ($type) {
-                /// todo update this filter
-                switch ($type) {
-                    case 1:
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
-                    case 2:
-                        return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-                    case 3:
-                        return $query->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
-                }
-            })
-            ->groupBy('cp_id')
+        $query = GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
+            ->whereNotNull('cp_id')
+            ->join('cps', 'gift_logs.cp_id', '=', 'cps.id')
+            ->join('cp_relations', 'cps.cp_relation_id', '=', 'cp_relations.id')
+            ->whereNotNull('cp_relations.type');
+
+        // Apply date filters
+        $query->when($type, function ($query) use ($type) {
+            switch ($type) {
+                case 1:
+                    $query->whereBetween('gift_logs.created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
+                    break;
+                case 2:
+                    $query->whereBetween('gift_logs.created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 3:
+                    $query->whereMonth('gift_logs.created_at', Carbon::now()->month)
+                        ->whereYear('gift_logs.created_at', Carbon::now()->year);
+                    break;
+            }
+        });
+
+        // Group and rank directly in SQL
+        $result = $query->groupBy('cp_id', 'cp_relations.type')
             ->orderByDesc('total_gifts')
-            // ->take(1)
+            ->with(['cp' => function ($q) {
+                $q->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id')
+                    ->with(['relation:id,type']);
+            }])
             ->get()
-            ->groupBy(function ($item) {
-                return $item->cp->relation->type;
-            })
-            ->map(function ($groupedLogs) {
-                return $groupedLogs->sortByDesc('total_gifts')->first();
-            });
+            ->groupBy('cp.relation.type') // just grouping final small set
+            ->map(fn ($group) => $group->first()); // pick top 1 per type
+
+        return $result;
     }
+
 
     public function getCpList($userId, $activeOnly = false)
     {
@@ -298,7 +352,11 @@ class CpRepository
 
     public function getUserCpProfiles($userId, $statuses, $count = 9)
     {
-        return Cp::with('relation:id,title,type', 'toUser', 'fromUser')
+        return Cp::with([
+            'cpRelation:id,title,type',
+            'toUser:id,name,dress_1,dress_2,dress_3',
+            'fromUser:id,name,dress_1,dress_2,dress_3',
+        ])
             ->whereHas("cpRelation", function ($q) {
                 $q->where('type', "!=", 'solution');
             })
@@ -311,6 +369,7 @@ class CpRepository
             ->take($count)
             ->get();
     }
+
 
     public function getByUser($userId)
     {
