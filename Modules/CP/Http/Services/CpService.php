@@ -122,6 +122,7 @@ class CpService
     {
         // Check if the CP has already taken the gift for the level
         if ($this->hasTakenGift($cp->id, $level->level)) {
+            info('hasTakenGift');
             return true;
         }
 
