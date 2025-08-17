@@ -161,7 +161,7 @@ class RewardTargetController extends MainController
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
             });
-        $form->number('expire', __('expire'));
+        $form->number('expire', __('expire'))->default(1);
         return $form;
     }
 }
