@@ -18,6 +18,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomReward;
+use Modules\RoomBoom\Transformers\RoomBoomRewardResource;
 
 class RoomBoomRewardJob implements ShouldQueue
 {
@@ -44,7 +45,9 @@ class RoomBoomRewardJob implements ShouldQueue
         $rewardItems = [];
         foreach ($rewards as $reward) {
             for ($i = 0; $i < $reward->quantity; $i++) {
-                $rewardItems[] = $reward->toArray();
+                $item = $reward->toArray();
+                $item['quantity'] = 1;
+                $rewardItems[] = $item;
             }
         }
 
@@ -61,11 +64,39 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $assignments = [];
         $assignedUserIds = [];
+        $winnerData = [];
 
         foreach ($topContributorIds as $i => $userId) {
             if (!isset($rewardItems[$i])) break;
             $reward = $rewardItems[$i];             //first user will take first reward ordered by priority and quantity
             $this->distributeBoomRewards($userId, $reward);
+
+            $assignedUserIds[] = $userId;
+            $assignments[] = $reward;
+
+            $winnerData[] = [
+                'user_id' => $userId,
+                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+            ];
+        }
+
+        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
+            ->where('room_boom_level', $level->level)
+            ->where('start_boom_ranking', 1)
+            ->orderByDesc('created_at')
+            ->value('sender_id');
+
+        if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
+            $randomReward = $rewards->random();
+            $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
+
+            $assignedUserIds[] = $lastTriggerSenderId;
+            $assignments[] = $randomReward;
+
+            $winnerData[] = [
+                'user_id' => $lastTriggerSenderId,
+                'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl()
+            ];
         }
 
         $numAssigned = count($assignments);
@@ -81,7 +112,24 @@ class RoomBoomRewardJob implements ShouldQueue
             if (!isset($remainingRewards[$i])) break;
             $reward = $remainingRewards[$i];
             $this->distributeBoomRewards($visitorId, $reward);
+
+            $winnerData[] = [
+                'user_id' => $visitorId,
+                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+            ];
         }
+
+        $d = [
+            "messageContent" => [
+                "message" => "roomBoomEnded",
+                'roomBoomLevel' => $level->level,
+                'duration' => 10,
+                'winners' => $winnerData
+            ]
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
     }
 
     public function distributeBoomRewards($userId, $reward): void

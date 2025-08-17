@@ -44,14 +44,14 @@ class RoomBoomRewardResource extends JsonResource
         }
     }
 
-    protected function getImageUrl()
+    public function getImageUrl()
     {
         if ($this->target_type == 'ware') {
             $ware = $this->getWare();
-            $path = $ware?->show_img ?? $ware?->img2;
+            $path = $ware->img2 ?? $ware?->show_img;
         }  elseif ($this->target_type == 'gift') {
             $gift = $this->getGift();
-            $path = $gift?->show_img ?? $gift?->img;
+            $path = $gift->img ?? $gift?->show_img;
         } elseif ($this->target_type == 'achievement') {
             $path = $this->target;
         }
