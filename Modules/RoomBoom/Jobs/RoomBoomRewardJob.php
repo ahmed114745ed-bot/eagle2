@@ -33,6 +33,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
     public function handle()
     {
+        info('in job');
         $boom = RoomBoom::with(['roomBoomLevel', 'totalRoomGift'])->find($this->boomId);
         if (!$boom || !$boom->roomBoomLevel || !$boom->totalRoomGift) return;
 
