@@ -84,8 +84,11 @@ class SpecialHistoryController extends MainController
         $grid->column('user.name', __('User'))->display(function () {
             $name = @$this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
-            if (request()->filled('_export_')) {
+            if ($this->user && request()->filled('_export_')) {
+
                 return "{$name} (UUID: {$uid})";
+            } else {
+                return "user not found";
             }
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;
