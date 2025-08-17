@@ -68,22 +68,24 @@ class RoomBoomRewardController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
-        $grid->column('image', __('image'))->display(function ($path) {
-            if ($this->target_type == 'ware') {
-                $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware?->show_img;
-            } elseif ($this->target_type == 'gift') {
-                $gift = Gift::find($this->target);
-                $path = $gift->show_img ?? $gift?->img;
-            } elseif ($this->target_type == 'achievement') {
-                $path = $this?->target;
-            } else {
-                $path = 'coin.png';
-            }
-            /** @var Gift $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+        if (!request()->filled('_export_')) {
+            $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->target_type == 'ware') {
+                    $ware = Ware::find($this->target);
+                    $path = $ware->img2 ?? $ware?->show_img;
+                } elseif ($this->target_type == 'gift') {
+                    $gift = Gift::find($this->target);
+                    $path = $gift->show_img ?? $gift?->img;
+                } elseif ($this->target_type == 'achievement') {
+                    $path = $this?->target;
+                } else {
+                    $path = 'coin.png';
+                }
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
         $grid->column('priority', __('priority'));
         $grid->column('quantity', __('Quantity'));
         $grid->column('expire_days', __('expire'));
