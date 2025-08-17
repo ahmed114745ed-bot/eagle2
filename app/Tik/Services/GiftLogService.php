@@ -131,8 +131,10 @@ class GiftLogService
         $fromName = $user->name;
         $sendGiftServices = new SendGiftService();
 
+        info($user);
         $jsonSendGiftData =
             $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1 || !$request->has('to_zego')));
+        info('after zego');
         //send to zego if pk not null
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
 
@@ -201,7 +203,6 @@ class GiftLogService
             }
         }
         // (new RoomAchievementTargetService)->roomTarget($room);
-            info('im here');
 
         // CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
 
