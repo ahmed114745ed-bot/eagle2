@@ -377,6 +377,7 @@ class UserCommon
         }
         DB::beginTransaction();
         try {
+            info('before pack');
             $arr['user_id'] = $user->id;
             $arr['type'] = $ware->type;
             $arr['get_type'] = $ware->get_type;
@@ -390,6 +391,8 @@ class UserCommon
             $pack->senderable()->associate($sender);
             $pack->save();
             DB::commit();
+
+            info('after pack');
 
             Common::sendOfficialMessage($user->id, $title, $body);
             (new UserCounterServices)->eventUser($user, 'official-messages');

@@ -6,13 +6,10 @@ namespace App\Tik\Services;
 use App\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
-use App\Jobs\LogUserCoinProfit;
 use App\Models\Cp;
-use App\Models\GiftLog;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
-use Carbon\Carbon;
 use DB;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
@@ -20,7 +17,6 @@ use App\Jobs\UpdatePkAndSendToZigo;
 use App\Classes\Gifts\SendGiftService;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
-use App\Exceptions\NotInfMoneyException;
 use App\Tik\Repositories\GiftRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
@@ -28,11 +24,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
-use Modules\Achievement\Jobs\CalculateAchievement;
-use App\Http\Services\RoomAchievementTargetService;
-use Modules\RoomBoom\Entities\RoomBoom;
-use Modules\RoomBoom\Entities\RoomBoomLevel;
-use Modules\RoomBoom\Entities\TotalRoomGift;
+use Modules\RoomBoom\Services\RoomBoomGiftService;
 
 
 class GiftLogService
@@ -93,28 +85,25 @@ class GiftLogService
 
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
-        try {
-            $sendPrice = (int)($totalPrice);
+        $sendPrice = (int)($totalPrice);
 
-            if ( $type !== 'bag'  ){
-                $amountBefore = $user->di;
+        if ( $type !== 'bag'  ){
+            $amountBefore = $user->di;
 
-                UserCoinLogHelper::logByType(
-                    $user->id,
-                    -abs($sendPrice),
-                    $amountBefore,
-                    UserCoinLogType::GIFT,
-                    $gift?->name
-                );
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($sendPrice),
+                $amountBefore,
+                UserCoinLogType::GIFT,
+                $gift?->name
+            );
 
-                $updateUserWhenSendGift->send($sendPrice, $user);
-            }else{
+            $updateUserWhenSendGift->send($sendPrice, $user);
+        }else{
 
-                $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
-            }
-        } catch (NotInfMoneyException $e) {
-            return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+            $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
         }
+
         //increase room session
         $room->enableSaving = false;
         $room->session      += $totalPrice;
@@ -165,7 +154,7 @@ class GiftLogService
 
         $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
-//        $sendGiftServices->roomBoom($room, $totalPrice, $roomBoomUuid);
+        (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
 
         foreach ($receivedUsers as $receivedUser) {
             $updateUserWhenSendGift->update($price, $receivedUser);
@@ -224,7 +213,9 @@ class GiftLogService
 }
 
 
-
+    /**
+     * @throws \Throwable
+     */
     private function checkGiftAvailability($user, $gift, $number, $type, $totalPrice)
     {
 
@@ -238,16 +229,19 @@ class GiftLogService
                               ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
                     })->first();
 
-                if ( $existingGiftCount && $existingGiftCount->quantity < $number) {
-                    return Common::apiResponse(0, 'Receiver has reached maximum allowed gifts', null, 407);
-                }
+
+               throw_if(( $existingGiftCount && $existingGiftCount->quantity < $number), \Exception::class, 'Receiver has reached maximum allowed gifts');
+
 
             return null;
         }
 
-        if ($user->di < $totalPrice) {
-            return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
-        }
+        throw_if(
+            $user->di < $totalPrice,
+            \Exception::class,
+            'Insufficient balance, please go to recharge!'
+        );
+
         return null;
     }
 

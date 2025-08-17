@@ -20,4 +20,9 @@ class RoomBoomLevelRepository
         }
         ])->orderBy('level')->get();
     }
+
+    public function getVideos(): Collection|array
+    {
+        return RoomBoomLevel::select('id', 'level', 'video')->orderBy('level')->get();
+    }
 }

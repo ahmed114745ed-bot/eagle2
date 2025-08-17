@@ -14,6 +14,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Validation\Rule;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\RoomBoomReward;
 
 class RoomBoomRewardController extends MainController
@@ -68,22 +69,24 @@ class RoomBoomRewardController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
-        $grid->column('image', __('image'))->display(function ($path) {
-            if ($this->target_type == 'ware') {
-                $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware?->show_img;
-            } elseif ($this->target_type == 'gift') {
-                $gift = Gift::find($this->target);
-                $path = $gift->show_img ?? $gift?->img;
-            } elseif ($this->target_type == 'achievement') {
-                $path = $this?->target;
-            } else {
-                $path = 'coin.png';
-            }
-            /** @var Gift $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+        if (!request()->filled('_export_')) {
+            $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->target_type == 'ware') {
+                    $ware = Ware::find($this->target);
+                    $path = $ware->img2 ?? $ware?->show_img;
+                } elseif ($this->target_type == 'gift') {
+                    $gift = Gift::find($this->target);
+                    $path = $gift->show_img ?? $gift?->img;
+                } elseif ($this->target_type == 'achievement') {
+                    $path = $this?->target;
+                } else {
+                    $path = 'coin.png';
+                }
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
         $grid->column('priority', __('priority'));
         $grid->column('quantity', __('Quantity'));
         $grid->column('expire_days', __('expire'));
@@ -94,11 +97,25 @@ class RoomBoomRewardController extends MainController
             $this->extendGrid($grid);
         }
 
+        $grid->tools(function (Grid\Tools $tools) {
+            $label = __('Back');
+            $url   = admin_url('room_boom_levels');
+
+            $tools->append(
+                <<<HTML
+                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                        <i class="fa fa-arrow-left"></i> {$label}
+                    </a>
+                HTML
+            );
+        });
+
         return $grid;
     }
 
     protected function detail($id)
     {
+        $id = request()->route('id');
         $show = new Show(RoomBoomReward::findOrFail($id));
 
         $show->field('id', __('ID'));
@@ -202,7 +219,7 @@ class RoomBoomRewardController extends MainController
         ];
     }
 
-    protected function addWareFields($form ,$prefix = '')
+    protected function addWareFields($form ,$prefix = ''): void
     {
         $form->belongsTo('target', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
             $form->setElementName($prefix . 'target')
@@ -218,12 +235,10 @@ class RoomBoomRewardController extends MainController
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
-
-//            $this->addWareJs();
         });
     }
 
-    protected function addGiftFields($form ,$prefix = '')
+    protected function addGiftFields($form ,$prefix = ''): void
     {
         $form->belongsTo('target', Gifts::class, __('Gift'), function ($form) use ($prefix) {
             $form->setElementName($prefix . 'target')
@@ -242,9 +257,9 @@ class RoomBoomRewardController extends MainController
         });
     }
 
-    protected function addAchievementFields($form)
+    protected function addAchievementFields($form): void
     {
-        $form->image("achievement", __('image'))
+        $form->image("target", __('image'))
             ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
             ->disk('gcs');
     }
