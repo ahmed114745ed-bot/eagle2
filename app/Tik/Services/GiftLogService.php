@@ -34,6 +34,7 @@ use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 use Modules\RoomBoom\Services\RoomBoomGiftService;
+use PHPUnit\Framework\Exception;
 
 
 class GiftLogService
@@ -243,14 +244,14 @@ class GiftLogService
                     })->first();
 
                 if ( $existingGiftCount && $existingGiftCount->quantity < $number) {
-                    return __('Receiver has reached maximum allowed gifts');
+                    throw new Exception(__('Receiver has reached maximum allowed gifts'), 407);
                 }
 
             return null;
         }
 
         if ($user->di < $totalPrice) {
-            return __('Insufficient balance, please go to recharge!');
+            throw new Exception(__('Insufficient balance, please go to recharge!'), 407);
         }
         return null;
     }
