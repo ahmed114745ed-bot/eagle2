@@ -72,7 +72,7 @@ class PaymentCoinController extends MainController
     protected function grid()
     {
         $grid = new Grid(new PaymentCoin());
-        $grid->model()->where('package_type','user'); 
+        $grid->model(); 
 
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
