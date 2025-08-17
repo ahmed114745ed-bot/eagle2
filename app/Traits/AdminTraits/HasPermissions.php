@@ -13,8 +13,16 @@ trait HasPermissions
      */
     public function allPermissions(): Collection
     {
-        return $this->roles()->with('permissions')->get()->pluck('permissions')->flatten()->merge($this->permissions);
-    }
+        return \Cache::rememberForever("user_permissions_{$this->id}", function () {
+            return $this->roles()
+                ->with('permissions:id,slug') // load only needed fields
+                ->get()
+                ->pluck('permissions')
+                ->flatten()
+                ->merge($this->permissions) // direct permissions
+                ->unique('id')
+                ->values();
+        });    }
 
     public function cachedPermissions()
     {
@@ -114,16 +122,29 @@ trait HasPermissions
     }
 
     /**
+     * Clear cached permissions (after role/permission update).
+     */
+    public function forgetCachedPermissions(): void
+    {
+        \Cache::forget("admin_user_permissions_{$this->id}");
+        \Cache::forget("user_permissions_{$this->id}");
+    }
+
+    /**
      * Detach models from the relationship.
      *
      * @return void
      */
     protected static function bootHasPermissions()
     {
+        static::saved(function ($model) {
+            $model->forgetCachedPermissions();
+        });
+
         static::deleting(function ($model) {
             $model->roles()->detach();
-
             $model->permissions()->detach();
+            $model->forgetCachedPermissions();
         });
     }
 }
