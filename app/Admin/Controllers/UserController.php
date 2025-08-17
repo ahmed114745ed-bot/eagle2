@@ -166,7 +166,7 @@ class UserController extends MainController
             ->with([
             'profile',
             'agency',
-            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
+//            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
             'senderLevel',
             'receiverLevel',
             'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
