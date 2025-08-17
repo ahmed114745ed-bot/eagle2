@@ -13,7 +13,9 @@ class UserService
     public function adminUserAvatar($user, bool $withoutLevels = false): string
     {
 
-        LogHelper::info('this user', $user);
+        if ($user->id == 303) {
+            LogHelper::info('this user', $user);
+        }
         if (! $user) return __('No user');
 
         $uid = $user->original_uuid;

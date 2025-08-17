@@ -1775,6 +1775,18 @@ class User extends Authenticatable
                       ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
             });
     }
+
+    public function senderLevel()
+    {
+        return $this->belongsTo(Vip::class, 'sender_level', 'level')
+            ->where('type', 2);
+    }
+
+    public function receiverLevel()
+    {
+        return $this->belongsTo(Vip::class, 'received_level', 'level')
+            ->where('type', 1);
+    }
 }
 
 
