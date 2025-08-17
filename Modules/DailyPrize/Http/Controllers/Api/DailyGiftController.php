@@ -81,9 +81,9 @@ class DailyGiftController extends Controller
             return Common::apiResponse(0, '  لا يوجد هديه اليوم ', [], 400);
         }
         $result = DailyGiftCount::query()->where('user_id', $user->id)->orderByDesc('id')->first();
-        // if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
-        //     return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
-        // }
+        if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
+            return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
+        }
         try {
 
             $type = $dailyGift->gift_type;
