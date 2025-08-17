@@ -102,7 +102,7 @@ class DailyGiftController extends Controller
             'target'    => $target,
         ]);
         $this->assignGiftToUser($type, $user, $target, $expire);
-        return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', []);
+        return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', [], 200);
     }
 
     public function getCurrentDay()
