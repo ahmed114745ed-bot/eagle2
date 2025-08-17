@@ -13,7 +13,7 @@ use App\Models\Ware;
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user, int $expire ,$dashUserId = 0 ,$typeSend = '' ,$qty = 1, $senderId = 0 , $total = 0): bool
+    public static function createUserVip(OVip $vip, User $user, int $expire = 0 ,$dashUserId = 0 ,$typeSend = '' ,$qty = 1, $senderId = 0 , $total = 0): bool
     {
         try {
             DB::transaction(function () use ($vip, $user, $expire ,$dashUserId ,$typeSend ,$senderId,$qty,$total) {

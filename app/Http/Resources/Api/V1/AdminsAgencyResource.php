@@ -19,7 +19,7 @@ class AdminsAgencyResource extends JsonResource
 
     public function toArray($request)
     {
-        $hasColor = Common::hasInPack($this->user->id, 18, true);
+        $hasColor = Common::hasInPack(@$this->user->id, 18, true);
 
         return [
             'id' => $this->user->id ?? 0,
@@ -29,7 +29,7 @@ class AdminsAgencyResource extends JsonResource
             'exp'   => '0',
             'image_color'          => @$this->user->color_image,
             'id_image'             => @$this->user->specialId?->ware?->show_img ?? '',
-            'colored_name' => $hasColor ? common::wareUserVip($this->user->id, 18, 'color') ?? '' : '',
+            'colored_name' => $hasColor ? common::wareUserVip(@$this->user->id, 18, 'color') ?? '' : '',
 
         ];
     }

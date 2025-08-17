@@ -84,8 +84,11 @@ class SpecialHistoryController extends MainController
         $grid->column('user.name', __('User'))->display(function () {
             $name = @$this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
-            if (request()->filled('_export_')) {
+            if ($this->user && request()->filled('_export_')) {
+
                 return "{$name} (UUID: {$uid})";
+            } else {
+                return "user not found";
             }
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;
@@ -141,7 +144,7 @@ class SpecialHistoryController extends MainController
 
             $grid->column('ware.get_type', __('get_type'))->display(function ($status) {
 
-                if (@$this->ware->get_type && $request()->filled('_export_')) {
+                if (@$this->ware->get_type && request()->filled('_export_')) {
                     return $status == 4 ? trans('purchase') : trans('limited time purchase');
                 } else {
                     return '';
