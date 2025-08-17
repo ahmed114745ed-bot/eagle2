@@ -22,33 +22,43 @@ class RoomBoomLevelResource extends JsonResource
             'rewards' => RoomBoomRewardResource::collection($this->whenLoaded('roomBoomRewards')),
         ];
 
-        $roomBoom = $this->when($this->whenLoaded('roomBooms'), $this->roomBooms->first());
-
-        if ($roomBoom && $roomBoom->ended_at) {
-            $topContributors = GiftLog::select('sender_id', \DB::raw('SUM(giftPrice) as total_gift'))
-                ->where('room_id', $roomBoom->totalRoomGift->room_id)
-                ->where('room_boom_level', $this->level)
-                ->where('start_boom_ranking', 1)
-                ->where('created_at', '>=', Carbon::today())
-                ->groupBy('sender_id')
-                ->orderByDesc('total_gift')
-                ->limit(3)
-                ->get();
-
-            $users = $topContributors->map(function($contributor) {
-                $user = User::with('profile')->find($contributor->sender_id);
-                if ($user) {
-                    $user->total_gift = $contributor->total_gift;
-                    return $user;
-                }
-                return null;
-            })->filter();
-
-            $data['top_contributors'] = TopUsersRankResource::collection($users);
-        } else {
-            $data['top_contributors'] = [];
-        }
+        $this->appendTopContributors($data);
 
         return $data;
+    }
+
+    protected function appendTopContributors(array &$data): void
+    {
+        if (! $this->relationLoaded('roomBooms')) {
+            return;
+        }
+
+        $roomBoom = $this->roomBooms->first();
+
+        if (! $roomBoom || ! $roomBoom->ended_at) {
+            $data['top_contributors'] = [];
+            return;
+        }
+
+        $topContributors = GiftLog::select('sender_id', \DB::raw('SUM(giftPrice) as total_gift'))
+            ->where('room_id', $roomBoom->totalRoomGift->room_id)
+            ->where('room_boom_level', $this->level)
+            ->where('start_boom_ranking', 1)
+            ->where('created_at', '>=', Carbon::today())
+            ->groupBy('sender_id')
+            ->orderByDesc('total_gift')
+            ->limit(3)
+            ->get();
+
+        $users = $topContributors->map(function($contributor) {
+            $user = User::with('profile')->find($contributor->sender_id);
+            if ($user) {
+                $user->total_gift = $contributor->total_gift;
+                return $user;
+            }
+            return null;
+        })->filter();
+
+        $data['top_contributors'] = TopUsersRankResource::collection($users);
     }
 }
