@@ -219,7 +219,7 @@ class RoomBoomRewardController extends MainController
         ];
     }
 
-    protected function addWareFields($form ,$prefix = '')
+    protected function addWareFields($form ,$prefix = ''): void
     {
         $form->belongsTo('target', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
             $form->setElementName($prefix . 'target')
@@ -240,7 +240,7 @@ class RoomBoomRewardController extends MainController
         });
     }
 
-    protected function addGiftFields($form ,$prefix = '')
+    protected function addGiftFields($form ,$prefix = ''): void
     {
         $form->belongsTo('target', Gifts::class, __('Gift'), function ($form) use ($prefix) {
             $form->setElementName($prefix . 'target')
