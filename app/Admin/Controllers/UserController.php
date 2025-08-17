@@ -167,11 +167,12 @@ class UserController extends MainController
             ->with([
             'profile',
             'agency',
+            'userSetting',
 //            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
             'senderLevel',
             'receiverLevel',
             'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ]);
+        ])->withCount('sameDeviceUsers');
 
         if (request()->online == 1) {
             $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)
@@ -234,7 +235,7 @@ class UserController extends MainController
 
 
 
-        $grid->column('agency', __('Agency'))
+        $grid->column('agency_id', __('Agency'))
             ->display(function () {
                 $agency = $this->agency;
                 if (! $agency) {
@@ -261,7 +262,7 @@ class UserController extends MainController
         ");
 
         $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
-            $count = $this->sameDeviceUsers()->count();
+            $count = $this->same_device_users_count;
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
 
@@ -913,7 +914,7 @@ class UserController extends MainController
         $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
             'uuid' => [
-                'nullable',
+                'sometimes',
                 Rule::unique('users', 'uuid')->ignore($user->id),
             ],
             'phone' => [

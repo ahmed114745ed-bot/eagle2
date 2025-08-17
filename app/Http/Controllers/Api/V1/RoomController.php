@@ -132,7 +132,7 @@ class RoomController extends Controller
     }
 
 
-    public function extraRoomData(int $owner_id): \Illuminate\Http\JsonResponse
+    public function extraRoomData($owner_id): \Illuminate\Http\JsonResponse
     {
         $room = $this->roomService->findRoomUser($owner_id);
         if (!$room) return Common::apiResponse(false, 'No Room Founded');

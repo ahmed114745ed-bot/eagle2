@@ -211,7 +211,7 @@ class CpRepository
         );
     }
 
-    public function getCpRanking($relationType, $type)
+    public function getCpRanking0($relationType, $type)
     {
         return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
         ->whereNotNull("cp_id")
@@ -240,6 +240,57 @@ class CpRepository
         ->take(20)
         ->get();
     }
+
+    public function getCpRanking($relationType, $type)
+{
+    return GiftLog::query()
+        ->selectRaw('
+            cps.id as cp_id,
+            cps.di,
+            cps.level_id,
+            cps.user_one_id,
+            cps.user_two_id,
+            cps.cp_relation_id,
+            cp_relations.type as relation_type,
+            SUM(gift_logs.giftNum * gift_logs.giftPrice) as total_gifts
+        ')
+        ->join('cps', 'cps.id', '=', 'gift_logs.cp_id')
+        ->join('cp_relations', 'cp_relations.id', '=', 'cps.cp_relation_id')
+        ->whereNotNull('gift_logs.cp_id')
+        ->where('cp_relations.type', $relationType)
+        ->when($type, function ($query) use ($type) {
+            return match ($type) {
+                1 => $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]),
+                2 => $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                3 => $query->whereMonth('gift_logs.created_at', now()->month)
+                           ->whereYear('gift_logs.created_at', now()->year),
+                default => $query
+            };
+        })
+        ->groupBy(
+            'cps.id',
+            'cps.di',
+            'cps.level_id',
+            'cps.user_one_id',
+            'cps.user_two_id',
+            'cps.cp_relation_id',
+            'cp_relations.type'
+        )
+        ->orderByDesc('total_gifts')
+        ->limit(20)
+        ->get()
+        ->map(function ($row) {
+            $cp = \App\Models\Cp::with(['level', 'fromUser.profile', 'toUser.profile'])->find($row->cp_id);
+            if ($cp) {
+                $cp->total_gifts = $row->total_gifts;
+            }
+            return $cp;
+        });
+}
+
+    
+    
+
 
     public function getCpRankingWithOutRelation(int $type)
     {

@@ -111,11 +111,11 @@ class PackService
         $pack = $this->packRepository->getByUserId($user->id, $itemId);
 
         if (!$pack) {
-            throw new \Exception('Item not found');
+            throw new Exception('Item not found');
         }
 
         if (!in_array($pack->type, $supportedTypes)) {
-            throw new \Exception('Unusable item');
+            throw new Exception('Unusable item');
         }
 
         // Mark all same type packs as unused

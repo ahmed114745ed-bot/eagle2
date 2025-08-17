@@ -100,8 +100,13 @@ class RewardTargetController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('expire', __('expire'));
-        $grid->column('created_at', __('Created at'));
+        $grid->column('expire', __('expire'))->display(function ($expire) {
+            if ($this->type == 'coins') {
+               return  '-';
+            }
+            return $expire ;
+        });
+                $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($target) {
             $url = url('admin/target-events');
