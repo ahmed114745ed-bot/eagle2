@@ -161,13 +161,15 @@ class UserController extends MainController
         $haveCoins = (request()->have_coins == 1);
 
         // Optimize eager loading
-        $grid->model()->with([
+        $grid->model()
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id'])
+            ->with([
             'profile',
             'agency',
             'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
             'senderLevel',
             'receiverLevel',
-            'packs' => fn($q) => $q->whereIn('type', [25])->with('ware:id,value')
+            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ]);
 
         if (request()->online == 1) {

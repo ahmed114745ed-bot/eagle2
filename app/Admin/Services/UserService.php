@@ -53,7 +53,9 @@ class UserService
 
             $receiverImg = UserLevelHelper::getReceiverImage($user);
             $senderImg = UserLevelHelper::getSenderImage($user);
-
+            if ($user->id == 303) {
+                LogHelper::info('Level user', [$senderImg, $receiverImg]);
+            }
             // Charge level
             /*$chargeLevel = Vip::collectionBuilder()
                 ->where('type', 5)
