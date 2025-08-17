@@ -166,7 +166,8 @@ class UserController extends MainController
             'agency',
             'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
             'senderLevel',
-            'receiverLevel'
+            'receiverLevel',
+            'packs' => fn($q) => $q->whereIn('type', [25])->with('ware:id,value')
         ]);
 
         if (request()->online == 1) {
