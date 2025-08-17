@@ -19,7 +19,7 @@ class UserService
         if (! $user) return __('No user');
 
         $uid = $user->original_uuid;
-        $special = $user->uuid_v3;
+        $special = $user->uuid;
 
         $defaultImage = asset('images/businessman-icon.jpg');
         $path = $user->profile->avatar ?? null;
