@@ -6,13 +6,10 @@ namespace App\Tik\Services;
 use App\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
-use App\Jobs\LogUserCoinProfit;
 use App\Models\Cp;
-use App\Models\GiftLog;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
-use Carbon\Carbon;
 use DB;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
@@ -20,7 +17,6 @@ use App\Jobs\UpdatePkAndSendToZigo;
 use App\Classes\Gifts\SendGiftService;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
-use App\Exceptions\NotInfMoneyException;
 use App\Tik\Repositories\GiftRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
@@ -28,11 +24,6 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
-use Modules\Achievement\Jobs\CalculateAchievement;
-use App\Http\Services\RoomAchievementTargetService;
-use Modules\RoomBoom\Entities\RoomBoom;
-use Modules\RoomBoom\Entities\RoomBoomLevel;
-use Modules\RoomBoom\Entities\TotalRoomGift;
 use Modules\RoomBoom\Services\RoomBoomGiftService;
 
 
@@ -131,10 +122,8 @@ class GiftLogService
         $fromName = $user->name;
         $sendGiftServices = new SendGiftService();
 
-        info($user);
         $jsonSendGiftData =
             $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1 || !$request->has('to_zego')));
-        info('after zego');
         //send to zego if pk not null
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
 
