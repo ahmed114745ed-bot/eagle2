@@ -162,9 +162,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()->with([
-            'ownerRoom',
             'profile',
-            'userSetting',
             'agency',
             'sameDeviceUsers',
             'senderLevel',
