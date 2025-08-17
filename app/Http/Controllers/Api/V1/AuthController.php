@@ -32,15 +32,15 @@ class AuthController extends Controller
         $whatsappOtpService = new WhatsappOtp();
         $phone              = $request->phone;
 
-        if (!$phone || !$request->code) {
-            return Common::apiResponse(false, __('api_responses.invalid_code'));
-        }
-        $isValid  = $whatsappOtpService->isValidate($phone, $request->code);
+        // if (!$phone || !$request->code) {
+        //     return Common::apiResponse(false, __('api_responses.invalid_code'));
+        // }
+        // $isValid  = $whatsappOtpService->isValidate($phone, $request->code);
 
-        if (!$isValid) {
-            return Common::apiResponse(false, __('api_responses.invalid_code'));
-        }
-        $whatsappOtpService->resetCodes($phone);
+        // if (!$isValid) {
+        //     return Common::apiResponse(false, __('api_responses.invalid_code'));
+        // }
+        // $whatsappOtpService->resetCodes($phone);
         try {
             [$user, $token] = $this->authService->registration($request);
         } catch (\Exception $exception) {
