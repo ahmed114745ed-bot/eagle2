@@ -480,7 +480,7 @@ class RankingService
 
         $arr['user']['exp'] = ($userExp != null) ? (@$userExp->exp ?? '0') : (@$userData->exp ?? '0');
         $arr['user']['sender_img'] = UserLevelHelper::getSenderImage($user);
-        $arr['user']['vip_level']  = $user->UserVip->level;
+        $arr['user']['vip_level']  = $user->UserVip?->level;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
         $arr['user']['reciver_level']  = $user->total_received_level ?? '';
         $arr['user']['vip_level_img']  = UserPackHelper::getVipIcon($user);
