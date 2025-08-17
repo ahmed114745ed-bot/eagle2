@@ -18,6 +18,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomReward;
+use Modules\RoomBoom\Transformers\RoomBoomRewardResource;
 
 class RoomBoomRewardJob implements ShouldQueue
 {
@@ -63,6 +64,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $assignments = [];
         $assignedUserIds = [];
+        $winnerData = [];
 
         foreach ($topContributorIds as $i => $userId) {
             if (!isset($rewardItems[$i])) break;
@@ -71,6 +73,11 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $assignedUserIds[] = $userId;
             $assignments[] = $reward;
+
+            $winnerData[] = [
+                'user_id' => $userId,
+                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+            ];
         }
 
         $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
@@ -81,11 +88,15 @@ class RoomBoomRewardJob implements ShouldQueue
 
         if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
             $randomReward = $rewards->random();
-            info($randomReward);
             $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
 
             $assignedUserIds[] = $lastTriggerSenderId;
             $assignments[] = $randomReward;
+
+            $winnerData[] = [
+                'user_id' => $lastTriggerSenderId,
+                'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl()
+            ];
         }
 
         $numAssigned = count($assignments);
@@ -101,7 +112,24 @@ class RoomBoomRewardJob implements ShouldQueue
             if (!isset($remainingRewards[$i])) break;
             $reward = $remainingRewards[$i];
             $this->distributeBoomRewards($visitorId, $reward);
+
+            $winnerData[] = [
+                'user_id' => $visitorId,
+                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+            ];
         }
+
+        $d = [
+            "messageContent" => [
+                "message" => "roomBoomEnded",
+                'roomBoomLevel' => $level->level,
+                'duration' => 10,
+                'winners' => $winnerData
+            ]
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
     }
 
     public function distributeBoomRewards($userId, $reward): void

@@ -44,7 +44,7 @@ class RoomBoomRewardResource extends JsonResource
         }
     }
 
-    protected function getImageUrl()
+    public function getImageUrl()
     {
         if ($this->target_type == 'ware') {
             $ware = $this->getWare();
