@@ -211,7 +211,7 @@ class CpRepository
         );
     }
 
-    public function getCpRanking($relationType, $type)
+    public function getCpRanking0($relationType, $type)
     {
         return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
         ->whereNotNull("cp_id")
@@ -240,6 +240,42 @@ class CpRepository
         ->take(20)
         ->get();
     }
+
+
+    public function getCpRanking($relationType, $type)
+    {
+        return GiftLog::selectRaw('
+                gift_logs.cp_id,
+                SUM(gift_logs.giftNum * gift_logs.giftPrice) as total_gifts,
+                cps.id as cp_id,
+                cps.di,
+                cps.level_id,
+                cps.user_one_id,
+                cps.user_two_id,
+                cps.cp_relation_id,
+                cp_relations.type as relation_type
+            ')
+            ->join('cps', 'gift_logs.cp_id', '=', 'cps.id')
+            ->join('cp_relations', 'cps.cp_relation_id', '=', 'cp_relations.id')
+            ->whereNotNull('gift_logs.cp_id')
+            ->where('cp_relations.type', $relationType)
+            ->when($type, function ($query) use ($type) {
+                switch ($type) {
+                    case 1: 
+                        return $query->whereBetween('gift_logs.created_at', [now()->startOfDay(), now()->endOfDay()]);
+                    case 2: 
+                        return $query->whereBetween('gift_logs.created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+                    case 3: 
+                        return $query->whereMonth('gift_logs.created_at', now()->month)
+                                    ->whereYear('gift_logs.created_at', now()->year);
+                }
+            })
+            ->groupBy('gift_logs.cp_id')
+            ->orderByDesc('total_gifts')
+            ->take(20)
+            ->get();
+    }
+
 
     public function getCpRankingWithOutRelation(int $type)
     {
