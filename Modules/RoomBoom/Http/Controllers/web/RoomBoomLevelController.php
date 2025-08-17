@@ -51,6 +51,15 @@ class RoomBoomLevelController extends MainController
         $grid->column('level', __('level'));
         $grid->column('min_target', __('min target'));
         $grid->column('target', __('target'));
+        $grid->column('show_img', __('show_img'))->display(function ($path) {
+            $defaultImage = asset("images/image.png");
+
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
@@ -93,6 +102,9 @@ class RoomBoomLevelController extends MainController
         $form->number('level', __('level'))->rules('required|integer|min:1');
         $form->number('min_target', __('min target'))->required();
         $form->number('target', __('target'))->required();
+        $form->file('video', trans('video'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        })->default('1.png');
 
         $form->saving(function (Form $form) {
             if (!$form->model()->exists) {
