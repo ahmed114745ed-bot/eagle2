@@ -243,14 +243,14 @@ class GiftLogService
                     })->first();
 
                 if ( $existingGiftCount && $existingGiftCount->quantity < $number) {
-                    return Common::apiResponse(0, 'Receiver has reached maximum allowed gifts', null, 407);
+                    return __('Receiver has reached maximum allowed gifts');
                 }
 
             return null;
         }
 
         if ($user->di < $totalPrice) {
-            return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+            return __('Insufficient balance, please go to recharge!');
         }
         return null;
     }
