@@ -1103,7 +1103,12 @@
 "User": "User",
     "You have received :coin coin.": "You have received :coin coin.",
     "You have received a gift: :ware": "You have received a gift: :ware",
-    "banned_from_action":"You are banned from performing this action."
+    "banned_from_action":"You are banned from performing this action.",
+    "invalid_data": "Please check the input data",
+    "ware_not_found": "Product not found",
+    "insufficient_di": "You do not have enough quiz points",
+    "all_chairs_purchased": "You have already purchased all chairs",
+    "added_successfully": "Added successfully"
 
 
 
