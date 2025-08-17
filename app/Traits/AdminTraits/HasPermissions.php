@@ -42,10 +42,6 @@ trait HasPermissions
      */
     public function can($ability, $arguments = []): bool
     {
-        // Allow everything if wildcard
-        if ($ability === '*' || empty($ability)) {
-            return true;
-        }
 
         // Super admin check
         if ($this->isAdministrator()) {
@@ -53,6 +49,11 @@ trait HasPermissions
         }
 
         $permissions = $this->cachedPermissions();
+
+        // Allow everything if wildcard
+        if ($permissions->contains('*') || empty($ability)) {
+            return true;
+        }
 
         return $permissions->contains($ability);
     }
@@ -76,7 +77,7 @@ trait HasPermissions
      */
     public function isAdministrator(): bool
     {
-        return $this->isRole('administrator');
+        return $this->isRole('administrator') || $this->isRole('developer');
     }
 
     /**
