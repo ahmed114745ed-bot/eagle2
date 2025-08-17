@@ -13,9 +13,6 @@ class UserService
     public function adminUserAvatar($user, bool $withoutLevels = false): string
     {
 
-        if ($user->id == 303) {
-            LogHelper::info('this user', $user);
-        }
         if (! $user) return __('No user');
 
         $uid = $user->original_uuid;
@@ -49,9 +46,6 @@ class UserService
                 if (!empty($img)) {
                     $levelImages .= "<img src='$img' style='width: 32px; height: 14px;'> ";
                 }
-            }
-            if ($user->id == 303) {
-                LogHelper::info('Level user', $levelImages);
             }
         }
         admin_toastr();
