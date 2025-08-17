@@ -8,7 +8,7 @@ use Modules\Vip\Entities\Vip;
 trait UserLevel
 {
 
-    /*public function senderLevel()
+    public function senderLevel()
     {
         return $this->belongsTo(Vip::class, 'sender_level', 'level')
             ->where('type', 2);
@@ -18,6 +18,6 @@ trait UserLevel
     {
         return $this->belongsTo(Vip::class, 'received_level', 'level')
             ->where('type', 1);
-    }*/
+    }
 
 }

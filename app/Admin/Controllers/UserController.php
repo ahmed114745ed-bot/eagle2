@@ -164,7 +164,7 @@ class UserController extends MainController
         $grid->model()->with([
             'profile',
             'agency',
-            'sameDeviceUsers',
+            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
             'senderLevel',
             'receiverLevel'
         ]);
