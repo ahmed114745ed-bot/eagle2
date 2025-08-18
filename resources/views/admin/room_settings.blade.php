@@ -270,7 +270,7 @@
                 </form>
             </div>
 
-            <div id="custom_background_settings" class="settings-section active">
+            <div id="custom_background_settings" class="settings-section">
 
                 <h3> {{ __('Custom Background settings') }}</h3>
 
@@ -370,7 +370,7 @@
                 }
             }
 
-            showSection('PaidRoom');
+           // showSection('PaidRoom');
             document.addEventListener("DOMContentLoaded", function() {
                 // Function to get query parameter by name
                 function getQueryParam(name) {
@@ -378,7 +378,7 @@
                     return urlParams.get(name);
                 }
 
-                // Get the 'firsttab' parameter from URL or default to 'brandSettings'
+                // Get the 'firsttab' parameter from URL or default to 'PaidRoom'
                 const activeTab = getQueryParam("firsttab") || "PaidRoom";
 
                 // Show the selected tab
