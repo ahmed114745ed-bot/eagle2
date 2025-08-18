@@ -2470,7 +2470,16 @@
 "role name": "اسم الدور",
 " browse charger report": "استعراض تقرير الشاحن",
   "gift price":"سعر الهدية",
-
+  "Super Boom Rules": "قواعد سوبر بوم",
+  "Super Boom Rule Details": "تفاصيل قاعدة سوبر بوم",
+  "Create Super Boom Rule": "إنشاء قاعدة سوبر بوم",
+  "Edit Super Boom Rule": "تعديل قاعدة سوبر بوم",
+  "Rules (AR)": "القواعد (عربي)",
+  "Rules (EN)": "القواعد (إنجليزي)",
+  "Content": "المحتوى",
+  "Created At": "تاريخ الإنشاء",
+  "Updated At": "تاريخ التعديل",
+  "ID": "الرقم",
 
   "app BD id": "معرّف  BD",
   "salaries BD": "محفظة  BD",
@@ -2479,6 +2488,7 @@
   "request-agencies": "طلبات الوكالات",
   "request agencies": "طلبات الوكالات",
   "Request agencies": "طلبات الوكالات",
+  "request agencies": "الطلبات",
 
   "current_balance": "الرصيد الحالي",
   "remaining_percent": "النسبة المتبقية",
