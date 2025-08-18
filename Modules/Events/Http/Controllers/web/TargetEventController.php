@@ -91,18 +91,21 @@ class TargetEventController extends MainController
                     </div>";
         });
 
-        if (Admin::user()->can('browse-' . 'gift-target-event') || Admin::user()->can('*')) {
-            $grid->column(__('procedures'))->display(function () {
+        if (!request()->filled('_export_')) {
+     
+            if (Admin::user()->can('browse-' . 'gift-target-event') || Admin::user()->can('*')) {
+                $grid->column(__('procedures'))->display(function () {
 
-                if (request()->filled('_export_')) {
-                    return '';
-                }
-                $url1 = url('admin/target-events-gift/' . $this->id);
-                $gifts = __('gifts');
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
+                    if (request()->filled('_export_')) {
+                        return '';
+                    }
+                    $url1 = url('admin/target-events-gift/' . $this->id);
+                    $gifts = __('gifts');
+                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
 
-                return $button1;
-            });
+                    return $button1;
+                });
+            }
         }
         $this->extendGrid($grid);
         return $grid;

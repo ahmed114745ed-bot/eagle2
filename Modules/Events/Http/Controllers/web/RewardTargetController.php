@@ -181,8 +181,10 @@ class RewardTargetController extends MainController
 
         return response()->json([
             'status'  => true,
-            'message' => 'تم حذف العناصر المحددة بنجاح',
+            'message' => __('deleted_success'),
         ]);
     }
 
 }
+
+
