@@ -2,22 +2,23 @@
 
 namespace App\Tik\Services;
 
-use App\Exceptions\CValidationException;
-use App\Helpers\Common;
-use App\Facades\UserHandling;
-use App\Models\Profile;
 use DB;
 use Google_Client;
+use App\Models\User;
+use Mockery\Exception;
+use App\Helpers\Common;
+use App\Models\Profile;
+use App\Facades\UserHandling;
 use Illuminate\Http\UploadedFile;
+use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+
+use App\Exceptions\CValidationException;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
-
-use Mockery\Exception;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
-use Google\Client as GoogleClient;
 
 class AuthService
 {
@@ -75,13 +76,13 @@ class AuthService
 
         DB::beginTransaction();
         try {
-            if ($trashedUser){
+            if ($trashedUser) {
                 $trashedUser->restore();
 
                 $trashedUser->password = $request->password;
 
                 $user = $trashedUser;
-            }else{
+            } else {
                 $data = [
                     'phone' => $phone,
                     'password' => $request->password,
@@ -98,9 +99,14 @@ class AuthService
                 $user->country_id = @$country->id;
             }
             $user->is_points_first = 1;
+            if (!$this->checkDeviceToken(@$request->device_token)) {
+                $user->di = 20000;
+            }
+
+            $user->device_token = $request->device_token;
             $user->save();
             $token = $user->createToken('api_token')->plainTextToken;
-          //  UserHandling::AddUserVip($user, 'register');
+            //  UserHandling::AddUserVip($user, 'register');
 
             DB::commit();
         } catch (\Exception $e) {
@@ -109,6 +115,11 @@ class AuthService
         }
 
         return [$user, $token];
+    }
+
+    public function checkDeviceToken($deviceToken)
+    {
+        return User::where('device_token', $deviceToken)->exists();
     }
 
     public function loginWithPassword($request)
@@ -179,6 +190,10 @@ class AuthService
                 //                }
                 $is_new = true;
                 $user = $this->userRepository->create($data);
+                if (!$this->checkDeviceToken(@$request['device_token'])) {
+                    $user->di = 20000;
+                    $user->save();
+                }
 
                 $this->storeImage($request, $data, $user);
 
@@ -206,25 +221,24 @@ class AuthService
             $img = $request['image'];
             $imageType = $img->getClientOriginalExtension();
             if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
-                throw new \Exception( __('api_responses.gifImage'));
+                throw new \Exception(__('api_responses.gifImage'));
             }
 
             $user->profile_count += 1;
             $user->save();
             $user->load('profile');
             $profile = $user->profile;
-            if($profile)
-            {
+            if ($profile) {
                 $profile->fill($data);
                 $profile->save();
-            }else{
+            } else {
                 $profile = Profile::create([
                     'gender' => null,
                     'birthday' => null,
                     'province' => null,
                     'city' => null,
                     'country' => null,
-                    'user_id'=> @$user->id,
+                    'user_id' => @$user->id,
                 ]);
             }
 
