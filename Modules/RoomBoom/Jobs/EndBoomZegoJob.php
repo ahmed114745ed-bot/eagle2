@@ -26,6 +26,8 @@ class EndBoomZegoJob implements ShouldQueue
 
     public function handle(): void
     {
+        info('in end room zego job');
+
         $d = [
             "messageContent" => [
                 "message" => "roomBoomEnded",
