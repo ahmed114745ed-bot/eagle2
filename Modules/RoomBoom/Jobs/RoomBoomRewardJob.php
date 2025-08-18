@@ -8,6 +8,7 @@ use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\UserGift;
+use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Bus\Queueable;
@@ -46,9 +47,9 @@ class RoomBoomRewardJob implements ShouldQueue
         $rewardItems = [];
         foreach ($rewards as $reward) {
             for ($i = 0; $i < $reward->quantity; $i++) {
-                $item = $reward->toArray();
-                $item['quantity'] = 1;
-                $rewardItems[] = $item;
+                $rewardCopy = clone $reward;
+                $rewardCopy->quantity = 1;
+                $rewardItems[] = $rewardCopy;
             }
         }
 
@@ -138,7 +139,8 @@ class RoomBoomRewardJob implements ShouldQueue
         $user = User::find($userId);
         $expire = $reward['expire_days'];
         if ($reward['target_type'] == 'ware') {
-            UserCommon::addWareToUser($user, $reward, $expire);
+            $ware = Ware::find($reward->target);
+            UserCommon::addWareToUser($user, $ware, $expire);
         }
         if ($reward['target_type'] == 'achieve') {
             $target = $reward->target;
