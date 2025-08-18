@@ -41,6 +41,9 @@ Route::group(
         }
         Route::post('login', [\App\Bd\Controllers\AuthController::class, 'postLogin']);
         Route::get('logout', [\App\Bd\Controllers\AuthController::class, 'logout']);
+
+
+        
     }
 );
 
@@ -61,6 +64,9 @@ Route::group(
         'as' => 'bd.',
     ],
     function () {
+        Route::get('setting', [\App\Bd\Controllers\AuthController::class, 'getSetting']);
+        Route::put('update-setting', [\App\Bd\Controllers\AuthController::class, 'putSetting']);
+
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
         Route::resource('/agencies', AgencyController::class);
