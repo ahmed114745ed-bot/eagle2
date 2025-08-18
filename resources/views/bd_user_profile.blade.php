@@ -1335,9 +1335,9 @@
                                                     data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
                                             </button>
-                                            <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
+                                            <!-- <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </td>
                                 </tr>
@@ -1380,7 +1380,7 @@
                             <th>{{ __('expire') }}</th>
                             <th>{{ __('qty') }}</th>
                             <th>{{ __('total Price') }}</th>
-                            <th>{{ __('action') }}</th>
+                            <!-- <th>{{ __('action') }}</th> -->
 
                         </tr>
                         </thead>
@@ -1393,14 +1393,14 @@
                                     <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
-                                    <td>
+                                    <!-- <td>
                                         <div class="d-flex">
 
                                             <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
-                                    </td>
+                                    </td> -->
 
                                 </tr>
                             @endforeach
@@ -1894,13 +1894,13 @@
                                     <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
                                     <td>{{ @$coin->from_date ?? 0 }}</td>
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
-                                    <td>
-                                        <div class="d-flex">
+                                    <!-- <td>
+                                        <div class="d-flex"> -->
                                             <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button> -->
-                                        </div>
-                                    </td>
+                                        <!-- </div>
+                                    </td> -->
                                 </tr>
                             @endforeach
                         </tbody>
