@@ -12,6 +12,7 @@ enum UserCoinLogType: string
     case PAYMENT = 'payment';
     case ROOM_TARGET = 'room_target';
     case CP = 'cp';
+    case CPS = 'cps';
     case EXCHANGE = 'exchange';
     case FAMILY = 'family';
     case BACKGROUND_IMAGES = 'background_images';
@@ -75,6 +76,11 @@ enum UserCoinLogType: string
                 'queue_job' => null,
             ],
             self::CP => [
+                'sub_type' => 'cps',
+                'item_name' => 'room_target',
+                'queue_job' => null,
+            ],
+            self::CPS => [
                 'sub_type' => 'cps',
                 'item_name' => 'room_target',
                 'queue_job' => null,
