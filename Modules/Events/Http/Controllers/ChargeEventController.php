@@ -154,7 +154,7 @@ class ChargeEventController extends Controller
                 UserCommon::addVipToUser($user, $vip, $reward->expire);
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
-                UserCommon::addWareToUser($user, $ware, $reward->expire);
+                UserCommon::addEvintsWareToUser($user, $ware, $reward->expire);
             } elseif ($reward->type == "achievement") {
                 $attributes = [
                     'user_id'       => $user->id,
