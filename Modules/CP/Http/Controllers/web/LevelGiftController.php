@@ -95,6 +95,9 @@ class LevelGiftController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this?->type == "ware") {
+                if (request()->filled('_export_')) {
+                    return 'ware';
+                }
 
                 return  self::renderWareWithImage($this?->ware);
 
@@ -103,12 +106,24 @@ class LevelGiftController extends MainController
             } elseif ($this?->type == "coins") {
                 return @$this?->item_id;
             } elseif ($this?->type == "achievement") {
+                if (request()->filled('_export_')) {
+                    return 'achievement';
+                }
                 $value = getDriverUrl() . '/' . @$this?->item_id;
                 return "<img src='$value' width='80' height='80'>";
             }
         });
 
+        $grid->column('expire', __('expire'));
+        $grid->column('gender', __('gender'))->display(function ($value) {
+            $map = [
+                'all'    => __('all'),
+                'male'   => __('male'),
+                'female' => __('female'),
+            ];
 
+            return $map[$value] ?? $value;
+        });
         $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($vip, $charge_event_id) {

@@ -415,7 +415,7 @@ class UserCommon
             $arr['target_id'] = $ware->id;
             $arr['num']       = 1;
             $arr['is_read']   = 1;
-            $arr['days']      = $ware->expire;
+            $arr['days']      = $expir;
 
 
             $pack = Pack::query()->create($arr);

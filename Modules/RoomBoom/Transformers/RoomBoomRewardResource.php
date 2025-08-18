@@ -36,7 +36,7 @@ class RoomBoomRewardResource extends JsonResource
         return $this->gift = Gift::find($this->target);
     }
 
-    protected function getGiftImageType()
+    public function getGiftImageType()
     {
         if ($this->target_type == 'gift') {
             $gift = $this->getGift();

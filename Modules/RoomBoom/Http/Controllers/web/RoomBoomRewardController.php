@@ -160,7 +160,7 @@ class RoomBoomRewardController extends MainController
         ->when("ware", fn() => $this->addWareFields($form))
         ->when("gift", fn() => $this->addGiftFields($form))
         ->when("achievement", fn() => $this->addAchievementFields($form));
-        
+
         $form->number('priority', __('priority'))
             ->rules(function () use ($roomBoomLevelId, $form) {
                 return [
@@ -191,10 +191,10 @@ class RoomBoomRewardController extends MainController
             unset($form->ware_target_id);
             unset($form->gift_target_id);
         });
-        
-        
-        
-        
+
+
+
+
         return $form;
     }
 
@@ -223,7 +223,7 @@ class RoomBoomRewardController extends MainController
     protected function addGiftFields($form, $prefix = 'gift_'): void
     {
         $fieldName = $prefix . 'id';
-    
+
         $form->select('target', __('Gift'))
             ->options(function ($id) {
                 if ($id) {
@@ -239,22 +239,22 @@ class RoomBoomRewardController extends MainController
                 'data-load-url'     => admin_url('gifts-by-id'),
             ]);
         $form->html('<div id="gift-image-preview" style="margin-top:10px;"></div>');
-    
+
         $this->addGiftJs($fieldName, 'gift-image-preview');
     }
-    
-    
+
+
     protected function addGiftJs(string $fieldName = 'gift_id', string $previewId = 'gift-image-preview'): void
     {
         $script = <<<'JS'
     (function () {
         var select = $('select[name="{{fieldName}}"]');
         var preview = $('#{{previewId}}');
-    
+
         function updatePreview(id) {
             var url = select.data('load-url');
             if (!url || !id) { preview.empty(); return; }
-    
+
             $.get(url, { id: id }, function (res) {
                 var img  = (res && (res.image || (res.data && res.data.image))) ? (res.image || res.data.image) : null;
                 var name = (res && (res.name  || (res.data && res.data.name ))) ? (res.name  || res.data.name)  : '';
@@ -271,16 +271,16 @@ class RoomBoomRewardController extends MainController
             });
         }
         select.on('change', function () { updatePreview($(this).val()); });
-    
+
         if (select.val()) updatePreview(select.val());
     })();
     JS;
-    
+
         $script = str_replace(['{{fieldName}}', '{{previewId}}'], [$fieldName, $previewId], $script);
-    
+
         \Encore\Admin\Admin::script($script);
     }
-    
+
 
 
     protected function addAchievementFields($form): void
@@ -290,7 +290,7 @@ class RoomBoomRewardController extends MainController
                 if ($file instanceof UploadedFile) {
                     return now()->timestamp . '.' . $file->guessExtension();
                 }
-    
+
                 return $file;
             })
             ->disk('gcs');
