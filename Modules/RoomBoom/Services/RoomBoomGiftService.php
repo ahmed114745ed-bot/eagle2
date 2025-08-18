@@ -31,7 +31,7 @@ class RoomBoomGiftService
         }
 
         $currentLevel = RoomBoomLevel::where('min_target', '<=', $newTotal)
-            ->where('target', '>=', $newTotal)
+            ->where('target', '>=', $currentTotal)
             ->orderBy('level')
             ->first();
 
