@@ -35,7 +35,7 @@ class HomeController extends Controller
 
         $finalWallet = '';
         return $content
-            ->title('لوحة BD')
+            ->title(__('Home'))
             ->description('إحصائيات عامة')
 
             ->row(function (Row $row) use ($agencyCount, $finalSalary, $finalWallet) {
