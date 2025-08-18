@@ -89,7 +89,7 @@ class RoomBoomGiftService
 
         $totalRoomGift->current_total = $newTotal;
 
-        $this->checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room);
+//        $this->checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room);
 
         $totalRoomGift->save();
     }
