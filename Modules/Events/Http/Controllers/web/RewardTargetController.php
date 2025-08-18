@@ -71,35 +71,40 @@ class RewardTargetController extends MainController
         $grid->model()->where("charge_event_id", $charge_event_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
-                return @$this->ware->name;
-            } elseif ($this->type == "vip") {
-                return @$this->vip->name;
-            } elseif ($this->type == "coins") {
-                return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
-            }
-        });
-        $grid->column('image', __('image'))->display(function ($path) {
-            if ($this->type == 'ware') {
-                $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware?->show_img;
-            } elseif ($this->type == 'vip') {
-                $vips = OVip::find($this->target);
-                $path = $vips?->img;
-            } elseif ($this->type == 'achievement') {
-                $path = $this?->target;
-            } else {
-                $path = 'coin.png';
-            }
 
-            /** @var Gift $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+        if (!request()->filled('_export_')) { 
+            $grid->column('gift_id', __('gifts'))->display(function () {
+                if ($this->type == "ware") {
+                    return @$this->ware->name;
+                } elseif ($this->type == "vip") {
+                    return @$this->vip->name;
+                } elseif ($this->type == "coins") {
+                    return @$this->target;
+                } elseif ($this->type == "achievement") {
+                    $value = getDriverUrl() . '/' . @$this->target;
+                    return "<img src='$value' width='80' height='80'>";
+                }
+            });
+        }
+        if (!request()->filled('_export_')) { 
+            $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->type == 'ware') {
+                    $ware = Ware::find($this->target);
+                    $path = $ware->img2 ?? $ware?->show_img;
+                } elseif ($this->type == 'vip') {
+                    $vips = OVip::find($this->target);
+                    $path = $vips?->img;
+                } elseif ($this->type == 'achievement') {
+                    $path = $this?->target;
+                } else {
+                    $path = 'coin.png';
+                }
+
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
         $grid->column('expire', __('expire'))->display(function ($expire) {
             if ($this->type == 'coins') {
                return  '-';
@@ -164,4 +169,20 @@ class RewardTargetController extends MainController
         $form->number('expire', __('expire'))->default(1);
         return $form;
     }
+
+
+    public function destroyBulk($id, $targets)
+    {
+        $targetIds = explode(',', $targets);
+
+        RewardTarget::where('charge_event_id', $id) 
+            ->whereIn('id', $targetIds)
+            ->delete();
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'تم حذف العناصر المحددة بنجاح',
+        ]);
+    }
+
 }
