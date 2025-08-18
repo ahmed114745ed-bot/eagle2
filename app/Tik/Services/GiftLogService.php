@@ -10,11 +10,11 @@ use App\Models\Cp;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
-use DB;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Classes\Gifts\SendGiftService;
+use Illuminate\Support\Facades\DB;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Tik\Repositories\GiftRepository;
@@ -39,6 +39,9 @@ class GiftLogService
     ) {}
 
 
+    /**
+     * @throws \Throwable
+     */
     public function sendGift($request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
