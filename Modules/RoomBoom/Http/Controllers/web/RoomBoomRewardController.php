@@ -156,10 +156,10 @@ class RoomBoomRewardController extends MainController
             "gift" => __('gift'),
             "achievement" => __('achievement')
         ])
-            ->when("ware", fn() => $this->addWareFields($form, 'ware_'))
-            ->when("gift", fn() => $this->addGiftFields($form, 'gift_'))
-            ->when("achievement", fn() => $this->addAchievementFields($form));
-
+        ->when("ware", fn() => $this->addWareFields($form))
+        ->when("gift", fn() => $this->addGiftFields($form))
+        ->when("achievement", fn() => $this->addAchievementFields($form));
+        
         $form->number('priority', __('priority'))
             ->rules(function () use ($roomBoomLevelId, $form) {
                 return [
@@ -174,8 +174,56 @@ class RoomBoomRewardController extends MainController
         $form->number('quantity', __('Quantity'))->rules('required|integer|min:1');
         $form->number('expire_days', __('expire'));
 
+        $form->saving(function (Form $form) {
+            switch ($form->target_type) {
+                case 'ware':
+                    $form->model()->target = $form->ware_target_id;
+                    break;
+                case 'gift':
+                    $form->model()->target = $form->gift_target_id;
+                    break;
+                case 'achievement':
+                    $form->model()->target = $form->achievement_target;
+                    break;
+            }
+
+            unset($form->ware_target_id);
+            unset($form->gift_target_id);
+        });
+        
+        
+        
+        
         return $form;
     }
+    protected function addWareFields($form): void
+    {
+        $form->belongsTo('ware_target_id', Wares::class, __('Ware'))
+            ->value(function () use ($form) {
+                $model = $form->model();
+                return $model->exists && $model->target_type === 'ware' ? $model->target : null;
+            });
+    }
+    
+    protected function addGiftFields($form): void
+    {
+        $form->belongsTo('gift_target_id', Gifts::class, __('Gift'))
+            ->value(function () use ($form) {
+                $model = $form->model();
+                return $model->exists && $model->target_type === 'gift' ? $model->target : null;
+            });
+    }
+    
+    
+      
+
+    
+protected function addAchievementFields($form): void
+{
+    $form->image("achievement_target", __('image'))
+        ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
+        ->disk('gcs');
+}
 
     public function store()
     {
@@ -219,48 +267,5 @@ class RoomBoomRewardController extends MainController
         ];
     }
 
-    protected function addWareFields($form ,$prefix = ''): void
-    {
-        $form->belongsTo('target', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target')
-                ->select('id', __('wares'))
-                ->options(function ($id) {
-                    if (!$id) return [];
-                    $ware = Ware::find($id);
-                    return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
-                })
-                ->attribute([
-                    'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
-                ]);
 
-            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
-        });
-    }
-
-    protected function addGiftFields($form ,$prefix = ''): void
-    {
-        $form->belongsTo('target', Gifts::class, __('Gift'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target')
-                ->select('id', __('gifts'))
-                ->options(function ($id) {
-                    if (!$id) return [];
-                    $gift = Gift::find($id);
-                    return $gift ? [$gift->id => "{$gift->name}_{$gift->id}"] : [];
-                })
-                ->attribute([
-                    'data-image-select' => 1,
-                    'data-load-url' => ''
-                ]);
-
-            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
-        });
-    }
-
-    protected function addAchievementFields($form): void
-    {
-        $form->image("target", __('image'))
-            ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
-            ->disk('gcs');
-    }
 }
