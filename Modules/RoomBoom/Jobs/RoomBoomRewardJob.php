@@ -87,7 +87,8 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $userId,
-                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
             ];
         }
 
@@ -106,7 +107,8 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $lastTriggerSenderId,
-                'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl()
+                'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
             ];
         }
 
