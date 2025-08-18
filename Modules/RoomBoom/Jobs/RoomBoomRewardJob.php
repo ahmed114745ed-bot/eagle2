@@ -33,6 +33,9 @@ class RoomBoomRewardJob implements ShouldQueue
         $this->boomId = $boomId;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function handle()
     {
         info('in reward job');
@@ -54,13 +57,18 @@ class RoomBoomRewardJob implements ShouldQueue
             }
         }
 
-        $topContributorIds = GiftLog::select('sender_id', DB::raw('SUM(giftPrice) as total_gift'))
+        $topContributorIds = GiftLog::
+        select('sender_id',
+            DB::raw('SUM(giftPrice) as total_gift'),
+            DB::raw('MIN(created_at) as first_contribution')
+        )
             ->where('room_id', $roomId)
             ->where('room_boom_level', $level->level)
             ->where('start_boom_ranking', 1)
             ->where('created_at', '>=', Carbon::today())
             ->groupBy('sender_id')
             ->orderByDesc('total_gift')
+            ->orderBy('first_contribution', 'asc')
             ->limit(3)
             ->pluck('sender_id')
             ->toArray();
@@ -118,7 +126,8 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $visitorId,
-                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+                'image' => (new RoomBoomRewardResource((object)$reward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
             ];
         }
 
