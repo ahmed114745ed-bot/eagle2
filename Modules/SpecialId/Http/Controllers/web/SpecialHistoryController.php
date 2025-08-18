@@ -87,8 +87,6 @@ class SpecialHistoryController extends MainController
             if ($this->user && request()->filled('_export_')) {
 
                 return "{$name} (UUID: {$uid})";
-            } else {
-                return "user not found";
             }
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;

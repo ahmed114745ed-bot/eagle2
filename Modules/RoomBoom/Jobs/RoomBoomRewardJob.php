@@ -47,9 +47,9 @@ class RoomBoomRewardJob implements ShouldQueue
         $rewardItems = [];
         foreach ($rewards as $reward) {
             for ($i = 0; $i < $reward->quantity; $i++) {
-                $item = $reward->toArray();
-                $item['quantity'] = 1;
-                $rewardItems[] = $item;
+                $rewardCopy = clone $reward;
+                $rewardCopy->quantity = 1;
+                $rewardItems[] = $rewardCopy;
             }
         }
 
