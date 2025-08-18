@@ -33,7 +33,9 @@ class RewardWinnerLevelInterval implements ShouldQueue
     public function handle()
     {
 
-        $levelIntervals = LevelInterval::where('min', '<=', $this->level)
+        $levelIntervals = LevelInterval::query()
+            ->where('min', '<=', $this->level)
+            ->where('max', '>=', $this->level)
             ->where('type', $this->type)->orderBy('min')->get();
 
 
