@@ -134,13 +134,16 @@ class RoomBoomRewardJob implements ShouldQueue
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function distributeBoomRewards($userId, $reward): void
     {
         $user = User::find($userId);
         $expire = $reward['expire_days'];
         if ($reward['target_type'] == 'ware') {
             $ware = Ware::find($reward->target);
-            UserCommon::addWareToUser($user, $ware, $expire);
+            UserCommon::addEvintsWareToUser($user, $ware, $expire);
         }
         if ($reward['target_type'] == 'achieve') {
             $target = $reward->target;
