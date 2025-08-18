@@ -667,3 +667,19 @@ Route::get('/public-official-test/{ids}', function ($ids) {
 
     return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
 });
+
+Route::get('gifts-by-id', function (Request $request) {
+    $gift = \App\Models\Gift::find($request->get('id')); 
+    if (!$gift) {
+        return response()->json([]);
+    }
+
+    $imageUrl = $gift->show_img
+        ?? ($gift->show_img ? Storage::url($gift->show_img) : null);
+
+    return response()->json([
+        'id'    => $gift->id,
+        'name'  => $gift->name,
+        'image' => $imageUrl,
+    ]);
+});
