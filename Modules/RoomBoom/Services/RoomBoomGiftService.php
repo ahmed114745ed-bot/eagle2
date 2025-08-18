@@ -132,7 +132,6 @@ class RoomBoomGiftService
                 $openBoom->final_gift_id = $giftLog->id;
                 $openBoom->save();
 
-                info('reward job');
                 dispatch(new RoomBoomRewardJob($openBoom->id))->delay(now()->addSeconds(30));
                 dispatch(new EndBoomPusherJob($currentLevel, $newTotal, auth()->id(), $room));
                 dispatch(new EndBoomZegoJob($currentLevel, $room))->delay(now()->addSeconds(20));
