@@ -1,6 +1,7 @@
 <?php
 
 use Modules\RoomBoom\Http\Controllers\Api\RoomBoomLevelController;
+use Modules\RoomBoom\Http\Controllers\Api\SuperBoomRuleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +21,7 @@ Route::group([
     Route::get('get_videos', [RoomBoomLevelController::class, 'getVideos']);
     Route::get('{id}', [RoomBoomLevelController::class, 'index']);
 });
+
+
+Route::get('super-boom-rules', [SuperBoomRuleController::class, 'index']);
+
