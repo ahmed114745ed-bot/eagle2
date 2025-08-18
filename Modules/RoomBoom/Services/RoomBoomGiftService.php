@@ -51,15 +51,15 @@ class RoomBoomGiftService
                     'trigger_gift_id' => $giftLogId
                 ]);
 
-//                $d = [
-//                    "messageContent" => [
-//                        "message" => "roomBoomStarted",
-//                        'roomBoomLevel' => $currentLevel->id,
-//                    ]
-//                ];
-//                $json = json_encode($d);
-//
-//                Common::sendToZego('SendCustomCommand', $roomId, $roomUid, $json);
+                $d = [
+                    "messageContent" => [
+                        "message" => "roomBoomStarted",
+                        'roomBoomLevel' => $currentLevel->id,
+                    ]
+                ];
+                $json = json_encode($d);
+
+                Common::sendToZego('SendCustomCommand', $roomId, $roomUid, $json);
             }
 
             if ($newTotal >= $currentLevel->min_target) {
@@ -68,10 +68,10 @@ class RoomBoomGiftService
                 $startBoomRanking = 0;
             }
 
-            GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
-                'room_boom_level' => $currentLevel->level,
-                'start_boom_ranking' => $startBoomRanking
-            ]);
+//            GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
+//                'room_boom_level' => $currentLevel->level,
+//                'start_boom_ranking' => $startBoomRanking
+//            ]);
             $existingBoom->total_gifts_value = $newTotal;
             $existingBoom->save();
         } else {
@@ -80,16 +80,16 @@ class RoomBoomGiftService
                 ->first();
 
             if ($nextLevel) {
-                GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
-                    'room_boom_level' => $nextLevel->level,
-                    'start_boom_ranking' => 0
-                ]);
+//                GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
+//                    'room_boom_level' => $nextLevel->level,
+//                    'start_boom_ranking' => 0
+//                ]);
             }
         }
 
         $totalRoomGift->current_total = $newTotal;
 
-//        $this->checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room);
+        $this->checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room);
 
         $totalRoomGift->save();
     }
