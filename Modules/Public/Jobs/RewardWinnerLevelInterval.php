@@ -2,8 +2,6 @@
 
 namespace Modules\Public\Jobs;
 
-use App\Models\Gift;
-use App\Models\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\UserCommon;
@@ -16,7 +14,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Achievement\Entities\UserAchievementLevel;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\Vip\Entities\OVip;
 
 class RewardWinnerLevelInterval implements ShouldQueue
 {
