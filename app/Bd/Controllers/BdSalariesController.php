@@ -99,7 +99,9 @@ class BdSalariesController extends AdminController
                 AND year = bd_agency_host_sallaries.year
         ) as total_agency_sallary
     ')
-    ->groupBy('agency_id', 'month', 'year');
+    ->groupBy('agency_id', 'month', 'year')
+    ->orderBy('year', 'desc')
+    ->orderBy('month', 'desc');
             
         $grid->disableActions();
         $grid->disableCreateButton();
