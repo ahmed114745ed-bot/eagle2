@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Models\Gift;
 use App\Models\Ware;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +23,16 @@ class RoomBoomReward extends Model
     public function gift(): HasOne
     {
         return $this->hasOne(Gift::class, 'id', 'target');
+    }
+
+    public function ware_target(): BelongsTo
+    {
+        return $this->belongsTo(Ware::class, 'target');
+    }
+
+    public function gift_target(): BelongsTo
+    {
+        return $this->belongsTo(Gift::class, 'target');
     }
 
     protected static function boot(): void
