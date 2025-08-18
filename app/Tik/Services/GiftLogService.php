@@ -6,14 +6,10 @@ namespace App\Tik\Services;
 use App\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
-use App\Jobs\LogUserCoinProfit;
 use App\Models\Cp;
-use App\Models\GiftLog;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
-use Carbon\Carbon;
-use DB;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
@@ -29,11 +25,6 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
-use Modules\Achievement\Jobs\CalculateAchievement;
-use App\Http\Services\RoomAchievementTargetService;
-use Modules\RoomBoom\Entities\RoomBoom;
-use Modules\RoomBoom\Entities\RoomBoomLevel;
-use Modules\RoomBoom\Entities\TotalRoomGift;
 use Modules\RoomBoom\Services\RoomBoomGiftService;
 
 class GiftLogService
