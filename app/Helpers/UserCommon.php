@@ -334,6 +334,7 @@ class UserCommon
 
     public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null)
     {
+        info('add vip');
         DB::beginTransaction();
         VipCommon::createUserVip($vip ,$user ,$expire , null ,'',);
         DB::commit();
