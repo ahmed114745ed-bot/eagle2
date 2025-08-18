@@ -346,61 +346,40 @@ class UserCommon
 
     public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)
     {
-        $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
-
         $title = __('congratulations');
         $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
-
-        if ($pack) {
-            if ($pack->expire == 0) return '';
-            if ($pack->expire > now()->timestamp) {
-                if ($ware->expire != 0) {
-                    DB::beginTransaction();
-                    try {
-                        $pack->expire += $expir ? ($expir * 86400) : ($ware->expire * 86400);
-                        $pack->save();
-                        DB::commit();
-
-                        Common::sendOfficialMessage($user->id, $title, $body);
-                        (new UserCounterServices)->eventUser($user, 'official-messages');
-
-                        $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-                        Common::send_firebase_notification($tokens_notfacion, $title, $body);
-
-                    } catch (\Exception $exception) {
-                        DB::rollBack();
-                    }
-                }
-            } else {
-                $pack->delete();
-            }
-        }
+    
         DB::beginTransaction();
         try {
-            info('before pack');
-            $arr['user_id'] = $user->id;
-            $arr['type'] = $ware->type;
-            $arr['get_type'] = $ware->get_type;
+            $arr['user_id']   = $user->id;
+            $arr['type']      = $ware->type;
+            $arr['get_type']  = $ware->get_type;
             $arr['target_id'] = $ware->id;
-            $arr['num'] = 1; //$qty;
-            //            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
-            $arr['is_read'] = 1;
-            $arr['days'] = $ware->expire;
-
+            $arr['num']       = 1;
+            $arr['is_read']   = 1;
+            $arr['days']      = $ware->expire;
+    
+         
             $pack = Pack::query()->create($arr);
-            $pack->senderable()->associate($sender);
-            $pack->save();
+    
+            if ($sender) {
+                $pack->senderable()->associate($sender);
+                $pack->save();
+            }
+    
             DB::commit();
-
-            info('after pack');
-
+    
             Common::sendOfficialMessage($user->id, $title, $body);
             (new UserCounterServices)->eventUser($user, 'official-messages');
-
-            $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+    
+            $tokens_notfacion[] = DB::table('users')
+                ->where('id', $user->id)
+                ->value('notification_id');
+    
             Common::send_firebase_notification($tokens_notfacion, $title, $body);
         } catch (\Exception $exception) {
             DB::rollBack();
+            throw $exception;
         }
     }
 
