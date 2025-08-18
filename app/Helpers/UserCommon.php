@@ -393,6 +393,7 @@ class UserCommon
             DB::commit();
 
             info('after pack');
+            info($pack);
 
             Common::sendOfficialMessage($user->id, $title, $body);
             (new UserCounterServices)->eventUser($user, 'official-messages');
