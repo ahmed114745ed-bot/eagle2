@@ -3653,7 +3653,9 @@
     "ware_not_found": "المنتج غير موجود",
     "insufficient_di": "لم تملك القيمه من الكويز",
     "all_chairs_purchased": "لقد قمت بشراء جميع الكراسى",
-    "added_successfully": "تم الاضافه بنجاح"
+    "added_successfully": "تم الاضافه بنجاح",
+    "message.deleted_success": "تم حذف العناصر المحددة بنجاح",
+
 
 
 
