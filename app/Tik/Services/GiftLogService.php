@@ -14,6 +14,7 @@ use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Classes\Gifts\SendGiftService;
+use Illuminate\Support\Facades\DB;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Tik\Repositories\GiftRepository;
