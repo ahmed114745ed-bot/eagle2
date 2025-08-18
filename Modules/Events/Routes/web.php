@@ -57,7 +57,10 @@ Route::group(
             Route::delete('/{id}', [PkEventGiftController::class, 'destroy'])->where('id', '[0-9]+');
         });
 
+    
 
+        Route::delete('target-events-gift/{id}/{targets}', [RewardTargetController::class, 'destroyBulk'])
+        ->where('targets', '.*');
         Route::prefix('target-events-gift/{charge_event_id}')->group(function () {
             Route::get('/', [RewardTargetController::class, 'index']);
             Route::get('/create', [RewardTargetController::class, 'create']);

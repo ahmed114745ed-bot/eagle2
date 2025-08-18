@@ -9,6 +9,7 @@ use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\UserGift;
+use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Bus\Queueable;
@@ -138,7 +139,8 @@ class RoomBoomRewardJob implements ShouldQueue
         $user = User::find($userId);
         $expire = $reward['expire_days'];
         if ($reward['target_type'] == 'ware') {
-            UserCommon::addWareToUser($user, $reward, $expire);
+            $ware = Ware::find($reward->target);
+            UserCommon::addWareToUser($user, $ware, $expire);
         }
         if ($reward['target_type'] == 'achieve') {
             $target = $reward->target;

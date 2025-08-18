@@ -4,8 +4,6 @@ namespace App\Classes\Gifts;
 
 use App\Classes\Enums\NotificationType;
 use App\Exceptions\NotInfMoneyException;
-use App\Helpers\Common;
-use App\Jobs\LogUserCoinProfit;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
 use Modules\Vip\Entities\Vip;
