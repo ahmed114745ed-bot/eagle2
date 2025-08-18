@@ -30,7 +30,7 @@ class TargetEventController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(__('pk-events'))
+            ->title(__('Charge events'))
             ->row(function (Row $row) {
 
                 $row->column(12, function (Column $column) {
@@ -82,7 +82,9 @@ class TargetEventController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('value', __('value'))->display(function ($value) {
             $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
-
+            if (request()->filled('_export_')) {
+                return $value;
+            }
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <span>{$value}</span>
                         <img src='{$image}' alt='USD' width='20' height='20'>
@@ -91,13 +93,14 @@ class TargetEventController extends MainController
 
         if (Admin::user()->can('browse-' . 'gift-target-event') || Admin::user()->can('*')) {
             $grid->column(__('procedures'))->display(function () {
-                // توليد الروابط
+
+                if (request()->filled('_export_')) {
+                    return '';
+                }
                 $url1 = url('admin/target-events-gift/' . $this->id);
                 $gifts = __('gifts');
-                // إنشاء أزرار HTML
                 $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
 
-                // دمج الأزرار في سلسلة واحدة وإرجاعها
                 return $button1;
             });
         }
