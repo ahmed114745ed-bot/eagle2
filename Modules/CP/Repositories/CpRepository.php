@@ -280,7 +280,7 @@ class CpRepository
             'cps.cp_relation_id',
             'cp_relations.type'
         )
-        ->orderByDesc('total_gifts')
+        ->orderByDesc('cps.di')
         ->limit(20)
         ->get()
         ->map(function ($row) {
