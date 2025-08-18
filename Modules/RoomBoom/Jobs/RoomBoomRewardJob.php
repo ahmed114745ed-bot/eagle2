@@ -9,6 +9,7 @@ use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\UserGift;
+use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Bus\Queueable;
@@ -32,9 +33,12 @@ class RoomBoomRewardJob implements ShouldQueue
         $this->boomId = $boomId;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function handle()
     {
-        info('in job');
+        info('in reward job');
         $boom = RoomBoom::with(['roomBoomLevel', 'totalRoomGift'])->find($this->boomId);
         if (!$boom || !$boom->roomBoomLevel || !$boom->totalRoomGift) return;
 
@@ -53,13 +57,18 @@ class RoomBoomRewardJob implements ShouldQueue
             }
         }
 
-        $topContributorIds = GiftLog::select('sender_id', DB::raw('SUM(giftPrice) as total_gift'))
+        $topContributorIds = GiftLog::
+        select('sender_id',
+            DB::raw('SUM(giftPrice) as total_gift'),
+            DB::raw('MIN(created_at) as first_contribution')
+        )
             ->where('room_id', $roomId)
             ->where('room_boom_level', $level->level)
             ->where('start_boom_ranking', 1)
             ->where('created_at', '>=', Carbon::today())
             ->groupBy('sender_id')
             ->orderByDesc('total_gift')
+            ->orderBy('first_contribution', 'asc')
             ->limit(3)
             ->pluck('sender_id')
             ->toArray();
@@ -78,7 +87,8 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $userId,
-                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
             ];
         }
 
@@ -97,7 +107,8 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $lastTriggerSenderId,
-                'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl()
+                'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
             ];
         }
 
@@ -117,7 +128,8 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $visitorId,
-                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+                'image' => (new RoomBoomRewardResource((object)$reward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
             ];
         }
 
@@ -133,12 +145,16 @@ class RoomBoomRewardJob implements ShouldQueue
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function distributeBoomRewards($userId, $reward): void
     {
         $user = User::find($userId);
         $expire = $reward['expire_days'];
         if ($reward['target_type'] == 'ware') {
-            UserCommon::addWareToUser($user, $reward, $expire);
+            $ware = Ware::find($reward->target);
+            UserCommon::addEvintsWareToUser($user, $ware, $expire);
         }
         if ($reward['target_type'] == 'achieve') {
             $target = $reward->target;

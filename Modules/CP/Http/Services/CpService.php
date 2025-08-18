@@ -227,10 +227,10 @@ class CpService
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
 
         if ($rewardGender == $userOneGender || $rewardGender == 'all') {
-            UserCommon::addWareToUser($userOne, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userOne, $ware, $reward->expire);
         }
         if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-            UserCommon::addWareToUser($userTwo, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userTwo, $ware, $reward->expire);
         }
     }
 

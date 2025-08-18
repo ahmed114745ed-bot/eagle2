@@ -377,7 +377,6 @@ class UserCommon
         }
         DB::beginTransaction();
         try {
-            info('before pack');
             $arr['user_id'] = $user->id;
             $arr['type'] = $ware->type;
             $arr['get_type'] = $ware->get_type;
@@ -392,9 +391,6 @@ class UserCommon
             $pack->save();
             DB::commit();
 
-            info('after pack');
-            info($pack);
-
             Common::sendOfficialMessage($user->id, $title, $body);
             (new UserCounterServices)->eventUser($user, 'official-messages');
 
@@ -404,6 +400,47 @@ class UserCommon
             DB::rollBack();
         }
     }
+
+
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null)
+    {
+        $title = __('congratulations');
+        $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
+
+        DB::beginTransaction();
+        try {
+            $arr['user_id']   = $user->id;
+            $arr['type']      = $ware->type;
+            $arr['get_type']  = $ware->get_type;
+            $arr['target_id'] = $ware->id;
+            $arr['num']       = 1;
+            $arr['is_read']   = 1;
+            $arr['days']      = $ware->expire;
+
+
+            $pack = Pack::query()->create($arr);
+
+            if ($sender) {
+                $pack->senderable()->associate($sender);
+                $pack->save();
+            }
+
+            DB::commit();
+
+            Common::sendOfficialMessage($user->id, $title, $body);
+            (new UserCounterServices)->eventUser($user, 'official-messages');
+
+            $tokens_notfacion[] = DB::table('users')
+                ->where('id', $user->id)
+                ->value('notification_id');
+
+            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
 
     public static function addChargeLevel($userId, $amount)
     {
