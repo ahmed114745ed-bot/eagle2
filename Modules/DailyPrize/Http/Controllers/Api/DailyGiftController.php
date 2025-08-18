@@ -55,7 +55,7 @@ class DailyGiftController extends Controller
     public function getWeekGifts(int $currentDay): array
     {
         $DAYS_IN_WEEK = 7;
-        $currentWeek = $currentDay % $DAYS_IN_WEEK;
+        $currentWeek = intdiv($currentDay - 1, $DAYS_IN_WEEK);
 
         $startDay = 1 + ($DAYS_IN_WEEK * $currentWeek);
         $endDay = $startDay + $DAYS_IN_WEEK - 1;

@@ -2,6 +2,7 @@
 
 namespace Modules\RoomBoom\Jobs;
 
+use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\GiftLog;
@@ -33,7 +34,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
     public function handle()
     {
-        info('im here');
+        info('in job');
         $boom = RoomBoom::with(['roomBoomLevel', 'totalRoomGift'])->find($this->boomId);
         if (!$boom || !$boom->roomBoomLevel || !$boom->totalRoomGift) return;
 
@@ -120,17 +121,16 @@ class RoomBoomRewardJob implements ShouldQueue
             ];
         }
 
-        $d = [
-            "messageContent" => [
+        foreach ($winnerData as $winner) {
+            $data = [
                 "message" => "roomBoomEnded",
                 'roomBoomLevel' => $level->level,
                 'duration' => 10,
-                'winners' => $winnerData
-            ]
-        ];
-        $json = json_encode($d);
+                'winner' => $winner
+            ];
 
-        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+            event(new RoomBoomRewardsEvent($data));
+        }
     }
 
     public function distributeBoomRewards($userId, $reward): void
