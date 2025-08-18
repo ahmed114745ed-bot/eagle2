@@ -29,6 +29,8 @@ class EndBoomPusherJob implements ShouldQueue
 
     public function handle(): void
     {
+        info('in end room pusher job');
+
         $user = User::with('profile')->where('id', $this->userId)->first();
 
         $gift_data = [

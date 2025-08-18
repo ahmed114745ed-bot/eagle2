@@ -377,7 +377,6 @@ class UserCommon
         }
         DB::beginTransaction();
         try {
-            info('before pack');
             $arr['user_id'] = $user->id;
             $arr['type'] = $ware->type;
             $arr['get_type'] = $ware->get_type;
@@ -391,8 +390,6 @@ class UserCommon
             $pack->senderable()->associate($sender);
             $pack->save();
             DB::commit();
-
-            info('after pack');
 
             Common::sendOfficialMessage($user->id, $title, $body);
             (new UserCounterServices)->eventUser($user, 'official-messages');
@@ -420,7 +417,7 @@ class UserCommon
             $arr['is_read']   = 1;
             $arr['days']      = $ware->expire;
 
-            
+
             $pack = Pack::query()->create($arr);
 
             if ($sender) {
@@ -440,7 +437,7 @@ class UserCommon
             Common::send_firebase_notification($tokens_notfacion, $title, $body);
         } catch (\Exception $exception) {
             DB::rollBack();
-            throw $exception; 
+            throw $exception;
         }
     }
 
