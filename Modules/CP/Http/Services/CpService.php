@@ -201,7 +201,7 @@ class CpService
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
 
-                self::UserCoinLog($userTwo,$userTwo->di ,$userTwo);
+                self::UserCoinLog($userTwo,$userTwo->di ,$amount);
 
                 $userTwo->increment('di', $amount);
                 Common::sendOfficialMessage($userOne->id, $title, $body);
