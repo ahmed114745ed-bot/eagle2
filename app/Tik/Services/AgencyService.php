@@ -501,9 +501,9 @@ class AgencyService
         if ($Host_agency == 1) {
             $user->type_user = 2;
             $user->agency_id = $agency->id;
-            $user->monthly_diamond_received = 0;
             $user->is_host = 1;
             $user->save();
+            uploadMonthlyDiamondReceive($user->id, 0);
         }
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());

@@ -30,9 +30,9 @@ class UpdateUserWhenSendGift
         DB::transaction(function () use ($totalCoins, $receivedUser) {
 
             $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
-
+            $diamondUser =  $user->monthly_diamond_received + $totalCoins;
             $user->salary_is_updated = true;
-            $user->monthly_diamond_received += $totalCoins;
+
             $user->total_diamond_received += $totalCoins;
 
             if ($user->type_user == 0 && $user->agency_id == 0) {
@@ -51,6 +51,7 @@ class UpdateUserWhenSendGift
             }
 
             $user->save();
+            uploadMonthlyDiamondReceive($user->id, $diamondUser);
         });
     }
     public function updateUsers(int $totalCoins, array $userIds)

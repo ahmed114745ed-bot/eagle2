@@ -91,9 +91,6 @@ class UserHandling
     {
         // decrement total diamond with monthly diamond when user not in agency
         $user->total_diamond_received -= $user->monthly_diamond_received;
-        // set diamond to zero
-        $user->monthly_diamond_received = 0;
-
         $agencyId = $user->agency_id;
         $user->is_host = 0;
         $user->agency_id = 0;
@@ -135,6 +132,7 @@ class UserHandling
 
         $user->monthly_days = 0;
         $user->save();
+        uploadMonthlyDiamondReceive($user->id, 0);
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
         $agencyUserJoined = UsersJoinedAgency::where([
             'user_id' => $user->id,
