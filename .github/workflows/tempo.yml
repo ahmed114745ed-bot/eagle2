@@ -35,7 +35,7 @@ jobs:
 
           # Run artisan command inside that container
           if [ -n "$CONTAINER_ID" ]; then
-            docker exec -it $CONTAINER_ID php artisan whatsapp:change-token
+            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
           else
             echo "No running container found for tempo-app.1 service task"
             exit 1
