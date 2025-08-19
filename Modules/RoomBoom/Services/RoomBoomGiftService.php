@@ -89,7 +89,7 @@ class RoomBoomGiftService
 
         $totalRoomGift->current_total = $newTotal;
 
-        $this->checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room);
+        $this->checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $room);
 
         $totalRoomGift->save();
     }
@@ -115,7 +115,7 @@ class RoomBoomGiftService
         return $totalRoomGift;
     }
 
-    private function checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room): void
+    private function checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $room): void
     {
         $openBooms = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
             ->whereNull('ended_at')
