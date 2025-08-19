@@ -72,36 +72,43 @@ class BdSalariesController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new BdAgencyHostSallary());
-        $appID = Auth::user()->id;
- 
-        $grid->model()
+       
+       
+    $grid = new Grid(new BdAgencyHostSallary());
+    $appID = Auth::user()->id;
+
+    $latestRecords = BdAgencyHostSallary::selectRaw('MAX(id) as id')
+        ->groupBy('user_id', 'agency_id', 'month', 'year');
+
+    $grid->model()
         ->where('bd_id', $appID)
         ->with('agency')
+        ->whereIn('id', $latestRecords)
         ->selectRaw('
-        agency_id, 
-        month,
-        year,
-        SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
-        COUNT(*) as count,
-        (
-            SELECT SUM(CAST(sallary AS DECIMAL(15,4))) 
-            FROM user_sallaries 
-            WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
-                AND month = bd_agency_host_sallaries.month 
-                AND year = bd_agency_host_sallaries.year
-        ) as total_user_sallary,
-        (
-            SELECT SUM(CAST(agency_sallary AS DECIMAL(15,4))) 
-            FROM user_sallaries 
-            WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
-                AND month = bd_agency_host_sallaries.month 
-                AND year = bd_agency_host_sallaries.year
-        ) as total_agency_sallary
-    ')
-    ->groupBy('agency_id', 'month', 'year')
-    ->orderBy('year', 'desc')
-    ->orderBy('month', 'desc');
+            agency_id, 
+            month,
+            year,
+            SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
+            COUNT(*) as count,
+            (
+                SELECT SUM(CAST(sallary AS DECIMAL(15,4))) 
+                FROM user_sallaries 
+                WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
+                    AND month = bd_agency_host_sallaries.month 
+                    AND year = bd_agency_host_sallaries.year
+            ) as total_user_sallary,
+            (
+                SELECT SUM(CAST(agency_sallary AS DECIMAL(15,4))) 
+                FROM user_sallaries 
+                WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
+                    AND month = bd_agency_host_sallaries.month 
+                    AND year = bd_agency_host_sallaries.year
+            ) as total_agency_sallary
+        ')
+        ->groupBy('agency_id', 'month', 'year')
+        ->orderBy('year', 'desc')
+        ->orderBy('month', 'desc');
+
             
         $grid->disableActions();
         $grid->disableCreateButton();
