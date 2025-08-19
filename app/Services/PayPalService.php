@@ -52,7 +52,6 @@ class PayPalService
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
                 'landing_page' => 'BILLING',
-                "shipping_preference" => "NO_SHIPPING",
             ],
             "purchase_units" => [
                 [
