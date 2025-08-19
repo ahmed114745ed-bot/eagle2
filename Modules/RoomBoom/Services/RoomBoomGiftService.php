@@ -59,6 +59,7 @@ class RoomBoomGiftService
                 ];
                 $json = json_encode($d);
 
+                info('next level zego');
                 Common::sendToZego('SendCustomCommand', $roomId, $roomUid, $json);
             }
 

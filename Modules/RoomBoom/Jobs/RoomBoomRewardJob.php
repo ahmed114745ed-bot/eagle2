@@ -150,6 +150,7 @@ class RoomBoomRewardJob implements ShouldQueue
      */
     public function distributeBoomRewards($userId, $reward): void
     {
+        info($userId);
         $user = User::find($userId);
         $expire = $reward['expire_days'];
         if ($reward['target_type'] == 'ware') {
