@@ -119,6 +119,7 @@ class PaymentMethodController extends Controller
                 'statusCode',
                 'statusDescription',
                 'merchantRefNumber',
+                'orderStatus'
             ]);
 
             // Validate required parameters
