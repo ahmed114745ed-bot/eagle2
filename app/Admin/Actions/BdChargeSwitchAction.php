@@ -54,8 +54,9 @@ class BdChargeSwitchAction extends RowAction
     public function dialog()
     {
         $msg = $this->row->transfer_salary
-            ? 'هل أنت متأكد من تعطيل تحويل المرتب؟'
-            : 'هل أنت متأكد من تفعيل تحويل المرتب؟';
+            ?  'هل أنت متأكد من تفعيل تحويل المرتب؟'
+            : 'هل أنت متأكد من تعطيل تحويل المرتب؟';
+           
 
         $this->confirm($msg, '', []);
     }
