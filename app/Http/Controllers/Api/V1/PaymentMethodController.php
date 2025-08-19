@@ -141,7 +141,6 @@ class PaymentMethodController extends Controller
                 ]);
             }
 
-            info($query['statusDescription']);
             info($query['statusCode']);
             return response()->json([
                 'status' => $query['statusCode'] == 200,
