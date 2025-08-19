@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use Log;
+use Cache;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Config;
 use App\Models\Target;
-use App\Models\User;
-use App\Models\UserSallary;
-use Cache;
-use Log;
 use App\Helpers\Common;
-use App\Models\BrandImage;
 use App\Models\Setting;
 use App\Models\Timezone;
+use App\Models\BrandImage;
+use App\Models\PaymentCoin;
+use App\Models\UserSallary;
+use Illuminate\Support\Str;
 use App\Models\Notification;
 use Illuminate\Http\Request;
-use App\Models\NotificationTranslation;
-use App\Models\PaymentCoin;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission;
+use Illuminate\Support\Facades\File;
+use App\Models\NotificationTranslation;
 
 class SettingsController extends Controller
 {
@@ -229,7 +230,7 @@ class SettingsController extends Controller
         }
         $data = $request->except('_token', 'super_admin_coins');
 
-    
+
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
             $data['background_color'] = $request->background_color;
@@ -256,7 +257,10 @@ class SettingsController extends Controller
 
 
         unset($data['app_background_image'], $data['brand_background_image_reset']);
-
+        if ($request->reset) {
+            $timestamp = Carbon::now()->timestamp;
+            settings()->set('color_setting_updated_at', $timestamp);
+        }
         // Process and save settings
         foreach ($data as $key => $value) {
 

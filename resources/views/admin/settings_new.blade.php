@@ -3343,7 +3343,7 @@ use Modules\Vip\Entities\Vip;
                 <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
-                     <input type="hidden" name="reset" id="reset" value=0>
+                     <input type="hidden" name="reset" id="reset" value=3>
                         {{-- Primary Color --}}
                         <div class="col-md-6">
                             <label>{{ __('Primary Color') }}</label>
