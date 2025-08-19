@@ -90,21 +90,17 @@ class PaymentMethodController extends Controller
             $paymentMethod->status = 'paid';
             $order->save();
 
-            info('success');
             return response()->json(['status' => 'success', 'message' => 'Payment successful.']);
         }
         if ($orderStatus === 'UNPAID') {
-            info('pending');
             return response()->json(['status' => 'pending', 'message' => 'Payment is still unpaid.'], 202);
         }
         if ($orderStatus === 'CANCELLED') {
-            info('cancelled');
             $paymentMethod->status = 'cancelled';
 
             return response()->json(['status' => 'cancelled', 'message' => 'Payment was cancelled.']);
         }
 
-        info('error');
         $paymentMethod->status = 'Error';
         $paymentMethod->save();
         $order->save();
@@ -134,7 +130,6 @@ class PaymentMethodController extends Controller
             $purchaseProduct = CoinLog::where('trx', $query['merchantRefNumber'])->first();
 
             if (! $purchaseProduct) {
-                info('Transaction not found.');
                 return response()->json([
                     'status' => false,
                     'trx' => $query['merchantRefNumber'],
@@ -143,21 +138,19 @@ class PaymentMethodController extends Controller
             }
 
             if ($query['statusCode'] == 200 && $query['orderStatus'] == 'UNPAID'){
-                info('pending');
                 return response()->json([
                     'status' => true,
                     'trx' => $query['merchantRefNumber'],
                     'message' => 'pending',
                 ]);
             }
-            info($query['statusCode']);
+
             return response()->json([
                 'status' => $query['statusCode'] == 200,
                 'trx' => $purchaseProduct->trx,
                 'message' => $query['statusDescription'] ?? 'No description provided.',
             ]);
         } catch (Throwable $e) {
-            info('An error occurred');
             return response()->json([
                 'status' => false,
                 'trx' => null,
