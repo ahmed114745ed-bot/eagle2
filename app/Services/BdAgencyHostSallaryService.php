@@ -18,11 +18,14 @@ class BdAgencyHostSallaryService
 
     protected static function calculateTotalSallary(int $bdId, int $month, int $year): float
     {
-        return BdAgencyHostSallary::where([
-            'bd_id' => $bdId,
-            'month' => $month,
-            'year'  => $year,
-        ])->sum('amount');
+        $subQuery = BdAgencyHostSallary::select(DB::raw('MAX(id) as id'))
+        ->where('bd_id', $bdId)
+        ->where('month', $month)
+        ->where('year', $year)
+        ->groupBy('user_id');
+
+        return BdAgencyHostSallary::whereIn('id', $subQuery)
+            ->sum('amount');
     }
 
     protected static function storeOrUpdateBdSalary(int $bdId, int $month, int $year, float $salary): void
