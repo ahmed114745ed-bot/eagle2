@@ -18,8 +18,6 @@ use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
-use App\Http\Controllers\Api\V1\BoxController;
-use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
@@ -126,7 +124,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
         Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
-         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
+        Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
     });
 
@@ -510,7 +508,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
                 Route::get('admins/{id}', [AgencyController::class, 'admin']);
-                Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']);//target
+                Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']); //target
                 Route::get('stars/{id}', [AgencyController::class, 'star']);
                 Route::get('heroes/{id}', [AgencyController::class, 'heroes']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
@@ -617,9 +615,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
                 // return response()->json($result);
             });
-
-
-
         }
     );
 
@@ -655,13 +650,13 @@ Route::get('/public-official-test/{ids}', function ($ids) {
     foreach ($users as $user) {
         Common::sendOfficialMessage(
             $user->id,
-               $body_en,
-               $title,
-               $type,
-             $subType,
-                        $body_ar,
-                 $image,
-             $fromUser
+            $body_en,
+            $title,
+            $type,
+            $subType,
+            $body_ar,
+            $image,
+            $fromUser
         );
     }
 
@@ -669,7 +664,7 @@ Route::get('/public-official-test/{ids}', function ($ids) {
 });
 
 Route::get('gifts-by-id', function (Request $request) {
-    $gift = \App\Models\Gift::find($request->get('id')); 
+    $gift = \App\Models\Gift::find($request->get('id'));
     if (!$gift) {
         return response()->json([]);
     }

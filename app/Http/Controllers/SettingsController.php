@@ -133,7 +133,7 @@ class SettingsController extends Controller
             }
         }
 
-       
+
 
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
@@ -223,13 +223,13 @@ class SettingsController extends Controller
 
     public function updateAppConfig(Request $request)
     {
+
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
         $data = $request->except('_token', 'super_admin_coins');
 
-
-
+    
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
             $data['background_color'] = $request->background_color;
@@ -242,15 +242,15 @@ class SettingsController extends Controller
             $data['gradient_3'] = $request->gradient_3;
         }
 
-// Primary Color
+        // Primary Color
         $data['app_primary_color'] = $request->app_primary_color;
 
-// Bottom Nav
-        $data['bottom_nav_bottom_color'] = $request->bottom_color;
-        $data['bottom_nav_active_color'] = $request->active_color;
-        $data['bottom_nav_inactive_color'] = $request->inactive_color;
+        // Bottom Nav
+        $data['bottom_nav_bottom_color'] = $request->reset != 1 ? $request->bottom_color : null;
+        $data['bottom_nav_active_color'] = $request->reset != 1 ? $request->active_color : null;
+        $data['bottom_nav_inactive_color'] = $request->reset != 1 ? $request->inactive_color : null;
 
-// Text & Button Colors
+        // Text & Button Colors
         $data['text_header_color'] = $request->text_header_color;
         $data['button_text_color'] = $request->button_text_color;
 
@@ -282,8 +282,6 @@ class SettingsController extends Controller
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
-
-
         }
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
