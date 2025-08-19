@@ -35,33 +35,29 @@ class ChangeUsersAgencyAction extends RowAction
     public function handle(Model $model, Request $request)
     {
 
-    //    $users = User::where('agency_id',$request->old_agency_id)->where('type_user',1)->get();
-    $ownerId = Agency::where('id', $request->old_agency_id)->value('app_owner_id');
+        //    $users = User::where('agency_id',$request->old_agency_id)->where('type_user',1)->get();
+        $ownerId = Agency::where('id', $request->old_agency_id)->value('app_owner_id');
 
-    $users = User::where('agency_id', $request->old_agency_id)
-        // ->where('type_user', 1)
-        ->when($ownerId, function ($query) use ($ownerId) {
-            $query->where('id', '=', $ownerId);
-        })
-        ->get();
-      
+        $users = User::where('agency_id', $request->old_agency_id)->get();
+        
         if ($users->count() === 1 && $users->pluck('id')->first() == $ownerId) {
+            dd(123);
             $error = new MessageBag([
                 'title'   => __('error_title_div'),
                 'message' => __('cant it owner'),
             ]);
-    
+
             session()->flash('error', $error);
             throw new \Exception(__('cant it owner'));
         }
-   
-    $checkAgencyUser = UsersJoinedAgency::where([
+        $users = $users->where('id', '!=', $ownerId);
+    
+        $checkAgencyUser = UsersJoinedAgency::where([
 
-        'agency_id' => $request->old_agency_id,
-        'type' => 2,
-    ])->where('leave_date', null)->update(['leave_date'=> now(),'status' => 'change agency by admin']);
-        foreach($users as $user)
-        {
+            'agency_id' => $request->old_agency_id,
+            'type' => 2,
+        ])->where('leave_date', null)->update(['leave_date' => now(), 'status' => 'change agency by admin']);
+        foreach ($users as $user) {
             $user->agency_id = $request->new_agency_id;
             $user->monthly_diamond_received = 0;
             $user->save();
@@ -73,10 +69,10 @@ class ChangeUsersAgencyAction extends RowAction
             if (!$checkAgencyUser) {
                 UsersJoinedAgency::create([
                     'user_id' => $user->id,
-                    'agency_id' =>$request->new_agency_id,
+                    'agency_id' => $request->new_agency_id,
                     'type' => 2,
                     'join_date' => now(),
-                    'status' =>'Joined'
+                    'status' => 'Joined'
                 ]);
             }
         }
@@ -93,17 +89,19 @@ class ChangeUsersAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('old_agency_id', __('id'))->value($this->id);
-        $this->select('new_agency_id', __('agency id'))->options(function ($value){
+        $this->select('new_agency_id', __('agency id'))->options(function ($value) {
             $ops2 = [];
-            foreach (Agency::where('id','!=',$this->id)->where(function ($query) {
-            $query->WhereDoesntHave('additionalInfo')->orWhereHas(
-                'additionalInfo',
-                function ($query) {
-                    $query->where('status', 1);
-                }
-            );
-        })->get() as $agency){
-                $ops2[$agency->id] = $agency->id. '_' .$agency->name;
+            foreach (
+                Agency::where('id', '!=', $this->id)->where(function ($query) {
+                    $query->WhereDoesntHave('additionalInfo')->orWhereHas(
+                        'additionalInfo',
+                        function ($query) {
+                            $query->where('status', 1);
+                        }
+                    );
+                })->get() as $agency
+            ) {
+                $ops2[$agency->id] = $agency->id . '_' . $agency->name;
             }
             return $ops2;
         });
@@ -111,7 +109,7 @@ class ChangeUsersAgencyAction extends RowAction
 
     public function html()
     {
-        return '<a href="javascript:void(0);" onclick="pu('.$this->id.')" ></a>
+        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" ></a>
             <script>
 
             function pu(val) {
