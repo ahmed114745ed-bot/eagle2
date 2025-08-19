@@ -31,7 +31,7 @@ class RoomBoomGiftService
         }
 
         $currentLevel = RoomBoomLevel::where('min_target', '<=', $newTotal)
-            ->where('target', '>=', $currentTotal)
+            ->where('target', '>=', $newTotal)
             ->orderBy('level')
             ->first();
 
@@ -117,12 +117,12 @@ class RoomBoomGiftService
 
     private function checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room): void
     {
-        $openBoom = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
+        $openBooms = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
             ->whereNull('ended_at')
             ->latest()
-            ->first();
+            ->get();
 
-        if ($openBoom){
+        foreach ($openBooms as $openBoom){
             $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
             $giftLog = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->first(['id', 'sender_id']);
 
