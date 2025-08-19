@@ -140,6 +140,13 @@ class CpController extends Controller
         return $this->cpService->getCpList($userId);
     }
 
+
+    public function cpUserList()
+    {
+        $userId = request('id') ?? Auth::id();
+        return $this->cpService->cpUserList($userId);
+    }
+
     public function extendCard(Request $request)
     {
         $user = Auth::user();

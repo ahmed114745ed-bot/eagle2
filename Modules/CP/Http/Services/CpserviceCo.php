@@ -306,4 +306,13 @@ class CpserviceCo
         $data = $this->cpRepository->getCpList($userId, true);
         return Common::apiResponse(1, '', CpListResource::collection($data));
     }
+
+
+    public function cpUserList($userId)
+    {
+        $data = $this->cpRepository->cpUserList($userId, true);
+        return Common::apiResponse(1, '', CpListResource::collection($data));
+    }
+
+    
 }
