@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\DedicateAction;
 use App\Admin\Actions\ResendZegoMessageAction;
 use App\Models\User;
 use App\Traits\Gifts\WinLuckyGift;

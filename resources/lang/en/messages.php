@@ -25,4 +25,6 @@ return[
 'transfer_to_agency'   => 'An amount has been transferred to agency :name.',
 'trans_to_'            => 'An amount has been transferred to the target: :target.',
 'charge_to_user'       => 'Balance has been charged to user :name.',
+'request_agencies' => 'Request Agencies',
+
 ];

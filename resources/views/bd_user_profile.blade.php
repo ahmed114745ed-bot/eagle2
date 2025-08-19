@@ -1335,11 +1335,11 @@
                                                     data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
                                             </button>
-                                            <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
+                                            <!-- <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button>
-                                        </div> -->
-                                    <!-- </td> -->
+                                            </button> -->
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -1894,13 +1894,13 @@
                                     <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
                                     <td>{{ @$coin->from_date ?? 0 }}</td>
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
-                                    <td>
-                                        <div class="d-flex">
+                                    <!-- <td>
+                                        <div class="d-flex"> -->
                                             <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button> -->
-                                        </div>
-                                    </td>
+                                        <!-- </div>
+                                    </td> -->
                                 </tr>
                             @endforeach
                         </tbody>

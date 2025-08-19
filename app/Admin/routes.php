@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\CoinLogReportsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
+use App\Admin\Controllers\SuperBoomRuleController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;

@@ -89,7 +89,7 @@ class RoomBoomGiftService
 
         $totalRoomGift->current_total = $newTotal;
 
-        $this->checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room);
+        $this->checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $room);
 
         $totalRoomGift->save();
     }
@@ -115,14 +115,14 @@ class RoomBoomGiftService
         return $totalRoomGift;
     }
 
-    private function checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $currentLevel, $room): void
+    private function checkAndEndBoom($totalRoomGift, $roomBoomUuid, $newTotal, $room): void
     {
-        $openBoom = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
+        $openBooms = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
             ->whereNull('ended_at')
             ->latest()
-            ->first();
+            ->get();
 
-        if ($openBoom){
+        foreach ($openBooms as $openBoom){
             $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
             $giftLog = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->first(['id', 'sender_id']);
 
@@ -133,8 +133,8 @@ class RoomBoomGiftService
                 $openBoom->save();
 
                 dispatch(new RoomBoomRewardJob($openBoom->id))->delay(now()->addSeconds(30));
-                dispatch(new EndBoomPusherJob($currentLevel, $newTotal, auth()->id(), $room));
-                dispatch(new EndBoomZegoJob($currentLevel, $room))->delay(now()->addSeconds(20));
+                dispatch(new EndBoomPusherJob($boomLevel, $newTotal, auth()->id(), $room));
+                dispatch(new EndBoomZegoJob($boomLevel, $room))->delay(now()->addSeconds(20));
             }
         }
     }

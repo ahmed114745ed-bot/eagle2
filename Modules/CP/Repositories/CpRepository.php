@@ -418,6 +418,22 @@ class CpRepository
             ->get();
     }
 
+    public function cpUserList($userId, $activeOnly = false)
+    {
+        $var =  [1, 4] ;
+
+        return Cp::where(function ($query) use ($userId) {
+            $query->where("user_one_id", $userId)
+                ->orWhere(function ($query) use ($userId) {
+                    $query->where("user_two_id", $userId);
+                });
+        })
+            ->whereIn("status", $var)
+            ->get();
+    }
+
+
+
     public function findWare($wareId)
     {
         return Ware::find($wareId);
