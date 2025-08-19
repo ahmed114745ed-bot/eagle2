@@ -1090,7 +1090,11 @@
 "Agency": "Agency",
 ":name has been removed from administrators.": ":name has been removed from administrators.",
 "User": "User",
-"banned_from_action":"You are banned from performing this action."
+"banned_from_action":"You are banned from performing this action.",
+"enable_transfer_salary_success": "Transfer salary has been enabled successfully",
+"disable_transfer_salary_success": "Transfer salary has been disabled successfully",
+"confirm_enable_transfer_salary": "Are you sure you want to enable transfer salary?",
+"confirm_disable_transfer_salary": "Are you sure you want to disable transfer salary?"
 
 
 
