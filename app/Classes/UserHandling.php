@@ -84,8 +84,7 @@ class UserHandling
 
         if ($vip) {
 
-            VipCommon::createUserVip($vip ,$user ,$vip->expire , null ,$type);
-      
+            VipCommon::createUserVip($vip, $user, $vip->expire, null, $type);
         }
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void
@@ -185,17 +184,24 @@ class UserHandling
             }
         }
 
-        // update in users tables
-        DB::table('users')
-            ->where('agency_id', $agency_id)
-            ->update([
-                'total_diamond_received' => DB::raw('CASE WHEN total_diamond_received < 0 THEN 0 ELSE total_diamond_received - monthly_diamond_received  END'),
-                'monthly_diamond_received' => 0,
-                'is_host' => 0,
-                'agency_id' => 0,
-                'monthly_days' => 0,
-                'type_user' => 0
-            ]);
+        $users = User::where('agency_id', $agency_id)->get();
+        $users = User::where('agency_id', $agency_id)->get();
+
+        foreach ($users as $user) {
+
+            DB::table('users')
+                ->where('id', $user->id)
+                ->update([
+                    'total_diamond_received' => DB::raw('CASE WHEN total_diamond_received < 0 THEN 0 ELSE total_diamond_received - ' . (int) $user->monthly_diamond_received . ' END'),
+                    'is_host' => 0,
+                    'agency_id' => 0,
+                    'monthly_days' => 0,
+                    'type_user' => 0,
+                ]);
+
+            uploadMonthlyDiamondReceive($user->id, 0);
+        }
+
 
 
         DB::table('live_times')->whereIn('uid', $usersIds)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->delete();

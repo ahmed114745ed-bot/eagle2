@@ -51,7 +51,6 @@ class UpdateUserWhenSendGift
             }
 
             $user->save();
-
         });
     }
     public function updateUsers(int $totalCoins, array $userIds)
@@ -69,12 +68,15 @@ class UpdateUserWhenSendGift
 
             foreach ($users as $user) {
                 DB::table('users')->where('id', $user->id)->update([
-                    'monthly_diamond_received' => $user->monthly_diamond_received + $totalCoins,
                     'total_diamond_received'   => $user->total_diamond_received + $totalCoins,
                     'exchange_diamonds'        => $user->agency_id == 0
                         ? $user->exchange_diamonds + $totalCoins
                         : $user->exchange_diamonds,
                 ]);
+
+                $monthlyDiamond = $user->monthly_diamond_received + $totalCoins;
+
+                uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
             }
         });
     }
@@ -175,7 +177,7 @@ class UpdateUserWhenSendGift
         $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages['exp_sender_percentage'];
         // dd($total,$totalDiamondSend,$totalDiamond ,$this->expPercentages['exp_sender_percentage']);
         $levelVip                 = $this->getLevel(2, $total);
-        return $levelVip != null ? (@$levelVip->level ) ?? 0 : 0;
+        return $levelVip != null ? (@$levelVip->level) ?? 0 : 0;
     }
 
     public function getRoomLevel($total)

@@ -10,6 +10,7 @@ use Cache;
 use Log;
 use App\Helpers\Common;
 use App\Models\BrandImage;
+use App\Models\MonthlyDiamondReceive;
 use App\Models\Setting;
 use App\Models\Timezone;
 use App\Models\Notification;
@@ -358,7 +359,7 @@ class SettingsController extends Controller
         $hasActiveTargets = false;
 
         if ($target) {
-            $users = User::where('monthly_diamond_received', '>=', $target->diamonds)->get();
+            $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month',now()->month)->where('year',now()->year)->get();
             $hasActiveTargets = $users->count() > 0;
         }
 

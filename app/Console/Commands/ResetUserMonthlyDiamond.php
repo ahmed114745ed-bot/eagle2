@@ -58,11 +58,11 @@ class ResetUserMonthlyDiamond extends Command
 
 
 
-            DB::statement("
-            UPDATE users
-            SET monthly_diamond_received = 0
-            WHERE agency_id != 0
-        ");
+        //     DB::statement("
+        //     UPDATE users
+        //     SET monthly_diamond_received = 0
+        //     WHERE agency_id != 0
+        // ");
 
 //        try {
 //            User::where('agency_id', '!=', 0)->chunk(1000, function ($users) {

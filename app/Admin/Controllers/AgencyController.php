@@ -132,8 +132,13 @@ class AgencyController extends MainController
                     $agency->mempers()->when(isset($uuid), function ($query) use ($uuid) {
                         $query->where('uuid', $uuid);
                     })
-                    ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                    ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
+                    ->withSum(['monthlyDiamondReceives as monthly_diamond_received' => function ($query) {
+                        $query->where('month', now()->month)
+                            ->where('year', now()->year);
+                    }], 'monthly_diamond_received')
+
                     ->paginate(10, ['*'], 'members_page');
                 // });
                 break;
@@ -371,7 +376,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen')
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
             ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
             ->where(function ($query) {
                 $query
@@ -766,10 +771,10 @@ class AgencyController extends MainController
                 $user->update([
                     'type_user' => 0,
                     'agency_id' => 0,
-                    'monthly_diamond_received' => 0,
                     'is_host' => 0,
                 ]);
-
+                
+                uploadMonthlyDiamondReceive($user->id, 0);
                 // if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
                 //     User::find($newOwnerId)->update([
                 //         'type_user' => 2,
@@ -823,9 +828,10 @@ class AgencyController extends MainController
                 'type_user' => 2,
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
-                'monthly_diamond_received' => 0,
 
             ]);
+            
+            uploadMonthlyDiamondReceive(intval($appOwnerId), 0);
             // }
 
 
