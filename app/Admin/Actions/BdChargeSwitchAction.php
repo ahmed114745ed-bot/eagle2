@@ -21,8 +21,8 @@ class BdChargeSwitchAction extends RowAction
     public function name()
     {
         return !$this->row->transfer_salary
-            ? 'تعطيل تحويل المرتب'
-            : 'تفعيل تحويل المرتب';
+            ? __('Disable Transfer Salary')
+            : __('Enable Transfer Salary');
     }
 
     public function handle(Model $model)
@@ -35,8 +35,8 @@ class BdChargeSwitchAction extends RowAction
         $model->refresh(); // ✅ تحديث الموديل بعد التغيير
 
         $message = !$model->transfer_salary
-            ? 'تم تفعيل تحويل المرتب بنجاح'
-            : 'تم تعطيل تحويل المرتب بنجاح';
+        ? __('enable_transfer_salary_success')
+        : __('disable_transfer_salary_success');
 
         $response = !$model->transfer_salary ? 'success' : 'error';
 
@@ -54,8 +54,8 @@ class BdChargeSwitchAction extends RowAction
     public function dialog()
     {
         $msg = $this->row->transfer_salary
-            ?  'هل أنت متأكد من تفعيل تحويل المرتب؟'
-            : 'هل أنت متأكد من تعطيل تحويل المرتب؟';
+                ? __('confirm_enable_transfer_salary')
+                : __('confirm_disable_transfer_salary');
            
 
         $this->confirm($msg, '', []);

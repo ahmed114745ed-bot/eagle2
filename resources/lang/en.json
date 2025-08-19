@@ -1110,6 +1110,11 @@
 "all_chairs_purchased": "You have already purchased all chairs",
 "added_successfully": "Added successfully",
 "deleted_success": "Selected items deleted successfully",
+"banned_from_action":"You are banned from performing this action.",
+"enable_transfer_salary_success": "Transfer salary has been enabled successfully",
+"disable_transfer_salary_success": "Transfer salary has been disabled successfully",
+"confirm_enable_transfer_salary": "Are you sure you want to enable transfer salary?",
+"confirm_disable_transfer_salary": "Are you sure you want to disable transfer salary?",
 
 
     "You have received :coin coin.": "You have received :coin coin.",
