@@ -3927,7 +3927,7 @@ use Modules\Vip\Entities\Vip;
                     if (resetApColorSettingpButton) {
                         resetApColorSettingpButton.addEventListener('click', function() {
                             // Reset color inputs with valid hex values
-                            document.getElementById('app_primary_color').value = "#33FFAA";     // Teal-green
+                            document.getElementById('app_primary_color').value = "#32e5ac";     // Teal-green
                             document.getElementById('background_color').value = "#FFFFFF";      // White
                             document.getElementById('background_type').value = "color";
                             document.getElementById('bottom_color').value = "#FFFFFF";          // White
