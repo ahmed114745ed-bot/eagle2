@@ -67,11 +67,10 @@ class ChangeAgencyAction extends RowAction
             'join_date' => now(),
             'status' => 'Joined'
         ]);
-
+        $user->monthly_diamond_received = 0;
         $user->agency_id = $request->agency_id;
         $user->type_user = 1;
         $user->save();
-        uploadMonthlyDiamondReceive($user->id, 0);
         // $userSalary = UserSallary::where('user_id',$user->id)->where('month',now()->month)->where('year',now()->year)->first();
         // if($userSalary){
         //     $userSalary->user_agency_id = $request->agency_id;
@@ -83,7 +82,7 @@ class ChangeAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
-        $this->select('agency_id', __('agency id'))->ajax('search/host-agency', 'id', 'name');
+        $this->select('agency_id', __('agency id'))->ajax('/admin/search/host-agency', 'id', 'name');
     }
 
     public function html()
