@@ -181,7 +181,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/stripe-pay', [StripeController::class, 'pay']);
             Route::get('/paysky-pay', [PaySkyController::class, 'pay']);
 
-            Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
+            Route::get('zego-credential', [UserController::class, 'zegoCredential']);
 
 
             Route::prefix('config')->group(function () {
@@ -189,13 +189,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
                 //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
             });
-            Route::get('user-app-setting', [\App\Http\Controllers\Api\V1\UserController::class, 'app_setting']);
+            Route::get('user-app-setting', [UserController::class, 'app_setting']);
 
-            Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
+            Route::post('auth/logout', [UserController::class, 'logout']);
             Route::post('/change-room-effect', [UserController::class, 'showSetting']);
             Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
-            Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
+            Route::get('user-statistics', [UserController::class, 'user_statistic']);
             Route::get('user-levels', [UserController::class, 'userLevels']);
             // rooms api
             Route::post('check-room', [RoomController::class, 'check_room']);
@@ -271,7 +271,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('v2/{id}', [UserController::class, 'vTwoshow'])->where('id', '[0-9]+');
-                Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
+                Route::get('/charger_agency', [UserController::class, 'chargerAgency']);
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
                 Route::get('/online', [UserController::class, 'online']);
@@ -286,7 +286,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
                 Route::get('delete', [UserController::class, 'delete']);
-                Route::post('change_phone', [\App\Http\Controllers\Api\V1\UserController::class, 'changePhone']);
+                Route::post('change_phone', [UserController::class, 'changePhone']);
                 Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
                 Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
                 Route::post('reset_password', [\App\Http\Controllers\Api\V2\Auth\ResetPasswordController::class, 'reset']);
@@ -406,12 +406,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('update-user-image/{image_id}', [UserController::class, 'update_user_multi_images']);
 
 
-            Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');
-            Route::get('parent-statistic', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitationStatistics']);
-            Route::get('parent-user', [\App\Http\Controllers\Api\V1\UserController::class, 'parentUser']);
-            Route::get('user-earn-from-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitation']);
-            Route::get('create-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'CreateCodeInvitation']);
-            Route::get('add-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'AddCodeInvitation']);
+            Route::get('explain-invitation', [UserController::class, 'explain_invitation'])->name('create-code-invitation');
+            Route::get('parent-statistic', [UserController::class, 'UserEarnFromInvitationStatistics']);
+            Route::get('parent-user', [UserController::class, 'parentUser']);
+            Route::get('user-earn-from-invitation', [UserController::class, 'UserEarnFromInvitation']);
+            Route::get('create-code-invitation', [UserController::class, 'CreateCodeInvitation']);
+            Route::get('add-code-invitation', [UserController::class, 'AddCodeInvitation']);
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 
