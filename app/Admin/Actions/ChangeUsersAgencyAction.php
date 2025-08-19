@@ -41,7 +41,7 @@ class ChangeUsersAgencyAction extends RowAction
         $users = User::where('agency_id', $request->old_agency_id)->get();
         
         if ($users->count() === 1 && $users->pluck('id')->first() == $ownerId) {
-            dd(123);
+            
             $error = new MessageBag([
                 'title'   => __('error_title_div'),
                 'message' => __('cant it owner'),
