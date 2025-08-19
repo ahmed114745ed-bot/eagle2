@@ -605,5 +605,8 @@ Route::group(
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });
-Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
+        Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
+
+        Route::get('search/host-agency', [App\Http\Controllers\Api\V1\UserController::class, 'hostAgencies'])->name('hostAgency');
+
 });

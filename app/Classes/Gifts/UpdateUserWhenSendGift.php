@@ -62,8 +62,8 @@ class UpdateUserWhenSendGift
         //     'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
         // ]);
         DB::transaction(function () use ($totalCoins, $userIds) {
-            $users = DB::table('users')
-                ->whereIn('id', $userIds)
+            $users = User::
+                  whereIn('id', $userIds)
                 ->lockForUpdate()
                 ->get();
 

@@ -83,7 +83,7 @@ class ChangeAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
-        $this->select('agency_id', __('agency id'))->ajax('api/search/host-agency', 'id', 'name');
+        $this->select('agency_id', __('agency id'))->ajax('search/host-agency', 'id', 'name');
     }
 
     public function html()
