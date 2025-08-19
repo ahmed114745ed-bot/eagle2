@@ -47,8 +47,8 @@ class BdSalariesController extends AdminController
         $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
         $finalSalary = truncateAndTrim($finalSalary,2);
             return $content
-                ->header(trans('admin.index'))
-                ->description(trans('admin.description'))
+                ->header(trans('salaries'))
+                ->description(trans('salaries'))
 
         ->row(function ($row) use ($finalSalary) {
             $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalSalary]));
