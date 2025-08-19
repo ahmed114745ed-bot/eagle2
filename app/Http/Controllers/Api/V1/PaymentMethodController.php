@@ -142,6 +142,14 @@ class PaymentMethodController extends Controller
                 ]);
             }
 
+            if ($query['statusCode'] == 200 && $query['orderStatus'] == 'UNPAID'){
+                info('pending');
+                return response()->json([
+                    'status' => true,
+                    'trx' => $query['merchantRefNumber'],
+                    'message' => 'pending',
+                ]);
+            }
             info($query['statusCode']);
             return response()->json([
                 'status' => $query['statusCode'] == 200,
