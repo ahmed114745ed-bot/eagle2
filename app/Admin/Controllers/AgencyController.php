@@ -134,7 +134,7 @@ class AgencyController extends MainController
                     })
                     ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
-                    ->withSum(['monthlyDiamondReceives as monthly_diamond_received' => function ($query) {
+                    ->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($query) {
                         $query->where('month', now()->month)
                             ->where('year', now()->year);
                     }], 'monthly_diamond_received')
