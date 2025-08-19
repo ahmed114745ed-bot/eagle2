@@ -143,7 +143,7 @@ class CpController extends Controller
 
     public function cpUserList()
     {
-        $userId = request('id') ?? Auth::id();
+        $userId = request('user_id') ?? Auth::id();
         return $this->cpService->cpUserList($userId);
     }
 
