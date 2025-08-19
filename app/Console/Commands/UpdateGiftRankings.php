@@ -43,32 +43,38 @@ class UpdateGiftRankings extends Command
 
     private function updateRanking(string $type, string $role, string $column, $startDate): void
     {
-        // Decide ranker_type based on role
         $rankerType = \App\Models\User::class;
-        /*if ($role === 'room') {
-            $rankerType = \App\Models\User::class;
-        }*/
 
-        DB::statement("
-        REPLACE INTO gift_rankings (
-            type, role, ranker_id, ranker_type, total_gifts, last_calculated_at, created_at, updated_at
-        )
-        SELECT
-            " . DB::getPdo()->quote($type) . ",
-            " . DB::getPdo()->quote($role) . ",
-            $column AS ranker_id,
-            '" . addslashes($rankerType) . "' AS ranker_type,
-            SUM(giftPrice) AS total_gifts,
-            NOW(),
-            NOW(),
-            NOW()
-        FROM gift_logs
-        WHERE created_at >= " . DB::getPdo()->quote($startDate) . "
-        GROUP BY $column
-        ORDER BY total_gifts DESC
-        LIMIT 100
-    ");
+        DB::transaction(function () use ($type, $role, $column, $startDate, $rankerType) {
+            // 1. Delete all old rankings of this type
+            DB::table('gift_rankings')
+                ->where('type', $type)
+                ->where('role', $role)
+                ->delete();
+
+            // 2. Insert fresh rankings
+            DB::statement("
+            INSERT INTO gift_rankings (
+                type, role, ranker_id, ranker_type, total_gifts, last_calculated_at, created_at, updated_at
+            )
+            SELECT
+                " . DB::getPdo()->quote($type) . ",
+                " . DB::getPdo()->quote($role) . ",
+                $column AS ranker_id,
+                '" . addslashes($rankerType) . "' AS ranker_type,
+                SUM(giftPrice) AS total_gifts,
+                NOW(),
+                NOW(),
+                NOW()
+            FROM gift_logs
+            WHERE created_at >= " . DB::getPdo()->quote($startDate) . "
+            GROUP BY $column
+            ORDER BY total_gifts DESC
+            LIMIT 100
+        ");
+        });
     }
+
 
 
 }
