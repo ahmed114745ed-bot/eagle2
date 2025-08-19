@@ -23,10 +23,17 @@ class RequestAgencyController extends AdminController
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
-        $this->title = __('request agencies');
     }
 
 
+    public function index(Content $content)
+    {
+        return $content
+            ->header(trans('request-agencies'))
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            });
+    }
 
 
 
