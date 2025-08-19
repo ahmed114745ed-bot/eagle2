@@ -133,6 +133,7 @@ class PaymentMethodController extends Controller
             $purchaseProduct = CoinLog::where('trx', $query['merchantRefNumber'])->first();
 
             if (! $purchaseProduct) {
+                info('Transaction not found.');
                 return response()->json([
                     'status' => false,
                     'trx' => $query['merchantRefNumber'],
@@ -140,12 +141,15 @@ class PaymentMethodController extends Controller
                 ]);
             }
 
+            info($query['statusDescription']);
+            info('No description provided.');
             return response()->json([
                 'status' => $query['statusCode'] == 200,
                 'trx' => $purchaseProduct->trx,
                 'message' => $query['statusDescription'] ?? 'No description provided.',
             ]);
         } catch (Throwable $e) {
+            info('An error occurred');
             return response()->json([
                 'status' => false,
                 'trx' => null,
