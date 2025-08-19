@@ -18,7 +18,7 @@ class BdAgencyHostSallaryService
 
     protected static function calculateTotalSallary(int $bdId, int $month, int $year): float
     {
-        $subQuery = BdAgencyHostSallary::select(DB::raw('MAX(id) as id'))
+        $subQuery = BdAgencyHostSallary::select(\DB::raw('MAX(id) as id'))
         ->where('bd_id', $bdId)
         ->where('month', $month)
         ->where('year', $year)
