@@ -142,7 +142,7 @@ class PaymentMethodController extends Controller
             }
 
             info($query['statusDescription']);
-            info('No description provided.');
+            info($query['statusCode']);
             return response()->json([
                 'status' => $query['statusCode'] == 200,
                 'trx' => $purchaseProduct->trx,
