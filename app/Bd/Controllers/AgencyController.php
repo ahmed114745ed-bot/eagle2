@@ -391,7 +391,14 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
-        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone',  'coins', 'img')
+        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone',  'coins', 
+        'img',
+        \DB::raw('(
+            SELECT SUM(sallary - cut_amount) 
+            FROM agency_sallaries 
+            WHERE agency_sallaries.agency_id = agencies.id
+        ) as salary')
+         )
             ->where(function ($query) {
                 $query->WhereDoesntHave('additionalInfo')
                     ->orWhereHas('additionalInfo', function ($query) {
