@@ -133,8 +133,8 @@ class RoomBoomGiftService
                 $openBoom->save();
 
                 dispatch(new RoomBoomRewardJob($openBoom->id))->delay(now()->addSeconds(30));
-                dispatch(new EndBoomPusherJob($currentLevel, $newTotal, auth()->id(), $room));
-                dispatch(new EndBoomZegoJob($currentLevel, $room))->delay(now()->addSeconds(20));
+                dispatch(new EndBoomPusherJob($boomLevel, $newTotal, auth()->id(), $room));
+                dispatch(new EndBoomZegoJob($boomLevel, $room))->delay(now()->addSeconds(20));
             }
         }
     }
