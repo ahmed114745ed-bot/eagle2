@@ -3596,6 +3596,9 @@ use Modules\Vip\Entities\Vip;
             </div>
 
             <script>
+               $(document).on('change', '.libraryRealTime', function() {
+                    $(this).closest('form').submit();
+                });
                 function reseting(colorid, value) {
                     $('#' + colorid).val(value);
 
