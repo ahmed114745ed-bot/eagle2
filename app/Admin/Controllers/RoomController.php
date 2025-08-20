@@ -581,6 +581,9 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
 
+            if (strlen($name) > 150){
+                $name = substr($name,0,150) . ' ...';
+            }
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
