@@ -27,6 +27,9 @@ Route::middleware(['auth:sanctum', 'localization'])->group(function () {
     Route::post('/buy-sets', [CpController::class, 'extendCard']);
     Route::get('/cp-profile', [CpController::class, 'cpProfile']);
     Route::get('/cp-levels-gifts', [CpController::class , 'cpLevels']);
+
+    Route::get('/cp-user-list', [CpController::class, 'cpUserList']);
+
 });
 
 Route::prefix('weekly-cp')->middleware(['auth:sanctum', 'localization'])->group(function () {

@@ -8,7 +8,7 @@ use App\Models\Room;
 use App\Models\Agency;
 
 use App\Models\GiftLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\ExchangeLog;
 use App\Models\AgencySallary;
 use Illuminate\Database\Seeder;

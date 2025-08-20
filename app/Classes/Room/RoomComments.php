@@ -37,6 +37,7 @@ class RoomComments
             $ms = [
                 'messageContent' => [
                     'msg' => 'yellowBanner',
+                    'event' => 'room.comment.event',
                     'uId' => $user->id,
                     'umsg' => $data['message'],
                     'oid' => @$room->uid,
@@ -58,8 +59,7 @@ class RoomComments
             ];
             $json = json_encode($ms);
 
-
-            Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+//            Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
 
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $data['room_id']), 'heavyProcessing');
 

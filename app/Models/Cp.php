@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Helpers\Common;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\CP\Entities\CpLevel;
@@ -44,7 +43,7 @@ class Cp extends Model
     protected static function booted()
     {
         static::created(function ($cp) {
-           
+
         });
     }
 }

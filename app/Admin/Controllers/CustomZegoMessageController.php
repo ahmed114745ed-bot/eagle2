@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\DedicateAction;
 use App\Admin\Actions\ResendZegoMessageAction;
 use App\Models\User;
 use App\Traits\Gifts\WinLuckyGift;
@@ -86,7 +85,7 @@ class CustomZegoMessageController extends AdminController
 
                 $zigoData = [
                     'user_id'      => $user->id,
-                    'user_image'   => @$user->avatar->image ?? '',
+                    'user_image'   => @$user->profile->avatar ?? '',
                     'gift_image'   => @$gift->img ?? '',
                     'owner_id'     => $user->id,
                     'user_name'    => $user->name ?? '',

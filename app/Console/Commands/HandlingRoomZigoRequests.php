@@ -46,7 +46,7 @@ class HandlingRoomZigoRequests extends Command
     {
 
         $data = Redis::keys('*CharismaGift*');
- 
+
 
         $allData = [];
 
@@ -59,12 +59,17 @@ class HandlingRoomZigoRequests extends Command
 
                 $item = @unserialize($item);
 
+                // Ensure $item is an array
+                if ($item === false || !is_array($item)) {
+                    throw new \RuntimeException("Invalid data from Redis key: {$cleanKey}");
+                }
+
                 $item = new \App\Tik\DTO\RoomJobClass($item ?? []);
 
                 $data_ne                = $roomFactory->setType($item->type)->work($item);
                 $allData[$item->type][] = $data_ne;
                 echo 'Done ' . $item->type . ' to room ' . $item->room_id . PHP_EOL;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 echo 'Fail ' . $item->type . ' to room ' . $item->room_id . PHP_EOL;
 
             }

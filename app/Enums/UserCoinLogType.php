@@ -12,6 +12,7 @@ enum UserCoinLogType: string
     case PAYMENT = 'payment';
     case ROOM_TARGET = 'room_target';
     case CP = 'cp';
+    case CPS = 'cps';
     case EXCHANGE = 'exchange';
     case FAMILY = 'family';
     case BACKGROUND_IMAGES = 'background_images';
@@ -20,13 +21,15 @@ enum UserCoinLogType: string
     case WEEKLY_STAR = 'weekly_star';
     case CHARGE_EVENT = 'charge_event';
     case LUCK_BOX = 'lucky_box';
-    
     case COIN_GAME = 'coin_game';
     case LUCKY_GIFT = 'lucky_gift';
     case CASHBACK = 'cashback';
     case VIP = 'vip';
     case PACK = 'packs';
     case GIFT = 'gifts';
+    case RETURN_CHAGE = 'return_charge';
+
+    case CREATE_ROOM = 'create_room';
 
     public function meta(): array
     {
@@ -76,6 +79,11 @@ enum UserCoinLogType: string
             self::CP => [
                 'sub_type' => 'cps',
                 'item_name' => 'room_target',
+                'queue_job' => null,
+            ],
+            self::CPS => [
+                'sub_type' => 'cps',
+                'item_name' => 'cps',
                 'queue_job' => null,
             ],
             self::EXCHANGE => [
@@ -149,6 +157,19 @@ enum UserCoinLogType: string
                 'item_name' => 'gift',
                 'queue_job' => \App\Jobs\LogUserCoinProfit::class,
             ],
+            self::RETURN_CHAGE => [
+                'sub_type' => 'return_charges',
+                'item_name' => 'return_charges',
+                'queue_job' => null,
+            ],
+            self::CREATE_ROOM => [
+                'sub_type' => 'rooms',
+                'item_name' => 'rooms',
+                'queue_job' => null,
+            ],
+
+            
         };
     }
 }
+

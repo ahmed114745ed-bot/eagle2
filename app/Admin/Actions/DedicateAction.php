@@ -3,12 +3,12 @@
 namespace App\Admin\Actions;
 
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +20,7 @@ use App\Classes\Enums\SubTypeMessagesType;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeServices;
+use Modules\Vip\Helpers\VipCommon;
 
 class DedicateAction extends RowAction
 {
@@ -110,7 +111,7 @@ class DedicateAction extends RowAction
 
 
             $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
-            $is_used = $enableVipAuto === "true" ? 1 : 0;
+            $is_used = $enableVipAuto === "true" ? 0 : 0;
 
             try {
                 $uniqueAttributes = [
@@ -121,18 +122,9 @@ class DedicateAction extends RowAction
                 ];
                 $userVip = UserVip::query()->where($uniqueAttributes)->first();
                 if (!$userVip) {
-                    UserVip::query()->create(
-                        [
-                            ...$uniqueAttributes,
-                            'type'   => 1,
-                            'expire' => Carbon::now()->addDays($request->days ?: 1)->timestamp,
-                            'qty'    => 1,
-                            'price'  => 0,
-                            'total'  => 0,
-                            'is_used'  => $is_used,
-                            'dash_user_id'  => \auth()->user()->id,
-                        ]
-                    );
+
+                    VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id() );
+
                 } else {
                     $userVip->qty++;
                     if($userVip->expire > now()->timestamp){
@@ -145,7 +137,7 @@ class DedicateAction extends RowAction
                     }
                     $userVip->save();
                 }
-                Common::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
+                // VipCommon::handelVip($vip, $user, expire: $request->days ?? 1, userVip: $userVip);
 
                 DB::commit();
                 CustomNotification::vips($user, $request->days, $vip->img);

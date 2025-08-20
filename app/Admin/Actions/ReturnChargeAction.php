@@ -5,6 +5,8 @@ namespace App\Admin\Actions;
 
 
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Models\Charge;
 use App\Models\ReturnCharge;
@@ -75,6 +77,16 @@ class ReturnChargeAction extends Action
                     'receiver_amount' => $receiverUser->di,
                     'charge_id'    => $charge->id,
                 ];
+
+                $amountBefore =  $receiverUser->di;
+                UserCoinLogHelper::logByType(
+                    $receiverUser->id,
+                    -abs($charge->amount),
+                    $amountBefore,
+                    UserCoinLogType::RETURN_CHAGE,
+                );
+                
+
                 $receiverUser->decrement('di', $charge->amount);
             }
         }
@@ -113,12 +125,12 @@ class ReturnChargeAction extends Action
     public function html()
     {
         return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" class="btn btn-sm btn-info salary_action ">' . __('return') . '</a>
-<script>
-function pu(val) {
+        <script>
+        function pu(val) {
 
-  $("#vid").val(val)
-}
-</script>
-';
+        $("#vid").val(val)
+        }
+        </script>
+        ';
     }
 }

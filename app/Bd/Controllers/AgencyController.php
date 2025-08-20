@@ -93,7 +93,7 @@ class AgencyController extends MainController
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->find($id);
-      
+
 
         if (!$agency) {
             $agency =  ShippingAgency::query()
@@ -101,7 +101,7 @@ class AgencyController extends MainController
                     ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
                     ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                     ->find($id);
-           
+
         }
 
         if (!$agency) {
@@ -109,7 +109,7 @@ class AgencyController extends MainController
                 'title'   => __('error_title_div'),
                 'message' => __('Agency not found'),
             ]);
-    
+
             session()->flash('error', $error);
             throw new \Exception(__('Agency not found'));
         }
@@ -334,7 +334,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
-        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'salary', 'coins', 'img')
+        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone',  'coins', 'img')
             ->where(function ($query) {
                 $query->WhereDoesntHave('additionalInfo')
                     ->orWhereHas('additionalInfo', function ($query) {
@@ -685,7 +685,7 @@ class AgencyController extends MainController
                             const nationalNumber = input.value.replace(/\s/g, '');
 
                             const hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden'; 
+                            hiddenInput.type = 'hidden';
                             hiddenInput.name = 'phone_code';
                             hiddenInput.value = `+${dialCode}`;
                             form.appendChild(hiddenInput);

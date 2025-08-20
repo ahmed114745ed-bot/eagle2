@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard\Events;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Events\AdminEventReportResource;
 use App\Models\Pack;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\Events\Entities\GeneralRole;

@@ -24,23 +24,23 @@ class ExtendCardService
     public function extendCard($user, $wareId)
     {
         if (!$wareId) {
-            return Common::apiResponse(0, 'راجع البيانات المدخله');
+            return Common::apiResponse(0, 'invalid_data');
         }
 
         $ware = $this->cpRepository->findWare($wareId);
         if (!$ware) {
-            return Common::apiResponse(0, 'المنتج غير موجود');
+            return Common::apiResponse(0, 'ware_not_found');
         }
 
         if ($ware->price > $user->di) {
-            return Common::apiResponse(0, 'لم تملك القيمه من الكويز');
+            return Common::apiResponse(0, 'insufficient_di');
         }
 
         $expire = 30;
 
         /// TODO check expire packs
         $existingPack = $this->packRepository->findByUserIdAndTargetId($user->id, $ware->id);
-        if ($existingPack && $existingPack->use_num == 15) return Common::apiResponse(0, 'لقد قمت بشراء جميع الكراسى');
+        if ($existingPack && $existingPack->use_num == 15) return Common::apiResponse(0, 'all_chairs_purchased');
 
       //  $countPack = $this->packRepository->countUserVipPacks($user->id);
 
@@ -68,6 +68,6 @@ class ExtendCardService
         $user->di -= $ware->price;
         $user->save();
 
-        return Common::apiResponse(1, 'تم الاضافه بنجاح');
+        return Common::apiResponse(1, 'added_successfully');
     }
 }

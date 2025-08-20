@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Helpers\CoinHelper;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\CoinLog;
@@ -66,15 +67,12 @@ class OPayController extends Controller
         if ($result['status']) {
             $coinLog = CoinLog::query ()->where ('trx',$result['data']['reference'])->where ('status',0)->where ('method','opay')->first ();
             if (!$coinLog) return Common::apiResponse (0,'cannot find transaction',null,404);
-            $user = User::query ()->find ($coinLog->user_id);
-            if (!$user){
-                return Common::apiResponse (0,'paid but cant found user',null,404);
-            }
-            $user->increment ('di',$coinLog->obtained_coins);
+            
+            CoinHelper::applyCoinLog($coinLog);
+
             $coinLog->status = 1;
             $coinLog->save();
-            Common::sendOfficialMessage (@$user->id,__('congratulations'),__('your recharge success'));
-            (new UserCounterServices)->eventUser($user,'official-messages');
+          
             return Common::apiResponse (1,'successfully paid',null,200);
         } else {
             return Common::apiResponse (0,'fail',null,400);

@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Repositories\ProfileRepository;
 use App\Models\Follow;
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Repositories\User\UserRepository;
 
 class ProfileRelationService

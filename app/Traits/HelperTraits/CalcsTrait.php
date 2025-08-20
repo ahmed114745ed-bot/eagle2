@@ -7,11 +7,11 @@ use App\Models\Family;
 use App\Models\FamilyLevel;
 use App\Models\GiftLog;
 use App\Models\OfficialMessage;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserLevelLog;
-use App\Models\UserVip;
-use App\Models\Vip;
+use Modules\Vip\Entities\UserVip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -1289,7 +1289,7 @@ trait CalcsTrait
     {
         $family = Family::query()->find($family_id);
         if ($family) {
-            $family->update(['today_rank' => 1, 'week_rank' => 1, 'month_rank' => 1]);
+            $family->inc(['today_rank' => 1, 'week_rank' => 1, 'month_rank' => 1]);
             $giftLogs = GiftLog::query()->where(function ($q) use ($family) {
                 $q->where('receiver_family_id', $family->id)->orWhere('sender_family_id', $family->id);
             })->sum('giftPrice');

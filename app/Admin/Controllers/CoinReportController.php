@@ -26,18 +26,22 @@ class CoinReportController extends MainController
 
     protected function grid()
     {
-        $name = "lucky_gift";
-        if (request("name") != null) {
-            $name = request("name");
+        $default = "lucky_gift";
+        $name = request("name") ?? $default;
+
+        if (!method_exists($this, $name)) {
+            $name = $default;
         }
+
         $grid = $this->{$name}();
-        $grid->disableexport();
+        $grid->disableExport();
         $grid->disableActions();
         $grid->disableCreateButton();
         $grid->disableColumnSelector();
 
         return $grid;
     }
+
 
     protected function lucky_gift()
     {
@@ -157,45 +161,6 @@ class CoinReportController extends MainController
         $grid->column('total_coins_win', __('win'));
         $grid->column('earliest_created_at', __('created at'));
 
-        return $grid;
-    }
-
-    protected function shipping_host()
-    {
-        $grid = new Grid(new Charge());
-        $grid->disableRowSelector();
-
-        $grid->model()->selectRaw('MIN(charges.created_at) as earliest_created_at,charges.user_id, MAX(users.name) as user_name, sum(CASE WHEN charges.user_type = "app" THEN charges.amount ELSE 0 END) as total_coins_from_user, sum(CASE WHEN charges.user_type != "app" AND charges.user_type != "dash" THEN charges.amount ELSE 0 END) as total_coins_shipping')
-            ->leftJoin('users', 'charges.user_id', '=', 'users.id')
-            ->groupBy('charges.user_id')->orderByDesc('earliest_created_at');
-
-        $grid->filter(function ($filter) {
-            $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $query->where('users.uuid', $this->input);
-                }, __('Uid'), 'Uid');
-            });
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
-                    $query->whereDate('charges.created_at', '>=', $datt);
-                }, __('from_date'), 'from_date')->date();
-            });
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
-
-                    $query->whereDate('charges.created_at', '<=', $datt);
-                }, __('to_date'), 'to_date')->date();
-            });
-        });
-
-        $grid->column('user.uuid', __('user id'));
-        $grid->column('user_name', __('user name'));
-        $grid->column('total_coins_shipping', __('from shipping'));
-        $grid->column('total_coins_from_user', __('from user'));
-        $grid->column('earliest_created_at', __('created at'));
         return $grid;
     }
 }

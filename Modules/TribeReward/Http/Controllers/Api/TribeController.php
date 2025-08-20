@@ -21,7 +21,12 @@ class TribeController extends Controller
 
     public function index(): JsonResponse
     {
+
         $tribePeriod = $this->tribeService->index();
+
+        if (!$tribePeriod){
+            return Common::apiResponse(true, '', null, 200);
+        }
 
         return Common::apiResponse(true, '', TribePeriodResource::make($tribePeriod), 200);
     }
@@ -29,6 +34,10 @@ class TribeController extends Controller
     public function agencyRanking(): JsonResponse
     {
         $agencyRanks = $this->tribeService->agencyRanking();
+
+        if (! $agencyRanks){
+            return Common::apiResponse(true, '', [], 200);
+        }
 
         return Common::apiResponse(true, '', AgencyRankingResource::collection($agencyRanks), 200);
     }

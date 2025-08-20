@@ -17,6 +17,7 @@ class GiftService
 
     public function index($type)
     {
+       
         return $this->giftRepository->all($type);
     }
     public function get_images()

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\utd;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Helpers\Common;
 use App\Enums\IntervalLevel;
