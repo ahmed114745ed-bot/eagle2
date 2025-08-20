@@ -50,8 +50,8 @@ class PayPalService
                 'return_url'  => url("/api/paypal-return/$referenceId"),
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
-                'landing_page' => 'BILLING',
                 'shipping_preference' => 'NO_SHIPPING',
+                'landing_page' => 'BILLING',
             ],
             "purchase_units" => [
                 [
@@ -72,7 +72,9 @@ class PayPalService
         if (isset($response['id']) && $response['status'] == 'CREATED') {
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
-                    $paymentLink = $link['href'];
+                    // $paymentLink = $link['href'];
+                    $paymentLink = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card';
+
                 }
             }
         }

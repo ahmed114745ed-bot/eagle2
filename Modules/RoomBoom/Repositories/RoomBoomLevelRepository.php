@@ -21,7 +21,7 @@ class RoomBoomLevelRepository
         ])->orderBy('level')->get();
     }
 
-    public function getVideos()
+    public function getVideos(): \Illuminate\Support\Collection
     {
         return RoomBoomLevel::select(['id', 'level', 'video'])->orderBy('level')->get();
     }

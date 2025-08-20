@@ -92,11 +92,13 @@ class RoomBoomRewardJob implements ShouldQueue
             ];
         }
 
-        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
-            ->where('room_boom_level', $level->level)
-            ->where('start_boom_ranking', 1)
-            ->orderByDesc('created_at')
-            ->value('sender_id');
+//        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
+//            ->where('room_boom_level', $level->level)
+//            ->where('start_boom_ranking', 1)
+//            ->orderByDesc('created_at')
+//            ->value('sender_id');
+
+        $lastTriggerSenderId = GiftLog::where('id', $boom->final_gift_id)->value('sender_id');
 
         if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
             if ($rewards->isNotEmpty()){
