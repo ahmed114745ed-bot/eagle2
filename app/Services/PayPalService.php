@@ -51,7 +51,7 @@ class PayPalService
                 'return_url'          => url("/api/paypal-return/$referenceId"),
                 'cancel_url'          => url('/api/paypal-cancel'),
                 'user_action'         => 'PAY_NOW',
-                'shipping_preference' => 'NO_SHIPPING',
+                'shipping_preference' => 'GET_FROM_FILE',
                 'landing_page'        => 'NO_PREFERENCE',
             ],
             "purchase_units" => [
