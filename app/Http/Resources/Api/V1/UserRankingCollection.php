@@ -32,67 +32,101 @@ class UserRankingCollection extends ResourceCollection
     }
 
     public function toArray($request): array
-    {
-        $data   = $this->collection->values();
-        $top    = $data->take(3);
-        $others = $data->slice(3)->values();
+{
+    $data   = $this->collection->values();
+    $top    = $data->take(3)->values();   // may return < 3 items
+    $others = $data->slice(3)->values();
 
-        $perPage     = (int) $request->get('per_page', 10);
-        $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+    // 🔹 ensure top always has 3 items
+    $kong = [
+        'user_id'            => 0,
+        'uuid'               => '',
+        'exp'                => '0',
+        'exp_int'            => 0,
+        'remaining'          => '0',
+        'remaining_int'      => 0,
+        'name'               => '',
+        'avatar'             => '',
+        'frame'              => '',
+        'frame_id'           => 0,
+        'sender_img'         => '',
+        'reseverimg'         => '',
+        'vip_level'          => 0,
+        'sender_level'       => 0,
+        'reciver_level'      => 0,
+        'vip_level_img'      => '',
+        'sender_level_img'   => '',
+        'reciver_level_img'  => '',
+        'age'                => 0,
+        'type_user'          => 0,
+        'manger_type'        => null,
+        'achievement_images' => [],
+        'color_name'         => '',
+    ];
 
-        // keep a paginator to compute meta, but return items-only in "other"
-        $this->otherPaginator = new LengthAwarePaginator(
-            $others,
-            $others->count(),
-            $perPage,
-            $currentPage,
-            ['path' => LengthAwarePaginator::resolveCurrentPath()]
-        );
+    // fill missing slots
+    for ($i = $top->count(); $i < 3; $i++) {
+        $top->push($kong);
+    }
 
-        // items for current page (already transformed)
-        $otherItems = $others->forPage($currentPage, $perPage);
-        $achievement_images = [];
-        if ($this->user->medals) {
-            foreach ($this->user->medals as $medal) {
-                if ($medal->achievementLevel) {
-                    $achievementData = [
-                        'image' => @$medal->achievementLevel->valid_image,
-                        'title' => @$medal->achievementLevel?->achievement?->name ?? '',
-                        'created_at' => @$medal->created_at,
-                    ];
-                    $achievement_images[] = $achievementData;
-                }
+    // paginate "other"
+    $perPage     = (int) $request->get('per_page', 10);
+    $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+
+    $this->otherPaginator = new LengthAwarePaginator(
+        $others,
+        $others->count(),
+        $perPage,
+        $currentPage,
+        ['path' => LengthAwarePaginator::resolveCurrentPath()]
+    );
+
+    $otherItems = $others->forPage($currentPage, $perPage);
+
+    // build achievement_images and color_name
+    $achievement_images = [];
+    if ($this->user->medals) {
+        foreach ($this->user->medals as $medal) {
+            if ($medal->achievementLevel) {
+                $achievementData = [
+                    'image'      => @$medal->achievementLevel->valid_image,
+                    'title'      => @$medal->achievementLevel?->achievement?->name ?? '',
+                    'created_at' => @$medal->created_at,
+                ];
+                $achievement_images[] = $achievementData;
             }
         }
-        $hasColor = Common::hasInPackV2($this->user->packs, 18, true);
-
-        $color_name = $hasColor ? common::wareUserVipV2($this->user->id, 18, 'color') ?? '' : '';
-        return [
-            'user'  => [
-                'user_id'            => $this->user->id,
-                'uuid'               => $this->user->uuid ?? '',
-                'exp'                => $this->userExp != null
-                    ? ($this->total_gifts ?? '0')
-                    : ($data->where($this->key, $this->user->id)->first()->total_gifts ?? '0'),
-                'vip_level'          => $this->user->UserVip?->level ?? 0,
-                'sender_level'       => $this->user->total_sender_level ?? 0,
-                'reciver_level'      => $this->user->total_received_level ?? 0,
-                'vip_level_img'      => \App\Helpers\UserPackHelper::getVipIcon($this->user),
-                'sender_level_img'   => \App\Helpers\UserLevelHelper::getSenderImage($this->user),
-                'reciver_level_img'  => \App\Helpers\UserLevelHelper::getReceiverImage($this->user),
-                'type_user'          => intval($this->user->type_user ?? 0),
-                'country'            => @$this->user->country,
-                'manger_type'        => $this->user->mangerType
-                    ? new MangerTypeResource($this->user->mangerType)
-                    : null,
-                'age'                => $this->user->profile?->age ?? '',
-                'color_name'         => $color_name ,
-                'achievement_images' => $achievement_images,
-            ],
-            'top'   => NewUserRankingResource::collection($top),
-
-            // IMPORTANT: items only (no paginator structure)
-            'other' => NewUserRankingResource::collection($otherItems),
-        ];
     }
+
+    $hasColor   = Common::hasInPackV2($this->user->packs, 18, true);
+    $color_name = $hasColor
+        ? Common::wareUserVipV2($this->user->id, 18, 'color') ?? ''
+        : '';
+
+    return [
+        'user'  => [
+            'user_id'            => $this->user->id,
+            'uuid'               => $this->user->uuid ?? '',
+            'exp'                => $this->userExp != null
+                ? ($this->total_gifts ?? '0')
+                : ($data->where($this->key, $this->user->id)->first()->total_gifts ?? '0'),
+            'vip_level'          => $this->user->UserVip?->level ?? 0,
+            'sender_level'       => $this->user->total_sender_level ?? 0,
+            'reciver_level'      => $this->user->total_received_level ?? 0,
+            'vip_level_img'      => \App\Helpers\UserPackHelper::getVipIcon($this->user),
+            'sender_level_img'   => \App\Helpers\UserLevelHelper::getSenderImage($this->user),
+            'reciver_level_img'  => \App\Helpers\UserLevelHelper::getReceiverImage($this->user),
+            'type_user'          => intval($this->user->type_user ?? 0),
+            'country'            => @$this->user->country,
+            'manger_type'        => $this->user->mangerType
+                ? new MangerTypeResource($this->user->mangerType)
+                : null,
+            'age'                => $this->user->profile?->age ?? '',
+            'color_name'         => $color_name,
+            'achievement_images' => $achievement_images,
+        ],
+        'top'   => $top, // already padded to 3
+        'other' => NewUserRankingResource::collection($otherItems),
+    ];
+}
 }
