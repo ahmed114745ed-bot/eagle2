@@ -3,10 +3,8 @@
 namespace Modules\RoomBoom\Transformers;
 
 use App\Http\Resources\Api\V1\TopUsersRankResource;
-use App\Models\Gift;
 use App\Models\GiftLog;
 use App\Models\User;
-use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,7 +19,7 @@ class RoomBoomResource extends JsonResource
             'ended_at' => $this->ended_at,
             'total_gifts_value' => $this->total_gifts_value,
             'level' => $this->roomBoomLevel ? $this->roomBoomLevel->level : null,
-            'top_contributors' => TopUsersRankResource::collection($this->getTopContributors()),
+            'top_contributors' => $this->ended_at ? TopUsersRankResource::collection($this->getTopContributors()) : [],
         ];
     }
 
