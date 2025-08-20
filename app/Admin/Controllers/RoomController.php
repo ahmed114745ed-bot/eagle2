@@ -581,7 +581,7 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
 
-            if (strlen($name) > 150){
+            if (strlen($name) > 50){
                 $name = substr($name,0,50) . ' ...';
             }
             return "
