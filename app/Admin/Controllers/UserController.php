@@ -223,7 +223,7 @@ class UserController extends MainController
 
                 $user = $this;
                 if (! $user) {
-                    return __('No Agency');
+                    return __('No User');
                 }
 
                 return app(UserService::class)->adminUserAvatar($user);
