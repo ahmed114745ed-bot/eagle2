@@ -221,6 +221,7 @@ class CpserviceCo
         if ($cp?->relation?->type == 'solution') {
             if ($request->status == 1) {
                 $cpBetweenUsers = $this->cpRepository->findCpBetweenUsers($cp->user_one_id, $cp->user_two_id, 'solution');
+                info($cpBetweenUsers);
                 $cpBetweenUsers->status = 3;
                 $cpBetweenUsers->save();
             }
@@ -284,7 +285,7 @@ class CpserviceCo
     public function getCpRanking()
     {
         $relationType = request("relationType") ?? 'lovely';
-    
+
         $type = request("type") ?? 1;
 
         $data = $this->cpRepository->getCpRanking($relationType, $type);
@@ -314,5 +315,5 @@ class CpserviceCo
         return Common::apiResponse(1, '', CpListResource::collection($data));
     }
 
-    
+
 }
