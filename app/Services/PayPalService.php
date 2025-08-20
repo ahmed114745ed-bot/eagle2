@@ -59,7 +59,15 @@ class PayPalService
                     "amount"       => [
                         "currency_code" => config('paypal.currency'),
                         "value"         => number_format($amount, 2),
-                    ]
+                    ],
+                    // "shipping" => [
+                    //     "address" => [
+                    //         "address_line_1" => "Test Street",
+                    //         "admin_area_2"   => "London",
+                    //         "postal_code"    => "12345",
+                    //         "country_code"   => "GB" 
+                    //     ]
+                    //     ],
                 ]
             ],
         ];
@@ -73,7 +81,7 @@ class PayPalService
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
                     // $paymentLink = $link['href'];
-                    $paymentLink = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card';
+                    $paymentLink = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card&intent=capture&locale.x=ar_AE';
 
                 }
             }
