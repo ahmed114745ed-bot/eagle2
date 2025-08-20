@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use Log;
+use Cache;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Config;
 use App\Models\Target;
-use App\Models\User;
-use App\Models\UserSallary;
-use Cache;
-use Log;
 use App\Helpers\Common;
-use App\Models\BrandImage;
 use App\Models\Setting;
 use App\Models\Timezone;
+use App\Models\BrandImage;
+use App\Models\PaymentCoin;
+use App\Models\UserSallary;
+use Illuminate\Support\Str;
 use App\Models\Notification;
 use Illuminate\Http\Request;
-use App\Models\NotificationTranslation;
-use App\Models\PaymentCoin;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission;
+use Illuminate\Support\Facades\File;
+use App\Models\NotificationTranslation;
 
 class SettingsController extends Controller
 {
@@ -133,6 +134,8 @@ class SettingsController extends Controller
             }
         }
 
+
+
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
             $data['background_color'] = $request->background_color;
@@ -218,6 +221,77 @@ class SettingsController extends Controller
         return back();
     }
 
+
+    public function updateAppConfig(Request $request)
+    {
+
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_name);
+        }
+        $data = $request->except('_token', 'super_admin_coins');
+
+
+        if ($request->background_type === 'color') {
+            $data['app_background'] = $request->background_color;
+            $data['background_color'] = $request->background_color;
+        } elseif ($request->background_type === 'image' && $request->hasFile('background_image')) {
+            $data['app_background'] = Common::upload('images', $request->file('background_image'));
+            $data['background_image'] = $data['app_background'];
+        } elseif ($request->background_type === 'gradient') {
+            $data['gradient_1'] = $request->gradient_1;
+            $data['gradient_2'] = $request->gradient_2;
+            $data['gradient_3'] = $request->gradient_3;
+        }
+
+        // Primary Color
+        $data['app_primary_color'] = $request->app_primary_color;
+
+        // Bottom Nav
+        $data['bottom_nav_bottom_color'] = $request->reset != 1 ? $request->bottom_color : null;
+        $data['bottom_nav_active_color'] = $request->reset != 1 ? $request->active_color : null;
+        $data['bottom_nav_inactive_color'] = $request->reset != 1 ? $request->inactive_color : null;
+
+        // Text & Button Colors
+        $data['text_header_color'] = $request->text_header_color;
+        $data['button_text_color'] = $request->button_text_color;
+
+
+        unset($data['app_background_image'], $data['brand_background_image_reset']);
+        if ($request->reset) {
+            $timestamp = Carbon::now()->timestamp;
+            settings()->set('color_setting_updated_at', $timestamp);
+        }
+        // Process and save settings
+        foreach ($data as $key => $value) {
+
+            if (Str::contains($key, ['color']) && (common::getSettingValue('app_primary_color') != $request->app_primary_color || common::getSettingValue('app_second_color') != $request->app_second_color || common::getSettingValue('app_white_color') != $request->app_white_color || common::getSettingValue('app_black_color') != $request->app_black_color || common::getSettingValue('app_grey_color') != $request->app_grey_color || common::getSettingValue('app_yellow_color') != $request->app_yellow_color)) {
+                $cacheKey = 'colors_updated_at';
+                settings()->set($cacheKey, true);
+            } elseif ((common::getSettingValue('background_type') !== $request->background_type || $request->hasFile('app_background_image') || common::getSettingValue('background_color') !== $request->background_color || common::getSettingValue('gradient_2') !== $request->gradient_2 || common::getSettingValue('gradient_3') !== $request->gradient_3 || common::getSettingValue('gradient_1') !== $request->gradient_1)) {
+                $cacheKey = 'ground_updated_at';
+                settings()->set($cacheKey, true);
+            } else {
+                $cacheKey = $key . '_updated_at';
+                settings()->set($cacheKey, true);
+            }
+            if ($value instanceof \Illuminate\Http\UploadedFile) {
+                $value = Common::upload('images', $value);
+            }
+
+            if (!is_null($value)) {
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+                if (!$value instanceof \Illuminate\Http\UploadedFile) {
+                    Cache::put($key, $value);
+                }
+            }
+            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            Cache::put($key, $value);
+        }
+
+        admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
+
+        return back();
+    }
     public function store_notification_templates(Request $request)
     {
 

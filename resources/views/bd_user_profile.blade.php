@@ -1335,9 +1335,9 @@
                                                     data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
                                             </button>
-                                            <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
+                                            <!-- <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </td>
                                 </tr>
@@ -1380,7 +1380,7 @@
                             <th>{{ __('expire') }}</th>
                             <th>{{ __('qty') }}</th>
                             <th>{{ __('total Price') }}</th>
-                            <th>{{ __('action') }}</th>
+                            <!-- <th>{{ __('action') }}</th> -->
 
                         </tr>
                         </thead>
@@ -1393,14 +1393,14 @@
                                     <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
-                                    <td>
+                                    <!-- <td>
                                         <div class="d-flex">
 
                                             <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
-                                    </td>
+                                    </td> -->
 
                                 </tr>
                             @endforeach
@@ -1628,13 +1628,13 @@
                                 <div class=" col-lg-6 form-Roles mb-3">
                                     <label class="form-label level-label"> {{ __('Sender Level') }}</label>
                                     <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control "
-                                           id="total_sender_level" name="total_sender_level" required>
+                                           id="total_sender_level" name="total_sender_level" >
                                 </div>
 
                                 <div class=" col-lg-6 form-Roles mb-3">
                                     <label class="form-label level-label"> {{ __('Received Level') }}</label>
                                     <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control "
-                                           id="total_received_level" name="total_received_level" required>
+                                           id="total_received_level" name="total_received_level" >
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -1894,13 +1894,13 @@
                                     <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
                                     <td>{{ @$coin->from_date ?? 0 }}</td>
                                     <td>{{ @$coin->to_date ?? 0 }}</td>
-                                    <td>
-                                        <div class="d-flex">
+                                    <!-- <td>
+                                        <div class="d-flex"> -->
                                             <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
                                                 {{ __('dashboard.delete') }}
                                             </button> -->
-                                        </div>
-                                    </td>
+                                        <!-- </div>
+                                    </td> -->
                                 </tr>
                             @endforeach
                         </tbody>
@@ -2364,12 +2364,12 @@
 
                                     <div class="col-lg-6 mb-3 form-group">
                                         <label class="form-label">{{ __('Name') }}</label>
-                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" required>
+                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" >
                                     </div>
 
                                     <div class="col-lg-6 mb-3 form-group">
                                         <label class="form-label">{{ __('uuid') }}</label>
-                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" required>
+                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" >
                                     </div>
 
                                     <div class="col-lg-6 mb-3 form-group">
@@ -2412,6 +2412,11 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                    </div>
+
+                                    <div class="mb-3 col-lg-12 form-group">
+                                        <label class="form-label">{{ __('bio') }}</label>
+                                        <textarea name="bio" id="" cols="30" rows="10" class="form-control" value="{{ old('bio', $user->bio ?? '') }}"></textarea>
                                     </div>
                                 </div>
                             </div>

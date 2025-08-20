@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;

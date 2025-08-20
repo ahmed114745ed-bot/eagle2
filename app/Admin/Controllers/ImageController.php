@@ -11,7 +11,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class ImageController extends Controller
+class ImageController extends MainController
 {
     use HasResourceActions;
 
@@ -89,6 +89,20 @@ class ImageController extends Controller
         $grid->column('status',__('status'))->switch (Common::getSwitchStates ());
         $grid->disableExport();
         return $grid;
+    }
+
+
+    protected function detail($id)
+    {
+        $show = new Show(Image::findOrFail($id));
+
+        $show->field('id', 'ID');
+        $show->field('name', 'Name');
+        $show->field('url', 'url');
+        $show->field('type', 'type');
+        $show->field('status', 'status');
+
+        return $show;
     }
 
     /**

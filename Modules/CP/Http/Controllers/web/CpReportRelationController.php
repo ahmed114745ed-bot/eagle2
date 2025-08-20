@@ -85,7 +85,7 @@ class CpReportRelationController extends MainController
             <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
             });
         $grid->column("di", __("coins"));
-         $grid->column("level_id", __("level"));
+         $grid->column("level.level", __("level"));
         $grid->column("price", __("price"));
         $grid->column("cpRelation.type", __("relation type"))->display(function ($type) {
             return __($type);
@@ -106,7 +106,7 @@ class CpReportRelationController extends MainController
                     case 5:
                         return "<span style='color: blue;'>".__('Awaiting Return')."</span>";
                     default:
-                        return $status; // Display as it is for other cases
+                        return $status;
                 }
             })->style('font-weight: bold;');
              $grid->disableRowSelector();

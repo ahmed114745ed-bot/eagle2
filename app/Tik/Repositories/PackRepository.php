@@ -5,6 +5,7 @@ namespace App\Tik\Repositories;
 use App\Models\Pack;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 
 /**
@@ -149,11 +150,54 @@ class PackRepository extends AbstractRepository
         return true;
     }
 
-    public function updateIsUsedByPackId($userId, $packId,$expire)
+    // public function updateIsUsedByPackId($userId, $packId,$expire)
+    // {
+    //     $this->model->query()->where(['user_id' => $userId, 'id' => $packId])->update(['is_used' => 1, 'use_num' => 1, 'using'=> 1,'expire' =>$expire ]);
+    //     return true;
+    // }
+    public function updateIsUsedByPackId(int $userId, int $packId, string $expire): bool
     {
-        $this->model->query()->where(['user_id' => $userId, 'id' => $packId])->update(['is_used' => 1, 'use_num' => 1, 'using'=> 1,'expire' =>$expire ]);
-        return true;
+        return DB::transaction(function () use ($userId, $packId, $expire) {
+            $pack = $this->model->query()
+                ->where(['user_id' => $userId, 'id' => $packId])
+                ->lockForUpdate() 
+                ->first();
+    
+            if (!$pack) {
+                return false;
+            }
+    
+            $this->isFirstUse($pack)
+                ? $this->markFirstUse($pack, $expire)
+                : $this->incrementUse($pack);
+    
+            return true;
+        });
     }
+    
+    private function isFirstUse($pack): bool
+    {
+        return (int) $pack->using === 0;
+    }
+    
+    private function markFirstUse($pack, string $expire): void
+    {
+        $pack->update([
+            'is_used' => 1,
+            'use_num' => 1,
+            'using'   => 1,
+            'expire'  => $expire,
+        ]);
+    }
+    
+    private function incrementUse($pack): void
+    {
+        $pack->update([
+            'is_used' => 1, 
+            'use_num' => $pack->use_num + 1,
+        ]);
+    }
+
 
     public function  bestSale()
     {

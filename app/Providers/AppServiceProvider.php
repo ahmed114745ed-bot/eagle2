@@ -19,7 +19,7 @@ use App\Models\Room;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
 use App\Observers\AgencyObserver;
@@ -28,6 +28,7 @@ use App\Observers\FamilyObserver;
 use App\Observers\FamilyUserObserver;
 use App\Observers\GiftObserver;
 use App\Observers\PKObserver;
+use App\Observers\RoomBoomLevelObserver;
 use App\Observers\RoomObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserSallaryObserver;
@@ -49,6 +50,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -108,11 +110,13 @@ class AppServiceProvider extends ServiceProvider
 
             return;
         }
-
         $locale = app()->getLocale();
         $key = $locale === 'ar' ? 'app_title_ar' : 'app_title_en';
-        $appName = Setting::where('key', $key)->value('value') ?? 'Default';
-
+        
+        $appName = Cache::rememberForever("settings.{$key}", function () use ($key) {
+            return Setting::where('key', $key)->value('value') ?? 'Default';
+        });
+        
         config(['app.name' => $appName]);
 
         $settings = DB::table('settings')->pluck('value', 'key')->toArray();
@@ -228,6 +232,7 @@ class AppServiceProvider extends ServiceProvider
         Agency::observe(AgencyObserver::class);
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
         Vip::observe(VipObserver::class);
+        RoomBoomLevel::observe(RoomBoomLevelObserver::class);
     }
 
     protected function cacheLuckyGiftProbabilities(): void

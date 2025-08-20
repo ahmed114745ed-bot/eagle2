@@ -1189,6 +1189,7 @@
 <div class="agency-tabs">
     <a href="?tab=charges" class="tab-btn {{ ($activeTab == 'charges') ? 'active' : '' }}" data-target="charges-tab">{{ __('Sent Transactions') }}</a>
     <a href="?tab=resived" class="tab-btn {{ ($activeTab == 'resived') ? 'active' : '' }}" data-target="resived-tab">{{ __('Received Transactions') }}</a>
+    <a href="?tab=coinsLog" class="tab-btn {{ ($activeTab == 'coinsLog') ? 'active' : '' }}" data-target="coinsLog-tab">{{ __('Coins Logs') }}</a>
 </div>
 
 <!-- Loading Indicator -->
@@ -1373,6 +1374,86 @@
         @endif
     </div>
 </div>
+
+<div id="coinsLog-tab" style="display: {{ ($activeTab == 'coinsLog') ? 'block' : 'none' }}">
+    <div class="performers-card">
+        <div class="filter-section mb-3">
+            <!-- <select id="sender-type" class="form-control" style="width: 200px;">
+                <option value="">{{ __('Select type') }}</option>
+                <option value="user">{{ __('Users') }}</option>
+                <option value="shipping_agency">{{ __('Shipping Agencies') }}</option>
+            </select>
+
+            <select id="sender-id" class="form-control select2" style="width: 300px;">
+                <option value="">{{ __('Search') }}</option>
+            </select>
+
+            <button class="btn btn-primary search-btn" data-tab="coinsLog">
+                <i class="fas fa-search"></i> {{ __('Search') }}
+            </button>
+
+            <button class="btn btn-secondary reset-filters" data-tab="coinsLog">
+                <i class="fas fa-redo"></i> {{ __('Reset') }}
+            </button> -->
+        </div>
+
+        @if($coinLogs && $coinLogs->count())
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('ID') }}</th>
+                            <th>{{ __('Owner') }}</th>
+                            <th>{{ __('usd') }}</th>
+                            <th>{{ __('obtained coins') }}</th>
+                            <th>{{ __('payment method') }}</th>
+                            <th>{{ __('Status') }}</th>
+                            <th>{{ __('Transaction Ref') }}</th>
+                            <th>{{ __('Date') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($coinLogs as $index => $log)
+                            @php
+                                $ownerName = '-';
+                                if ($log->user_type === 'user') {
+                                    $ownerName = optional($log->user)->name;
+                                } elseif ($log->user_type === 'shipping_agency') {
+                                    $ownerName = optional($log->shippingAgency)->name;
+                                }
+                            @endphp
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $log->id }}</td>
+                                <td>{{ $ownerName }}</td>
+                                <td>${{ number_format($log->paid_usd, 2) }}</td>
+                                <td>{{ $log->obtained_coins }}</td>
+                                <td>{{ ucfirst($log->method) }}</td>
+                                <td>
+                                    @if($log->status == 1)
+                                        <span class="badge bg-success">{{ __('Completed') }}</span>
+                                    @else
+                                        <span class="badge bg-warning">{{ __('Pending') }}</span>
+                                    @endif
+                                </td>
+                                <td>{{ $log->trx }}</td>
+                                <td>{{ $log->created_at }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                {{ $coinLogs->withQueryString()->links() }}
+            </div>
+        @else
+            <p class="text-center text-muted">{{ __('No coin logs found.') }}</p>
+        @endif
+    </div>
+</div>
+
+
+
+
 
         </div>
     </div>

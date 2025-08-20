@@ -3,7 +3,7 @@
 namespace Modules\Events\Services;
 
 use App\Models\Pack;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\Ware;
 use Carbon\Carbon;
 

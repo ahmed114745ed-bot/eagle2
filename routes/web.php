@@ -1,10 +1,12 @@
 <?php
 
+use App\Admin\Controllers\GiftLogSummaryController;
+use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\RoomVisitor;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
 use Illuminate\Support\Facades\Route;
@@ -247,6 +249,7 @@ Route::group(
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
@@ -404,3 +407,4 @@ Route::get('get-setting/{key}', function ($key) {
 Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
 
 
+Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);

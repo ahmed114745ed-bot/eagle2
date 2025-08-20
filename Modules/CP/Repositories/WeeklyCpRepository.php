@@ -43,16 +43,29 @@ class WeeklyCpRepository
         return GeneralRole::where('type', 'weekly_cp')->first();
     }
 
-    public function topUsers($giftIds, $weeklyCp)
+    public function topUsers($giftIds, $weeklyCp, int $perPage = 10)
     {
-        $gifts = GiftLog::whereIn('giftId', $giftIds)->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
+        return GiftLog::whereIn('giftId', $giftIds)->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
             ->groupBy('cp_id')->whereBetween('created_at', [
                 $weeklyCp->start_date,
                 $weeklyCp->end_date
             ])->whereHas('cps', function ($q) {
                 $q->relation();
-            })->with('cp')->orderByDesc('totalGiftNum')->get();
-        return $gifts;
+            })->with('cp')->orderByDesc('totalGiftNum')->paginate($perPage);
+    }
+
+
+    public function topUser($giftIds, $weeklyCp)
+    {
+        return GiftLog::whereIn('giftId', $giftIds)
+            ->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
+            ->groupBy('cp_id')
+            ->whereBetween('created_at', [
+                $weeklyCp->start_date,
+                $weeklyCp->end_date
+            ])->whereHas('cps', function ($q) {
+                $q->relation();
+            })->with('cp')->orderByDesc('totalGiftNum')->first();
     }
 
     public function userDetails($giftIds, $weeklyCp, $userId)

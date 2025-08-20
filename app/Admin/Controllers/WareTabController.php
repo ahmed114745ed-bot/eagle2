@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Services\FileService;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -326,7 +326,7 @@ class WareTabController extends MainController
                      var type = $('#type').val();
                      if(type == '28') {
                          $('#profile_frame').closest('.form-group').show();
-                          $('#image_type1').closest('.form-group').hide();
+                         $('#image_type1').closest('.form-group').hide();
                      } else {
                          $('#profile_frame').closest('.form-group').hide();
                          $('#image_type1').closest('.form-group').show();
