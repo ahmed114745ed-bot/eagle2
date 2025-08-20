@@ -18,9 +18,9 @@ class UpdateGiftRankings extends Command
      */
     public function handle()
     {
-        // if (!settings()->get('gift_send')) return;
+        if (!settings()->get('gift_send')) return;
 
-        // settings()->set('gift_send', false);
+        settings()->set('gift_send', false);
 
         $timezone = getTimezone();
 
