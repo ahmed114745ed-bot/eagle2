@@ -29,7 +29,8 @@ enum UserCoinLogType: string
     case GIFT = 'gifts';
     case RETURN_CHAGE = 'return_charge';
 
-    
+    case CREATE_ROOM = 'create_room';
+
     public function meta(): array
     {
         return match ($this) {
@@ -82,7 +83,7 @@ enum UserCoinLogType: string
             ],
             self::CPS => [
                 'sub_type' => 'cps',
-                'item_name' => 'room_target',
+                'item_name' => 'cps',
                 'queue_job' => null,
             ],
             self::EXCHANGE => [
@@ -161,6 +162,13 @@ enum UserCoinLogType: string
                 'item_name' => 'return_charges',
                 'queue_job' => null,
             ],
+            self::CREATE_ROOM => [
+                'sub_type' => 'rooms',
+                'item_name' => 'rooms',
+                'queue_job' => null,
+            ],
+
+            
         };
     }
 }
