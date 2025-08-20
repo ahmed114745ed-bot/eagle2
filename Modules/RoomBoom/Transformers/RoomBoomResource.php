@@ -39,6 +39,22 @@ class RoomBoomResource extends JsonResource
             ->limit(3)
             ->get();
 
+
+        if ($topContributors->isEmpty()) {
+            $lastGift = GiftLog::find($this->final_gift_id);
+
+            if ($lastGift) {
+                $user = User::with('profile')->find($lastGift->sender_id);
+                if ($user) {
+                    $user->total_gift = GiftLog::where('room_boom_uuid', $lastGift->room_boom_uuid)
+                        ->where('sender_id', $lastGift->sender_id)
+                        ->sum('giftPrice');
+
+                    return collect([$user]);
+                }
+            }
+        }
+
         return $topContributors->map(function($contributor) {
             $user = User::with('profile')->find($contributor->sender_id);
             if ($user) {
