@@ -16,7 +16,7 @@ class RoomBoomLevelService
         return $this->roomBoomLevelRepository->getLatestWithRewards($id);
     }
 
-    public function getVideos(): Collection|array
+    public function getVideos(): \Illuminate\Support\Collection
     {
         return $this->roomBoomLevelRepository->getVideos();
     }
