@@ -20,6 +20,8 @@ class BannerResource extends JsonResource
             'is_active' => (int)$this->is_active,
             'user_event_winner' =>  $avatar ?? "profile/g0lEsx7Joe.jpg",
             'user_event_winner_two' => $cpAvatar ?? "profile/g0lEsx7Joe.jpg",
+            'cp_winner_name_one' => $nameOne ?? '',
+            'cp_winner_name_two' => $nameTwo ?? '',
             'event_type' => $this->event_type
         ];
     }
