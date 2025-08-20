@@ -17,7 +17,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;

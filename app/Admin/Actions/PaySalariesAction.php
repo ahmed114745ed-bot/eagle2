@@ -38,10 +38,11 @@ class PaySalariesAction extends Action
         try {
             DB::beginTransaction();
             if ( $request->type == "user" ) {
-                $user = User::findOrFail(\request('id'));
+                $user = User::findOrFail(\request('id')); 
                 $amount = $amount ?? $user->salary;
-                $agencyId= $user->agency_id;
-                $userId= $user->id;
+                if ($user->salary < $amount) {
+                    return $this->response()->error(__('low balance'))->refresh();
+                }
 
                 UserSallary::updateOrCreate(
                     [
@@ -51,7 +52,7 @@ class PaySalariesAction extends Action
                     ],
                     [
                         'cut_amount' => DB::raw("cut_amount + $amount"),
-                        'pending_dollar' => DB::raw("pending_dollar - $amount")
+                        // 'pending_dollar' => DB::raw("pending_dollar - $amount")
                     ]
                 );
                 SalaryTrx::query()->create(
@@ -69,9 +70,11 @@ class PaySalariesAction extends Action
 
             }elseif ( $request->type == "agency") {
                 $agency = Agency::findOrFail(\request('id'));
-                $agencyId= $agency->id;
                 $amount = $amount ?? $agency->salary;
-                $userId = null;
+
+                if ($agency->salary < $amount) {
+                    return $this->response()->error(__('low balance'))->refresh();
+                }
 
                 AgencySallary::updateOrCreate(
                     [

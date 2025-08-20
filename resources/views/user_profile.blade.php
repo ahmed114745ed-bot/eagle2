@@ -7,8 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-
-
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
             --secondary-color: {{ config('themes.secondaryColor') }};
@@ -23,8 +21,6 @@
             --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
             --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
             --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
-
-
             --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
             --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
             --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
@@ -1328,7 +1324,7 @@
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
 
                                     </td>
-                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :'∞' }}</td>
+                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :$pack->days  }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
@@ -1390,7 +1386,13 @@
                                 <tr>
                                     <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
                                     <td>{{ $userVip->level }}</td>
-                                    <td>{{ (!empty($userVip->expire) && $userVip->expire != '0') ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') : '∞' }}</td>
+                                    <td>
+                                        {{ 
+                                            (!empty($userVip->expire) && $userVip->expire != '0') 
+                                                ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s') 
+                                                : $userVip->days 
+                                        }}
+                                    </td> 
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
                                     <td>
@@ -2384,12 +2386,12 @@
 
                                     <div class="col-lg-6 mb-3 form-group">
                                         <label class="form-label">{{ __('Name') }}</label>
-                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" required>
+                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" >
                                     </div>
 
                                     <div class="col-lg-6 mb-3 form-group">
                                         <label class="form-label">{{ __('uuid') }}</label>
-                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" required>
+                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" >
                                     </div>
 
                                     <div class="col-lg-6 mb-3 form-group">
@@ -2432,6 +2434,11 @@
                                                 </option>
                                             @endforeach
                                         </select>
+                                    </div>
+
+                                    <div class="mb-3 col-lg-12 form-group">
+                                        <label class="form-label">{{ __('bio') }}</label>
+                                        <textarea class="form-control"  cols="10" name="bio" rows="2">{{ old('bio', $user->bio ?? '') }}</textarea>
                                     </div>
                                 </div>
                             </div>

@@ -3,6 +3,7 @@
 namespace App\Tik\Repositories;
 
 use App\Models\Gift;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -15,11 +16,30 @@ class GiftRepository extends AbstractRepository
 
     public function all($type)
     {
-        $gifts = $this->model->query()->where('enable', 1)->orderBy("use_count", "desc");
-        if ($type) {
-            $gifts = $gifts->where('type', $type);
+        $user = Auth::user();
+     
+       
+        if ($type == 11 && $user) {
+       
+            return $user->myGifts()
+                ->withPivot('quantity')
+                ->where('enable', 1)
+                ->orderBy('use_count', 'desc')
+                ->orderByRaw('ISNULL(`sort`), `sort`')
+                ->orderBy('price')
+                ->get();
         }
-        return $gifts->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price')->get();
+    
+        $query = $this->model->newQuery()->where('enable', 1);
+    
+        if ($type) {
+            $query->where('type', $type);
+        }
+    
+        return $query->orderBy('use_count', 'desc')
+            ->orderByRaw('ISNULL(`sort`), `sort`')
+            ->orderBy('price')
+            ->get();
     }
 
     public function get_images()

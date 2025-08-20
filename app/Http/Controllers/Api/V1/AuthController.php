@@ -23,9 +23,7 @@ use Google\Client as GoogleClient;
 class AuthController extends Controller
 {
 
-    public function __construct(private AuthService $authService)
-    {
-    }
+    public function __construct(private AuthService $authService) {}
 
     public function register(RegisterRequest $request)
     {
@@ -73,7 +71,7 @@ class AuthController extends Controller
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithPhonePassword($fields);
             case 'google':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'],'id_token' => $request['id_token'], 'image' => $request['google_image']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithGoogle($fields);
             case 'apple':
@@ -105,7 +103,6 @@ class AuthController extends Controller
         try {
             event(new DeviceTokenSent($user->id, $user->device_token));
         } catch (\Exception $e) {
-
         }
 
         $user->auth_token = $token;
@@ -126,7 +123,7 @@ class AuthController extends Controller
     {
         try {
             [$user, $token, $resource] = $this->authService->loginWithGoogle($data);
-            if ($resource!= null) {
+            if ($resource != null) {
                 Common::apiResponse(false, 'email already taken', $resource, 405);
             }
         } catch (\Exception $exception) {
@@ -141,7 +138,6 @@ class AuthController extends Controller
         try {
             event(new DeviceTokenSent($user->id, $user->device_token));
         } catch (\Exception $e) {
-
         }
 
 
@@ -166,8 +162,8 @@ class AuthController extends Controller
         $fields = $data;
         $unique_id = $data['apple_id'];
         $teamId = config('apple.apple_team_id'); // Use the correct environment variable name
-        $keyId = config('apple.apple_key_id');//"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
-        $clientId = config('apple.apple_client_id');//'com.tikkchat.app'; // Use the correct environment variable name
+        $keyId = config('apple.apple_key_id'); //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+        $clientId = config('apple.apple_client_id'); //'com.tikkchat.app'; // Use the correct environment variable name
         $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');

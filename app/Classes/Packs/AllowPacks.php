@@ -3,7 +3,7 @@
 namespace App\Classes\Packs;
 
 use App\Helpers\Common;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use Illuminate\Database\Eloquent\Collection;
@@ -87,7 +87,7 @@ class AllowPacks
             ->where('is_active_for_vip', true)
             ->groupBy('type')
             ->get();
-
+         
         // Load VIP prices
         $this->vipPrices = $this->getVipPrices();
     }

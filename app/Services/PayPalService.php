@@ -44,13 +44,14 @@ class PayPalService
             'Authorization'     => 'Bearer ' . $this->getAccessToken(),
             'PayPal-Request-Id' => $id,
         ];
-
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
                 'return_url'  => url("/api/paypal-return/$referenceId"),
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
+                'shipping_preference' => 'NO_SHIPPING',
+                'landing_page' => 'BILLING',
             ],
             "purchase_units" => [
                 [
@@ -58,7 +59,15 @@ class PayPalService
                     "amount"       => [
                         "currency_code" => config('paypal.currency'),
                         "value"         => number_format($amount, 2),
-                    ]
+                    ],
+                    // "shipping" => [
+                    //     "address" => [
+                    //         "address_line_1" => "Test Street",
+                    //         "admin_area_2"   => "London",
+                    //         "postal_code"    => "12345",
+                    //         "country_code"   => "GB" 
+                    //     ]
+                    //     ],
                 ]
             ],
         ];
@@ -71,7 +80,9 @@ class PayPalService
         if (isset($response['id']) && $response['status'] == 'CREATED') {
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
-                    $paymentLink = $link['href'];
+                    // $paymentLink = $link['href'];
+                    $paymentLink = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card&intent=capture&locale.x=en_IS';
+
                 }
             }
         }

@@ -43,6 +43,9 @@ use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\RoomBoom\Entities\RoomBoom;
+use Modules\RoomBoom\Transformers\RoomBoomLevelResource;
+use Modules\RoomBoom\Transformers\RoomBoomResource;
 
 class RoomController extends Controller
 {
@@ -129,14 +132,26 @@ class RoomController extends Controller
     }
 
 
-    public function extraRoomData(int $owner_id): \Illuminate\Http\JsonResponse
+    public function extraRoomData($owner_id): \Illuminate\Http\JsonResponse
     {
         $room = $this->roomService->findRoomUser($owner_id);
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
+
+        $openBoom = RoomBoom::whereIn('total_room_gift_id', function ($query) use ($room) {
+            $query->select('id')
+                ->from('total_room_gifts')
+                ->where('room_id', $room->id);
+        })
+            ->whereNull('ended_at')
+            ->whereNotNull('started_at')
+            ->whereDate('started_at', Carbon::today())
+            ->first();
+
         $collections = [
             'charisma'          => $this->roomCharisma($owner_id),
             'achievements'      => $this->achievementLevels($owner_id),
             'boxes'             => BoxUseResource::collection($this->getBoxes($owner_id, Auth::id())),
+            'open_boom'       => $openBoom ? new RoomBoomResource($openBoom) : null,
         ];
         return Common::apiResponse(true, 'successfully', $collections);
     }

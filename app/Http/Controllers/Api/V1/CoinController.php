@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\ShippingAgency;
 use Exception;
 use App\Models\Coin;
 use App\Helpers\Common;
 use App\Models\CoinLog;
 use Illuminate\Http\Request;
 use App\Tik\Services\CoinService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Classes\PaymentGateways\Fawry;
@@ -28,13 +30,32 @@ class CoinController extends Controller
     public function buyCoins(Request $request)
     {
         if (!$request->coin_id) return Common::apiResponse(0, 'missing param', null, 422);
-        $user = $request->user();
+         
+      
+        $userType = $request->get('type', 'user');
+        $charger = null;
+
+        switch ($userType) {
+            case 'user':
+                $charger = $request->user();
+                break;
+
+            case 'shipping_agency':
+                $charger = ShippingAgency::where('app_owner_id', Auth::id())->first();
+                if (!$charger) {
+                    return Common::apiResponse(0, 'Shipping agency not found', null, 404);
+                }
+                break;
+
+            default:
+                return Common::apiResponse(0, 'Invalid type', null, 422);
+        }
 
         try {
-            return  $this->coinService->buyCoins($user, $request);
-        } catch (\Exception $exception) {
+            return  $this->coinService->buyCoins($charger, $request ,$userType);
+        } catch (Exception $exception) {
             DB::rollBack();
-            return Common::apiResponse(0, 'fail', null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
 
@@ -98,7 +119,8 @@ class CoinController extends Controller
 
     public function paymentCoin(Request $request)
     {
-        $data =  $this->coinService->paymentCoin($request);
+        $type = $request->type ?? 'user';
+        $data =  $this->coinService->paymentCoin($type);
         return Common::apiResponse(1, '', $data);
     }
 
@@ -149,5 +171,28 @@ class CoinController extends Controller
         }
         $data = $this->coinService->showPayment($request->payment_coin_id);
         return Common::apiResponse(1, '', $data);
+    }
+
+
+    public function userCoinReport()
+    {
+        try {
+            $data = $this->coinService->getUserReport();
+            return Common::apiResponse(1, 'User coin logs fetched successfully', $data);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), null, 400);
+        }
+    }
+
+    public function shippingAgencyCoinReport()
+    {
+
+        try {
+            $id =request('id');
+            $data = $this->coinService->getShippingAgencyReport($id);
+            return Common::apiResponse(1, 'Shipping agency coin logs fetched successfully', $data);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), null, 400);
+        }
     }
 }

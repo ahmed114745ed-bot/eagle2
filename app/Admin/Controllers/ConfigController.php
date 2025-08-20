@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

@@ -46,8 +46,9 @@ class VersionController extends Controller
         $isExtraUpdated = $this->isUpdated('extra_updated_at', @$request->extra_time);
         $agencyBadges = $this->isUpdated('badges_agency_update_at', @$request->badges_agency_time);
         $wapple = $this->isUpdated('wappel_frame_updated_at', @$request->wabbles_frame_time);
-        $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
+        $isColorSettingUpdated = $this->isUpdated('color_setting_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
+        $isRoomBoomVideoUpdated = $this->isUpdated('room_boom_video_update_at', @$request->room_boom_video_update_at);
         $reelSettings = Setting::where('key', 'reel_status')->first();
         $images = $this->isUpdated('images_updated_at', @$request->images_time);
         $data = [
@@ -65,10 +66,12 @@ class VersionController extends Controller
                 'extras' => $isExtraUpdated,
                 'profile_frame_updated' => $ProfileFrameUpdated,
                 'bubble_frame' => $isBubbleFrameUpdated,
+                'room_boom_videos' => $isRoomBoomVideoUpdated,
                 'wapple' => $wapple ?? false,
                 'colors' => settings()->get('colors_updated_at') ?? false,
                 'background' => settings()->get('ground_updated_at') ?? false,
                 'host_agency' => (bool)\Cache::get('host_agency'),
+                'color_time'  => $isColorSettingUpdated,
                 //intro - frames - extradata - emoji
             ],
             'enable_chat'  => settings()->get('chat_status') == "on",

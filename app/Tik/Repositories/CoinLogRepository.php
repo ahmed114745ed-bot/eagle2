@@ -4,6 +4,7 @@ namespace App\Tik\Repositories;
 
 
 use App\Models\CoinLog;
+use Illuminate\Support\Facades\Auth;
 
 class CoinLogRepository extends AbstractRepository
 {
@@ -30,5 +31,23 @@ class CoinLogRepository extends AbstractRepository
     {
         return $this->model::find($id);
             
+    }
+
+    public function getUserCoinLogs()
+    {
+        return CoinLog::query()
+            ->where('user_type', 'user')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+    }
+
+    public function getShippingAgencyCoinLogs($id)
+    {
+        return CoinLog::query()
+            ->where('user_type', 'shipping_agency')
+            ->where('user_id',$id ) 
+            ->latest()
+            ->get();
     }
 }

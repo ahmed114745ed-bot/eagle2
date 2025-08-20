@@ -3,11 +3,15 @@
 namespace App\Repositories;
 
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Agency;
 use App\Models\GiftLog;
+use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
 use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Achievement\Enums\AchievementType;
 
 class RankingRepository
 {
@@ -61,6 +65,84 @@ class RankingRepository
             ->limit($limit)->get()->reject(function ($q) {
                 return $q->exp == 0;
             });
+    }
+
+    public function getUserRanking(string $role, string $rankingType, int $perPage = 10)
+    {
+        $query = GiftRanking::query()
+            ->with([
+                'ranker' => function ($q) use ($role) {
+
+                    $q->with([
+                        'packs' => fn($q) => $q->select(['user_id', 'target_id', 'type'])
+                            ->whereIn('type', [4, 18, 10, 25])
+                            ->where('is_used', true)
+                            ->with('ware:id,name,img1,img2,show_img,color,value'),
+                        'mangerType:id,name_ar,name_en,img',
+                        'UserVip:id,user_id,expire,level,is_used',
+                        'senderLevel:id,level,type,img',
+                        'receiverLevel:id,level,type,img',
+                        'country:id,name,iso,flag',
+                        'profile:user_id,avatar,birthday',
+                        'medals' => fn($q) => $q->select(['achievement_level_id', 'picked', 'custom_image', 'user_id'])
+                            ->where('picked', true)
+                            ->with([
+                                'achievementLevel' => fn($q) => $q->select(['id', 'valid_image'])
+                                    ->with('achievement:id,name,type')
+                                    ->whereHas(
+                                        'achievement',
+                                        fn($q) =>
+                                        $q->where('type', '!=', AchievementType::ROOM_TARGET->value)
+                                    )
+                            ])
+                            ->limit(5),
+                    ])
+                        //->select(['id', 'name', 'sender_level', 'received_level', 'uuid', 'special_id'])
+                        ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom'));
+                },
+            ])
+            ->where('role', $role)
+            ->where('ranker_type', User::class)
+            ->where('type', $rankingType)
+            ->orderByDesc('total_gifts');
+
+        return $query->paginate($perPage);
+    }
+
+    public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10)
+    {
+        $query = GiftRanking::query()
+            ->with([
+                'ranker' => function ($q) {
+                    $q->with('owner')->select(['id', 'name', 'notice', 'phone', 'img','app_owner_id']);
+                },
+            ])
+            ->where('role', $role)
+            ->where('ranker_type', Agency::class)
+            ->where('type', $rankingType)
+            ->orderByDesc('total_gifts');
+
+        return $query->paginate($perPage);
+    }
+
+    public function getUserRankingImages(string $role, string $rankingType, int $limit = 3)
+    {
+        $query = GiftRanking::query()
+            ->with([
+                'ranker' => function ($q) use ($role) {
+                    $q->with([
+                        'profile:user_id,avatar',
+                    ])
+                        ->select(['id'])
+                        ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,uid,room_cover'));
+                },
+            ])
+            ->where('role', $role)
+            ->where('ranker_type', User::class)
+            ->where('type', $rankingType)
+            ->orderByDesc('total_gifts');
+
+        return $query->limit($limit)->get();
     }
 
     public function getGiftLogsV2($class, $rel, $type, $limit, $keywords)

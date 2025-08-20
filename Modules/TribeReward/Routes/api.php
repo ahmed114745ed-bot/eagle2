@@ -17,7 +17,7 @@ use Modules\TribeReward\Http\Controllers\Api\TribeController;
 
 Route::group([
     'prefix' => 'tribes',
-    'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan']
+    'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization']
 ], function (){
     Route::get('general', [TribeController::class, 'index']);
     Route::get('ranking', [TribeController::class, 'agencyRanking']);
@@ -25,4 +25,4 @@ Route::group([
 });
 
 Route::post('agencies/rewards/{id}/send', [TribeController::class, 'sendUserRewards'])
-    ->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan']);
+    ->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization']);

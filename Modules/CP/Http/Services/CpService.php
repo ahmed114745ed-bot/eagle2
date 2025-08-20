@@ -2,25 +2,23 @@
 
 namespace Modules\CP\Http\Services;
 
+use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Modules\Achievement\Entities\AchievementLevel;
-use Modules\Achievement\Entities\UserAchievement;
 use Modules\Achievement\Entities\UserAchievementLevel;
-use Modules\Achievement\Enums\TargetType;
 use Modules\CP\Entities\Cp as EntitiesCp;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
 use Modules\CP\Entities\CpLevelTakeGift;
+use Modules\Vip\Helpers\VipCommon;
 
 class CpService
 {
@@ -39,6 +37,9 @@ class CpService
         return $cpIds;
     }
 
+    /**
+     * @throws \Throwable
+     */
     protected function processGiftForReceiver(User $sender, User $receiver, int $giftId, int $giftPrice)
     {
         $checkIfExistCp = EntitiesCp::where(function ($query) use ($sender, $receiver) {
@@ -71,13 +72,20 @@ class CpService
         if (!$cp) return false;
 
         $newDi = $cp->di + $diamonds;
-        $level = $this->getLevel($cp->cp_relation_id, $newDi);
-        if ($level) {
-            DB::table('cps')->where('id', $cp->id)->update([
-                'di' => $newDi,
-                'level_id' => $level->id
-            ]);
-            if ($level->level) $this->assignGifts($level, $cp);
+        $levels = $this->getEligibleLevels(
+            $cp->cp_relation_id,
+            $newDi,
+            $cp->level_id
+        );
+
+        if (!$levels->isEmpty()) {
+            foreach ($levels as $level){
+                DB::table('cps')->where('id', $cp->id)->update([
+                    'di' => $newDi,
+                    'level_id' => $level->id
+                ]);
+                if ($level->level) $this->assignGifts($level, $cp);
+            }
         } else {
             DB::table('cps')->where('id', $cp->id)->update([
                 'di' => $newDi
@@ -87,12 +95,25 @@ class CpService
         return true;
     }
 
+    public function getEligibleLevels(int $cpRelationId, int $totalCoins, int $currentLevelId)
+    {
+        return CpLevel::query()
+            ->where('cp_relation_id', $cpRelationId)
+            ->where('id', '>', $currentLevelId)
+            ->where('exp', '<=', $totalCoins)
+            ->orderBy('exp')
+            ->get();
+    }
+
     public function getLevel(int $cpRelationId, int $totalCoins)
     {
         return CpLevel::query()->where('cp_relation_id', $cpRelationId)->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }
 
-
+    public function getLevels(int $cpRelationId, int $totalCoins)
+    {
+        return CpLevel::query()->where('cp_relation_id', $cpRelationId)->where('exp', '<=', $totalCoins)->get();
+    }
 
     //////////////////////////////////////////// assign gift ///////////////////////////////////////////////////////////////////
 
@@ -167,10 +188,11 @@ class CpService
 
         $amount = $reward->item_id;
         $title = __('Coin Reward');
-        $body = __('You have received :coin coin.');
+        $body = __('You have received :coin coin.', ['coin' => $amount]);
 
         if ($amount) {
             if ($rewardGender == $userOneGender || $rewardGender == 'all'){
+                self::UserCoinLog($userOne,$userOne->di ,$amount);
                 $userOne->increment('di', $amount);
                 Common::sendOfficialMessage($userOne->id, $title, $body);
                 $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
@@ -178,15 +200,28 @@ class CpService
 //                CustomNotification::charges($userOne, $title, $body, ['coin' => $amount]);
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
+
+                self::UserCoinLog($userTwo,$userTwo->di ,$amount);
+
                 $userTwo->increment('di', $amount);
-                CustomNotification::charges($userTwo, $title, $body, ['coin' => $amount]);
+                Common::sendOfficialMessage($userOne->id, $title, $body);
+                $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
+                Common::send_firebase_notification($tokens_notfacion, $title, $body);
+//                CustomNotification::charges($userTwo, $title, $body, ['coin' => $amount]);
             }
         }
     }
 
-    /**
-     * @throws \Throwable
-     */
+    protected function UserCoinLog($user,$amountBefore , $amount){
+
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $amount,
+                $amountBefore,
+                UserCoinLogType::CP,
+                'cps'
+            );
+    }
     protected function assignVip($reward, $expire, $userOne, $userTwo)
     {
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
@@ -195,10 +230,10 @@ class CpService
         $vip = OVip::find($vipId);
         if ($vip) {
             if ($rewardGender == $userOneGender || $rewardGender == 'all'){
-                UserCommon::addVipToCpUser($userOne, $vip, $expire);
+                VipCommon::createUserVip($vip,$userOne,  $expire);
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-                UserCommon::addVipToCpUser($userTwo, $vip, $expire);
+                VipCommon::createUserVip( $vip,$userTwo, $expire);
             }
         }
     }
@@ -208,10 +243,10 @@ class CpService
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
 
         if ($rewardGender == $userOneGender || $rewardGender == 'all') {
-            UserCommon::addWareToUser($userOne, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userOne, $ware, $reward->expire);
         }
         if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-            UserCommon::addWareToUser($userTwo, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userTwo, $ware, $reward->expire);
         }
     }
 
@@ -277,4 +312,7 @@ class CpService
             'level' => $level,
         ]);
     }
+
+
+
 }

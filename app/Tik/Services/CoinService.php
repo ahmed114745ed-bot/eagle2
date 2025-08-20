@@ -35,11 +35,11 @@ class CoinService
         return $this->coinRepository->allCoinsByPaymentId($payment_id);
     }
 
-    public function buyCoins($user, $request)
+    public function buyCoins($user, $request ,$userType)
     {
         $coin = $this->coinRepository->findById($request->coin_id);
-        $paymentMethod = $coin->paymentCoin->type;
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
+        $paymentMethod = $coin->paymentCoin->type;
         $trx = rand(111111111111111111, 999999999999999999);
         // DB::beginTransaction();
         try {
@@ -51,6 +51,7 @@ class CoinService
                 'trx' => $trx,
                 'status' => 0,
                 'coin_id' => $request->coin_id,
+                'user_type' => $userType,
             ];
             $log = $this->coinLogRepository->create($dataCoinLog);
             //  DB::commit();
@@ -121,9 +122,9 @@ class CoinService
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             //  DB::rollBack();
-            return Common::apiResponse(0, 'fail', null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
 
@@ -154,9 +155,9 @@ class CoinService
         return true;
     }
 
-    public function paymentCoin()
+    public function paymentCoin($type)
     {
-        return $this->paymentCoinRepository->index();
+        return $this->paymentCoinRepository->index($type);
     }
 
     public function createPaymentCoins($request)
@@ -189,5 +190,15 @@ class CoinService
     public function showPayment($PaymentCoinId)
     {
         return $this->paymentCoinRepository->findById($PaymentCoinId);
+    }
+
+    public function getUserReport()
+    {
+        return $this->coinLogRepository->getUserCoinLogs();
+    }
+
+    public function getShippingAgencyReport($id)
+    {
+        return $this->coinLogRepository->getShippingAgencyCoinLogs($id);
     }
 }

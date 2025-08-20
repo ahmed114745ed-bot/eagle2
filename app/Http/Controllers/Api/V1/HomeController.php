@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Exception;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Room;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
@@ -256,7 +256,8 @@ class HomeController extends Controller
                 'anti_ban'       => 30,
             ];
             $type         = $request->type;
-            $this->homeService->changePackMode($type, $privilegeArr, $user, true);
+          
+            $this->homeService->changePackMode($type, $privilegeArr, $user, false);
 
             return Common::apiResponse(1, 'ok', null, 200);
         } catch (Exception $e) {
@@ -280,7 +281,7 @@ class HomeController extends Controller
             'anti_ban'       => 30,
         ];
         $type         = $request->type;
-        $this->homeService->changePackMode($type, $privilegeArr, $user, false);
+        $this->homeService->changePackMode($type, $privilegeArr, $user, true);
 
         return Common::apiResponse(1, 'ok', null, 200);
     }

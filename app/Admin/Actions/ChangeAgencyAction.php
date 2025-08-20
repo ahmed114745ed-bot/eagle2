@@ -2,14 +2,14 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\UsersJoinedAgency;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\FamilyUser;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;
@@ -82,13 +82,7 @@ class ChangeAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
-        $this->select('agency_id', __('agency id'))->options(function ($value) {
-            $ops2 = [];
-            foreach (Agency::get() as $agency) {
-                $ops2[$agency->id] =  $agency->id . '_' . $agency->name;
-            }
-            return $ops2;
-        });
+        $this->select('agency_id', __('agency id'))->ajax('/admin/search/host-agency', 'id', 'name');
     }
 
     public function html()
