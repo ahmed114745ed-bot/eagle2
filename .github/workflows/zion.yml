@@ -29,6 +29,17 @@ jobs:
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t zion:${{ github.sha }} .
           docker service update --image zion:${{ github.sha }} zion-app
+          
+          # Get first container ID of the service
+          CONTAINER_ID=$(docker ps --filter "name=zion-app.1" --format "{{.ID}}" | head -n 1)
+          # Run artisan command inside that container
+          if [ -n "$CONTAINER_ID" ]; then
+            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
+          else
+            echo "No running container found for zion-app service"
+            exit 1
+          fi
+
           # check again
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
