@@ -582,7 +582,7 @@ class RoomController extends MainController
             }
 
             if (strlen($name) > 150){
-                $name = substr($name,0,150) . ' ...';
+                $name = substr($name,0,50) . ' ...';
             }
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
