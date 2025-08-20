@@ -111,11 +111,13 @@ class AppServiceProvider extends ServiceProvider
 
             return;
         }
-
         $locale = app()->getLocale();
         $key = $locale === 'ar' ? 'app_title_ar' : 'app_title_en';
-        $appName = Setting::where('key', $key)->value('value') ?? 'Default';
-
+        
+        $appName = Cache::rememberForever("settings.{$key}", function () use ($key) {
+            return Setting::where('key', $key)->value('value') ?? 'Default';
+        });
+        
         config(['app.name' => $appName]);
 
         $settings = DB::table('settings')->pluck('value', 'key')->toArray();

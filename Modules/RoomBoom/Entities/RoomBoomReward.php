@@ -15,6 +15,8 @@ class RoomBoomReward extends Model
 {
     protected $fillable = ['room_boom_level_id', 'target', 'target_type', 'priority', 'quantity', 'expire_days'];
 
+     protected $guarded = ['ware_target_id', 'gift_target_id'];
+
     public function ware(): HasOne
     {
         return $this->hasOne(Ware::class, 'id', 'target');
@@ -38,6 +40,33 @@ class RoomBoomReward extends Model
     protected static function boot(): void
     {
         parent::boot();
+
+        static::saving(function ($model) {
+            unset($model->ware_target_id, $model->gift_target_id);
+
+            switch ($model->target_type) {
+                case 'ware':
+                    if (isset($model->ware_target_id)) {
+                        $model->target = $model->ware_target_id;
+                        unset($model->ware_target_id); 
+                    }
+                    break;
+    
+                case 'gift':
+                    if (isset($model->gift_target_id)) {
+                        $model->target = $model->gift_target_id;
+                        unset($model->gift_target_id);
+                    }
+                    break;
+    
+                case 'achievement':
+                    if (isset($model->achievement_target)) {
+                        $model->target = $model->achievement_target;
+                        unset($model->achievement_target);
+                    }
+                    break;
+            }
+        });
         self::creating(function ($model) {
             if ($model->target_type == 'ware') {
                 $model->target = request('target1', $model->target);
@@ -54,6 +83,8 @@ class RoomBoomReward extends Model
             unset($model->target1);
             unset($model->target4);
             unset($model->target5);
+
+          
         });
 
         self::updating(function ($model) {

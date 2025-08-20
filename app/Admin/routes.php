@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\CoinLogReportsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
+use App\Admin\Controllers\SuperBoomRuleController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -107,6 +108,7 @@ use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
+use App\Http\Controllers\Api\V1\UserController as UserV1Controller ;
 
 Route::group(
     [
@@ -173,7 +175,7 @@ Route::group(
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
         Route::post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
         Route::post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
-
+        Route::get('search/host-agency', [UserV1Controller::class, 'hostAgencies'])->name('hostAgency');
         Route::post('/locale', MultiLanguageController::class . '@locale');
         if (MultiLanguage::config("show-login-page", true)) {
             Route::get('login', MultiLanguageController::class . '@getLogin');

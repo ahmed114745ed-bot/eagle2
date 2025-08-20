@@ -1087,15 +1087,30 @@
 "Agency": "Agency",
 ":name has been removed from administrators.": ":name has been removed from administrators.",
 "User": "User",
+"You have received :coin coin.": "You have received :coin coin.",
+"You have received a gift: :ware": "You have received a gift: :ware",
+"banned_from_action":"You are banned from performing this action.",
+"invalid_data": "Please check the input data",
+"ware_not_found": "Product not found",
+"insufficient_di": "You do not have enough quiz points",
+"all_chairs_purchased": "You have already purchased all chairs",
+"added_successfully": "Added successfully",
+"deleted_success": "Selected items deleted successfully",
+
+
     "You have received :coin coin.": "You have received :coin coin.",
     "You have received a gift: :ware": "You have received a gift: :ware",
     "banned_from_action":"You are banned from performing this action.",
-    "invalid_data": "Please check the input data",
-    "ware_not_found": "Product not found",
-    "insufficient_di": "You do not have enough quiz points",
-    "all_chairs_purchased": "You have already purchased all chairs",
-    "added_successfully": "Added successfully"
-
+    "Super Boom Rules": "Super Boom Rules",
+    "Super Boom Rule Details": "Super Boom Rule Details",
+    "Create Super Boom Rule": "Create Super Boom Rule",
+    "Edit Super Boom Rule": "Edit Super Boom Rule",
+    "Rules (AR)": "Rules (Arabic)",
+    "Rules (EN)": "Rules (English)",
+    "Content": "Content",
+    "Created At": "Created At",
+    "Updated At": "Updated At",
+    "ID": "ID"
 
 
 

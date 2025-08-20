@@ -18,8 +18,6 @@ use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
-use App\Http\Controllers\Api\V1\BoxController;
-use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
@@ -128,7 +126,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
         Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
-         Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
+        Route::get('host-agency', [UserController::class, 'hostAgencies'])->name('hostAgency');
         Route::get('charges', [UserController::class, 'charges'])->name('charges');
     });
 
@@ -185,7 +183,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/stripe-pay', [StripeController::class, 'pay']);
             Route::get('/paysky-pay', [PaySkyController::class, 'pay']);
 
-            Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
+            Route::get('zego-credential', [UserController::class, 'zegoCredential']);
 
 
             Route::prefix('config')->group(function () {
@@ -193,13 +191,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
                 //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
             });
-            Route::get('user-app-setting', [\App\Http\Controllers\Api\V1\UserController::class, 'app_setting']);
+            Route::get('user-app-setting', [UserController::class, 'app_setting']);
 
-            Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
+            Route::post('auth/logout', [UserController::class, 'logout']);
             Route::post('/change-room-effect', [UserController::class, 'showSetting']);
             Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
-            Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
+            Route::get('user-statistics', [UserController::class, 'user_statistic']);
             Route::get('user-levels', [UserController::class, 'userLevels']);
             // rooms api
             Route::post('check-room', [RoomController::class, 'check_room']);
@@ -275,7 +273,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('v2/{id}', [UserController::class, 'vTwoshow'])->where('id', '[0-9]+');
-                Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
+                Route::get('/charger_agency', [UserController::class, 'chargerAgency']);
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
                 Route::get('/online', [UserController::class, 'online']);
@@ -290,7 +288,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
                 Route::get('delete', [UserController::class, 'delete']);
-                Route::post('change_phone', [\App\Http\Controllers\Api\V1\UserController::class, 'changePhone']);
+                Route::post('change_phone', [UserController::class, 'changePhone']);
                 Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
                 Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
                 Route::post('reset_password', [\App\Http\Controllers\Api\V2\Auth\ResetPasswordController::class, 'reset']);
@@ -410,12 +408,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('update-user-image/{image_id}', [UserController::class, 'update_user_multi_images']);
 
 
-            Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');
-            Route::get('parent-statistic', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitationStatistics']);
-            Route::get('parent-user', [\App\Http\Controllers\Api\V1\UserController::class, 'parentUser']);
-            Route::get('user-earn-from-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitation']);
-            Route::get('create-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'CreateCodeInvitation']);
-            Route::get('add-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'AddCodeInvitation']);
+            Route::get('explain-invitation', [UserController::class, 'explain_invitation'])->name('create-code-invitation');
+            Route::get('parent-statistic', [UserController::class, 'UserEarnFromInvitationStatistics']);
+            Route::get('parent-user', [UserController::class, 'parentUser']);
+            Route::get('user-earn-from-invitation', [UserController::class, 'UserEarnFromInvitation']);
+            Route::get('create-code-invitation', [UserController::class, 'CreateCodeInvitation']);
+            Route::get('add-code-invitation', [UserController::class, 'AddCodeInvitation']);
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 
@@ -512,7 +510,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
                 Route::get('admins/{id}', [AgencyController::class, 'admin']);
-                Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']);//target
+                Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']); //target
                 Route::get('stars/{id}', [AgencyController::class, 'star']);
                 Route::get('heroes/{id}', [AgencyController::class, 'heroes']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
@@ -619,9 +617,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
                 // return response()->json($result);
             });
-
-
-
         }
     );
 
@@ -657,15 +652,31 @@ Route::get('/public-official-test/{ids}', function ($ids) {
     foreach ($users as $user) {
         Common::sendOfficialMessage(
             $user->id,
-               $body_en,
-               $title,
-               $type,
-             $subType,
-                        $body_ar,
-                 $image,
-             $fromUser
+            $body_en,
+            $title,
+            $type,
+            $subType,
+            $body_ar,
+            $image,
+            $fromUser
         );
     }
 
     return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
+});
+
+Route::get('gifts-by-id', function (Request $request) {
+    $gift = \App\Models\Gift::find($request->get('id'));
+    if (!$gift) {
+        return response()->json([]);
+    }
+
+    $imageUrl = $gift->show_img
+        ?? ($gift->show_img ? Storage::url($gift->show_img) : null);
+
+    return response()->json([
+        'id'    => $gift->id,
+        'name'  => $gift->name,
+        'image' => $imageUrl,
+    ]);
 });

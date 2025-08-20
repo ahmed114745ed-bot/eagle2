@@ -83,7 +83,6 @@ class LevelGiftController extends MainController
     }
     protected function grid()
     {
-
         $charge_event_id = request('cp_level_id');
         $vip = CpLevel::query()->find($charge_event_id);
         $grid = new Grid(new CpLevelGift());
@@ -95,20 +94,42 @@ class LevelGiftController extends MainController
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this?->type == "ware") {
+                if (request()->filled('_export_')) {
+                    return 'ware';
+                }
 
                 return  self::renderWareWithImage($this?->ware);
 
             } elseif ($this?->type == "vip") {
-                return @$this?->vip?->name;
+//                return @$this?->vip?->name;
+                if (request()->filled('_export_')) {
+                    return 'vip';
+                }
+                $defaultImage = asset("images/image.png");
+                $path = getImagePath($this?->vip?->img);
+                $url = $path ?: $defaultImage;
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
             } elseif ($this?->type == "coins") {
                 return @$this?->item_id;
             } elseif ($this?->type == "achievement") {
+                if (request()->filled('_export_')) {
+                    return 'achievement';
+                }
                 $value = getDriverUrl() . '/' . @$this?->item_id;
                 return "<img src='$value' width='80' height='80'>";
             }
         });
 
+        $grid->column('expire', __('expire'));
+        $grid->column('gender', __('gender'))->display(function ($value) {
+            $map = [
+                'all'    => __('all'),
+                'male'   => __('male'),
+                'female' => __('female'),
+            ];
 
+            return $map[$value] ?? $value;
+        });
         $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($vip, $charge_event_id) {
@@ -137,6 +158,8 @@ class LevelGiftController extends MainController
 
         $form->hidden('vip_id')->value(request('cp_level_id'));
 
+        $form->hidden('item_id');
+
         $form->select('type', trans('type'))
             ->options([
                 "ware" => __('ware'),
@@ -161,9 +184,15 @@ class LevelGiftController extends MainController
         return $form;
     }
 
-    protected function addVipFields($form ,$prefix = '')
+    protected function addVipFields($form ,$prefix = ''): void
     {
-        $form->belongsTo($prefix.'item_id', OVips::class, __('vips'));
+        $form->select($prefix.'item_id', __('VIP'))
+            ->options(OVip::pluck('name', 'id'))
+            ->default(function ($form) {
+                return $form->model()->type === 'vip'
+                    ? $form->model()->item_id
+                    : null;
+            });
     }
 
     protected function addWareFields($form ,$prefix = '')

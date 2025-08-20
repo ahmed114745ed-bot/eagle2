@@ -2,12 +2,14 @@
 
 namespace Modules\RoomBoom\Jobs;
 
+use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\UserGift;
+use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Bus\Queueable;
@@ -31,9 +33,12 @@ class RoomBoomRewardJob implements ShouldQueue
         $this->boomId = $boomId;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function handle()
     {
-        info('in job');
+        info('in reward job');
         $boom = RoomBoom::with(['roomBoomLevel', 'totalRoomGift'])->find($this->boomId);
         if (!$boom || !$boom->roomBoomLevel || !$boom->totalRoomGift) return;
 
@@ -46,19 +51,24 @@ class RoomBoomRewardJob implements ShouldQueue
         $rewardItems = [];
         foreach ($rewards as $reward) {
             for ($i = 0; $i < $reward->quantity; $i++) {
-                $item = $reward->toArray();
-                $item['quantity'] = 1;
-                $rewardItems[] = $item;
+                $rewardCopy = clone $reward;
+                $rewardCopy->quantity = 1;
+                $rewardItems[] = $rewardCopy;
             }
         }
 
-        $topContributorIds = GiftLog::select('sender_id', DB::raw('SUM(giftPrice) as total_gift'))
+        $topContributorIds = GiftLog::
+        select('sender_id',
+            DB::raw('SUM(giftPrice) as total_gift'),
+            DB::raw('MIN(created_at) as first_contribution')
+        )
             ->where('room_id', $roomId)
             ->where('room_boom_level', $level->level)
             ->where('start_boom_ranking', 1)
             ->where('created_at', '>=', Carbon::today())
             ->groupBy('sender_id')
             ->orderByDesc('total_gift')
+            ->orderBy('first_contribution', 'asc')
             ->limit(3)
             ->pluck('sender_id')
             ->toArray();
@@ -77,27 +87,33 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $userId,
-                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
             ];
         }
 
-        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
-            ->where('room_boom_level', $level->level)
-            ->where('start_boom_ranking', 1)
-            ->orderByDesc('created_at')
-            ->value('sender_id');
+//        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
+//            ->where('room_boom_level', $level->level)
+//            ->where('start_boom_ranking', 1)
+//            ->orderByDesc('created_at')
+//            ->value('sender_id');
+
+        $lastTriggerSenderId = GiftLog::where('id', $boom->final_gift_id)->value('sender_id');
 
         if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
-            $randomReward = $rewards->random();
-            $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
+            if ($rewards->isNotEmpty()){
+                $randomReward = $rewards->random();
+                $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
 
-            $assignedUserIds[] = $lastTriggerSenderId;
-            $assignments[] = $randomReward;
+                $assignedUserIds[] = $lastTriggerSenderId;
+                $assignments[] = $randomReward;
 
-            $winnerData[] = [
-                'user_id' => $lastTriggerSenderId,
-                'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl()
-            ];
+                $winnerData[] = [
+                    'user_id' => $lastTriggerSenderId,
+                    'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl(),
+                    'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
+                ];
+            }
         }
 
         $numAssigned = count($assignments);
@@ -116,65 +132,72 @@ class RoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $visitorId,
-                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl()
+                'image' => (new RoomBoomRewardResource((object)$reward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
             ];
         }
 
-        $d = [
-            "messageContent" => [
+        foreach ($winnerData as $winner) {
+            $data = [
                 "message" => "roomBoomEnded",
                 'roomBoomLevel' => $level->level,
                 'duration' => 10,
-                'winners' => $winnerData
-            ]
-        ];
-        $json = json_encode($d);
+                'winner' => $winner
+            ];
 
-        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+            event(new RoomBoomRewardsEvent($data));
+        }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function distributeBoomRewards($userId, $reward): void
     {
+        info($userId);
         $user = User::find($userId);
-        $expire = $reward['expire_days'];
-        if ($reward['target_type'] == 'ware') {
-            UserCommon::addWareToUser($user, $reward, $expire);
-        }
-        if ($reward['target_type'] == 'achieve') {
-            $target = $reward->target;
-            $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
-            $title = __('Achievement Reward');
-            $body = __('You have received a new achievement.');
-            UserAchievementLevel::create([
-                'user_id' => $userId,
-                'custom_image' => $target,
-                'end_at' => $dateTimestamp,
-            ]);
-            Common::sendOfficialMessage($user->id, $title, $body);
-            $token = DB::table('users')->where('id', $user->id)->value('notification_id');
-            if ($token) {
-                Common::send_firebase_notification([$token], $title, $body);
+        if ($user){
+            $expire = $reward['expire_days'];
+            if ($reward['target_type'] == 'ware') {
+                $ware = Ware::find($reward->target);
+                UserCommon::addEvintsWareToUser($user, $ware, $expire);
             }
-        }
-
-        if ($reward['target_type'] == 'gift') {
-            $target = $reward['target'];
-            $title = __('Gift Reward');
-            $body = __('You have received a new gift.');
-
-            $data = [
-                'gift_id' => $target,
-                'user_id' => $userId,
-                'quantity' => $reward['quantity'],
-            ];
-            if ($expire){
-                $data['expire'] = $expire;
+            if ($reward['target_type'] == 'achieve') {
+                $target = $reward->target;
+                $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
+                $title = __('Achievement Reward');
+                $body = __('You have received a new achievement.');
+                UserAchievementLevel::create([
+                    'user_id' => $userId,
+                    'custom_image' => $target,
+                    'end_at' => $dateTimestamp,
+                ]);
+                Common::sendOfficialMessage($user->id, $title, $body);
+                $token = DB::table('users')->where('id', $user->id)->value('notification_id');
+                if ($token) {
+                    Common::send_firebase_notification([$token], $title, $body);
+                }
             }
-            UserGift::create($data);
-            Common::sendOfficialMessage($user->id, $title, $body);
-            $token = DB::table('users')->where('id', $user->id)->value('notification_id');
-            if ($token) {
-                Common::send_firebase_notification([$token], $title, $body);
+
+            if ($reward['target_type'] == 'gift') {
+                $target = $reward['target'];
+                $title = __('Gift Reward');
+                $body = __('You have received a new gift.');
+
+                $data = [
+                    'gift_id' => $target,
+                    'user_id' => $userId,
+                    'quantity' => $reward['quantity'],
+                ];
+                if ($expire){
+                    $data['expire'] = $expire;
+                }
+                UserGift::create($data);
+                Common::sendOfficialMessage($user->id, $title, $body);
+                $token = DB::table('users')->where('id', $user->id)->value('notification_id');
+                if ($token) {
+                    Common::send_firebase_notification([$token], $title, $body);
+                }
             }
         }
     }

@@ -159,7 +159,7 @@ class   BannerController extends MainController
         $this->disableFormTools($form);
 
         $form->image('image_url', __('Image url'))->name(function ($file) {
-            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->required()->dir('banners');
         $form->switch('publish', __('Publish Now'));
         $form->number('expire', __('duration(days)'));
@@ -170,10 +170,11 @@ class   BannerController extends MainController
         ])->when(1, function (Form $form) {
             $form->select('event_type', trans('events'))->options([
                 'event' => __('events'),
-                'pk_event' => __('pk_event'),
-                'weekly_star' => __('weekly_star'),
-                'charge_event' => __('charge_event'),
-                'event_period' => __('event_period'),
+                'pk_event' => __('pk event'),
+                'weekly_star' => __('weekly star'),
+                'charge_event' => __('charge event'),
+                'event_period' => __('event period'),
+                'cp_event' => __('cp event'),
             ]);
         });
         return $form;

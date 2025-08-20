@@ -2,20 +2,21 @@
 
 namespace App\Services;
 
-use App\Helpers\LogHelper;
-use App\Helpers\UserLevelHelper;
-use App\Helpers\UserPackHelper;
-use App\Models\Pk;
-;
-use App\Helpers\Common;
+use App\Models\Pk;;
 use App\Models\User;
+use App\Helpers\Common;
+use App\Helpers\LogHelper;
+
+use Illuminate\Log\LogManager;
+use App\Helpers\UserPackHelper;
+use App\Helpers\UserLevelHelper;
 use App\Repositories\RankingRepository;
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
-use Illuminate\Log\LogManager;
 use Modules\CP\Transformers\RankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+use App\Http\Resources\Api\V1\UserRankingCollection;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
@@ -137,13 +138,13 @@ class RankingService
             3 => 'monthly'
         ];
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
-
+   //dd($data);
         if ($class == 5) {
-            return $data;
+            return $this->rankingRepo->getAgencyRanking($rel, $types[$type], $limit);
         }
         $this->transformData3($data, $class, $keywords, $rel);
-
-        return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+       // return new UserRankingCollection($data, $user, $keywords);
+         return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
     protected function transformData3(&$data, $class, $key, $relation)
     {
@@ -240,9 +241,10 @@ class RankingService
     }
 
     protected function roomData($ownerRoom)
-    {   if(!$ownerRoom) return null;
+    {
+        if (!$ownerRoom) return null;
         $data = [];
-            $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
+        $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         $data =  [
             "id" => @$ownerRoom->id ?? 0,
             "owner_uuid" => @@$ownerRoom->owner->uuid ?? 0,
@@ -433,7 +435,6 @@ class RankingService
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
 
-
         $achievement_images = [];
 
         $kong['user_id']    = 0;
@@ -478,7 +479,7 @@ class RankingService
 
         $userData = $data->where($key, $user->id)->first();
 
-        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->exp ?? '0') : (@$userData->exp ?? '0');
+        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->total_gifts ?? '0') : (@$userData->total_gifts ?? '0');
         $arr['user']['sender_img'] = UserLevelHelper::getSenderImage($user);
         $arr['user']['vip_level']  = $user->UserVip?->level;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
@@ -545,7 +546,7 @@ class RankingService
 
         $data->each(function ($item) {
             $hasColor = Common::hasInPack($item->user_id, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '' ;
+            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '';
             $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
         });
 
@@ -647,9 +648,9 @@ class RankingService
 
     protected function prepareResponseV2($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
-        $data->each(function ($item) use ($user){
+        $data->each(function ($item) use ($user) {
             $hasColor = Common::hasInPackV2($user->packs, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '' ;
+            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '';
             $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
         });
 
@@ -985,5 +986,4 @@ class RankingService
             ->values()
             ->toArray();
     }
-
 }

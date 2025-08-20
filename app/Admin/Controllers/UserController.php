@@ -224,7 +224,7 @@ class UserController extends MainController
 
                 $user = $this;
                 if (! $user) {
-                    return __('No Agency');
+                    return __('No User');
                 }
 
                 return app(UserService::class)->adminUserAvatar($user);
@@ -376,11 +376,9 @@ class UserController extends MainController
 
     public function make_rooms_top(Request $request)
     {
-        if ($request->make_rooms_top == "true") {
-            settings()->set("make_rooms_top", "1");
-        } else {
-            settings()->set("make_rooms_top", "0");
-        }
+        $value = $request->make_rooms_top == "true" ? "1" : "0";
+        settings()->set("make_rooms_top", $value);
+        Cache::forever('rooms_make_rooms_top', $value);
     }
 
     public function transferSalary(Request $request)

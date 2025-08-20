@@ -36,7 +36,7 @@ class RoomBoomRewardResource extends JsonResource
         return $this->gift = Gift::find($this->target);
     }
 
-    protected function getGiftImageType()
+    public function getGiftImageType()
     {
         if ($this->target_type == 'gift') {
             $gift = $this->getGift();
@@ -48,10 +48,10 @@ class RoomBoomRewardResource extends JsonResource
     {
         if ($this->target_type == 'ware') {
             $ware = $this->getWare();
-            $path = $ware->img2 ?? $ware?->show_img;
+            $path = $ware->show_img ?? $ware?->img2;
         }  elseif ($this->target_type == 'gift') {
             $gift = $this->getGift();
-            $path = $gift->img ?? $gift?->show_img;
+            $path = $gift->show_img ?? $gift?->img;
         } elseif ($this->target_type == 'achievement') {
             $path = $this->target;
         }
