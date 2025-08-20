@@ -59,7 +59,15 @@ class PayPalService
                     "amount"       => [
                         "currency_code" => config('paypal.currency'),
                         "value"         => number_format($amount, 2),
-                    ]
+                    ],
+                    "shipping" => [
+                        "address" => [
+                            "address_line_1" => "Test Street",
+                            "admin_area_2"   => "London",
+                            "postal_code"    => "12345",
+                            "country_code"   => "GB" 
+                        ]
+                        ],
                 ]
             ],
         ];
