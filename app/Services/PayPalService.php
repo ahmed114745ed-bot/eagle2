@@ -73,7 +73,7 @@ class PayPalService
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
                     // $paymentLink = $link['href'];
-                    $paymentLink = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card';
+                    $paymentLink = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card&intent=capture';
 
                 }
             }
