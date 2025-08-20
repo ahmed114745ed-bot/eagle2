@@ -14,7 +14,7 @@ class RoomBoomLevelResource extends JsonResource
             'min_target' => $this->whenHas('min_target'),
             'target' => $this->whenHas('target'),
             'video' => $this->video,
-            'room_booms' => RoomBoomResource::make($this->whenLoaded('roomBooms')),
+            'room_booms' => RoomBoomResource::collection($this->whenLoaded('roomBooms')),
             'rewards' => RoomBoomRewardResource::collection($this->whenLoaded('roomBoomRewards')),
         ];
 
