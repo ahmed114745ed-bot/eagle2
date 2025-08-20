@@ -44,7 +44,7 @@ class PayPalService
             'Authorization'     => 'Bearer ' . $this->getAccessToken(),
             'PayPal-Request-Id' => $id,
         ];
-
+dd('ff');
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
