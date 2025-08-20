@@ -99,17 +99,19 @@ class RoomBoomRewardJob implements ShouldQueue
             ->value('sender_id');
 
         if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
-            $randomReward = $rewards->random();
-            $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
+            if ($rewards->isNotEmpty()){
+                $randomReward = $rewards->random();
+                $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
 
-            $assignedUserIds[] = $lastTriggerSenderId;
-            $assignments[] = $randomReward;
+                $assignedUserIds[] = $lastTriggerSenderId;
+                $assignments[] = $randomReward;
 
-            $winnerData[] = [
-                'user_id' => $lastTriggerSenderId,
-                'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl(),
-                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
-            ];
+                $winnerData[] = [
+                    'user_id' => $lastTriggerSenderId,
+                    'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl(),
+                    'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
+                ];
+            }
         }
 
         $numAssigned = count($assignments);

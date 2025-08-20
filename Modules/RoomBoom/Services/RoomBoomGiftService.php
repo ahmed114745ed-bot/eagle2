@@ -35,6 +35,28 @@ class RoomBoomGiftService
             ->orderBy('level')
             ->first();
 
+        $levelsToActivate = RoomBoomLevel::where('min_target', '<=', $newTotal)
+            ->where('target', '<=', $newTotal)
+            ->orderBy('level', 'asc')
+            ->get();
+
+        foreach ($levelsToActivate as $level){
+            $existingNotActiveBoom = RoomBoom::where('room_boom_level_id', $level->id)
+                ->where('total_room_gift_id', $totalRoomGift->id)
+                ->first();
+
+            if (!$existingNotActiveBoom) {
+                $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->latest()->value('id');
+                RoomBoom::create([
+                    'total_room_gift_id' => $totalRoomGift->id,
+                    'room_boom_level_id' => $level->id,
+                    'started_at' => Carbon::now(),
+                    'total_gifts_value' => $newTotal,
+                    'trigger_gift_id' => $giftLogId
+                ]);
+            }
+        }
+
         if ($currentLevel) {
             $existingBoom = RoomBoom::where('room_boom_level_id', $currentLevel->id)
                 ->where('total_room_gift_id', $totalRoomGift->id)
