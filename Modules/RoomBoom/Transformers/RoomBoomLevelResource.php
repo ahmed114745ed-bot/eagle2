@@ -6,6 +6,7 @@ use App\Http\Resources\Api\V1\TopUsersRankResource;
 use App\Models\GiftLog;
 use App\Models\User;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoomBoomLevelResource extends JsonResource
@@ -40,13 +41,17 @@ class RoomBoomLevelResource extends JsonResource
             return;
         }
 
-        $topContributors = GiftLog::select('sender_id', \DB::raw('SUM(giftPrice) as total_gift'))
+        $topContributors = GiftLog::select('sender_id',
+            DB::raw('SUM(giftPrice) as total_gift'),
+            DB::raw('MIN(created_at) as first_contribution')
+        )
             ->where('room_id', $roomBoom->totalRoomGift->room_id)
             ->where('room_boom_level', $this->level)
             ->where('start_boom_ranking', 1)
             ->where('created_at', '>=', Carbon::today())
             ->groupBy('sender_id')
             ->orderByDesc('total_gift')
+            ->orderBy('first_contribution', 'asc')
             ->limit(3)
             ->get();
 

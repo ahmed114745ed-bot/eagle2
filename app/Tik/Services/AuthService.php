@@ -75,13 +75,13 @@ class AuthService
 
         DB::beginTransaction();
         try {
-            if ($trashedUser){
+            if ($trashedUser) {
                 $trashedUser->restore();
 
                 $trashedUser->password = $request->password;
 
                 $user = $trashedUser;
-            }else{
+            } else {
                 $data = [
                     'phone' => $phone,
                     'password' => $request->password,
@@ -100,7 +100,7 @@ class AuthService
             $user->is_points_first = 1;
             $user->save();
             $token = $user->createToken('api_token')->plainTextToken;
-          //  UserHandling::AddUserVip($user, 'register');
+            //  UserHandling::AddUserVip($user, 'register');
 
             DB::commit();
         } catch (\Exception $e) {
@@ -134,11 +134,12 @@ class AuthService
         $client = new Google_Client();
 
         $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
-        // $payload = $client->verifyIdToken($request['id_token']);
-        // if (!$payload) {
-        //     throw new \Exception('Google ID Token not found or invalid');
-        // }
-        // $google_id = $payload['sub'];
+        if (!$request['id_token']) throw new \Exception('google id token missing');
+        $payload = $client->verifyIdToken($request['id_token']);
+        if (!$payload) {
+            throw new \Exception('Google ID Token not found or invalid');
+        }
+        $google_id = $payload['sub'];
 
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
@@ -206,25 +207,24 @@ class AuthService
             $img = $request['image'];
             $imageType = $img->getClientOriginalExtension();
             if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
-                throw new \Exception( __('api_responses.gifImage'));
+                throw new \Exception(__('api_responses.gifImage'));
             }
 
             $user->profile_count += 1;
             $user->save();
             $user->load('profile');
             $profile = $user->profile;
-            if($profile)
-            {
+            if ($profile) {
                 $profile->fill($data);
                 $profile->save();
-            }else{
+            } else {
                 $profile = Profile::create([
                     'gender' => null,
                     'birthday' => null,
                     'province' => null,
                     'city' => null,
                     'country' => null,
-                    'user_id'=> @$user->id,
+                    'user_id' => @$user->id,
                 ]);
             }
 
