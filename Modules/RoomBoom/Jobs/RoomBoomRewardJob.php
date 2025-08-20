@@ -152,46 +152,48 @@ class RoomBoomRewardJob implements ShouldQueue
     {
         info($userId);
         $user = User::find($userId);
-        $expire = $reward['expire_days'];
-        if ($reward['target_type'] == 'ware') {
-            $ware = Ware::find($reward->target);
-            UserCommon::addEvintsWareToUser($user, $ware, $expire);
-        }
-        if ($reward['target_type'] == 'achieve') {
-            $target = $reward->target;
-            $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
-            $title = __('Achievement Reward');
-            $body = __('You have received a new achievement.');
-            UserAchievementLevel::create([
-                'user_id' => $userId,
-                'custom_image' => $target,
-                'end_at' => $dateTimestamp,
-            ]);
-            Common::sendOfficialMessage($user->id, $title, $body);
-            $token = DB::table('users')->where('id', $user->id)->value('notification_id');
-            if ($token) {
-                Common::send_firebase_notification([$token], $title, $body);
+        if ($user){
+            $expire = $reward['expire_days'];
+            if ($reward['target_type'] == 'ware') {
+                $ware = Ware::find($reward->target);
+                UserCommon::addEvintsWareToUser($user, $ware, $expire);
             }
-        }
-
-        if ($reward['target_type'] == 'gift') {
-            $target = $reward['target'];
-            $title = __('Gift Reward');
-            $body = __('You have received a new gift.');
-
-            $data = [
-                'gift_id' => $target,
-                'user_id' => $userId,
-                'quantity' => $reward['quantity'],
-            ];
-            if ($expire){
-                $data['expire'] = $expire;
+            if ($reward['target_type'] == 'achieve') {
+                $target = $reward->target;
+                $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
+                $title = __('Achievement Reward');
+                $body = __('You have received a new achievement.');
+                UserAchievementLevel::create([
+                    'user_id' => $userId,
+                    'custom_image' => $target,
+                    'end_at' => $dateTimestamp,
+                ]);
+                Common::sendOfficialMessage($user->id, $title, $body);
+                $token = DB::table('users')->where('id', $user->id)->value('notification_id');
+                if ($token) {
+                    Common::send_firebase_notification([$token], $title, $body);
+                }
             }
-            UserGift::create($data);
-            Common::sendOfficialMessage($user->id, $title, $body);
-            $token = DB::table('users')->where('id', $user->id)->value('notification_id');
-            if ($token) {
-                Common::send_firebase_notification([$token], $title, $body);
+
+            if ($reward['target_type'] == 'gift') {
+                $target = $reward['target'];
+                $title = __('Gift Reward');
+                $body = __('You have received a new gift.');
+
+                $data = [
+                    'gift_id' => $target,
+                    'user_id' => $userId,
+                    'quantity' => $reward['quantity'],
+                ];
+                if ($expire){
+                    $data['expire'] = $expire;
+                }
+                UserGift::create($data);
+                Common::sendOfficialMessage($user->id, $title, $body);
+                $token = DB::table('users')->where('id', $user->id)->value('notification_id');
+                if ($token) {
+                    Common::send_firebase_notification([$token], $title, $body);
+                }
             }
         }
     }
