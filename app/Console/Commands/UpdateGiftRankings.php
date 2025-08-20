@@ -18,7 +18,7 @@ class UpdateGiftRankings extends Command
      */
     public function handle()
     {
-        if(!settings()->get('gift_send')) return;
+        if (!settings()->get('gift_send')) return;
 
         settings()->set('gift_send', false);
 
@@ -35,15 +35,14 @@ class UpdateGiftRankings extends Command
             $this->updateRanking($type, 'sender', 'sender_id', $startDate);
             $this->updateRanking($type, 'receiver', 'receiver_id', $startDate);
             $this->updateRanking($type, 'roomOwner', 'roomowner_id', $startDate);
+            $this->updateRanking($type, 'agency', 'agency_id', $startDate);
         }
-
-
     }
 
 
     private function updateRanking(string $type, string $role, string $column, $startDate): void
     {
-        $rankerType = \App\Models\User::class;
+        $rankerType = $role != 'agency' ? \App\Models\User::class : \App\Models\Agency::class;
 
         DB::transaction(function () use ($type, $role, $column, $startDate, $rankerType) {
             // 1. Delete all old rankings of this type
@@ -68,13 +67,12 @@ class UpdateGiftRankings extends Command
                 NOW()
             FROM gift_logs
             WHERE created_at >= " . DB::getPdo()->quote($startDate) . "
+            AND $column IS NOT NULL
+            AND $column != 0
             GROUP BY $column
             ORDER BY total_gifts DESC
             LIMIT 100
         ");
         });
     }
-
-
-
 }
