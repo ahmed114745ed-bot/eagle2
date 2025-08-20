@@ -234,6 +234,11 @@ class Room extends Model
         return count($usersIds) > 0 ? implode(',', $usersIds) : '';
     }
 
+    public function getRoomVisitorNewAttribute(): string
+    {
+        return $this->visitor_ids ?? '';
+    }
+
     public function topUser()
     {
         return $this->belongsTo(User::class, 'top_user_id');
@@ -311,5 +316,33 @@ class Room extends Model
     public function totalRoomGifts(): HasMany
     {
         return $this->hasMany(TotalRoomGift::class, 'room_id');
+    }
+
+    public function admins()
+    {
+        return $this->hasMany(User::class, 'id', 'room_admin');
+    }
+
+
+    protected static $microphoneCache = [];
+
+    public static function cacheMicrophoneUsers($ids)
+    {
+        if (empty($ids)) return collect();
+
+        $missingIds = array_diff($ids, array_keys(self::$microphoneCache));
+
+        if (!empty($missingIds)) {
+            $users = User::whereIn('id', $missingIds)
+                ->with('profile:id,user_id,avatar')
+                ->get()
+                ->keyBy('id');
+
+            foreach ($users as $id => $user) {
+                self::$microphoneCache[$id] = $user;
+            }
+        }
+
+        return collect(self::$microphoneCache)->only($ids);
     }
 }

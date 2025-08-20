@@ -4,6 +4,7 @@ namespace Modules\RoomBoom\Jobs;
 
 use App\Events\EndRoomBoomEvent;
 use App\Helpers\Common;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -21,7 +22,7 @@ class EndBoomZegoJob implements ShouldQueue
     public function __construct($currentLevel, $room)
     {
         $this->currentLevel = $currentLevel;
-        $this->room = $room;
+        $this->room = gettype($room) == 'integer'? Room::find($room) : $room ;
     }
 
     public function handle(): void

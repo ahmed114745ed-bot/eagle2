@@ -64,6 +64,8 @@ class User extends Authenticatable
 
     protected $dates = ['deleted_at'];
 
+    protected ?string $cachedComputedUuid = null;
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -1379,6 +1381,10 @@ class User extends Authenticatable
             ? $this->special_id
             : $this->original_uuid;
     }
+
+
+
+
 
 
     // originalUuid

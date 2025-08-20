@@ -10039,6 +10039,25 @@ namespace Illuminate\Support\Facades {
             /**
      * 
      *
+     * @method static void createSubscription(array|string $channels, \Closure $callback, string $method = 'subscribe')
+     * @method static \Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder funnel(string $name)
+     * @method static \Illuminate\Redis\Limiters\DurationLimiterBuilder throttle(string $name)
+     * @method static mixed client()
+     * @method static void subscribe(array|string $channels, \Closure $callback)
+     * @method static void psubscribe(array|string $channels, \Closure $callback)
+     * @method static mixed command(string $method, array $parameters = [])
+     * @method static void listen(\Closure $callback)
+     * @method static string|null getName()
+     * @method static \Illuminate\Redis\Connections\Connection setName(string $name)
+     * @method static \Illuminate\Contracts\Events\Dispatcher getEventDispatcher()
+     * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
+     * @method static void unsetEventDispatcher()
+     * @method static void macro(string $name, object|callable $macro)
+     * @method static void mixin(object $mixin, bool $replace = true)
+     * @method static bool hasMacro(string $name)
+     * @method static void flushMacros()
+     * @method static mixed macroCall(string $method, array $parameters)
+     * @see \Illuminate\Redis\RedisManager
      */        class Redis {
                     /**
          * Get a Redis connection by name.
@@ -14594,7 +14613,7 @@ namespace Illuminate\Support\Facades {
          * Get a filesystem instance.
          *
          * @param string|null $name
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function drive($name = null)
         {
@@ -14605,7 +14624,7 @@ namespace Illuminate\Support\Facades {
          * Get a filesystem instance.
          *
          * @param string|null $name
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function disk($name = null)
         {
@@ -14626,7 +14645,7 @@ namespace Illuminate\Support\Facades {
          * Build an on-demand disk.
          *
          * @param string|array $config
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function build($config)
         {
@@ -14637,7 +14656,7 @@ namespace Illuminate\Support\Facades {
          * Create an instance of the local driver.
          *
          * @param array $config
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function createLocalDriver($config)
         {
@@ -14648,7 +14667,7 @@ namespace Illuminate\Support\Facades {
          * Create an instance of the ftp driver.
          *
          * @param array $config
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function createFtpDriver($config)
         {
@@ -14659,7 +14678,7 @@ namespace Illuminate\Support\Facades {
          * Create an instance of the sftp driver.
          *
          * @param array $config
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function createSftpDriver($config)
         {
@@ -14681,7 +14700,7 @@ namespace Illuminate\Support\Facades {
          * Create a scoped driver.
          *
          * @param array $config
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function createScopedDriver($config)
         {
@@ -14766,94 +14785,37 @@ namespace Illuminate\Support\Facades {
                         return $instance->setApplication($app);
         }
                     /**
-         * Get the URL for the file at the given path.
-         *
-         * @param string $path
-         * @return string 
-         * @throws \RuntimeException
-         * @static 
-         */        public static function url($path)
-        {
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
-                        return $instance->url($path);
-        }
-                    /**
-         * Get a temporary URL for the file at the given path.
-         *
-         * @param string $path
-         * @param \DateTimeInterface $expiration
-         * @param array $options
-         * @return string 
-         * @static 
-         */        public static function temporaryUrl($path, $expiration, $options = [])
-        {
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
-                        return $instance->temporaryUrl($path, $expiration, $options);
-        }
-                    /**
-         * Get a temporary upload URL for the file at the given path.
-         *
-         * @param string $path
-         * @param \DateTimeInterface $expiration
-         * @param array $options
-         * @return string 
-         * @static 
-         */        public static function temporaryUploadUrl($path, $expiration, $options = [])
-        {
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
-                        return $instance->temporaryUploadUrl($path, $expiration, $options);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function getClient()
-        {
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
-                        return $instance->getClient();
-        }
-                    /**
-         * Determine if temporary URLs can be generated.
-         *
-         * @return bool 
-         * @static 
-         */        public static function providesTemporaryUrls()
-        {
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
-                        return $instance->providesTemporaryUrls();
-        }
-                    /**
          * Assert that the given file or directory exists.
          *
          * @param string|array $path
          * @param string|null $content
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function assertExists($path, $content = null)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->assertExists($path, $content);
         }
                     /**
          * Assert that the given file or directory does not exist.
          *
          * @param string|array $path
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function assertMissing($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->assertMissing($path);
         }
                     /**
          * Assert that the given directory is empty.
          *
          * @param string $path
-         * @return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter 
+         * @return \Illuminate\Filesystem\FilesystemAdapter 
          * @static 
          */        public static function assertDirectoryEmpty($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->assertDirectoryEmpty($path);
         }
                     /**
@@ -14863,8 +14825,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function exists($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->exists($path);
         }
                     /**
@@ -14874,8 +14836,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function missing($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->missing($path);
         }
                     /**
@@ -14885,8 +14847,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function fileExists($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->fileExists($path);
         }
                     /**
@@ -14896,8 +14858,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function fileMissing($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->fileMissing($path);
         }
                     /**
@@ -14907,8 +14869,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function directoryExists($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->directoryExists($path);
         }
                     /**
@@ -14918,8 +14880,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function directoryMissing($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->directoryMissing($path);
         }
                     /**
@@ -14929,8 +14891,8 @@ namespace Illuminate\Support\Facades {
          * @return string 
          * @static 
          */        public static function path($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->path($path);
         }
                     /**
@@ -14940,8 +14902,8 @@ namespace Illuminate\Support\Facades {
          * @return string|null 
          * @static 
          */        public static function get($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->get($path);
         }
                     /**
@@ -14952,8 +14914,8 @@ namespace Illuminate\Support\Facades {
          * @return array|null 
          * @static 
          */        public static function json($path, $flags = 0)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->json($path, $flags);
         }
                     /**
@@ -14966,8 +14928,8 @@ namespace Illuminate\Support\Facades {
          * @return \Symfony\Component\HttpFoundation\StreamedResponse 
          * @static 
          */        public static function response($path, $name = null, $headers = [], $disposition = 'inline')
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->response($path, $name, $headers, $disposition);
         }
                     /**
@@ -14978,8 +14940,8 @@ namespace Illuminate\Support\Facades {
          * @return \Symfony\Component\HttpFoundation\StreamedResponse 
          * @static 
          */        public static function download($path, $name = null, $headers = [])
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->download($path, $name, $headers);
         }
                     /**
@@ -14991,8 +14953,8 @@ namespace Illuminate\Support\Facades {
          * @return string|bool 
          * @static 
          */        public static function put($path, $contents, $options = [])
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->put($path, $contents, $options);
         }
                     /**
@@ -15004,8 +14966,8 @@ namespace Illuminate\Support\Facades {
          * @return string|false 
          * @static 
          */        public static function putFile($path, $file = null, $options = [])
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->putFile($path, $file, $options);
         }
                     /**
@@ -15018,8 +14980,8 @@ namespace Illuminate\Support\Facades {
          * @return string|false 
          * @static 
          */        public static function putFileAs($path, $file, $name = null, $options = [])
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->putFileAs($path, $file, $name, $options);
         }
                     /**
@@ -15029,8 +14991,8 @@ namespace Illuminate\Support\Facades {
          * @return string 
          * @static 
          */        public static function getVisibility($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->getVisibility($path);
         }
                     /**
@@ -15041,8 +15003,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function setVisibility($path, $visibility)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->setVisibility($path, $visibility);
         }
                     /**
@@ -15055,8 +15017,8 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function prepend($path, $data, $separator = '
 ')
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->prepend($path, $data, $separator);
         }
                     /**
@@ -15069,8 +15031,8 @@ namespace Illuminate\Support\Facades {
          * @static 
          */        public static function append($path, $data, $separator = '
 ')
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->append($path, $data, $separator);
         }
                     /**
@@ -15080,8 +15042,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function delete($paths)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->delete($paths);
         }
                     /**
@@ -15092,8 +15054,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function copy($from, $to)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->copy($from, $to);
         }
                     /**
@@ -15104,8 +15066,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function move($from, $to)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->move($from, $to);
         }
                     /**
@@ -15115,8 +15077,8 @@ namespace Illuminate\Support\Facades {
          * @return int 
          * @static 
          */        public static function size($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->size($path);
         }
                     /**
@@ -15126,8 +15088,8 @@ namespace Illuminate\Support\Facades {
          * @throws UnableToProvideChecksum
          * @static 
          */        public static function checksum($path, $options = [])
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->checksum($path, $options);
         }
                     /**
@@ -15137,8 +15099,8 @@ namespace Illuminate\Support\Facades {
          * @return string|false 
          * @static 
          */        public static function mimeType($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->mimeType($path);
         }
                     /**
@@ -15148,8 +15110,8 @@ namespace Illuminate\Support\Facades {
          * @return int 
          * @static 
          */        public static function lastModified($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->lastModified($path);
         }
                     /**
@@ -15159,8 +15121,8 @@ namespace Illuminate\Support\Facades {
          * @return resource|null The path resource or null on failure.
          * @static 
          */        public static function readStream($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->readStream($path);
         }
                     /**
@@ -15172,9 +15134,59 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function writeStream($path, $resource, $options = [])
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->writeStream($path, $resource, $options);
+        }
+                    /**
+         * Get the URL for the file at the given path.
+         *
+         * @param string $path
+         * @return string 
+         * @throws \RuntimeException
+         * @static 
+         */        public static function url($path)
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
+                        return $instance->url($path);
+        }
+                    /**
+         * Determine if temporary URLs can be generated.
+         *
+         * @return bool 
+         * @static 
+         */        public static function providesTemporaryUrls()
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
+                        return $instance->providesTemporaryUrls();
+        }
+                    /**
+         * Get a temporary URL for the file at the given path.
+         *
+         * @param string $path
+         * @param \DateTimeInterface $expiration
+         * @param array $options
+         * @return string 
+         * @throws \RuntimeException
+         * @static 
+         */        public static function temporaryUrl($path, $expiration, $options = [])
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
+                        return $instance->temporaryUrl($path, $expiration, $options);
+        }
+                    /**
+         * Get a temporary upload URL for the file at the given path.
+         *
+         * @param string $path
+         * @param \DateTimeInterface $expiration
+         * @param array $options
+         * @return array 
+         * @throws \RuntimeException
+         * @static 
+         */        public static function temporaryUploadUrl($path, $expiration, $options = [])
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
+                        return $instance->temporaryUploadUrl($path, $expiration, $options);
         }
                     /**
          * Get an array of all files in a directory.
@@ -15184,8 +15196,8 @@ namespace Illuminate\Support\Facades {
          * @return array 
          * @static 
          */        public static function files($directory = null, $recursive = false)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->files($directory, $recursive);
         }
                     /**
@@ -15195,8 +15207,8 @@ namespace Illuminate\Support\Facades {
          * @return array 
          * @static 
          */        public static function allFiles($directory = null)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->allFiles($directory);
         }
                     /**
@@ -15207,8 +15219,8 @@ namespace Illuminate\Support\Facades {
          * @return array 
          * @static 
          */        public static function directories($directory = null, $recursive = false)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->directories($directory, $recursive);
         }
                     /**
@@ -15218,8 +15230,8 @@ namespace Illuminate\Support\Facades {
          * @return array 
          * @static 
          */        public static function allDirectories($directory = null)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->allDirectories($directory);
         }
                     /**
@@ -15229,8 +15241,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function makeDirectory($path)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->makeDirectory($path);
         }
                     /**
@@ -15240,8 +15252,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function deleteDirectory($directory)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->deleteDirectory($directory);
         }
                     /**
@@ -15250,8 +15262,8 @@ namespace Illuminate\Support\Facades {
          * @return \League\Flysystem\FilesystemOperator 
          * @static 
          */        public static function getDriver()
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->getDriver();
         }
                     /**
@@ -15260,8 +15272,8 @@ namespace Illuminate\Support\Facades {
          * @return \League\Flysystem\FilesystemAdapter 
          * @static 
          */        public static function getAdapter()
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->getAdapter();
         }
                     /**
@@ -15270,8 +15282,8 @@ namespace Illuminate\Support\Facades {
          * @return array 
          * @static 
          */        public static function getConfig()
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->getConfig();
         }
                     /**
@@ -15281,8 +15293,8 @@ namespace Illuminate\Support\Facades {
          * @return void 
          * @static 
          */        public static function buildTemporaryUrlsUsing($callback)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         $instance->buildTemporaryUrlsUsing($callback);
         }
                     /**
@@ -15296,8 +15308,8 @@ namespace Illuminate\Support\Facades {
          * @return $this|TWhenReturnType 
          * @static 
          */        public static function when($value = null, $callback = null, $default = null)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->when($value, $callback, $default);
         }
                     /**
@@ -15311,8 +15323,8 @@ namespace Illuminate\Support\Facades {
          * @return $this|TUnlessReturnType 
          * @static 
          */        public static function unless($value = null, $callback = null, $default = null)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->unless($value, $callback, $default);
         }
                     /**
@@ -15323,8 +15335,8 @@ namespace Illuminate\Support\Facades {
          * @return void 
          * @static 
          */        public static function macro($name, $macro)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter::macro($name, $macro);
+        {
+                        \Illuminate\Filesystem\FilesystemAdapter::macro($name, $macro);
         }
                     /**
          * Mix another object into the class.
@@ -15335,8 +15347,8 @@ namespace Illuminate\Support\Facades {
          * @throws \ReflectionException
          * @static 
          */        public static function mixin($mixin, $replace = true)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter::mixin($mixin, $replace);
+        {
+                        \Illuminate\Filesystem\FilesystemAdapter::mixin($mixin, $replace);
         }
                     /**
          * Checks if macro is registered.
@@ -15345,8 +15357,8 @@ namespace Illuminate\Support\Facades {
          * @return bool 
          * @static 
          */        public static function hasMacro($name)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        return \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter::hasMacro($name);
+        {
+                        return \Illuminate\Filesystem\FilesystemAdapter::hasMacro($name);
         }
                     /**
          * Flush the existing macros.
@@ -15354,8 +15366,8 @@ namespace Illuminate\Support\Facades {
          * @return void 
          * @static 
          */        public static function flushMacros()
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter::flushMacros();
+        {
+                        \Illuminate\Filesystem\FilesystemAdapter::flushMacros();
         }
                     /**
          * Dynamically handle calls to the class.
@@ -15366,8 +15378,8 @@ namespace Illuminate\Support\Facades {
          * @throws \BadMethodCallException
          * @static 
          */        public static function macroCall($method, $parameters)
-        {            //Method inherited from \Illuminate\Filesystem\FilesystemAdapter         
-                        /** @var \Spatie\GoogleCloudStorage\GoogleCloudStorageAdapter $instance */
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->macroCall($method, $parameters);
         }
             }
@@ -17269,6 +17281,110 @@ namespace App\Facades {
             }
     }
 
+namespace Mccarlosen\LaravelMpdf\Facades {
+            /**
+     * Class LaravelMpdf
+     *
+     * @package Mccarlosen\LaravelMpdf\Facades
+     */        class LaravelMpdf {
+                    /**
+         * 
+         *
+         * @param array $config optional, default []
+         * @return \Mccarlosen\LaravelMpdf\LaravelMpdf 
+         * @static 
+         */        public static function getPdf($config = [])
+        {
+                        /** @var \Mccarlosen\LaravelMpdf\LaravelMpdfWrapper $instance */
+                        return $instance->getPdf($config);
+        }
+                    /**
+         * Load a HTML string
+         *
+         * @param string $html
+         * @param array $config optional, default []
+         * @return \Pdf 
+         * @throws \Mpdf\MpdfException
+         * @static 
+         */        public static function loadHTML($html, $config = [])
+        {
+                        /** @var \Mccarlosen\LaravelMpdf\LaravelMpdfWrapper $instance */
+                        return $instance->loadHTML($html, $config);
+        }
+                    /**
+         * Chunk a HTML with given word and load string
+         *
+         * @param string $separator
+         * @param string $html
+         * @param array $config optional, default []
+         * @return \Pdf 
+         * @throws \Mpdf\MpdfException
+         * @static 
+         */        public static function chunkLoadHTML($separator, $html, $config = [])
+        {
+                        /** @var \Mccarlosen\LaravelMpdf\LaravelMpdfWrapper $instance */
+                        return $instance->chunkLoadHTML($separator, $html, $config);
+        }
+                    /**
+         * Load a HTML file
+         *
+         * @param string $file
+         * @param array $config optional, default []
+         * @return \Pdf 
+         * @throws \Mpdf\MpdfException
+         * @static 
+         */        public static function loadFile($file, $config = [])
+        {
+                        /** @var \Mccarlosen\LaravelMpdf\LaravelMpdfWrapper $instance */
+                        return $instance->loadFile($file, $config);
+        }
+                    /**
+         * Chunk a HTML file with given word and load HTML
+         *
+         * @param string $separator
+         * @param string $file
+         * @param array $config optional, default []
+         * @return \Pdf 
+         * @static 
+         */        public static function chunkLoadFile($separator, $file, $config = [])
+        {
+                        /** @var \Mccarlosen\LaravelMpdf\LaravelMpdfWrapper $instance */
+                        return $instance->chunkLoadFile($separator, $file, $config);
+        }
+                    /**
+         * Load a View and convert to HTML
+         *
+         * @param string $view
+         * @param array $data
+         * @param array $mergeData
+         * @param array $config optional, default []
+         * @return \Pdf 
+         * @throws \Mpdf\MpdfException
+         * @static 
+         */        public static function loadView($view, $data = [], $mergeData = [], $config = [])
+        {
+                        /** @var \Mccarlosen\LaravelMpdf\LaravelMpdfWrapper $instance */
+                        return $instance->loadView($view, $data, $mergeData, $config);
+        }
+                    /**
+         * Chunk a View with given word and load HTML
+         *
+         * @param string $separator
+         * @param string $view
+         * @param array $data
+         * @param array $mergeData
+         * @param array $config optional, default []
+         * @return \Pdf 
+         * @throws \Mpdf\MpdfException
+         * @static 
+         */        public static function chunkLoadView($separator, $view, $data = [], $mergeData = [], $config = [])
+        {
+                        /** @var \Mccarlosen\LaravelMpdf\LaravelMpdfWrapper $instance */
+                        return $instance->chunkLoadView($separator, $view, $data, $mergeData, $config);
+        }
+            }
+    }
+
 namespace Barryvdh\Debugbar\Facades {
             /**
      * 
@@ -17765,179 +17881,12 @@ namespace Barryvdh\Debugbar\Facades {
 
 namespace Barryvdh\DomPDF\Facade {
             /**
-     * 
+     * Class LaravelMpdf
      *
-     * @method static BasePDF setBaseHost(string $baseHost)
-     * @method static BasePDF setBasePath(string $basePath)
-     * @method static BasePDF setCanvas(\Dompdf\Canvas $canvas)
-     * @method static BasePDF setCallbacks(array<string, mixed> $callbacks)
-     * @method static BasePDF setCss(\Dompdf\Css\Stylesheet $css)
-     * @method static BasePDF setDefaultView(string $defaultView, array<string, mixed> $options)
-     * @method static BasePDF setDom(\DOMDocument $dom)
-     * @method static BasePDF setFontMetrics(\Dompdf\FontMetrics $fontMetrics)
-     * @method static BasePDF setHttpContext(resource|array<string, mixed> $httpContext)
-     * @method static BasePDF setPaper(string|float[] $paper, string $orientation = 'portrait')
-     * @method static BasePDF setProtocol(string $protocol)
-     * @method static BasePDF setTree(\Dompdf\Frame\FrameTree $tree)
-     */        class Pdf {
-                    /**
-         * Get the DomPDF instance
-         *
-         * @static 
-         */        public static function getDomPDF()
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->getDomPDF();
-        }
-                    /**
-         * Show or hide warnings
-         *
-         * @static 
-         */        public static function setWarnings($warnings)
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->setWarnings($warnings);
-        }
-                    /**
-         * Load a HTML string
-         *
-         * @param string|null $encoding Not used yet
-         * @static 
-         */        public static function loadHTML($string, $encoding = null)
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->loadHTML($string, $encoding);
-        }
-                    /**
-         * Load a HTML file
-         *
-         * @static 
-         */        public static function loadFile($file)
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->loadFile($file);
-        }
-                    /**
-         * Add metadata info
-         *
-         * @param array<string, string> $info
-         * @static 
-         */        public static function addInfo($info)
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->addInfo($info);
-        }
-                    /**
-         * Load a View and convert to HTML
-         *
-         * @param array<string, mixed> $data
-         * @param array<string, mixed> $mergeData
-         * @param string|null $encoding Not used yet
-         * @static 
-         */        public static function loadView($view, $data = [], $mergeData = [], $encoding = null)
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->loadView($view, $data, $mergeData, $encoding);
-        }
-                    /**
-         * Set/Change an option (or array of options) in Dompdf
-         *
-         * @param array<string, mixed>|string $attribute
-         * @param null|mixed $value
-         * @static 
-         */        public static function setOption($attribute, $value = null)
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->setOption($attribute, $value);
-        }
-                    /**
-         * Replace all the Options from DomPDF
-         *
-         * @param array<string, mixed> $options
-         * @static 
-         */        public static function setOptions($options, $mergeWithDefaults = false)
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->setOptions($options, $mergeWithDefaults);
-        }
-                    /**
-         * Output the PDF as a string.
-         * 
-         * The options parameter controls the output. Accepted options are:
-         * 
-         * 'compress' = > 1 or 0 - apply content stream compression, this is
-         *    on (1) by default
-         *
-         * @param array<string, int> $options
-         * @return string The rendered PDF as string
-         * @static 
-         */        public static function output($options = [])
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->output($options);
-        }
-                    /**
-         * Save the PDF to a file
-         *
-         * @static 
-         */        public static function save($filename, $disk = null)
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->save($filename, $disk);
-        }
-                    /**
-         * Make the PDF downloadable by the user
-         *
-         * @static 
-         */        public static function download($filename = 'document.pdf')
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->download($filename);
-        }
-                    /**
-         * Return a response with the PDF to show in the browser
-         *
-         * @static 
-         */        public static function stream($filename = 'document.pdf')
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->stream($filename);
-        }
-                    /**
-         * Render the PDF
-         *
-         * @static 
-         */        public static function render()
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->render();
-        }
-                    /**
-         * 
-         *
-         * @param array<string> $pc
-         * @static 
-         */        public static function setEncryption($password, $ownerpassword = '', $pc = [])
-        {
-                        /** @var \Barryvdh\DomPDF\PDF $instance */
-                        return $instance->setEncryption($password, $ownerpassword, $pc);
-        }
-            }
-            /**
-     * 
-     *
-     * @method static BasePDF setBaseHost(string $baseHost)
-     * @method static BasePDF setBasePath(string $basePath)
-     * @method static BasePDF setCanvas(\Dompdf\Canvas $canvas)
-     * @method static BasePDF setCallbacks(array<string, mixed> $callbacks)
-     * @method static BasePDF setCss(\Dompdf\Css\Stylesheet $css)
-     * @method static BasePDF setDefaultView(string $defaultView, array<string, mixed> $options)
-     * @method static BasePDF setDom(\DOMDocument $dom)
-     * @method static BasePDF setFontMetrics(\Dompdf\FontMetrics $fontMetrics)
-     * @method static BasePDF setHttpContext(resource|array<string, mixed> $httpContext)
-     * @method static BasePDF setPaper(string|float[] $paper, string $orientation = 'portrait')
-     * @method static BasePDF setProtocol(string $protocol)
-     * @method static BasePDF setTree(\Dompdf\Frame\FrameTree $tree)
+     * @package Mccarlosen\LaravelMpdf\Facades
+     * @method static Pdf chunkLoadHTML(string $separator, string $html, ?array $config = [])
+     * @method static Pdf chunkLoadFile(string $separator, string $file, ?array $config = [])
+     * @method static Pdf chunkLoadView(string $separator, string $view, ?array $data = [], ?array $mergeData = [], ?array $config = [])
      */        class Pdf {
                     /**
          * Get the DomPDF instance
@@ -18445,294 +18394,6 @@ namespace Encore\Admin\Facades {
          */        public static function component($component, $data = [])
         {
                         return \Encore\Admin\Admin::component($component, $data);
-        }
-            }
-    }
-
-namespace Imdhemy\Purchases\Facades {
-            /**
-     * 
-     *
-     */        class Product {
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function googlePlay($client = null)
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->googlePlay($client);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function appStore($client = null)
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->appStore($client);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function packageName($packageName)
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->packageName($packageName);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function id($itemId)
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->id($itemId);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function token($token)
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->token($token);
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @static 
-         */        public static function get()
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->get();
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function createProduct()
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->createProduct();
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @static 
-         */        public static function acknowledge($developerPayload = null)
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->acknowledge($developerPayload);
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @static 
-         */        public static function consume()
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->consume();
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException|InvalidReceiptException
-         * @static 
-         */        public static function verifyReceipt()
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->verifyReceipt();
-        }
-                    /**
-         * 
-         *
-         * @return \Imdhemy\Purchases\Product 
-         * @static 
-         */        public static function receiptData($receiptData)
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->receiptData($receiptData);
-        }
-                    /**
-         * 
-         *
-         * @return \Imdhemy\Purchases\Product 
-         * @static 
-         */        public static function password($password)
-        {
-                        /** @var \Imdhemy\Purchases\Product $instance */
-                        return $instance->password($password);
-        }
-            }
-            /**
-     * 
-     *
-     */        class Subscription {
-                    /**
-         * 
-         *
-         * @psalm-suppress PropertyTypeCoercion - The client type is compatible
-         * @static 
-         */        public static function googlePlay($client = null)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->googlePlay($client);
-        }
-                    /**
-         * 
-         *
-         * @psalm-suppress PropertyTypeCoercion - The client type is compatible
-         * @static 
-         */        public static function appStore($client = null)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->appStore($client);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function id($itemId)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->id($itemId);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function token($token)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->token($token);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function packageName($packageName)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->packageName($packageName);
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @throws InvalidReceiptException
-         * @static 
-         */        public static function verifyRenewable($sandboxClient = null)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->verifyRenewable($sandboxClient);
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @throws InvalidReceiptException
-         * @static 
-         */        public static function verifyReceipt($sandboxClient = null)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->verifyReceipt($sandboxClient);
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function renewable()
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->renewable();
-        }
-                    /**
-         * 
-         *
-         * @static 
-         */        public static function nonRenewable()
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->nonRenewable();
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @static 
-         */        public static function acknowledge($developerPayload = null)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->acknowledge($developerPayload);
-        }
-                    /**
-         * 
-         *
-         * @psalm-suppress PossiblyNullArgument - This method should not be called if params are null
-         * @static 
-         */        public static function createSubscription()
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->createSubscription();
-        }
-                    /**
-         * 
-         *
-         * @return \Imdhemy\Purchases\Subscription 
-         * @static 
-         */        public static function receiptData($receiptData)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->receiptData($receiptData);
-        }
-                    /**
-         * 
-         *
-         * @return \Imdhemy\Purchases\Subscription 
-         * @static 
-         */        public static function password($password)
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->password($password);
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @throws InvalidReceiptException
-         * @psalm-suppress PossiblyNullArgument - This method should not be called if itemId and token are null
-         * @psalm-suppress MixedArgument - We know the type of the latest receipt info
-         * @psalm-suppress PossiblyNullArrayAccess - This method should not be called if the array if empty
-         * @static 
-         */        public static function toStd()
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->toStd();
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @static 
-         */        public static function get()
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->get();
-        }
-                    /**
-         * 
-         *
-         * @throws GuzzleException
-         * @static 
-         */        public static function cancel()
-        {
-                        /** @var \Imdhemy\Purchases\Subscription $instance */
-                        return $instance->cancel();
         }
             }
     }
@@ -23502,12 +23163,10 @@ namespace  {
             class Excel extends \Maatwebsite\Excel\Facades\Excel {}
             class FFMpeg extends \ProtoneMedia\LaravelFFMpeg\Support\FFMpeg {}
             class RedisService extends \App\Facades\RedisService {}
+            class PDF extends \Mccarlosen\LaravelMpdf\Facades\LaravelMpdf {}
             class Debugbar extends \Barryvdh\Debugbar\Facades\Debugbar {}
-            class PDF extends \Barryvdh\DomPDF\Facade\Pdf {}
             class Pdf extends \Barryvdh\DomPDF\Facade\Pdf {}
             class Admin extends \Encore\Admin\Facades\Admin {}
-            class Product extends \Imdhemy\Purchases\Facades\Product {}
-            class Subscription extends \Imdhemy\Purchases\Facades\Subscription {}
             class Image extends \Intervention\Image\Facades\Image {}
             class Firebase extends \Kreait\Laravel\Firebase\Facades\Firebase {}
             class Module extends \Nwidart\Modules\Facades\Module {}

@@ -3,6 +3,7 @@
 namespace Modules\RoomBoom\Jobs;
 
 use App\Events\EndRoomBoomEvent;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -24,7 +25,7 @@ class EndBoomPusherJob implements ShouldQueue
         $this->currentLevel = $currentLevel;
         $this->newTotal = $newTotal;
         $this->userId = $userId;
-        $this->room = $room;
+        $this->room = gettype($room) == 'integer'? Room::find($room) : $room ;
     }
 
     public function handle(): void
