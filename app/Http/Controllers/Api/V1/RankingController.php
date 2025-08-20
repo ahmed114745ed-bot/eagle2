@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\AgencyRankingRecourse;
-use App\Services\RankingService;
-use Modules\Vip\Services\Api\VipService;
 use Illuminate\Http\Request;
+use App\Services\RankingService;
+use App\Http\Controllers\Controller;
+use Modules\Vip\Services\Api\VipService;
+use App\Http\Resources\Api\V1\AgencyRankingRecourse;
+use App\Http\Resources\Api\V1\NewAgencyRankingResource;
 
 class RankingController extends Controller
 {
@@ -53,7 +54,7 @@ class RankingController extends Controller
         $data = $this->rankingService->getRanking22($class, $type, $request->user(), $limit);
 
         if ($class == 5) {
-            $data =   AgencyRankingRecourse::collection($data);
+            $data =   NewAgencyRankingResource::collection($data);
         }
 
         return Common::apiResponse(1, '', $data);

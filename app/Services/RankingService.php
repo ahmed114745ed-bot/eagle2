@@ -5,8 +5,8 @@ namespace App\Services;
 use App\Helpers\LogHelper;
 use App\Helpers\UserLevelHelper;
 use App\Helpers\UserPackHelper;
-use App\Models\Pk;
-;
+use App\Models\Pk;;
+
 use App\Helpers\Common;
 use App\Models\User;
 use App\Repositories\RankingRepository;
@@ -139,7 +139,7 @@ class RankingService
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
 
         if ($class == 5) {
-            return $data;
+            return $this->rankingRepo->getAgencyRanking($rel, $types[$type], $limit);
         }
         $this->transformData3($data, $class, $keywords, $rel);
 
@@ -240,9 +240,10 @@ class RankingService
     }
 
     protected function roomData($ownerRoom)
-    {   if(!$ownerRoom) return null;
+    {
+        if (!$ownerRoom) return null;
         $data = [];
-            $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
+        $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         $data =  [
             "id" => @$ownerRoom->id ?? 0,
             "owner_uuid" => @@$ownerRoom->owner->uuid ?? 0,
@@ -545,7 +546,7 @@ class RankingService
 
         $data->each(function ($item) {
             $hasColor = Common::hasInPack($item->user_id, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '' ;
+            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '';
             $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
         });
 
@@ -647,9 +648,9 @@ class RankingService
 
     protected function prepareResponseV2($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
-        $data->each(function ($item) use ($user){
+        $data->each(function ($item) use ($user) {
             $hasColor = Common::hasInPackV2($user->packs, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '' ;
+            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '';
             $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
         });
 
@@ -985,5 +986,4 @@ class RankingService
             ->values()
             ->toArray();
     }
-
 }
