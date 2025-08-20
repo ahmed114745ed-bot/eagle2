@@ -19,7 +19,7 @@ class RoomBoomResource extends JsonResource
             'ended_at' => $this->ended_at,
             'total_gifts_value' => $this->total_gifts_value,
             'level' => $this->roomBoomLevel ? $this->roomBoomLevel->level : null,
-            'top_contributors' => $this->ended_at ? TopUsersRankResource::collection($this->getTopContributors()) : [],
+            'top_contributors' => TopUsersRankResource::collection($this->getTopContributors()),
         ];
     }
 
