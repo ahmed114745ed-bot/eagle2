@@ -44,15 +44,14 @@ class PayPalService
             'Authorization'     => 'Bearer ' . $this->getAccessToken(),
             'PayPal-Request-Id' => $id,
         ];
-
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
                 'return_url'          => url("/api/paypal-return/$referenceId"),
                 'cancel_url'          => url('/api/paypal-cancel'),
                 'user_action'         => 'PAY_NOW',
-                'landing_page'        => 'BILLING', 
-                'shipping_preference' => 'NO_SHIPPING',
+                'shipping_preference' => 'GET_FROM_FILE',
+                'landing_page'        => 'NO_PREFERENCE',
             ],
             "purchase_units" => [
                 [
