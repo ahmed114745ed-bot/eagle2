@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class PayPalService
+class PayPalServiceOLD
 {
     use PaymentTrait;
    public static function redirectUrl()
@@ -48,10 +48,10 @@ class PayPalService
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
-                'return_url'          => url("/api/paypal-return/$referenceId"),
-                'cancel_url'          => url('/api/paypal-cancel'),
-                'user_action'         => 'PAY_NOW',
-                'landing_page'        => 'BILLING', 
+                'return_url'  => url("/api/paypal-return/$referenceId"),
+                'cancel_url'  => url('/api/paypal-cancel'),
+                'user_action' => 'PAY_NOW',
+                'landing_page' => 'BILLING',
                 'shipping_preference' => 'NO_SHIPPING',
             ],
             "purchase_units" => [
