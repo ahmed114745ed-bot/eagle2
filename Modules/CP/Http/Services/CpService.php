@@ -2,8 +2,10 @@
 
 namespace Modules\CP\Http\Services;
 
+use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
@@ -190,6 +192,7 @@ class CpService
 
         if ($amount) {
             if ($rewardGender == $userOneGender || $rewardGender == 'all'){
+                self::UserCoinLog($userOne,$userOne->di ,$amount);
                 $userOne->increment('di', $amount);
                 Common::sendOfficialMessage($userOne->id, $title, $body);
                 $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
@@ -197,6 +200,9 @@ class CpService
 //                CustomNotification::charges($userOne, $title, $body, ['coin' => $amount]);
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
+
+                self::UserCoinLog($userTwo,$userTwo->di ,$amount);
+
                 $userTwo->increment('di', $amount);
                 Common::sendOfficialMessage($userOne->id, $title, $body);
                 $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
@@ -206,6 +212,16 @@ class CpService
         }
     }
 
+    protected function UserCoinLog($user,$amountBefore , $amount){
+
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $amount,
+                $amountBefore,
+                UserCoinLogType::CP,
+                'cps'
+            );
+    }
     protected function assignVip($reward, $expire, $userOne, $userTwo)
     {
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
@@ -227,10 +243,10 @@ class CpService
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
 
         if ($rewardGender == $userOneGender || $rewardGender == 'all') {
-            UserCommon::addWareToUser($userOne, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userOne, $ware, $reward->expire);
         }
         if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-            UserCommon::addWareToUser($userTwo, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userTwo, $ware, $reward->expire);
         }
     }
 

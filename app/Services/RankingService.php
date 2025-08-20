@@ -2,15 +2,21 @@
 
 namespace App\Services;
 
-use App\Models\Pk;
-;
+use App\Models\Pk;;
+use App\Models\User;
 use App\Helpers\Common;
+use App\Helpers\LogHelper;
+
+use Illuminate\Log\LogManager;
+use App\Helpers\UserPackHelper;
+use App\Helpers\UserLevelHelper;
 use App\Repositories\RankingRepository;
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\CP\Transformers\RankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+use App\Http\Resources\Api\V1\UserRankingCollection;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
@@ -113,6 +119,106 @@ class RankingService
         return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
 
+    public function getRanking22($class, $type, $user, $limit)
+    {
+        if ($class == 4) {
+            $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
+            $this->transformData($data, $class, 'user_id', 'user');
+            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+        } elseif ($class == 6) {
+            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            return $this->prepareResponse2($data, $user, $type, $user->id, $class);
+            return \App\Http\Resources\RankingResource::collection($data);
+        }
+
+        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+        $types = [
+            1 => 'daily',
+            2 => 'weekly',
+            3 => 'monthly'
+        ];
+        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
+   //dd($data);
+        if ($class == 5) {
+            return $this->rankingRepo->getAgencyRanking($rel, $types[$type], $limit);
+        }
+        $this->transformData3($data, $class, $keywords, $rel);
+       // return new UserRankingCollection($data, $user, $keywords);
+         return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+    }
+    protected function transformData3(&$data, $class, $key, $relation)
+    {
+
+        $data = $data->values()->map(function ($item, $key) use ($data) {
+            if ($key === 0) {
+                $item->exp_diff = 0;
+            } else {
+                $item->exp_diff = $data[$key - 1]->total_gifts - $item->total_gifts  + 1;
+            }
+            return $item;
+        });
+
+
+        $data = $data->map(function ($v) use ($key, $class, $relation) {
+            $achievement_images = [];
+            $user = $v->ranker;
+
+            if ($user == null) {
+                return null;
+            }
+
+            $color_name = UserPackHelper::getColorName($user);
+
+            if ($user->medals) {
+                foreach ($user->medals as $medal) {
+                    $achievementData = [
+                        'image' => @$medal->custom_image ?? @$medal->achievementLevel->valid_image,
+                        'title' => @$medal->achievementLevel?->achievement?->name ?? 'Reward',
+                        'created_at' => @$medal->created_at,
+                    ];
+                    $achievement_images[] = $achievementData;
+                }
+            }
+
+            $v->user_id = $user->id;
+            $v->color_name = $color_name;
+
+            $value = $v->total_gifts;
+            $v->exp = numToString(ceil((float)$value));
+            $v->exp_int = ceil($value);
+
+            $value2 = $v->exp_diff;
+            $v->remaining = numToString(ceil($v->exp_diff));
+            $v->remaining_int = ceil($value2);
+
+            $v->name = $class == 3 ? (@$user->ownerRoom?->room_name ?? '') : $user->name;
+            $v->avatar = $class == 3 ? (@$user->ownerRoom?->room_cover ?? '') : $user->profile->avatar;
+            $v->frame = UserPackHelper::getFrameImage($user);
+            $v->frame_id = UserPackHelper::getFrameId($user);
+
+            $v->type_user =  intval(@$user->type_user) ?: 0;
+            $v->manger_type =  !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+
+            $v->vip_level = @$user->UserVip->level ?? 0;
+            $v->sender_level = @$user->total_sender_level;
+            $v->reciver_level = @$user->total_received_level;
+
+
+            $v->vip_level_img = @$user->UserVip?->OVip?->img ?? '';
+            $v->sender_level_img = UserLevelHelper::getSenderImage($user);
+            $v->reciver_level_img = UserLevelHelper::getReceiverImage($user);
+
+            $v->country = @$user->country;
+            $v->age = @$user->profile->age ?? '';
+            $v->achievement_images = $achievement_images;
+            $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
+            unset($v->ranker);
+            return $v;
+        })->reject(function ($v) {
+            return $v == null;
+        });
+    }
+
     public function getRankingV2($class, $type, $user, $limit, $room_uid, $sent_to_owner)
     {
         $user->loadMissing('profile', 'medals', 'medals.achievementLevel.achievement', 'UserVip.OVip');
@@ -135,9 +241,10 @@ class RankingService
     }
 
     protected function roomData($ownerRoom)
-    {   if(!$ownerRoom) return null;
+    {
+        if (!$ownerRoom) return null;
         $data = [];
-            $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
+        $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         $data =  [
             "id" => @$ownerRoom->id ?? 0,
             "owner_uuid" => @@$ownerRoom->owner->uuid ?? 0,
@@ -325,7 +432,75 @@ class RankingService
             return $v == null;
         });
     }
+    protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
+    {
 
+        $achievement_images = [];
+
+        $kong['user_id']    = 0;
+        $kong['uuid']       = '';
+        $kong['exp']        = '0';
+        $kong['exp_int']        = 0;
+        $kong['remaining']        = '0';
+        $kong['remaining_int']        = 0;
+        $kong['name']       = '';
+        $kong['avatar']     = '';
+        $kong['frame']      = '';
+        $kong['frame_id']   = 0;
+        $kong['sender_img'] = '';
+        $kong['reseverimg'] = '';
+        $kong['vip_level']  =  0;
+        $kong['sender_level'] = 0;
+        $kong['reciver_level'] = 0;
+
+        $kong['vip_level_img'] = '';
+        $kong['sender_level_img'] = '';
+        $kong['reciver_level_img'] = '';
+        $kong['age'] = 0;
+
+        $kong['type_user'] = 0;
+        $kong['manger_type'] = null;
+        $kong['achievement_images'] = [];
+        $kong['color_name'] = '';
+
+
+
+        $data[0] = isset($data[0]) ? $data[0] : $kong;
+        $data[1] = isset($data[1]) ? $data[1] : $kong;
+        $data[2] = isset($data[2]) ? $data[2] : $kong;
+        //        if ($limit == 3) return $data;
+
+
+        $user->sort = $this->getUserSortValue($data, $userId);
+        $user->user_id = $user->id;
+
+        $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id', 'age');
+
+
+        $userData = $data->where($key, $user->id)->first();
+
+        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->total_gifts ?? '0') : (@$userData->total_gifts ?? '0');
+        $arr['user']['sender_img'] = UserLevelHelper::getSenderImage($user);
+        $arr['user']['vip_level']  = $user->UserVip?->level;
+        $arr['user']['sender_level']  = $user->total_sender_level ?? '';
+        $arr['user']['reciver_level']  = $user->total_received_level ?? '';
+        $arr['user']['vip_level_img']  = UserPackHelper::getVipIcon($user);
+        $arr['user']['sender_level_img']  = UserLevelHelper::getSenderImage($user);
+        $arr['user']['reciver_level_img']  = UserLevelHelper::getReceiverImage($user);
+        $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
+        $arr['user']['country'] =  @$user->country;
+        $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+        $arr['user']['age'] = @$user->profile?->age ?? '';
+        $arr['user']['color_name'] = UserPackHelper::getColorName($user);
+        $arr['user']['achievement_images'] = $achievement_images;
+
+
+        $toArray = $data->toArray();
+        $countData = count($data);
+        $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
+        $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
+        return $arr;
+    }
 
     protected function prepareResponse2($data, $user)
     {
@@ -365,12 +540,13 @@ class RankingService
         return $arr;
     }
 
+
     protected function prepareResponse($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
 
         $data->each(function ($item) {
             $hasColor = Common::hasInPack($item->user_id, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '' ;
+            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '';
             $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
         });
 
@@ -472,9 +648,9 @@ class RankingService
 
     protected function prepareResponseV2($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
-        $data->each(function ($item) use ($user){
+        $data->each(function ($item) use ($user) {
             $hasColor = Common::hasInPackV2($user->packs, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '' ;
+            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '';
             $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
         });
 
@@ -769,5 +945,45 @@ class RankingService
         $this->transformData2($data, $class, $keywords, $rel);
 
         return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
+    }
+
+    public function getTodayTopUsers()
+    {
+        $data = $this->cpRepository->getCpRankingWithOutRelation(1);
+        $cp_top_2 = $data->take(2);
+        $topGamer = $this->coinGameUserRepository->topThree();
+        return [
+            'sender'    => $this->getRankUserAvatars('sender', 'daily'),
+            'receiver'  => $this->getRankUserAvatars('receiver', 'daily'),
+            'room'      => $this->getRankRoomAvatars('roomOwner', 'daily'),
+            'top_cp' => array_values(RankingResource::collection($cp_top_2)->toArray(request())),
+            'top_gamer' => GameRankingResource::collection($topGamer),
+        ];
+    }
+
+    /**
+     * Extract user avatars from ranking results.
+     */
+    protected function getRankUserAvatars(string $type, string $rankingType): array
+    {
+        return $this->rankingRepo
+            ->getUserRankingImages($type, $rankingType)
+            ->map(fn($item) => optional($item->ranker->profile)->avatar)
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * Extract room avatars from ranking results.
+     */
+    protected function getRankRoomAvatars(string $type, string $rankingType): array
+    {
+        return $this->rankingRepo
+            ->getUserRankingImages($type, $rankingType)
+            ->map(fn($item) => optional($item->ranker->ownerRoom)->room_cover)
+            ->filter()
+            ->values()
+            ->toArray();
     }
 }

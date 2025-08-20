@@ -28,6 +28,19 @@ class GiftResource extends JsonResource
             'music_gift' => $this->music_gift ? 1 : 0,
             'international_gift' => $this->international_gift ? 1 : 0,
             'image_type' => $this->image_type ?? '',
+            'quantity' => $this->when(
+                $request->query('type') == 11 && isset($this->pivot) && isset($this->pivot->quantity),
+                function () {
+                    return $this->pivot->quantity;
+                }
+            ),
+        
+            'expire' => $this->when(
+                $request->query('type') == 11 && isset($this->pivot) && isset($this->pivot->expire),
+                function () {
+                    return $this->pivot->expire;
+                }
+            ),
         ];
     }
 }

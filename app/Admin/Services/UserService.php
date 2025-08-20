@@ -2,16 +2,21 @@
 
 namespace App\Admin\Services;
 
+
+
+use App\Helpers\LogHelper;
+use App\Helpers\UserLevelHelper;
 use Modules\Vip\Entities\Vip;
 
 class UserService
 {
     public function adminUserAvatar($user, bool $withoutLevels = false): string
     {
+
         if (! $user) return __('No user');
 
         $uid = $user->original_uuid;
-        $special = $user->uuid_v3;
+        $special = $user->uuid;
 
         $defaultImage = asset('images/businessman-icon.jpg');
         $path = $user->profile->avatar ?? null;
@@ -29,31 +34,12 @@ class UserService
         $levelImages = '';
 
         if (! $withoutLevels) {
-            // Cache these expensive DB calls in one place
-            $senderAmount = $user->sender_level + $user->sub_sender_level;
-            $receiverAmount = $user->received_level + $user->sub_receiver_level;
 
-            $vipLevels = Vip::collectionBuilder()
-                ->whereIn('type', [1, 2])
-                ->whereIn('level', [$senderAmount, $receiverAmount])
-                ->orderByDesc('exp')
-                ->get()
-                ->keyBy(fn ($vip) => "{$vip->type}_{$vip->level}");
+            $receiverImg = getImagePath(UserLevelHelper::getReceiverImage($user));
+            $senderImg = getImagePath(UserLevelHelper::getSenderImage($user));
 
-            $receiverLevel = $vipLevels["1_{$receiverAmount}"] ?? null;
-            $senderLevel = $vipLevels["2_{$senderAmount}"] ?? null;
 
-            $receiverImg = getImagePath($receiverLevel->img ?? null) ?? null;
-            $senderImg = getImagePath($senderLevel->img ?? null) ?? null;
-
-            // Charge level
-            $chargeLevel = Vip::collectionBuilder()
-                ->where('type', 5)
-                ->where('level', $user->total_charge_level)
-                ->orderByDesc('exp')
-                ->first();
-
-            $chargerImg = getImagePath($chargeLevel->img ?? null) ?? null;
+            $chargerImg = null;
 
             // HTML rendering for levels
             foreach ([$receiverImg, $senderImg, $chargerImg] as $img) {

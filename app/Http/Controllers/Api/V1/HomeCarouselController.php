@@ -24,9 +24,7 @@ class HomeCarouselController extends Controller
         }
 
         $items = HomeCarousel::query()
-        
-       
-        ->where('enable', 1)->orderBy('sort');
+         ->where('enable', 1)->orderBy('sort');
         if ($request->type != null) {
             $items = $items->where('type', $request->type);
         }

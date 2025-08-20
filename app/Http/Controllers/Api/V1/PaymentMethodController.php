@@ -115,6 +115,7 @@ class PaymentMethodController extends Controller
                 'statusCode',
                 'statusDescription',
                 'merchantRefNumber',
+                'orderStatus'
             ]);
 
             // Validate required parameters
@@ -133,6 +134,14 @@ class PaymentMethodController extends Controller
                     'status' => false,
                     'trx' => $query['merchantRefNumber'],
                     'message' => 'Transaction not found.',
+                ]);
+            }
+
+            if ($query['statusCode'] == 200 && $query['orderStatus'] == 'UNPAID'){
+                return response()->json([
+                    'status' => true,
+                    'trx' => $query['merchantRefNumber'],
+                    'message' => 'pending',
                 ]);
             }
 

@@ -110,7 +110,7 @@ class MallService
                 'get_type'  => $ware->get_type,
                 'target_id' => $ware->id,
                 'num'       => 1, //$qty,
-                'expire'    => $ware->expire ? time() + ($quantity * $ware->expire * 86400) : 0,
+                'expire'    => null,
                 'is_read'   => 1,
                 'use_num'   => $ware->num,
                 'price'     => $totalPrice,

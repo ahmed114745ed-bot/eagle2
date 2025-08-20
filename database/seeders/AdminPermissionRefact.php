@@ -284,7 +284,7 @@ class AdminPermissionRefact extends Seeder
                 'name' => 'Gift',
                 'sort' => 20,
                 'permissions' => [
-                    
+
                     ['key' => 'gift', 'except' => [], 'additional' => []],
                     ['key' => 'gift-logs', 'except' => ['create', 'delete', 'show','edit'], 'additional' => []],
                 ],
@@ -411,7 +411,14 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'tribe-rewards', 'except' => [], 'additional' => []],
                 ],
             ],
-
+            [
+                'name' => 'Room Boom',
+                'sort' => 33,
+                'permissions' => [
+                    ['key' => 'room-boom-levels', 'except' => [], 'additional' => []],
+                    ['key' => 'room-boom-rewards', 'except' => [], 'additional' => []],
+                ],
+            ],
 
         ];
 

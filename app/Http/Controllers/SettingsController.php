@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use Log;
+use Cache;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Config;
 use App\Models\Target;
-use App\Models\User;
-use App\Models\UserSallary;
-use Cache;
-use Log;
 use App\Helpers\Common;
-use App\Models\BrandImage;
 use App\Models\Setting;
 use App\Models\Timezone;
+use App\Models\BrandImage;
+use App\Models\PaymentCoin;
+use App\Models\UserSallary;
+use Illuminate\Support\Str;
 use App\Models\Notification;
 use Illuminate\Http\Request;
-use App\Models\NotificationTranslation;
-use App\Models\PaymentCoin;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission;
+use Illuminate\Support\Facades\File;
+use App\Models\NotificationTranslation;
 
 class SettingsController extends Controller
 {
@@ -133,7 +134,7 @@ class SettingsController extends Controller
             }
         }
 
-       
+
 
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
@@ -223,11 +224,11 @@ class SettingsController extends Controller
 
     public function updateAppConfig(Request $request)
     {
+
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
         $data = $request->except('_token', 'super_admin_coins');
-
 
 
         if ($request->background_type === 'color') {
@@ -242,21 +243,24 @@ class SettingsController extends Controller
             $data['gradient_3'] = $request->gradient_3;
         }
 
-// Primary Color
+        // Primary Color
         $data['app_primary_color'] = $request->app_primary_color;
 
-// Bottom Nav
-        $data['bottom_nav_bottom_color'] = $request->bottom_color;
-        $data['bottom_nav_active_color'] = $request->active_color;
-        $data['bottom_nav_inactive_color'] = $request->inactive_color;
+        // Bottom Nav
+        $data['bottom_nav_bottom_color'] = $request->reset != 1 ? $request->bottom_color : null;
+        $data['bottom_nav_active_color'] = $request->reset != 1 ? $request->active_color : null;
+        $data['bottom_nav_inactive_color'] = $request->reset != 1 ? $request->inactive_color : null;
 
-// Text & Button Colors
+        // Text & Button Colors
         $data['text_header_color'] = $request->text_header_color;
         $data['button_text_color'] = $request->button_text_color;
 
 
         unset($data['app_background_image'], $data['brand_background_image_reset']);
-
+        if ($request->reset) {
+            $timestamp = Carbon::now()->timestamp;
+            settings()->set('color_setting_updated_at', $timestamp);
+        }
         // Process and save settings
         foreach ($data as $key => $value) {
 
@@ -282,8 +286,6 @@ class SettingsController extends Controller
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
-
-
         }
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');

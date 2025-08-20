@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Helpers\Common;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
@@ -38,7 +39,7 @@ class Handler extends ExceptionHandler
         if ($request->is('api/*')) {
             if ($e instanceof CValidationException) {
                 return Common::apiResponse(0, $e->getMessage(), null, 422);
-            }elseif ($e instanceof \Illuminate\Auth\AuthenticationException) {
+            }elseif ($e instanceof AuthenticationException) {
 
                 return Common::apiResponse (false,'Unauthenticated',[],401);
             } elseif ($e instanceof ModelNotFoundException) {
@@ -66,7 +67,7 @@ class Handler extends ExceptionHandler
             //
         });
 
-        $this->renderable(function (\Illuminate\Auth\AuthenticationException $e, $request) {
+        $this->renderable(function (AuthenticationException $e, $request) {
             if ($request->is('api/*')) {
                 return Common::apiResponse (false,'Unauthenticated',[],401);
             }

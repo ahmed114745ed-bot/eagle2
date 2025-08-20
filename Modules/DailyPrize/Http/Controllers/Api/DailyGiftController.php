@@ -55,7 +55,7 @@ class DailyGiftController extends Controller
     public function getWeekGifts(int $currentDay): array
     {
         $DAYS_IN_WEEK = 7;
-        $currentWeek = $currentDay % $DAYS_IN_WEEK;
+        $currentWeek = intdiv($currentDay - 1, $DAYS_IN_WEEK);
 
         $startDay = 1 + ($DAYS_IN_WEEK * $currentWeek);
         $endDay = $startDay + $DAYS_IN_WEEK - 1;
@@ -84,25 +84,31 @@ class DailyGiftController extends Controller
         if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
             return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
         }
+        try {
 
-        $type = $dailyGift->gift_type;
-        $target = $dailyGift->target;
-        $expire = $dailyGift->expire;
-        DailyGiftCount::query()->updateOrCreate([
-            'user_id' => $user->id,
+            $type = $dailyGift->gift_type;
+            $target = $dailyGift->target;
+            $expire = $dailyGift->expire;
+            $this->assignGiftToUser($type, $user, $target, $expire);
+            DailyGiftCount::query()->updateOrCreate([
+                'user_id' => $user->id,
 
-        ], [
-            'last_active' => now(),
-            'day_count' => $currentDay,
+            ], [
+                'last_active' => now(),
+                'day_count' => $currentDay,
 
-        ]);
-        DailyUserGift::create([
-            'user_id'   => $user->id,
-            'gift_type' => $type,
-            'target'    => $target,
-        ]);
-        $this->assignGiftToUser($type, $user, $target, $expire);
-        return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', []);
+            ]);
+            DailyUserGift::create([
+                'user_id'   => $user->id,
+                'gift_type' => $type,
+                'target'    => $target,
+            ]);
+
+            return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', [], 200);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 
     public function getCurrentDay()
@@ -125,9 +131,9 @@ class DailyGiftController extends Controller
         if ($type == "coins") {
 
             $amountBefore =  Common::getCurrentBalance($user->id);
-            UserCoinLogHelper::log(
+            UserCoinLogHelper::logByType(
                 $user->id,
-                 $target,
+                $target,
                 $amountBefore,
                 UserCoinLogType::DAILY_GIFT,
             );
@@ -136,11 +142,11 @@ class DailyGiftController extends Controller
             $user->save();
         } elseif ($type == "vip") {
             $vip = OVip::query()->find($target);
-            UserCommon::addVipToUser($user, $vip, $expire);
+            if ($vip) UserCommon::addVipToUser($user, $vip, $expire);
         } elseif ($type == "ware") {
 
             $ware = Ware::query()->find($target);
-            UserCommon::addWareToUser($user, $ware, $expire);
+            if ($ware) UserCommon::addWareToUser($user, $ware, $expire);
         } elseif ($type == "achievement") {
             $attributes = [
                 'user_id'      => $user->id,
@@ -162,6 +168,4 @@ class DailyGiftController extends Controller
         }
         return true;
     }
-
-
 }

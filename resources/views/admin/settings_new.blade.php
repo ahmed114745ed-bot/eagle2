@@ -3343,11 +3343,11 @@ use Modules\Vip\Entities\Vip;
                 <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
-
+                     <input type="hidden" name="reset" id="reset" value=3>
                         {{-- Primary Color --}}
                         <div class="col-md-6">
                             <label>{{ __('Primary Color') }}</label>
-                            <input type="color" name="app_primary_color"
+                            <input type="color" name="app_primary_color" id="app_primary_color"
                                    value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}"
                                    class="form-control">
                         </div>
@@ -3355,7 +3355,7 @@ use Modules\Vip\Entities\Vip;
                         {{-- Background Type --}}
                         <div class="col-md-6">
                             <label>{{ __('Background Type') }}</label>
-                            <select name="background_type" class="form-control" onchange="toggleBackgroundInput()">
+                            <select name="background_type" id="background_type" class="form-control" onchange="toggleBackgroundInput()">
                                 <option value="color" {{ data_get($settings, 'background_type') === 'color' ? 'selected' : '' }}>Color</option>
                                 <option value="image" {{ data_get($settings, 'background_type') === 'image' ? 'selected' : '' }}>Image</option>
                                 <option value="gradient" {{ data_get($settings, 'background_type') === 'gradient' ? 'selected' : '' }}>Gradient</option>
@@ -3366,7 +3366,7 @@ use Modules\Vip\Entities\Vip;
                         <div class="col-md-6" id="background_color_group"
                              style="display: {{ data_get($settings, 'background_type') === 'color' ? 'block' : 'none' }};">
                             <label>{{ __('Background Color') }}</label>
-                            <input type="color" name="background_color"
+                            <input type="color" name="background_color" id="background_color"
                                    value="{{ data_get($settings, 'background_color', '#ffffff') }}"
                                    class="form-control">
                         </div>
@@ -3386,27 +3386,27 @@ use Modules\Vip\Entities\Vip;
                         {{-- Bottom Nav --}}
                         <div class="col-md-6">
                             <label>{{ __('Bottom Nav Color') }}</label>
-                            <input type="color" name="bottom_color"
-                                   value="{{ data_get($settings, 'bottom_nav_bottom_color', '#ffffff') }}"
+                            <input type="color" name="bottom_color" id="bottom_color"
+                                   value="{{ data_get($settings, 'bottom_nav_bottom_color', '') }}"
                                    class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label>{{ __('Bottom Nav Active Color') }}</label>
-                            <input type="color" name="active_color"
-                                   value="{{ data_get($settings, 'bottom_nav_active_color', '#000000') }}"
+                            <input type="color" name="active_color" id="active_color"
+                                   value="{{ data_get($settings, 'bottom_nav_active_color', '') }}"
                                    class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label>{{ __('Bottom Nav Inactive Color') }}</label>
-                            <input type="color" name="inactive_color"
-                                   value="{{ data_get($settings, 'bottom_nav_inactive_color', '#808080') }}"
+                            <input type="color" name="inactive_color" id="inactive_color"
+                                   value="{{ data_get($settings, 'bottom_nav_inactive_color', '') }}"
                                    class="form-control">
                         </div>
 
                         {{-- Text Header Color --}}
                         <div class="col-md-6">
                             <label>{{ __('Text Header Color') }}</label>
-                            <input type="color" name="text_header_color"
+                            <input type="color" name="text_header_color" id="text_header_color"
                                    value="{{ data_get($settings, 'text_header_color', '#000000') }}"
                                    class="form-control">
                         </div>
@@ -3414,7 +3414,7 @@ use Modules\Vip\Entities\Vip;
                         {{-- Button Text Color --}}
                         <div class="col-md-6">
                             <label>{{ __('Button Text Color') }}</label>
-                            <input type="color" name="button_text_color"
+                            <input type="color" name="button_text_color" id="button_text_color"
                                    value="{{ data_get($settings, 'button_text_color', '#ffffff') }}"
                                    class="form-control">
                         </div>
@@ -3423,6 +3423,8 @@ use Modules\Vip\Entities\Vip;
 
                     <div class="col-12 d-flex gap-3 mt-3">
                         <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        <button type="button" id="resetAppColorsSettings"
+                            class="btn btn-secondary">{{ __('Reset Colors') }}</button>
                     </div>
                 </form>
             </div>
@@ -3594,6 +3596,9 @@ use Modules\Vip\Entities\Vip;
             </div>
 
             <script>
+               $(document).on('change', '.libraryRealTime', function() {
+                    $(this).closest('form').submit();
+                });
                 function reseting(colorid, value) {
                     $('#' + colorid).val(value);
 
@@ -3919,21 +3924,22 @@ use Modules\Vip\Entities\Vip;
 
                 document.addEventListener("DOMContentLoaded", function() {
                     let resetButton = document.getElementById('resetColors');
-                    let resetAppButton = document.getElementById('resetAppColors');
+                   
+                    let resetApColorSettingpButton = document.getElementById('resetAppColorsSettings');
 
-                    if (resetAppButton) {
-                        resetAppButton.addEventListener('click', function() {
-                            // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#32e5ac";
-                            document.getElementById('app_second_color').value = "#003FA6";
-
-                            // Reset background (assuming you want color background)
-                            document.getElementById('app_white_color').value = "#ffffff";
-                            document.getElementById('app_black_color').value = "#000000";
-                            document.getElementById('app_grey_color').value = "#a5a7a4"; // Grey color
-                            document.getElementById('app_yellow_color').value = "#FFAD38"; // Yellow color
-                            document.getElementById('background_type').value = "image";
-                            document.getElementById('background_type').value = "image";
+                    if (resetApColorSettingpButton) {
+                        resetApColorSettingpButton.addEventListener('click', function() {
+                            // Reset color inputs with valid hex values
+                            document.getElementById('app_primary_color').value = "#32e5ac";     // Teal-green
+                            document.getElementById('background_color').value = "#FFFFFF";      // White
+                            document.getElementById('background_type').value = "color";
+                            document.getElementById('bottom_color').value = "#FFFFFF";
+                             document.getElementById('reset').value = 1;          // White
+                            document.getElementById('active_color').value = "#33FFAA";          // Teal-green
+                            document.getElementById('inactive_color').value = "#D1CECE";        // Grey
+                            document.getElementById('text_header_color').value = "#000000";     // Black
+                            document.getElementById('button_text_color').value = "#FFFFFF";     // White
+                            
                             // Submit the form
                             document.querySelector('#appSettings form').submit();
                         });

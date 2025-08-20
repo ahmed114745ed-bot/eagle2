@@ -107,7 +107,7 @@ class BaishunGameController extends Controller
         } catch (\RuntimeException $e) {
             if ($e->getMessage() === 'insufficient') {
                 $responseArray = [
-                    'code' => 1,
+                    'code' => 1008,
                     'message' => 'failed',
                     'unique_id' => (string) $id,
                     'data' => [
@@ -118,7 +118,11 @@ class BaishunGameController extends Controller
                 return response()->json($responseArray);
             }
 
-            throw $e; // rethrow other unexpected errors
+            return response()->json([
+                'code' => 1,
+                'message' => 'user not found',
+                'unique_id' => (string) $id,
+            ]);
         }
 
         $type = $request->currency_diff >= 0;

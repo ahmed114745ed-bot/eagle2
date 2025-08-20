@@ -349,7 +349,7 @@ class UserController extends Controller
         $user = $request->user();
         try {
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }

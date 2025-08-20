@@ -3,7 +3,6 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Services\FileService;
-use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -22,6 +21,7 @@ use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\FfmpegService;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
+use Modules\Vip\Entities\OVip;
 
 
 class OvipGiftTapController extends MainController

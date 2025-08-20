@@ -334,18 +334,15 @@ class UserCommon
 
     public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null)
     {
+        info('add vip to user');
         DB::beginTransaction();
-
-
         VipCommon::createUserVip($vip ,$user ,$expire , null ,'',);
-
         DB::commit();
-
-        Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
-        $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-        $title = config('app.name_ar');
-        $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
-        Common::send_firebase_notification($tokens_notfacion, $title, $body);
+        // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
+        // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        // $title = config('app.name_ar');
+        // $body = __('لقد حصلت على مستوى VIP جديد كهدية') . $user->name;
+        // Common::send_firebase_notification($tokens_notfacion, $title, $body);
     }
 
     public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)
@@ -404,6 +401,47 @@ class UserCommon
             DB::rollBack();
         }
     }
+
+
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null)
+    {
+        $title = __('congratulations');
+        $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
+
+        DB::beginTransaction();
+        try {
+            $arr['user_id']   = $user->id;
+            $arr['type']      = $ware->type;
+            $arr['get_type']  = $ware->get_type;
+            $arr['target_id'] = $ware->id;
+            $arr['num']       = 1;
+            $arr['is_read']   = 1;
+            $arr['days']      = $expir;
+
+
+            $pack = Pack::query()->create($arr);
+
+            if ($sender) {
+                $pack->senderable()->associate($sender);
+                $pack->save();
+            }
+
+            DB::commit();
+
+            Common::sendOfficialMessage($user->id, $title, $body);
+            (new UserCounterServices)->eventUser($user, 'official-messages');
+
+            $tokens_notfacion[] = DB::table('users')
+                ->where('id', $user->id)
+                ->value('notification_id');
+
+            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
 
     public static function addChargeLevel($userId, $amount)
     {

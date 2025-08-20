@@ -3258,6 +3258,26 @@
     "restore": "Geri yükle",
     "restore_binding": "Bağlamayı geri yükle",
     "It has not been 24 hours yet to receive the next gift.": "Bir sonraki hediyeyi almak için henüz 24 saat dolmadı.",
+
+    "Room Boom Levels": "Oda Patlaması Seviyeleri",
+    "Room Boom Level": "Oda Patlaması Seviyesi",
+    "Edit Room Boom Level": "Oda Patlaması Seviyesini Düzenle",
+    "Create Room Boom Level": "Oda Patlaması Seviyesi Oluştur",
+    "min target": "minimum hedef",
+    "Updated At": "Güncellenme Tarihi",
+    "Room Boom Rewards": "Oda Patlaması Ödülleri",
+    "You can only have a maximum of 5 Room Boom Levels.": "En fazla 5 Oda Patlaması Seviyesi ekleyebilirsiniz.",
+    "room-boom-levels": "oda-patlamasi-seviyeleri",
+    "Room Boom Reward": "Oda Patlaması Ödülü",
+    "Edit Room Boom Reward": "Oda Patlaması Ödülünü Düzenle",
+    "Create Room Boom Reward": "Oda Patlaması Ödülü Oluştur",
+    "target type": "hedef türü",
+    "You can only have a maximum of 7 gifts for this Room Boom Level.": "Bu Oda Patlaması Seviyesi için en fazla 7 hediye ekleyebilirsiniz.",
+    "Created successfully": "Başarıyla oluşturuldu",
+    "Deleted successfully": "Başarıyla silindi",
+    "room-boom-rewards": "oda-patlamasi-odulleri",
+    "priority": "öncelik",
+
     "Reel Comments": "Video Yorumları"
 
 
