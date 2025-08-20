@@ -508,7 +508,8 @@ class RoomController extends MainController
                 $filter->where(function ($query) {
                     $input = $this->input;
                     $query->whereHas('owner', fn($q) => $q->where('name', 'like', "%$input%")
-                        ->orWhere('original_uuid', 'like', "%$input%"));
+                        ->orWhere('special_id', 'like', "%$input%")
+                        ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
 
                 $countries = Cache::rememberForever('filter_countries_list', function () {
@@ -543,7 +544,7 @@ class RoomController extends MainController
             // fetch all needed users once
             $users = collect();
             if (!empty($allIds)) {
-                $users = User::select(['id', 'name']) 
+                $users = User::select(['id', 'name'])
                 ->with('profile:id,user_id,avatar')
                     ->whereIn('id', $allIds)
                     ->get()
@@ -580,6 +581,9 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
 
+            if (strlen($name) > 50){
+                $name = substr($name,0,50) . ' ...';
+            }
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>

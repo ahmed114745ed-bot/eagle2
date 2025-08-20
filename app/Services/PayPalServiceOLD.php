@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class PayPalService
+class PayPalServiceOLD
 {
     use PaymentTrait;
    public static function redirectUrl()
@@ -44,6 +44,7 @@ class PayPalService
             'Authorization'     => 'Bearer ' . $this->getAccessToken(),
             'PayPal-Request-Id' => $id,
         ];
+
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
