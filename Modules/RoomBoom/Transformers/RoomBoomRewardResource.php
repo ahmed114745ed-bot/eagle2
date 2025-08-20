@@ -40,6 +40,7 @@ class RoomBoomRewardResource extends JsonResource
     {
         if ($this->target_type == 'gift') {
             $gift = $this->getGift();
+            return 'png';
             return $gift?->image_type;
         }
     }
