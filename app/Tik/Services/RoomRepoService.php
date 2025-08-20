@@ -3,6 +3,8 @@
 namespace App\Tik\Services;
 
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Config;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Schema;
@@ -62,6 +64,15 @@ class RoomRepoService
             if ($user->di < $paidRoomAmount->value){
                 throw new \Exception(__('you do not have enough coins for creating a room'));
             }
+
+            $amountBefore =  $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($paidRoomAmount->value),
+                $amountBefore,
+                UserCoinLogType::CREATE_ROOM,
+            );
+
             $user->di = $user->di - $paidRoomAmount->value;
             $user->save();
         }
