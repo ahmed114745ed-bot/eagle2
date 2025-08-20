@@ -184,21 +184,21 @@ class Room extends Model
     public function getCountRoomSocketAttribute()
     {
         $ids = explode(',', $this->room_visitor);
-        $countPacks = Pack::query()->whereIn('user_id', $ids)
+        /*$countPacks = Pack::query()->whereIn('user_id', $ids)
             ->where('is_used', 1)
             ->where('type', 17)
             ->where(function ($q) {
                 $q->where('packs.expire', 0)->orWhere('packs.expire', '>=', time());
             })
             ->count();
-        /** is it okay the id = 0 */
+
         foreach ($ids as $indes => $id) {
             if ($id === '' || $id < 0) {
                 unset($ids[$indes]);
             }
-        }
+        }*/
 
-        return count($ids) - $countPacks;
+        return count($ids);
     }
 
     public function getCountRoomSocketV2Attribute()
