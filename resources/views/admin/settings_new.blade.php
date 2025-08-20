@@ -3343,7 +3343,7 @@ use Modules\Vip\Entities\Vip;
                 <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
-
+                     <input type="hidden" name="reset" id="reset" value=3>
                         {{-- Primary Color --}}
                         <div class="col-md-6">
                             <label>{{ __('Primary Color') }}</label>
@@ -3387,19 +3387,19 @@ use Modules\Vip\Entities\Vip;
                         <div class="col-md-6">
                             <label>{{ __('Bottom Nav Color') }}</label>
                             <input type="color" name="bottom_color" id="bottom_color"
-                                   value="{{ data_get($settings, 'bottom_nav_bottom_color', '#ffffff') }}"
+                                   value="{{ data_get($settings, 'bottom_nav_bottom_color', '') }}"
                                    class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label>{{ __('Bottom Nav Active Color') }}</label>
                             <input type="color" name="active_color" id="active_color"
-                                   value="{{ data_get($settings, 'bottom_nav_active_color', '#000000') }}"
+                                   value="{{ data_get($settings, 'bottom_nav_active_color', '') }}"
                                    class="form-control">
                         </div>
                         <div class="col-md-6">
                             <label>{{ __('Bottom Nav Inactive Color') }}</label>
                             <input type="color" name="inactive_color" id="inactive_color"
-                                   value="{{ data_get($settings, 'bottom_nav_inactive_color', '#808080') }}"
+                                   value="{{ data_get($settings, 'bottom_nav_inactive_color', '') }}"
                                    class="form-control">
                         </div>
 
@@ -3596,6 +3596,9 @@ use Modules\Vip\Entities\Vip;
             </div>
 
             <script>
+               $(document).on('change', '.libraryRealTime', function() {
+                    $(this).closest('form').submit();
+                });
                 function reseting(colorid, value) {
                     $('#' + colorid).val(value);
 
@@ -3927,10 +3930,11 @@ use Modules\Vip\Entities\Vip;
                     if (resetApColorSettingpButton) {
                         resetApColorSettingpButton.addEventListener('click', function() {
                             // Reset color inputs with valid hex values
-                            document.getElementById('app_primary_color').value = "#33FFAA";     // Teal-green
+                            document.getElementById('app_primary_color').value = "#32e5ac";     // Teal-green
                             document.getElementById('background_color').value = "#FFFFFF";      // White
                             document.getElementById('background_type').value = "color";
-                            document.getElementById('bottom_color').value = "#FFFFFF";          // White
+                            document.getElementById('bottom_color').value = "#FFFFFF";
+                             document.getElementById('reset').value = 1;          // White
                             document.getElementById('active_color').value = "#33FFAA";          // Teal-green
                             document.getElementById('inactive_color').value = "#D1CECE";        // Grey
                             document.getElementById('text_header_color').value = "#000000";     // Black

@@ -31,7 +31,7 @@ class RoomBoomGiftService
         }
 
         $currentLevel = RoomBoomLevel::where('min_target', '<=', $newTotal)
-            ->where('target', '>=', $newTotal)
+            ->where('target', '>', $newTotal)
             ->orderBy('level')
             ->first();
 
@@ -59,6 +59,7 @@ class RoomBoomGiftService
                 ];
                 $json = json_encode($d);
 
+                info('next level zego');
                 Common::sendToZego('SendCustomCommand', $roomId, $roomUid, $json);
             }
 

@@ -72,6 +72,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/fawry.jpeg',
             'status' => 1,
             'type' => 'fawry',
+            'package_type' => 'user'
         ]);
         $fawry_fields = [
             'new_1' => [
@@ -120,6 +121,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/fawry.jpeg',
             'status' => 1,
             'type' => 'utd_fawry',
+            'package_type' => 'user'
         ]);
         $utd_fawry_fields = [
             'new_1' => [
@@ -168,6 +170,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/paysky.png',
             'status' => 1,
              'type' => 'sky_pay',
+             'package_type' => 'user'
          ]);
 
         $pay_sky_fields = [
@@ -217,6 +220,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/stripe.png',
             'status' => 1,
             'type' => 'strip',
+            'package_type' => 'user'
         ]);
 
         $strip_fields = [
@@ -271,6 +275,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/opay.png',
             'status' => 1,
             'type' => 'opay',
+            'package_type' => 'user'
         ]);
 
         $opay_fields = [
@@ -330,6 +335,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/cashfree.jpg',
             'status' => 1,
             'type' => 'cash_free',
+            'package_type' => 'user'
         ]);
 
         $cashfree_fields = [
@@ -379,6 +385,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/applepay.png',
             'status' => 1,
             'type' => 'apple_pay',
+            'package_type' => 'user'
         ]);
 
         $applepay_fields = [
@@ -525,6 +532,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/paypal.png',
             'status' => 1,
             'type' => 'paypal',
+            'package_type' => 'user'
         ]);
 
         $paypal_fields = [
@@ -634,6 +642,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/paytabs.webp',
             'status' => 1,
             'type' => 'paytabs',
+            'package_type' => 'user'
         ]);
 
         $paytabs_fields = [
@@ -1052,6 +1061,7 @@ class PaymentGatewaysSeeder extends Seeder
             'photo' => 'images/googlepay.png',
             'status' => 1,
             'type' => 'google_pay',
+            'package_type' => 'user'
         ]);
 
         $google_pay_fields = [
