@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Core\ProductionEnvironment;
 
 class PayPalService
 {
@@ -21,7 +22,7 @@ class PayPalService
 {
     $clientId = config('paypal.client_id');
     $clientSecret = config('paypal.client_secret');
-    $environment = new SandboxEnvironment($clientId, $clientSecret);
+    $environment = new ProductionEnvironment($clientId, $clientSecret);
     $this->client = new PayPalHttpClient($environment);
 }
 
