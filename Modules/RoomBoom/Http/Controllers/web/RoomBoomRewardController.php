@@ -3,6 +3,7 @@
 namespace Modules\RoomBoom\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use App\Models\Gift;
 use App\Models\Ware;
 use App\Selectables\Gifts;
@@ -186,7 +187,11 @@ class RoomBoomRewardController extends MainController
                     $form->model()->target = $form->gift_target_id;
                     break;
                 case 'achievement':
-                    $form->model()->target = $form->achievement_target;
+                    if ($form->achievement_target instanceof UploadedFile) {
+                        $url = Common::upload('roomBoom', $form->achievement_target);
+                    }
+                    $form->model()->target = $url ?? '';
+                    $form->target = $url ?? '';
                     break;
             }
 
@@ -289,7 +294,7 @@ class RoomBoomRewardController extends MainController
 
     protected function addAchievementFields($form): void
     {
-        $form->image("target", __('image'))
+        $form->image("achievement_target", __('image'))
             ->name(function ($file) {
                 if ($file instanceof UploadedFile) {
                     return now()->timestamp . '.' . $file->guessExtension();
