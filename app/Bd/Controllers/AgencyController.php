@@ -479,16 +479,20 @@ class AgencyController extends MainController
 
         $grid->column('phone', trans('phone'))->display(function ($number) {
             if (!$number) return '-';
-
-            $iconUrl = asset('images/phone.jpg'); // Adjust the path based on your actual file location
+        
+            $iconUrl = asset('images/phone.jpg');
             $phoneCode = $this->phone_code;
-            // Return an image with a WhatsApp link
-            return "<div style='display: flex; align-items: center; '>
-
-             <span>{$phoneCode}{$number}</span>
-
-              <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
-        </div>";
+            $locale = app()->getLocale();
+        
+            $direction = ($locale === 'ar') ? 'row-reverse' : 'row';
+            $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
+        
+            return "
+                <div style='display: flex; align-items: center; flex-direction: {$direction};'>
+                    <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
+                    <span style='direction:ltr; unicode-bidi:bidi-override;'>{$phoneCode}{$number}</span>
+                </div>
+            ";
         });
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
@@ -697,7 +701,7 @@ class AgencyController extends MainController
 
             $row->width(9)->text('phone', __('agency whatsApp number'))
                 ->rules('required')
-                ->attribute('id', 'phone-input')  ->attribute('maxlength', 11);
+                ->attribute('id', 'phone-input')  ->attribute('maxlength', 10);
             
             $row->hidden('phone_code');
 
@@ -789,7 +793,6 @@ class AgencyController extends MainController
             $user->update([
                 'type_user' => 0,
                 'agency_id' => 0,
-
                 'is_host' => 0,
             ]);
 
@@ -799,7 +802,6 @@ class AgencyController extends MainController
         User::where('id', intval($appOwnerId))->update([
             'type_user' => 2,
             'is_host' => 1,
-            
             'agency_id' => $form->model()->id,
 
         ]);
