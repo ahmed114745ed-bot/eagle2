@@ -8,14 +8,30 @@ use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Core\ProductionEnvironment;
 
 class PayPalService
 {
     use PaymentTrait;
+
+
+    public function __construct()
+{
+    $clientId = config('paypal.client_id');
+    $clientSecret = config('paypal.client_secret');
+    $environment = new ProductionEnvironment($clientId, $clientSecret);
+    $this->client = new PayPalHttpClient($environment);
+}
+
    public static function redirectUrl()
    {
     return url("/admin/payment-with-method");
    }
+
+
 
     protected function getAccessToken(): string
     {
@@ -81,13 +97,72 @@ class PayPalService
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
                     $paymentLink = $link['href'];
-                    $paymentLink2 = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card&intent=capture&locale.x=en_IS';
                 }
             }
         }
-        return view('paypal_buttons', compact('paymentLink', 'paymentLink2'));
+        return $paymentLink;
+    }
 
-        // return $paymentLink;
+
+
+
+    public function createOrder($referenceId, $amount, $user)
+    {
+        $request = new OrdersCreateRequest();
+        $request->prefer('return=representation');
+        $request->body = [
+            "intent" => "CAPTURE",
+            "purchase_units" => [[
+                "reference_id" => $referenceId,
+                "amount" => [
+                    "currency_code" =>config('paypal.currency'),
+                    "value" => $amount
+                ]
+            ]],
+            "application_context" => [
+                "brand_name" => config('app.name'),
+                "landing_page" => "BILLING",
+                "user_action" => "PAY_NOW",
+                "return_url" => url("/api/paypal-return/$referenceId"),
+                "cancel_url" =>  url('/api/paypal-cancel')
+            ]
+        ];
+
+        $response = $this->client->execute($request);
+        foreach ($response->result->links as $link) {
+            if ($link->rel === 'approve') {
+                // PayPal يرجع checkoutnow?token=XXX
+                $url = $link->href;
+        
+                // Log الرابط الأصلي من PayPal
+                \Log::info("PayPal Original Approve URL", ['url' => $url]);
+        
+                // استخرج التوكن
+                preg_match('/token=([A-Z0-9]+)/', $url, $matches);
+                if (!empty($matches[1])) {
+                    $token = $matches[1];
+        
+                    // Log التوكن المستخرج
+                    \Log::info("PayPal Token Extracted", ['token' => $token]);
+        
+                    // حوله دايمًا لصيغة ncp/payment
+                    $ncpUrl = "https://www.paypal.com/ncp/payment/" . $token;
+        
+                    // Log الرابط بعد التحويل
+                    \Log::info("PayPal Final Approve URL", ['url' => $ncpUrl]);
+        
+                    return $ncpUrl;
+                }
+        
+                // Log لو ما لقي توكن
+                \Log::warning("PayPal Token not found in URL", ['url' => $url]);
+        
+                return $url; // fallback
+            }
+            
+        }
+
+        throw new \Exception("PayPal approval link not found");
     }
 
     /**
