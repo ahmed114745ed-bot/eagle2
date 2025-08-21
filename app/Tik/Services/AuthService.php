@@ -132,7 +132,9 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
-        // Log::info('Google login request:', $request->only(['id_token', 'google_id', 'email']));
+        Log::info('Google login request', [
+            'data' => $request->only(['id_token', 'google_id', 'email'])
+        ]);
         $client = new Google_Client();
 
         $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
