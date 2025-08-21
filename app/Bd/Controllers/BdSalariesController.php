@@ -183,8 +183,7 @@ class BdSalariesController extends AdminController
         });
         
         $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
-            logger()->info('Total User Salary:', ['value' => $value]);
-            return truncateAndTrim($value);
+            return number_format((float) $value, 2, '.', '');
         });
         
         
