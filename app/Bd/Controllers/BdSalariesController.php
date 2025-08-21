@@ -77,13 +77,11 @@ class BdSalariesController extends AdminController
     $grid = new Grid(new BdAgencyHostSallary());
     $appID = Auth::user()->id;
 
-    $latestRecords = BdAgencyHostSallary::selectRaw('MAX(id) as id')
-        ->groupBy('user_id', 'agency_id', 'month', 'year');
+ 
 
     $grid->model()
         ->where('bd_id', $appID)
         ->with('agency')
-        ->whereIn('id', $latestRecords)
         ->selectRaw('
             agency_id, 
             month,
