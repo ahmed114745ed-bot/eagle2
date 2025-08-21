@@ -6,6 +6,7 @@ use App\Exceptions\CValidationException;
 use App\Helpers\Common;
 use App\Facades\UserHandling;
 use App\Models\Profile;
+use Illuminate\Support\Facades\Log;
 use DB;
 use Google_Client;
 use Illuminate\Http\UploadedFile;
@@ -131,10 +132,11 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
+         Log::info('Google login request:', $request->all());
         $client = new Google_Client();
 
         $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
-        dd($request);
+        
         if (!$request['id_token']) throw new \Exception('google id token missing');
         $payload = $client->verifyIdToken($request['id_token']);
         if (!$payload) {
