@@ -226,13 +226,15 @@ class RoomBoomRewardController extends MainController
 
         $form->select('target', __('Gift'))
             ->options(function ($id) {
+                $query = Gift::query()->pluck('name', 'id');
+
                 if ($id) {
-                    $gift = \App\Models\Gift::find($id);
-                    if ($gift) {
-                        return [$gift->id => "{$gift->name}_{$gift->id}"];
+                    $gift = Gift::find($id);
+                    if (!$query->has($gift->id)) {
+                        $query[$gift->id] = "{$gift->name}_{$gift->id}";
                     }
                 }
-                return \App\Models\Gift::pluck('name', 'id');
+                return Gift::pluck('name', 'id');
             })
             ->attribute([
                 'data-image-select' => 1,
