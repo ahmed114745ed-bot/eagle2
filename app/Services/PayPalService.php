@@ -125,8 +125,6 @@ class PayPalService
                 "user_action"  => "PAY_NOW",
                 "return_url"   => url("/api/paypal-return/$referenceId"),
                 "cancel_url"   => url('/api/paypal-cancel'),
-                // ممكن تحدد اللوكال علشان يظهر زر البطاقة
-                "locale"       => "en_IS" // أو ar_AE
             ]
         ];
     
