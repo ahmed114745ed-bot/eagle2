@@ -40,12 +40,13 @@ class HomeCarouselResource extends JsonResource
             'isLocked'   =>   $roomPass != '' || $roomPass != null,
             'owner_id'   =>  $this->owner_id ?? 0,
             'avatar' => $avatar ?? "profile/g0lEsx7Joe.jpg",
-            'cp_winner_name_one' => $nameOne,
-            'cp_avatar_two' => $cpAvatar ?? "profile/g0lEsx7Joe.jpg",
-            'cp_winner_name_two' => $nameTwo,
-
             'event_type' => $this->event_type,
         ];
+        if ($this->event_type == 'cp_event') {
+             $data['cp_winner_name_one'] = $nameOne;
+             $data['cp_avatar_two'] = $cpAvatar ?? "profile/g0lEsx7Joe.jpg";
+             $data['cp_winner_name_two'] = $nameTwo;
+        }
 
         if ($this->type == 'room') {
             $data += ['room' => [
