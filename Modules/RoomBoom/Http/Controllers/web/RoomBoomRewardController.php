@@ -188,7 +188,7 @@ class RoomBoomRewardController extends MainController
                     break;
                 case 'achievement':
                     if ($form->achievement_target instanceof UploadedFile) {
-                        $url = Common::upload('roomBoom', $form->achievement_target);
+                        $url = Common::upload('room-boom', $form->achievement_target);
                     }
                     $form->target = $url ?? '';
                     break;
