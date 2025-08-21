@@ -202,6 +202,7 @@ class RoomBoomRewardController extends MainController
 
 
 
+        info($form);
         return $form;
     }
 
