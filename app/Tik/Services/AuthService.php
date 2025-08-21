@@ -133,9 +133,7 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
-        Log::info('Google login request', [
-            'data' => Arr::only($request, ['id_token', 'google_id', 'email'])
-        ]);
+        
         if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
 
@@ -182,13 +180,7 @@ class AuthService
                     'status' => true,
                 ];
                 $user = $this->userRepository->create($data);
-                \Log::info('Google Login Email: ' . $data['email']);
-                Log::info('Google login request', [
-                    'data' => Arr::only($request, ['email'])
-                ]);
                 $is_new = true;
-
-                $user->update(['email' => $request['email']]);
                 $this->storeImage($request, $data, $user);
 
                 if (\request('tags') && is_array(\request('tags'))) {
