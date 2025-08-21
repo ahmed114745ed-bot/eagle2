@@ -62,7 +62,10 @@ class RoomBoomReward extends Model
                 case 'achievement':
                     info($model->achievement_target);
                     if (isset($model->achievement_target)) {
-                        $model->target = $model->achievement_target;
+                        if ($model->achievement_target instanceof UploadedFile) {
+                            $url = Common::upload('roomBoom', $model->achievement_target);
+                        }
+                        $model->target = $url;
                         unset($model->achievement_target);
                     }
                     info($model->target);
