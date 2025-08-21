@@ -297,7 +297,8 @@ class RoomBoomRewardController extends MainController
 
                 return $file;
             })
-            ->disk('gcs');
+            ->disk('gcs')
+            ->setColumn('target');
     }
 
     public function store()
