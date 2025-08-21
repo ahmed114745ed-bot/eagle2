@@ -80,7 +80,8 @@ class RoomBoomRewardController extends MainController
                     $gift = Gift::find($this->target);
                     $path = $gift->show_img ?? $gift?->img;
                 } elseif ($this->target_type == 'achievement') {
-                    $path = $this?->target;
+                    $value = getDriverUrl() . '/' . @$this?->target;
+                    return "<img src='$value' width='80' height='80'>";
                 } else {
                     $path = 'coin.png';
                 }
@@ -281,7 +282,7 @@ class RoomBoomRewardController extends MainController
 
         $script = str_replace(['{{fieldName}}', '{{previewId}}'], [$fieldName, $previewId], $script);
 
-        \Encore\Admin\Admin::script($script);
+        Admin::script($script);
     }
 
 
