@@ -138,13 +138,13 @@ class RankingService
             3 => 'monthly'
         ];
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
-   //dd($data);
+  
         if ($class == 5) {
             return $this->rankingRepo->getAgencyRanking($rel, $types[$type], $limit);
         }
         $this->transformData3($data, $class, $keywords, $rel);
-       // return new UserRankingCollection($data, $user, $keywords);
-         return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+        return new UserRankingCollection($data, $user, $keywords);
+        // return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
     protected function transformData3(&$data, $class, $key, $relation)
     {
@@ -212,7 +212,7 @@ class RankingService
             $v->age = @$user->profile->age ?? '';
             $v->achievement_images = $achievement_images;
             $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
-            unset($v->ranker);
+            //unset($v->ranker);
             return $v;
         })->reject(function ($v) {
             return $v == null;
