@@ -18,6 +18,7 @@ use Modules\CP\Transformers\RankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\Api\V1\UserRankingCollection;
+use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
@@ -97,28 +98,7 @@ class RankingService
             $this->achievementService->getUserAchievement($user)
         );
     }
-    public function getRanking($class, $type, $user, $limit, $room_uid, $sent_to_owner)
-    {
-        if ($class == 4) {
-            $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
-            $this->transformData($data, $class, 'user_id', 'user');
-            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
-        } elseif ($class == 6) {
-            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
-            return $this->prepareResponse2($data, $user, $type, $user->id, $class);
-            return \App\Http\Resources\RankingResource::collection($data);
-        }
-
-        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
-
-        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
-        if ($class == 5) {
-            return $data;
-        }
-        $this->transformData($data, $class, $keywords, $rel);
-
-        return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
-    }
+    
 
     public function getRanking22($class, $type, $user, $limit)
     {
@@ -143,11 +123,39 @@ class RankingService
         }
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
 
-
-        $this->transformData3($data, $class, $keywords, $rel);
-        return new UserRankingCollection($data, $user, $keywords);
-        // return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+  
+         $this->transformData3($data, $class, $keywords, $rel);
+      return new UserRankingCollection($data, $user, $keywords);
+         // return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
+
+    public function getRanking66($class, $type, $user, $limit)
+    {
+        if ($class == 4) {
+            $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
+            $this->transformData($data, $class, 'user_id', 'user');
+            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+        } elseif ($class == 6) {
+            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            return $this->prepareResponse2($data, $user, $type, $user->id, $class);
+            return \App\Http\Resources\RankingResource::collection($data);
+        }
+
+        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+        $types = [
+            1 => 'daily',
+            2 => 'weekly',
+            3 => 'monthly'
+        ];
+        if ($class == 5) {
+            return $this->rankingRepo->getAgencyRanking($rel, $types[$type], $limit);
+        }
+        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
+
+        return new UsersRankingCollection($data, $user, $keywords);
+        
+    }
+
     protected function transformData3(&$data, $class, $key, $relation)
     {
 

@@ -67,6 +67,25 @@ class RankingController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
+    public function ranking3(Request $request)
+    {
+        $class = $request->class ?: 1;
+        $type = $request->type !== null ? $request->type : 1;
+
+        if (!in_array($class, [1, 2, 3, 4, 5, 6]) || !in_array($type, [0, 1, 2, 3, 4])) {
+            return Common::apiResponse(0, 'Parameter error', null, 422);
+        }
+
+        $limit = $request->is_home ? 3 : 10;
+
+        $data = $this->rankingService->getRanking66($class, $type, $request->user(), $limit);
+
+        if ($class == 5) {
+            $data =   NewAgencyRankingResource::collection($data);
+        }
+        return Common::apiResponse(1, '', $data);
+    }
+
     public function rankingV2(Request $request)
     {
         $class = $request->class ?: 1;
