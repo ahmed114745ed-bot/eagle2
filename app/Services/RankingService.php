@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Pk;;
+
 use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
@@ -137,11 +138,12 @@ class RankingService
             2 => 'weekly',
             3 => 'monthly'
         ];
-        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
-  
         if ($class == 5) {
             return $this->rankingRepo->getAgencyRanking($rel, $types[$type], $limit);
         }
+        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
+
+
         $this->transformData3($data, $class, $keywords, $rel);
         return new UserRankingCollection($data, $user, $keywords);
         // return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
