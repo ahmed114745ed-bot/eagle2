@@ -115,6 +115,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('weekly-cp-winner')
             ->weekly()
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/weekly-cp-winner.log'))
             ->runInBackground();
 
         // $schedule->command('users:freeze-unfinished')
