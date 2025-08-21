@@ -116,7 +116,10 @@ class CoinService
                 $Active = config('is_paypal_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $paypalService = new PayPalService();
-                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
+                // $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
+                $paymentLink = $paypalService->createOrder($log->id, $coin->usd, $user);
+
+                
                 return Common::apiResponse(1, 'ok', $paymentLink, 200);
             }
             else {
