@@ -129,24 +129,36 @@ class PayPalService
         ];
 
         $response = $this->client->execute($request);
-
+        foreach ($response->result->links as $link) {
+            if ($link->rel === 'approve') {
+                // PayPal يرجع checkoutnow?token=XXX
+                $url = $link->href;
         
-                foreach ($response->result->links as $link) {
-                    if ($link->rel === 'approve') {
-                        // PayPal يرجع checkoutnow?token=XXX
-                        $url = $link->href;
-                
-                        // استخرج التوكن
-                        preg_match('/token=([A-Z0-9]+)/', $url, $matches);
-                        if (!empty($matches[1])) {
-                            $token = $matches[1];
-                            // حوله دايمًا لصيغة ncp/payment
-                            return "https://www.paypal.com/ncp/payment/" . $token;
-                        }
-                
-                        return $url; // fallback
-                    }
-                
+                // Log الرابط الأصلي من PayPal
+                \Log::info("PayPal Original Approve URL", ['url' => $url]);
+        
+                // استخرج التوكن
+                preg_match('/token=([A-Z0-9]+)/', $url, $matches);
+                if (!empty($matches[1])) {
+                    $token = $matches[1];
+        
+                    // Log التوكن المستخرج
+                    \Log::info("PayPal Token Extracted", ['token' => $token]);
+        
+                    // حوله دايمًا لصيغة ncp/payment
+                    $ncpUrl = "https://www.paypal.com/ncp/payment/" . $token;
+        
+                    // Log الرابط بعد التحويل
+                    \Log::info("PayPal Final Approve URL", ['url' => $ncpUrl]);
+        
+                    return $ncpUrl;
+                }
+        
+                // Log لو ما لقي توكن
+                \Log::warning("PayPal Token not found in URL", ['url' => $url]);
+        
+                return $url; // fallback
+            }
             
         }
 
