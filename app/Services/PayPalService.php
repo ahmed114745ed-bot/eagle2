@@ -107,57 +107,43 @@ class PayPalService
 
     public function createOrder($referenceId, $amount, $user)
     {
-        $request = new OrdersCreateRequest();
+        $request = new \PayPalCheckoutSdk\Orders\OrdersCreateRequest();
         $request->prefer('return=representation');
         $request->body = [
             "intent" => "CAPTURE",
             "purchase_units" => [[
-                "reference_id" => $referenceId,
+                "reference_id" => (string)$referenceId,
                 "amount" => [
-                    "currency_code" => config('paypal.currency'),
-                    "value" => $amount
+                    "currency_code" => config('paypal.currency', 'USD'),
+                    "value" => number_format((float)$amount, 2, '.', '')
                 ]
             ]],
             "application_context" => [
-                "brand_name"   => config('app.name'),
-                // مهم علشان يفتح صفحة الدفع بالبطاقة مباشرة
-                "landing_page" => "BILLING", // بدل LOGIN
-                "user_action"  => "PAY_NOW",
-                "return_url"   => url("/api/paypal-return/$referenceId"),
-                "cancel_url"   => url('/api/paypal-cancel'),
+                "brand_name"            => config('app.name'),
+                "landing_page"          => "BILLING",         // يحاول إظهار شاشة البطاقة
+                "user_action"           => "PAY_NOW",
+                "shipping_preference"   => "NO_SHIPPING",     // اختياري
+                "return_url"            => url("/api/paypal-return/$referenceId"),
+                "cancel_url"            => url('/api/paypal-cancel'),
+                // لا تضف locale هنا لو غير ضروري. وإن أردتها فاستخدم صيغة شرطة مثل "en-US" وليس "en_US".
             ]
         ];
     
         $response = $this->client->execute($request);
     
+        $orderId  = $response->result->id ?? null;
+        $status   = $response->result->status ?? null;
+        \Log::info('PayPal order created', ['order_id' => $orderId, 'status' => $status]);
+    
         foreach ($response->result->links as $link) {
             if ($link->rel === 'approve') {
-                $url = $link->href;
-    
-                // Log الرابط الأصلي
-                \Log::info("PayPal Original Approve URL", ['url' => $url]);
-    
-                // استخرج التوكن
-                preg_match('/token=([A-Z0-9]+)/', $url, $matches);
-                if (!empty($matches[1])) {
-                    $token = $matches[1];
-    
-                    // Log التوكن
-                    \Log::info("PayPal Token Extracted", ['token' => $token]);
-    
-                    // رابط الدفع المباشر بالبطاقة (Guest Checkout)
-                    $guestUrl = "https://www.paypal.com/ncp/payment/{$token}?fundingSource=card&intent=capture&locale.x=en_IS";
-    
-                    \Log::info("PayPal Guest Checkout URL", ['url' => $guestUrl]);
-    
-                    return $guestUrl;
-                }
-    
-                // fallback
-                return $url;
+                // أرجع الرابط كما هو، بدون أي تعديل
+                \Log::info("PayPal Approve URL", ['url' => $link->href]);
+                return $link->href;
             }
         }
     
+        \Log::error('PayPal approve link not found', ['order_id' => $orderId, 'status' => $status]);
         throw new \Exception("PayPal approval link not found");
     }
     
