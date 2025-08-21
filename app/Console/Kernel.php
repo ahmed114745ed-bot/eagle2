@@ -113,6 +113,9 @@ class Kernel extends ConsoleKernel
             ->everyThirtySeconds()
             ->runInBackground();
 
+        $schedule->command('weekly-cp-winner')
+            ->everyMinute();
+
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()
         //     ->timezone(getTimezone())
