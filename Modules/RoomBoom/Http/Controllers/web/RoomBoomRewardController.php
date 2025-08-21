@@ -190,7 +190,7 @@ class RoomBoomRewardController extends MainController
                     if ($form->achievement_target instanceof UploadedFile) {
                         $url = Common::upload('room-boom', $form->achievement_target);
                     }
-                    $form->target = $url ?? '';
+                    $form->model()->target = $url ?? '';
                     break;
             }
 
