@@ -25,6 +25,8 @@ use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\MessageBag;
 use App\Facades\CustomNotification;
 use App\Services\AppFeatureService;
 use Illuminate\Http\Request as req;
@@ -37,7 +39,6 @@ use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Support\MessageBag;
 
 class AgencyController extends MainController
 {
@@ -87,14 +88,18 @@ class AgencyController extends MainController
         $user = Auth::user();
 
         $agency = Agency::query()
-                ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
-                ->find($id);
+            // ->where('bd_id' ,$user->app_id )
+            ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
+            ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+            ->find($id);
+
+
         if (!$agency) {
             $agency =  ShippingAgency::query()
-                    ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                    ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
-                    ->find($id); 
+                // ->where('bd_id' ,$user->app_id )
+                ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                ->find($id);
         }
 
         if (!$agency) {
@@ -102,7 +107,7 @@ class AgencyController extends MainController
                 'title'   => __('error_title_div'),
                 'message' => __('Agency not found'),
             ]);
-    
+
             session()->flash('error', $error);
             throw new \Exception(__('Agency not found'));
         }
@@ -131,7 +136,7 @@ class AgencyController extends MainController
                     // Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
                     // return
                     $agency->mempers()
-                    ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                    ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
                     ->paginate(10, ['*'], 'members_page');
                 // });
@@ -496,7 +501,7 @@ class AgencyController extends MainController
         });
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-            $coin =truncateAndTrim($coin, 2);
+            $coin = number_format($coin, 2);
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>
@@ -809,7 +814,13 @@ class AgencyController extends MainController
     });
 
     $form->saved(function (Form $form) {
+        User::where('id', intval( $form->model()->app_owner_id))->update([
+            'type_user' => 2,
+            'is_host' => 1,
+            'agency_id' => $form->model()->id,
 
+        ]);
+     
         $checkAgencyUser = UsersJoinedAgency::where([
             'user_id' => $form->model()->app_owner_id,
             'agency_id' => $form->model()->id,
