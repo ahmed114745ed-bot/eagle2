@@ -13,7 +13,6 @@ use App\Models\BrandImage;
 use App\Models\MonthlyDiamondReceive;
 use App\Models\Setting;
 use App\Models\Timezone;
-use App\Models\BrandImage;
 use App\Models\PaymentCoin;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
