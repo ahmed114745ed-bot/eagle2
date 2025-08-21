@@ -509,7 +509,7 @@ class RankingService
 
         $otherData = $countData < 4 ? [] : array_slice($dataArray, 3);
 
-        $perPage = 10;
+        $perPage = request('per_page');
         $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
 
         $currentItems = array_slice($otherData, ($currentPage - 1) * $perPage, $perPage);
