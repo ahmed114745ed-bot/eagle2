@@ -12,6 +12,7 @@ use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Enums\AchievementType;
+use App\Http\Resources\Api\V1\UsersRankingCollection;
 
 class RankingRepository
 {
@@ -108,13 +109,12 @@ class RankingRepository
 
         return $query->paginate($perPage);
     }
-
     public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10)
     {
         $query = GiftRanking::query()
             ->with([
                 'ranker' => function ($q) {
-                    $q->with('owner')->select(['id', 'name', 'notice', 'phone', 'img','app_owner_id']);
+                    $q->with('owner')->select(['id', 'name', 'notice', 'phone', 'img', 'app_owner_id']);
                 },
             ])
             ->where('role', $role)
