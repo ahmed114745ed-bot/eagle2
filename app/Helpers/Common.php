@@ -98,8 +98,6 @@ class Common
         $nameCpOne = '';
         $nameCpTwo = '';
 
-        $event_type = 'weekly_cp';
-
         if ($event_type == 'pk_event') {
 
             $event = PkEvent::PreviousEvent()->latest()->first();
