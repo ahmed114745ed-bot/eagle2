@@ -5,6 +5,7 @@ namespace App\Console;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\CP\Console\WeeklyCpWinnerConsole;
 use Modules\TribeReward\Jobs\AgencyTribeRewardJob;
 use Modules\TribeReward\Jobs\CleanExpiredAgencyRewardsJob;
 
@@ -16,6 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\CloseStatusAppFeature::class,
         Commands\DeleteTrashedUsers::class,
         Commands\FreezeUsersCommand::class,
+        WeeklyCpWinnerConsole::class
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -110,6 +112,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:update-gift-rankings')
             ->everyThirtySeconds()
             ->runInBackground();
+
+        $schedule->command('weekly-cp-winner')
+            ->everyMinute();
 
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()

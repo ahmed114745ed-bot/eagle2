@@ -221,7 +221,6 @@ class CpserviceCo
         if ($cp?->relation?->type == 'solution') {
             if ($request->status == 1) {
                 $cpBetweenUsers = $this->cpRepository->findCpBetweenUsers($cp->user_one_id, $cp->user_two_id);
-                info($cpBetweenUsers);
                 $cpBetweenUsers->status = 3;
                 $cpBetweenUsers->save();
             }
