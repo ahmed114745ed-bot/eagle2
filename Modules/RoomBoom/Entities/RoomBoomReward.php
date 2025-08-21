@@ -63,11 +63,9 @@ class RoomBoomReward extends Model
                     if (request()->hasFile('achievement_target')) {
                         $file = request()->file('achievement_target');
 
-                        info('has file');
                         if ($file instanceof UploadedFile) {
                             $url = Common::upload('roomBoom', $file);
 
-                            info($url);
                             $model->target = $url;
                         }
                     }

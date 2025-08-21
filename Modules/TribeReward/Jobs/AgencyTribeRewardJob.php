@@ -33,7 +33,7 @@ class AgencyTribeRewardJob implements ShouldQueue
 
             if (!$period) {
                 DB::rollBack();
-                info('No ended period found.');
+//                info('No ended period found.');
                 return;
             }
 
@@ -118,10 +118,10 @@ class AgencyTribeRewardJob implements ShouldQueue
             }
 
             DB::commit();
-            info('Agency event rewards distributed and new period created if necessary.');
+//            info('Agency event rewards distributed and new period created if necessary.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            \Log::error("ERROR in AgencyTribeRewardJob Job: " . $e->getMessage());
+//            \Log::error("ERROR in AgencyTribeRewardJob Job: " . $e->getMessage());
             throw $e;
         }
     }
