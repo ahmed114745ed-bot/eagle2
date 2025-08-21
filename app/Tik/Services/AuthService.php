@@ -133,14 +133,12 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
-        Log::info('Google login request', [
+        $client = new Google_Client();
+          Log::info('Google login request', [
         'data' => Arr::only($request, ['id_token', 'google_id', 'email'])
     ]);
-    if (!$request['id_token']) throw new \Exception('google id token missing');
-        $client = new Google_Client();
-
-        $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
-        
+        //$client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
+        if (!$request['id_token']) throw new \Exception('google id token missing');
         $payload = $client->verifyIdToken($request['id_token']);
         if (!$payload) {
             throw new \Exception('Google ID Token not found or invalid');
