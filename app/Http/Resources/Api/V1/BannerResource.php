@@ -24,7 +24,7 @@ class BannerResource extends JsonResource
             'event_type' => $this->event_type
         ];
         
-        if ($this->event_type == 'weekly_cp') {
+        if ($this->event_type == 'cp_event') {
             $data['cp_winner_name_one'] = $nameOne ?? '';
             $data['cp_winner_name_two'] = $nameTwo ?? '';
         }
