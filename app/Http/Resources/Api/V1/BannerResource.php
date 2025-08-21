@@ -10,7 +10,8 @@ class BannerResource extends JsonResource
     public function toArray($request)
     {
         [$avatar, $cpAvatar, $nameOne, $nameTwo] = ($this->is_active == 1) ? (Common::switch_events($this->event_type) ?? "profile/g0lEsx7Joe.jpg") : null;
-        return [
+        
+        $data = [
             'id' => $this->id,
             'title' => $this->title,
             'button_text' => $this->button_text,
@@ -20,9 +21,14 @@ class BannerResource extends JsonResource
             'is_active' => (int)$this->is_active,
             'user_event_winner' =>  $avatar ?? "profile/g0lEsx7Joe.jpg",
             'user_event_winner_two' => $cpAvatar ?? "profile/g0lEsx7Joe.jpg",
-            'cp_winner_name_one' => $nameOne ?? '',
-            'cp_winner_name_two' => $nameTwo ?? '',
             'event_type' => $this->event_type
         ];
+        
+        if ($this->event_type == 'cp_event') {
+            $data['cp_winner_name_one'] = $nameOne ?? '';
+            $data['cp_winner_name_two'] = $nameTwo ?? '';
+        }
+
+        return $data;
     }
 }
