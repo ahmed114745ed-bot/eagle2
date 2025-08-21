@@ -126,7 +126,7 @@ class PayPalService
                 "return_url"   => url("/api/paypal-return/$referenceId"),
                 "cancel_url"   => url('/api/paypal-cancel'),
                 // ممكن تحدد اللوكال علشان يظهر زر البطاقة
-                "locale"       => "en_US" // أو ar_AE
+                "locale"       => "en_IS" // أو ar_AE
             ]
         ];
     
@@ -148,7 +148,7 @@ class PayPalService
                     \Log::info("PayPal Token Extracted", ['token' => $token]);
     
                     // رابط الدفع المباشر بالبطاقة (Guest Checkout)
-                    $guestUrl = "https://www.paypal.com/ncp/payment/{$token}?fundingSource=card&intent=capture&locale.x=en_US";
+                    $guestUrl = "https://www.paypal.com/ncp/payment/{$token}?fundingSource=card&intent=capture&locale.x=en_IS";
     
                     \Log::info("PayPal Guest Checkout URL", ['url' => $guestUrl]);
     
