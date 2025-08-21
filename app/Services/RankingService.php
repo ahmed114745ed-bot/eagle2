@@ -99,7 +99,7 @@ class RankingService
             $this->achievementService->getUserAchievement($user)
         );
     }
-    
+
 
     public function getRanking22($class, $type, $user, $limit)
     {
@@ -124,7 +124,7 @@ class RankingService
         }
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
 
-  
+
          $this->transformData3($data, $class, $keywords, $rel);
     //  return new UserRankingCollection($data, $user, $keywords);
           return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
@@ -154,7 +154,7 @@ class RankingService
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
 
         return new UsersRankingCollection($data, $user, $keywords);
-        
+
     }
 
     protected function transformData3(&$data, $class, $key, $relation)
@@ -443,7 +443,7 @@ class RankingService
             return $v == null;
         });
     }
-    
+
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
         $achievement_images = [];
@@ -504,16 +504,16 @@ class RankingService
 
         $dataArray = $data->toArray();
         $countData = count($dataArray);
-        
+
         $arr['top'] = $countData < 4 ? $dataArray : array_slice($dataArray, 0, 3);
-        
+
         $otherData = $countData < 4 ? [] : array_slice($dataArray, 3);
-        
-        $perPage = 10; 
+
+        $perPage = 10;
         $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
-        
+
         $currentItems = array_slice($otherData, ($currentPage - 1) * $perPage, $perPage);
-        
+
         $paginatedOther = new LengthAwarePaginator(
             $currentItems,
             count($otherData),
@@ -524,8 +524,9 @@ class RankingService
                 'pageName' => 'page',
             ]
         );
-        
-        $arr['other'] = $paginatedOther;
+
+        $arr['others'] = $paginatedOther->items();
+//        $arr['other'] = $countData < 4 ? [] : array_slice($dataArray, 3);
 
         return $arr;
     }
