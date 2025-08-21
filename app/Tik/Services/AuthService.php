@@ -7,13 +7,14 @@ use Google_Client;
 use Mockery\Exception;
 use App\Helpers\Common;
 use App\Models\Profile;
+use Illuminate\Support\Arr;
 use App\Facades\UserHandling;
 use Illuminate\Http\UploadedFile;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 
+use Illuminate\Support\Facades\Http;
 use App\Exceptions\CValidationException;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
@@ -133,8 +134,8 @@ class AuthService
     public function loginWithGoogle($request)
     {
         Log::info('Google login request', [
-            'data' => $request->only(['id_token', 'google_id', 'email'])
-        ]);
+        'data' => Arr::only($request, ['id_token', 'google_id', 'email'])
+    ]);
         $client = new Google_Client();
 
         $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
