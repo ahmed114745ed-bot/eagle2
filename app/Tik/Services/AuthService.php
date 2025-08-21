@@ -4,7 +4,6 @@ namespace App\Tik\Services;
 
 use DB;
 use Google_Client;
-use App\Models\User;
 use Mockery\Exception;
 use App\Helpers\Common;
 use App\Models\Profile;
@@ -13,8 +12,8 @@ use App\Facades\UserHandling;
 use Illuminate\Http\UploadedFile;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Log;
-
 use Illuminate\Support\Facades\Hash;
+
 use Illuminate\Support\Facades\Http;
 use App\Exceptions\CValidationException;
 use App\Tik\Repositories\UserRepository;
@@ -182,14 +181,14 @@ class AuthService
                     'is_points_first' => 1,
                     'status' => true,
                 ];
-                $user = User::create($data);
+                $user = $this->userRepository->create($data);
                 \Log::info('Google Login Email: ' . $data['email']);
                 Log::info('Google login request', [
                     'data' => Arr::only($request, ['email'])
                 ]);
                 $is_new = true;
 
-
+                $user->update(['email' => $request['email']]);
                 $this->storeImage($request, $data, $user);
 
                 if (\request('tags') && is_array(\request('tags'))) {
