@@ -444,7 +444,7 @@ class RankingService
         });
     }
     
-   protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
+    protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
         $achievement_images = [];
 
@@ -474,9 +474,11 @@ class RankingService
         $kong['achievement_images'] = [];
         $kong['color_name'] = '';
 
-        $data[0] = isset($data[0]) ? $data[0] : $kong;
-        $data[1] = isset($data[1]) ? $data[1] : $kong;
-        $data[2] = isset($data[2]) ? $data[2] : $kong;
+        if ($data->count() > 0) {
+            $data[0] = $data[0] ?? $kong;
+            $data[1] = $data[1] ?? $kong;
+            $data[2] = $data[2] ?? $kong;
+        }
 
         $user->sort = $this->getUserSortValue($data, $userId);
         $user->user_id = $user->id;
