@@ -22,7 +22,8 @@ use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
-
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class RankingService
 {
@@ -442,9 +443,9 @@ class RankingService
             return $v == null;
         });
     }
+    
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
-
         $achievement_images = [];
 
         $kong['user_id']    = 0;
@@ -473,19 +474,14 @@ class RankingService
         $kong['achievement_images'] = [];
         $kong['color_name'] = '';
 
-
-
         $data[0] = isset($data[0]) ? $data[0] : $kong;
         $data[1] = isset($data[1]) ? $data[1] : $kong;
         $data[2] = isset($data[2]) ? $data[2] : $kong;
-        //        if ($limit == 3) return $data;
-
 
         $user->sort = $this->getUserSortValue($data, $userId);
         $user->user_id = $user->id;
 
         $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id', 'age');
-
 
         $userData = $data->where($key, $user->id)->first();
 
@@ -504,11 +500,33 @@ class RankingService
         $arr['user']['color_name'] = UserPackHelper::getColorName($user);
         $arr['user']['achievement_images'] = $achievement_images;
 
-
         $toArray = $data->toArray();
         $countData = count($data);
+        
         $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
-        $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
+        
+        $otherData = $countData < 4 ? [] : array_slice($toArray, 3);
+        
+        $otherCollection = collect($otherData);
+        
+        $perPage = 10; 
+        $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+        
+        $currentItems = $otherCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        
+        $paginatedOther = new LengthAwarePaginator(
+            $currentItems,
+            $otherCollection->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
+        
+        $arr['other'] = $paginatedOther;
+
         return $arr;
     }
 
