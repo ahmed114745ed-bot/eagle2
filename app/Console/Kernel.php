@@ -114,7 +114,8 @@ class Kernel extends ConsoleKernel
             ->runInBackground();
 
         $schedule->command('weekly-cp-winner')
-            ->everyMinute();
+            ->weekly()
+            ->runInBackground();
 
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()
