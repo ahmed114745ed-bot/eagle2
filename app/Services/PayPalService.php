@@ -63,6 +63,7 @@ class PayPalService
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
+                "payment_method_preference"=> "IMMEDIATE_PAYMENT_REQUIRED",
                 'return_url'  => url("/api/paypal-return/$referenceId"),
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
@@ -125,7 +126,6 @@ class PayPalService
                 "shipping_preference"   => "NO_SHIPPING",     // اختياري
                 "return_url"            => url("/api/paypal-return/$referenceId"),
                 "cancel_url"            => url('/api/paypal-cancel'),
-                // لا تضف locale هنا لو غير ضروري. وإن أردتها فاستخدم صيغة شرطة مثل "en-US" وليس "en_US".
             ]
         ];
     
