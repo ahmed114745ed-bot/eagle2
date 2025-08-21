@@ -186,12 +186,13 @@ class RoomBoomRewardController extends MainController
                     $form->model()->target = $form->gift_target_id;
                     break;
                 case 'achievement':
-                    $form->model()->target = $form->achievement_target;
+                    $form->model()->target = $form->input('achievement_target');
                     break;
             }
 
             unset($form->ware_target_id);
             unset($form->gift_target_id);
+            unset($form->achievement_target);
         });
 
 
@@ -297,8 +298,7 @@ class RoomBoomRewardController extends MainController
 
                 return $file;
             })
-            ->disk('gcs')
-            ->setColumn('target');
+            ->disk('gcs');
     }
 
     public function store()
