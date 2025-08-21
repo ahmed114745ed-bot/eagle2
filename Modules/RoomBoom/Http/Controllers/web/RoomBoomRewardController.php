@@ -13,6 +13,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\RoomBoomReward;
