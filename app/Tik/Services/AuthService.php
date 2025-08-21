@@ -170,7 +170,8 @@ class AuthService
                 //         throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
                 //     }
                 // }
-
+                $email =    $this->userRepository->findByEmail($request['email']);
+                if ($email) throw new \Exception('you used this email before');
                 $country = $this->countryRepository->findByPhoneCode('101');
                 $data = [
                     'name' => $request['name'],
@@ -180,10 +181,10 @@ class AuthService
                     'is_points_first' => 1,
                     'status' => true,
                 ];
-                //                $checkValidation = $this->verifyGoogleToken($request['id_token']);
-                //                if (!$checkValidation) {
-                //                    throw new CValidationException('some thing wrong');
-                //                }
+                \Log::info('Google Login Email: ' . $data['email']);
+                Log::info('Google login request', [
+                    'data' => Arr::only($request, ['email'])
+                ]);
                 $is_new = true;
                 $user = $this->userRepository->create($data);
 
