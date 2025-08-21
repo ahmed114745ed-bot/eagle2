@@ -80,14 +80,14 @@ class PayPalService
         if (isset($response['id']) && $response['status'] == 'CREATED') {
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
-                    // $paymentLink = $link['href'];
-                    $paymentLink = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card&intent=capture&locale.x=en_IS';
-
+                    $paymentLink = $link['href'];
+                    $paymentLink2 = $link['href'] . (str_contains($link['href'], '?') ? '&' : '?') . 'fundingSource=card&intent=capture&locale.x=en_IS';
                 }
             }
         }
+        return view('paypal_buttons', compact('paymentLink', 'paymentLink2'));
 
-        return $paymentLink;
+        // return $paymentLink;
     }
 
     /**
