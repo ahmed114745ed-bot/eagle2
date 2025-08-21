@@ -68,7 +68,7 @@ class PayPalService
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
                 'shipping_preference' => 'NO_SHIPPING',
-                'landing_page' => 'BILLING',
+                'landing_page' => 'NO_PREFERENCE',
             ],
             "purchase_units" => [
                 [
@@ -82,7 +82,7 @@ class PayPalService
                     //         "address_line_1" => "Test Street",
                     //         "admin_area_2"   => "London",
                     //         "postal_code"    => "12345",
-                    //         "country_code"   => "GB" 
+                    //         "country_code"   => "GB"
                     //     ]
                     //     ],
                 ]
@@ -128,13 +128,13 @@ class PayPalService
                 "cancel_url"            => url('/api/paypal-cancel'),
             ]
         ];
-    
+
         $response = $this->client->execute($request);
-    
+
         $orderId  = $response->result->id ?? null;
         $status   = $response->result->status ?? null;
         \Log::info('PayPal order created', ['order_id' => $orderId, 'status' => $status]);
-    
+
         foreach ($response->result->links as $link) {
             if ($link->rel === 'approve') {
                 // أرجع الرابط كما هو، بدون أي تعديل
@@ -142,11 +142,11 @@ class PayPalService
                 return $link->href;
             }
         }
-    
+
         \Log::error('PayPal approve link not found', ['order_id' => $orderId, 'status' => $status]);
         throw new \Exception("PayPal approval link not found");
     }
-    
+
 
     /**
      * @return mixed
