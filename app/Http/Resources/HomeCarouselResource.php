@@ -42,7 +42,7 @@ class HomeCarouselResource extends JsonResource
             'avatar' => $avatar ?? "profile/g0lEsx7Joe.jpg",
             'event_type' => $this->event_type,
         ];
-        if ($this->event_type == 'cp_event') {
+        if ($this->event_type == 'weekly_cp') {
              $data['cp_winner_name_one'] = $nameOne;
              $data['cp_avatar_two'] = $cpAvatar ?? "profile/g0lEsx7Joe.jpg";
              $data['cp_winner_name_two'] = $nameTwo;
