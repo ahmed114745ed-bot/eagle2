@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Actions\BdChargeSwitchAction;
+use App\Helpers\Common;
 use App\Models\Bd;
 use App\Models\User;
 use Encore\Admin\Form;
@@ -207,12 +208,21 @@ class BdController extends MainController
             return truncateAndTrim($this->total_cut, 2);
         });
 
+        $grid->column('transfer_salary', __("transfer_salary"))
+        ->display(function () {
+            return $this->transfer_salary ? 1 : 0;
+        })
+        ->switch(Common::getSwitchStates());
+
+
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
             $locale = App::getLocale();
             $carbonDate->locale($locale);
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
         });
+
+
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
@@ -222,9 +232,9 @@ class BdController extends MainController
                 $actions->add(new \App\Admin\Actions\DeleteBdAction());
             }
 
-            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-                $actions->add(new BdChargeSwitchAction());
-            }
+            // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+            //     $actions->add(new BdChargeSwitchAction());
+            // }
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
@@ -300,7 +310,8 @@ class BdController extends MainController
         }
 
         $form->hidden('type', __('Type'))->value('bd');
-
+        $form->hidden('transfer_salary', __('transfer_salary'));
+        
         $form->saving(function (Form $form) {
             $originalAppId = $form->model()->getOriginal('app_id');
             $userExists = \App\Models\User::find($originalAppId);
