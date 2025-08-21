@@ -122,8 +122,8 @@ class PayPalService
                 "brand_name" => config('app.name'),
                 "landing_page" => "BILLING",
                 "user_action" => "PAY_NOW",
-                "return_url" => route('paypal.success'),
-                "cancel_url" => route('paypal.cancel')
+                "return_url" => url("/api/paypal-return/$referenceId"),
+                "cancel_url" =>  url('/api/paypal-cancel')
             ]
         ];
 
