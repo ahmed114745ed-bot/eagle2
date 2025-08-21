@@ -66,9 +66,6 @@ class UserObserver
     public function creating(User $user)
     {
         $user->uuid = (string)rand(1000000, 9999999);
-        if (request()->has('email') && empty($user->email)) {
-            $user->email = request('email');
-        }
     }
 
     public function saving(User $user)
