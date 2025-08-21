@@ -444,7 +444,7 @@ class RankingService
         });
     }
     
-    protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
+   protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
         $achievement_images = [];
 
@@ -500,23 +500,21 @@ class RankingService
         $arr['user']['color_name'] = UserPackHelper::getColorName($user);
         $arr['user']['achievement_images'] = $achievement_images;
 
-        $toArray = $data->toArray();
-        $countData = count($data);
+        $dataArray = $data->toArray();
+        $countData = count($dataArray);
         
-        $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
+        $arr['top'] = $countData < 4 ? $dataArray : array_slice($dataArray, 0, 3);
         
-        $otherData = $countData < 4 ? [] : array_slice($toArray, 3);
-        
-        $otherCollection = collect($otherData);
+        $otherData = $countData < 4 ? [] : array_slice($dataArray, 3);
         
         $perPage = 10; 
         $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
         
-        $currentItems = $otherCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        $currentItems = array_slice($otherData, ($currentPage - 1) * $perPage, $perPage);
         
         $paginatedOther = new LengthAwarePaginator(
             $currentItems,
-            $otherCollection->count(),
+            count($otherData),
             $perPage,
             $currentPage,
             [
