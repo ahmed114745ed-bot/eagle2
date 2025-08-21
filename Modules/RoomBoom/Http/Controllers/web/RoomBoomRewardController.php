@@ -202,6 +202,8 @@ class RoomBoomRewardController extends MainController
 
 
 
+        \Log::info('Form object:', [$form]);
+
         return $form;
     }
 
