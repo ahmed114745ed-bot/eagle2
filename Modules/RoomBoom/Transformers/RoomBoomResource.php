@@ -68,9 +68,9 @@ class RoomBoomResource extends JsonResource
     protected function getEmptyUser(): object
     {
         return (object) [
-            'id' => null,
+            'id' => 0,
             'name' => '',
-            'uuid' => null,
+            'uuid' => '',
             'profile' => (object) ['avatar' => ''],
             'total_gift' => 0,
         ];
