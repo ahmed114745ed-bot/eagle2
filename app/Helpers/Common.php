@@ -151,7 +151,6 @@ class Common
                         $nameCpOne = @$weekly_star->userOne->name;
                     }
                 }
-                dd($nameCpTwo,$nameCpOne);
         }
 
         return [$avatar, $avatarCp2, $nameCpOne, $nameCpTwo];
