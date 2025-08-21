@@ -63,6 +63,7 @@ class PayPalService
         $body = [
             "intent"         => "CAPTURE",
             'application_context' => [
+                "brand_name"          => "veego chat",
                 "payment_method_preference"=> "IMMEDIATE_PAYMENT_REQUIRED",
                 'return_url'  => url("/api/paypal-return/$referenceId"),
                 'cancel_url'  => url('/api/paypal-cancel'),
@@ -72,6 +73,7 @@ class PayPalService
             ],
             "purchase_units" => [
                 [
+                    "description"  => "veego chat",
                     "reference_id" => $referenceId,
                     "amount"       => [
                         "currency_code" => config('paypal.currency'),
