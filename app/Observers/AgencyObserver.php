@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\Agency;
 use App\Facades\UserHandling;
 use App\Models\AgencyJoinRequest;
+use App\Models\MonthlyDiamondReceive;
 use App\Models\UsersJoinedAgency;
 
 class AgencyObserver
@@ -26,9 +27,8 @@ class AgencyObserver
             $updateData['monthly_diamond_received'] = 0;
         }
 
-        User::query()
-            ->where('id', $agency->app_owner_id)
-            ->update($updateData);
+        $userDiamond =   MonthlyDiamondReceive::query()->where('id', $agency->app_owner_id)->where('month', now()->month)->where('year', now()->year)->first();
+        if ($userDiamond) $userDiamond->update($updateData);
     }
 
     /**
@@ -53,7 +53,7 @@ class AgencyObserver
             UserHandling::kickOfAllUsersFromAgency($agency);
             User::query()->where('agency_id', $agency->id)->update(['agency_id' => 0, 'type_user' => 0]);
             $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $agency->id])->get();
-            if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now(),'status' =>'delete agency from admin']);
+            if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now(), 'status' => 'delete agency from admin']);
             $user = User::find($agency->app_owner_id);
             Admin::where('username', $user->uuid)->delete();
         }

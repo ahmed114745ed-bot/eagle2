@@ -192,9 +192,10 @@ class AgencyJoinRequestController extends MainController
                 $user_id = $form->model()->user_id;
                 $update = DB::table('users')
                     ->where('id', $user_id)
-                    ->update(['type_user' => 1, 'monthly_diamond_received' => 0]);
-
-
+                    ->update(['type_user' => 1]);
+                
+                 uploadMonthlyDiamondReceive($user_id, 0);
+              
                 $user = User::query()->where('id', $form->model()->user_id)->first();
                 if ($user->agency_id) {
                     $error = new MessageBag(
@@ -205,7 +206,7 @@ class AgencyJoinRequestController extends MainController
                     );
                 }
                 return back()->with(compact('error'));
-                
+
                 UserCommon::userVip($user);
                 $checkAgencyUser = UsersJoinedAgency::where([
                     'user_id' => $user_id,
@@ -218,7 +219,7 @@ class AgencyJoinRequestController extends MainController
                         'agency_id' => $form->model()->agency_id,
                         'type' => 2,
                         'join_date' => now(),
-                        'status' =>'Joined'
+                        'status' => 'Joined'
                     ]);
                 }
             }

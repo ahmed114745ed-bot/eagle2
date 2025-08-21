@@ -30,9 +30,9 @@ class UpdateUserWhenSendGift
         DB::transaction(function () use ($totalCoins, $receivedUser) {
 
             $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
-
+            $diamondUser =  $user->monthly_diamond_received + $totalCoins;
             $user->salary_is_updated = true;
-            $user->monthly_diamond_received += $totalCoins;
+
             $user->total_diamond_received += $totalCoins;
 
             if ($user->type_user == 0 && $user->agency_id == 0) {
@@ -51,7 +51,7 @@ class UpdateUserWhenSendGift
             }
 
             $user->save();
-
+            uploadMonthlyDiamondReceive($user->id, $diamondUser);
         });
     }
     public function updateUsers(int $totalCoins, array $userIds)
@@ -62,19 +62,22 @@ class UpdateUserWhenSendGift
         //     'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
         // ]);
         DB::transaction(function () use ($totalCoins, $userIds) {
-            $users = DB::table('users')
-                ->whereIn('id', $userIds)
+            $users = User::
+                  whereIn('id', $userIds)
                 ->lockForUpdate()
                 ->get();
 
             foreach ($users as $user) {
                 DB::table('users')->where('id', $user->id)->update([
-                    'monthly_diamond_received' => $user->monthly_diamond_received + $totalCoins,
                     'total_diamond_received'   => $user->total_diamond_received + $totalCoins,
                     'exchange_diamonds'        => $user->agency_id == 0
                         ? $user->exchange_diamonds + $totalCoins
                         : $user->exchange_diamonds,
                 ]);
+
+                $monthlyDiamond = $user->monthly_diamond_received + $totalCoins;
+
+                uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
             }
         });
     }
@@ -175,7 +178,7 @@ class UpdateUserWhenSendGift
         $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages['exp_sender_percentage'];
         // dd($total,$totalDiamondSend,$totalDiamond ,$this->expPercentages['exp_sender_percentage']);
         $levelVip                 = $this->getLevel(2, $total);
-        return $levelVip != null ? (@$levelVip->level ) ?? 0 : 0;
+        return $levelVip != null ? (@$levelVip->level) ?? 0 : 0;
     }
 
     public function getRoomLevel($total)

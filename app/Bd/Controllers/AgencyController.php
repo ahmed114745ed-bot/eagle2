@@ -25,6 +25,8 @@ use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\MessageBag;
 use App\Facades\CustomNotification;
 use App\Services\AppFeatureService;
 use Illuminate\Http\Request as req;
@@ -37,7 +39,6 @@ use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Support\MessageBag;
 
 class AgencyController extends MainController
 {
@@ -87,14 +88,18 @@ class AgencyController extends MainController
         $user = Auth::user();
 
         $agency = Agency::query()
-                ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
-                ->find($id);
+            // ->where('bd_id' ,$user->app_id )
+            ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
+            ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+            ->find($id);
+
+
         if (!$agency) {
             $agency =  ShippingAgency::query()
-                    ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                    ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
-                    ->find($id); 
+                // ->where('bd_id' ,$user->app_id )
+                ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                ->find($id);
         }
 
         if (!$agency) {
@@ -131,7 +136,7 @@ class AgencyController extends MainController
                     // Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
                     // return
                     $agency->mempers()
-                    ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                    ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
                     ->paginate(10, ['*'], 'members_page');
                 // });
@@ -492,7 +497,7 @@ class AgencyController extends MainController
         });
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-            $coin =truncateAndTrim($coin, 2);
+            $coin = number_format($coin, 2);
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>
@@ -762,8 +767,94 @@ class AgencyController extends MainController
 
    
         $form->saving(function (Form $form) {
-        
-                $form->bd_id = Auth::id();
+            $form->input('bd_id', Auth::user()->app_id);
+            $form->model()->bd_id = Auth::user()->app_id;
+            $appOwnerId = $form->input('app_owner_id');
+            // $Host_agency = $form->input('Host_agency');
+
+            // $Shipping_agency = $form->input('Shipping_agency') ;
+            $host = 0;
+
+            $originalOwnerId = $form->model()->getOriginal('app_owner_id');
+            $newOwnerId = $form->model()->app_owner_id;
+            // Create admin dashboard for agency when accept it
+            $modelExists = $form->model()->exists;
+            //   if (!$modelExists)  Common::createUserAdmin($appOwnerId);
+
+            if ($modelExists && $appOwnerId != $originalOwnerId) {
+                //     Common::createUserAdmin($appOwnerId);
+                $user = User::find($originalOwnerId);
+                $agencyId = $form->model()->id;
+                Common::userJoinAgency($originalOwnerId, $appOwnerId, $agencyId);
+
+                Admin::where('username', $user->uuid)->delete();
+                $user->update([
+                    'type_user' => 0,
+                    'agency_id' => 0,
+
+                    'is_host' => 0,
+                ]);
+
+                uploadMonthlyDiamondReceive($user->id, 0);
+
+                // if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 2,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 4,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 3,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // }
+            }
+
+
+
+            // if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
+
+            //     session()->flash('show_alert', 'Your alert message');
+            //     return redirect()->back();
+            // }
+
+
+
+
+            // if ($Host_agency == 'on' || $Host_agency == 1) {
+            //     $host += 2;
+            // }
+
+            // if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
+            //     $host += 3;
+            // }
+            if ($host > 3) {
+                $host = 4;
+            }
+            // if ($appOwnerId) {
+            $newType = intval($host);
+            /*// Reset diamond only when agency created
+            if (!$modelExists) $values['monthly_diamond_received'] = 0;*/
+            User::where('id', intval($appOwnerId))->update([
+                'type_user' => $newType,
+                'is_host' => 1,
+                'agency_id' => $form->model()->id,
+            ]);
+            // }
+
+
+
         });
     
         $form->footer(function ($footer) {
