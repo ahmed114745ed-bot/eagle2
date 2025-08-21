@@ -125,8 +125,8 @@ class RankingService
 
   
          $this->transformData3($data, $class, $keywords, $rel);
-      return new UserRankingCollection($data, $user, $keywords);
-         // return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+    //  return new UserRankingCollection($data, $user, $keywords);
+          return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
 
     public function getRanking66($class, $type, $user, $limit)
