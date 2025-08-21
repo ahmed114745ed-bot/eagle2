@@ -809,7 +809,13 @@ class AgencyController extends MainController
     });
 
     $form->saved(function (Form $form) {
+        
+        User::where('id', intval( $form->model()->app_owner_id))->update([
+            'type_user' => 2,
+            'is_host' => 1,
+            'agency_id' => $form->model()->id,
 
+        ]);
         $checkAgencyUser = UsersJoinedAgency::where([
             'user_id' => $form->model()->app_owner_id,
             'agency_id' => $form->model()->id,
