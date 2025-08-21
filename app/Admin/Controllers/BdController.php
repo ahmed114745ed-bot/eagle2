@@ -197,7 +197,7 @@ class BdController extends MainController
             return truncateAndTrim($this->total_salary, 2);
         });
 
-        $grid->column('current_balance', __('Current Balance'))->display(function () {
+        $grid->column('current_balance', __('current_balance'))->display(function () {
             $total = floatval($this->total_salary);
             $cut   = floatval($this->total_cut);
             return truncateAndTrim($total - $cut, 2);

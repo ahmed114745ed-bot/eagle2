@@ -1176,7 +1176,7 @@
         </div>
         <div class="card p-3 bg-danger-subtle">
             <div class="d-flex justify-content-between align-items-center">
-            <a href="{{ session('back_url', route('bd.home')) }}" class="btn btn-light">
+            <a href="{{  route('bd.agencies.index') }}" class="btn btn-light">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
             </a>
                      @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
