@@ -289,7 +289,7 @@ class RoomBoomRewardController extends MainController
 
     protected function addAchievementFields($form): void
     {
-        $form->image("target", __('image'))
+        $form->image("achievement_target", __('image'))
             ->name(function ($file) {
                 if ($file instanceof UploadedFile) {
                     return now()->timestamp . '.' . $file->guessExtension();
@@ -297,7 +297,8 @@ class RoomBoomRewardController extends MainController
 
                 return $file;
             })
-            ->disk('gcs');
+            ->disk('gcs')
+            ->setColumn('target');
     }
 
     public function store()
