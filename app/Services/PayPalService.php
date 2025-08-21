@@ -130,10 +130,24 @@ class PayPalService
 
         $response = $this->client->execute($request);
 
-        foreach ($response->result->links as $link) {
-            if ($link->rel === 'approve') {
-                return $link->href;
-            }
+        
+                foreach ($response->result->links as $link) {
+                    if ($link->rel === 'approve') {
+                        // PayPal يرجع checkoutnow?token=XXX
+                        $url = $link->href;
+                
+                        // استخرج التوكن
+                        preg_match('/token=([A-Z0-9]+)/', $url, $matches);
+                        if (!empty($matches[1])) {
+                            $token = $matches[1];
+                            // حوله دايمًا لصيغة ncp/payment
+                            return "https://www.paypal.com/ncp/payment/" . $token;
+                        }
+                
+                        return $url; // fallback
+                    }
+                
+            
         }
 
         throw new \Exception("PayPal approval link not found");
