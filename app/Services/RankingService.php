@@ -505,7 +505,7 @@ class RankingService
         $dataArray = $data->toArray();
         $countData = count($dataArray);
 
-        $arr['top'] = $countData < 4 ? $dataArray : array_slice($dataArray, 0, 3);
+        $arr['tops'] = $countData < 4 ? $dataArray : array_slice($dataArray, 0, 3);
 
         $otherData = $countData < 4 ? [] : array_slice($dataArray, 3);
 
@@ -525,7 +525,16 @@ class RankingService
             ]
         );
 
-        $arr['other'] = $paginatedOther;
+        $arr['others'] = $paginatedOther->items();
+        $arr['others_pagination'] = [
+            'total'        => $paginatedOther->total(),
+            'per_page'     => $paginatedOther->perPage(),
+            'current_page' => $paginatedOther->currentPage(),
+            'last_page'    => $paginatedOther->lastPage(),
+            'next_page'    => $paginatedOther->nextPageUrl(),
+            'prev_page'    => $paginatedOther->previousPageUrl(),
+        ];
+//        $arr['other'] = $countData < 4 ? [] : array_slice($dataArray, 3);
 
         return $arr;
     }
