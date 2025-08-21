@@ -58,12 +58,12 @@ class RankingController extends Controller
         }
 
 
-        if ($class != 5 && $class != 4 && $class != 6) {
-            // Extract pagination from the 'other' key if it exists
-            $payload   = $data->toArray($request);                   // array with 'user', 'top', 'other' (items only)
-            $paginates = ['other' => $data->getOtherPaginator()];    // give apiResponse the paginator to build meta
-            return Common::apiResponse(true, '', $payload, 200, $paginates);
-        }
+        // if ($class != 5 && $class != 4 && $class != 6) {
+        //     // Extract pagination from the 'other' key if it exists
+        //     $payload   = $data->toArray($request);                   // array with 'user', 'top', 'other' (items only)
+        //     $paginates = ['other' => $data->getOtherPaginator()];    // give apiResponse the paginator to build meta
+        //     return Common::apiResponse(true, '', $payload, 200, $paginates);
+        // }
         return Common::apiResponse(1, '', $data);
     }
 

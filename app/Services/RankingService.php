@@ -22,7 +22,8 @@ use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
-
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class RankingService
 {
@@ -125,8 +126,8 @@ class RankingService
 
   
          $this->transformData3($data, $class, $keywords, $rel);
-      return new UserRankingCollection($data, $user, $keywords);
-         // return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+    //  return new UserRankingCollection($data, $user, $keywords);
+          return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
 
     public function getRanking66($class, $type, $user, $limit)
@@ -442,9 +443,9 @@ class RankingService
             return $v == null;
         });
     }
+    
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
-
         $achievement_images = [];
 
         $kong['user_id']    = 0;
@@ -473,19 +474,16 @@ class RankingService
         $kong['achievement_images'] = [];
         $kong['color_name'] = '';
 
-
-
-        $data[0] = isset($data[0]) ? $data[0] : $kong;
-        $data[1] = isset($data[1]) ? $data[1] : $kong;
-        $data[2] = isset($data[2]) ? $data[2] : $kong;
-        //        if ($limit == 3) return $data;
-
+        if ($data->count() > 0) {
+            $data[0] = $data[0] ?? $kong;
+            $data[1] = $data[1] ?? $kong;
+            $data[2] = $data[2] ?? $kong;
+        }
 
         $user->sort = $this->getUserSortValue($data, $userId);
         $user->user_id = $user->id;
 
         $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id', 'age');
-
 
         $userData = $data->where($key, $user->id)->first();
 
@@ -504,11 +502,31 @@ class RankingService
         $arr['user']['color_name'] = UserPackHelper::getColorName($user);
         $arr['user']['achievement_images'] = $achievement_images;
 
+        $dataArray = $data->toArray();
+        $countData = count($dataArray);
+        
+        $arr['top'] = $countData < 4 ? $dataArray : array_slice($dataArray, 0, 3);
+        
+        $otherData = $countData < 4 ? [] : array_slice($dataArray, 3);
+        
+        $perPage = 10; 
+        $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+        
+        $currentItems = array_slice($otherData, ($currentPage - 1) * $perPage, $perPage);
+        
+        $paginatedOther = new LengthAwarePaginator(
+            $currentItems,
+            count($otherData),
+            $perPage,
+            $currentPage,
+            [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
+        
+        $arr['other'] = $paginatedOther;
 
-        $toArray = $data->toArray();
-        $countData = count($data);
-        $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
-        $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
         return $arr;
     }
 
