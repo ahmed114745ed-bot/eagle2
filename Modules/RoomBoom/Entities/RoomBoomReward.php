@@ -75,6 +75,7 @@ class RoomBoomReward extends Model
 //                        $model->target = $model->achievement_target;
 //                        unset($model->achievement_target);
 //                    }
+                    unset($model->achievement_target);
                     break;
             }
         });
