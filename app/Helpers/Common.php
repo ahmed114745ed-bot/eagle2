@@ -97,6 +97,9 @@ class Common
         $avatarCp2 = null;
         $nameCpOne = '';
         $nameCpTwo = '';
+
+        $event_type = 'weekly_cp';
+
         if ($event_type == 'pk_event') {
 
             $event = PkEvent::PreviousEvent()->latest()->first();
@@ -141,7 +144,7 @@ class Common
             if ($event) {
                 $weekly_star = WeeklyCpWinner::with('userTwo', 'userOne')->where('weekly_cp_id', $event->id)
                     ->where('level', 1)->first();
-
+                dd($weekly_star);
                 if ($weekly_star) {
                     $avatar = @$weekly_star->userOne->profile->avatar;
                     $avatarCp2 = @$weekly_star->userTwo->profile->avatar;
