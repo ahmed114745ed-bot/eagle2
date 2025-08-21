@@ -48,18 +48,19 @@ class RoomBoomReward extends Model
                 case 'ware':
                     if (isset($model->ware_target_id)) {
                         $model->target = $model->ware_target_id;
-                        unset($model->ware_target_id); 
+                        unset($model->ware_target_id);
                     }
                     break;
-    
+
                 case 'gift':
                     if (isset($model->gift_target_id)) {
                         $model->target = $model->gift_target_id;
                         unset($model->gift_target_id);
                     }
                     break;
-    
+
                 case 'achievement':
+                    info($model->achievement_target);
                     if (isset($model->achievement_target)) {
                         $model->target = $model->achievement_target;
                         unset($model->achievement_target);
@@ -84,7 +85,7 @@ class RoomBoomReward extends Model
             unset($model->target4);
             unset($model->target5);
 
-          
+
         });
 
         self::updating(function ($model) {
