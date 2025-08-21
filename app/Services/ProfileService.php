@@ -31,8 +31,8 @@ class ProfileService
     public function updateProfile(ProfileRequest $request)
     {
         Log::info('Google login request', [
-                    'data' => Arr::only($request, ['email'])
-                ]);
+            'data' => Arr::only($request, ['email'])
+        ]);
         $data = $request->only(['name', 'email', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id']);
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
