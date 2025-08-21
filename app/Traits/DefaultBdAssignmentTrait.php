@@ -8,6 +8,7 @@ trait DefaultBdAssignmentTrait
 {
     public static function bootDefaultBdAssignmentTrait()
     {
+
         static::creating(function ($model) {
             if (empty($model->bd_id)) {
                 $defaultBd = Bd::where('type', 'bd')
@@ -19,6 +20,7 @@ trait DefaultBdAssignmentTrait
                 }
             }
         });
+        
 
         static::updating(function ($model) {
             if (empty($model->bd_id)) {
