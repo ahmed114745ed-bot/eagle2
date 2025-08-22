@@ -142,7 +142,7 @@ class RoomController extends Controller
         $room = $this->roomService->findRoomUser($owner_id);
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
 
-        $tz = $this->getTimezone();
+        $tz = getTimezone();
         $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
         $openBoom = RoomBoom::whereIn('total_room_gift_id', function ($query) use ($room) {
