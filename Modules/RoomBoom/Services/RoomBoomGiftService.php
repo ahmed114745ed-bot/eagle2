@@ -19,7 +19,7 @@ class RoomBoomGiftService
         $roomId = $room->id;
         $roomUid = $room->uid;
         $tz = $this->getTimezone();
-        $todayStart = Carbon::now($tz)->startOfDay();
+        $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
         $totalRoomGift = $this->getOrCreateTotalRoomGift($roomId, $todayStart, $totalPrice);
 
