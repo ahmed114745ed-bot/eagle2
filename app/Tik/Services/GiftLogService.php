@@ -233,7 +233,7 @@ class GiftLogService
                     })->first();
 
 
-               throw_if(( $existingGiftCount && $existingGiftCount->quantity < $number), \Exception::class, 'Receiver has reached maximum allowed gifts');
+               throw_if(( !$existingGiftCount || $existingGiftCount->quantity < $number), \Exception::class, 'Receiver has reached maximum allowed gifts');
 
 
             return null;
