@@ -51,7 +51,7 @@ class RoomBoomRewardResource extends JsonResource
             $path = $ware->show_img ?? $ware?->img2;
         }  elseif ($this->target_type == 'gift') {
             $gift = $this->getGift();
-            $path = $gift->show_img ?? $gift?->img;
+            $path = $gift->img ?? '';
         } elseif ($this->target_type == 'achievement') {
             $path = $this->target;
         }
