@@ -25,7 +25,7 @@ class Bd extends Model
 
     public function agencies()
     {
-        return $this->hasMany(Agency::class, 'bd_id', 'app_id');
+        return $this->hasMany(Agency::class, 'bd_id', 'id');
     }
 
     public function transactions()
@@ -39,19 +39,22 @@ class Bd extends Model
         return $this->agencies()->count();
     }
 
-    public function salaries()
-    {
-        return $this->hasMany(BDSallary::class, 'bd_id', 'app_id');
-    }
 
     public function getTotalSalaryAttribute()
     {
-        return $this->salaries()->sum('sallary');
+        return $this->bdSalaries()->sum('salary');
+    }
+    public function getTotalCutAttribute()
+    {
+        return $this->bdSalaries()->sum('cut_amount');
     }
 
     public function getNetSallaryAttribute()
     {
-        return $this->salaries()->sum(DB::raw('sallary - cat_amount'));
+        $userSallary = $this->bdSalaries()
+        ->sum(DB::raw('salary - cut_amount'));
+
+       return floor($userSallary);
     }
 
     protected static function booted(): void
@@ -67,8 +70,8 @@ class Bd extends Model
                 ->first();
 
             if ($defaultBd) {
-                Agency::where('bd_id', $bd->app_id)
-                    ->update(['bd_id' => $defaultBd->app_id]);
+                Agency::where('bd_id', $bd->id)
+                    ->update(['bd_id' => $defaultBd->id]);
             } else {
                 throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
             }
@@ -94,7 +97,7 @@ class Bd extends Model
                 Agency::where(function ($query) {
                     $query->whereNull('bd_id')
                         ->orWhere('bd_id', 0);
-                })->update(['bd_id' => $model->app_id]);
+                })->update(['bd_id' => $model->id]);
             }
         });
 
@@ -104,8 +107,35 @@ class Bd extends Model
                 Agency::where(function ($query) {
                     $query->whereNull('bd_id')
                         ->orWhere('bd_id', 0);
-                })->update(['bd_id' => $model->app_id]);
+                })->update(['bd_id' => $model->id]);
             }
         });
+    }
+
+
+    public function incrementCutAmountInBdSallary(int $amount)
+    {
+        $lastBdSalary = $this->bdSalaries()->latest()->first();
+
+        if ($lastBdSalary) {
+            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
+            $lastBdSalary->update(['cut_amount' => $newAmount]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function bdSalaries()
+    {
+        return $this->hasMany(BdSalary::class, 'bd_id');
+    }
+    public function getBdSalaryAttribute()
+    {
+        $userSallary = $this->bdSalaries()
+            ->sum(DB::raw('salary - cut_amount'));
+
+        return floor($userSallary);
     }
 }

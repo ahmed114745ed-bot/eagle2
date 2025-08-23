@@ -5,6 +5,7 @@ namespace App\Bd\Controllers;
 use App\Enums\UserCoinLogType;
 use App\Helpers\ShippingAgencyHelper;
 use App\Helpers\UserCoinLogHelper;
+use App\Models\Bd;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
@@ -50,7 +51,7 @@ class WalletController extends MainController
      */
     public function index(Content $content)
     {
-        $netvalue = UserWallet::where('user_id', Auth::user()->app_id)
+        $netvalue = UserWallet::where('user_id', Auth::user()->id)
             ->selectRaw('SUM(value) as total_value, SUM(cut_amount) as total_cut')
             ->first();
 
@@ -81,7 +82,7 @@ class WalletController extends MainController
     {
         $grid = new Grid(new \App\Models\WalletTransaction());
 
-        $currentUserId = \Auth::user()->app_id;
+        $currentUserId = \Auth::user()->id;
         $grid->model()->where('user_id', $currentUserId);
 
         $grid->column('id', __('Id'));
@@ -243,7 +244,7 @@ class WalletController extends MainController
             'amount' => 'required|numeric|min:0.01',
         ]);
 
-        $appID = Auth::user()->app_id;
+        $appID = Auth::user()->id;
 
         $netData = BDSallary::where('bd_id', $appID)
             ->selectRaw('SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut')
@@ -304,13 +305,13 @@ class WalletController extends MainController
                 'target_type' => 'required|string',
             ]);
 
-
             $types = [
                 'user' => [$this, 'chargeToUser'],
                 'agency' => [$this, 'chargeToAgency']
             ];
 
             $type = $request->input('target_type');
+          
 
             if (!array_key_exists($type, $types)) {
                 admin_toastr('نوع الوجهة غير موجود', 'error');
@@ -333,30 +334,29 @@ class WalletController extends MainController
 
     public function chargeToUser(array $data)
     {
-        $appID = Auth::user()->app_id;
-        $sender = User::find($appID);
+       
+        $appID = Auth::user()->id;
+        $sender = Auth::user();
         $amount = $data['amount'];
         $receiverId = $data['target_id'] ?? null;
 
-        // $wallet = UserWallet::where('user_id', $sender->id)->first();
-        // if (!$wallet || ($wallet->value - $wallet->cut_amount) < $amount) {
-        //     throw new \Exception(__('balance not enough'));
-        // }
-        $totalSalary = $sender?->bdSalary ?? 0;
-        if ($totalSalary < $amount) {
-            throw new \Exception(__('balance not enough'));
-        }
+     
+ 
+     
 
         $receiver = User::find($receiverId);
         if (!$receiver) {
             throw new \Exception(__('this user not found'));
         }
-
         if ($sender->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }
         if ($receiver->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_receiver'));
+        }
+        $totalSalary = $sender?->bdSalary ?? 0;
+        if ($totalSalary < $amount) {
+            throw new \Exception(__('balance not enough'));
         }
         $rate = Common::getCoinsValue('user_coins');
         if (!$rate) {
@@ -368,7 +368,7 @@ class WalletController extends MainController
         return $this->startTransaction($receiver, $sender, $amount, $coins, 'user');
     }
 
-    public function startTransaction(User $receiver, User $sender, int $amount, int $coins, string $receiverType)
+    public function startTransaction(User $receiver, Bd $sender, int $amount, int $coins, string $receiverType)
     {
         DB::beginTransaction();
         try {
@@ -377,7 +377,7 @@ class WalletController extends MainController
             $amountBefore =  Common::getCurrentBalance($receiver->id);
             UserCoinLogHelper::logByType(
                 $receiver->id,
-                $amount,
+                $coins,
                 $amountBefore,
                 UserCoinLogType::BD_CHARGES,
             );
@@ -422,13 +422,16 @@ class WalletController extends MainController
     public function chargeToAgency(array $data)
     {
         $user = Auth::user();
-        $from = User::find($user->app_id);
+        $from = Bd::find($user->id);
         $usd = $data['amount'] ?? null;
         $toId = $data['target_id'] ?? null;
 
         if (settings()->get("stop_charge", 0)) {
 
             throw new \Exception(__('api_responses.freez_charge'));
+        }
+        if ($from->transfer_salary == 1) {
+            throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }
 
         if (!is_numeric($usd) || $usd <= 0) {
@@ -441,7 +444,8 @@ class WalletController extends MainController
             throw new \Exception(__('it_agency_freez_charge'));
         }
         if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
-            return Common::apiResponse(0, __('not_verified_agency'), 403);
+            throw new \Exception(__('not_verified_agency'));
+
         }
 
         $rate = Common::getCoinsValue('shipping_coins');
@@ -464,7 +468,7 @@ class WalletController extends MainController
         return 1;
     }
 
-    private function performAgencyCharge(User $fromUser, ShippingAgency $toAgency, $coins, $usd)
+    private function performAgencyCharge(Bd $fromUser, ShippingAgency $toAgency, $coins, $usd)
     {
 
 

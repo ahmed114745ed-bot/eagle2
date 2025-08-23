@@ -5,8 +5,9 @@ namespace App\Bd\Controllers;
 use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\Admin;
+use App\Models\BdAgencyHostSallary;
 use App\Models\Charge;
-use App\Models\BDSallary;
+use App\Models\BdSalary;
 use App\Models\User;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -36,25 +37,25 @@ class BdSalariesController extends AdminController
      */
     public function index(Content $content)
     {
-        $appID = Auth::user()->app_id;
+        $appID = Auth::user()->id;
 
-        $netSalary = BDSallary::where('bd_id', $appID)
-        ->selectRaw('SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut')
+        $netSalary = BdSalary::where('bd_id', $appID)
+        ->selectRaw('SUM(salary) as total_sallary, SUM(cut_amount) as total_cut')
         ->first();
         $totalCut =$netSalary->total_cut;
         $total_sallary =$netSalary->total_sallary;
         $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
-        $finalSalary = round($finalSalary,2);
+        $finalSalary = truncateAndTrim($finalSalary,2);
             return $content
-                ->header(trans('admin.index'))
-                ->description(trans('admin.description'))
+                ->header(trans('salaries'))
+                ->description(trans('salaries'))
 
         ->row(function ($row) use ($finalSalary) {
             $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalSalary]));
         })
         ->row(function (Row $row) use ($total_sallary, $totalCut ) {
-            $row->column(6, new InfoBox(__('total_sallary'), 'money', 'green', '', round($total_sallary ,2) . ' 💰' ));
-            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', 'charges', round($totalCut,2)));
+            $row->column(6, new InfoBox(__('total_sallary'), 'money', 'green', '', truncateAndTrim($total_sallary ,2) . ' 💰' ));
+            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', 'charges', truncateAndTrim($totalCut,2)));
         })
 
         ->row(function ($row) {
@@ -71,21 +72,47 @@ class BdSalariesController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new BDSallary);
-        $appID = Auth::user()->app_id;
+       
+       
+    $grid = new Grid(new BdAgencyHostSallary());
+    $appID = Auth::user()->id;
 
  
-        $grid->model()
-            ->where('bd_id', $appID)
-            ->with('agency'); // تحميل العلاقة
-            // ->selectRaw('agency_id, SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut, COUNT(*) as count')
-            // ->groupBy('agency_id');
-    
+
+    $grid->model()
+        ->where('bd_id', $appID)
+        ->with('agency')
+        ->selectRaw('
+            agency_id, 
+            month,
+            year,
+            SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
+            COUNT(*) as count,
+            (
+                SELECT SUM(CAST(sallary AS DECIMAL(15,4))) 
+                FROM user_sallaries 
+                WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
+                    AND month = bd_agency_host_sallaries.month 
+                    AND year = bd_agency_host_sallaries.year
+            ) as total_user_sallary,
+            (
+                SELECT SUM(CAST(agency_sallary AS DECIMAL(15,4))) 
+                FROM user_sallaries 
+                WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
+                    AND month = bd_agency_host_sallaries.month 
+                    AND year = bd_agency_host_sallaries.year
+            ) as total_agency_sallary
+        ')
+        ->groupBy('agency_id', 'month', 'year')
+        ->orderBy('year', 'desc')
+        ->orderBy('month', 'desc');
+
+            
         $grid->disableActions();
         $grid->disableCreateButton();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-        
+            $filter->disableIdFilter();
             $filter->equal('month', __('Month'))->select([
                 1 => __('January'),
                 2 => __('February'),
@@ -107,6 +134,10 @@ class BdSalariesController extends AdminController
                 $years[$i] = $i;
             }
             $filter->equal('year', __('Year'))->select($years);
+
+            $filter->equal('agency_id', __('Agency'))->select(
+                \App\Models\Agency::where('bd_id',Auth::id())->pluck('name', 'id')->toArray()
+            );
         });
         
         $grid->column('agency.name', trans('agency'))->display(function () {
@@ -146,22 +177,24 @@ class BdSalariesController extends AdminController
             ";
         });
     
-        $grid->column('sallary', trans('totalBd'))->display(function ($value) {
+        $grid->column('total_bd_sallary', trans('totalBd'))->display(function ($value) {
           
-            return number_format($value, 2);
+            return truncateAndTrim($value);
         });
+        
+        $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
+            return number_format((float) $value, 2, '.', '');
+        });
+        
         
         $grid->column('total_agency_sallary', __('Total Agency Sallary'))->display(function ($value) {
-            return number_format($value, 2);
+            return truncateAndTrim($value);
         });
-        
-        $grid->column('total_users_sallary', __('Total Users Sallary'))->display(function ($value) {
-            return number_format($value, 2);
-        });
-        
-        $grid->column('total_diamond', __('Total Diamond'))->display(function ($value) {
-            return number_format($value, 2);
-        });
+        $grid->disableRowSelector();
+
+        // $grid->column('total_diamond', __('Total Diamond'))->display(function ($value) {
+        //     return number_format($value, 2);
+        // });
         $grid->column('month', __('month'));
         $grid->column('year', __('year'));
         // $grid->tools(function (Grid\Tools $tools) {

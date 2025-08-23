@@ -220,7 +220,7 @@
         .agency-avatar .logo-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            /* object-fit: cover; */
         }
 
         .agency-info {
@@ -886,13 +886,13 @@
                     </div>
                 </div>
                 <div class="agency-stats">
-                    <div class="stat-card">
-                        <div class="stat-value">{{ number_format(@$agency->coins) ?? 0 }}</div>
-                        <div class="stat-label">{{__("coins")}}</div>
+                <div class="stat-card">
+                        <div class="stat-value">{{ truncateAndTrim(@$agency->salary ?? 0) }}</div>
+                        <div class="stat-label">{{__("salary")}}</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
-                        <div class="stat-label">{{__("salary")}}</div>
+                        <div class="stat-value">{{ truncateAndTrim(@$sumTargets ?? 0) }}</div>
+                        <div class="stat-label">{{__("diamonds")}}</div>
                     </div>
 
                 </div>
@@ -907,7 +907,7 @@
 
             <div class="agency-avatar" style="border-radius: 50%;">
                 @php
-                $url =  url("admin/users/{$agency?->owner?->id}");
+                $url =  url("bd/users/profile/{$agency?->owner?->id}");
                 @endphp
             <a href="{{ $url }}">
                 <img src="{{ getImagePath($agency?->owner?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}" class="logo-img">
@@ -968,7 +968,7 @@
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                     $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                     $username = htmlspecialchars($user->name ?? 'Unknown');
-                                    $userUrl = route('admin.users.show', $user->id);
+                                    $userUrl = route('bd.user.profile', $user->id);
                                     $exp = number_format($log->exp);
                             @endphp
 
@@ -1008,7 +1008,7 @@
                                     $defaultImage = asset("images/businessman-icon.jpg");
                                     $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                     $username = htmlspecialchars($user->name ?? 'Unknown');
-                                    $userUrl = route('admin.users.show', $user->id);
+                                    $userUrl = route('bd.user.profile', $user->id);
                             @endphp
 
                             <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }}">
@@ -1067,107 +1067,179 @@
         ">
             {{ __('Loading...') }}
         </div>
+
         @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-            <div class="tab-content active" id="members-tab">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>{{ __('Agency Members') }}</h3>
-                        <span class="badge count-badge">{{ optional($members)->total() ?? 0 }}</span>
-                    </div>
+<div class="tab-content active" id="members-tab">
 
-                    @if($members && $members->count())
-                        <div class="table-responsive">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>{{ __('Member') }}</th>
-                                        <th>{{ __('Reals') }}</th>
-                                        <th>{{ __('Live Hours') }}</th>
-                                        <th>{{ __('Monthly DI') }}</th>
-                                        <th>{{ __('Salary') }}</th>
-                                        <th>{{ __('Role') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($members as $index => $member)
-                                        @php
-                                            $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
-                                                ->where('agency_id', $member->agency_id)
-                                                ->where('type', 'requestManger')
-                                                ->exists();
-                                            $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
-                                                ->where('id', $member->agency_id)
-                                                ->exists();
-                                        @endphp
-
-                                        <tr>
-                                            <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
-                                            <td class="user-cell">
-                                                <div class="user-avatar">
-                                                    <img src="{{ getImagePath(@$member->profile->avatar) }}"
-                                                        alt="{{ $member->name }}">
-                                                </div>
-                                                <div class="user-info">
-                                                    <strong>{{ @$member->name ?? '' }}</strong>
-                                                    <small>UID: {{ @$member->uuid ?? '' }}</small>
-                                                </div>
-                                            </td>
-                                            <td>{{ count($member->reals) ?? 0 }}</td>
-                                            <td>{{ $member->liveTime->sum("hours") }}</td>
-                                            <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                            <td>{{ $member->salary ?? 0 }}</td>
-                                            <td>
-                                                @if($isOwner)
-                                                    <span class="role-badge owner">{{ __('Owner') }}</span>
-                                                @elseif($isAdmin)
-                                                    <!-- <span class="role-badge admin">{{ __('Admin') }}</span> -->
-                                                    @if (\Encore\Admin\Facades\Admin::user()->can('remove-admin-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                                                        <button class="btn-action remove-admin-btn btn-danger" style="background-color: red;" data-id="{{ $member->id }}">
-                                                            {{ __('remove_admin') }}
-                                                        </button>
-                                                    @endif
-                                                    @if (\Encore\Admin\Facades\Admin::user()->can('kick-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                                                        <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
-                                                            {{ __('kick') }}
-                                                        </button>
-                                                    @endif
-                                                @else
-                                                        @if (\Encore\Admin\Facades\Admin::user()->can('make-admin-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                                                                <button class="btn-action make-admin-btn" data-id="{{ $member->id }}">
-                                                                    {{ __('Make Admin') }}
-                                                                </button>
-                                                            @endif
-                                                @if (\Encore\Admin\Facades\Admin::user()->can('kick-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                                                    <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
-                                                        {{ __('kick') }}
-                                                    </button>
-                                                @endif
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="pagination-wrapper">
-                            {{ $members?->appends([
-                                        'charges_page' => $charges?->currentPage(),
-                                        'salaries_page' => $salaries?->currentPage(),
-                                        'join_page' => $agencyJoinRequests?->currentPage(),
-                                        'target_page' => $memberTargets?->currentPage(),
-                                    ])->links('vendor.pagination.default') }}
-                        </div>
-                    @else
-                        <div class="empty-table">
-                            <i class="fas fa-users-slash"></i>
-                            <p>{{ __('No members found') }}</p>
-                        </div>
-                    @endif
-                </div>
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ __('Agency Members') }}</h3>
+                <span class="badge count-badge">{{ optional($members)->total() ?? 0 }}</span>
             </div>
-         @endif
+            <div class="card">
+            <div class="card-body">
+                <form action="{{ url('bd/agencies/profile/' . $agency->id) }}" class="form-horizontal member-form" method="GET" pjax-container>
+                    <input type="hidden" name="tab" value="members">
+                    <input type="hidden" name="members_page" value="{{ request()->get('members_page', 1) }}">
+
+                    <div class="row mb-4" style="align-items: flex-end;">
+                        <!-- From Date -->
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border">
+                                <div class="card-body p-3">
+                                    <label for="from_date" class="form-label fw-bold">
+                                        <i class="fa fa-calendar me-1"></i> {{ __('UUID') }}
+                                    </label>
+                                    <input type="text"
+                                        class="form-control"
+                                        id="from_date"
+                                        name="uuid"
+                                        value="{{ request('uuid') }}"
+                                        placeholder="{{ __('Enter UUID') }}">
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Buttons -->
+                        <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                            <button type="submit" class="btn btn-info btn-sm me-2">
+                                <i class="fa fa-search"></i> {{__('Search')}}
+                            </button>
+                            <a href="{{ url('bd/agencies/profile/' . $agency->id. '?'.'tab=members' ) }}" class="btn btn-default btn-sm">
+                                <i class="fa fa-undo"></i> {{__('Reset')}}
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+            @if($members && $members->count())
+                <div class="table-responsive">
+
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Member') }}</th>
+                                <th>{{ __('Reals') }}</th>
+                                <th>{{ __('Moments') }}</th>
+                                <th>{{ __('Live Hours') }}</th>
+                                <th>{{ __('Monthly DI') }}</th>
+                                <th>{{ __('Salary') }}</th>
+                                <th>{{ __('Role') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($members as $index => $member)
+                                @php
+                                    $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
+                                        ->where('agency_id', $member->agency_id)
+                                        ->where('type', 'requestManger')
+                                        ->exists();
+                                    $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
+                                        ->where('id', $member->agency_id)
+                                        ->exists();
+                                    $showUrl = $member ? url("admin/users/{$member->id}") : "#";
+                                    $moment = App\Helpers\Common::getUserMediaStats($member->id, 'moment',$member->agency_id) ?? [];
+                                    $reel = App\Helpers\Common::getUserMediaStats($member->id, 'reel',$member->agency_id) ?? [];
+
+                                                $momentUpload = $moment['upload'] ?? '0/0';
+                                                $momentLikes = $moment['likes'] ?? '0/0';
+                                                $momentComments = $moment['comments'] ?? '0/0';
+
+                                                $reelUpload = $reel['upload'] ?? '0/0';
+                                                $reelLikes = $reel['likes'] ?? '0/0';
+                                                $reelComments = $reel['comments'] ?? '0/0';
+
+                                @endphp
+
+                                <tr>
+                                    <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
+                                    <td class="user-cell">
+                                        <div class="user-avatar">
+                                            <a href='{{$showUrl}}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                                            <img src="{{ getImagePath(@$member->profile->avatar) }}"
+                                                alt="{{ $member->name }}">
+                                        </div>
+                                        <div class="user-info">
+                                            <strong>{{ @$member->name ?? '' }}</strong>
+                                            <small>UID: {{ @$member->uuid ?? '' }}</small>
+                                        </div>
+                                    </td>
+                                                <td>
+                                                    <div style="line-height: 1.6;">
+                                                        <ul style="margin-left: 8px; width: 141px;">
+                                                            <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
+                                                            <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
+                                                            <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div style="line-height: 1.6;">
+                                                        <ul style="margin-left: 8px; width: 141px;">
+                                                            <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
+                                                            <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
+                                                            <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                    <td>{{ $member->getLiveTimeThisMonth() }}</td>
+                                    <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
+                                    <td>{{ $member->salary_by_agency ?? 0 }}</td>
+                                    <td>
+                                        @if($isOwner)
+                                            <span class="role-badge owner">{{ __('Owner') }}</span>
+                                        @elseif($isAdmin)
+                                            <!-- <span class="role-badge admin">{{ __('Admin') }}</span> -->
+                                            @if (\Encore\Admin\Facades\Admin::user()->can('remove-admin-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                <button class="btn-action remove-admin-btn btn-danger" style="background-color: red;" data-id="{{ $member->id }}">
+                                                    {{ __('remove_admin') }}
+                                                </button>
+                                            @endif
+                                            @if (\Encore\Admin\Facades\Admin::user()->can('kick-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
+                                                    {{ __('kick') }}
+                                                </button>
+                                            @endif
+                                        @else
+                                                @if (\Encore\Admin\Facades\Admin::user()->can('make-admin-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                        <button class="btn-action make-admin-btn" data-id="{{ $member->id }}">
+                                                            {{ __('Make Admin') }}
+                                                        </button>
+                                                    @endif
+                                        @if (\Encore\Admin\Facades\Admin::user()->can('kick-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                            <button class="btn-action kick-member-btn" data-id="{{ $member->id }}">
+                                                {{ __('kick') }}
+                                            </button>
+                                        @endif
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-wrapper">
+                    {{ $members?->appends([
+                                'charges_page' => $charges?->currentPage(),
+                                'salaries_page' => $salaries?->currentPage(),
+                                'join_page' => $agencyJoinRequests?->currentPage(),
+                                'target_page' => $memberTargets?->currentPage(),
+                            ])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="empty-table">
+                    <i class="fas fa-users-slash"></i>
+                    <p>{{ __('No members found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
+ @endif
         <!-- Charges Section -->
         <div class="tab-content" id="charges-tab">
             <div class="card">
@@ -1424,7 +1496,7 @@
 
                         <div class="card-target-filter-phone ">
                             <!-- Filter Form -->
-                            <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                            <form method="GET" action="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                 class="filter-form">
                                 <div class="row">
                                     <input type="hidden" name="tab" value="targets">
@@ -1461,7 +1533,7 @@
                                             <i class="fas fa-filter"></i> {{ __('Apply') }}
                                         </button>
                                         @if(request()->has('month') || request()->has('year'))
-                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                                            <a href="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                                 class="btn btn-outline-secondary ml-2" title="Reset filters">
                                                 <i class="fas fa-times"></i>
                                             </a>
@@ -1498,7 +1570,7 @@
 
 
                         <div class="card-target-filter">
-                            <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                            <form method="GET" action="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                 class="filter-form">
                                 <div class="row">
                                     <input type="hidden" name="tab" value="targets">
@@ -1535,7 +1607,7 @@
                                             <i class="fas fa-filter"></i> {{ __('Apply') }}
                                         </button>
                                         @if(request()->has('month') || request()->has('year'))
-                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                                            <a href="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                                 class="btn btn-outline-secondary ml-2" title="Reset filters">
                                                 <i class="fas fa-times"></i>
                                             </a>
@@ -1566,7 +1638,7 @@
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                             $username = htmlspecialchars($user->name ?? 'Unknown');
-                                            $userUrl = route('admin.users.show', $user->id);
+                                            $userUrl = route('bd.user.profile', $user->id);
                                             $exp = number_format($log->exp);
                                     @endphp
 
@@ -1605,7 +1677,7 @@
                                             $defaultImage = asset("images/businessman-icon.jpg");
                                             $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                                             $username = htmlspecialchars($user->name ?? 'Unknown');
-                                            $userUrl = route('admin.users.show', $user->id);
+                                            $userUrl = route('bd.user.profile', $user->id);
                                             $exp = number_format($log->exp);
                                     @endphp
 

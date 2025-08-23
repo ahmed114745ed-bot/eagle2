@@ -36,7 +36,7 @@
                     <ul class="dropdown-menu">
                         <!-- The user image in the menu -->
                         <li class="user-header">
-                            <img src="{{ Admin::user()->avatar }}" class="img-circle" alt="User Image">
+                            <img src="{{ Admin::user()->image }}" class="img-circle" alt="User Image">
 
                             <p>
                                 {{ Admin::user()->name }}

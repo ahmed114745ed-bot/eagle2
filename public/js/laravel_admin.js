@@ -23,3 +23,15 @@ $(document).ready(function () {
        }, 200);
     });
 });
+
+$(document).on('ajaxComplete', function (event, xhr, settings) {
+    if (xhr.responseJSON && xhr.responseJSON.data) {
+        let data = xhr.responseJSON.data;
+
+        let btn = $('.grid-row-action[data-key="' + data.id + '"] a');
+        if (btn.length) {
+            btn.find('i').attr('class', data.icon);
+            btn.find('span').text(data.label);
+        }
+    }
+});
