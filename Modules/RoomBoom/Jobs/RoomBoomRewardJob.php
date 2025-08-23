@@ -38,7 +38,6 @@ class RoomBoomRewardJob implements ShouldQueue
      */
     public function handle()
     {
-        info('in reward job');
         $boom = RoomBoom::with(['roomBoomLevel', 'totalRoomGift'])->find($this->boomId);
         if (!$boom || !$boom->roomBoomLevel || !$boom->totalRoomGift) return;
 
@@ -173,10 +172,10 @@ class RoomBoomRewardJob implements ShouldQueue
                     'end_at' => $dateTimestamp,
                 ]);
                 Common::sendOfficialMessage($user->id, $title, $body);
-                $token = DB::table('users')->where('id', $user->id)->value('notification_id');
-                if ($token) {
-                    Common::send_firebase_notification([$token], $title, $body);
-                }
+                // $token = DB::table('users')->where('id', $user->id)->value('notification_id');
+                // if ($token) {
+                //     Common::send_firebase_notification([$token], $title, $body);
+                // }
             }
 
             if ($reward['target_type'] == 'gift') {
@@ -194,10 +193,10 @@ class RoomBoomRewardJob implements ShouldQueue
                 }
                 UserGift::create($data);
                 Common::sendOfficialMessage($user->id, $title, $body);
-                $token = DB::table('users')->where('id', $user->id)->value('notification_id');
-                if ($token) {
-                    Common::send_firebase_notification([$token], $title, $body);
-                }
+                // $token = DB::table('users')->where('id', $user->id)->value('notification_id');
+                // if ($token) {
+                //     Common::send_firebase_notification([$token], $title, $body);
+                // }
             }
         }
     }
