@@ -187,12 +187,6 @@ class BdSalariesController extends AdminController
             return truncateAndTrim($value, 2);
         });
         
-        $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
-            $truncatedValue = truncateAndTrim($value, 2);
-            $return  = number_format((float) $value, 2, '.', '');
-
-            return "<span>Original: {$value}</span> | <span>Truncated: {$truncatedValue} --- {$return}</span>";
-        });
         
         $grid->column('total_agency_sallary', __('Total Agency Sallary'))->display(function ($value) {
             return truncateAndTrim($value , 2);
