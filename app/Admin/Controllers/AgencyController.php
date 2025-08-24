@@ -455,7 +455,7 @@ class AgencyController extends MainController
             $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
         
             return "
-                <div style='display: flex; align-items: center; flex-direction: {$direction};'>
+                <div style='display: ; align-items: center; flex-direction: {$direction};'>
                     <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
                     <span style='direction:ltr; unicode-bidi:bidi-override;'>{$phoneCode}{$number}</span>
                 </div>
