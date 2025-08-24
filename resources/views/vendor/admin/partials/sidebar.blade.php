@@ -76,7 +76,7 @@
   
                 @php
                     $bdLinks = [
-                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('home')],
+                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Home')],
                         ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges')],
                         ['uri' => '/agencies', 'icon' => 'fa-building', 'title' => __('agencies')],
                         ['uri' => '/salaries', 'icon' => 'fa-building', 'title' => __('salaries')],

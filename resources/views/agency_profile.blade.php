@@ -220,7 +220,7 @@
         .agency-avatar .logo-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            /* object-fit: cover; */
         }
 
         .agency-info {
@@ -1160,7 +1160,7 @@
         </div>
         @if (\Encore\Admin\Facades\Admin::user()->can('member-switch-' . 'agencies') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-            <div class="tab-content active" id="members-tab">
+        <div class="tab-content active" id="members-tab">
 
                 <div class="card">
                     <div class="card-header">
@@ -1279,7 +1279,7 @@
                                                         </td>
                                             <td>{{ $member->getLiveTimeThisMonth() }}</td>
                                             <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                            <td>{{ $member->salary_by_agency ?? 0 }}</td>
+                                            <td>{{ $member->salary_by_latest_join ?? 0 }}</td>
                                             <td>
                                                 @if($isOwner)
                                                     <span class="role-badge owner">{{ __('Owner') }}</span>
