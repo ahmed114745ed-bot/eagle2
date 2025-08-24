@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\Api\V1\RoomAdminsResource;
 use Exception;
 use App\Models\Pk;
 use Carbon\Carbon;
@@ -210,15 +211,15 @@ class RoomController extends Controller
 
     public function getAdmins(Request $request)
     {
-        if (!$request->owner_id) return Common::apiResponse(0, 'missing params', null, 422);
 
+        if (!$request->owner_id) return Common::apiResponse(0, 'missing params', null, 422);
         try {
             $admins = $this->roomService->roomAdmins($request->owner_id);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
 
-        $data        = UserResource::collection($admins);
+        $data        = RoomAdminsResource::collection($admins);
         return Common::apiResponse(1, '', $data, 200);
     }
 

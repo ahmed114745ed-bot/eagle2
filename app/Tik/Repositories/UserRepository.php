@@ -123,7 +123,26 @@ class UserRepository extends AbstractRepository
 
     public function getUsers($ids)
     {
-        return $this->model->query()->with(['agency', 'profile', 'family'])->whereIn('id', $ids)->get();
+        return $this->model->query()->with(['agency', 'profile', 'family'])
+        ->whereIn('id', $ids)->get();
+        
+    }
+
+    public function getAdmins($ids)
+    {
+        if (empty($ids)) return collect();
+
+        return $this->model->with([
+            'agency.owner',      
+            'agency.mempers',   
+            'profile',
+            'family',
+            'packs.ware',       
+            'ownAgency',
+            'userSetting',
+            ])
+            ->whereIn('id', $ids)
+            ->get();
     }
 
     public function getUsersWithPaginate($ids, $paginate)

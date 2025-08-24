@@ -36,17 +36,25 @@ class AuthController extends BaseAuthController
     {
         $user = Admin::user(); 
         $uri = request()->path(); 
-   
+    
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
+   
+        if ($user) {
+           
+            if (str_contains($uri, $bdLogin) && $user->type == null) {
+                return redirect('/admin');
+            }
+           
+            if (str_contains($uri, $bdLogin) && $user->type === 'bd') {
+                return redirect('/bd');
+            }
+        }
     
-        if (\Str::contains($uri, $adminLogin) || \Str::contains($uri, $bdLogin)  && $user?->type !== 'bd') {
-            return redirect('/admin'); 
+        if (str_contains($uri, $adminLogin)) {
+            return view('admin.login');
         }
-        if (\Str::contains($uri, $bdLogin) || \Str::contains($uri, $adminLogin) && $user?->type == 'bd') {
-        
-            return redirect('/bd'); 
-        }
+  
 
         $test = request()->query('redirect_url');
         $languages = MultiLanguage::config("languages");
