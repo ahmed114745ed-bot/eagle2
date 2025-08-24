@@ -43,8 +43,8 @@ class RoomAdminsResource extends JsonResource
             'chat_setting' => $chatSetting ? new ChatSettingResource($chatSetting) : null,
             'change_room_effect' => $userSetting ? new ShowUserSettingResource($userSetting) : null,
             'my_agency' => $ownAgency ? $ownAgency->only(['id','name','status','img','phone','url','contents']) : null,
-            'level' => $this->getLevel(),
-            'user_types' => $this->user_types,
+            'level' => $this->preloaded_level ,
+            'user_types' => $this->user_types2 ?? [0],
         ];
     }
 
@@ -76,7 +76,11 @@ class RoomAdminsResource extends JsonResource
 
     private function formatOnlineTime()
     {
-        return $this->online_time ? Carbon::createFromTimestamp($this->online_time)->diffForHumans() : null;
+        if ($this->relationLoaded('activePack20') && $this->activePack20) {
+            return null;
+        }
+    
+        return $this->org_online_time ? Carbon::createFromTimestamp($this->org_online_time)->diffForHumans() : null;
     }
 
     private function getUserDress($type, $dress, $item = 'img1')
@@ -89,7 +93,7 @@ class RoomAdminsResource extends JsonResource
     {
         static $vip = null;
         if ($vip === null) {
-            $vip = Common::ovip_center($this->id);
+            $vip = Common::ovip_center_room_admins($this->id);
         }
         return $vip;
     }
