@@ -17,6 +17,7 @@ return[
 
 'deleteShipping' => 'If the agency is deleted, the coins and dollars will be lost',
 'cancel' => 'cancel',
+'cancelCp'=>'you want to cancel this relation?',
 
 'transfer_to_user'     => 'An amount has been transferred to user :name.',
 'transfer_to'          => 'An amount has been transferred to :target.',
