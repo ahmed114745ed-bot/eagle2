@@ -145,7 +145,7 @@ class RoomBoomRewardJob implements ShouldQueue
         if ($user){
             $expire = $reward['expire_days'];
             if ($reward['target_type'] == 'ware') {
-                $ware = Ware::find($reward->target);
+                $ware = Ware::find($reward['target']);
                 UserCommon::addEvintsWareToUser($user, $ware, $expire);
             }
             if ($reward['target_type'] == 'achieve') {
@@ -248,7 +248,7 @@ class RoomBoomRewardJob implements ShouldQueue
             "message" => "roomBoomEnded",
             'roomBoomLevel' => $levelColumn,
             'duration' => 10,
-            'winner' => $this->winnerData
+            'winners' => $this->winnerData
         ];
 
         event(new RoomBoomRewardsEvent($data, $roomID));
