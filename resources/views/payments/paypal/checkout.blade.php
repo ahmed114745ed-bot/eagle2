@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,6 +20,22 @@
             padding: 16px;
             max-width: 100%;
             overflow-x: hidden;
+        }
+        
+        .language-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .language-selector select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background-color: white;
+            font-size: 16px;
+            width: 200px;
+            outline: none;
+            cursor: pointer;
         }
         
         .container {
@@ -151,14 +167,23 @@
     </style>
 </head>
 <body>
+    <div class="language-selector">
+        <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="ar" selected>العربية</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+        </select>
+    </div>
+    
     <div class="container">
         <div class="header">
-            <h1>إتمام عملية الدفع</h1>
-            <p>اختر طريقة الدفع المناسبة لك</p>
+            <h1 id="title">إتمام عملية الدفع</h1>
+            <p id="subtitle">اختر طريقة الدفع المناسبة لك</p>
         </div>
         
         <div class="amount-display">
-            المبلغ: {{ $amount }} دولار
+            <span id="amountLabel">المبلغ:</span> {{ $amount }} $
         </div>
         
         <div class="payment-options">
@@ -166,7 +191,7 @@
             
             <div class="divider">
                 <div class="divider-line"></div>
-                <div class="divider-text">أو</div>
+                <div class="divider-text" id="dividerText">أو</div>
                 <div class="divider-line"></div>
             </div>
             
@@ -174,12 +199,61 @@
         </div>
         
         <div class="secure-notice">
-            <i>✓</i> عملية دفع آمنة ومشفرة
+            <i>✓</i> <span id="secureText">عملية دفع آمنة ومشفرة</span>
         </div>
     </div>
 
     <script>
-        // ✅ BUTTON 1 (Yellow PayPal button - redirect)
+        function changeLanguage(lang) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('lang', lang);
+            window.history.replaceState({}, '', url);
+            
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = lang;
+            
+            const translations = {
+                en: {
+                    title: "Complete Payment",
+                    subtitle: "Choose your preferred payment method",
+                    amountLabel: "Amount:",
+                    dividerText: "or",
+                    secureText: "Secure encrypted payment process"
+                },
+                ar: {
+                    title: "إتمام عملية الدفع",
+                    subtitle: "اختر طريقة الدفع المناسبة لك",
+                    amountLabel: "المبلغ:",
+                    dividerText: "أو",
+                    secureText: "عملية دفع آمنة ومشفرة"
+                },
+                fr: {
+                    title: "Finaliser le Paiement",
+                    subtitle: "Choisissez votre méthode de paiement préférée",
+                    amountLabel: "Montant:",
+                    dividerText: "ou",
+                    secureText: "Processus de paiement sécurisé et crypté"
+                },
+                es: {
+                    title: "Completar Pago",
+                    subtitle: "Elija su método de pago preferido",
+                    amountLabel: "Monto:",
+                    dividerText: "o",
+                    secureText: "Proceso de pago seguro y encriptado"
+                }
+            };
+            
+            document.getElementById('title').textContent = translations[lang].title;
+            document.getElementById('subtitle').textContent = translations[lang].subtitle;
+            document.getElementById('amountLabel').textContent = translations[lang].amountLabel;
+            document.getElementById('dividerText').textContent = translations[lang].dividerText;
+            document.getElementById('secureText').textContent = translations[lang].secureText;
+        }
+        
+        document.getElementById('languageSelect').addEventListener('change', function() {
+            changeLanguage(this.value);
+        });
+        
         paypal.Buttons({
             fundingSource: paypal.FUNDING.PAYPAL,
             style: {
@@ -209,7 +283,6 @@
             }
         }).render('#paypal-button');
 
-        // ✅ BUTTON 2 (Debit/Credit - popup continues as normal)
         paypal.Buttons({
             fundingSource: paypal.FUNDING.CARD,
             style: {
@@ -249,6 +322,13 @@
                 window.location.href = "/api/paypal-cancel";
             }
         }).render('#card-button');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const langParam = urlParams.get('lang');
+        if (langParam && ['en', 'ar', 'fr', 'es'].includes(langParam)) {
+            document.getElementById('languageSelect').value = langParam;
+            changeLanguage(langParam);
+        }
     </script>
 </body>
 </html>
