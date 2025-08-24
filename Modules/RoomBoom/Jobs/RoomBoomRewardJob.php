@@ -56,12 +56,11 @@ class RoomBoomRewardJob implements ShouldQueue
         $topContributorIds = $this->getTopContributorIds($roomId, $level->level);
 
         $lastTriggerSenderId = GiftLog::where('id', $boom->final_gift_id)->value('sender_id');
-        $allUserIds = array_merge($topContributorIds, [$lastTriggerSenderId]); // will expand more later
 
         $room = Room::with('roomVisitors')->find($roomId);
 
         if ($room) {
-            $allUserIds = array_merge($allUserIds, $room->roomVisitors->pluck('user_id')->toArray());
+            $allUserIds = array_merge($topContributorIds, [$lastTriggerSenderId], $room->roomVisitors->pluck('user_id')->toArray());
         }
 
         $this->users = User::whereIn('id', $allUserIds)->get()->keyBy('id')->toArray();
