@@ -90,7 +90,7 @@ class AgencyController extends MainController
         $agency = Agency::query()
             // ->where('bd_id' ,$user->app_id )
             ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-            ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+            ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
             ->find($id);
 
 
@@ -98,7 +98,7 @@ class AgencyController extends MainController
             $agency =  ShippingAgency::query()
                 // ->where('bd_id' ,$user->app_id )
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
                 ->find($id);
         }
 
@@ -112,7 +112,7 @@ class AgencyController extends MainController
             throw new \Exception(__('Agency not found'));
         }
         if ($agency->type == 2) {
-          
+            
             return self::shippingProfile($agency, $request, $content);
         }
 
