@@ -5,8 +5,7 @@
     <script src="https://www.paypal.com/sdk/js?client-id={{ config('paypal.client_id') }}&currency={{ config('paypal.currency','USD') }}"></script>
 </head>
 <body>
-<h2>Checkout with PayPal</h2>
-
+<br>
 <div id="paypal-button"></div>
 <br>
 <div id="card-button"></div>
