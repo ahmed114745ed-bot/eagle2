@@ -134,6 +134,8 @@ class AuthService
     public function loginWithGoogle($request)
     {
         
+        logger()->info('Google login request data:', $request->all());
+
         if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
 
