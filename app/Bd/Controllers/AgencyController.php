@@ -606,7 +606,7 @@ class AgencyController extends MainController
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->attribute('id', 'phone-input');
 
                 // $row->width(12)->hidden('Host_agency')->default(1);
 
