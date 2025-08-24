@@ -881,8 +881,10 @@
                         <span class="meta-value">{{ $agency->id }}</span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">{{__("Phone")}}:</span>
-                        <span class="meta-value">{{ @$agency->phone ?? 'N/A' }}</span>
+                        <span class="meta-label">{{ __("Phone") }}:</span>
+                        <span class="meta-value" style="direction: ltr; display: inline-block;">
+                            {{ ($agency->phone_code ?? '') . ($agency->phone ?? '') ?: 'N/A' }}
+                        </span>
                     </div>
                 </div>
                 <div class="agency-stats">
