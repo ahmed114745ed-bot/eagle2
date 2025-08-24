@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Checkout with PayPal</title>
-    <!-- Include PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id={{ config('paypal.client_id') }}&currency={{ config('paypal.currency','USD') }}"></script>
 </head>
 <body>
@@ -15,7 +14,7 @@
 <script>
     // ✅ BUTTON 1 (Yellow PayPal button - redirect)
     paypal.Buttons({
-        fundingSource: paypal.FUNDING.PAYPAL,  // PayPal only
+        fundingSource: paypal.FUNDING.PAYPAL,
         createOrder: function(data, actions) {
             return fetch('/paypal/create-order', {
                 method: 'POST',
@@ -54,7 +53,7 @@
             })
                 .then(res => res.json())
                 .then(orderData => {
-                    return orderData.id; // card checkout needs order ID
+                    return orderData.id;
                 });
         },
         onApprove: function(data, actions) {
