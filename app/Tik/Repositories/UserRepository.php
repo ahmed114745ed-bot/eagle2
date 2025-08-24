@@ -195,7 +195,6 @@ class UserRepository extends AbstractRepository
         $receivedNum = floor($diamondReceived * ($expPercentages['exp_received_percentage'] ?? 1));
         $senderNum = floor($diamondSend * ($expPercentages['exp_sender_percentage'] ?? 1));
 
-        // تجنب القسمة على صفر
         $receiver_div = max(1, ($nextStarData['next_exp'] ?? 1) - $current_star_num);
         $sender_div = max(1, ($nextGoldData['next_exp'] ?? 1) - $current_gold_num);
 
