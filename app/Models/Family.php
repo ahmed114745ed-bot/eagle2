@@ -14,7 +14,7 @@ class Family extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['rank'];
+    protected $appends = [];
 
     private $cachedLevelMax = null;
 
