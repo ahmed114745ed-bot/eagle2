@@ -256,7 +256,7 @@ class HomeController extends Controller
                 'anti_ban'       => 30,
             ];
             $type         = $request->type;
-          
+
             $this->homeService->changePackMode($type, $privilegeArr, $user, false);
 
             return Common::apiResponse(1, 'ok', null, 200);
@@ -267,23 +267,27 @@ class HomeController extends Controller
 
     public function un_hide(Request $request)
     {
-        $user = $request->user();
-        $privilegeArr = [
-            'has_color_name' => 18,
-            //            'anonymous'      => 17,
-            'country'        => 13,
-            'last_active'    => 20,
-            'visit'          => 19,
-            'room'           => 16,
-            // 'spechEfeect'    => 22
-            'sound_effect'   => 21,
-            'being_kicked'   => 29,
-            'anti_ban'       => 30,
-        ];
-        $type         = $request->type;
-        $this->homeService->changePackMode($type, $privilegeArr, $user, true);
+        try {
+            $user = $request->user();
+            $privilegeArr = [
+                'has_color_name' => 18,
+                //            'anonymous'      => 17,
+                'country'        => 13,
+                'last_active'    => 20,
+                'visit'          => 19,
+                'room'           => 16,
+                // 'spechEfeect'    => 22
+                'sound_effect'   => 21,
+                'being_kicked'   => 29,
+                'anti_ban'       => 30,
+            ];
+            $type         = $request->type;
+            $this->homeService->changePackMode($type, $privilegeArr, $user, true);
 
-        return Common::apiResponse(1, 'ok', null, 200);
+            return Common::apiResponse(1, 'ok', null, 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
     }
 
     // public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
