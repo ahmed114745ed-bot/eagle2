@@ -92,7 +92,6 @@ class PayPalService
             ->withBody(json_encode($body))
             ->post(config('paypal.base_url'). '/v2/checkout/orders');
 
-        info($response);
         if (isset($response['id']) && $response['status'] == 'CREATED') {
             return $response['id'];
             foreach ($response['links'] as $link) {

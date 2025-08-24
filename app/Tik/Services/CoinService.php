@@ -115,8 +115,8 @@ class CoinService
             } else if ($paymentMethod == 'paypal') {
                 $Active = config('is_paypal_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
-                $paypalService = new PayPalService();
-                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
+//                $paypalService = new PayPalService();
+//                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
                 // $paymentLink = $paypalService->createOrder($log->id, $coin->usd, $user);
                 $bladeUrl = url("/paypal/checkout/{$log->id}");
 
