@@ -131,11 +131,19 @@ class RoomController extends Controller
         }
     }
 
+    private function getTimezone(): string
+    {
+        $tz = request()->header('tz', Common::timeZone());
+        return in_array($tz, timezone_identifiers_list()) ? $tz : 'UTC';
+    }
 
     public function extraRoomData($owner_id): \Illuminate\Http\JsonResponse
     {
         $room = $this->roomService->findRoomUser($owner_id);
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
+
+        $tz = getTimezone();
+        $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
         $openBoom = RoomBoom::whereIn('total_room_gift_id', function ($query) use ($room) {
             $query->select('id')
@@ -144,7 +152,7 @@ class RoomController extends Controller
         })
             ->whereNull('ended_at')
             ->whereNotNull('started_at')
-            ->whereDate('started_at', Carbon::today())
+            ->whereDate('started_at', $todayStart)
             ->first();
 
         $collections = [
