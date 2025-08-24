@@ -50,7 +50,7 @@ class PayPalService
     /**
      * @return string
      */
-    public function create(int $referenceId, $amount, $user): string
+    public function create(int $referenceId, $amount, $user): array|string
     {
         $id = uuid_create();
 
@@ -66,8 +66,8 @@ class PayPalService
                 'return_url'  => url("/api/paypal-return/$referenceId"),
                 'cancel_url'  => url('/api/paypal-cancel'),
                 'user_action' => 'PAY_NOW',
-                'shipping_preference' => 'NO_SHIPPING',
-                'landing_page' => 'BILLING',
+//                'shipping_preference' => 'NO_SHIPPING',
+//                'landing_page' => 'BILLING',
             ],
             "purchase_units" => [
                 [
@@ -93,14 +93,14 @@ class PayPalService
             ->post(config('paypal.base_url'). '/v2/checkout/orders');
 
         if (isset($response['id']) && $response['status'] == 'CREATED') {
-            return $response['id'];
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
                     $paymentLink = $link['href'];
                 }
             }
         }
-        return $paymentLink;
+
+        return [$response['id'], $paymentLink];
     }
 
 

@@ -393,7 +393,12 @@
                 <button onclick="showSection('user_days')">{{ __('user days') }}</button>
                 {{-- <button onclick="showSection('agency_settings')">{{ __('Agency Settings') }}</button> --}}
 
-                <button onclick="showSection('targets_table')">{{ __('Targets') }}</button>
+                <!-- <button onclick="showSection('targets_table')">{{ __('Targets') }}</button> -->
+                <button 
+                    onclick="showSection('targets_table')" 
+                    class="{{ $tab == 'targets_table' ? 'active' : '' }}">
+                    {{ __('Targets') }}
+                </button>
             </div>
         </div>
 

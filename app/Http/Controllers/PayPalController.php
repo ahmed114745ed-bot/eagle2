@@ -22,9 +22,12 @@ class PayPalController extends Controller
     public function create(Request $request): JsonResponse
     {
         $paypal = new PayPalService();
-        $orderId = $paypal->create($request->referenceId, $request->amount, null);
+        [$orderId, $paymentLink] = $paypal->create($request->referenceId, $request->amount, null);
 
-        return response()->json(["id" => $orderId]);
+        return response()->json([
+            'id' => $orderId ?? null,
+            'approval_url' => $paymentLink,
+        ]);
     }
 
     public function capture($orderId): JsonResponse

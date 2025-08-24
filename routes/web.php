@@ -1,8 +1,8 @@
 <?php
 
-use App\Admin\Controllers\GiftLogSummaryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\BdSalaryMigrationController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -11,7 +11,6 @@ use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RoomSettings;
 use App\Admin\Controllers\UserController;
 use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\SettingsController;
@@ -406,6 +405,8 @@ Route::get('get-setting/{key}', function ($key) {
 
 // In your web.php
 Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
+
+Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
 
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
