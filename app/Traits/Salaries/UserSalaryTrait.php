@@ -53,7 +53,7 @@ trait UserSalaryTrait
         $year = $year ?? $now->year;
         $allTargetOrNothing = Common::getConfig('all_target_or_nothing') == 'true';
 
-//        DB::statement('SET SESSION sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"');
+        //        DB::statement('SET SESSION sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"');
 
         if ($checkStoredProcedureExists) {
 
@@ -64,7 +64,6 @@ trait UserSalaryTrait
             \DB::statement($query);
 
             $this->callProcedure($month, $year, $allTargetOrNothing);
-
         }
     }
 
@@ -79,7 +78,7 @@ trait UserSalaryTrait
             ->where('agency_id', '!=', 0)
             ->where('salary_is_updated', 1)
             ->where('type_user', '!=', 0)
-            ->chunk(500, function ($users) use($month, $year){
+            ->chunk(500, function ($users) use ($month, $year) {
                 foreach ($users as $user) {
                     $cacheKey = 'cache-data-mystore-' . $user->id;
 
@@ -90,7 +89,7 @@ trait UserSalaryTrait
                             if ($app_feature) {
 
                                 $targetService = new FixedTargetService($user, month: $month, year: $year);
-                                $targetService->calculateTarget();
+                                $targetService->calculateTarget($month, $year);
                             }
                         } catch (\Throwable $e) {
 
