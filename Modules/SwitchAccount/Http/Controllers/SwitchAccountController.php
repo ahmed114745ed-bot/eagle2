@@ -183,7 +183,10 @@ class SwitchAccountController extends Controller
         $new_account = User::find($request->id);
         $token = $new_account->createToken('api_token')->plainTextToken;
         $new_account->auth_token = $token;
-
+        $user->is_logout = 1;
+        $user->save();
+        $new_account->is_logout = 0;
+        $new_account->save();
         $data = [
             'id'            => $new_account->id,
             'is_first'      => @(bool)$new_account->is_points_first,
@@ -254,7 +257,7 @@ class SwitchAccountController extends Controller
                 'image_color'          => @$currentUser->color_image ?? (object)[],
                 'level' => [
                     'receiver_img' => $currentUser->getImageReceiverOrSender('receiver_id', 1)->img ?? '',
-                    'sender_img' => $currentUser->getImageReceiverOrSender('sender_id', 2)->img ??'',
+                    'sender_img' => $currentUser->getImageReceiverOrSender('sender_id', 2)->img ?? '',
                 ],
                 'user_types' => $currentUser->user_types,
                 'frame' => $frame,
@@ -276,13 +279,13 @@ class SwitchAccountController extends Controller
 
     private function getFrame(User $user)
     {
-        $dress_1_data = $this->getUserDress($user,4, $user->dress_1, 'img2');
-        $dress_1_fallback = $this->getUserDress($user,4, $user->dress_1, 'img1');
+        $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'img2');
+        $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
         $frame = $dress_1_data ?: $dress_1_fallback;
         return $frame;
     }
 
-    private function getUserDress(User $user,$type, $dress, $item = 'img1')
+    private function getUserDress(User $user, $type, $dress, $item = 'img1')
     {
         $pack = $user->packs?->where('is_used', 1)
             ->where('type', $type)
