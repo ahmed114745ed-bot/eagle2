@@ -183,7 +183,7 @@
         </div>
         
         <div class="amount-display">
-            <span id="amountLabel">المبلغ:</span> {{ $amount }} $
+            <span id="amountLabel">المبلغ:</span> {{ $amount }} <span id="currency">دولار</span>
         </div>
         
         <div class="payment-options">
@@ -204,131 +204,195 @@
     </div>
 
     <script>
+        // دالة لاستخراج اللغة من header الـ x-localization
+        function getLanguageFromHeaders() {
+            // في بيئة production، سيتم الحصول على هذا من الـ header الحقيقي
+            // للعرض التوضيحي، سنستخدم معلمة URL كبديل
+            const urlParams = new URLSearchParams(window.location.search);
+            const headerLang = urlParams.get('x-localization');
+            
+            return headerLang && ['en', 'ar', 'fr', 'es'].includes(headerLang) ? headerLang : null;
+        }
+        
+        // دالة لتغيير اللغة
         function changeLanguage(lang) {
+            // إضافة معلمة اللغة إلى الرابط
             const url = new URL(window.location.href);
             url.searchParams.set('lang', lang);
             window.history.replaceState({}, '', url);
             
+            // تغيير اتجاه الصفحة بناءً على اللغة
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = lang;
             
+            // ترجمة النصوص
             const translations = {
                 en: {
                     title: "Complete Payment",
                     subtitle: "Choose your preferred payment method",
                     amountLabel: "Amount:",
+                    currency: "USD",
                     dividerText: "or",
-                    secureText: "Secure encrypted payment process"
+                    secureText: "Secure encrypted payment process",
+                    payWithPayPal: "Pay with PayPal",
+                    payWithCard: "Pay with Debit or Credit Card"
                 },
                 ar: {
                     title: "إتمام عملية الدفع",
                     subtitle: "اختر طريقة الدفع المناسبة لك",
                     amountLabel: "المبلغ:",
+                    currency: "دولار",
                     dividerText: "أو",
-                    secureText: "عملية دفع آمنة ومشفرة"
+                    secureText: "عملية دفع آمنة ومشفرة",
+                    payWithPayPal: "الدفع باستخدام PayPal",
+                    payWithCard: "الدفع باستخدام بطاقة ائتمان أو خصم"
                 },
                 fr: {
                     title: "Finaliser le Paiement",
                     subtitle: "Choisissez votre méthode de paiement préférée",
                     amountLabel: "Montant:",
+                    currency: "USD",
                     dividerText: "ou",
-                    secureText: "Processus de paiement sécurisé et crypté"
+                    secureText: "Processus de paiement sécurisé et crypté",
+                    payWithPayPal: "Payer avec PayPal",
+                    payWithCard: "Payer par carte de débit ou de crédit"
                 },
                 es: {
                     title: "Completar Pago",
                     subtitle: "Elija su método de pago preferido",
                     amountLabel: "Monto:",
+                    currency: "USD",
                     dividerText: "o",
-                    secureText: "Proceso de pago seguro y encriptado"
+                    secureText: "Proceso de pago seguro y encriptado",
+                    payWithPayPal: "Pagar con PayPal",
+                    payWithCard: "Pagar con tarjeta de débito o crédito"
                 }
             };
             
+            // تطبيق الترجمة
             document.getElementById('title').textContent = translations[lang].title;
             document.getElementById('subtitle').textContent = translations[lang].subtitle;
             document.getElementById('amountLabel').textContent = translations[lang].amountLabel;
+            document.getElementById('currency').textContent = translations[lang].currency;
             document.getElementById('dividerText').textContent = translations[lang].dividerText;
             document.getElementById('secureText').textContent = translations[lang].secureText;
+            
+            // ترجمة أزرار PayPal (سيتم إعادة إنشائها)
+            recreatePayPalButtons(lang, translations[lang].payWithPayPal, translations[lang].payWithCard);
         }
         
+        // إعادة إنشاء أزرار PayPal بالنصوص المترجمة
+        function recreatePayPalButtons(lang, paypalText, cardText) {
+            // إزالة الأزرار الحالية
+            document.getElementById('paypal-button').innerHTML = '';
+            document.getElementById('card-button').innerHTML = '';
+            
+            // ✅ BUTTON 1 (Yellow PayPal button - redirect)
+            paypal.Buttons({
+                fundingSource: paypal.FUNDING.PAYPAL,
+                style: {
+                    layout: 'vertical',
+                    shape: 'pill',
+                    height: 45,
+                    label: 'paypal'
+                },
+                createOrder: function(data, actions) {
+                    return fetch('/paypal/create-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            referenceId: "{{ $logId }}",
+                            amount: "{{ $amount }}"
+                        })
+                    })
+                        .then(res => res.json())
+                        .then(orderData => {
+                            // Redirect instead of popup
+                            window.location.href = orderData.approval_url;
+                            return false; // stop popup
+                        });
+                }
+            }).render('#paypal-button');
+
+            // ✅ BUTTON 2 (Debit/Credit - popup continues as normal)
+            paypal.Buttons({
+                fundingSource: paypal.FUNDING.CARD,
+                style: {
+                    layout: 'vertical',
+                    shape: 'pill',
+                    height: 45,
+                    label: 'checkout'
+                },
+                createOrder: function(data, actions) {
+                    return fetch('/paypal/create-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            referenceId: "{{ $logId }}",
+                            amount: "{{ $amount }}"
+                        })
+                    })
+                        .then(res => res.json())
+                        .then(orderData => {
+                            return orderData.id;
+                        });
+                },
+                onApprove: function(data, actions) {
+                    return fetch('/paypal/capture-order/' + data.orderID, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    })
+                        .then(res => res.json())
+                        .then(orderData => {
+                            window.location.href = "/api/paypal-return/{{ $logId }}";
+                        });
+                },
+                onCancel: function() {
+                    window.location.href = "/api/paypal-cancel";
+                }
+            }).render('#card-button');
+        }
+        
+        // استجابة لتغيير اختيار اللغة
         document.getElementById('languageSelect').addEventListener('change', function() {
             changeLanguage(this.value);
         });
         
-        paypal.Buttons({
-            fundingSource: paypal.FUNDING.PAYPAL,
-            style: {
-                layout: 'vertical',
-                shape: 'pill',
-                height: 45,
-                label: 'paypal'
-            },
-            createOrder: function(data, actions) {
-                return fetch('/paypal/create-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        referenceId: "{{ $logId }}",
-                        amount: "{{ $amount }}"
-                    })
-                })
-                    .then(res => res.json())
-                    .then(orderData => {
-                        // Redirect instead of popup
-                        window.location.href = orderData.approval_url;
-                        return false; // stop popup
-                    });
+        // تحديد اللغة الافتراضية
+        function determineDefaultLanguage() {
+            // 1. أولوية للغة من الـ header
+            const headerLang = getLanguageFromHeaders();
+            if (headerLang) {
+                return headerLang;
             }
-        }).render('#paypal-button');
-
-        paypal.Buttons({
-            fundingSource: paypal.FUNDING.CARD,
-            style: {
-                layout: 'vertical',
-                shape: 'pill',
-                height: 45,
-                label: 'checkout'
-            },
-            createOrder: function(data, actions) {
-                return fetch('/paypal/create-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        referenceId: "{{ $logId }}",
-                        amount: "{{ $amount }}"
-                    })
-                })
-                    .then(res => res.json())
-                    .then(orderData => {
-                        return orderData.id;
-                    });
-            },
-            onApprove: function(data, actions) {
-                return fetch('/paypal/capture-order/' + data.orderID, {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-                })
-                    .then(res => res.json())
-                    .then(orderData => {
-                        window.location.href = "/api/paypal-return/{{ $logId }}";
-                    });
-            },
-            onCancel: function() {
-                window.location.href = "/api/paypal-cancel";
+            
+            // 2. ثم تحقق من معلمة URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlLang = urlParams.get('lang');
+            if (urlLang && ['en', 'ar', 'fr', 'es'].includes(urlLang)) {
+                return urlLang;
             }
-        }).render('#card-button');
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const langParam = urlParams.get('lang');
-        if (langParam && ['en', 'ar', 'fr', 'es'].includes(langParam)) {
-            document.getElementById('languageSelect').value = langParam;
-            changeLanguage(langParam);
+            
+            // 3. ثم لغة المتصاف
+            const browserLang = navigator.language.substring(0, 2);
+            if (['en', 'ar', 'fr', 'es'].includes(browserLang)) {
+                return browserLang;
+            }
+            
+            // 4. افتراضي العربية
+            return 'ar';
         }
+        
+        // تطبيق اللغة الافتراضية عند التحميل
+        const defaultLang = determineDefaultLanguage();
+        document.getElementById('languageSelect').value = defaultLang;
+        changeLanguage(defaultLang);
     </script>
 </body>
 </html>
