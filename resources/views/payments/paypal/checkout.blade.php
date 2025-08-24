@@ -2,14 +2,20 @@
 <html>
 <head>
     <title>Checkout with PayPal</title>
+    <!-- Include PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id={{ config('paypal.client_id') }}&currency={{ config('paypal.currency','USD') }}"></script>
 </head>
 <body>
+<h2>Checkout with PayPal</h2>
+
+<div id="paypal-button"></div>
 <br>
-<div id="paypal-button-container"></div>
+<div id="card-button"></div>
 
 <script>
+    // ✅ BUTTON 1 (Yellow PayPal button - redirect)
     paypal.Buttons({
+        fundingSource: paypal.FUNDING.PAYPAL,  // PayPal only
         createOrder: function(data, actions) {
             return fetch('/paypal/create-order', {
                 method: 'POST',
@@ -24,10 +30,33 @@
             })
                 .then(res => res.json())
                 .then(orderData => {
-                    console.log("PayPal Order Created:", orderData);
-                    return orderData.id;
+                    // Redirect instead of popup
+                    window.location.href = orderData.approval_url;
+                    return false; // stop popup
                 });
-            },
+        }
+    }).render('#paypal-button');
+
+    // ✅ BUTTON 2 (Debit/Credit - popup continues as normal)
+    paypal.Buttons({
+        fundingSource: paypal.FUNDING.CARD,
+        createOrder: function(data, actions) {
+            return fetch('/paypal/create-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    referenceId: "{{ $logId }}",
+                    amount: "{{ $amount }}"
+                })
+            })
+                .then(res => res.json())
+                .then(orderData => {
+                    return orderData.id; // card checkout needs order ID
+                });
+        },
         onApprove: function(data, actions) {
             return fetch('/paypal/capture-order/' + data.orderID, {
                 method: 'POST',
@@ -41,7 +70,7 @@
         onCancel: function() {
             window.location.href = "/api/paypal-cancel";
         }
-    }).render('#paypal-button-container');
+    }).render('#card-button');
 </script>
 </body>
 </html>
