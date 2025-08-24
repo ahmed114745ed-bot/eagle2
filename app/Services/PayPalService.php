@@ -204,7 +204,7 @@ class PayPalService
 
         if ($coinLog->status){
             if ($coinLog->status) {
-                return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
+                return response()->json(['status' => 'success', 'message' => 'Payment successful.']);
             }
         }
 
@@ -218,6 +218,7 @@ class PayPalService
 
     public function callback(Request $request): JsonResponse
     {
+        info('webhook', $request);
         $eventType = $request->get('event_type');
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
             return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);
