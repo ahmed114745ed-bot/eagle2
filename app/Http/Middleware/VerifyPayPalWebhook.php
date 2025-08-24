@@ -31,9 +31,10 @@ class VerifyPayPalWebhook extends PayPalService
 
         $accessToken = (new PayPalService())->getAccessToken();
 
-        info('accessToken', [$accessToken]);
         $response = Http::withToken($accessToken)
             ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', $verificationData);
+
+        info('accessToken', [$response]);
 
         if ($response->json('verification_status') !== 'SUCCESS') {
             return response()->json(['status' => 'unauthorized'], 401);
