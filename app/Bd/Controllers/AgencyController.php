@@ -494,16 +494,14 @@ class AgencyController extends MainController
             ";
         });
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
+            $coin = truncateAndTrim($this->salary ?? 0);
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-            $coin = number_format($coin, 2);
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
+                </div>";
         });
+
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
