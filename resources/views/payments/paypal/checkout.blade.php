@@ -183,7 +183,7 @@
         </div>
         
         <div class="amount-display">
-            <span id="amountLabel">المبلغ:</span> {{ $amount }} دولار
+            <span id="amountLabel">المبلغ:</span> {{ $amount }} $
         </div>
         
         <div class="payment-options">
