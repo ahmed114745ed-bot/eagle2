@@ -396,33 +396,23 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
-        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone',  'coins', 
-        'img',
-        \DB::raw('(
-            SELECT SUM(sallary - cut_amount) 
-            FROM agency_sallaries 
-            WHERE agency_sallaries.agency_id = agencies.id
-        ) as salary')
-         )
+        $grid->model()
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen')
+            ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
             ->where(function ($query) {
-                $query->WhereDoesntHave('additionalInfo')
-                    ->orWhereHas('additionalInfo', function ($query) {
-                        $query->where('status', 1);
-                    });
+                $query
+                    ->whereDoesntHave('additionalInfo')
+                    ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
             })
-
-            ->with(['owner' => function ($query) {
-                $query->select('id', 'name', 'uuid');
-            }])
-            // ->where('Host_agency',  1)
-            ->where('bd_id',  Auth::user()->id)
             ->orderByDesc('id');
 
-        if (request("active") == true) {
-            $grid->model()->whereHas("agencySalaries", function ($q) {
-                $q->where('month', now()->month)
-                    ->where('year', now()->year);
-            });
+        if (request()->has('active')) {
+            $grid->model()
+                ->whereHas('agencySalaries', function ($q) {
+                    $q
+                        ->where('month', now()->month)
+                        ->where('year', now()->year);
+                });
         }
 
         $grid->column('name', __('Agency'))
