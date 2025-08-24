@@ -200,7 +200,19 @@ class User extends Authenticatable
 
     public function getMonthlyDiamondReceivedAttribute()
     {
-        return $this->currentMonthlyDiamond()->value('monthly_diamond_received') ?? 0;
+        return $this->getMonthlyDiamondReceived();
+    }
+
+    // method for passing params
+    public function getMonthlyDiamondReceived($month = null, $year = null)
+    {
+        $month = $month ?? now()->month;
+        $year  = $year ?? now()->year;
+  
+        return $this->monthlyDiamondReceive()
+            ->where('month', $month)
+            ->where('year', $year)
+            ->value('monthly_diamond_received') ?? 0;
     }
 
     public function setMonthlyDiamondReceivedAttribute($value)
