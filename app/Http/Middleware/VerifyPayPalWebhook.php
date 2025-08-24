@@ -18,7 +18,6 @@ class VerifyPayPalWebhook extends PayPalService
     public function handle(Request $request, Closure $next): Response
     {
         $headers = $request->headers;
-        $payload = $request->getContent();
 
         $verificationData = [
             'auth_algo'         => $headers->get('paypal-auth-algo'),
@@ -27,7 +26,7 @@ class VerifyPayPalWebhook extends PayPalService
             'transmission_sig'  => $headers->get('paypal-transmission-sig'),
             'transmission_time' => $headers->get('paypal-transmission-time'),
             'webhook_id'        => config('paypal.webhook_id'),
-            'webhook_event'     => json_decode($payload),
+            'webhook_event'     => $request->all(),
         ];
 
         $accessToken = (new PayPalService())->getAccessToken();
@@ -35,7 +34,8 @@ class VerifyPayPalWebhook extends PayPalService
         $response = Http::withToken($accessToken)
             ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', $verificationData);
 
-        info('response', [$response->json()]);
+        info('response', [$response]);
+
         if ($response->json('verification_status') !== 'SUCCESS') {
             return response()->json(['status' => 'unauthorized'], 401);
         }
