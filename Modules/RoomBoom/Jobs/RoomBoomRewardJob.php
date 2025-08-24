@@ -63,15 +63,15 @@ class RoomBoomRewardJob implements ShouldQueue
             $allUserIds = array_merge($topContributorIds, [$lastTriggerSenderId], $room->roomVisitors->pluck('user_id')->toArray());
         }
 
-        $this->users = User::whereIn('id', $allUserIds)->get()->keyBy('id')->toArray();
+        $this->users = User::whereIn('id', $allUserIds)->select('id')->get()->keyBy('id')->toArray();
 
-        $this->distributeTopContributors($topContributorIds);
+        $this->distributeTopContributors($topContributorIds, $rewardItems);
 
         $this->distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards);
 
         $this->distributeVisitorRewards($rewardItems, $room);
 
-        $this->sendEvent($level->level);
+        $this->sendEvent($level->level, $roomId);
 
         if (!empty($this->giftInsertData)) {
             UserGift::insert($this->giftInsertData);
@@ -84,7 +84,7 @@ class RoomBoomRewardJob implements ShouldQueue
     /**
      * @throws \Exception
      */
-    public function distributeTopContributors($topContributorIds): void
+    public function distributeTopContributors($topContributorIds, $rewardItems): void
     {
         foreach ($topContributorIds as $i => $userId) {
             if (!isset($rewardItems[$i])) break;
@@ -153,7 +153,7 @@ class RoomBoomRewardJob implements ShouldQueue
             }
 
             if ($reward['target_type'] == 'gift') {
-                $this->giftRewards($reward['target'], $userId, $expire);
+                $this->giftRewards($reward, $userId, $expire);
             }
         }
     }
@@ -242,7 +242,7 @@ class RoomBoomRewardJob implements ShouldQueue
         ];
     }
 
-    public function sendEvent($levelColumn): void
+    public function sendEvent($levelColumn, $roomID): void
     {
         $data = [
             "message" => "roomBoomEnded",
@@ -251,7 +251,7 @@ class RoomBoomRewardJob implements ShouldQueue
             'winner' => $this->winnerData
         ];
 
-        event(new RoomBoomRewardsEvent($data));
+        event(new RoomBoomRewardsEvent($data, $roomID));
     }
 }
 
