@@ -27,7 +27,7 @@ class VerifyPayPalWebhook extends PayPalService
             'transmission_sig'  => $headers->get('paypal-transmission-sig'),
             'transmission_time' => $headers->get('paypal-transmission-time'),
             'webhook_id'        => config('paypal.webhook_id'),
-            'webhook_event'     => json_decode($payload, true),
+            'webhook_event'     => json_decode($payload),
         ];
 
         $accessToken = (new PayPalService())->getAccessToken();
