@@ -1,4 +1,4 @@
-{{-- resources/views/payments/now_payments/cancel.blade.php --}}
+{{-- resources/views/payments/now_payments/checkout.blade.php --}}
 
     <div class="container text-center mt-5">
         <h2 class="text-danger">❌ تم إلغاء الدفع</h2>

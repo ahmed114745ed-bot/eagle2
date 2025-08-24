@@ -22,7 +22,8 @@ class PayPalService
 {
     $clientId = config('paypal.client_id');
     $clientSecret = config('paypal.client_secret');
-    $environment = new ProductionEnvironment($clientId, $clientSecret);
+//    $environment = new ProductionEnvironment($clientId, $clientSecret);
+    $environment = new SandboxEnvironment($clientId, $clientSecret);
     $this->client = new PayPalHttpClient($environment);
 }
 
@@ -30,8 +31,6 @@ class PayPalService
    {
     return url("/admin/payment-with-method");
    }
-
-
 
     protected function getAccessToken(): string
     {
@@ -95,6 +94,7 @@ class PayPalService
 
         info($response);
         if (isset($response['id']) && $response['status'] == 'CREATED') {
+            return $response['id'];
             foreach ($response['links'] as $link) {
                 if ($link['rel'] === 'approve') {
                     $paymentLink = $link['href'];
@@ -131,7 +131,7 @@ class PayPalService
 
         $response = $this->client->execute($request);
 
-        $orderId  = $response->result->id ?? null;
+        return $orderId  = $response->result->id ?? null;
         $status   = $response->result->status ?? null;
         \Log::info('PayPal order created', ['order_id' => $orderId, 'status' => $status]);
 
@@ -210,6 +210,11 @@ class PayPalService
         }
 
         return response()->json(['status' => 'failed', 'message' => 'Payment failed.',], 500);
+    }
+
+    public function cancel(): JsonResponse
+    {
+        return response()->json(['status' => 'failed', 'message' => 'Payment cancelled.',], 500);
     }
 
     public function callback(Request $request): JsonResponse

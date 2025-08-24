@@ -118,9 +118,9 @@ class CoinService
                 $paypalService = new PayPalService();
                 $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
                 // $paymentLink = $paypalService->createOrder($log->id, $coin->usd, $user);
+                $bladeUrl = url("/paypal/checkout/{$log->id}");
 
-                
-                return Common::apiResponse(1, 'ok', $paymentLink, 200);
+                return Common::apiResponse(1, 'ok', $bladeUrl, 200);
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
