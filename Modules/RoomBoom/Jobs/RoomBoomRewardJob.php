@@ -44,6 +44,8 @@ class RoomBoomRewardJob implements ShouldQueue
      */
     public function handle()
     {
+        info('in room boom reward job');
+
         $boom = RoomBoom::with(['roomBoomLevel', 'totalRoomGift'])->find($this->boomId);
         $level = $boom->roomBoomLevel;
         $roomId = $boom->totalRoomGift->room_id;
