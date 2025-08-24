@@ -20,12 +20,12 @@ class AuthenticateWeb
     { 
         \config(['auth.defaults.guard' => 'admin']);
         $uri = $request->path(); 
-
+        
         $user = Admin::user(); 
 
         $adminLogin = 'admin/login';
         $bdLogin = 'bd/login';
-     
+    
         if ($user) {
             if (Str::contains($uri, $adminLogin) && $user?->type !== 'bd') {
                 return redirect('/admin'); 

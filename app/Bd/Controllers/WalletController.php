@@ -298,6 +298,7 @@ class WalletController extends MainController
 
     public function charge(Request $request)
     {
+       
         try {
             $request->validate([
                 'amount' => 'required|integer|min:1',
@@ -335,8 +336,8 @@ class WalletController extends MainController
     public function chargeToUser(array $data)
     {
        
-        $appID = Auth::user()->id;
-        $sender = Auth::user();
+        $bdId = Auth::user()->id;
+        // $sender = Auth::user();
         $amount = $data['amount'];
         $receiverId = $data['target_id'] ?? null;
 
@@ -345,6 +346,7 @@ class WalletController extends MainController
      
 
         $receiver = User::find($receiverId);
+        $sender = Bd::find($bdId);
         if (!$receiver) {
             throw new \Exception(__('this user not found'));
         }

@@ -129,7 +129,7 @@ class Bd extends Model
 
     public function bdSalaries()
     {
-        return $this->hasMany(BdSalary::class, 'bd_id');
+        return $this->hasMany(BdSalary::class,  'bd_id', 'id');
     }
     public function getBdSalaryAttribute()
     {
