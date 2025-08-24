@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-           // $table->dropColumn('monthly_diamond_received');
+        Schema::table('monthly_diamond_receives', function (Blueprint $table) {
+           $table->bigInteger('old_diamond')->default(0);
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('monthly_diamond_receives', function (Blueprint $table) {
+            $table->dropColumn('old_diamond');
         });
     }
 };

@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Common;
-use App\Jobs\CalculateUserTargetJob;
+use Carbon\Carbon;
 use App\Models\User;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\CalculateUserTargetJob;
+use Illuminate\Support\Facades\Auth;
+use App\Models\MonthlyDiamondReceive;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\FixedTarget\Services\FixedTargetV2Service;
 
@@ -111,5 +112,25 @@ class DiamondController extends Controller
             'status' => true,
             'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
         ]);
+    }
+
+
+    public function copyMonthlyDiamondReceive()
+    {
+        User::chunk(100, function ($users) {
+            foreach ($users as $user) {
+                MonthlyDiamondReceive::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'month'   => now()->month,
+                        'year'    => now()->year,
+                    ],
+                    [
+                        'old_diamond' => $user->monthly_diamond_received,
+                    ]
+                );
+            }
+        });
+        return 'done!';
     }
 }
