@@ -31,7 +31,7 @@ class ChargeSwitchAction extends RowAction
             'transfer_salary' => DB::raw('NOT transfer_salary')
         ]);
 
-        $model->refresh(); // ✅ الحل هنا
+        $model->refresh(); 
 
         $message = $model->transfer_salary
             ? __('Disable Transfer Salary!')
