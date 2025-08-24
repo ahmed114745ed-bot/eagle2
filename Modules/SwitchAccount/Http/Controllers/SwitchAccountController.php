@@ -182,11 +182,12 @@ class SwitchAccountController extends Controller
 
         $new_account = User::find($request->id);
         $token = $new_account->createToken('api_token')->plainTextToken;
-        $new_account->auth_token = $token;
         $user->is_logout = 1;
         $user->save();
         $new_account->is_logout = 0;
         $new_account->save();
+        $new_account->auth_token = $token;
+        
         $data = [
             'id'            => $new_account->id,
             'is_first'      => @(bool)$new_account->is_points_first,
