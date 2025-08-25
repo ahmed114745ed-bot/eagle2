@@ -2,7 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\BdChargeSwitchAction;
+use App\Helpers\Common;
 use App\Models\Bd;
+use App\Models\BdAgencyHostSallary;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -102,7 +105,12 @@ class BdController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Bd());
+        $grid->model()->with('bdSalaries')->orderByDesc('id');
 
+        $grid->filter(function ($filter) {
+            $filter->like('appUser.uuid', __('App User UUID'));
+            $filter->like('appUser.name', __('User Name'));
+        });
         $grid->column('id', __('Id'));
         // $grid->column('username', __('username'));
         // $grid->column('name', __('Name'));
@@ -157,7 +165,7 @@ class BdController extends MainController
 
 
 
-        $grid->column('appUser.name', __('المستخدم المرتبط'))->display(function ($name) {
+        $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
@@ -192,12 +200,25 @@ class BdController extends MainController
 
 
         $grid->column('total_salary', __('total proft'))->display(function () {
-            return number_format($this->total_salary, 2);
+            return truncateAndTrim($this->total_salary, 2);
         });
 
-        $grid->column('net_salary', __('Net Salary'))->display(function () {
-            return number_format($this->net_salary, 2);
+        $grid->column('current_balance', __('current_balance'))->display(function () {
+            $total = floatval($this->total_salary);
+            $cut   = floatval($this->total_cut);
+            return truncateAndTrim($total - $cut, 2);
         });
+
+        $grid->column('total_cut', __('Cut amount'))->display(function () {
+            return truncateAndTrim($this->total_cut, 2);
+        });
+
+        $grid->column('transfer_salary', __("transfer_salary"))
+        ->display(function () {
+            return $this->transfer_salary ? 1 : 0;
+        })
+        ->switch(Common::getSwitchStates());
+
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
@@ -205,6 +226,8 @@ class BdController extends MainController
             $carbonDate->locale($locale);
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
         });
+
+
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
@@ -214,11 +237,18 @@ class BdController extends MainController
                 $actions->add(new \App\Admin\Actions\DeleteBdAction());
             }
 
+            // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+            //     $actions->add(new BdChargeSwitchAction());
+            // }
             // $actions->add(new MakeBdDefultAction($model->id));
         });
 
+
+    
+
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
+
 
                 $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
             });
@@ -260,7 +290,9 @@ class BdController extends MainController
         // $form->switch('default', __('set_as_default'))
         //     ->help(__('make_bd_default'));
 
+        $form->hidden('transfer_salary', __('transfer_salary'));
 
+        
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -283,7 +315,8 @@ class BdController extends MainController
         }
 
         $form->hidden('type', __('Type'))->value('bd');
-
+        $form->hidden('transfer_salary', __('transfer_salary'));
+        
         $form->saving(function (Form $form) {
             $originalAppId = $form->model()->getOriginal('app_id');
             $userExists = \App\Models\User::find($originalAppId);
@@ -341,66 +374,54 @@ class BdController extends MainController
         $year = request('year') ?? now()->year;
         $month = request('month') ?? now()->month;
         $tab = request()->query('tab', 'agencies');
-
-        $bd = Cache::remember("bd_{$id}", 600, function () use ($id) {
-            return Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
-        });
-        $id = $bd->app_id;
+    
+        $bd = Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
+    
+        $id = $bd->id;
         $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($bd->img) ?? $defaultImage;
-
+        $imageUrl = getImagePath($bd->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
-
         $bd->display_image = $imageUrl;
-
+    
         $agencies = $transactions = $target_history = null;
-
+    
         switch ($tab) {
             case 'agencies':
-                $agencies = Cache::remember("bd_{$id}_agencies_page_" . request()->get('agencies_page', 1), 600, function () use ($bd) {
-                    return $bd->agencies()->paginate(10, ['*'], 'agencies_page');
-                });
+                $agencies = $bd->agencies()->paginate(10, ['*'], 'agencies_page');
                 break;
-
+    
             case 'transactions':
-                $transactions = Cache::remember("bd_{$id}_transactions_page_" . request()->get('transactions_page', 1), 600, function () use ($bd) {
-                    return $bd->transactions()
-                        ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
-                        ->latest()
-                        ->paginate(10, ['*'], 'transactions_page');
-                });
-
+                $transactions = $bd->transactions()
+                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+                    ->latest()
+                    ->paginate(10, ['*'], 'transactions_page');
                 break;
+    
             case 'target_history':
-                $target_history = Cache::remember("bd_{$id}_target_history_{$year}_{$month}_page_" . request()->get('target_history_page', 1), 600, function () use ($bd, $year, $month) {
-                    return BDSallary::select(
-                        'id',
-                        'bd_id',
-                        'agency_id',
-                        'sallary',
-                        'cut_amount',
-                        'month',
-                        'year',
-                        'is_paid',
-                        'created_at',
-                        'total_agency_sallary',
-                        'total_users_sallary',
-                        'total_diamond'
-                    )
-                        ->where('bd_id', $bd->app_id)
-                        ->where('month', $month)
-                        ->where('year', $year)
-                        ->latest()
-                        ->paginate(10, ['*'], 'target_history_page');
-                });
-
+                $target_history =BdAgencyHostSallary::select(
+                    'id',
+                    'bd_id',
+                    'agency_id',
+                    'salary',
+                    'amount',
+                    'month',
+                    'year',
+                    'bd_user_id',
+                    'created_at'
+                )
+                ->where('bd_id', $bd->id)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->latest()
+                ->paginate(10, ['*'], 'target_history_page');
                 break;
         }
-
+    
         return view('admin.bd.bd_profile', compact('bd', 'agencies', 'transactions', 'target_history'));
     }
+    
 
     protected function detail($id)
     {

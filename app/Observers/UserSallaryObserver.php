@@ -3,41 +3,53 @@
 namespace App\Observers;
 
 use App\Models\Agency;
+use App\Models\BdSalary;
 use App\Models\BDSallary;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Classes\Enums\NotificationType;
 use App\Jobs\SendCustomOfficialMessageToUser;
+use App\Services\BdAgencyHostSallaryService;
 
 class UserSallaryObserver
 {
     public function updated(UserSallary $userSalary)
     {
+        
         $this->updateOrCreateAgencySallary($userSalary);
-        $this->updateOrCreateBDSallary($userSalary);
     }
 
     public function saved(UserSallary $userSalary)
     {
         $this->updateOrCreateAgencySallary($userSalary);
-        $this->updateOrCreateBDSallary($userSalary);
+        $this->updateBdHostSallary($userSalary);
+
     }
 
     public function creating(UserSallary $userSalary)
     {
+        $originalDbValue = $userSalary->getOriginal('dB');
+
 
         if (!$userSalary->extras) $userSalary->extras = '';
         $this->updateOrCreateAgencySallary($userSalary);
-        $this->updateOrCreateBDSallary($userSalary);
+        $this->updateBdHostSallary($userSalary);
+        app()->singleton('originalDbValue', fn () => $originalDbValue);
+
     }
 
     public function updating(UserSallary $userSalary)
     {
+        $originalDbValue = $userSalary->getOriginal('dB');
+
         if (!$userSalary->extras) $userSalary->extras = '';
 
         if ($userSalary->isDirty('sallary') && $userSalary->sallary > 0) {
             dispatch(new SendCustomOfficialMessageToUser($userSalary->user_id, NotificationType::TARGET))->onQueue('notification');
         }
+        app()->singleton('originalDbValue', fn () => $originalDbValue);
+
+
     }
 
     public function updateOrCreateAgencySallary(UserSallary $userSalary): void
@@ -76,60 +88,24 @@ class UserSallaryObserver
         }
     }
 
-    public function updateOrCreateBDSallary(UserSallary $userSalary): void
+
+
+    private function updateBdHostSallary(UserSallary $userSallary): void
     {
-        $agency = Agency::find($userSalary->user_agency_id);
+        $agency = Agency::find($userSallary->user_agency_id);
 
-        if ($userSalary->user_agency_id != 0 && $agency && $agency->bd_id && $agency->status == 1) {
-            $bdId    = $agency->bd_id;
-            $month   = now()->month;
-            $year    = now()->year;
-            $agencyId = $agency->id;
+        if ($agency && $agency->bd_id && $agency->status == 1) {
+            $oldDbValue = app()->has('originalDbValue') ? app('originalDbValue') : $userSallary->getOriginal('dB');
 
-            $totals = UserSallary::query()
-                ->where('user_agency_id', $agency->id)
-                ->where('month', now()->month)
-                ->where('year', now()->year)
-                ->selectRaw('SUM(agency_sallary) as total_agency_sallary, SUM(sallary) as total_users_sallary, SUM(diamond) as total_diamond')
-                ->first();
-
-            $totalBdSallary = UserSallary::query()
-                ->where('user_agency_id', $agencyId)
-                ->where('month', $month)
-                ->where('year', $year)
-                ->sum('dB');
-
-            $bdSalary = BDSallary::query()
-                ->where([
-                    'bd_id'     => $bdId,
-                    'agency_id' => $agencyId,
-                    'month'     => $month,
-                    'year'      => $year,
-                ])
-                ->lock()
-                ->first();
-
-            if ($bdSalary) {
-                $bdSalary->update([
-                    'sallary' => $totalBdSallary,
-                    'total_agency_sallary' => $totals->total_agency_sallary ?? 0,
-                    'total_users_sallary' =>  $totals->total_users_sallary ?? 0,
-                    'total_diamond' =>  $totals->total_diamond ?? 0,
-                ]);
-            } else {
-                BDSallary::query()->create([
-                    'bd_id'      => $bdId,
-                    'agency_id'  => $agencyId,
-                    'month'      => $month,
-                    'year'       => $year,
-                    'cut_amount' => 0,
-                    'sallary'    => $totalBdSallary,
-                    'is_paid'    => false,
-                    'total_agency_sallary' => $totals->total_agency_sallary ?? 0,
-                    'total_users_sallary' =>  $totals->total_users_sallary ?? 0,
-                    'total_diamond' =>  $totals->total_diamond ?? 0,
-                ]);
-            }
+            BdAgencyHostSallaryService::storeOrUpdate([
+                'bd_id'     => $agency->bd_id,
+                'user_id'   => $userSallary->user_id,
+                'agency_id' => $agency->id,
+                'amount'    => $userSallary->dB ?? 0,
+                'oldDbValue'   => $oldDbValue,
+                'month'     => $userSallary->month,
+                'year'      => $userSallary->year,
+            ]);
         }
     }
 }

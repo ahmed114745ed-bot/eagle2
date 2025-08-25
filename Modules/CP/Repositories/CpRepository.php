@@ -165,6 +165,20 @@ class CpRepository
                 ->orWhere('user_two_id', $userId);
         })->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])->first();
     }
+    public function checkExistingCpSendingOne($userId, $cpId)
+    {
+        return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
+            $query->where('user_one_id', $userId);
+        })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
+    }
+
+    public function checkExistingCpSendingTwo($userId, $cpId)
+    {
+        return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
+            $query->where('user_two_id', $userId);
+        })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
+    }
+
 
     public function getUserRelationAvailable($userId, $cpRelationId)
     {

@@ -41,6 +41,9 @@ Route::group(
         }
         Route::post('login', [\App\Bd\Controllers\AuthController::class, 'postLogin']);
         Route::get('logout', [\App\Bd\Controllers\AuthController::class, 'logout']);
+
+
+        
     }
 );
 
@@ -60,15 +63,18 @@ Route::group(
         ],
         'as' => 'bd.',
     ],
-    function () { 
+    function () {
+        Route::get('setting', [\App\Bd\Controllers\AuthController::class, 'getSetting']);
+        Route::put('update-setting', [\App\Bd\Controllers\AuthController::class, 'putSetting']);
+
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
         Route::resource('/agencies', AgencyController::class);
         Route::resource('/salaries', BdSalariesController::class);
         Route::resource('/charges', ChargeController::class);
         // Route::resource('/wallet', 'WalletController');
-        Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
-        Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+        Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
 

@@ -3,6 +3,7 @@
 namespace Modules\RoomBoom\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use App\Models\Gift;
 use App\Models\Ware;
 use App\Selectables\Gifts;
@@ -13,6 +14,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\RoomBoomReward;
@@ -79,7 +81,8 @@ class RoomBoomRewardController extends MainController
                     $gift = Gift::find($this->target);
                     $path = $gift->show_img ?? $gift?->img;
                 } elseif ($this->target_type == 'achievement') {
-                    $path = $this?->target;
+                    $value = getDriverUrl() . '/' . @$this?->target;
+                    return "<img src='$value' width='80' height='80'>";
                 } else {
                     $path = 'coin.png';
                 }
@@ -184,7 +187,11 @@ class RoomBoomRewardController extends MainController
                     $form->model()->target = $form->gift_target_id;
                     break;
                 case 'achievement':
-                    $form->model()->target = $form->achievement_target;
+                    if ($form->achievement_target instanceof UploadedFile) {
+                        $url = Common::upload('roomBoom', $form->achievement_target);
+                    }
+                    $form->model()->target = $url ?? '';
+                    $form->target = $url ?? '';
                     break;
             }
 
@@ -226,13 +233,15 @@ class RoomBoomRewardController extends MainController
 
         $form->select('target', __('Gift'))
             ->options(function ($id) {
+                $query = Gift::query()->pluck('name', 'id');
+
                 if ($id) {
-                    $gift = \App\Models\Gift::find($id);
-                    if ($gift) {
-                        return [$gift->id => "{$gift->name}_{$gift->id}"];
+                    $gift = Gift::find($id);
+                    if ($gift && !$query->has($gift->id)) {
+                        $query[$gift->id] = "{$gift->name}_{$gift->id}";
                     }
                 }
-                return \App\Models\Gift::pluck('name', 'id');
+                return Gift::pluck('name', 'id');
             })
             ->attribute([
                 'data-image-select' => 1,
@@ -278,7 +287,7 @@ class RoomBoomRewardController extends MainController
 
         $script = str_replace(['{{fieldName}}', '{{previewId}}'], [$fieldName, $previewId], $script);
 
-        \Encore\Admin\Admin::script($script);
+        Admin::script($script);
     }
 
 

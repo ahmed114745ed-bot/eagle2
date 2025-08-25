@@ -1,7 +1,8 @@
 <?php
 
-use App\Admin\Controllers\GiftLogSummaryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
+use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\BdSalaryMigrationController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -10,7 +11,6 @@ use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RoomSettings;
 use App\Admin\Controllers\UserController;
 use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\SettingsController;
@@ -376,7 +376,6 @@ Route::get('/send-notification/{id}', function ($id) {
     return "notifaction send successfully!";
 });
 
-
 Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
 Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
@@ -406,5 +405,16 @@ Route::get('get-setting/{key}', function ($key) {
 // In your web.php
 Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
 
+Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
+
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
+Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
+
+Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
+    Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
+    Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
+    Route::post('/capture-order/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
+});
+
+
