@@ -5,6 +5,7 @@ namespace Modules\RoomBoom\Jobs;
 use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
+use App\Models\Gift;
 use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
@@ -171,8 +172,7 @@ class RoomBoomRewardJob implements ShouldQueue
     public function achievementRewards($rewardTarget, $expire, $userId, $token): void
     {
         $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
-        $title = __('Achievement Reward');
-        $body = __('You have received a new achievement.');
+
         $this->achievementInsertData[] = [
             'user_id' => $userId,
             'custom_image' => $rewardTarget,
@@ -180,20 +180,15 @@ class RoomBoomRewardJob implements ShouldQueue
             'created_at' => now(),
             'updated_at' => now()
         ];
-        Common::sendOfficialMessage($userId, $title, $body);
 
+        $this->giftNotifications['user_ids'][] = $userId;
         if ($token) {
-            $this->achievementNotifications['title'] = $title;
-            $this->achievementNotifications['body'] = $body;
-            $this->achievementNotifications['tokens'][] = $token;
+            $this->giftNotifications['tokens'][] = $token;
         }
     }
 
     public function giftRewards($reward, $userId, $expire, $token): void
     {
-        $title = __('Gift Reward');
-        $body = __('You have received a new gift.');
-
         $giftData = [
             'gift_id' => $reward['target'],
             'user_id' => $userId,
@@ -204,10 +199,9 @@ class RoomBoomRewardJob implements ShouldQueue
         ];
 
         $this->giftInsertData[] = $giftData;
-        Common::sendOfficialMessage($userId, $title, $body);
+
+        $this->giftNotifications[$reward['target']]['user_ids'][] = $userId;
         if ($token) {
-            $this->giftNotifications[$reward['target']]['title'] = $title;
-            $this->giftNotifications[$reward['target']]['body'] = $body;
             $this->giftNotifications[$reward['target']]['tokens'][] = $token;
         }
     }
@@ -292,25 +286,26 @@ class RoomBoomRewardJob implements ShouldQueue
 
     protected function dispatchPendingNotifications(): void
     {
-        foreach ($this->achievementNotifications as $achievementId => $notification) {
-            if (!empty($notification['tokens'])) {
-                Common::send_firebase_notification(
-                    $notification['tokens'],
-                    $notification['title'],
-                    $notification['body']
-                );
-            }
+        if (!empty($this->achievementNotifications)) {
+            $achievementTitle = __('Achievement Reward');
+            $achievementBody = __('You have received a new achievement.');
+
+            Common::sendOfficialMessage($this->achievementNotifications['user_ids'], $achievementTitle, $achievementBody);
+            Common::send_firebase_notification($this->achievementNotifications['tokens'], $achievementTitle, $achievementBody);
         }
 
-        info($this->giftNotifications);
+        $giftTitle = __('Gift Reward');
+        $giftBody = __('You have received the gift: :giftName');
+        $giftIds = array_keys($this->giftNotifications);
+        $gifts = Gift::whereIn('id', $giftIds)->get()->keyBy('id');
+
         foreach ($this->giftNotifications as $giftId => $notification) {
-            if (!empty($notification['tokens'])) {
-                Common::send_firebase_notification(
-                    $notification['tokens'],
-                    $notification['title'],
-                    $notification['body']
-                );
-            }
+            $giftName = $gifts[$giftId]->name ?? __('a special gift');
+
+            $giftBody = str_replace(':giftName', $giftName, $giftBody);
+
+            Common::sendOfficialMessage($notification['user_ids'], $giftTitle, $giftBody);
+            Common::send_firebase_notification($notification['tokens'], $giftTitle, $giftBody);
         }
     }
 
