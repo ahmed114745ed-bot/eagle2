@@ -795,17 +795,31 @@ class Common
 
         $projectId = env('FIREBASE_PROJECT_NAME');
 
-        $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+        $promise  = Http::withHeaders($headers)
+            ->async()
+            ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
 
-        $result = json_decode($result);
+        return $promise->then(function ($response) use ($isGroup, $key, $token, $tokens, $api_access_key) {
+            $result = $response->json();
 
-        //remove group with $key if is group
-        if ($result  && $isGroup) {
-            self::removeGroupName($key, $token, $tokens, $api_access_key);
-        }
-        return $result;
+            if ($result && $isGroup) {
+                self::removeGroupName($key, $token, $tokens, $api_access_key);
+            }
+
+            return $result;
+        })->otherwise(function ($e) {
+            return null;
+        });
+
+        //        $result = json_decode($result);
+//
+//        //remove group with $key if is group
+//        if ($result  && $isGroup) {
+//            self::removeGroupName($key, $token, $tokens, $api_access_key);
+//        }
+//        return $result;
     }
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
@@ -1868,7 +1882,7 @@ class Common
                     'id_image' => $owner?->specialId?->ware?->show_img ?? '',
                     'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
                 ];
-                
+
             case 'bd':
                 $bd = $resource->bd;
                 return [
