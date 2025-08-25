@@ -1506,7 +1506,13 @@ class Common
     {
         $zegoClientId = config('app.zego_client_id') ?? env('ZEGO_CLIENT_ID');
         $zego_token = Common::getConf('zego_token');
-
+        if ((!$zego_token && !$zego_token) || !$zego_token) {
+            $zegoData = [
+                'zego_app_id'        =>  '',
+                'zego_server_secret' =>  '',
+                'zego_app_sign'      =>  '',
+            ];
+        }
         $data = decryptToArray($zego_token, $zegoClientId);
 
         $zegoData = [
