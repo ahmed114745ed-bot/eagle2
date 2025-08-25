@@ -1155,4 +1155,23 @@ class UserService
     {
         return  $this->userRepository->findOrFail($userId, ['family', 'medals']);
     }
+
+    public function syncBDUsers()
+    {
+        $bdUsers = User::where('is_bd', 1)->get();
+
+        foreach ($bdUsers as $user) {
+            $exists = DB::table('admin_users')
+                ->where('app_id', $user->id)
+                ->exists();
+
+            if (! $exists) {
+              
+                $user->is_bd = 0;
+                $user->save();
+            }
+        }
+
+        return ['message' => 'Done'];
+    }
 }
