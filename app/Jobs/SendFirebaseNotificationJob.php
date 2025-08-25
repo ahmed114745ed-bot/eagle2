@@ -36,7 +36,6 @@ class SendFirebaseNotificationJob implements ShouldQueue
         $projectId = env('FIREBASE_PROJECT_NAME');
 
         $client = new Client([
-            'base_uri' => "https://fcm.googleapis.com/v1/projects/{$projectId}/",
             'headers'  => [
                 'Authorization' => 'Bearer ' . $api_access_key,
                 'Content-Type'  => 'application/json',
@@ -96,7 +95,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 $payload['notification']['image'] = $this->data['image'];
             }
 
-            $promises[$token] = $client->postAsync("messages:send", [
+            $promises[$token] = $client->postAsync("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
                 'json' => ['message' => $payload]
             ]);
 
