@@ -407,7 +407,7 @@ class BdController extends MainController
                     'bd_user_id',
                     'created_at'
                 )
-                ->where('bd_id', $bd->app_id)
+                ->where('bd_id', $bd->id)
                 ->where('month', $month)
                 ->where('year', $year)
                 ->latest()
