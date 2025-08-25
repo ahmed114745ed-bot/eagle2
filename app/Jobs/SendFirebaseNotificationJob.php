@@ -44,13 +44,16 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
         $promises = [];
 
-        foreach ($this->tokens as $token) {
-            $user= User::where('notification_id',$token)->first();
+        $users =  User::select('id')->whereIn('notification_id',$this->tokens)
+            ->where('is_logout', 0)
+            ->get();
 
+        $hasInPack = Common::hasInPack($this->user->id, 18, true);
 
-            if (!$user || $user->is_logout) {
-                continue;
-            }
+        foreach ($users as $user) {
+
+            $token = $user->notification_id;
+
 
             $notification = [
                 'title' => $this->title,
@@ -59,11 +62,12 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
             $userData = [];
             if ($this->user) {
+
                 $userData = [
                     'user_id'        => $this->user->id,
                     'name'           => $this->user->name,
                     'uuid'           => $this->user->uuid,
-                    'has_color_name' => Common::hasInPack($this->user->id, 18, true),
+                    'has_color_name' => $hasInPack,
                     'image'          => $this->user->profile->avatar ?? '',
                 ];
             }
