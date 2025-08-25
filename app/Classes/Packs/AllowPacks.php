@@ -114,8 +114,7 @@ class AllowPacks
 
         foreach ($this->data as $key => $value) {
             $ware = $this->getWare($value);
-            if ($value === 16) {
-            }
+
             $isAllow = $this->isAllowToUser($ware) ?? false;
             $minLevel = @$ware->min_level;
 
@@ -131,9 +130,7 @@ class AllowPacks
                 'max' => @$ware->max_level,
                 'min_price' => @$this->vipPrices->where('id', $minLevel)?->first()?->price,
             ];
-            if ($value === 16) {
-
-            }
+            
 
         }
 
