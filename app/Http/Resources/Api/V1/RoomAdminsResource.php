@@ -93,7 +93,7 @@ class RoomAdminsResource extends JsonResource
     {
         static $vip = null;
         if ($vip === null) {
-            $vip = Common::ovip_center_room_admins($this->id);
+            $vip = Common::ovip_center($this->id);
         }
         return $vip;
     }
