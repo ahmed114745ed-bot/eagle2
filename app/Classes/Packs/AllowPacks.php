@@ -58,6 +58,7 @@ class AllowPacks
     public function isPackUsedAndExist(int $id): bool
     {
         return $this->packs
+            ->where('vip_user_id',$this->user?->UserVip->id)
             ->where('type', $id)
             ->where('is_used', 1)
             ->isNotEmpty();
