@@ -107,6 +107,10 @@ class BdController extends MainController
         $grid = new Grid(new Bd());
         $grid->model()->with('bdSalaries')->orderByDesc('id');
 
+        $grid->filter(function ($filter) {
+            $filter->like('appUser.uuid', __('App User UUID'));
+            $filter->like('appUser.name', __('User Name'));
+        });
         $grid->column('id', __('Id'));
         // $grid->column('username', __('username'));
         // $grid->column('name', __('Name'));
@@ -161,7 +165,7 @@ class BdController extends MainController
 
 
 
-        $grid->column('appUser.name', __('المستخدم المرتبط'))->display(function ($name) {
+        $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
