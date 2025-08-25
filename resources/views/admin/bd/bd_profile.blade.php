@@ -818,7 +818,7 @@
 <!-- Header Section -->
 <div class="agency-header">
     <div class="agency-avatar">
-        <img src="{{ getImagePath($bd->img) }}" alt="Agency Logo" class="logo-img">
+        <img src="{{ getImagePath($bd->avatar) }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
         <h1 class="agency-name">{{ $bd->name ??'' }}</h1>
@@ -848,8 +848,6 @@
                     </h2>
                 </div>
                     <div class="avatar-grid">
-                        
-                            
                             <a href="#" ">
                                {{  truncateAndTrim( $bd->total_salary)  }}
                             </a>

@@ -376,7 +376,7 @@ class BdController extends MainController
         $id = $bd->id;
         // $imageUrl = getImagePath($bd->img) ?? $defaultImage;
         $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($bd->img);
+        $imageUrl = getImagePath($bd->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
