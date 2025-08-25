@@ -115,22 +115,9 @@ class SendFirebaseNotificationJob implements ShouldQueue
         }
 
         try {
-            info("🚀 Starting Utils::unwrap with " . count($promises) . " promises");
-
-            $results = Utils::unwrap($promises);
-
-            info("🎯 Utils::unwrap finished. Total results: " . count($results));
-        } catch (\Throwable $e) {
-            info("💥 Exception inside Utils::unwrap: " . $e->getMessage());
-            if (method_exists($e, 'getResponse') && $e->getResponse()) {
-                info("Error response: " . (string) $e->getResponse()->getBody());
-            }
+            Utils::unwrap($promises);
+        } catch (\Throwable $_) {
         }
-
-        $end = microtime(true);
-        $timeTaken = round($end - $start, 3);
-        info($timeTaken);
-
     }
 
 }
