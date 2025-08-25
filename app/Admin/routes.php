@@ -608,4 +608,14 @@ Route::group(
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
+
+
+});
+
+
+Route::group([
+    'prefix' => 'admin',
+    'middleware' => ['web', 'admin'],
+], function() {
+    Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
 });
