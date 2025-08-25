@@ -98,7 +98,19 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
             $promises[$token] = $client->postAsync("messages:send", [
                 'json' => ['message' => $payload]
-            ]);
+            ])->then(
+                function ($response) use ($token) {
+                    $body = json_decode((string) $response->getBody(), true);
+                    info("✅ Notification sent to {$token}", $body);
+                },
+                function ($exception) use ($token) {
+                    info("❌ Failed to send to {$token}: " . $exception->getMessage());
+                    if ($exception->hasResponse()) {
+                        $errorBody = (string) $exception->getResponse()->getBody();
+                        info("Error body: " . $errorBody);
+                    }
+                }
+            );
 
 //            $headers = [
 //                'Authorization' => 'Bearer ' . $api_access_key,
