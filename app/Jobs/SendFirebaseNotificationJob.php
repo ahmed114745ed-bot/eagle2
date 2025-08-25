@@ -44,7 +44,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
         $promises = [];
 
-        $users =  User::select('id')->whereIn('notification_id',$this->tokens)
+        $users =  User::select(['id', 'notification_id'])->whereIn('notification_id',$this->tokens)
             ->where('is_logout', 0)
             ->get();
 
