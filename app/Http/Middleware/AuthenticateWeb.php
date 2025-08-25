@@ -17,25 +17,69 @@ class AuthenticateWeb
      * @return mixed
      */
     public function handle($request, Closure $next)
-    {
+    { 
         \config(['auth.defaults.guard' => 'admin']);
         $uri = $request->path(); 
+        
+        $user = Admin::user(); 
 
+        $adminLogin = 'admin/login';
+        $bdLogin = 'bd/login';
+    
+        if ($user) {
+            if (Str::contains($uri, $adminLogin) && $user?->type !== 'bd') {
+                return redirect('/admin'); 
+            }
+    
+            if (Str::contains($uri, $bdLogin) && $user?->type == 'bd') {
+                return redirect('/bd'); 
+            }
+        }
         $redirectTo = admin_base_path(config('admin.auth.redirect_to', 'auth/login'));
         $test = $request->getRequestUri();  // Or any other value you want to pass
         if (Str::contains($uri, 'bd')) {
             $redirectTo = '/bd/login';
         }
+
         // If the user is not authenticated, redirect to login and pass the $test variable as a query parameter
         if (Admin::guard()->guest() && !$this->shouldPassThrough($request)) {
             return redirect()->to($redirectTo . '?redirect_url=' . urlencode($test));
         }
 
-        $user = Admin::user();
         
-        if (Str::contains($uri, 'bd') && $user->type != 'bd') {
-            abort(403, 'غير مصرح بالدخول');
+        // if (
+        //     (Str::contains($uri, 'bd') && $user?->type != 'bd') ||
+        //     (Str::contains($uri, 'admin') && $user?->type == 'bd')
+        // ) {
+        //     if ($user->type === 'bd') {
+        //         $redirectUrl = url('/bd');
+        //         $logoutRoute = 'bd.logout';
+        //     } else {
+        //         $redirectUrl = url('/admin');
+        //         $logoutRoute = 'admin.logout';
+        //     }
+
+        //     return response()->view('auth.unauthorized', [
+        //         'redirect_url' => $redirectUrl,
+        //         'logout_route' => $logoutRoute,
+        //     ], 403);
+        // }
+
+        if (
+            (Str::contains($uri, 'bd') && $user?->type != 'bd') ||
+            (Str::contains($uri, 'admin') && $user?->type == 'bd')
+        ) {
+            // تحديد رابط العودة حسب نوع المستخدم
+            if ($user->type === 'bd') {
+                return redirect('/bd');
+            } else {
+                return redirect('/admin');
+            }
         }
+
+
+
+        
         
         return $next($request);
     }

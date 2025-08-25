@@ -18,19 +18,25 @@ use Illuminate\Support\Facades\Auth;
 
 class RequestAgencyController extends AdminController
 {
-    public $permission_name = 'agencies-request';
+    // public $permission_name = 'agencies-request';
+
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
 
 
-    // public function index(Content $content)
-    // {
-    //     return parent::index($content
-    //         ->title(trans('Request agencies'))
-    //         ->body($this->grid()));
-    // }
+    public function index(Content $content)
+    {
+        return $content
+            ->header(trans('request-agencies'))
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            });
+    }
+
+
+
 
     /**
      * Show interface.
@@ -68,16 +74,12 @@ class RequestAgencyController extends AdminController
     }
 
 
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
+   
     protected function grid()
     {
         $grid = new Grid(new Agency());
         $grid->model()
-            ->where('bd_id', Auth::user()->app_id)
+            ->where('bd_id', Auth::user()->id)
             ->where('status', 0)->orderByDesc("id")
             ->whereHas('additionalInfo', function ($query) {
                 $query->where('status', 0);

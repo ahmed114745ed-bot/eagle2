@@ -1187,4 +1187,10 @@ class UserController extends Controller
         request()->merge(['user_id' => $id]);
         return Common::apiResponse(true, 'done', new DataUserResource($data));
     }
+
+    public function syncBD()
+    {
+        $result = $this->userService->syncBDUsers();
+        return response()->json($result);
+    }
 }

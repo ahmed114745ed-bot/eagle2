@@ -1009,6 +1009,45 @@ trait CalcsTrait
     }
 
 
+    public static function ovip_center_room_admins($user)
+    {
+        if (is_int($user)) {
+            $user = User::with(['UserVip.vip.privilegs'])->find($user);
+            if (!$user) return new \stdClass();
+        }
+
+        $uvip = $user->UserVip;
+        if (!$uvip ) return new \stdClass();
+
+        $vip = OVip::query()->find($uvip->vip_id);
+        if (!$vip) return new \stdClass();
+        $vipIcon = $vip->wares->firstWhere('type', 10) ?? null; // preloaded relation
+        $hasColor = $user->packs->contains(fn($p) => $p->type == 18 && $p->is_used);
+        $color = $user->packs->firstWhere(fn($p) => $p->type == 21 && $p->is_used)?->ware->color ?? '';
+
+        $vip_gifts = $vip->privilegs->contains('type', 14);
+        $vip_upload_gif = $vip->privilegs->contains('type', 22);
+
+        return [
+            'id' => 1,
+            'level' => $vip->level,
+            'name' => $vip->name,
+            'price' => $vip->price,
+            'img_old' => $vip->img,
+            'img' => $vipIcon?->show_img ?? '',
+            'image' => $vip->image,
+            'image_from_wares' => $vipIcon?->show_img ?? '',
+            'expire' => $vip->expire,
+            'ware_id' => $vipIcon?->id ?? 0,
+            'color' => $color,
+            'vip_gifts' => $vip_gifts,
+            'vip_upload_gif' => $vip_upload_gif,
+            'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+        ];
+    }
+
+
+
     public static function wareUserVip($user_id, $type, $item, $isLatest = false)
     {
         if (gettype($user_id) == 'integer') {
@@ -1372,4 +1411,53 @@ trait CalcsTrait
 
         return $chargeLevel;
     }
+
+
+    public static function level_center_room_admins(User $user)
+{
+    static $cache = []; 
+    if (isset($cache[$user->id])) {
+        return $cache[$user->id];
+    }
+
+    $expPercentages = config('exp_percentages', ['exp_received_percentage' => 1, 'exp_sender_percentage' => 1]);
+
+    $vipsData = DB::table('vips')->get()->groupBy('type');
+
+    $receivedNum = floor(($user->total_received_diamonds ?? 0) * ($expPercentages['exp_received_percentage'] ?? 1));
+    $senderNum = floor(($user->total_sender_diamonds ?? 0) * ($expPercentages['exp_sender_percentage'] ?? 1));
+
+    $star_level = $user->total_received_level ?? 0;
+    $gold_level = $user->total_sender_level ?? 0;
+
+    $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
+    $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+    $nextStarData = self::getNextLevelDataFromCache(1, $star_level, $vipsData);
+    $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
+
+    $receiver_diff = $nextStarData['next_exp'] - $current_star_num;
+    $sender_diff = $nextGoldData['next_exp'] - $current_gold_num;
+    $data = [
+        'receiver_num' => $receivedNum,
+        'sender_num' => $senderNum,
+        'receiver_level' => $star_level,
+        'sender_level' => $gold_level,
+        'prev_receiver_num' => $current_star_num,
+        'prev_sender_num' => $current_gold_num,
+        'next_receiver_num' => $nextStarData['next_exp'] ?? 0,
+        'next_receiver_level' => $nextStarData['next_level'] ?? 0,
+        'next_sender_num' => $nextGoldData['next_exp'] ?? 0,
+        'next_sender_level' => $nextGoldData['next_level'] ?? 0,
+        'receiver_per' => ($receiver_diff > 0) ? max(0, min(1, ($receivedNum - $current_star_num)/$receiver_diff)) : 1,
+        'sender_per' => ($sender_diff > 0) ? max(0, min(1, ($senderNum - $current_gold_num)/$sender_diff)) : 1,
+    
+        'exp-sender' => $expPercentages['exp_sender_percentage'] ?? 1,
+        'exp-receiver' => $expPercentages['exp_received_percentage'] ?? 1,
+    ];
+
+    $cache[$user->id] = $data;
+
+    return $data;
+}
+
 }

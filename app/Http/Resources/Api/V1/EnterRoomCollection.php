@@ -72,6 +72,7 @@ class EnterRoomCollection extends JsonResource
             'owner_sound'         => $this->getOwnerSound($this->uid, $this->room_sound) ? 2 : 1,
             'ban_users'           => $this->getBans($this->room_speak ?? ''),
             'owner_name'          => @$owner->name ?? '',
+            'owner_image'         => $owner->avatar ?: '',
             'owner_special_id'          => @$owner?->specialId?->ware?->show_img ?? "",
             'owner_image_color'          => @$owner?->color_image,
             'owner_avatar'        => @$owner->profile->avatar ?? '',

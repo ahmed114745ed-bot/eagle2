@@ -46,7 +46,6 @@ class ResetUserMonthlyDiamond extends Command
         try {
             $timezone = getTimezone();
             $dt       = Carbon::now($timezone);
-//        $dt = new \DateTime('now', new \DateTimeZone($timezone));
             if ($dt->format('j') == 1){
                 $carbon = $dt->subDay();
 
@@ -64,17 +63,6 @@ class ResetUserMonthlyDiamond extends Command
             WHERE agency_id != 0
         ");
 
-//        try {
-//            User::where('agency_id', '!=', 0)->chunk(1000, function ($users) {
-//                // Loop through users and store last monthly_diamond_received value in history
-//                foreach ($users as $user) {
-//                    $user->storeLastMonthlyDiamondReceivedInHistory();
-//                }
-//            });
-//        } catch (\Exception $e) {
-//        }
-
-//            $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
 
         }catch (\Exception $exception){
             $this->error('reset monthly diamond failed: '.$exception->getMessage());
