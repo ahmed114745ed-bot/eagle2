@@ -609,7 +609,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
                 $notificationTokens = DB::table('users')->orderBy('id', 'desc')->limit(100)->pluck('notification_id')->filter()->toArray();
 
-                info($notificationTokens);
                 $title = 'Test';
                 $body = 'Test';
 
