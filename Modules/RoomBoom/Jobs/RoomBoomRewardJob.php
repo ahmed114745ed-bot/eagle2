@@ -294,6 +294,7 @@ class RoomBoomRewardJob implements ShouldQueue
             Common::send_firebase_notification($this->achievementNotifications['tokens'], $achievementTitle, $achievementBody);
         }
 
+
         $giftTitle = __('Gift Reward');
         $giftBody = __('You have received the gift: :giftName');
         $giftIds = array_keys($this->giftNotifications);
