@@ -126,6 +126,7 @@ class DiamondController extends Controller
                         'year'    => now()->year,
                     ],
                     [
+                        'monthly_diamond_received' => $user->monthly_diamond_received,
                         'old_diamond' => $user->monthly_diamond_received,
                     ]
                 );

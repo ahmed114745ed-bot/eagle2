@@ -32,6 +32,7 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
 use App\Models\Config as ConfigModel;
+use Carbon\Carbon;
 use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
 
@@ -217,13 +218,14 @@ class User extends Authenticatable
 
     public function setMonthlyDiamondReceivedAttribute($value)
     {
+        $date = \Carbon\Carbon::now(getTimezone());;
+
         $record = $this->monthlyDiamondReceive()
             ->firstOrNew([
-                'month' => now()->month,
-                'year'  => now()->year,
+                'month' => $date->month,
+                'year'  => $date->year,
             ]);
 
-        // if null, start from 0
         $record->monthly_diamond_received = ($record->monthly_diamond_received ?? 0) + $value;
 
         $record->save();
