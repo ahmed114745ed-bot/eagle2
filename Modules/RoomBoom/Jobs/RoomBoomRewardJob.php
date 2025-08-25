@@ -37,6 +37,7 @@ class RoomBoomRewardJob implements ShouldQueue
     protected array $winnerData = [];
     protected array $achievementNotifications = [];
     protected array $giftNotifications = [];
+    protected array $wareNotifications = [];
     public function __construct($boomId)
     {
         $this->boomId = $boomId;
@@ -158,7 +159,13 @@ class RoomBoomRewardJob implements ShouldQueue
             if ($reward['target_type'] == 'ware') {
                 $ware = Ware::find($reward['target']);
                 UserCommon::addEvintsWareToUser($user, $ware, $expire);
+
+                $this->wareNotifications[$reward['target']]['user_ids'][] = $userId;
+                if ($token) {
+                    $this->wareNotifications[$reward['target']]['tokens'][] = $token;
+                }
             }
+
             if ($reward['target_type'] == 'achieve') {
                 $this->achievementRewards($reward['target'], $expire, $userId, $token);
             }
@@ -286,6 +293,13 @@ class RoomBoomRewardJob implements ShouldQueue
 
     protected function dispatchPendingNotifications(): void
     {
+        $this->dispatchAchievementNotification();
+
+        $this->dispatchGiftNotification();
+    }
+
+    public function dispatchAchievementNotification(): void
+    {
         if (!empty($this->achievementNotifications)) {
             $achievementTitle = __('Achievement Reward');
             $achievementBody = __('You have received a new achievement.');
@@ -293,8 +307,10 @@ class RoomBoomRewardJob implements ShouldQueue
             Common::sendOfficialMessage($this->achievementNotifications['user_ids'], $achievementTitle, $achievementBody);
             Common::send_firebase_notification($this->achievementNotifications['tokens'], $achievementTitle, $achievementBody);
         }
+    }
 
-
+    public function dispatchGiftNotification(): void
+    {
         $giftTitle = __('Gift Reward');
         $giftBody = __('You have received the gift: :giftName');
         $giftIds = array_keys($this->giftNotifications);
@@ -309,7 +325,6 @@ class RoomBoomRewardJob implements ShouldQueue
             Common::send_firebase_notification($notification['tokens'], $giftTitle, $giftBody);
         }
     }
-
 }
 
 //        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
