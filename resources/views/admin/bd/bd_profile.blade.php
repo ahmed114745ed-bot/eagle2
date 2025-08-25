@@ -1,8 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -810,7 +806,6 @@
     </style>
 
 
-</head>
 <body>
 
 <div class="agency-profile-container">
@@ -821,7 +816,7 @@
         <img src="{{ getImagePath($bd->avatar) }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
-        <h1 class="agency-name">{{ $bd->name ??'' }}</h1>
+        <h1 class="agency-name">{{ $bd->username ??'' }}</h1>
         <div class="agency-meta">
             <div class="meta-item">
                 <span class="meta-label">{{ __("ID") }}:</span>
@@ -948,7 +943,7 @@
                                                 </strong>
                                             </div>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="">
                                             @if($agency->status == 1)
                                                 <span style="color:green;" title="Active">&#10004;</span> {{-- ✔ --}}
                                             @else
@@ -1167,11 +1162,10 @@
 @endif
 
 </div>
-<!-- jQuery أولاً -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script> 
 
 
     <script>

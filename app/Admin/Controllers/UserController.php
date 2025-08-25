@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Services\AgencyService;
 use App\Admin\Services\UserService;
+use App\Models\Bd;
 use App\Models\UserCoinLog;
 use Carbon\Carbon;
 use App\Models\Pack;
@@ -163,7 +164,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','transfer_salary'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','transfer_salary','is_bd'])
             ->with([
             'profile',
             'agency',
@@ -226,7 +227,9 @@ class UserController extends MainController
                 if (! $user) {
                     return __('No User');
                 }
-
+                if ($this->is_bd == 1) {
+                    return "<button class='btn btn-danger btn-sm remove-bd' data-id='{$this->id}'>".__('Remove BD')."</button>";
+                }
                 return app(UserService::class)->adminUserAvatar($user);
             });
 
@@ -268,71 +271,46 @@ class UserController extends MainController
         $permission = $this->permission_name;
 
 
-        if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            $grid->column('transfer_salary', __("transfer_salary"))
-            ->display(function () {
-                return $this->transfer_salary ? 1 : 0;
-            })
-            ->switch(Common::getSwitchStates());
-        }
+ 
+       
+        $grid->column('bd_action', __('BD Action'))->display(function () {
+            if ($this->is_bd == 1) {
+             
+                $form = '<form method="POST" action="' . route('users.remove', $this->id) . '" style="display:inline">';
+                $form .= csrf_field(); 
+                $form .= method_field('POST'); 
+                $form .= '<button type="submit" class="btn btn-danger btn-sm">'
+                    . __('Remove BD') . '</button>';
+                $form .= '</form>';
+                return $form;
+            }
+            return '';
+        });
+        
+
         Admin::script("
-            $(document).on('click', '.show-same-device-modal', function() {
-                console.log('here');
-                var userId = $(this).data('user-id');
-                $('#sameDeviceUsersModal .modal-body').html('Loading...');
-                $('#sameDeviceUsersModal').modal('show');
-                $.get('/admin/users/' + userId + '/same-device-users-table', function(html) {
-                    $('#sameDeviceUsersModal .modal-body').html(html);
-                });
-            });
+                    $(document).on('click', '.show-same-device-modal', function() {
+                        console.log('here');
+                        var userId = $(this).data('user-id');
+                        $('#sameDeviceUsersModal .modal-body').html('Loading...');
+                        $('#sameDeviceUsersModal').modal('show');
+                        $.get('/admin/users/' + userId + '/same-device-users-table', function(html) {
+                            $('#sameDeviceUsersModal .modal-body').html(html);
+                        });
+                    });
         ");
 
 
 
-        /* $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
-            return $this->sameDeviceUsers()->count();
-        })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
-            $users         = $this->sameDeviceUsers;
 
-            $rows = $users->map(function ($user) {
-                $path = $user->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-
-                $image = handleShowImageWithTypes($user->id, $url, 40, 40);
-
-                $nameColumn = "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        $image
-                        <div>
-                             <a  style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                                <span cursor: pointer;'>$user->name</span>
-                            </a>
-                            <span style='color: #aaa; font-size: smaller;'>UUID: $user->uuid</span>
-                        </div>
-                    </div>
-                ";
-
-                return [
-                    'name' => $nameColumn,
-                    'phone' => $user->phone,
-                ];
-            });
-
-            return new Table([__('Name'), __('phone')], $rows->toArray());
-        });*/
 
 
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //     $actions->add(new ChargeSwitchAction());
-            // }
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new ChargeSwitchAction());
+            }
             if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new InviteSwitchAction());
@@ -998,4 +976,19 @@ class UserController extends MainController
         // Return just table's HTML (your AJAX will inject this)
         return $table->render();
     }
+
+
+    public function removeBD($id)
+    {
+
+        Bd::where('app_id', $id)->update(['app_id' => 0]);
+
+        $user = User::findOrFail($id);
+        $user->is_bd = 0;
+        $user->save();
+    
+        return redirect()->back();
+    }
+
+
 }

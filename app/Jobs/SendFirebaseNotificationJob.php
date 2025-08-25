@@ -3,6 +3,8 @@ namespace App\Jobs;
 
 use App\Models\User;
 use App\Helpers\Common;
+use GuzzleHttp\Client;
+use GuzzleHttp\Promise\Utils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Queue\SerializesModels;
@@ -29,13 +31,31 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
     public function handle()
     {
-
-
+        $start = microtime(true);
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
 
-        foreach ($this->tokens as $token) {
-            $user= User::where('notification_id',$token)->first();
+        $client = new Client([
+            'headers'  => [
+                'Authorization' => 'Bearer ' . $api_access_key,
+                'Content-Type'  => 'application/json',
+            ]
+        ]);
+
+        $promises = [];
+
+        $users =  User::select(['id', 'notification_id'])->whereIn('notification_id',$this->tokens)
+            ->where('is_logout', 0)
+            ->where('notification_id', '!=', null)
+            ->get();
+
+        $hasInPack = $this->user && Common::hasInPack($this->user->id, 18, true);
+
+        foreach ($users as $user) {
+
+            $token = $user->notification_id;
+
+
             $notification = [
                 'title' => $this->title,
                 'body'  => $this->body,
@@ -43,11 +63,12 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
             $userData = [];
             if ($this->user) {
+
                 $userData = [
                     'user_id'        => $this->user->id,
                     'name'           => $this->user->name,
                     'uuid'           => $this->user->uuid,
-                    'has_color_name' => Common::hasInPack($this->user->id, 18, true),
+                    'has_color_name' => $hasInPack,
                     'image'          => $this->user->profile->avatar ?? '',
                 ];
             }
@@ -79,16 +100,24 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 $payload['notification']['image'] = $this->data['image'];
             }
 
-            $headers = [
-                'Authorization' => 'Bearer ' . $api_access_key,
-                'Content-Type'  => 'application/json',
-            ];
+            $promises[$token] = $client->postAsync("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+                'json' => ['message' => $payload]
+            ]);
 
-       if (!$user->is_logout)     Http::withHeaders($headers)->post(
-                "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
-                ['message' => $payload]
-            );
+//            $headers = [
+//                'Authorization' => 'Bearer ' . $api_access_key,
+//                'Content-Type'  => 'application/json',
+//            ];
+//
+//            if (!$user->is_logout)     Http::withHeaders($headers)->post(
+//                "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
+//                ['message' => $payload]
+//           );
+        }
 
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $_) {
         }
     }
 

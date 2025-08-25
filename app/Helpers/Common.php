@@ -1468,9 +1468,6 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
-
-
-
         try {
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
@@ -1868,7 +1865,7 @@ class Common
                     'id_image' => $owner?->specialId?->ware?->show_img ?? '',
                     'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
                 ];
-                
+
             case 'bd':
                 $bd = $resource->bd;
                 return [
