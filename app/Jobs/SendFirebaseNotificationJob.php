@@ -98,19 +98,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
             $promises[$token] = $client->postAsync("messages:send", [
                 'json' => ['message' => $payload]
-            ])->then(
-                function ($response) use ($token) {
-                    $body = json_decode((string) $response->getBody(), true);
-                    info("✅ Notification sent to {$token}", $body);
-                },
-                function ($exception) use ($token) {
-                    info("❌ Failed to send to {$token}: " . $exception->getMessage());
-                    if ($exception->hasResponse()) {
-                        $errorBody = (string) $exception->getResponse()->getBody();
-                        info("Error body: " . $errorBody);
-                    }
-                }
-            );
+            ]);
 
 //            $headers = [
 //                'Authorization' => 'Bearer ' . $api_access_key,
@@ -124,8 +112,16 @@ class SendFirebaseNotificationJob implements ShouldQueue
         }
 
         try {
-            Utils::unwrap($promises);
+            info("🚀 Starting Utils::unwrap with " . count($promises) . " promises");
+
+            $results = Utils::unwrap($promises);
+
+            info("🎯 Utils::unwrap finished. Total results: " . count($results));
         } catch (\Throwable $e) {
+            info("💥 Exception inside Utils::unwrap: " . $e->getMessage());
+            if (method_exists($e, 'getResponse') && $e->getResponse()) {
+                info("Error response: " . (string) $e->getResponse()->getBody());
+            }
         }
 
         $end = microtime(true);
