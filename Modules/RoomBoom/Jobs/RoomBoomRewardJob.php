@@ -66,7 +66,7 @@ class RoomBoomRewardJob implements ShouldQueue
             $allUserIds = array_merge($topContributorIds, [$lastTriggerSenderId], $room->roomVisitors->pluck('user_id')->toArray());
         }
 
-        $this->users = User::whereIn('id', $allUserIds)->select(['id', 'notification_id'])->get()->keyBy('id')->toArray();
+        $this->users = User::whereIn('id', $allUserIds)->select(['id', 'notification_id'])->get()->keyBy('id');
 
         $this->distributeTopContributors($topContributorIds, $rewardItems);
 
@@ -141,7 +141,7 @@ class RoomBoomRewardJob implements ShouldQueue
     public function distributeBoomRewards($userId, $reward): void
     {
         $user = $this->users[$userId] ?? null;
-        $token = $user['notification_id'];
+        $token = $user->notification_id;
 
         if ($user){
             $expire = $reward['expire_days'];
