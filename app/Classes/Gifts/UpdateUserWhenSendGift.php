@@ -32,7 +32,7 @@ class UpdateUserWhenSendGift
         DB::transaction(function () use ($totalCoins, $receivedUser) {
 
             $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
-            $diamondUser =$totalCoins;
+            $diamondUser =  $user->monthly_diamond_received + $totalCoins;
             $user->salary_is_updated = true;
 
             $user->total_diamond_received += $totalCoins;
