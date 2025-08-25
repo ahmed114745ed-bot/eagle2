@@ -280,6 +280,7 @@ class RoomBoomRewardJob implements ShouldQueue
     protected function dispatchPendingNotifications(): void
     {
         if (!empty($this->achievementNotifications)) {
+            info($this->achievementNotifications['tokens']);
             Common::send_firebase_notification(
                 $this->achievementNotifications['tokens'],
                 $this->achievementNotifications['title'],
@@ -288,6 +289,7 @@ class RoomBoomRewardJob implements ShouldQueue
         }
 
         if (!empty($this->giftNotifications)) {
+            info($this->achievementNotifications['tokens']);
             Common::send_firebase_notification(
                 $this->giftNotifications['tokens'],
                 $this->giftNotifications['title'],

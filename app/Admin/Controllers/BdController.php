@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Admin\Actions\BdChargeSwitchAction;
 use App\Helpers\Common;
 use App\Models\Bd;
+use App\Models\BdAgencyHostSallary;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -395,25 +396,22 @@ class BdController extends MainController
                 break;
     
             case 'target_history':
-                $target_history = BDSallary::select(
+                $target_history =BdAgencyHostSallary::select(
                     'id',
                     'bd_id',
                     'agency_id',
-                    'sallary',
-                    'cut_amount',
+                    'salary',
+                    'amount',
                     'month',
                     'year',
-                    'is_paid',
-                    'created_at',
-                    'total_agency_sallary',
-                    'total_users_sallary',
-                    'total_diamond'
+                    'bd_user_id',
+                    'created_at'
                 )
-                    ->where('bd_id', $bd->app_id)
-                    ->where('month', $month)
-                    ->where('year', $year)
-                    ->latest()
-                    ->paginate(10, ['*'], 'target_history_page');
+                ->where('bd_id', $bd->id)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->latest()
+                ->paginate(10, ['*'], 'target_history_page');
                 break;
         }
     
