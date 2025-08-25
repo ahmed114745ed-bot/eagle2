@@ -33,7 +33,8 @@ class RoomBoomRewardJob implements ShouldQueue
     protected array $assignedUserIds = [];
     protected array $assignments = [];
     protected array $winnerData = [];
-
+    protected array $achievementNotifications = [];
+    protected array $giftNotifications = [];
     public function __construct($boomId)
     {
         $this->boomId = $boomId;
@@ -65,7 +66,7 @@ class RoomBoomRewardJob implements ShouldQueue
             $allUserIds = array_merge($topContributorIds, [$lastTriggerSenderId], $room->roomVisitors->pluck('user_id')->toArray());
         }
 
-        $this->users = User::whereIn('id', $allUserIds)->select('id')->get()->keyBy('id')->toArray();
+        $this->users = User::whereIn('id', $allUserIds)->select(['id', 'notification_id'])->get()->keyBy('id')->toArray();
 
         $this->distributeTopContributors($topContributorIds, $rewardItems);
 
@@ -75,12 +76,9 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $this->sendEvent($level->level, $roomId);
 
-        if (!empty($this->giftInsertData)) {
-            UserGift::insert($this->giftInsertData);
-        }
-        if (!empty($this->achievementInsertData)) {
-            UserAchievementLevel::insert($this->achievementInsertData);
-        }
+        $this->bulkInsertGiftsAchievements();
+
+        $this->dispatchPendingNotifications();
     }
 
     /**
@@ -143,6 +141,7 @@ class RoomBoomRewardJob implements ShouldQueue
     public function distributeBoomRewards($userId, $reward): void
     {
         $user = $this->users[$userId] ?? null;
+        $token = $user['notification_id'];
 
         if ($user){
             $expire = $reward['expire_days'];
@@ -151,16 +150,16 @@ class RoomBoomRewardJob implements ShouldQueue
                 UserCommon::addEvintsWareToUser($user, $ware, $expire);
             }
             if ($reward['target_type'] == 'achieve') {
-                $this->achievementRewards($reward['target'], $expire, $userId);
+                $this->achievementRewards($reward['target'], $expire, $userId, $token);
             }
 
             if ($reward['target_type'] == 'gift') {
-                $this->giftRewards($reward, $userId, $expire);
+                $this->giftRewards($reward, $userId, $expire, $token);
             }
         }
     }
 
-    public function achievementRewards($rewardTarget, $expire, $userId): void
+    public function achievementRewards($rewardTarget, $expire, $userId, $token): void
     {
         $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
         $title = __('Achievement Reward');
@@ -173,9 +172,15 @@ class RoomBoomRewardJob implements ShouldQueue
             'updated_at' => now()
         ];
         Common::sendOfficialMessage($userId, $title, $body);
+
+        if ($token) {
+            $this->achievementNotifications['title'] = $title;
+            $this->achievementNotifications['body'] = $body;
+            $this->achievementNotifications['tokens'][] = $token;
+        }
     }
 
-    public function giftRewards($reward, $userId, $expire): void
+    public function giftRewards($reward, $userId, $expire, $token): void
     {
         $target = $reward['target'];
         $title = __('Gift Reward');
@@ -193,6 +198,11 @@ class RoomBoomRewardJob implements ShouldQueue
         }
         $this->giftInsertData[] = $giftData;
         Common::sendOfficialMessage($userId, $title, $body);
+        if ($token) {
+            $this->giftNotifications['title'] = $title;
+            $this->giftNotifications['body'] = $body;
+            $this->giftNotifications['tokens'][] = $token;
+        }
     }
 
     public function getRewardItems($rewards)
@@ -255,6 +265,36 @@ class RoomBoomRewardJob implements ShouldQueue
 
         event(new RoomBoomRewardsEvent($data, $roomID));
     }
+
+    public function bulkInsertGiftsAchievements(): void
+    {
+        if (!empty($this->giftInsertData)) {
+            UserGift::insert($this->giftInsertData);
+        }
+        if (!empty($this->achievementInsertData)) {
+            UserAchievementLevel::insert($this->achievementInsertData);
+        }
+    }
+
+    protected function dispatchPendingNotifications(): void
+    {
+        if (!empty($this->achievementNotifications)) {
+            Common::send_firebase_notification(
+                $this->achievementNotifications['tokens'],
+                $this->achievementNotifications['title'],
+                $this->achievementNotifications['body']
+            );
+        }
+
+        if (!empty($this->giftNotifications)) {
+            Common::send_firebase_notification(
+                $this->giftNotifications['tokens'],
+                $this->giftNotifications['title'],
+                $this->giftNotifications['body']
+            );
+        }
+    }
+
 }
 
 //        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
