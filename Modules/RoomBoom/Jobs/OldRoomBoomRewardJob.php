@@ -110,7 +110,7 @@ class OldRoomBoomRewardJob implements ShouldQueue
                 $winnerData[] = [
                     'user_id' => $lastTriggerSenderId,
                     'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl(),
-                    'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
+                    'image_type' => (new RoomBoomRewardResource((object)$randomReward))->getGiftImageType(),
                 ];
             }
         }

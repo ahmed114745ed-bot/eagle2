@@ -131,7 +131,7 @@ class RoomBoomRewardJob implements ShouldQueue
                 $reward = $remainingRewards[$i];
                 $this->distributeBoomRewards($visitorId, $reward);
 
-                $this->assignWinnerData();
+                $this->assignWinnerData($visitorId, $reward);
             }
         }
     }
@@ -141,6 +141,7 @@ class RoomBoomRewardJob implements ShouldQueue
      */
     public function distributeBoomRewards($userId, $reward): void
     {
+        info($userId);
         $user = $this->users[$userId] ?? null;
         $token = $user->notification_id;
 
@@ -241,12 +242,10 @@ class RoomBoomRewardJob implements ShouldQueue
             ->toArray();
     }
 
-    public function assignWinnerData($userId = null, $reward = null): void
+    public function assignWinnerData($userId, $reward): void
     {
-        if ($userId && $reward){
-            $this->assignedUserIds[] = $userId;
-            $this->assignments[] = $reward;
-        }
+        $this->assignedUserIds[] = $userId;
+        $this->assignments[] = $reward;
 
         $this->winnerData[] = [
             'user_id' => $userId,
