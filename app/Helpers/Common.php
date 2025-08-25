@@ -795,31 +795,17 @@ class Common
 
         $projectId = env('FIREBASE_PROJECT_NAME');
 
-        $promise  = Http::withHeaders($headers)
-            ->async()
-            ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+        $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
 
-        return $promise->then(function ($response) use ($isGroup, $key, $token, $tokens, $api_access_key) {
-            $result = $response->json();
+        $result = json_decode($result);
 
-            if ($result && $isGroup) {
-                self::removeGroupName($key, $token, $tokens, $api_access_key);
-            }
-
-            return $result;
-        })->otherwise(function ($e) {
-            return null;
-        });
-
-        //        $result = json_decode($result);
-//
-//        //remove group with $key if is group
-//        if ($result  && $isGroup) {
-//            self::removeGroupName($key, $token, $tokens, $api_access_key);
-//        }
-//        return $result;
+        //remove group with $key if is group
+        if ($result  && $isGroup) {
+            self::removeGroupName($key, $token, $tokens, $api_access_key);
+        }
+        return $result;
     }
 
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
@@ -1482,9 +1468,6 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
-
-
-
         try {
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
