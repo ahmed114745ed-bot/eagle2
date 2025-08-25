@@ -25,8 +25,8 @@ class AgencyObserver
         User::query()->where('id', $agency->app_owner_id)->update($updateData);
 
         $updateDataMonth['monthly_diamond_received'] = 0;
-        $userDiamond =   MonthlyDiamondReceive::query()->where('id', $agency->app_owner_id)->where('month', now()->month)->where('year', now()->year)->first();
-        dd($userDiamond,$agency->app_owner_id);
+        $userDiamond =   MonthlyDiamondReceive::query()->where('user_id', $agency->app_owner_id)->where('month', now()->month)->where('year', now()->year)->first();
+        
         if ($userDiamond) $userDiamond->update($updateDataMonth);
     }
 
