@@ -207,8 +207,8 @@ class User extends Authenticatable
     // method for passing params
     public function getMonthlyDiamondReceived($month = null, $year = null)
     {
-        $month = $month ?? now()->month;
-        $year  = $year ?? now()->year;
+        $month = $month ?? now(getTimezone())->month;
+        $year  = $year ?? now(getTimezone())->year;
   
         return $this->monthlyDiamondReceive()
             ->where('month', $month)
