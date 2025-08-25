@@ -369,66 +369,57 @@ class BdController extends MainController
         $year = request('year') ?? now()->year;
         $month = request('month') ?? now()->month;
         $tab = request()->query('tab', 'agencies');
-
-        $bd = Cache::remember("bd_{$id}", 600, function () use ($id) {
-            return Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
-        });
+    
+        $bd = Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
+    
         $id = $bd->id;
-        // $imageUrl = getImagePath($bd->img) ?? $defaultImage;
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($bd->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
-
         $bd->display_image = $imageUrl;
-
+    
         $agencies = $transactions = $target_history = null;
-
+    
         switch ($tab) {
             case 'agencies':
-                $agencies = Cache::remember("bd_{$id}_agencies_page_" . request()->get('agencies_page', 1), 600, function () use ($bd) {
-                    return $bd->agencies()->paginate(10, ['*'], 'agencies_page');
-                });
+                $agencies = $bd->agencies()->paginate(10, ['*'], 'agencies_page');
                 break;
-
+    
             case 'transactions':
-                $transactions = Cache::remember("bd_{$id}_transactions_page_" . request()->get('transactions_page', 1), 600, function () use ($bd) {
-                    return $bd->transactions()
-                        ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
-                        ->latest()
-                        ->paginate(10, ['*'], 'transactions_page');
-                });
-
+                $transactions = $bd->transactions()
+                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+                    ->latest()
+                    ->paginate(10, ['*'], 'transactions_page');
                 break;
+    
             case 'target_history':
-                $target_history = Cache::remember("bd_{$id}_target_history_{$year}_{$month}_page_" . request()->get('target_history_page', 1), 600, function () use ($bd, $year, $month) {
-                    return BDSallary::select(
-                        'id',
-                        'bd_id',
-                        'agency_id',
-                        'sallary',
-                        'cut_amount',
-                        'month',
-                        'year',
-                        'is_paid',
-                        'created_at',
-                        'total_agency_sallary',
-                        'total_users_sallary',
-                        'total_diamond'
-                    )
-                        ->where('bd_id', $bd->app_id)
-                        ->where('month', $month)
-                        ->where('year', $year)
-                        ->latest()
-                        ->paginate(10, ['*'], 'target_history_page');
-                });
-
+                $target_history = BDSallary::select(
+                    'id',
+                    'bd_id',
+                    'agency_id',
+                    'sallary',
+                    'cut_amount',
+                    'month',
+                    'year',
+                    'is_paid',
+                    'created_at',
+                    'total_agency_sallary',
+                    'total_users_sallary',
+                    'total_diamond'
+                )
+                    ->where('bd_id', $bd->app_id)
+                    ->where('month', $month)
+                    ->where('year', $year)
+                    ->latest()
+                    ->paginate(10, ['*'], 'target_history_page');
                 break;
         }
-
+    
         return view('admin.bd.bd_profile', compact('bd', 'agencies', 'transactions', 'target_history'));
     }
+    
 
     protected function detail($id)
     {
