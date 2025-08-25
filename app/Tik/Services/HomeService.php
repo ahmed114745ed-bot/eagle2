@@ -143,7 +143,7 @@ class HomeService
         $packQuery = Pack::where('user_id', $user->id)
             ->where('type', $privilegeId);
 
-        if (!$isAvailable) $packQuery->where('is_used', 0);
+        if (!$isAvailable) $packQuery->where('is_used', 1);
      
         if (!$packQuery->exists()) {
 
@@ -158,6 +158,7 @@ class HomeService
             ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
             ->first();
 
+        
         if (!$pack) {
             throw new \Exception(__('api.notWare'));
         }
