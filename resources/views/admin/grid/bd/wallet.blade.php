@@ -237,7 +237,7 @@
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <!-- Select2 JS -->
@@ -278,7 +278,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     ">
       <div class="modal-header" style="background-color: var(--primary-color); color: var(--text-secondary-color);">
                     <h5 class="modal-title" id="modalDescriptionTitle"></h5>
-                    <button type="button" class="close" data-dismiss="modal" style="color: var(--text-secondary-color);">&times;</button>
+                    <button type="button" class="close" data-dismiss="modal" onclick="closeChargeModal()" style="color: var(--text-secondary-color);">&times;</button>
                 </div>
                 <form id="chargeForm" class="transferForm" method="POST" action="{{ route('bd.wallet.charge') }}">
     @csrf

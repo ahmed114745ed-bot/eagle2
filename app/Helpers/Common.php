@@ -139,18 +139,16 @@ class Common
             }
         } else if ($event_type == 'weekly_cp') {
             $event = WeeklyStar::WeeklyCP()->previousEvent()->first();
-
             if ($event) {
                 $weekly_star = WeeklyCpWinner::with('userTwo', 'userOne')->where('weekly_cp_id', $event->id)
                     ->where('level', 1)->first();
-
-                if ($weekly_star) {
-                    $avatar = @$weekly_star->userOne->profile->avatar;
-                    $avatarCp2 = @$weekly_star->userTwo->profile->avatar;
-                    $nameCpTwo = @$weekly_star->userTwo->name;
-                    $nameCpOne = @$weekly_star->userOne->name;
+                    if ($weekly_star) {
+                        $avatar = @$weekly_star->userOne->profile->avatar;
+                        $avatarCp2 = @$weekly_star->userTwo->profile->avatar;
+                        $nameCpTwo = @$weekly_star->userTwo->name;
+                        $nameCpOne = @$weekly_star->userOne->name;
+                    }
                 }
-            }
         }
 
         return [$avatar, $avatarCp2, $nameCpOne, $nameCpTwo];
@@ -1470,9 +1468,6 @@ class Common
 
     public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
     {
-
-
-
         try {
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
@@ -1872,6 +1867,18 @@ class Common
                 ];
 
             case 'bd':
+                $bd = $resource->bd;
+                return [
+                    'name' => $bd->username ?? '',
+                    'image' => $bd->avatar ?? '',
+                    'uuid' => $bd->id ?? '',
+                    'id' => $bd->id ?? '',
+                    'type' => 'bd',
+                    'url' => $bd ? url("admin/usersBd/{$bd->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
             case 'user':
                 $user = $resource->senderUser;
                 $hasColor = $user ? Common::hasInPack($user->id, 18, true) : false;
@@ -1958,6 +1965,7 @@ class Common
     {
         return [
             'admin',
+            'bd',
             'senderUser',
             'senderUser.profile',
             'senderAgency',

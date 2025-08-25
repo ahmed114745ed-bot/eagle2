@@ -123,8 +123,101 @@ class UserRepository extends AbstractRepository
 
     public function getUsers($ids)
     {
-        return $this->model->query()->with(['agency', 'profile', 'family'])->whereIn('id', $ids)->get();
+        return $this->model->query()->with(['agency', 'profile', 'family'])
+        ->whereIn('id', $ids)->get();
+        
     }
+
+    public function getAdmins($ids)
+    {
+        if (empty($ids)) return collect();
+    
+        $vipsData = DB::table('vips')->get()->groupBy('type');
+        $expPercentages = config('exp_percentages', [
+            'exp_received_percentage' => 1,
+            'exp_sender_percentage' => 1
+        ]);
+    
+        $admins = $this->model->with([
+            'agency.owner',
+            'agency.mempers',
+            'profile',
+            'family',
+            'packs.ware',
+            'ownAgency',
+            'userSetting',
+            'activePack20'
+        ])->whereIn('id', $ids)->get();
+    
+        $admins->each(function ($user) use ($vipsData, $expPercentages) {
+            $user->user_types2 = $this->computeUserTypes($user);
+            $user->preloaded_uuid = $this->computeUuid($user);
+            $user->preloaded_level = $this->computeLevel($user, $vipsData, $expPercentages);
+
+        });
+    
+        return $admins;
+    }
+
+    private function computeUserTypes($user): array
+    {
+        $types = [];
+        if ($user->type_user >= 1) $types[] = 1;
+        if ($user->type_user >= 2) $types[] = 2;
+        if ($user->agency?->type === 'shipping') $types[] = 3;
+        if ($user->is_bd) $types[] = 4;
+
+        return empty($types) ? [0] : array_unique($types);
+    }
+
+    private function computeUuid($user)
+    {
+        $pack = $user->packs
+            ->where('type', 25)
+            ->where('is_used', true)
+            ->first(fn($p) => $p->ware?->value == $user->special_id);
+
+        return ($user->special_id && $pack) ? $user->special_id : $user->original_uuid;
+    }
+
+    private function computeLevel($user, $vipsData, $expPercentages): array
+    {
+        $diamondReceived = $user->total_received_diamonds ?? 0;
+        $diamondSend = $user->total_sender_diamonds ?? 0;
+        $star_level = $user->total_received_level ?? 0;
+        $gold_level = $user->total_sender_level ?? 0;
+
+        $current_star_num = Common::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
+        $current_gold_num = Common::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+        $nextStarData = Common::getNextLevelDataFromCache(1, $star_level, $vipsData);
+        $nextGoldData = Common::getNextLevelDataFromCache(2, $gold_level, $vipsData);
+
+        $receivedNum = floor($diamondReceived * ($expPercentages['exp_received_percentage'] ?? 1));
+        $senderNum = floor($diamondSend * ($expPercentages['exp_sender_percentage'] ?? 1));
+
+        $receiver_div = max(1, ($nextStarData['next_exp'] ?? 1) - $current_star_num);
+        $sender_div = max(1, ($nextGoldData['next_exp'] ?? 1) - $current_gold_num);
+
+        return [
+            'receiver_num' => $receivedNum,
+            'sender_num' => $senderNum,
+            'receiver_level' => $star_level,
+            'sender_level' => $gold_level,
+            'prev_receiver_num' => $current_star_num,
+            'prev_sender_num' => $current_gold_num,
+            'next_receiver_num' => $nextStarData['next_exp'] ?? 0,
+            'next_receiver_level' => $nextStarData['next_level'] ?? 0,
+            'next_sender_num' => $nextGoldData['next_exp'] ?? 0,
+            'next_sender_level' => $nextGoldData['next_level'] ?? 0,
+            'receiver_per' => min(1, max(0, ($receivedNum - $current_star_num) / $receiver_div)),
+            'sender_per' => min(1, max(0, ($senderNum - $current_gold_num) / $sender_div)),
+            'exp-sender' => $expPercentages['exp_sender_percentage'] ?? 1,
+            'exp-receiver' => $expPercentages['exp_received_percentage'] ?? 1,
+        ];
+    }
+
+
+  
 
     public function getUsersWithPaginate($ids, $paginate)
     {

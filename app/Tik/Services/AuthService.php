@@ -2,22 +2,24 @@
 
 namespace App\Tik\Services;
 
-use App\Exceptions\CValidationException;
-use App\Helpers\Common;
-use App\Facades\UserHandling;
-use App\Models\Profile;
 use DB;
 use Google_Client;
+use Mockery\Exception;
+use App\Helpers\Common;
+use App\Models\Profile;
+use Illuminate\Support\Arr;
+use App\Facades\UserHandling;
 use Illuminate\Http\UploadedFile;
+use Google\Client as GoogleClient;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+
 use Illuminate\Support\Facades\Http;
+use App\Exceptions\CValidationException;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
-
-use Mockery\Exception;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
-use Google\Client as GoogleClient;
 
 class AuthService
 {
@@ -131,15 +133,19 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
+        
+        logger()->info('Google login request data:', $request);
+
+        if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
 
-        $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
-        // if (!$request['id_token']) throw new \Exception('google id token missing');
-        // $payload = $client->verifyIdToken($request['id_token']);
-        // if (!$payload) {
-        //     throw new \Exception('Google ID Token not found or invalid');
-        // }
-        // $google_id = $payload['sub'];
+        // $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
+
+        $payload = $client->verifyIdToken($request['id_token']);
+        if (!$payload) {
+            throw new \Exception('Google ID Token not found or invalid');
+        }
+        $google_id = $payload['sub'];
 
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
@@ -164,7 +170,8 @@ class AuthService
                 //         throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
                 //     }
                 // }
-
+                $email =    $this->userRepository->findByEmail($request['email']);
+                if ($email) throw new \Exception('you used this email before');
                 $country = $this->countryRepository->findByPhoneCode('101');
                 $data = [
                     'name' => $request['name'],
@@ -174,13 +181,8 @@ class AuthService
                     'is_points_first' => 1,
                     'status' => true,
                 ];
-                //                $checkValidation = $this->verifyGoogleToken($request['id_token']);
-                //                if (!$checkValidation) {
-                //                    throw new CValidationException('some thing wrong');
-                //                }
-                $is_new = true;
                 $user = $this->userRepository->create($data);
-
+                $is_new = true;
                 $this->storeImage($request, $data, $user);
 
                 if (\request('tags') && is_array(\request('tags'))) {

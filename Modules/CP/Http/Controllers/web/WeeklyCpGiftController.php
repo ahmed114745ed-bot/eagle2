@@ -2,6 +2,7 @@
 
 namespace Modules\CP\Http\Controllers\web;
 
+use App\Selectables\WaresByType;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -208,60 +209,133 @@ class WeeklyCpGiftController extends MainController
     {
         $form = new Form(new WeeklyCpGift());
         $this->disableFormTools($form);
-
+        $this->addHiddenFields($form);
+        $this->addTypeField($form);
+        $this->addExpireField($form);
+        $this->addGenderField($form);
+        $this->addSavedRedirect($form);
+    
+        return $form;
+    }
+    
+    /**
+     * Hidden fields
+     */
+    protected function addHiddenFields(Form $form)
+    {
         $form->hidden('weekly_cp_id')->value(request('weekly_cp_id'));
         $form->hidden('level')->value(request('level'));
+    }
+    
+    /**
+     * Type field and dependent fields
+     */
+    protected function addTypeField(Form $form)
+    {
+        $form->select('type', trans('type'))->options([
+            "ware" => __('ware'),
+            "vip" => __('vip'),
+            "coins" => __('coins'),
+            "achievement" => __('achievement')
+        ])->when('ware', function () use ($form) {
+            $this->addWareField($form);
+        })->when('vip', function () use ($form) {
+            $this->addVipField($form);
+        })->when('coins', function () use ($form) {
+            $this->addCoinsField($form);
+        })->when('achievement', function () use ($form) {
+            $this->addAchievementField($form);
+        });
+    }
+    
+    /**
+     * Ware field
+     */
+    protected function addWareField(Form $form)
+    {
+        $prefix = 'wares';
+        $form->belongsTo('target', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
+            $form->setElementName($prefix . 'target')
+                ->select('id', __('wares'))
+                ->options(function ($id) {
+                    if (!$id) return [];
+                    $ware = Ware::find($id);
+                    return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+                })
+                ->attribute([
+                    'data-image-select' => 1,
+                    'data-load-url' => admin_url('wares-by-id')
+                ]);
 
-        $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
-            ->when("ware", function () use ($form) {
-                $form->select('target1', trans('wares'))->options(function () {
-                    $ops = [0 => ''];
-                    $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
-                    foreach ($wares as  $ware) {
-                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
+            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
 
-                        if ($ware->type == 4) {
-                            $ops[$ware->id] .= '_' . 'bubble';
-                        } elseif ($ware->type == 5) {
-                            $ops[$ware->id] .= '_' . 'intro';
-                        } elseif ($ware->type == 6) {
-                            $ops[$ware->id] .= '_' . 'frame';
-                        }
-                    }
-                    return $ops;
-                });
-                $form->hidden('sub_type');
-            })
-            ->when("vip", function () use ($form) {
-                $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    foreach ($vips as  $vip) {
-                        $ops[$vip->id] = $vip->name;
-                    }
-                    return $ops;
-                });
-            })
-            ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"));
-            })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
-            });
+            $this->addWareJs();
+        });
+        $form->hidden('sub_type');
+    }
+    
+    /**
+     * VIP field
+     */
+    protected function addVipField(Form $form)
+    {
+        $form->select('target2', trans('vips'))->options(function () {
+            $ops = [];
+            $vips = OVip::query()->select('id', 'name')->get();
+            foreach ($vips as $vip) {
+                $ops[$vip->id] = $vip->name;
+            }
+            return $ops;
+        });
+    }
+    
+    /**
+     * Coins field
+     */
+    protected function addCoinsField(Form $form)
+    {
+        $form->number("target3", __("coins"));
+    }
+    
+    /**
+     * Achievement field
+     */
+    protected function addAchievementField(Form $form)
+    {
+        $form->image("target4", __('image'))->name(function ($file) {
+            return now()->timestamp . '.' . $file->guessExtension();
+        })->disk('gcs');
+    }
+    
+    /**
+     * Expire field
+     */
+    protected function addExpireField(Form $form)
+    {
         $form->number('expire', __('expire'))->required();
+    }
+    
+    /**
+     * Gender field
+     */
+    protected function addGenderField(Form $form)
+    {
         $form->select('gender', __('gender'))->options([
             'all' => __('all'),
             'male' => __('Male'),
             'female' => __('Female')
         ])->required();
+    }
+    
+    /**
+     * Redirect after saved
+     */
+    protected function addSavedRedirect(Form $form)
+    {
         $form->saved(function (Form $form) {
-
-
             $route = url('admin/weekly-cp-gift/' . request('weekly_cp_id'));
             return redirect($route);
         });
-
-
-        return $form;
     }
+    
 }

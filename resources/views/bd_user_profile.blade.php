@@ -1176,9 +1176,9 @@
         </div>
         <div class="card p-3 bg-danger-subtle">
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ url('admin/users/' . $user->id . '/edit') }}" class="btn btn-light">
+            <a href="{{  route('bd.agencies.index') }}" class="btn btn-light">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
-                </a>
+            </a>
                      @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
                         <button type="submit" class="btn btn-danger edit_user_item_model_btn">
@@ -1275,7 +1275,7 @@
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
                             <th>{{ __('expire') }}</th>
-                            <th>{{ __('action') }}</th>
+                            <!-- <th>{{ __('action') }}</th> -->
 
                         </tr>
                         </thead>
@@ -1303,13 +1303,13 @@
                                     $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
 
                                     $uid = optional($admin)->id ?? 0;
-                                    $url = $admin ? url("admin/auth/users/" . $uid) : '#';
+                                    $url = $admin ? '#' : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $packs->firstItem() + $index }}</td>
                                     <td>
                                         @if ($admin)
-                                            <a href="{{ $url ?? '#' }}" target="_blank"
+                                            <a href="{{ $url ?? '#' }}"  
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ $image }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -1329,17 +1329,17 @@
 
                                     </td>
                                     <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :'∞' }}</td>
-                                    <td>
-                                        <div class="d-flex">
+                                    <!-- <td> -->
+                                        <!-- <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
                                                     data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
                                             </button>
                                             <!-- <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button> -->
-                                        </div>
-                                    </td>
+                                            </button>
+                                        </div> -->
+                                    <!-- </td> -->
                                 </tr>
                             @endforeach
                             </tbody>
@@ -1432,7 +1432,7 @@
             <div class="box-body p-3">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                        <form method="GET" action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
                             <input type="hidden" name="tab" value="salary">
                             <div class="row">
                                 <div class="col-md-6">
@@ -1482,7 +1482,7 @@
                                                 </button>
                                             </div>
                                             <div class="btn-group pull-left" style="margin-left: 10px;">
-                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
+                                                <a href="{{ url('bd/users/profile/' . $user->id. '?'.'tab=salary') }}"
                                                    class="btn btn-default btn-sm">
                                                     <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
                                                 </a>
@@ -1531,7 +1531,7 @@
                                         }
 
                                         $image = handleShowImageWithTypes($user->id, $url, 40, 40);
-                                        $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+                                        $profileUrl = route('bd.agency.profile', ['id' => @$agency->id ?? 0]);
 
                                         $extras = json_decode($salary->extras, true);
                                         $moment = $extras['moment'] ?? [];
@@ -1658,7 +1658,7 @@
         <div class="box-body p-3">
             <div class="card mb-4">
                 <div class="card-body">
-                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
+                    <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
                         <input type="hidden" name="tab" value="user-agency">
 
                         <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
@@ -1678,7 +1678,7 @@
                                 <button type="submit" class="btn btn-info btn-sm me-2">
                                     <i class="fa fa-search"></i> {{__('Search')}}
                                 </button>
-                                <a href="{{ url('admin/users/' . $user->id. '?tab=user-agency') }}" class="btn btn-default btn-sm">
+                                <a href="{{ url('bd/users/profile/' . $user->id. '?tab=user-agency') }}" class="btn btn-default btn-sm">
                                     <i class="fa fa-undo"></i> {{__('Reset')}}
                                 </a>
                             </div>
@@ -1723,7 +1723,7 @@
                                             $url = $defaultImage;
                                         }
                                         $image = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                        $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
+                                        $profileUrl = route('bd.agency.profile', ['id' => @$agency->id ?? 0]);
                                     @endphp
 
                                     @php
@@ -1740,7 +1740,7 @@
                                                 $url = $defaultImage;
                                             }
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
+                                            $kickedByUrl = url("bd/users/profile/" . ($kickedBy->id) ?? 0);
                                         }
 
                                         if ($userJoinAgency->kicked_by_admin){
@@ -1755,7 +1755,7 @@
                                                 $url = $defaultImage;
                                             }
                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
+                                            $kickedByUrl = '#';
                                         }
                                     }
                                     @endphp
@@ -1776,7 +1776,7 @@
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
                                             @if(!empty($kickedBy) && !empty($kickedBy->id))
-                                                <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
+                                                <a href="{{ $kickedByUrl ?? '#' }}"  
                                                    style="display: inline-flex; align-items: center; text-decoration: none;">
                                                     {!! $kickedByImage !!}
                                                     <span>{{ $kickedByName }} ({{ $kickedByUuid }})</span>
@@ -1821,7 +1821,7 @@
         <div class="box-body p-3">
             <div class="card mb-4">
                 <div class="card-body">
-                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
+                    <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
                         <input type="hidden" name="tab" value="user-coins">
                         <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
 
@@ -1854,7 +1854,7 @@
                                 <button type="submit" class="btn btn-info btn-sm me-2">
                                     <i class="fa fa-search"></i> {{ __('Search') }}
                                 </button>
-                                <a href="{{ url('admin/users/' . $user->id. '?tab=user-coins') }}" class="btn btn-default btn-sm">
+                                <a href="{{ url('bd/users/profile/' . $user->id. '?tab=user-coins') }}" class="btn btn-default btn-sm">
                                     <i class="fa fa-undo"></i> {{ __('Reset') }}
                                 </a>
                             </div>
@@ -1988,7 +1988,7 @@
                             <tr>
                                 <td>{{ @$charge->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
+                                    <a href="{{  '#' }}"  
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ getImagePath( $image) }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2054,7 +2054,7 @@
 
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
+                        <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
                             <input type="hidden" name="tab" value="gift-log">
                             <input type="hidden" name="gift_type" value="{{ $giftType }}">
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
@@ -2095,7 +2095,7 @@
                                     <button type="submit" class="btn btn-info btn-sm me-2">
                                         <i class="fa fa-search"></i> {{__('Search')}}
                                     </button>
-                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                    <a href="{{ url('bd/users/profile/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
                                         <i class="fa fa-undo"></i> {{__('Reset')}}
                                     </a>
                                 </div>
@@ -2184,7 +2184,7 @@
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{ url('admin/users/' . $id) }}" target="_blank"
+                                    <a href="{{ url('bd/users/profile/' . $id) }}"  
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $image }}" width="40" height="40"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2196,7 +2196,7 @@
                                 </td>
                                 <td>
                                     @if(!empty($giftSLog->room))
-                                        <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
+                                        <a href="{{ url('bd/users/profile/' . $ownerRoom) }}"  
                                            class="d-flex align-items-center text-decoration-none">
                                             <img src="{{ $url }}"
                                                  width="30" height="30"
@@ -2241,7 +2241,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" target="_blank"
+                                    <a href="#" 
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
                                              width="30" height="30"
@@ -2252,7 +2252,7 @@
                                 @if($giftType == 'receiver')
                                     <td>
                                         @if ($giftSLog->agency_id)
-                                            <a href="{{ url('admin/agencies/' . $agencyId) }}" target="_blank"
+                                            <a href="{{ url('bd/agencies/profile/' . $agencyId) }}"  
                                                class="d-flex align-items-center text-decoration-none">
                                                 <img src="{{ $agencyImage }}"
                                                      width="50" height="30"
@@ -2302,7 +2302,7 @@
                     <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                             data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('admin.pack.free') }}" method="POST" id="add_form">
+                <form action="" method="POST" id="add_form">
                     @csrf
                     <div class="modal-body p-0">
                         <div class="rounded-top-lg py-3 ps-4 pe-6 bg-light">
@@ -2354,7 +2354,7 @@
                                 data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST" enctype="multipart/form-data">
+                    <form action="" id="country_update_form" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body p-0">
 

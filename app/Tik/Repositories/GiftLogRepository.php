@@ -122,7 +122,7 @@ class GiftLogRepository extends AbstractRepository
             ->get();
     }
 
-    public function userGiftInfo($id, $type, $startDate = null, $endDate = null, $perPage, $page)
+    public function userGiftInfo($id, $type, $startDate = null, $endDate = null, $perPage = null, $page = null)
     {
         return $this->model->with('sender', 'receiver', 'gift')
             ->selectRaw('giftId, sender_id, receiver_id, SUM(giftNum * giftPrice) AS total')
