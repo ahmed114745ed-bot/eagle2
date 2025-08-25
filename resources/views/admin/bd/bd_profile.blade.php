@@ -818,7 +818,7 @@
 <!-- Header Section -->
 <div class="agency-header">
     <div class="agency-avatar">
-        <img src="{{ $bd->display_image }}" alt="Agency Logo" class="logo-img">
+        <img src="{{ getImagePath($bd->img) }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
         <h1 class="agency-name">{{ $bd->name ??'' }}</h1>
@@ -833,9 +833,9 @@
             </div>
         </div>
     </div>
-    <button class="btn-back" onclick="window.history.back()">
+    <a href="{{ url('admin/usersBd') }}" class="btn-back">
         <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
-    </button>
+    </a>
 </div>
  
 <div class="top-performers-section">
@@ -851,7 +851,7 @@
                         
                             
                             <a href="#" ">
-                               {{ $bd->total_salary  }}
+                               {{  truncateAndTrim( $bd->total_salary)  }}
                             </a>
                     </div>
               
@@ -920,23 +920,27 @@
                                 <tr>
                                     <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
                                     <td class="user-cell">
-                                        <div class="user-avatar">
-                                            <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ??''}}">
-                                        </div>
-                                        <div class="user-info">
-                                            <strong>{{ $agency->name ??'' }}</strong>
-                                            <!-- <small>UID: {{ $agency->notice ?? '' }}</small> -->
-                                        </div>
-                                    </td>
-                                    <td class="user-cell">
-                                        <div class="user-avatar">
-                                            <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->name ??''}}">
-                                        </div>
-                                        <div class="user-info">
-                                            <strong>{{ $agency->owner->name ??''}}</strong>
-                                        </div>
-                                    </td>
-                                    <td>{{ $agency->status }}</td>
+                                            <div class="user-avatar">
+                                                <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                    <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ??'' }}">
+                                                </a>
+                                            </div>
+                                            <div class="user-info">
+                                                <strong>
+                                                    <a href="{{url('admin/agencies/profile/' .$agency->id) }}">
+                                                        {{ $agency->name ??'' }}
+                                                    </a>
+                                                </strong>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($agency->status == 1)
+                                                <i class="fas fa-check-circle text-success" title="Active"></i>
+                                            @else
+                                                <i class="fas fa-times-circle text-danger" title="Inactive"></i>
+                                            @endif
+                                        </td>
+
                                 </tr>
                             @endforeach
                         </tbody>

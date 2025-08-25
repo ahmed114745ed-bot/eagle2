@@ -1017,9 +1017,10 @@ trait CalcsTrait
         }
 
         $uvip = $user->UserVip;
-        if (!$uvip || !$uvip->vip) return new \stdClass();
+        if (!$uvip ) return new \stdClass();
 
-        $vip = $uvip->vip;
+        $vip = OVip::query()->find($uvip->vip_id);
+        if (!$vip) return new \stdClass();
         $vipIcon = $vip->wares->firstWhere('type', 10) ?? null; // preloaded relation
         $hasColor = $user->packs->contains(fn($p) => $p->type == 18 && $p->is_used);
         $color = $user->packs->firstWhere(fn($p) => $p->type == 21 && $p->is_used)?->ware->color ?? '';
