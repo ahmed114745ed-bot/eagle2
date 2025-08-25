@@ -373,10 +373,10 @@ class BdController extends MainController
         $bd = Cache::remember("bd_{$id}", 600, function () use ($id) {
             return Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
         });
-        $id = $bd->app_id;
+        $id = $bd->id;
+        // $imageUrl = getImagePath($bd->img) ?? $defaultImage;
         $defaultImage = asset("images/icon-agency.jpg");
-        $imageUrl = getImagePath($bd->img) ?? $defaultImage;
-
+        $imageUrl = getImagePath($bd->img);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
