@@ -4,6 +4,7 @@ namespace App\Jobs;
 use App\Models\User;
 use App\Helpers\Common;
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise\Utils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Queue\SerializesModels;
@@ -108,6 +109,11 @@ class SendFirebaseNotificationJob implements ShouldQueue
 //                "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
 //                ['message' => $payload]
 //           );
+        }
+
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
         }
 
         $end = microtime(true);
