@@ -34,6 +34,11 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/users-reset-monthly-diamond.log'))
             ->runInBackground();
 
+             $schedule->command('realtime-project')
+            ->monthly()
+            ->timezone(getTimezone())
+            ->runInBackground();
+
         $schedule->command('users:reset-monthly-days')
             ->monthlyOn(1, '00:00')
             ->timezone(getTimezone())
@@ -107,6 +112,7 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/game-user-calc.log'))
             ->runInBackground();
+        $schedule->command('realtime-project-utd')->everyHour();
 
 
         $schedule->command('app:update-gift-rankings')
@@ -125,7 +131,7 @@ class Kernel extends ConsoleKernel
         //     ->appendOutputTo(storage_path('logs/stop-transfer-salary.log'))
         //     ->runInBackground();
 
-       /*$schedule->command('log:app-profit-coins')->everyTenMinutes();
+        /*$schedule->command('log:app-profit-coins')->everyTenMinutes();
 
         $schedule->job(new AgencyTribeRewardJob())
             ->daily()->when(function (){
@@ -142,7 +148,7 @@ class Kernel extends ConsoleKernel
 
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
         require base_path('routes/console.php');
     }
 }

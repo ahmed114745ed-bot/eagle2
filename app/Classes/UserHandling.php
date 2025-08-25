@@ -14,8 +14,9 @@ use App\Models\BanType;
 use App\Models\GiftLog;
 use Modules\Vip\Entities\UserVip;
 use App\Models\LiveTime;
-use App\Models\RealtimeProject;
 use App\Models\UserSallary;
+use App\Models\TimeEnterRoom;
+use App\Models\RealtimeProject;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Modules\AgencyApp\Entities\AgencyUserJob;
@@ -43,7 +44,6 @@ class UserHandling
             $user_hours =
                 LiveTime::query()->where('uid', $uid)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->whereDay('created_at', '=', Carbon::now()->day)->sum('hours');
 
-            $this->realtimeProject($second);
             $hours = (int)$user_hours;
             $num = \Cache::get('hours_days') ?? 2;
 
@@ -57,13 +57,29 @@ class UserHandling
         }
     }
 
+    public function calcTimeRoomEntered($uid, $roomId)
+    {
+        $timer = TimeEnterRoom::query()->where('user_id', $uid)->where('room_id', $roomId->id)->whereDate('created_at', today())->where('end_time', null)->orderByDesc('id')->first();
+        if ($timer) {
+            $second = (time() - $timer->start_time);
+            $timer->end_time = time();
+            $timer->seconds    =  $second;
+            $timer->save();
+            $this->realtimeProject($second);
+        }
+    }
+
     public function realtimeProject($second)
     {
-        $realtimeProject = RealtimeProject::where('type', 'audio')->whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)->first();
+        $month = Carbon::now()->month;
+        $year = Carbon::now()->year;
+        $realtimeProject = RealtimeProject::where('type', 'audio')->where('month', $month)
+            ->where('year', $year)->first();
         if (!$realtimeProject) {
             $realtimeProject = RealtimeProject::create([
                 'type' => 'audio',
+                'month' => $month,
+                'year' => $year,
             ]);
         };
         $realtimeProject->used += $second;

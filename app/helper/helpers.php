@@ -64,6 +64,14 @@ function generateAgoraRtmToken($channelName, $rtmUid)
 
     return $token;
 }
+if (!function_exists('decryptToArray')) {
+    function decryptToArray(string $encrypted, $key): array
+    {
+        $iv = substr($key, 0, 16);
+        $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
+        return json_decode($decrypted, true);
+    }
+}
 
 
 
@@ -679,7 +687,7 @@ if (! function_exists('validateUploadedFileType')) {
      */
     function validateUploadedFileType(UploadedFile $file, $itemId = null): string
     {
-        $allowedExtensions = ['svga','svg', 'mp4', 'alpha', 'vap', 'png'];
+        $allowedExtensions = ['svga', 'svg', 'mp4', 'alpha', 'vap', 'png'];
         $ext = strtolower($file->guessExtension());
         $originalExt = strtolower($file->getClientOriginalExtension());
 
@@ -738,8 +746,8 @@ if (!function_exists('bd_url')) {
 
         $secure = $secure ?? (config('bd.https') || config('bd.secure'));
 
-        if (app()->environment(['production', 'Production'])) {
-            return secure_url($base . '/' . trim($path, '/'), $parameters);
+        if (app()->environment('production')) {
+            return secure_url($base . '/' . trim($path, '/'), $parameters, $secure);
         }
 
         return url($base . '/' . trim($path, '/'), $parameters, $secure);

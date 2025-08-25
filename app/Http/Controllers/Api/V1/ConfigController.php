@@ -32,12 +32,13 @@ class ConfigController extends Controller
         $this->configService = $configService;
     }
 
-    public function uploadBadges(Request $request){
-        if (!Admin::user()->can('*')){
-            Permission::check('edit-'.$this->permission_name);
+    public function uploadBadges(Request $request)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_name);
         }
 
-        foreach($request->allFiles() as $input => $file){
+        foreach ($request->allFiles() as $input => $file) {
 
             if (is_array($file)) {
                 foreach ($file as $singleFile) {
@@ -57,35 +58,78 @@ class ConfigController extends Controller
         return back();
     }
 
+    // public function getConfigValues(ConfigValuesRequest $request)
+    // {
+    //     $configs = [];
+    //     if (isset($request['keys'])) {
+    //         $keys = $request['keys'];
+    //         $keys = array_diff($keys, ['zego_server_secret', 'zego_app_id', 'app_sign']);
+    //         $configs = Common::getConfFromKey($keys);
+
+    //         $configs = $configs->flatMap(function ($value) {
+    //             return [
+    //                 $value->name => $value->value,
+    //             ];
+    //         });
+    //     }
+    //     if ($request['enable-special'] == 1) {
+    //         $wapel                 = Pack::query()
+    //             ->where('type', 12)
+    //             ->where('expire', '>=', time())
+    //             ->where('user_id', \Auth::id())
+    //             ->where('use_num', '>', 0)
+    //             ->select(['id', 'use_num'])
+    //             ->first();
+    //         $configs['wapel_num']  =  @(int)$wapel->use_num ?? 0;
+    //         $user                  = $request->user();
+    //         $configs['user_coins'] =  @(int)$user->di ?? 0;
+    //         $configs['user_coins_string'] =  @$user->coins_string ?? '0';
+    //     }
+    //     return Common::apiResponse(true, 'config returned success', $configs, 200);
+    // }
+
     public function getConfigValues(ConfigValuesRequest $request)
     {
         $configs = [];
-        if (isset($request['keys'])) {
-            $keys = $request['keys'];
-            $keys = array_diff($keys, ['zego_server_secret', 'zego_app_id', 'app_sign']);
-            $configs = Common::getConfFromKey($keys);
 
-            $configs = $configs->flatMap(function ($value) {
-                return [
-                    $value->name => $value->value,
+        if (isset($request['keys'])) {
+            foreach ($request['keys'] as $key) {
+                // Map for zegoData keys
+                $zegoMap = [
+                    'zego_server_secret' => 'zego_server_secret',
+                    'zego_app_id'        => 'zego_app_id',
+                    'app_sign'           => 'zego_app_sign',
                 ];
-            });
+
+                if (isset($zegoMap[$key])) {
+                    // Get from zegoData
+                    $configs[$key] = Common::zegoData($zegoMap[$key]);
+                } else {
+                    // Get from normal config
+                    $configs[$key] = Common::getConf($key);
+                }
+            }
         }
+
         if ($request['enable-special'] == 1) {
-            $wapel                 = Pack::query()
+            $wapel = Pack::query()
                 ->where('type', 12)
                 ->where('expire', '>=', time())
                 ->where('user_id', \Auth::id())
                 ->where('use_num', '>', 0)
                 ->select(['id', 'use_num'])
                 ->first();
-            $configs['wapel_num']  =  @(int)$wapel->use_num ?? 0;
-            $user                  = $request->user();
-            $configs['user_coins'] =  @(int)$user->di ?? 0;
-            $configs['user_coins_string'] =  @$user->coins_string ?? '0';
+
+            $configs['wapel_num']         = @(int) $wapel->use_num ?? 0;
+            $user                         = $request->user();
+            $configs['user_coins']        = @(int) $user->di ?? 0;
+            $configs['user_coins_string'] = @$user->coins_string ?? '0';
         }
+
         return Common::apiResponse(true, 'config returned success', $configs, 200);
     }
+
+
 
     public function index()
     {
@@ -117,8 +161,8 @@ class ConfigController extends Controller
 
     public function updateConfigChatGroup(Request $request)
     {
-        if (!Admin::user()->can('*')){
-            Permission::check('edit-'.$this->permission_config_name);
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_config_name);
         }
 
         $config = Config::find($request->id);
