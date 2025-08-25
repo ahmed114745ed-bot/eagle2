@@ -848,6 +848,8 @@
                     </h2>
                 </div>
                     <div class="avatar-grid">
+                        
+                            
                             <a href="#" ">
                                {{  truncateAndTrim( $bd->total_salary)  }}
                             </a>
@@ -919,7 +921,7 @@
                                     <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
                                     <td class="user-cell">
                                             <div class="user-avatar">
-                                                <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                <a href=" {{ url('admin/agencies/profile/' .$agency->id) }}">
                                                     <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ??'' }}">
                                                 </a>
                                             </div>
@@ -927,6 +929,21 @@
                                                 <strong>
                                                     <a href="{{url('admin/agencies/profile/' .$agency->id) }}">
                                                         {{ $agency->name ??'' }}
+                                                    </a>
+                                                </strong>
+                                            </div>
+                                        </td>
+
+                                        <td class="user-cell">
+                                            <div class="user-avatar">
+                                                <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                    <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ??'' }}">
+                                                </a>
+                                            </div>
+                                            <div class="user-info">
+                                                <strong>
+                                                    <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                        {{ $agency->owner?->name ??'' }}
                                                     </a>
                                                 </strong>
                                             </div>
