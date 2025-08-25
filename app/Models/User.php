@@ -218,7 +218,7 @@ class User extends Authenticatable
 
     public function setMonthlyDiamondReceivedAttribute($value)
     {
-        $date = \Carbon\Carbon::now(getTimezone());;
+        $date = \Carbon\Carbon::now(getTimezone());
 
         $record = $this->monthlyDiamondReceive()
             ->firstOrNew([
