@@ -158,7 +158,7 @@ class HomeService
             ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
             ->first();
 
-        
+        Log::info(['pack'=>$pack->id,'avilable'=>!$isAvailable]);
         if (!$pack) {
             throw new \Exception(__('api.notWare'));
         }
