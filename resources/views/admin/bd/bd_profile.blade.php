@@ -950,11 +950,12 @@
                                         </td>
                                         <td class="text-center">
                                             @if($agency->status == 1)
-                                                <i class="fas fa-check-circle text-success" title="Active"></i>
+                                                <span style="color:green;" title="Active">&#10004;</span> {{-- ✔ --}}
                                             @else
-                                                <i class="fas fa-times-circle text-danger" title="Inactive"></i>
+                                                <span style="color:red;" title="Inactive">&#10008;</span> {{-- ✖ --}}
                                             @endif
                                         </td>
+
 
                                 </tr>
                             @endforeach
