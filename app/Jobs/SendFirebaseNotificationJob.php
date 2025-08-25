@@ -3,6 +3,7 @@ namespace App\Jobs;
 
 use App\Models\User;
 use App\Helpers\Common;
+use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Queue\SerializesModels;
@@ -29,13 +30,28 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
     public function handle()
     {
-
-
+        $start = microtime(true);
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
 
+//        $client = new Client([
+//            'base_uri' => "https://fcm.googleapis.com/v1/projects/{$projectId}/",
+//            'headers'  => [
+//                'Authorization' => 'Bearer ' . $api_access_key,
+//                'Content-Type'  => 'application/json',
+//            ]
+//        ]);
+//
+//        $promises = [];
+
         foreach ($this->tokens as $token) {
             $user= User::where('notification_id',$token)->first();
+
+
+            if (!$user || $user->is_logout) {
+                continue;
+            }
+
             $notification = [
                 'title' => $this->title,
                 'body'  => $this->body,
@@ -79,17 +95,25 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 $payload['notification']['image'] = $this->data['image'];
             }
 
+//            $promises[$token] = $client->postAsync("messages:send", [
+//                'json' => ['message' => $payload]
+//            ]);
+
             $headers = [
                 'Authorization' => 'Bearer ' . $api_access_key,
                 'Content-Type'  => 'application/json',
             ];
 
-       if (!$user->is_logout)     Http::withHeaders($headers)->post(
+            if (!$user->is_logout)     Http::withHeaders($headers)->post(
                 "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
                 ['message' => $payload]
-            );
-
+           );
         }
+
+        $end = microtime(true);
+        $timeTaken = round($end - $start, 3);
+        info($timeTaken);
+
     }
 
 }
