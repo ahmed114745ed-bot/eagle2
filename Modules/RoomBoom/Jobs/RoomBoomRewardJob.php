@@ -165,7 +165,7 @@ class RoomBoomRewardJob implements ShouldQueue
         $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
         $title = __('Achievement Reward');
         $body = __('You have received a new achievement.');
-        $this->achievementInsertData = [
+        $this->achievementInsertData[] = [
             'user_id' => $userId,
             'custom_image' => $rewardTarget,
             'end_at' => $dateTimestamp,
@@ -289,7 +289,7 @@ class RoomBoomRewardJob implements ShouldQueue
         }
 
         if (!empty($this->giftNotifications)) {
-            info($this->achievementNotifications['tokens']);
+            info($this->giftNotifications['tokens']);
             Common::send_firebase_notification(
                 $this->giftNotifications['tokens'],
                 $this->giftNotifications['title'],
