@@ -14,7 +14,7 @@ class AddIndexToGiftLogsTable extends Migration
     public function up()
     {
         Schema::table('gift_logs', function (Blueprint $table) {
-            $table->index(['room_id', 'room_boom_level', 'start_boom_ranking', 'created_at']);
+            $table->index(['room_id', 'room_boom_level', 'start_boom_ranking', 'created_at'], 'gift_logs_room_boom_idx');
         });
     }
 
@@ -26,7 +26,7 @@ class AddIndexToGiftLogsTable extends Migration
     public function down()
     {
         Schema::table('gift_logs', function (Blueprint $table) {
-            $table->dropIndex(['room_id', 'room_boom_level', 'start_boom_ranking', 'created_at']);
+            $table->dropIndex('gift_logs_room_boom_idx');
         });
     }
 }
