@@ -26,9 +26,10 @@
         margin: 0 !important;
     }
 
-    .ltr label {
-        margin: 0 !important;
-    }
+    /*.ltr label {*/
+    /*    margin: 0 !important;*/
+    /*}*/
+
     .ltr .fields-group .form-group{
 
        display: flex !important;
@@ -44,6 +45,21 @@
     }
     .rtl .pull-right{
         float: left !important;
+    }
+
+    .box-footer .pull-right {
+    }
+
+    .box-info .btn-group.pull-right {
+        float: right !important;
+    }
+
+    .rtl .box-info .pull-right{
+        float: right !important;
+    }
+
+    .rtl .box-info label {
+        margin: 5px 10px 0 0 !important;
     }
 
     .btn-success {
@@ -841,7 +857,7 @@ html.ltr .dropdown-menu {
                 color: #444;
                display: block;
                position: relative;
-    
+
             }
             .rtl .breadcrumb {
                 left: 10px !important;
@@ -1161,5 +1177,76 @@ html.ltr .dropdown-menu {
         right: 207px;
     }
 
+    .box-footer {
+        flex-direction: row-reverse;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .pagination-info {
+        margin: 5px 0;
+        white-space: nowrap;
+        text-align: right;
+        width: auto;
+        order: 2;
+    }
+
+    .box-footer .pull-right {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        /*margin: 5px 0;*/
+        order: 1;
+    }
+
+    .box-footer .pull-right .dropdown {
+        margin-left: 5px;
+    }
+
+    .pagination > li > a,
+    .pagination > li > span {
+        min-width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    .pagination {
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    @media (max-width: 576px) {
+        .box-footer {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pagination-info,
+        .box-footer .pull-right {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .pagination-info {
+            order: 1;
+            margin-bottom: 10px;
+        }
+
+        .box-footer .pull-right {
+            order: 2;
+        }
+    }
+
+    .rtl label.control-label.pull-right small:last-of-type{
+        margin-left: 50px;
+    }
 
 </style>

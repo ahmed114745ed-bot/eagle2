@@ -439,6 +439,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //start rankin
             Route::prefix('ranking')->group(function () {
                 Route::post('/', [RankingController::class, 'ranking2']);
+                Route::post('/version3', [RankingController::class, 'rankingV2']);
                 Route::post('/version2', [RankingController::class, 'rankingV2']);
                 Route::post('/room', [UserController::class, 'ranking_room']);
                 Route::get('/top_user_ranking', [RankingController::class, 'topUserRanking']);
@@ -602,6 +603,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->toArray();
 
                 return Common::send_firebase_notification($tokens, $title, $body);
+            });
+
+            Route::get('/send_test_notifications', function () {
+
+                $notificationTokens = DB::table('users')->orderBy('id', 'desc')->limit(100)->pluck('notification_id')->filter()->toArray();
+
+                $title = 'Test';
+                $body = 'Test';
+
+                Common::send_firebase_notification($notificationTokens, $title, $body, '', [], 'vip');
+
+                return "notification sent successfully!";
             });
 
             Route::get('/unsubscribe-all-from-topic/{topic}', function ($topic) {

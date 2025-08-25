@@ -849,14 +849,14 @@
   "total_percentage_must_be_100": "Total percentage must be 100 exactly!",
   "app bd id":" Bd ID",
   "make_bd_default":"When you enable this option, this BD will become the default instead of the current default.",
+"vip_gift_message": "You have received a new VIP level as a gift",
 "default_current": "This BD will become the default owner for any agency when its BD is deleted",
 "no_default_set": "No default BD has been set yet",
 "select_default_bd": "Select BD to be default",
 "set_as_default": "Set as Default BD",
 "back": "Back",
-"total proft":"total proft",
-"congratulations": "Congratulations",
-"vip_gift_message": "You have received a new VIP level as a gift",
+"total proft":"total profit",
+
 "Wares Dedicate": "Gift from the store",
 "User Levels": "Edit Level",
 "Vips Dedicate": "Gift VIP",
@@ -922,22 +922,11 @@
 "bdDescription": "To ensure smooth operations, it's essential to create a virtual BD that you manage. All agencies that aren't affiliated with a specific BD are automatically assigned to this virtual BD.\nWhen a BD is deleted, the agencies associated with it are transferred to the virtual BD, ensuring uninterrupted management. If there isn't a virtual BD, the user will need to enter the BD ID when requesting to open an agency, but they won't be able to operate it without a specific BD.\nTherefore, it's always advisable to create and manage a virtual BD to ensure continuity of operations.",
 "default_status":"Default BD",
 "Create close room": "close room ",
-  "Delete close room": "Delete close ",
+"Delete close room": "Delete close ",
 "Gift switch gift from the store": " Gift a gift from the store",
 "Gift switch gift VIP": " Gift a gift VIP ",
 "Gift switch gift a medal": "Gift a gift a medal",
-  "Charge report switch coin recharge":" report  coin recharge",
-  "Delete user account switch deleted accounts": "Delete deleted user accounts",
-"Restore user account switch deleted accounts": "Restore deleted user accounts",
-"Actions switch users" :"Actions",
-"Chang agency switch users": "Change users in the agency",
-"Charge switch users": "Charge users",
-"Invite switch users": "Invite users",
-"Can play switch users": "Allow users to play",
-"Kick family switch users": "Kick users from the family",
-"Kick agency switch users": "Kick users from the agency",
-"Rejected request switch internal sales system report": "Reject internal sales system report request",
-"Accept request switch internal sales system report": "Accept internal sales system report request",
+"Charge report switch coin recharge":" report  coin recharge",
 "Delete user account switch deleted accounts": "Delete deleted user accounts",
 "Restore user account switch deleted accounts": "Restore deleted user accounts",
 "Chang agency switch users": "Change agency for users",
@@ -1014,8 +1003,6 @@
 ,    "target_change_warning": "Increasing the target value will increase the dollar amount received by the hosts, while decreasing it will reduce their dollar value."
 ,"host":"Host",
 "Host reports":"Host Reports",
-"Moments": "Moments",
-"Reels": "Reels",
 "Uploads:": "Uploads:",
 "Likes:": "Likes:",
 "Comments:": "Comments:",
@@ -1090,64 +1077,35 @@
 "loss" : "Loss",
 "Agency": "Agency",
 ":name has been removed from administrators.": ":name has been removed from administrators.",
-"User": "User",
-"You have received :coin coin.": "You have received :coin coin.",
-"You have received a gift: :ware": "You have received a gift: :ware",
-"banned_from_action":"You are banned from performing this action.",
 "invalid_data": "Please check the input data",
 "ware_not_found": "Product not found",
 "insufficient_di": "You do not have enough quiz points",
 "all_chairs_purchased": "You have already purchased all chairs",
 "added_successfully": "Added successfully",
 "deleted_success": "Selected items deleted successfully",
-
-
-    "You have received :coin coin.": "You have received :coin coin.",
-    "You have received a gift: :ware": "You have received a gift: :ware",
-    "banned_from_action":"You are banned from performing this action.",
-    "Super Boom Rules": "Super Boom Rules",
-    "Super Boom Rule Details": "Super Boom Rule Details",
-    "Create Super Boom Rule": "Create Super Boom Rule",
-    "Edit Super Boom Rule": "Edit Super Boom Rule",
-    "Rules (AR)": "Rules (Arabic)",
-    "Rules (EN)": "Rules (English)",
-    "Content": "Content",
-    "Created At": "Created At",
-    "Updated At": "Updated At",
-    "ID": "ID"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"enable_transfer_salary_success": "Transfer salary has been enabled successfully",
+"disable_transfer_salary_success": "Transfer salary has been disabled successfully",
+"confirm_enable_transfer_salary": "Are you sure you want to enable transfer salary?",
+"confirm_disable_transfer_salary": "Are you sure you want to disable transfer salary?",
+"You have received :coin coin.": "You have received :coin coin.",
+"You have received a gift: :ware": "You have received a gift: :ware",
+"banned_from_action":"You are banned from performing this action.",
+"Super Boom Rules": "Super Boom Rules",
+"Super Boom Rule Details": "Super Boom Rule Details",
+"Create Super Boom Rule": "Create Super Boom Rule",
+"Edit Super Boom Rule": "Edit Super Boom Rule",
+"Rules (AR)": "Rules (Arabic)",
+"Rules (EN)": "Rules (English)",
+"Content": "Content",
+"Created At": "Created At",
+"Updated At": "Updated At",
+"BD Action": "BD Action",
+"Remove BD": "Remove BD",
+"Are you sure?": "Are you sure?",
+"Do you want to remove BD for this user?": "Do you want to remove BD for this user?",
+"Yes, remove it!": "Yes, remove it!",
+"Cancel": "Cancel",
+"Removed!": "Removed!",
+"Error": "Error",
+"Something went wrong": "Something went wrong"
 }

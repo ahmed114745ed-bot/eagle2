@@ -116,4 +116,12 @@ trait EventModel
         );
     }
 
+    public function scopeDayEnd(Builder $query): Builder
+    {
+        $timezone = getTimezone();
+        $nowDate  = Carbon::now($timezone)->toDateString();
+
+        return $query->whereDate('end_date', $nowDate);
+
+    }
 }

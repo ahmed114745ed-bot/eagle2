@@ -41,18 +41,18 @@ class RoomBoomResource extends JsonResource
 
 
         if ($topContributors->isEmpty()) {
-            $lastGift = GiftLog::find($this->final_gift_id);
-
-            if ($lastGift) {
-                $user = User::with('profile')->find($lastGift->sender_id);
-                if ($user) {
-                    $user->total_gift = GiftLog::where('room_boom_uuid', $lastGift->room_boom_uuid)
-                        ->where('sender_id', $lastGift->sender_id)
-                        ->sum('giftPrice');
-
-                    return collect([$user]);
-                }
-            }
+            return collect([$this->getEmptyUser()]);
+//            $lastGift = GiftLog::find($this->final_gift_id);
+//            if ($lastGift) {
+//                $user = User::with('profile')->find($lastGift->sender_id);
+//                if ($user) {
+//                    $user->total_gift = GiftLog::where('room_boom_uuid', $lastGift->room_boom_uuid)
+//                        ->where('sender_id', $lastGift->sender_id)
+//                        ->sum('giftPrice');
+//
+//                    return collect([$user]);
+//                }
+//            }
         }
 
         return $topContributors->map(function($contributor) {
@@ -63,5 +63,16 @@ class RoomBoomResource extends JsonResource
             }
             return null;
         })->filter();
+    }
+
+    protected function getEmptyUser(): object
+    {
+        return (object) [
+            'id' => 0,
+            'name' => '',
+            'uuid' => '',
+            'profile' => (object) ['avatar' => ''],
+            'total_gift' => 0,
+        ];
     }
 }

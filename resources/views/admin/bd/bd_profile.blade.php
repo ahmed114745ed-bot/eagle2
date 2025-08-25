@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -810,7 +806,6 @@
     </style>
 
 
-</head>
 <body>
 
 <div class="agency-profile-container">
@@ -818,10 +813,10 @@
 <!-- Header Section -->
 <div class="agency-header">
     <div class="agency-avatar">
-        <img src="{{ $bd->display_image }}" alt="Agency Logo" class="logo-img">
+        <img src="{{ getImagePath($bd->avatar) }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
-        <h1 class="agency-name">{{ $bd->name ??'' }}</h1>
+        <h1 class="agency-name">{{ $bd->username ??'' }}</h1>
         <div class="agency-meta">
             <div class="meta-item">
                 <span class="meta-label">{{ __("ID") }}:</span>
@@ -833,9 +828,9 @@
             </div>
         </div>
     </div>
-    <button class="btn-back" onclick="window.history.back()">
+    <a href="{{ url('admin/usersBd') }}" class="btn-back">
         <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
-    </button>
+    </a>
 </div>
  
 <div class="top-performers-section">
@@ -851,7 +846,7 @@
                         
                             
                             <a href="#" ">
-                               {{ $bd->total_salary  }}
+                               {{  truncateAndTrim( $bd->total_salary)  }}
                             </a>
                     </div>
               
@@ -920,23 +915,43 @@
                                 <tr>
                                     <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
                                     <td class="user-cell">
-                                        <div class="user-avatar">
-                                            <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ??''}}">
-                                        </div>
-                                        <div class="user-info">
-                                            <strong>{{ $agency->name ??'' }}</strong>
-                                            <!-- <small>UID: {{ $agency->notice ?? '' }}</small> -->
-                                        </div>
-                                    </td>
-                                    <td class="user-cell">
-                                        <div class="user-avatar">
-                                            <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->name ??''}}">
-                                        </div>
-                                        <div class="user-info">
-                                            <strong>{{ $agency->owner->name ??''}}</strong>
-                                        </div>
-                                    </td>
-                                    <td>{{ $agency->status }}</td>
+                                            <div class="user-avatar">
+                                                <a href=" {{ url('admin/agencies/profile/' .$agency->id) }}">
+                                                    <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ??'' }}">
+                                                </a>
+                                            </div>
+                                            <div class="user-info">
+                                                <strong>
+                                                    <a href="{{url('admin/agencies/profile/' .$agency->id) }}">
+                                                        {{ $agency->name ??'' }}
+                                                    </a>
+                                                </strong>
+                                            </div>
+                                        </td>
+
+                                        <td class="user-cell">
+                                            <div class="user-avatar">
+                                                <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                    <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ??'' }}">
+                                                </a>
+                                            </div>
+                                            <div class="user-info">
+                                                <strong>
+                                                    <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                        {{ $agency->owner?->name ??'' }}
+                                                    </a>
+                                                </strong>
+                                            </div>
+                                        </td>
+                                        <td class="">
+                                            @if($agency->status == 1)
+                                                <span style="color:green;" title="Active">&#10004;</span> {{-- ✔ --}}
+                                            @else
+                                                <span style="color:red;" title="Inactive">&#10008;</span> {{-- ✖ --}}
+                                            @endif
+                                        </td>
+
+
                                 </tr>
                             @endforeach
                         </tbody>
@@ -1102,45 +1117,40 @@
                 <h4 class="card-title">{{ __('Target History') }}</h4>
             </div>
             @if($target_history && $target_history->count())
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Agency ID') }}</th>
-                                <th>{{ __('Salary') }}</th>
-                                <th>{{ __('Cut Amount') }}</th>
-                                <th>{{ __('Total Agency Salary') }}</th>
-                                <th>{{ __('Total Users Salary') }}</th>
-                                <th>{{ __('Total Diamond') }}</th>
-                                <th>{{ __('Month') }}</th>
-                                <th>{{ __('Year') }}</th>
-                                <th>{{ __('Is Paid') }}</th>
-                                <th>{{ __('Created At') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($target_history as $index => $item)
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $target_history->firstItem() + $index }}</td>
-                                    <td>{{ $item->agency_id }}</td>
-                                    <td>{{ $item->sallary }}</td>
-                                    <td>{{ $item->cut_amount }}</td>
-                                    <td>{{ $item->total_agency_sallary }}</td>
-                                    <td>{{ $item->total_users_sallary }}</td>
-                                    <td>{{ $item->total_diamond }}</td>
-                                    <td>{{ $item->month }}</td>
-                                    <td>{{ $item->year }}</td>
-                                    <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
-                                    <td>{{ $item->created_at }}</td>
+                                    <th>#</th>
+                                    <th>{{ __('Agency ID') }}</th>
+                                    <th>{{ __('Salary') }}</th>
+                                    <th>{{ __('Amount') }}</th>
+                                    <th>{{ __('Month') }}</th>
+                                    <th>{{ __('Year') }}</th>
+                                    <th>{{ __('Is Paid') }}</th>
+                                    <th>{{ __('Created At') }}</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination-wrapper">
-                    {{ $target_history->appends(['tab' => 'target_history'])->links('vendor.pagination.default') }}
-                </div>
+                            </thead>
+                            <tbody>
+                                @foreach($target_history as $index => $item)
+                                    <tr>
+                                        <td>{{ $target_history->firstItem() + $index }}</td>
+                                        <td>{{ $item->agency_id }}</td>
+                                        <td>{{ $item->salary }}</td>
+                                        <td>{{ $item->amount }}</td>
+                                        <td>{{ $item->month }}</td>
+                                        <td>{{ $item->year }}</td>
+                                        <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
+                                        <td>{{ $item->created_at }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-wrapper">
+                        {{ $target_history->appends(['tab' => 'target_history'])->links('vendor.pagination.default') }}
+                    </div>
+
             @else
                 <div class="empty-table">
                     <i class="fas fa-calendar-times"></i>
@@ -1152,11 +1162,10 @@
 @endif
 
 </div>
-<!-- jQuery أولاً -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script> 
 
 
     <script>

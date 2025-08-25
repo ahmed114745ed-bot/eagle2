@@ -190,10 +190,13 @@ class RoomRepoService
 
     public function roomAdmins($ownerId)
     {
-        $room = $this->findRoomUser($ownerId);
+        $room = $this->repository->findRoomAdmins($ownerId, true);
         if (!$room) throw new \Exception(__('room not found'));
-        $room_admin = explode(',', $room->room_admin);
-        return $this->userRepository->getUsers($room_admin);
+    
+        if (empty($room->room_admin)) return collect();
+    
+        $adminIds = explode(',', $room->room_admin);
+        return $this->userRepository->getAdmins($adminIds);
     }
 
     public function changePasswordRoom($ownerId)

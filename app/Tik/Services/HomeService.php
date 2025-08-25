@@ -17,6 +17,7 @@ use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;
+use Illuminate\Support\Facades\Log;
 use Modules\Vip\Repositories\OvipRepository;
 use Modules\Vip\Repositories\UserVipRepository;
 
@@ -140,33 +141,33 @@ class HomeService
 
         // Ensure the user has the pack before updating
         $packQuery = Pack::where('user_id', $user->id)
-            ->where('type', $privilegeId);
-
-        if(!$isAvailable) $packQuery->where('is_used', true);
-
-        if (!$packQuery->exists()) {
-            throw new Exception(__('api.notWare'));
-        }
-
-        // Fetch the specific pack with VIP level and expiration check
-        $pack = $packQuery
+            ->where('vip_user_id',$user->UserVip->id)
             ->whereHas('ware', fn($q) => $q->where('level', $user->UserVip->level ?? 0))
             ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
-            ->first();
+            ->where('type', $privilegeId);
+
+        if (!$isAvailable) $packQuery->where('is_used', 1);
+
+        if (!$packQuery->exists()) {
+
+            throw new Exception(__('api.notWare'));
+        }
+        if (!$user->UserVip) throw new Exception(__('api.notWare'));
+
+        // Fetch the specific pack with VIP level and expiration check
+        $pack = $packQuery->first();
 
         if (!$pack) {
             throw new \Exception(__('api.notWare'));
         }
-
         // Update pack status
         $pack->update([
             'is_used' => $isAvailable,
             'using' => 1,
         ]);
-      
+
 
 
         return true;
     }
-
 }

@@ -58,24 +58,24 @@ class UserRewardsWeeklyCp
         self::genderForReward($ware, $reward, $userOne, $userTwo);
     }
 
-    public  function genderForReward($ware, $reward, $userOne, $userTwo)
+    public static function genderForReward($ware, $reward, $userOne, $userTwo)
     {
         if ($reward->gender === 'male') {
-            $this->assignWareToUserByGender($ware, $reward->expire, $userOne, 1);
-            $this->assignWareToUserByGender($ware, $reward->expire, $userTwo, 1);
+            self::assignWareToUserByGender($ware, $reward->expire, $userOne, 1);
+            self::assignWareToUserByGender($ware, $reward->expire, $userTwo, 1);
         } elseif ($reward->gender === 'female') {
-            $this->assignWareToUserByGender($ware, $reward->expire, $userOne, 2);
-            $this->assignWareToUserByGender($ware, $reward->expire, $userTwo, 2);
+            self::assignWareToUserByGender($ware, $reward->expire, $userOne, 2);
+            self::assignWareToUserByGender($ware, $reward->expire, $userTwo, 2);
         } else {
-            UserCommon::addWareToUser($userOne, $ware, $reward->expire);
-            UserCommon::addWareToUser($userTwo, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userOne, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userTwo, $ware, $reward->expire);
         }
     }
 
     public  static function assignWareToUserByGender($ware, $expire, $user, $gender)
     {
         if ($user->profile?->gender === $gender) {
-            UserCommon::addWareToUser($user, $ware, $expire);
+            UserCommon::addEvintsWareToUser($user, $ware, $expire);
         }
     }
     public static function assignAchievement($itemId, $expire, $userOne, $userTwo)

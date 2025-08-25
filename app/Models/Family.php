@@ -14,7 +14,7 @@ class Family extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['rank'];
+    protected $appends = [];
 
     private $cachedLevelMax = null;
 
@@ -195,7 +195,7 @@ class Family extends Model
             $this->save();
         }*/
 
-        return $this->today_rank;
+        return $this->attributes['today_rank'] ?? 0;
     }
 
     public function getWeekRankAttribute($val)
@@ -208,7 +208,7 @@ class Family extends Model
             $this->save();
         }*/
 
-        return $this->week_rank;
+        return $this->attributes['week_rank'] ?? 0;
     }
 
     public function getMonthRankAttribute($val)
@@ -221,7 +221,7 @@ class Family extends Model
             $this->save();
         }*/
 
-        return $this->month_rank;
+        return $this->attributes['month_rank'] ?? 0;
     }
 
     /*public function setTodayRankAttribute()

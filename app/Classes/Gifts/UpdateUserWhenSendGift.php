@@ -11,6 +11,7 @@ use Modules\Vip\Entities\Vip;
 use App\Models\UserGift;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
 
@@ -139,6 +140,7 @@ class UpdateUserWhenSendGift
      */
     public function sendFromBagAndRemoveGift(int $totalCoins, User $senderUser, int $giftId, int $number)
     {
+        Log::info("gooooooooooood");
         $senderUser->enableSaving = false;
         $senderUser->monthly_diamond_send += $totalCoins;
         $senderUser->total_diamond_send   += $totalCoins;
