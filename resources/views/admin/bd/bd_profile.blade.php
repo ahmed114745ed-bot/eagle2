@@ -948,7 +948,7 @@
                                                 </strong>
                                             </div>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="">
                                             @if($agency->status == 1)
                                                 <span style="color:green;" title="Active">&#10004;</span> {{-- ✔ --}}
                                             @else
