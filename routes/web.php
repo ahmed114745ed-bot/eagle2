@@ -376,6 +376,24 @@ Route::get('/send-notification/{id}', function ($id) {
     return "notifaction send successfully!";
 });
 
+Route::get('/send_test_notifications', function ($id) {
+
+    $notificationTokens = DB::table('users')->orderBy('id', 'desc')->limit(100)->pluck('notification_id')->filter()->toArray();
+
+    $title = 'Test';
+    $body = 'Test';
+
+    // CustomNotification::charges(
+    //     $to,
+    //     $title,
+    //     $body,
+    //     ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
+    // );
+
+    Common::send_firebase_notification($notificationTokens, $title, $body, '', [], 'vip');
+
+    return "notification sent successfully!";
+});
 
 Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
 Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
