@@ -33,6 +33,13 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/users-reset-monthly-diamond.log'))
             ->runInBackground();
+        
+            $schedule->command('realtime-project')
+            ->monthly()
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/realtime-project.log'))
+            ->runInBackground();
+
 
              $schedule->command('realtime-project')
             ->monthly()
