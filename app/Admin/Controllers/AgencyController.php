@@ -831,11 +831,6 @@ class AgencyController extends MainController
 
             ]);
             
-            uploadMonthlyDiamondReceive(intval($appOwnerId), 0);
-            // }
-
-
-
         });
 
         $form->saved(function (Form $form) {
