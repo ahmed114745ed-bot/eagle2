@@ -36,7 +36,6 @@ class SendFirebaseNotificationJob implements ShouldQueue
         $projectId = env('FIREBASE_PROJECT_NAME');
 
         $client = new Client([
-            'base_uri' => "https://fcm.googleapis.com/v1/projects/{$projectId}/",
             'headers'  => [
                 'Authorization' => 'Bearer ' . $api_access_key,
                 'Content-Type'  => 'application/json',
@@ -45,13 +44,17 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
         $promises = [];
 
-        foreach ($this->tokens as $token) {
-            $user= User::where('notification_id',$token)->first();
+        $users =  User::select(['id', 'notification_id'])->whereIn('notification_id',$this->tokens)
+            ->where('is_logout', 0)
+            ->where('notification_id', '!=', null)
+            ->get();
 
+        $hasInPack = $this->user && Common::hasInPack($this->user->id, 18, true);
 
-            if (!$user || $user->is_logout) {
-                continue;
-            }
+        foreach ($users as $user) {
+
+            $token = $user->notification_id;
+
 
             $notification = [
                 'title' => $this->title,
@@ -60,11 +63,12 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
             $userData = [];
             if ($this->user) {
+
                 $userData = [
                     'user_id'        => $this->user->id,
                     'name'           => $this->user->name,
                     'uuid'           => $this->user->uuid,
-                    'has_color_name' => Common::hasInPack($this->user->id, 18, true),
+                    'has_color_name' => $hasInPack,
                     'image'          => $this->user->profile->avatar ?? '',
                 ];
             }
@@ -96,7 +100,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 $payload['notification']['image'] = $this->data['image'];
             }
 
-            $promises[$token] = $client->postAsync("messages:send", [
+            $promises[$token] = $client->postAsync("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
                 'json' => ['message' => $payload]
             ]);
 
@@ -113,13 +117,8 @@ class SendFirebaseNotificationJob implements ShouldQueue
 
         try {
             Utils::unwrap($promises);
-        } catch (\Throwable $e) {
+        } catch (\Throwable $_) {
         }
-
-        $end = microtime(true);
-        $timeTaken = round($end - $start, 3);
-        info($timeTaken);
-
     }
 
 }
