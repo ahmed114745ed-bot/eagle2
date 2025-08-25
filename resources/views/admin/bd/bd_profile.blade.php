@@ -1121,45 +1121,40 @@
                 <h4 class="card-title">{{ __('Target History') }}</h4>
             </div>
             @if($target_history && $target_history->count())
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Agency ID') }}</th>
-                                <th>{{ __('Salary') }}</th>
-                                <th>{{ __('Cut Amount') }}</th>
-                                <th>{{ __('Total Agency Salary') }}</th>
-                                <th>{{ __('Total Users Salary') }}</th>
-                                <th>{{ __('Total Diamond') }}</th>
-                                <th>{{ __('Month') }}</th>
-                                <th>{{ __('Year') }}</th>
-                                <th>{{ __('Is Paid') }}</th>
-                                <th>{{ __('Created At') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($target_history as $index => $item)
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $target_history->firstItem() + $index }}</td>
-                                    <td>{{ $item->agency_id }}</td>
-                                    <td>{{ $item->sallary }}</td>
-                                    <td>{{ $item->cut_amount }}</td>
-                                    <td>{{ $item->total_agency_sallary }}</td>
-                                    <td>{{ $item->total_users_sallary }}</td>
-                                    <td>{{ $item->total_diamond }}</td>
-                                    <td>{{ $item->month }}</td>
-                                    <td>{{ $item->year }}</td>
-                                    <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
-                                    <td>{{ $item->created_at }}</td>
+                                    <th>#</th>
+                                    <th>{{ __('Agency ID') }}</th>
+                                    <th>{{ __('Salary') }}</th>
+                                    <th>{{ __('Amount') }}</th>
+                                    <th>{{ __('Month') }}</th>
+                                    <th>{{ __('Year') }}</th>
+                                    <th>{{ __('Is Paid') }}</th>
+                                    <th>{{ __('Created At') }}</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                <div class="pagination-wrapper">
-                    {{ $target_history->appends(['tab' => 'target_history'])->links('vendor.pagination.default') }}
-                </div>
+                            </thead>
+                            <tbody>
+                                @foreach($target_history as $index => $item)
+                                    <tr>
+                                        <td>{{ $target_history->firstItem() + $index }}</td>
+                                        <td>{{ $item->agency_id }}</td>
+                                        <td>{{ $item->salary }}</td>
+                                        <td>{{ $item->amount }}</td>
+                                        <td>{{ $item->month }}</td>
+                                        <td>{{ $item->year }}</td>
+                                        <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
+                                        <td>{{ $item->created_at }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-wrapper">
+                        {{ $target_history->appends(['tab' => 'target_history'])->links('vendor.pagination.default') }}
+                    </div>
+
             @else
                 <div class="empty-table">
                     <i class="fas fa-calendar-times"></i>
