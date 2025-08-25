@@ -139,7 +139,6 @@ class HomeService
             throw new Exception('not found');
         }
 
-        Log::info($privilegeId);
         // Ensure the user has the pack before updating
         $packQuery = Pack::where('user_id', $user->id)
             ->where('type', $privilegeId);
@@ -154,6 +153,7 @@ class HomeService
 
         // Fetch the specific pack with VIP level and expiration check
         $pack = $packQuery
+            ->where('vip_user_id',$user->UserVip->id)
             ->whereHas('ware', fn($q) => $q->where('level', $user->UserVip->level ?? 0))
             ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
             ->first();
