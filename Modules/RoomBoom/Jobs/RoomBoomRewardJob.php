@@ -55,7 +55,9 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $rewards = RoomBoomReward::where('room_boom_level_id', $level->id)->orderBy('priority')->get();
 
-        $rewardItems[] = $this->getRewardItems($rewards);
+        $rewardItems = [];
+
+        $this->getRewardItems($rewards, $rewardItems);
 
         $topContributorIds = $this->getTopContributorIds($roomId, $level->level);
 
@@ -131,7 +133,7 @@ class RoomBoomRewardJob implements ShouldQueue
                 $reward = $remainingRewards[$i];
                 $this->distributeBoomRewards($visitorId, $reward);
 
-                $this->assignWinnerData();
+                $this->assignWinnerData($visitorId, $reward);
             }
         }
     }
@@ -141,6 +143,7 @@ class RoomBoomRewardJob implements ShouldQueue
      */
     public function distributeBoomRewards($userId, $reward): void
     {
+        info($userId);
         $user = $this->users[$userId] ?? null;
         $token = $user->notification_id;
 
@@ -206,11 +209,11 @@ class RoomBoomRewardJob implements ShouldQueue
         }
     }
 
-    public function getRewardItems($rewards)
+    public function getRewardItems($rewards, &$rewardItems): void
     {
         foreach ($rewards as $reward) {
             for ($i = 0; $i < $reward->quantity; $i++) {
-                return [
+                $rewardItems[] = [
                     'id' => $reward->id,
                     'target_type' => $reward->target_type,
                     'target' => $reward->target,
@@ -241,12 +244,10 @@ class RoomBoomRewardJob implements ShouldQueue
             ->toArray();
     }
 
-    public function assignWinnerData($userId = null, $reward = null): void
+    public function assignWinnerData($userId, $reward): void
     {
-        if ($userId && $reward){
-            $this->assignedUserIds[] = $userId;
-            $this->assignments[] = $reward;
-        }
+        $this->assignedUserIds[] = $userId;
+        $this->assignments[] = $reward;
 
         $this->winnerData[] = [
             'user_id' => $userId,
@@ -280,7 +281,6 @@ class RoomBoomRewardJob implements ShouldQueue
     protected function dispatchPendingNotifications(): void
     {
         if (!empty($this->achievementNotifications)) {
-            info($this->achievementNotifications['tokens']);
             Common::send_firebase_notification(
                 $this->achievementNotifications['tokens'],
                 $this->achievementNotifications['title'],
@@ -289,7 +289,6 @@ class RoomBoomRewardJob implements ShouldQueue
         }
 
         if (!empty($this->giftNotifications)) {
-            info($this->giftNotifications['tokens']);
             Common::send_firebase_notification(
                 $this->giftNotifications['tokens'],
                 $this->giftNotifications['title'],
