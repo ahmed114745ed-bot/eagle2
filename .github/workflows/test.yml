@@ -4,7 +4,7 @@ on:
     branches: ["test"]
 jobs:
   run_example_job:
-    runs-on: [self-hosted]
+    runs-on: [hosted]
     steps:
     - name: print out Eagle final marge 
       uses: appleboy/ssh-action@v1.2.1
