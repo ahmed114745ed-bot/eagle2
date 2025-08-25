@@ -267,13 +267,7 @@ class UserController extends MainController
         $permission = $this->permission_name;
 
 
-        if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            $grid->column('transfer_salary', __("transfer_salary"))
-            ->display(function () {
-                return $this->transfer_salary ? 1 : 0;
-            })
-            ->switch(Common::getSwitchStates());
-        }
+   
         Admin::script("
             $(document).on('click', '.show-same-device-modal', function() {
                 console.log('here');
@@ -329,9 +323,9 @@ class UserController extends MainController
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //     $actions->add(new ChargeSwitchAction());
-            // }
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new ChargeSwitchAction());
+            }
             if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new InviteSwitchAction());
