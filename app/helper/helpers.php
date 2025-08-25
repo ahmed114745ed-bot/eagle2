@@ -187,11 +187,12 @@ if (!function_exists('upload')) {
 if (!function_exists('uploadMonthlyDiamondReceive')) {
     function uploadMonthlyDiamondReceive($user_id, $monthlyDiamondValue)
     {
+        $date = \Carbon\Carbon::now(getTimezone());
         MonthlyDiamondReceive::updateOrCreate(
             [
                 'user_id' => $user_id,
-                'month'   => now()->month,
-                'year'    => now()->year,
+                'month' => $date->month,
+                'year'  => $date->year,
             ],
             [
                 'monthly_diamond_received' => $monthlyDiamondValue,
