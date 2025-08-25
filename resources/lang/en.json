@@ -1098,5 +1098,14 @@
 "Rules (EN)": "Rules (English)",
 "Content": "Content",
 "Created At": "Created At",
-"Updated At": "Updated At"
+"Updated At": "Updated At",
+"BD Action": "إجراء BD",
+"Remove BD": "إزالة BD",
+"Are you sure?": "هل أنت متأكد؟",
+"Do you want to remove BD for this user?": "هل تريد إزالة BD لهذا المستخدم؟",
+"Yes, remove it!": "نعم، أزلها!",
+"Cancel": "إلغاء",
+"Removed!": "تم الإزالة!",
+"Error": "خطأ",
+"Something went wrong": "حدث خطأ ما"
 }
