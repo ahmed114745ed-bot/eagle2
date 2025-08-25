@@ -141,6 +141,9 @@ class HomeService
 
         // Ensure the user has the pack before updating
         $packQuery = Pack::where('user_id', $user->id)
+            ->where('vip_user_id',$user->UserVip->id)
+            ->whereHas('ware', fn($q) => $q->where('level', $user->UserVip->level ?? 0))
+            ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
             ->where('type', $privilegeId);
 
         if (!$isAvailable) $packQuery->where('is_used', 1);
@@ -152,11 +155,7 @@ class HomeService
         if (!$user->UserVip) throw new Exception(__('api.notWare'));
 
         // Fetch the specific pack with VIP level and expiration check
-        $pack = $packQuery
-            ->where('vip_user_id',$user->UserVip->id)
-            ->whereHas('ware', fn($q) => $q->where('level', $user->UserVip->level ?? 0))
-            ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
-            ->first();
+        $pack = $packQuery->first();
 
         if (!$pack) {
             throw new \Exception(__('api.notWare'));
