@@ -605,6 +605,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 return Common::send_firebase_notification($tokens, $title, $body);
             });
 
+            Route::get('/send_test_notifications', function () {
+
+                $notificationTokens = DB::table('users')->orderBy('id', 'desc')->limit(100)->pluck('notification_id')->filter()->toArray();
+
+                $title = 'Test';
+                $body = 'Test';
+
+                Common::send_firebase_notification($notificationTokens, $title, $body, '', [], 'vip');
+
+                return "notification sent successfully!";
+            });
+
             Route::get('/unsubscribe-all-from-topic/{topic}', function ($topic) {
                 $tokens = User::whereNotNull('notification_id')
                     ->pluck('notification_id')

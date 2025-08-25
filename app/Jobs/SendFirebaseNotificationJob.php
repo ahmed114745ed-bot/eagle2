@@ -4,6 +4,7 @@ namespace App\Jobs;
 use App\Models\User;
 use App\Helpers\Common;
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise\Utils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Queue\SerializesModels;
@@ -34,15 +35,15 @@ class SendFirebaseNotificationJob implements ShouldQueue
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
 
-//        $client = new Client([
-//            'base_uri' => "https://fcm.googleapis.com/v1/projects/{$projectId}/",
-//            'headers'  => [
-//                'Authorization' => 'Bearer ' . $api_access_key,
-//                'Content-Type'  => 'application/json',
-//            ]
-//        ]);
-//
-//        $promises = [];
+        $client = new Client([
+            'base_uri' => "https://fcm.googleapis.com/v1/projects/{$projectId}/",
+            'headers'  => [
+                'Authorization' => 'Bearer ' . $api_access_key,
+                'Content-Type'  => 'application/json',
+            ]
+        ]);
+
+        $promises = [];
 
         foreach ($this->tokens as $token) {
             $user= User::where('notification_id',$token)->first();
@@ -95,19 +96,24 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 $payload['notification']['image'] = $this->data['image'];
             }
 
-//            $promises[$token] = $client->postAsync("messages:send", [
-//                'json' => ['message' => $payload]
-//            ]);
+            $promises[$token] = $client->postAsync("messages:send", [
+                'json' => ['message' => $payload]
+            ]);
 
-            $headers = [
-                'Authorization' => 'Bearer ' . $api_access_key,
-                'Content-Type'  => 'application/json',
-            ];
+//            $headers = [
+//                'Authorization' => 'Bearer ' . $api_access_key,
+//                'Content-Type'  => 'application/json',
+//            ];
+//
+//            if (!$user->is_logout)     Http::withHeaders($headers)->post(
+//                "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
+//                ['message' => $payload]
+//           );
+        }
 
-            if (!$user->is_logout)     Http::withHeaders($headers)->post(
-                "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
-                ['message' => $payload]
-           );
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
         }
 
         $end = microtime(true);
