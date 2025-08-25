@@ -5,7 +5,7 @@ namespace Modules\Events\Http\Controllers;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
@@ -154,7 +154,7 @@ class ChargeEventController extends Controller
                 UserCommon::addVipToUser($user, $vip, $reward->expire);
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
-                UserCommon::addWareToUser($user, $ware, $reward->expire);
+                UserCommon::addEvintsWareToUser($user, $ware, $reward->expire);
             } elseif ($reward->type == "achievement") {
                 $attributes = [
                     'user_id'       => $user->id,

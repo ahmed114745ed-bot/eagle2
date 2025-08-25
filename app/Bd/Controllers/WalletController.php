@@ -298,6 +298,7 @@ class WalletController extends MainController
 
     public function charge(Request $request)
     {
+       
         try {
             $request->validate([
                 'amount' => 'required|integer|min:1',
@@ -305,13 +306,13 @@ class WalletController extends MainController
                 'target_type' => 'required|string',
             ]);
 
-
             $types = [
                 'user' => [$this, 'chargeToUser'],
                 'agency' => [$this, 'chargeToAgency']
             ];
 
             $type = $request->input('target_type');
+          
 
             if (!array_key_exists($type, $types)) {
                 admin_toastr('نوع الوجهة غير موجود', 'error');
@@ -334,27 +335,30 @@ class WalletController extends MainController
 
     public function chargeToUser(array $data)
     {
-        $appID = Auth::user()->id;
-        $sender = Bd::find($appID);
+       
+        $bdId = Auth::user()->id;
+        // $sender = Auth::user();
         $amount = $data['amount'];
         $receiverId = $data['target_id'] ?? null;
 
-
-        $totalSalary = $sender?->bdSalary ?? 0;
-        if ($totalSalary < $amount) {
-            throw new \Exception(__('balance not enough'));
-        }
+     
+ 
+     
 
         $receiver = User::find($receiverId);
+        $sender = Bd::find($bdId);
         if (!$receiver) {
             throw new \Exception(__('this user not found'));
         }
-
         if ($sender->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }
         if ($receiver->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_receiver'));
+        }
+        $totalSalary = $sender?->bdSalary ?? 0;
+        if ($totalSalary < $amount) {
+            throw new \Exception(__('balance not enough'));
         }
         $rate = Common::getCoinsValue('user_coins');
         if (!$rate) {
@@ -428,10 +432,10 @@ class WalletController extends MainController
 
             throw new \Exception(__('api_responses.freez_charge'));
         }
-
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }
+
         if (!is_numeric($usd) || $usd <= 0) {
             throw new \Exception(__('This value is not allowed'));
         }

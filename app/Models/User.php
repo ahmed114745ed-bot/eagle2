@@ -7,6 +7,7 @@ use App\Traits\FollowTrait;
 use App\Traits\MomentRelationshipTrait;
 use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
+use App\Traits\User\UserLevel;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -31,13 +32,14 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
 use App\Models\Config as ConfigModel;
-
+use Modules\Vip\Entities\UserVip;
+use Modules\Vip\Entities\Vip;
 /**
  * @method static withoutAppends()
  */
 class User extends Authenticatable
 {
-    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait;
+    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -61,6 +63,8 @@ class User extends Authenticatable
     ];
 
     protected $dates = ['deleted_at'];
+
+    protected ?string $cachedComputedUuid = null;
 
     /**
      * The attributes that should be hidden for serialization.
@@ -94,7 +98,9 @@ class User extends Authenticatable
         'is_frozen',
         'total_charge_level',
         'photo',
+        'org_online_time'
     ];
+
 
     /* protected $appends = [
          'my_store',
@@ -1358,12 +1364,30 @@ class User extends Authenticatable
      */
     public function getUuidAttribute($value)
     {
-        $pack = $this->getLoadedPacks()
-            ->where('ware.value', $this->special_id)
-            ->first();
+        if ($this->relationLoaded('packs')) {
+            $pack = $this->packs
+                ->where('type', 25)
+                ->where('is_used', true)
+                ->where('ware.value', $this->special_id)
+                ->first();
+        } else {
+            $pack = $this->packs()
+                ->with('ware')
+                ->where('type', 25)
+                ->where('is_used', true)
+                ->whereHas('ware', fn ($q) => $q->where('value', $this->special_id))
+                ->first();
+        }
 
-        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : $this->original_uuid;
+        return ($this->special_id && $pack && $pack->is_used === 1)
+            ? $this->special_id
+            : $this->original_uuid;
     }
+
+
+
+
+
 
     // originalUuid
     public function getOriginalUuidAttribute()
@@ -1395,6 +1419,13 @@ class User extends Authenticatable
 
         return $value;
     }
+
+    public function getOrgOnlineTimeAttribute()
+    {
+        return $this->attributes['online_time'] ?? null;
+    }
+
+ 
 
     public function getRealOnlineTimeAttribute()
     {
@@ -1595,23 +1626,6 @@ class User extends Authenticatable
 
     public function getUserTypesAttribute(): array
     {
-        // $userTypes = match (true) {
-        //     in_array($this->type_user, [2, 4]) => [1, 2],
-        //     $this->type_user === 1 => [1],
-        //     default => []
-        // };
-
-        // if ($this->is_bd) {
-        //     return [4];
-        // }
-
-        // if ($this->hasShippingAgency()) {
-        //     $userTypes[] = 3;
-        // }
-
-        // $userTypes = array_unique($userTypes);
-
-        // return empty($userTypes) ? [0] : $userTypes;
         $userTypes = [];
 
         if ($this->type_user >= 1) {
@@ -1634,6 +1648,7 @@ class User extends Authenticatable
 
         return empty($userTypes) ? [0] : $userTypes;
     }
+
 
     public function sallariesByMonth()
     {
@@ -1784,4 +1799,29 @@ class User extends Authenticatable
     {
         return $this->packs?->where('type', 28)->where('is_used', 1)->first()?->ware;
     }
+    public function myGifts()
+    {
+        return $this->belongsToMany(Gift::class, 'user_gifts')
+            ->withPivot('quantity', 'expire')
+            ->withTimestamps()
+            ->where(function ($query) {
+                $query->where('user_gifts.expire', 0)
+                      ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
+            });
+    }
+
+
+    public function activePack20()
+    {
+        return $this->hasOne(Pack::class)
+                    ->where('is_used', 1)
+                    ->where('type', 20)
+                    ->where(function($q) {
+                        $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                    });
 }
+
+}
+
+

@@ -18,11 +18,12 @@ class BdAgencyHostSallaryService
 
     protected static function calculateTotalSallary(int $bdId, int $month, int $year): float
     {
-        return BdAgencyHostSallary::where([
-            'bd_id' => $bdId,
-            'month' => $month,
-            'year'  => $year,
-        ])->sum('amount');
+        $subQuery = BdAgencyHostSallary::where('bd_id', $bdId)
+                                        ->where('month', $month)
+                                        ->where('year', $year)
+                                        ->sum('amount');
+        return  $subQuery;
+          
     }
 
     protected static function storeOrUpdateBdSalary(int $bdId, int $month, int $year, float $salary): void
@@ -72,7 +73,7 @@ class BdAgencyHostSallaryService
         }
     
         $attributes = self::buildAttributes($data, $bdUserId);
-        $newSalary = Self::getOldSalary($data['bd_id']);
+        $newSalary = Self::getOldSalary($data['bd_id'],$data['user_id']);
         $values = self::buildValues($data, $difference,$newSalary);
     
         BdAgencyHostSallary::create(array_merge($attributes, $values));
@@ -133,9 +134,11 @@ class BdAgencyHostSallaryService
 
     
     
-    protected static function getOldSalary(int $bdId): float
+    protected static function getOldSalary(int $bdId ,$userId): float
     {
-        return BdAgencyHostSallary::where('bd_id', $bdId)
+        return BdAgencyHostSallary::
+             where('bd_id', $bdId)
+             ->where('user_id', $userId)
             ->orderByDesc('id')
             ->value('salary') ?? 0;
     }

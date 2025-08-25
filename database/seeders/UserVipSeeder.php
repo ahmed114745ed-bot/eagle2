@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use Illuminate\Database\Seeder;
 
 

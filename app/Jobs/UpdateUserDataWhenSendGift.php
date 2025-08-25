@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Classes\Gifts\SendGiftService;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Helpers\UserCommon;
+use App\Models\Cp;
 use App\Models\Gift;
 use App\Models\Room;
 use App\Models\User;
@@ -14,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Modules\CP\Http\Services\CpService;
 
 class UpdateUserDataWhenSendGift implements ShouldQueue
 {
@@ -36,6 +38,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     public function handle(): void
     {
         $user = User::Find($this->userId);
+
         $room =
             Room::withoutAppends()->where(['id' => $this->roomId])
                 ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone')
@@ -68,8 +71,17 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
 
         $price = $number * ($gift->price * 0.1);
 
+        $cpId = Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
+
+        $cpIds = [];
+        if ($cpId != null) {
+     
+            $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $gift->id, $price);
+
+        }
+
         $sendGiftServices = new SendGiftService();
-        $sendGiftServices->sendGift2($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0);
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0 , cpIds: $cpIds);
 
     }
 

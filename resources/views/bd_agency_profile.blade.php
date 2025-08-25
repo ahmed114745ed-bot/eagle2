@@ -871,7 +871,7 @@
         <!-- Header Section -->
         <div class="agency-header">
             <div class="agency-avatar" style="width: 183px !important;">
-                <img src="{{ @$imageUrl??asset('images/icon-agency.jpg') }}" alt="Agency Logo" class="logo-img">
+                <img src="{{ @$imageUrl ?? asset('images/icon-agency.jpg') }}" alt="Agency Logo" class="logo-img">
             </div>
             <div class="agency-info">
                 <h1 class="agency-name">{{ @$agency?->name ?? ''}}</h1>
@@ -881,8 +881,10 @@
                         <span class="meta-value">{{ $agency->id }}</span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">{{__("Phone")}}:</span>
-                        <span class="meta-value">{{ @$agency->phone ?? 'N/A' }}</span>
+                        <span class="meta-label">{{ __("Phone") }}:</span>
+                        <span class="meta-value" style="direction: ltr; display: inline-block;">
+                            {{ ($agency->phone_code ?? '') . ($agency->phone ?? '') ?: 'N/A' }}
+                        </span>
                     </div>
                 </div>
                 <div class="agency-stats">
@@ -907,7 +909,7 @@
 
             <div class="agency-avatar" style="border-radius: 50%;">
                 @php
-                $url =  url("admin/users/{$agency?->owner?->id}");
+                $url =  url("bd/users/profile/{$agency?->owner?->id}");
                 @endphp
             <a href="{{ $url }}">
                 <img src="{{ getImagePath($agency?->owner?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}" class="logo-img">
@@ -1079,7 +1081,7 @@
             </div>
             <div class="card">
             <div class="card-body">
-                <form action="{{ url('admin/agencies/' . $agency->id) }}" class="form-horizontal member-form" method="GET" pjax-container>
+                <form action="{{ url('bd/agencies/profile/' . $agency->id) }}" class="form-horizontal member-form" method="GET" pjax-container>
                     <input type="hidden" name="tab" value="members">
                     <input type="hidden" name="members_page" value="{{ request()->get('members_page', 1) }}">
 
@@ -1107,7 +1109,7 @@
                             <button type="submit" class="btn btn-info btn-sm me-2">
                                 <i class="fa fa-search"></i> {{__('Search')}}
                             </button>
-                            <a href="{{ url('admin/agencies/' . $agency->id. '?'.'tab=members' ) }}" class="btn btn-default btn-sm">
+                            <a href="{{ url('bd/agencies/profile/' . $agency->id. '?'.'tab=members' ) }}" class="btn btn-default btn-sm">
                                 <i class="fa fa-undo"></i> {{__('Reset')}}
                             </a>
                         </div>
@@ -1496,7 +1498,7 @@
 
                         <div class="card-target-filter-phone ">
                             <!-- Filter Form -->
-                            <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                            <form method="GET" action="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                 class="filter-form">
                                 <div class="row">
                                     <input type="hidden" name="tab" value="targets">
@@ -1533,7 +1535,7 @@
                                             <i class="fas fa-filter"></i> {{ __('Apply') }}
                                         </button>
                                         @if(request()->has('month') || request()->has('year'))
-                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                                            <a href="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                                 class="btn btn-outline-secondary ml-2" title="Reset filters">
                                                 <i class="fas fa-times"></i>
                                             </a>
@@ -1570,7 +1572,7 @@
 
 
                         <div class="card-target-filter">
-                            <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                            <form method="GET" action="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                 class="filter-form">
                                 <div class="row">
                                     <input type="hidden" name="tab" value="targets">
@@ -1607,7 +1609,7 @@
                                             <i class="fas fa-filter"></i> {{ __('Apply') }}
                                         </button>
                                         @if(request()->has('month') || request()->has('year'))
-                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}"
+                                            <a href="{{ url('bd/agencies/profile/' . $agency->id) }}"
                                                 class="btn btn-outline-secondary ml-2" title="Reset filters">
                                                 <i class="fas fa-times"></i>
                                             </a>

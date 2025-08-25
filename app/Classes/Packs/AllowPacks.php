@@ -3,7 +3,7 @@
 namespace App\Classes\Packs;
 
 use App\Helpers\Common;
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use Illuminate\Database\Eloquent\Collection;
@@ -58,6 +58,7 @@ class AllowPacks
     public function isPackUsedAndExist(int $id): bool
     {
         return $this->packs
+            ->where('vip_user_id',$this->user?->UserVip->id)
             ->where('type', $id)
             ->where('is_used', 1)
             ->isNotEmpty();
@@ -87,7 +88,7 @@ class AllowPacks
             ->where('is_active_for_vip', true)
             ->groupBy('type')
             ->get();
-
+         
         // Load VIP prices
         $this->vipPrices = $this->getVipPrices();
     }
@@ -114,8 +115,7 @@ class AllowPacks
 
         foreach ($this->data as $key => $value) {
             $ware = $this->getWare($value);
-            if ($value === 16) {
-            }
+
             $isAllow = $this->isAllowToUser($ware) ?? false;
             $minLevel = @$ware->min_level;
 
@@ -131,9 +131,7 @@ class AllowPacks
                 'max' => @$ware->max_level,
                 'min_price' => @$this->vipPrices->where('id', $minLevel)?->first()?->price,
             ];
-            if ($value === 16) {
-
-            }
+            
 
         }
 

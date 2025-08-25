@@ -25,25 +25,30 @@ class HomeCarouselResource extends JsonResource
     }
 
     public function toArray($request)
-    {   
+    {
         $roomPass = $this->room?->room_pass ?? '';
         $ownerRoom = $this->user?->ownerRoom;
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom?->id) : null;
-        $avatar = Common::switch_events($this->event_type);
+        [$avatar, $cpAvatar, $nameOne, $nameTwo] = Common::switch_events($this->event_type);
 
-        $urlEvent = GeneralRole::where('type',$this->event_type)->first();
+        $urlEvent = GeneralRole::where('type', $this->event_type)->first();
         $data =  [
             'id'         => $this->id,
-            'img'        => $this->img ?:'',
+            'img'        => $this->img ?: '',
             'type'   => $this->type ?? '',
-            'url'        => ($this->type == 'link' || $this->event_type == 'event')? ($this->url ?? '') :( ($this->event_type == 'pk_event'||$this->event_type == 'weekly_star' ||$this->event_type == 'charge_event' ||$this->event_type =='event_period' ||$this->event_type =='weekly_cp')? ($urlEvent->url ?? ''):''),
+            'url'        => ($this->type == 'link' || $this->event_type == 'event') ? ($this->url ?? '') : (($this->event_type == 'pk_event' || $this->event_type == 'weekly_star' || $this->event_type == 'charge_event' || $this->event_type == 'event_period' || $this->event_type == 'weekly_cp') ? ($urlEvent->url ?? '') : ''),
             'isLocked'   =>   $roomPass != '' || $roomPass != null,
             'owner_id'   =>  $this->owner_id ?? 0,
             'avatar' => $avatar ?? "profile/g0lEsx7Joe.jpg",
-            'event_type' => $this->event_type
+            'event_type' => $this->event_type,
         ];
+        if ($this->event_type == 'weekly_cp') {
+             $data['cp_winner_name_one'] = $nameOne;
+             $data['cp_avatar_two'] = $cpAvatar ?? "profile/g0lEsx7Joe.jpg";
+             $data['cp_winner_name_two'] = $nameTwo;
+        }
 
-        if($this->type == 'room'){
+        if ($this->type == 'room') {
             $data += ['room' => [
                 "id" => @$ownerRoom->id ?? 0,
                 "owner_id" => @@$this->user->id ?? 0,

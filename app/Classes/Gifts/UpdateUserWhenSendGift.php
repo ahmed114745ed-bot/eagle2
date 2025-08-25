@@ -4,13 +4,14 @@ namespace App\Classes\Gifts;
 
 use App\Classes\Enums\NotificationType;
 use App\Exceptions\NotInfMoneyException;
-use App\Helpers\Common;
-use App\Jobs\LogUserCoinProfit;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
-use App\Models\Vip;
+use Mockery\Exception;
+use Modules\Vip\Entities\Vip;
+use App\Models\UserGift;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
 
@@ -45,7 +46,7 @@ class UpdateUserWhenSendGift
             try {
                 (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
 
-                if ($user->total_received_level > $lastReceivedLevel) {
+                if ($user->total_received_level != $lastReceivedLevel) {
                     dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
                 }
             } catch (\Exception $e) {
@@ -89,7 +90,7 @@ class UpdateUserWhenSendGift
         $totalDiamondReceived                  = $receivedUser->total_received_diamonds;
         $levelVip                     = $this->getLevel(1, $totalDiamondReceived);
         $receivedUser->received_level = $levelVip != null ? (@$levelVip->level - $receivedUser->sub_receiver_level) ?? 0 : 0;
-        if ($receivedUser->total_received_level > $lastReceivedLevel) {
+        if ($receivedUser->total_received_level != $lastReceivedLevel) {
             dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
         }
 
@@ -123,7 +124,7 @@ class UpdateUserWhenSendGift
             throw new NotInfMoneyException();
         }
         (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
-        if ($senderUser->total_sender_level > $lastSenderUser) {
+        if ($senderUser->total_sender_level != $lastSenderUser) {
             dispatch(new SendCustomOfficialMessageToUser($senderUser->id, NotificationType::SENDER_LEVEL))->onQueue('notification');
         }
 
@@ -133,6 +134,52 @@ class UpdateUserWhenSendGift
 
         return $senderUser;
     }
+
+    /**
+     * @throws \Throwable
+     */
+    public function sendFromBagAndRemoveGift(int $totalCoins, User $senderUser, int $giftId, int $number)
+    {
+        Log::info("gooooooooooood");
+        $senderUser->enableSaving = false;
+        $senderUser->monthly_diamond_send += $totalCoins;
+        $senderUser->total_diamond_send   += $totalCoins;
+        $lastSenderUser = $senderUser->total_sender_level;
+
+
+        $userGift = UserGift::where('user_id', $senderUser->id)
+            ->where('gift_id', $giftId)
+            ->where(function($query) {
+                $query->where('expire', 0)
+                    ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
+            })->first();
+
+
+        throw_if(( !$userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
+
+        $userGift->quantity -= $number;
+
+        if ($userGift->quantity > 0) {
+            $userGift->save();
+        } else {
+            $userGift->delete();
+        }
+
+
+        (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
+        if ($senderUser->total_sender_level > $lastSenderUser) {
+            dispatch(new SendCustomOfficialMessageToUser(
+                $senderUser->id,
+                NotificationType::SENDER_LEVEL
+            ))->onQueue('notification');
+        }
+
+        $senderUser->save();
+        $senderUser->enableSaving = true;
+
+        return $senderUser;
+    }
+
 
     public function getSenderLevel($totalDiamondSend, $totalDiamond, int $subSenderLevel)
     {

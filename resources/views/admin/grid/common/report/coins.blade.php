@@ -16,11 +16,6 @@
             <li class="{{ request()->name == 'games' ? 'active' : '' }}"><a href="?name=games" class="charge_action"><i
                         class="fa fa-arrow-right text-red"></i>{{ __('games') }}</a>
             </li>
-            <li class="{{ request()->name == 'shipping_host' ? 'active' : '' }}">
-                <a href="?name=shipping_host" class="charge_action"><i
-                        class="fa fa-arrow-right text-red"></i>{{ __('shipping_host') }}</a>
-            </li>
-
         </ul>
     </div>
 

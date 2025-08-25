@@ -47,8 +47,8 @@ class BdSalariesController extends AdminController
         $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
         $finalSalary = truncateAndTrim($finalSalary,2);
             return $content
-                ->header(trans('admin.index'))
-                ->description(trans('admin.description'))
+                ->header(trans('salaries'))
+                ->description(trans('salaries'))
 
         ->row(function ($row) use ($finalSalary) {
             $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalSalary]));
@@ -72,34 +72,41 @@ class BdSalariesController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new BdAgencyHostSallary());
-        $appID = Auth::user()->id;
+       
+       
+    $grid = new Grid(new BdAgencyHostSallary());
+    $appID = Auth::user()->id;
+
  
-        $grid->model()
+
+    $grid->model()
         ->where('bd_id', $appID)
         ->with('agency')
         ->selectRaw('
-        agency_id, 
-        month,
-        year,
-        SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
-        COUNT(*) as count,
-        (
-            SELECT SUM(CAST(sallary AS DECIMAL(15,4))) 
-            FROM user_sallaries 
-            WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
-                AND month = bd_agency_host_sallaries.month 
-                AND year = bd_agency_host_sallaries.year
-        ) as total_user_sallary,
-        (
-            SELECT SUM(CAST(agency_sallary AS DECIMAL(15,4))) 
-            FROM user_sallaries 
-            WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
-                AND month = bd_agency_host_sallaries.month 
-                AND year = bd_agency_host_sallaries.year
-        ) as total_agency_sallary
-    ')
-    ->groupBy('agency_id', 'month', 'year');
+            agency_id, 
+            month,
+            year,
+            SUM(CAST(amount AS DECIMAL(15,4))) as total_bd_sallary, 
+            COUNT(*) as count,
+            (
+                SELECT SUM(CAST(sallary AS DECIMAL(15,4))) 
+                FROM user_sallaries 
+                WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
+                    AND month = bd_agency_host_sallaries.month 
+                    AND year = bd_agency_host_sallaries.year
+            ) as total_user_sallary,
+            (
+                SELECT SUM(CAST(agency_sallary AS DECIMAL(15,4))) 
+                FROM user_sallaries 
+                WHERE user_agency_id = bd_agency_host_sallaries.agency_id 
+                    AND month = bd_agency_host_sallaries.month 
+                    AND year = bd_agency_host_sallaries.year
+            ) as total_agency_sallary
+        ')
+        ->groupBy('agency_id', 'month', 'year')
+        ->orderBy('year', 'desc')
+        ->orderBy('month', 'desc');
+
             
         $grid->disableActions();
         $grid->disableCreateButton();
@@ -172,15 +179,17 @@ class BdSalariesController extends AdminController
     
         $grid->column('total_bd_sallary', trans('totalBd'))->display(function ($value) {
           
-            return truncateAndTrim($value);
+            return truncateAndTrim($value , 2);
         });
         
         $grid->column('total_user_sallary', __('Total Users Sallary'))->display(function ($value) {
-            return truncateAndTrim($value);
+
+            return truncateAndTrim($value, 2);
         });
         
+        
         $grid->column('total_agency_sallary', __('Total Agency Sallary'))->display(function ($value) {
-            return truncateAndTrim($value);
+            return truncateAndTrim($value , 2);
         });
         $grid->disableRowSelector();
 

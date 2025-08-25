@@ -6,6 +6,7 @@ use Exception;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\CP\Http\Resources\TopWeeklyCpResource;
 use Modules\CP\Http\Services\WeeklyCpService;
 use Modules\CP\Http\Resources\WeeklyCpResource;
 use Modules\CP\Http\Resources\UserWeeklyCpResource;
@@ -47,13 +48,13 @@ class WeeklyCpController extends Controller
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
 
-        return Common::apiResponse(1, '', $data);
+        return Common::apiResponse(1, 'success', TopWeeklyCpResource::collection($data));
     }
 
     public function topOnePerviousWeeklyCp()
     {
         try {
-            $data = $this->weeklyCpService->topOnePerviousWeeklyCp();
+            $data = $this->weeklyCpService->topOneCurrentWeeklyCp();
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }

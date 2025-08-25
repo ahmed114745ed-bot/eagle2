@@ -64,15 +64,7 @@ view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
 
 Form::extend('dynamicFields', DynamicFields::class);
 
-if (request()->is('admin*')) {
-    if (auth()->check() && auth()->user()->type === 'bd') {
-        abort(403, 'Invalid request');
-    }
 
-    if (auth('bd')->check()) {
-        abort(403, 'Invalid request');
-    }
-}
 Encore\Admin\Admin::script(<<<'JS'
     $(document).on('pjax:start', function () {
         $('.select2-container--open').each(function () {

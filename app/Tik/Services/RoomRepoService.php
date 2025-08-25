@@ -3,6 +3,8 @@
 namespace App\Tik\Services;
 
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use App\Models\Config;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Schema;
@@ -62,6 +64,15 @@ class RoomRepoService
             if ($user->di < $paidRoomAmount->value){
                 throw new \Exception(__('you do not have enough coins for creating a room'));
             }
+
+            $amountBefore =  $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($paidRoomAmount->value),
+                $amountBefore,
+                UserCoinLogType::CREATE_ROOM,
+            );
+
             $user->di = $user->di - $paidRoomAmount->value;
             $user->save();
         }
@@ -179,10 +190,13 @@ class RoomRepoService
 
     public function roomAdmins($ownerId)
     {
-        $room = $this->findRoomUser($ownerId);
+        $room = $this->repository->findRoomAdmins($ownerId, true);
         if (!$room) throw new \Exception(__('room not found'));
-        $room_admin = explode(',', $room->room_admin);
-        return $this->userRepository->getUsers($room_admin);
+    
+        if (empty($room->room_admin)) return collect();
+    
+        $adminIds = explode(',', $room->room_admin);
+        return $this->userRepository->getAdmins($adminIds);
     }
 
     public function changePasswordRoom($ownerId)

@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\Api\V1\GiftLogController;
+use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\BdSalaryMigrationController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\RoomVisitor;
-use App\Models\VipPrivilege;
+use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RoomSettings;
 use App\Admin\Controllers\UserController;
 use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\SettingsController;
@@ -249,6 +249,7 @@ Route::group(
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('app_settings.index');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
@@ -357,7 +358,7 @@ Route::get('/generate-token/{id}', function ($id) {
 });
 
 Route::get('/send-notification/{id}', function ($id) {
-   
+
     $notificationToken[] = DB::table('users')->where('id', $id)->value('notification_id');
 
     $title = 'Coins Received';
@@ -409,3 +410,9 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
+
+Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
+    Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
+    Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
+    Route::post('/capture-order/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
+});

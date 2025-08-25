@@ -2,7 +2,7 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Selectables\Wares;
 use Encore\Admin\Form;
@@ -71,37 +71,47 @@ class RewardTargetController extends MainController
         $grid->model()->where("charge_event_id", $charge_event_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
-                return @$this->ware->name;
-            } elseif ($this->type == "vip") {
-                return @$this->vip->name;
-            } elseif ($this->type == "coins") {
-                return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
-            }
-        });
-        $grid->column('image', __('image'))->display(function ($path) {
-            if ($this->type == 'ware') {
-                $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware?->show_img;
-            } elseif ($this->type == 'vip') {
-                $vips = OVip::find($this->target);
-                $path = $vips?->img;
-            } elseif ($this->type == 'achievement') {
-                $path = $this?->target;
-            } else {
-                $path = 'coin.png';
-            }
 
-            /** @var Gift $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        if (!request()->filled('_export_')) { 
+            $grid->column('gift_id', __('gifts'))->display(function () {
+                if ($this->type == "ware") {
+                    return @$this->ware->name;
+                } elseif ($this->type == "vip") {
+                    return @$this->vip->name;
+                } elseif ($this->type == "coins") {
+                    return @$this->target;
+                } elseif ($this->type == "achievement") {
+                    $value = getDriverUrl() . '/' . @$this->target;
+                    return "<img src='$value' width='80' height='80'>";
+                }
+            });
+        }
+        if (!request()->filled('_export_')) { 
+            $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->type == 'ware') {
+                    $ware = Ware::find($this->target);
+                    $path = $ware->img2 ?? $ware?->show_img;
+                } elseif ($this->type == 'vip') {
+                    $vips = OVip::find($this->target);
+                    $path = $vips?->img;
+                } elseif ($this->type == 'achievement') {
+                    $path = $this?->target;
+                } else {
+                    $path = 'coin.png';
+                }
+
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
+        $grid->column('expire', __('expire'))->display(function ($expire) {
+            if ($this->type == 'coins') {
+               return  '-';
+            }
+            return $expire ;
         });
-        $grid->column('expire', __('expire'));
-        $grid->column('created_at', __('Created at'));
+                $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($target) {
             $url = url('admin/target-events');
@@ -112,7 +122,7 @@ class RewardTargetController extends MainController
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
                             <i class="fa fa-arrow-left"></i> {$back}
                         </a>
-                        <label style="margin: 0;" { $gifts} : {$target->value} </label>
+                        <label style="margin: 0;" { $gifts} : {$target?->value} </label>
                     </div>
                 HTML;
             $tools->append($customButtonHTML);
@@ -156,7 +166,25 @@ class RewardTargetController extends MainController
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
             });
-        $form->number('expire', __('expire'));
+        $form->number('expire', __('expire'))->default(1);
         return $form;
     }
+
+
+    public function destroyBulk($id, $targets)
+    {
+        $targetIds = explode(',', $targets);
+
+        RewardTarget::where('charge_event_id', $id) 
+            ->whereIn('id', $targetIds)
+            ->delete();
+
+        return response()->json([
+            'status'  => true,
+            'message' => __('deleted_success'),
+        ]);
+    }
+
 }
+
+

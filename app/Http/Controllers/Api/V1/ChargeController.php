@@ -77,7 +77,11 @@ class ChargeController extends Controller
         if (!$instance) {
             return Common::apiResponse(0, 'Type Not Found', 400);
         }
-        $data = call_user_func($instance, $request);
+        try {
+            $data = call_user_func($instance, $request);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 400);
+        }
         return $data;
     }
 

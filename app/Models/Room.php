@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Modules\LuckyBox\Traits\RoomBoxes;
+use Modules\RoomBoom\Entities\TotalRoomGift;
 
 /**
  * @method static withoutAppends()
@@ -183,21 +184,21 @@ class Room extends Model
     public function getCountRoomSocketAttribute()
     {
         $ids = explode(',', $this->room_visitor);
-        $countPacks = Pack::query()->whereIn('user_id', $ids)
+        /*$countPacks = Pack::query()->whereIn('user_id', $ids)
             ->where('is_used', 1)
             ->where('type', 17)
             ->where(function ($q) {
                 $q->where('packs.expire', 0)->orWhere('packs.expire', '>=', time());
             })
             ->count();
-        /** is it okay the id = 0 */
+
         foreach ($ids as $indes => $id) {
             if ($id === '' || $id < 0) {
                 unset($ids[$indes]);
             }
-        }
+        }*/
 
-        return count($ids) - $countPacks;
+        return count($ids);
     }
 
     public function getCountRoomSocketV2Attribute()
@@ -231,6 +232,11 @@ class Room extends Model
         $usersIds = $this->roomVisitors->pluck('user_id')->toArray();
 
         return count($usersIds) > 0 ? implode(',', $usersIds) : '';
+    }
+
+    public function getRoomVisitorNewAttribute(): string
+    {
+        return $this->visitor_ids ?? '';
     }
 
     public function topUser()
@@ -305,5 +311,38 @@ class Room extends Model
     protected function getAdminsAttribute()
     {
         return explode(',', $this->room_admin);
+    }
+
+    public function totalRoomGifts(): HasMany
+    {
+        return $this->hasMany(TotalRoomGift::class, 'room_id');
+    }
+
+    public function admins()
+    {
+        return $this->hasMany(User::class, 'id', 'room_admin');
+    }
+
+
+    protected static $microphoneCache = [];
+
+    public static function cacheMicrophoneUsers($ids)
+    {
+        if (empty($ids)) return collect();
+
+        $missingIds = array_diff($ids, array_keys(self::$microphoneCache));
+
+        if (!empty($missingIds)) {
+            $users = User::whereIn('id', $missingIds)
+                ->with('profile:id,user_id,avatar')
+                ->get()
+                ->keyBy('id');
+
+            foreach ($users as $id => $user) {
+                self::$microphoneCache[$id] = $user;
+            }
+        }
+
+        return collect(self::$microphoneCache)->only($ids);
     }
 }

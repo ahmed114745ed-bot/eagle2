@@ -26,7 +26,7 @@ class WeeklyCpResource extends JsonResource
     public function toArray($request)
     {
         $endDate = $this->end_date_local;
-        $time = Carbon::now()->copy()->diff($endDate);
+        $time = Carbon::now()->diff($endDate);
         $timeComponents = [
             'day' => @$time->days ?? 0,
             'hour' => @$time->h ?? 0,

@@ -2,14 +2,15 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\OVip;
+use Modules\Vip\Entities\OVip;
+use App\Models\AgencyUserJob;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\UsersJoinedAgency;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Helpers\Common;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\FamilyUser;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;
@@ -43,6 +44,7 @@ class ChangeAgencyAction extends RowAction
         $agencyOwner = Agency::query()->where('owner_id', $request->id)->orWhere('app_owner_id', $request->id)->exists();
         if ($agencyOwner) throw ValidationException::withMessages(['error' => __('This user is the agency owner and cannot be deleted')]);
         $user = User::find($request->id);
+        $agencyId=$user->agency_id;
         $checkAgencyUser = UsersJoinedAgency::where([
             'user_id' => $user->id,
             'agency_id' => $user->agency_id,
@@ -71,6 +73,8 @@ class ChangeAgencyAction extends RowAction
         $user->agency_id = $request->agency_id;
         $user->type_user = 1;
         $user->save();
+        AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
+
         // $userSalary = UserSallary::where('user_id',$user->id)->where('month',now()->month)->where('year',now()->year)->first();
         // if($userSalary){
         //     $userSalary->user_agency_id = $request->agency_id;
@@ -82,13 +86,7 @@ class ChangeAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
-        $this->select('agency_id', __('agency id'))->options(function ($value) {
-            $ops2 = [];
-            foreach (Agency::get() as $agency) {
-                $ops2[$agency->id] =  $agency->id . '_' . $agency->name;
-            }
-            return $ops2;
-        });
+        $this->select('agency_id', __('agency id'))->ajax('/admin/search/host-agency', 'id', 'name');
     }
 
     public function html()

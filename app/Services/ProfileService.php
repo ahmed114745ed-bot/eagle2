@@ -2,17 +2,18 @@
 
 namespace App\Services;
 
-use App\Repositories\ProfileRepository;
 use App\Helpers\Common;
+use App\Models\Profile;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use App\Services\UserCounterServices;
+use App\Repositories\ProfileRepository;
+use Illuminate\Support\Facades\Storage;
+use App\Repositories\User\UserRepository;
+use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\UserResource as V1UserResource;
-use App\Http\Resources\Api\V1\UserVisitorResource;
-use App\Models\Profile;
-use App\Repositories\User\UserRepository;
-use Illuminate\Support\Facades\Storage;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
-use Illuminate\Support\Facades\Log;
 
 class ProfileService
 {
@@ -29,7 +30,13 @@ class ProfileService
 
     public function updateProfile(ProfileRequest $request)
     {
-        $data = $request->only(['name', 'email', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id']);
+        Log::info('Google login request', [
+            'data' => $request->only('email')
+        ]);
+        $data = $request->only(['name', 'phone', 'nickname', 'country_id', 'bio', 'chat_id', 'notification_id']);
+        if ($request->email) {
+            $data['email'] = $request->email;
+        }
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
         $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country', 'image']);

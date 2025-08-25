@@ -4,7 +4,7 @@ namespace Modules\CP\Transformers;
 
 use App\Helpers\Common;
 use App\Models\User;
-use App\Models\Vip;
+use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -23,8 +23,8 @@ class CpListResource extends JsonResource
             $user = $this->fromUser;
         }
 
-        $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'img2');
-        $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
+        $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'show_img');
+        $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'show_img');
         $frame = $dress_1_data ?: $dress_1_fallback;
  
         $currentLevel = CpLevel::find($this->level_id);
@@ -72,7 +72,7 @@ class CpListResource extends JsonResource
 
         ];
     }
-    public function getUserDress($user, $type, $dress, $item = 'img1')
+    public function getUserDress($user, $type, $dress, $item = 'show_img')
     {
         $pack = $user->packs
             ->where('type', $type)

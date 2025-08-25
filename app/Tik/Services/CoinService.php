@@ -35,7 +35,7 @@ class CoinService
         return $this->coinRepository->allCoinsByPaymentId($payment_id);
     }
 
-    public function buyCoins($user, $request)
+    public function buyCoins($user, $request ,$userType)
     {
         $coin = $this->coinRepository->findById($request->coin_id);
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
@@ -51,6 +51,7 @@ class CoinService
                 'trx' => $trx,
                 'status' => 0,
                 'coin_id' => $request->coin_id,
+                'user_type' => $userType,
             ];
             $log = $this->coinLogRepository->create($dataCoinLog);
             //  DB::commit();
@@ -114,14 +115,17 @@ class CoinService
             } else if ($paymentMethod == 'paypal') {
                 $Active = config('is_paypal_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
-                $paypalService = new PayPalService();
-                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
-                return Common::apiResponse(1, 'ok', $paymentLink, 200);
+//                $paypalService = new PayPalService();
+//                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
+                // $paymentLink = $paypalService->createOrder($log->id, $coin->usd, $user);
+                $bladeUrl = url("/paypal/checkout/{$log->id}");
+
+                return Common::apiResponse(1, 'ok', $bladeUrl, 200);
             }
             else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             //  DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
@@ -154,9 +158,9 @@ class CoinService
         return true;
     }
 
-    public function paymentCoin()
+    public function paymentCoin($type)
     {
-        return $this->paymentCoinRepository->index();
+        return $this->paymentCoinRepository->index($type);
     }
 
     public function createPaymentCoins($request)
@@ -189,5 +193,15 @@ class CoinService
     public function showPayment($PaymentCoinId)
     {
         return $this->paymentCoinRepository->findById($PaymentCoinId);
+    }
+
+    public function getUserReport()
+    {
+        return $this->coinLogRepository->getUserCoinLogs();
+    }
+
+    public function getShippingAgencyReport($id)
+    {
+        return $this->coinLogRepository->getShippingAgencyCoinLogs($id);
     }
 }

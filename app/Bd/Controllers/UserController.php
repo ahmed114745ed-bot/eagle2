@@ -17,7 +17,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
-use App\Models\UserVip;
+use Modules\Vip\Entities\UserVip;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
@@ -176,7 +176,8 @@ class UserController extends MainController
                 ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
                 ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
 
-         
+                session(['back_url' => url()->previous()]);
+
 
             $countries = $this->countries();
             $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');

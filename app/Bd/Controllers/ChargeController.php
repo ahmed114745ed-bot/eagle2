@@ -43,7 +43,8 @@ class ChargeController extends MainController
 
         $grid->model()->where('charger_type', 'bd')
             ->with('receiverUser', 'receiveragency')
-            ->where('charger_id', Auth::user()->id);
+            ->where('charger_id', Auth::user()->id)
+            ->orderBy('id', 'desc');
 
 
 
@@ -60,8 +61,10 @@ class ChargeController extends MainController
                 });
             }, __('UUID'))->placeholder(__('ابحث في مستلم التحويل'));
 
-            // فلتر التاريخ (من-إلى)
-            $filter->between('created_at', __('تاريخ الإنشاء'))->date();
+                $filter->between('created_at', __('تاريخ الإنشاء'))->date();
+       
+        
+        
         });
 
         $grid->column('amount', __('Amount'))->display(function ($coin) {
