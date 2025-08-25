@@ -655,7 +655,7 @@ class UserController extends MainController
 
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
 
-        $form->hidden('transfer_salary', __('transfer_salary'))->default(false);
+        $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
