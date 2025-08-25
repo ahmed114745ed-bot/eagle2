@@ -17,6 +17,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Collection;
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomReward;
@@ -27,7 +28,7 @@ class RoomBoomRewardJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $boomId;
-    protected array $users = [];
+    protected Collection $users;
     protected array $giftInsertData = [];
     protected array $achievementInsertData = [];
     protected array $assignedUserIds = [];
