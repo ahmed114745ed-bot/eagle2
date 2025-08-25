@@ -26,12 +26,14 @@ class WeeklyCpWinnerConsole extends Command
     protected $cpService;
     public function __construct(CpService $cpService)
     {
+        parent::__construct();
+
         $this->cpService = $cpService;
     }
 
     public function handle()
     {
-        $weeklyCp = WeeklyStar::endToday()->where('type', 'weekly_cp')
+        $weeklyCp = WeeklyStar::dayEnd()->where('type', 'weekly_cp')
             ->with('gifts', 'weeklyCpGifts')
             ->latest()
             ->first();
@@ -49,13 +51,11 @@ class WeeklyCpWinnerConsole extends Command
                 $q->relation();
             })->with('cp')->orderByDesc('totalGiftNum')->take(3)->get();
 
-
-
         foreach ($leaderBoard as $index => $entry) {
             $alreadyWinner = WeeklyCpWinner::where(['weekly_cp_id' => $weeklyCp->id, 'user_one_id' => $entry->cp->user_one_id, 'user_two_id' => $entry->cp->user_two_id, 'type_relation' => $entry->cp->relation->type])->exists();
 
             if (!$alreadyWinner) {
-                $winner = WeeklyCpWinner::create([
+                WeeklyCpWinner::create([
                     'weekly_cp_id' => $weeklyCp->id,
                     'user_one_id' => $entry->cp->user_one_id,
                     'user_two_id' => $entry->cp->user_two_id,

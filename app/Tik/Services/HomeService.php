@@ -17,6 +17,7 @@ use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;
+use Illuminate\Support\Facades\Log;
 use Modules\Vip\Repositories\OvipRepository;
 use Modules\Vip\Repositories\UserVipRepository;
 
@@ -138,15 +139,18 @@ class HomeService
             throw new Exception('not found');
         }
 
+        Log::info($privilegeId);
         // Ensure the user has the pack before updating
         $packQuery = Pack::where('user_id', $user->id)
             ->where('type', $privilegeId);
 
-        if(!$isAvailable) $packQuery->where('is_used', true);
-
+        if (!$isAvailable) $packQuery->where('is_used', 0);
+     
         if (!$packQuery->exists()) {
+
             throw new Exception(__('api.notWare'));
         }
+        if (!$user->UserVip) throw new Exception(__('api.notWare'));
 
         // Fetch the specific pack with VIP level and expiration check
         $pack = $packQuery
@@ -157,16 +161,14 @@ class HomeService
         if (!$pack) {
             throw new \Exception(__('api.notWare'));
         }
-
         // Update pack status
         $pack->update([
-            'is_used' => $isAvailable,
+            'is_used' => !$isAvailable,
             'using' => 1,
         ]);
-      
+
 
 
         return true;
     }
-
 }

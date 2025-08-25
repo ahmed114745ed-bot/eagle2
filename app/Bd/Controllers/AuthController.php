@@ -34,7 +34,28 @@ class AuthController extends BaseAuthController
 
     public function showLoginForm()
     {
-        
+        $user = Admin::user(); 
+        $uri = request()->path(); 
+    
+        $adminLogin = 'admin/login';
+        $bdLogin = 'bd/login';
+   
+        if ($user) {
+           
+            if (str_contains($uri, $bdLogin) && $user->type == null) {
+                return redirect('/admin');
+            }
+           
+            if (str_contains($uri, $bdLogin) && $user->type === 'bd') {
+                return redirect('/bd');
+            }
+        }
+    
+        if (str_contains($uri, $adminLogin)) {
+            return view('admin.login');
+        }
+  
+
         $test = request()->query('redirect_url');
         $languages = MultiLanguage::config("languages");
         $cookie_name = MultiLanguage::config('cookie-name', 'locale');

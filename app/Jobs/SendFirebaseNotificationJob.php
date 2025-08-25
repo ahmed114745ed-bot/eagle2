@@ -1,6 +1,7 @@
 <?php
 namespace App\Jobs;
 
+use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Http;
@@ -34,6 +35,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
         $projectId = env('FIREBASE_PROJECT_NAME');
 
         foreach ($this->tokens as $token) {
+            $user= User::where('notification_id',$token)->first();
             $notification = [
                 'title' => $this->title,
                 'body'  => $this->body,
@@ -82,7 +84,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
                 'Content-Type'  => 'application/json',
             ];
 
-            Http::withHeaders($headers)->post(
+       if (!$user->is_logout)     Http::withHeaders($headers)->post(
                 "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
                 ['message' => $payload]
             );

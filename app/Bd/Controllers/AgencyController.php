@@ -90,7 +90,7 @@ class AgencyController extends MainController
         $agency = Agency::query()
             // ->where('bd_id' ,$user->app_id )
             ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-            ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+            ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
             ->find($id);
 
 
@@ -98,7 +98,7 @@ class AgencyController extends MainController
             $agency =  ShippingAgency::query()
                 // ->where('bd_id' ,$user->app_id )
                 ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img','type')
                 ->find($id);
         }
 
@@ -112,7 +112,7 @@ class AgencyController extends MainController
             throw new \Exception(__('Agency not found'));
         }
         if ($agency->type == 2) {
-          
+            
             return self::shippingProfile($agency, $request, $content);
         }
 
@@ -396,20 +396,14 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
-        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone',  'coins', 
-        'img',
-        \DB::raw('(
-            SELECT SUM(sallary - cut_amount) 
-            FROM agency_sallaries 
-            WHERE agency_sallaries.agency_id = agencies.id
-        ) as salary')
-         )
-            ->where(function ($query) {
-                $query->WhereDoesntHave('additionalInfo')
-                    ->orWhereHas('additionalInfo', function ($query) {
-                        $query->where('status', 1);
-                    });
-            })
+        $grid->model()
+        ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen')
+        ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
+        ->where(function ($query) {
+            $query
+                ->whereDoesntHave('additionalInfo')
+                ->orWhereHas('additionalInfo', fn($query) => $query->where('status', 1));
+        })
 
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
@@ -493,23 +487,21 @@ class AgencyController extends MainController
             $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
         
             return "
-                <div style='display: flex; align-items: center; flex-direction: {$direction};'>
+                <div style='display: ; align-items: center; flex-direction: {$direction};'>
                     <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
                     <span style='direction:ltr; unicode-bidi:bidi-override;'>{$phoneCode}{$number}</span>
                 </div>
             ";
         });
         $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
+            $coin = truncateAndTrim($this->salary ?? 0);
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-            $coin = number_format($coin, 2);
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
+                </div>";
         });
+
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;

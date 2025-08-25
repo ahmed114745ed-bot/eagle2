@@ -3,6 +3,7 @@
 namespace App\Admin\Actions;
 
 use Modules\Vip\Entities\OVip;
+use App\Models\AgencyUserJob;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\UsersJoinedAgency;
@@ -13,8 +14,6 @@ use Modules\Vip\Entities\UserVip;
 use App\Models\FamilyUser;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;
-use App\Facades\UserHandling;
-use App\Models\UserSallary;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Support\Facades\Auth;

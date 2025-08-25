@@ -871,7 +871,7 @@
         <!-- Header Section -->
         <div class="agency-header">
             <div class="agency-avatar" style="width: 183px !important;">
-                <img src="{{ @$imageUrl??asset('images/icon-agency.jpg') }}" alt="Agency Logo" class="logo-img">
+                <img src="{{ @$imageUrl ?? asset('images/icon-agency.jpg') }}" alt="Agency Logo" class="logo-img">
             </div>
             <div class="agency-info">
                 <h1 class="agency-name">{{ @$agency?->name ?? ''}}</h1>
@@ -881,8 +881,10 @@
                         <span class="meta-value">{{ $agency->id }}</span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">{{__("Phone")}}:</span>
-                        <span class="meta-value">{{ @$agency->phone ?? 'N/A' }}</span>
+                        <span class="meta-label">{{ __("Phone") }}:</span>
+                        <span class="meta-value" style="direction: ltr; display: inline-block;">
+                            {{ ($agency->phone_code ?? '') . ($agency->phone ?? '') ?: 'N/A' }}
+                        </span>
                     </div>
                 </div>
                 <div class="agency-stats">

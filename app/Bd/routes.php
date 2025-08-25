@@ -73,8 +73,8 @@ Route::group(
         Route::resource('/salaries', BdSalariesController::class);
         Route::resource('/charges', ChargeController::class);
         // Route::resource('/wallet', 'WalletController');
-        Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
-        Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+        Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+        Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
 

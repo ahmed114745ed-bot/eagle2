@@ -163,7 +163,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','transfer_salary'])
             ->with([
             'profile',
             'agency',
@@ -265,7 +265,16 @@ class UserController extends MainController
             $count = $this->same_device_users_count;
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
+        $permission = $this->permission_name;
 
+
+        if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+            $grid->column('transfer_salary', __("transfer_salary"))
+            ->display(function () {
+                return $this->transfer_salary ? 1 : 0;
+            })
+            ->switch(Common::getSwitchStates());
+        }
         Admin::script("
             $(document).on('click', '.show-same-device-modal', function() {
                 console.log('here');
@@ -318,13 +327,12 @@ class UserController extends MainController
         });*/
 
 
-        $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-                $actions->add(new ChargeSwitchAction());
-            }
+            // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+            //     $actions->add(new ChargeSwitchAction());
+            // }
             if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
 
                 $actions->add(new InviteSwitchAction());
@@ -648,6 +656,7 @@ class UserController extends MainController
 
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
 
+       // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
@@ -671,6 +680,7 @@ class UserController extends MainController
         //             $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
         //             $('.fileinput-upload').hide(); // Hide upload buttons if present
         //             $('input[type="file"]').prop('disabled', true); // Prevent any file selection
+   
         //         });
         //     JS
         // );

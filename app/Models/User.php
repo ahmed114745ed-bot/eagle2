@@ -99,7 +99,9 @@ class User extends Authenticatable
         'is_frozen',
         'total_charge_level',
         'photo',
+        'org_online_time'
     ];
+
 
     /* protected $appends = [
          'my_store',
@@ -1419,6 +1421,13 @@ class User extends Authenticatable
         return $value;
     }
 
+    public function getOrgOnlineTimeAttribute()
+    {
+        return $this->attributes['online_time'] ?? null;
+    }
+
+ 
+
     public function getRealOnlineTimeAttribute()
     {
         return @$this->attributes['online_time'] ?? $this->online_time;
@@ -1618,23 +1627,6 @@ class User extends Authenticatable
 
     public function getUserTypesAttribute(): array
     {
-        // $userTypes = match (true) {
-        //     in_array($this->type_user, [2, 4]) => [1, 2],
-        //     $this->type_user === 1 => [1],
-        //     default => []
-        // };
-
-        // if ($this->is_bd) {
-        //     return [4];
-        // }
-
-        // if ($this->hasShippingAgency()) {
-        //     $userTypes[] = 3;
-        // }
-
-        // $userTypes = array_unique($userTypes);
-
-        // return empty($userTypes) ? [0] : $userTypes;
         $userTypes = [];
 
         if ($this->type_user >= 1) {
@@ -1657,6 +1649,7 @@ class User extends Authenticatable
 
         return empty($userTypes) ? [0] : $userTypes;
     }
+
 
     public function sallariesByMonth()
     {
@@ -1818,6 +1811,17 @@ class User extends Authenticatable
             });
     }
 
+
+    public function activePack20()
+    {
+        return $this->hasOne(Pack::class)
+                    ->where('is_used', 1)
+                    ->where('type', 20)
+                    ->where(function($q) {
+                        $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                    });
+}
 
 }
 
