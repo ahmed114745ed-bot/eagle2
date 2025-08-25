@@ -2,24 +2,28 @@
 
 namespace App\Services;
 
-use App\Helpers\LogHelper;
-use App\Helpers\UserLevelHelper;
-use App\Helpers\UserPackHelper;
-use App\Models\Pk;
-;
-use App\Helpers\Common;
+use App\Models\Pk;;
+
 use App\Models\User;
+use App\Helpers\Common;
+use App\Helpers\LogHelper;
+
+use Illuminate\Log\LogManager;
+use App\Helpers\UserPackHelper;
+use App\Helpers\UserLevelHelper;
 use App\Repositories\RankingRepository;
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
-use Illuminate\Log\LogManager;
 use Modules\CP\Transformers\RankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+use App\Http\Resources\Api\V1\UserRankingCollection;
+use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
-
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class RankingService
 {
@@ -95,28 +99,7 @@ class RankingService
             $this->achievementService->getUserAchievement($user)
         );
     }
-    public function getRanking($class, $type, $user, $limit, $room_uid, $sent_to_owner)
-    {
-        if ($class == 4) {
-            $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
-            $this->transformData($data, $class, 'user_id', 'user');
-            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
-        } elseif ($class == 6) {
-            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
-            return $this->prepareResponse2($data, $user, $type, $user->id, $class);
-            return \App\Http\Resources\RankingResource::collection($data);
-        }
 
-        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
-
-        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
-        if ($class == 5) {
-            return $data;
-        }
-        $this->transformData($data, $class, $keywords, $rel);
-
-        return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
-    }
 
     public function getRanking22($class, $type, $user, $limit)
     {
@@ -136,15 +119,44 @@ class RankingService
             2 => 'weekly',
             3 => 'monthly'
         ];
+        if ($class == 5) {
+            return $this->rankingRepo->getAgencyRanking($rel, $types[$type], $limit);
+        }
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
 
-        if ($class == 5) {
-            return $data;
-        }
-        $this->transformData3($data, $class, $keywords, $rel);
 
-        return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
+         $this->transformData3($data, $class, $keywords, $rel);
+    //  return new UserRankingCollection($data, $user, $keywords);
+          return $this->prepareResponse3($data, $user, $type, $keywords, $user->id, $class, $limit);
     }
+
+    public function getRanking66($class, $type, $user, $limit)
+    {
+        if ($class == 4) {
+            $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
+            $this->transformData($data, $class, 'user_id', 'user');
+            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+        } elseif ($class == 6) {
+            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            return $this->prepareResponse2($data, $user, $type, $user->id, $class);
+            return \App\Http\Resources\RankingResource::collection($data);
+        }
+
+        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+        $types = [
+            1 => 'daily',
+            2 => 'weekly',
+            3 => 'monthly'
+        ];
+        if ($class == 5) {
+            return $this->rankingRepo->getAgencyRanking($rel, $types[$type], $limit);
+        }
+        $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
+
+        return new UsersRankingCollection($data, $user, $keywords);
+
+    }
+
     protected function transformData3(&$data, $class, $key, $relation)
     {
 
@@ -211,7 +223,7 @@ class RankingService
             $v->age = @$user->profile->age ?? '';
             $v->achievement_images = $achievement_images;
             $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
-            unset($v->ranker);
+            //unset($v->ranker);
             return $v;
         })->reject(function ($v) {
             return $v == null;
@@ -240,9 +252,10 @@ class RankingService
     }
 
     protected function roomData($ownerRoom)
-    {   if(!$ownerRoom) return null;
+    {
+        if (!$ownerRoom) return null;
         $data = [];
-            $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
+        $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         $data =  [
             "id" => @$ownerRoom->id ?? 0,
             "owner_uuid" => @@$ownerRoom->owner->uuid ?? 0,
@@ -430,10 +443,9 @@ class RankingService
             return $v == null;
         });
     }
+
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
-
-
         $achievement_images = [];
 
         $kong['user_id']    = 0;
@@ -462,23 +474,20 @@ class RankingService
         $kong['achievement_images'] = [];
         $kong['color_name'] = '';
 
-
-
-        $data[0] = isset($data[0]) ? $data[0] : $kong;
-        $data[1] = isset($data[1]) ? $data[1] : $kong;
-        $data[2] = isset($data[2]) ? $data[2] : $kong;
-        //        if ($limit == 3) return $data;
-
+        if ($data->count() > 0) {
+            $data[0] = $data[0] ?? $kong;
+            $data[1] = $data[1] ?? $kong;
+            $data[2] = $data[2] ?? $kong;
+        }
 
         $user->sort = $this->getUserSortValue($data, $userId);
         $user->user_id = $user->id;
 
         $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id', 'age');
 
-
         $userData = $data->where($key, $user->id)->first();
 
-        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->exp ?? '0') : (@$userData->exp ?? '0');
+        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->total_gifts ?? '0') : (@$userData->total_gifts ?? '0');
         $arr['user']['sender_img'] = UserLevelHelper::getSenderImage($user);
         $arr['user']['vip_level']  = $user->UserVip?->level;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
@@ -493,11 +502,40 @@ class RankingService
         $arr['user']['color_name'] = UserPackHelper::getColorName($user);
         $arr['user']['achievement_images'] = $achievement_images;
 
+        $dataArray = $data->toArray();
+        $countData = count($dataArray);
 
-        $toArray = $data->toArray();
-        $countData = count($data);
-        $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
-        $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
+        $arr['top'] = $countData < 4 ? $dataArray : array_slice($dataArray, 0, 3);
+
+        $otherData = $countData < 4 ? [] : array_slice($dataArray, 3);
+
+        $perPage = request('per_page', 10);
+        $currentPage = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+
+        $currentItems = array_slice($otherData, ($currentPage - 1) * $perPage, $perPage);
+
+        $paginatedOther = new LengthAwarePaginator(
+            $currentItems,
+            count($otherData),
+            $perPage,
+            $currentPage,
+            [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
+
+        $arr['other'] = $paginatedOther->items();
+        $arr['others_pagination'] = [
+            'total'        => $paginatedOther->total(),
+            'per_page'     => $paginatedOther->perPage(),
+            'current_page' => $paginatedOther->currentPage(),
+            'last_page'    => $paginatedOther->lastPage(),
+            'next_page'    => $paginatedOther->nextPageUrl(),
+            'prev_page'    => $paginatedOther->previousPageUrl(),
+        ];
+//        $arr['other'] = $countData < 4 ? [] : array_slice($dataArray, 3);
+
         return $arr;
     }
 
@@ -545,7 +583,7 @@ class RankingService
 
         $data->each(function ($item) {
             $hasColor = Common::hasInPack($item->user_id, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '' ;
+            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '';
             $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
         });
 
@@ -647,9 +685,9 @@ class RankingService
 
     protected function prepareResponseV2($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
-        $data->each(function ($item) use ($user){
+        $data->each(function ($item) use ($user) {
             $hasColor = Common::hasInPackV2($user->packs, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '' ;
+            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '';
             $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
         });
 
@@ -985,5 +1023,4 @@ class RankingService
             ->values()
             ->toArray();
     }
-
 }

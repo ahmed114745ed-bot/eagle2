@@ -1337,9 +1337,9 @@
                                             </button>
                                             <!-- <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button> -->
-                                        </div>
-                                    </td>
+                                            </button>
+                                        </div> -->
+                                    <!-- </td> -->
                                 </tr>
                             @endforeach
                             </tbody>

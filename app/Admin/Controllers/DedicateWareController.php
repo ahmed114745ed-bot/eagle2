@@ -97,7 +97,7 @@ class DedicateWareController extends MainController
         $grid = new Grid(new Ware);
         $grid->model()->orderByDesc('created_at');
 
-        $grid->model()->where('type',  $type)->where('get_type', 4)->where('type', '!=', 25);
+        $grid->model()->where('type',  $type)->whereIn('get_type', [4,6])->where('type', '!=', 25);
 
         $grid->id('ID');
         $grid->column('name', __('name'));

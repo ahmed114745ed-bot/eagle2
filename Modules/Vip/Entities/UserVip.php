@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Vip\Entities\OVip;
 
@@ -47,7 +48,7 @@ class UserVip extends Model
     protected static function booted()
     {
         static::created(function ($userVip) {
-          
+
         });
     }
 

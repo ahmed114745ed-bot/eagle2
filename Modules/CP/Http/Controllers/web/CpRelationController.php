@@ -14,7 +14,7 @@ use Encore\Admin\Layout\Content;
 
 class CpRelationController extends MainController
 {
-
+     public $permission_name = 'cp-relation';
     public function index(Content $content)
     {
         return parent::index($content

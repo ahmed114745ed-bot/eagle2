@@ -15,14 +15,16 @@ class RoomBoomRewardsEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $rewardData;
-    public function __construct($rewardData)
+    public $roomId;
+    public function __construct($rewardData, $roomId)
     {
         $this->rewardData = $rewardData;
+        $this->roomId = $roomId;
     }
 
     public function broadcastOn(): Channel
     {
-        return new PrivateChannel('room.boom.rewards.' . $this->rewardData['winner']['user_id']);
+        return new PrivateChannel('room.boom.rewards.' . $this->roomId);
     }
 
     public function broadcastAs(): string

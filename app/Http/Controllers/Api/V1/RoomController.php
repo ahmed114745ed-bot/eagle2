@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\Api\V1\RoomAdminsResource;
 use Exception;
 use App\Models\Pk;
 use Carbon\Carbon;
@@ -131,11 +132,19 @@ class RoomController extends Controller
         }
     }
 
+    private function getTimezone(): string
+    {
+        $tz = request()->header('tz', Common::timeZone());
+        return in_array($tz, timezone_identifiers_list()) ? $tz : 'UTC';
+    }
 
     public function extraRoomData($owner_id): \Illuminate\Http\JsonResponse
     {
         $room = $this->roomService->findRoomUser($owner_id);
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
+
+        $tz = getTimezone();
+        $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
         $openBoom = RoomBoom::whereIn('total_room_gift_id', function ($query) use ($room) {
             $query->select('id')
@@ -144,7 +153,7 @@ class RoomController extends Controller
         })
             ->whereNull('ended_at')
             ->whereNotNull('started_at')
-            ->whereDate('started_at', Carbon::today())
+            ->whereDate('started_at', $todayStart)
             ->first();
 
         $collections = [
@@ -202,15 +211,15 @@ class RoomController extends Controller
 
     public function getAdmins(Request $request)
     {
-        if (!$request->owner_id) return Common::apiResponse(0, 'missing params', null, 422);
 
+        if (!$request->owner_id) return Common::apiResponse(0, 'missing params', null, 422);
         try {
             $admins = $this->roomService->roomAdmins($request->owner_id);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
 
-        $data        = UserResource::collection($admins);
+        $data        = RoomAdminsResource::collection($admins);
         return Common::apiResponse(1, '', $data, 200);
     }
 

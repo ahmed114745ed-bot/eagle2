@@ -84,7 +84,8 @@ class UserHandling
 
         if ($vip) {
 
-            VipCommon::createUserVip($vip, $user, $vip->expire, null, $type);
+            VipCommon::createUserVip($vip ,$user ,$vip->expire , null ,$type);
+
         }
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void
@@ -242,7 +243,9 @@ class UserHandling
         $now = now();
 
         return Ban::query()->where('type', '!=', 'action')
-            ->where(fn($q) => $q->where('uid', $uuid)->orWhere(fn($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))->orWhere(fn($q) => $q->where('device_number', '!=', null)->where('device_number', $request->device_token)))
+            ->where(fn($q) => $q->where('uid', $uuid)
+                ->orWhere(fn($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))
+                ->orWhere(fn($q) => $q->where('device_number', '!=', null)->where('device_number', $request->header('x-device-token'))))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->first();
     }
@@ -253,7 +256,7 @@ class UserHandling
         $url = $request->url();
         $method = $request->method();
         $path = parse_url($url, PHP_URL_PATH);
-        // Remove the leading slash 
+        // Remove the leading slash
         $path = ltrim($path, '/');
         // Split the path into segments
         $segments = explode('/', $path);

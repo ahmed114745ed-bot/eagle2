@@ -162,7 +162,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','transfer_salary'])
             ->with([
             'profile',
             'agency',
@@ -223,7 +223,7 @@ class UserController extends MainController
 
                 $user = $this;
                 if (! $user) {
-                    return __('No Agency');
+                    return __('No User');
                 }
 
                 return app(UserService::class)->adminUserAvatar($user);
@@ -383,11 +383,9 @@ class UserController extends MainController
 
     public function make_rooms_top(Request $request)
     {
-        if ($request->make_rooms_top == "true") {
-            settings()->set("make_rooms_top", "1");
-        } else {
-            settings()->set("make_rooms_top", "0");
-        }
+        $value = $request->make_rooms_top == "true" ? "1" : "0";
+        settings()->set("make_rooms_top", $value);
+        Cache::forever('rooms_make_rooms_top', $value);
     }
 
     public function transferSalary(Request $request)
@@ -657,7 +655,7 @@ class UserController extends MainController
 
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
 
-        $form->hidden('transfer_salary', __('transfer_salary'));
+       // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
@@ -681,6 +679,7 @@ class UserController extends MainController
         //             $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
         //             $('.fileinput-upload').hide(); // Hide upload buttons if present
         //             $('input[type="file"]').prop('disabled', true); // Prevent any file selection
+   
         //         });
         //     JS
         // );

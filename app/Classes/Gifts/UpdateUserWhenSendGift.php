@@ -6,10 +6,12 @@ use App\Classes\Enums\NotificationType;
 use App\Exceptions\NotInfMoneyException;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
+use Mockery\Exception;
 use Modules\Vip\Entities\Vip;
 use App\Models\UserGift;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
 
@@ -136,8 +138,12 @@ class UpdateUserWhenSendGift
         return $senderUser;
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function sendFromBagAndRemoveGift(int $totalCoins, User $senderUser, int $giftId, int $number)
     {
+        Log::info("gooooooooooood");
         $senderUser->enableSaving = false;
         $senderUser->monthly_diamond_send += $totalCoins;
         $senderUser->total_diamond_send   += $totalCoins;
@@ -146,17 +152,22 @@ class UpdateUserWhenSendGift
 
         $userGift = UserGift::where('user_id', $senderUser->id)
             ->where('gift_id', $giftId)
-            ->first();
+            ->where(function($query) {
+                $query->where('expire', 0)
+                    ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
+            })->first();
 
-        if ($userGift) {
-            $userGift->quantity -= $number;
 
-            if ($userGift->quantity > 0) {
-                $userGift->save();
-            } else {
-                $userGift->delete();
-            }
+        throw_if(( !$userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
+
+        $userGift->quantity -= $number;
+
+        if ($userGift->quantity > 0) {
+            $userGift->save();
+        } else {
+            $userGift->delete();
         }
+
 
         (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
         if ($senderUser->total_sender_level > $lastSenderUser) {

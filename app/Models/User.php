@@ -65,6 +65,8 @@ class User extends Authenticatable
 
     protected $dates = ['deleted_at'];
 
+    protected ?string $cachedComputedUuid = null;
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -98,7 +100,9 @@ class User extends Authenticatable
         'total_charge_level',
         'photo',
         'monthly_diamond_received',
+        'org_online_time'
     ];
+
 
     /* protected $appends = [
          'my_store',
@@ -1426,6 +1430,10 @@ class User extends Authenticatable
     }
 
 
+
+
+
+
     // originalUuid
     public function getOriginalUuidAttribute()
     {
@@ -1456,6 +1464,13 @@ class User extends Authenticatable
 
         return $value;
     }
+
+    public function getOrgOnlineTimeAttribute()
+    {
+        return $this->attributes['online_time'] ?? null;
+    }
+
+ 
 
     public function getRealOnlineTimeAttribute()
     {
@@ -1656,23 +1671,6 @@ class User extends Authenticatable
 
     public function getUserTypesAttribute(): array
     {
-        // $userTypes = match (true) {
-        //     in_array($this->type_user, [2, 4]) => [1, 2],
-        //     $this->type_user === 1 => [1],
-        //     default => []
-        // };
-
-        // if ($this->is_bd) {
-        //     return [4];
-        // }
-
-        // if ($this->hasShippingAgency()) {
-        //     $userTypes[] = 3;
-        // }
-
-        // $userTypes = array_unique($userTypes);
-
-        // return empty($userTypes) ? [0] : $userTypes;
         $userTypes = [];
 
         if ($this->type_user >= 1) {
@@ -1695,6 +1693,7 @@ class User extends Authenticatable
 
         return empty($userTypes) ? [0] : $userTypes;
     }
+
 
     public function sallariesByMonth()
     {
@@ -1855,4 +1854,17 @@ class User extends Authenticatable
                     ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
             });
     }
+
+
+    public function activePack20()
+    {
+        return $this->hasOne(Pack::class)
+                    ->where('is_used', 1)
+                    ->where('type', 20)
+                    ->where(function($q) {
+                        $q->where('expire', 0)
+                        ->orWhere('expire', '>=', now()->timestamp);
+                    });
+    }
+
 }

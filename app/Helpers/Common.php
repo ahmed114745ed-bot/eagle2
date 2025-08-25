@@ -2,13 +2,10 @@
 
 namespace App\Helpers;
 
-use App\Jobs\SendFirebaseNotificationJob;
-use App\Jobs\SendFirebaseTopicNotificationJob;
-use App\Models\Ban;
 use App\Models\Pk;
 use App\Models\UserCoinLog;
 use Illuminate\Log\Logger;
-use Modules\Vip\Entities\Vip;
+use App\Models\Ban;
 use App\Models\Pack;
 use App\Models\Role;
 use App\Models\Room;
@@ -18,40 +15,41 @@ use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Follow;
 use App\Models\Target;
-use App\Tik\DTO\NotificationPayload;
 use Encore\Admin\Show;
 use GuzzleHttp\Client;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
 use App\Models\Setting;
-use Modules\Vip\Entities\UserVip;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserSallary;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
 use Kreait\Firebase\Factory;
 use App\Facades\UserHandling;
+use Modules\Vip\Entities\Vip;
 use App\Models\ShippingAgency;
 use Illuminate\Support\Carbon;
 use App\Models\OfficialMessage;
 use Encore\Admin\Facades\Admin;
 use App\Models\Owner_pid_target;
 use App\Models\UsersJoinedAgency;
+use Illuminate\Http\JsonResponse;
+use Modules\Vip\Entities\UserVip;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Modules\Events\Entities\Winner;
 use App\Models\NotificationTemplate;
-
+use App\Tik\DTO\NotificationPayload;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+
 use Modules\Events\Entities\PkEvent;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
 use App\Notifications\AgencyOwnerRole;
@@ -64,11 +62,14 @@ use App\Traits\HelperTraits\AdminTrait;
 use App\Traits\HelperTraits\CalcsTrait;
 use App\Traits\HelperTraits\MoneyTrait;
 use Illuminate\Support\Facades\Storage;
+use Modules\CP\Entities\WeeklyCpWinner;
 use Modules\Events\Entities\WeeklyStar;
 use App\Traits\HelperTraits\FilterTrait;
+use App\Jobs\SendFirebaseNotificationJob;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
+use App\Jobs\SendFirebaseTopicNotificationJob;
 use Modules\Charizma\Entities\ExtraDataInRoom;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
@@ -93,6 +94,9 @@ class Common
     {
 
         $avatar = null;
+        $avatarCp2 = null;
+        $nameCpOne = '';
+        $nameCpTwo = '';
 
         if ($event_type == 'pk_event') {
 
@@ -105,7 +109,7 @@ class Common
                     ->first();
 
                 if ($pk_winner) {
-                    $avatar = $pk_winner?->user?->profile?->avatar;
+                    $avatar = @$pk_winner?->user?->profile?->avatar;
                 }
             }
         } else if ($event_type == 'weekly_star') {
@@ -117,7 +121,7 @@ class Common
                     ->first();
 
                 if ($weekly_star) {
-                    $avatar = $weekly_star->user->profile->avatar;
+                    $avatar = @$weekly_star->user->profile->avatar;
                 }
             }
         } else if ($event_type == 'charge_event') {
@@ -131,11 +135,23 @@ class Common
                 ->first();
 
             if ($charge) {
-                $avatar = $charge->user->profile->avatar;
+                $avatar = @$charge->user->profile->avatar;
             }
+        } else if ($event_type == 'weekly_cp') {
+            $event = WeeklyStar::WeeklyCP()->previousEvent()->first();
+            if ($event) {
+                $weekly_star = WeeklyCpWinner::with('userTwo', 'userOne')->where('weekly_cp_id', $event->id)
+                    ->where('level', 1)->first();
+                    if ($weekly_star) {
+                        $avatar = @$weekly_star->userOne->profile->avatar;
+                        $avatarCp2 = @$weekly_star->userTwo->profile->avatar;
+                        $nameCpTwo = @$weekly_star->userTwo->name;
+                        $nameCpOne = @$weekly_star->userOne->name;
+                    }
+                }
         }
 
-        return $avatar;
+        return [$avatar, $avatarCp2, $nameCpOne, $nameCpTwo];
     }
 
     public static function userVipLevel($userId, $level)
@@ -757,10 +773,10 @@ class Common
             ],
         ];
 
-//        info('icon', [$icon]);
-//        if ($icon) {
-//            $payload['notification']['icon'] = $icon;
-//        }
+        //        info('icon', [$icon]);
+        //        if ($icon) {
+        //            $payload['notification']['icon'] = $icon;
+        //        }
         if (isset($userData) && is_array($userData)) {
             $payload['data']['user'] = json_encode($userData);
         }
@@ -902,10 +918,10 @@ class Common
 
         $result = $messaging->subscribeToTopic($topic, $registrationTokens);
 
-//        logger()->info('✅ Kreait Topic Subscribe', [
-//            'topic' => $topic,
-//            'result' => $result,
-//        ]);
+        //        logger()->info('✅ Kreait Topic Subscribe', [
+        //            'topic' => $topic,
+        //            'result' => $result,
+        //        ]);
 
         return $result;
     }
@@ -919,11 +935,11 @@ class Common
 
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-//            logger()->info('✅ Unsubscribe from FCM topic result', [
-//                'topic'          => $topic,
-//                'tokensCount'    => count($registrationTokens),
-//                'response'       => $response,
-//            ]);
+            //            logger()->info('✅ Unsubscribe from FCM topic result', [
+            //                'topic'          => $topic,
+            //                'tokensCount'    => count($registrationTokens),
+            //                'response'       => $response,
+            //            ]);
 
             // تحليل النتائج (اختياري)
             $result = $response[$topic->value()] ?? [];
@@ -945,7 +961,7 @@ class Common
                 'details' => $result
             ];
         } catch (\Throwable $e) {
-//            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
+            //            logger()->error('❌ Unsubscribe Error', ['error' => $e->getMessage()]);
             return [
                 'success' => false,
                 'error' => $e->getMessage()
@@ -1175,19 +1191,19 @@ class Common
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
-//            logger()->info('[sendOfficialMessage] Bulk insert success', [
-//                'id' => $id,
-//            ]);
+            //            logger()->info('[sendOfficialMessage] Bulk insert success', [
+            //                'id' => $id,
+            //            ]);
         }
 
         if (!empty($data)) {
             OfficialMessage::insert($data);
-//            logger()->info('[sendOfficialMessage] Bulk insert success', [
-//                'user_ids' => $userIds,
-//            ]);
+            //            logger()->info('[sendOfficialMessage] Bulk insert success', [
+            //                'user_ids' => $userIds,
+            //            ]);
         }
 
-//        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
+        //        logger()->warning('[sendOfficialMessage] No valid user IDs to insert message.');
 
 
         // OfficialMessage::query()->create(
@@ -2073,24 +2089,19 @@ class Common
         $isBanned =  Ban::where('uid', $uuid)
             ->whereHas('banType', function ($query) use ($routeName, $method) {
                 $query->where('route', $routeName)
-                      ->where(function ($q) use ($method) {
-                          $q->whereNull('method')
+                    ->where(function ($q) use ($method) {
+                        $q->whereNull('method')
                             ->orWhere('method', strtoupper($method));
-                      });
+                    });
             })
             ->exists();
         return $isBanned ? self::bannedResponse() : null;
-
     }
 
 
 
     public static function bannedResponse(): JsonResponse
     {
-        return Common::apiResponse(1, __('banned_from_action'),[],377 );
-
+        return Common::apiResponse(1, __('banned_from_action'), [], 377);
     }
-
-
-
 }
