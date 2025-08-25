@@ -212,17 +212,26 @@ class RoomBoomRewardJob implements ShouldQueue
     public function getRewardItems($rewards, &$rewardItems): void
     {
         foreach ($rewards as $reward) {
-            for ($i = 0; $i < $reward->quantity; $i++) {
-                $rewardItems[] = [
-                    'id' => $reward->id,
-                    'target_type' => $reward->target_type,
-                    'target' => $reward->target,
-                    'expire_days' => $reward->expire_days,
-                    'priority' => $reward->priority,
-                    'quantity' => 1
-                ];
+            $rewardItems[] = [
+                'id'          => $reward->id,
+                'target_type' => $reward->target_type,
+                'target'      => $reward->target,
+                'expire_days' => $reward->expire_days,
+                'priority'    => $reward->priority,
+                'quantity'    => $reward->quantity,
+            ];
+        }
+    }
+
+    protected function getNextAvailableReward(&$rewardItems): ?array
+    {
+        foreach ($rewardItems as &$reward) {
+            if ($reward['quantity'] > 0) {
+                $reward['quantity']--;
+                return $reward;
             }
         }
+        return null;
     }
 
     public function getTopContributorIds($roomId, $levelColumn): array
