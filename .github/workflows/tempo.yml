@@ -51,3 +51,29 @@ jobs:
           else
             echo "Disk space is within acceptable limits $current% "
           fi
+  run_tempo_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out Tempo Job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.56.160"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+
+          cd /var/www/tempo
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          docker build -t tempo-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image tempo-job:${{ github.sha }} tempo-job
