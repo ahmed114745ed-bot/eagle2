@@ -609,15 +609,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
                 $notificationTokens = DB::table('users')->orderBy('id', 'desc')->limit(100)->pluck('notification_id')->filter()->toArray();
 
+                info($notificationTokens);
                 $title = 'Test';
                 $body = 'Test';
-
-                // CustomNotification::charges(
-                //     $to,
-                //     $title,
-                //     $body,
-                //     ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
-                // );
 
                 Common::send_firebase_notification($notificationTokens, $title, $body, '', [], 'vip');
 
