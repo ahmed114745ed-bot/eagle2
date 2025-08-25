@@ -3685,14 +3685,15 @@
 "disable_transfer_salary_success": "تم تعطيل تحويل المرتب بنجاح",
 "confirm_enable_transfer_salary": "هل أنت متأكد من تفعيل تحويل المرتب؟",
 "confirm_disable_transfer_salary": "هل أنت متأكد من تعطيل تحويل المرتب؟",
-"BD Action": "BD Action",
-"Remove BD": "Remove BD",
-"Are you sure?": "Are you sure?",
-"Do you want to remove BD for this user?": "Do you want to remove BD for this user?",
-"Yes, remove it!": "Yes, remove it!",
-"Cancel": "Cancel",
-"Removed!": "Removed!",
-"Error": "Error",
-"Something went wrong": "Something went wrong"
+
+"BD Action": "إجراء BD",
+"Remove BD": "إزالة BD",
+"Are you sure?": "هل أنت متأكد؟",
+"Do you want to remove BD for this user?": "هل تريد إزالة BD لهذا المستخدم؟",
+"Yes, remove it!": "نعم، أزلها!",
+"Cancel": "إلغاء",
+"Removed!": "تم الإزالة!",
+"Error": "خطأ",
+"Something went wrong": "حدث خطأ ما"
 
 }
