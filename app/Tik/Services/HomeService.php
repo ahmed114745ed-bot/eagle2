@@ -143,8 +143,8 @@ class HomeService
         $packQuery = Pack::where('user_id', $user->id)
             ->where('type', $privilegeId);
 
-        if (!$isAvailable) $packQuery->where('is_used', 0);
-     
+        if (!$isAvailable) $packQuery->where('is_used', 1);
+
         if (!$packQuery->exists()) {
 
             throw new Exception(__('api.notWare'));
@@ -163,7 +163,7 @@ class HomeService
         }
         // Update pack status
         $pack->update([
-            'is_used' => !$isAvailable,
+            'is_used' => $isAvailable,
             'using' => 1,
         ]);
 
