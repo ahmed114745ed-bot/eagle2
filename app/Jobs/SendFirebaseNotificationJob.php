@@ -48,7 +48,7 @@ class SendFirebaseNotificationJob implements ShouldQueue
             ->where('is_logout', 0)
             ->get();
 
-        $hasInPack = Common::hasInPack($this->user->id, 18, true);
+        $hasInPack = $this->user && Common::hasInPack($this->user->id, 18, true);
 
         foreach ($users as $user) {
 
