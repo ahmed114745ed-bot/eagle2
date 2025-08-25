@@ -162,7 +162,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','transfer_salary'])
             ->with([
             'profile',
             'agency',
@@ -679,6 +679,7 @@ class UserController extends MainController
         //             $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
         //             $('.fileinput-upload').hide(); // Hide upload buttons if present
         //             $('input[type="file"]').prop('disabled', true); // Prevent any file selection
+   
         //         });
         //     JS
         // );
