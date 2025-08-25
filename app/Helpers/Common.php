@@ -1512,14 +1512,16 @@ class Common
                 'zego_server_secret' =>  '',
                 'zego_app_sign'      =>  '',
             ];
-        }
-        $data = decryptToArray($zego_token, $zegoClientId);
+        } else {
+            $data = decryptToArray($zego_token, $zegoClientId);
 
-        $zegoData = [
-            'zego_app_id'        => $data['app_id'] ?? '',
-            'zego_server_secret' => $data['server_secret'] ?? '',
-            'zego_app_sign'      => $data['app_sign'] ?? '',
-        ];
+            $zegoData = [
+                'zego_app_id'        => $data['app_id'] ?? '',
+                'zego_server_secret' => $data['server_secret'] ?? '',
+                'zego_app_sign'      => $data['app_sign'] ?? '',
+            ];
+        }
+
 
         // If a key is provided, return that specific value
         if ($key) {
