@@ -167,7 +167,7 @@ class AuthController extends Controller
         $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
-        $keyContent = file_get_contents(storage_path('app/keys/AuthKey_BKD3JLV6HY.p8'));
+        $keyContent = file_get_contents(public_path('files/AuthKey_BKD3JLV6HY.p8'));
        // $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
 
 
@@ -187,7 +187,7 @@ class AuthController extends Controller
                 'client_id' => $clientId,
                 'client_secret' => $token,
             ]);
-
+           
             $claims = explode('.', $res['id_token'])[1];
             $data = json_decode(base64_decode($claims), true);
         } catch (\Exception $e) {
