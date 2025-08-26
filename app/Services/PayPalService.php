@@ -288,6 +288,13 @@ class PayPalService
 
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
+                $captureResponse = Http::withToken($this->getAccessToken())
+                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
+
+                if ($captureResponse->successful()) {
+                    return $this->webhookPayment($coinLogId);
+                }
+
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog?->trx ?? $paypalId,

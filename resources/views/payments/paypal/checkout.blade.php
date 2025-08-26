@@ -12,7 +12,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background-color: #f5f7fa;
             color: #333;
@@ -21,12 +21,12 @@
             max-width: 100%;
             overflow-x: hidden;
         }
-        
+
         .language-selector {
             text-align: center;
             margin-bottom: 20px;
         }
-        
+
         .language-selector select {
             padding: 10px 15px;
             border-radius: 8px;
@@ -37,7 +37,7 @@
             outline: none;
             cursor: pointer;
         }
-        
+
         .container {
             max-width: 400px;
             margin: 0 auto;
@@ -46,32 +46,32 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid #eee;
         }
-        
+
         .header h1 {
             font-size: 22px;
             color: #253b80;
             margin-bottom: 5px;
         }
-        
+
         .header p {
             color: #666;
             font-size: 14px;
         }
-        
+
         .payment-options {
             display: flex;
             flex-direction: column;
             gap: 15px;
             margin: 20px 0;
         }
-        
+
         .payment-button {
             border-radius: 8px;
             padding: 16px;
@@ -86,59 +86,59 @@
             justify-content: center;
             gap: 10px;
         }
-        
+
         .paypal-button {
             background-color: #ffc439;
             color: #000;
         }
-        
+
         .paypal-button:hover {
             background-color: #f2b432;
         }
-        
+
         .card-button {
             background-color: #0070ba;
             color: #fff;
         }
-        
+
         .card-button:hover {
             background-color: #005ea6;
         }
-        
+
         .payment-button i {
             font-size: 20px;
         }
-        
+
         .divider {
             display: flex;
             align-items: center;
             margin: 20px 0;
         }
-        
+
         .divider-line {
             flex: 1;
             height: 1px;
             background-color: #ddd;
         }
-        
+
         .divider-text {
             padding: 0 15px;
             color: #777;
             font-size: 14px;
         }
-        
+
         .secure-notice {
             text-align: center;
             margin-top: 20px;
             font-size: 14px;
             color: #666;
         }
-        
+
         .secure-notice i {
             color: #28a745;
             margin-right: 5px;
         }
-        
+
         .amount-display {
             text-align: center;
             background: #f8f9fa;
@@ -149,16 +149,16 @@
             color: #253b80;
             font-size: 18px;
         }
-        
+
         @media (max-width: 480px) {
             .container {
                 padding: 15px;
             }
-            
+
             .header h1 {
                 font-size: 20px;
             }
-            
+
             .payment-button {
                 padding: 14px;
                 font-size: 15px;
@@ -175,29 +175,29 @@
             <option value="es">Español</option>
         </select>
     </div>
-    
+
     <div class="container">
         <div class="header">
             <h1 id="title">إتمام عملية الدفع</h1>
             <p id="subtitle">اختر طريقة الدفع المناسبة لك</p>
         </div>
-        
+
         <div class="amount-display">
             <span id="amountLabel">المبلغ:</span> {{ $amount }} <span id="currency">دولار</span>
         </div>
-        
+
         <div class="payment-options">
             <div id="paypal-button"></div>
-            
+
             <div class="divider">
                 <div class="divider-line"></div>
                 <div class="divider-text" id="dividerText">أو</div>
                 <div class="divider-line"></div>
             </div>
-            
+
             <div id="card-button"></div>
         </div>
-        
+
         <div class="secure-notice">
             <i>✓</i> <span id="secureText">عملية دفع آمنة ومشفرة</span>
         </div>
@@ -210,21 +210,21 @@
             // للعرض التوضيحي، سنستخدم معلمة URL كبديل
             const urlParams = new URLSearchParams(window.location.search);
             const headerLang = urlParams.get('x-localization');
-            
+
             return headerLang && ['en', 'ar', 'fr', 'es'].includes(headerLang) ? headerLang : null;
         }
-        
+
         // دالة لتغيير اللغة
         function changeLanguage(lang) {
             // إضافة معلمة اللغة إلى الرابط
             const url = new URL(window.location.href);
             url.searchParams.set('lang', lang);
             window.history.replaceState({}, '', url);
-            
+
             // تغيير اتجاه الصفحة بناءً على اللغة
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = lang;
-            
+
             // ترجمة النصوص
             const translations = {
                 en: {
@@ -268,7 +268,7 @@
                     payWithCard: "Pagar con tarjeta de débito o crédito"
                 }
             };
-            
+
             // تطبيق الترجمة
             document.getElementById('title').textContent = translations[lang].title;
             document.getElementById('subtitle').textContent = translations[lang].subtitle;
@@ -276,17 +276,17 @@
             document.getElementById('currency').textContent = translations[lang].currency;
             document.getElementById('dividerText').textContent = translations[lang].dividerText;
             document.getElementById('secureText').textContent = translations[lang].secureText;
-            
+
             // ترجمة أزرار PayPal (سيتم إعادة إنشائها)
             recreatePayPalButtons(lang, translations[lang].payWithPayPal, translations[lang].payWithCard);
         }
-        
+
         // إعادة إنشاء أزرار PayPal بالنصوص المترجمة
         function recreatePayPalButtons(lang, paypalText, cardText) {
             // إزالة الأزرار الحالية
             document.getElementById('paypal-button').innerHTML = '';
             document.getElementById('card-button').innerHTML = '';
-            
+
             // ✅ BUTTON 1 (Yellow PayPal button - redirect)
             paypal.Buttons({
                 fundingSource: paypal.FUNDING.PAYPAL,
@@ -344,26 +344,27 @@
                         });
                 },
                 onApprove: function(data, actions) {
-                    return fetch('/paypal/capture-order/' + data.orderID, {
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-                    })
-                        .then(res => res.json())
-                        .then(orderData => {
-                            window.location.href = "/api/paypal-return/{{ $logId }}";
-                        });
+                    return actions.order.capture().then(function(details) {
+                    {{--        return fetch('/paypal/capture-order/' + data.orderID, {--}}
+                    {{--    method: 'POST',--}}
+                    {{--    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }--}}
+                    {{--})--}}
+                    {{--    .then(res => res.json())--}}
+                    {{--    .then(orderData => {--}}
+                    {{--        window.location.href = "/api/paypal-return/{{ $logId }}";--}}
+                    });
                 },
                 onCancel: function() {
-                    window.location.href = "/api/paypal-cancel";
+                    window.location.href = "/api/paypal-cancel/{{ $logId }}";
                 }
             }).render('#card-button');
         }
-        
+
         // استجابة لتغيير اختيار اللغة
         document.getElementById('languageSelect').addEventListener('change', function() {
             changeLanguage(this.value);
         });
-        
+
         // تحديد اللغة الافتراضية
         function determineDefaultLanguage() {
             // 1. أولوية للغة من الـ header
@@ -371,24 +372,24 @@
             if (headerLang) {
                 return headerLang;
             }
-            
+
             // 2. ثم تحقق من معلمة URL
             const urlParams = new URLSearchParams(window.location.search);
             const urlLang = urlParams.get('lang');
             if (urlLang && ['en', 'ar', 'fr', 'es'].includes(urlLang)) {
                 return urlLang;
             }
-            
+
             // 3. ثم لغة المتصاف
             const browserLang = navigator.language.substring(0, 2);
             if (['en', 'ar', 'fr', 'es'].includes(browserLang)) {
                 return browserLang;
             }
-            
+
             // 4. افتراضي العربية
             return 'ar';
         }
-        
+
         // تطبيق اللغة الافتراضية عند التحميل
         const defaultLang = determineDefaultLanguage();
         document.getElementById('languageSelect').value = defaultLang;
