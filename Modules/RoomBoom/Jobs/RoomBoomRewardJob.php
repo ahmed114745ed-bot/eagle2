@@ -5,7 +5,6 @@ namespace Modules\RoomBoom\Jobs;
 use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\Gift;
 use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
@@ -37,7 +36,6 @@ class RoomBoomRewardJob implements ShouldQueue
     protected array $winnerData = [];
     protected array $achievementNotifications = [];
     protected array $giftNotifications = [];
-    protected array $wareNotifications = [];
     public function __construct($boomId)
     {
         $this->boomId = $boomId;
@@ -57,15 +55,13 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $rewards = RoomBoomReward::where('room_boom_level_id', $level->id)->orderBy('priority')->get();
 
-        $rewardItems = [];
-
-        $this->getRewardItems($rewards, $rewardItems);
+        $rewardItems[] = $this->getRewardItems($rewards);
 
         $topContributorIds = $this->getTopContributorIds($roomId, $level->level);
 
         $lastTriggerSenderId = GiftLog::where('id', $boom->final_gift_id)->value('sender_id');
 
-        $room = Room::select('id')->with('roomVisitors:id,user_id,room_id')->find($roomId);
+        $room = Room::with('roomVisitors')->find($roomId);
 
         if ($room) {
             $allUserIds = array_merge($topContributorIds, [$lastTriggerSenderId], $room->roomVisitors->pluck('user_id')->toArray());
@@ -89,13 +85,13 @@ class RoomBoomRewardJob implements ShouldQueue
     /**
      * @throws \Exception
      */
-    public function distributeTopContributors($topContributorIds, &$rewardItems): void
+    public function distributeTopContributors($topContributorIds, $rewardItems): void
     {
         foreach ($topContributorIds as $i => $userId) {
-            $reward = $this->getNextAvailableReward($rewardItems);
-            if (!$reward) break;
-
+            if (!isset($rewardItems[$i])) break;
+            $reward = $rewardItems[$i];             //first user will take first reward ordered by priority and quantity
             $this->distributeBoomRewards($userId, $reward);
+
             $this->assignWinnerData($userId, $reward);
         }
     }
@@ -108,18 +104,9 @@ class RoomBoomRewardJob implements ShouldQueue
         if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
             if ($rewards->isNotEmpty()){
                 $randomReward = $rewards->random();
+                $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
 
-                $rewardArray = [
-                    'id'          => $randomReward->id,
-                    'target_type' => $randomReward->target_type,
-                    'target'      => $randomReward->target,
-                    'expire_days' => $randomReward->expire_days,
-                    'priority'    => $randomReward->priority,
-                    'quantity'    => 1,
-                ];
-
-                $this->distributeBoomRewards($lastTriggerSenderId, $rewardArray);
-                $this->assignWinnerData($lastTriggerSenderId, $rewardArray);
+                $this->assignWinnerData($lastTriggerSenderId, $randomReward);
             }
         }
     }
@@ -127,21 +114,25 @@ class RoomBoomRewardJob implements ShouldQueue
     /**
      * @throws \Exception
      */
-    public function distributeVisitorRewards(&$rewardItems, $room): void
+    public function distributeVisitorRewards($rewardItems, $room): void
     {
-        $visitorIds = $room->roomVisitors()
-            ->whereNotIn('user_id', $this->assignedUserIds)
-            ->inRandomOrder()
-            ->pluck('user_id')
-            ->toArray();
+        $numAssigned = count($this->assignments);
+        $remainingRewards = array_slice($rewardItems, $numAssigned);    //remaining rewards by order
 
-        foreach ($visitorIds as $i => $visitorId){
-            $reward = $this->getNextAvailableReward($rewardItems);
-            if (!$reward) break;
+        if (!empty($remainingRewards)) {
+            $visitorIds = $room->roomVisitors()
+                ->whereNotIn('user_id', $this->assignedUserIds)
+                ->inRandomOrder()
+                ->pluck('user_id')
+                ->toArray();
 
-            $this->distributeBoomRewards($visitorId, $reward);
+            foreach ($visitorIds as $i => $visitorId){
+                if (!isset($remainingRewards[$i])) break;
+                $reward = $remainingRewards[$i];
+                $this->distributeBoomRewards($visitorId, $reward);
 
-            $this->assignWinnerData($visitorId, $reward);
+                $this->assignWinnerData();
+            }
         }
     }
 
@@ -150,19 +141,15 @@ class RoomBoomRewardJob implements ShouldQueue
      */
     public function distributeBoomRewards($userId, $reward): void
     {
-        info($userId);
         $user = $this->users[$userId] ?? null;
         $token = $user->notification_id;
 
         if ($user){
             $expire = $reward['expire_days'];
             if ($reward['target_type'] == 'ware') {
-                $this->wareNotifications[$reward['target']]['user_ids'][] = $userId;
-                if ($token) {
-                    $this->wareNotifications[$reward['target']]['tokens'][] = $token;
-                }
+                $ware = Ware::find($reward['target']);
+                UserCommon::addEvintsWareToUser($user, $ware, $expire);
             }
-
             if ($reward['target_type'] == 'achieve') {
                 $this->achievementRewards($reward['target'], $expire, $userId, $token);
             }
@@ -176,63 +163,63 @@ class RoomBoomRewardJob implements ShouldQueue
     public function achievementRewards($rewardTarget, $expire, $userId, $token): void
     {
         $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
-
-        $this->achievementInsertData[] = [
+        $title = __('Achievement Reward');
+        $body = __('You have received a new achievement.');
+        $this->achievementInsertData = [
             'user_id' => $userId,
             'custom_image' => $rewardTarget,
             'end_at' => $dateTimestamp,
             'created_at' => now(),
             'updated_at' => now()
         ];
+        Common::sendOfficialMessage($userId, $title, $body);
 
-        $this->giftNotifications['user_ids'][] = $userId;
         if ($token) {
-            $this->giftNotifications['tokens'][] = $token;
+            $this->achievementNotifications['title'] = $title;
+            $this->achievementNotifications['body'] = $body;
+            $this->achievementNotifications['tokens'][] = $token;
         }
     }
 
     public function giftRewards($reward, $userId, $expire, $token): void
     {
+        $target = $reward['target'];
+        $title = __('Gift Reward');
+        $body = __('You have received a new gift.');
+
         $giftData = [
-            'gift_id' => $reward['target'],
+            'gift_id' => $target,
             'user_id' => $userId,
-            'quantity' => 1,
-            'expire' => $expire ?? 0,
+            'quantity' => $reward['quantity'],
             'created_at' => now(),
             'updated_at' => now()
         ];
-
+        if ($expire){
+            $giftData['expire'] = $expire;
+        }
         $this->giftInsertData[] = $giftData;
-
-        $this->giftNotifications[$reward['target']]['user_ids'][] = $userId;
+        Common::sendOfficialMessage($userId, $title, $body);
         if ($token) {
-            $this->giftNotifications[$reward['target']]['tokens'][] = $token;
+            $this->giftNotifications['title'] = $title;
+            $this->giftNotifications['body'] = $body;
+            $this->giftNotifications['tokens'][] = $token;
         }
     }
 
-    public function getRewardItems($rewards, &$rewardItems): void
+    public function getRewardItems($rewards)
     {
         foreach ($rewards as $reward) {
-            $rewardItems[] = [
-                'id'          => $reward->id,
-                'target_type' => $reward->target_type,
-                'target'      => $reward->target,
-                'expire_days' => $reward->expire_days,
-                'priority'    => $reward->priority,
-                'quantity'    => $reward->quantity,
-            ];
-        }
-    }
-
-    protected function getNextAvailableReward(&$rewardItems)
-    {
-        foreach ($rewardItems as &$reward) {
-            if ($reward['quantity'] > 0) {
-                $reward['quantity']--;
-                return $reward;
+            for ($i = 0; $i < $reward->quantity; $i++) {
+                return [
+                    'id' => $reward->id,
+                    'target_type' => $reward->target_type,
+                    'target' => $reward->target,
+                    'expire_days' => $reward->expire_days,
+                    'priority' => $reward->priority,
+                    'quantity' => 1
+                ];
             }
         }
-        return null;
     }
 
     public function getTopContributorIds($roomId, $levelColumn): array
@@ -254,10 +241,12 @@ class RoomBoomRewardJob implements ShouldQueue
             ->toArray();
     }
 
-    public function assignWinnerData($userId, $reward): void
+    public function assignWinnerData($userId = null, $reward = null): void
     {
-        $this->assignedUserIds[] = $userId;
-        $this->assignments[] = $reward;
+        if ($userId && $reward){
+            $this->assignedUserIds[] = $userId;
+            $this->assignments[] = $reward;
+        }
 
         $this->winnerData[] = [
             'user_id' => $userId,
@@ -288,80 +277,27 @@ class RoomBoomRewardJob implements ShouldQueue
         }
     }
 
-    /**
-     * @throws \Throwable
-     */
     protected function dispatchPendingNotifications(): void
     {
-        $this->dispatchWareNotification();
-
-        $this->dispatchAchievementNotification();
-
-        $this->dispatchGiftNotification();
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    public function dispatchWareNotification(): void
-    {
-        $wareTitle = __('congratulations');
-        $wareBody = __('You have received a gift: :ware');
-
-        $wareIds = array_keys($this->wareNotifications);
-        $wares   = Ware::whereIn('id', $wareIds)->get()->keyBy('id');
-
-        foreach ($this->wareNotifications as $wareId => $notification) {
-            $ware     = $wares[$wareId] ?? null;
-            $wareName = $ware->name ?? __('a special ware');
-            $body     = str_replace(':ware', $wareName, $wareBody);
-
-            foreach ($notification['user_ids'] as $userId) {
-                $user = $this->users[$userId] ?? null;
-                if ($user) {
-                    $expire = $notification['expire_days'] ?? null;
-                    UserCommon::assignRoomBoomWare($user, $ware, $expire);
-                }
-            }
-
-            if (!empty($notification['user_ids'])) {
-                Common::sendOfficialMessage($notification['user_ids'], $wareTitle, $body);
-            }
-
-            if (!empty($notification['tokens'])) {
-                Common::send_firebase_notification($notification['tokens'], $wareTitle, $body);
-            }
-        }
-    }
-
-
-    public function dispatchAchievementNotification(): void
-    {
         if (!empty($this->achievementNotifications)) {
-            $achievementTitle = __('Achievement Reward');
-            $achievementBody = __('You have received a new achievement.');
+            info($this->achievementNotifications['tokens']);
+            Common::send_firebase_notification(
+                $this->achievementNotifications['tokens'],
+                $this->achievementNotifications['title'],
+                $this->achievementNotifications['body']
+            );
+        }
 
-            Common::sendOfficialMessage($this->achievementNotifications['user_ids'], $achievementTitle, $achievementBody);
-            Common::send_firebase_notification($this->achievementNotifications['tokens'], $achievementTitle, $achievementBody);
+        if (!empty($this->giftNotifications)) {
+            info($this->achievementNotifications['tokens']);
+            Common::send_firebase_notification(
+                $this->giftNotifications['tokens'],
+                $this->giftNotifications['title'],
+                $this->giftNotifications['body']
+            );
         }
     }
 
-    public function dispatchGiftNotification(): void
-    {
-        $giftTitle = __('Gift Reward');
-        $giftBody = __('You have received the gift: :giftName');
-        $giftIds = array_keys($this->giftNotifications);
-        $gifts = Gift::whereIn('id', $giftIds)->get()->keyBy('id');
-
-        foreach ($this->giftNotifications as $giftId => $notification) {
-            $giftName = $gifts[$giftId]->name ?? __('a special gift');
-
-            $giftBody = str_replace(':giftName', $giftName, $giftBody);
-
-            Common::sendOfficialMessage($notification['user_ids'], $giftTitle, $giftBody);
-            Common::send_firebase_notification($notification['tokens'], $giftTitle, $giftBody);
-        }
-    }
 }
 
 //        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
