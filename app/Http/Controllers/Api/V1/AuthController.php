@@ -161,14 +161,14 @@ class AuthController extends Controller
     {
         $fields = $data;
         $unique_id = $data['apple_id'];
-        $teamId = config('apple.apple_team_id'); // Use the correct environment variable name
-        $keyId = config('apple.apple_key_id'); //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
-        $clientId = config('apple.apple_client_id'); //'com.tikkchat.app'; // Use the correct environment variable name
+        $teamId = '4WZ4BZDW8K'; // Use the correct environment variable name
+        $keyId =  'BKD3JLV6HY'; //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+        $clientId = 'com.moon.light.app'; //'com.tikkchat.app'; // Use the correct environment variable name
         $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
 
-        $keyContent = \Storage::get(config('apple.apple_service_file'));
+        $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
 
 
         $token = JWT::encode([
