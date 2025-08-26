@@ -414,7 +414,7 @@ Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class
 Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle:10,1'
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
     Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
-    Route::post('/capture-order/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
+    Route::get('/capture-order/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
 });
 
 
