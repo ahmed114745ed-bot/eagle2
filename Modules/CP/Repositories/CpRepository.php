@@ -311,8 +311,8 @@ class CpRepository
     public function getCpRanking($relationType, $type)
     {
         $t = is_numeric($type) ? (int) $type : null;
-        $timezone = getTimezone();
-        $now = \Carbon\Carbon::now($timezone);
+       // $timezone = getTimezone();
+        $now = \Carbon\Carbon::now();
 
         return GiftLog::query()
             ->selectRaw('
