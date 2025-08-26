@@ -56,6 +56,7 @@ class RoomBoomResource extends JsonResource
         }
 
         return $topContributors->map(function($contributor) {
+            info($contributor->total_gift);
             $user = User::with('profile')->find($contributor->sender_id);
             if ($user) {
                 $user->total_gift = $contributor->total_gift;
