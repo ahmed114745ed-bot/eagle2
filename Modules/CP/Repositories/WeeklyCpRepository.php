@@ -57,13 +57,13 @@ class WeeklyCpRepository
 
     public function topUser($giftIds, $weeklyCp)
     {
-
+       $timezone = getTimezone();
         return GiftLog::whereIn('giftId', $giftIds)
             ->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
             ->groupBy('cp_id')
             ->whereBetween('created_at', [
-                \Carbon\Carbon::parse($weeklyCp->start_date)->startOfDay(),
-                \Carbon\Carbon::parse($weeklyCp->end_date)->endOfDay()
+                \Carbon\Carbon::parse($weeklyCp->start_date, $timezone)->startOfDay(),
+            \Carbon\Carbon::parse($weeklyCp->end_date, $timezone)->endOfDay(),
             ])->whereHas('cps', function ($q) {
                 $q->relation();
             })->with('cp')->orderByDesc('totalGiftNum')->first();
