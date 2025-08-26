@@ -68,9 +68,9 @@ class BdAgencyHostSallaryService
     
         $difference = $amount - $oldDbValue;
     
-        if ($difference <= 0.00001) {
-            return;
-        }
+        // if ($difference <= 0.00001) {
+        //     return;
+        // }
     
         $attributes = self::buildAttributes($data, $bdUserId);
         $newSalary = Self::getOldSalary($data['bd_id'],$data['user_id']);
