@@ -3,7 +3,7 @@ on:
   push:
     branches: ["tempoApp"]
 jobs:
-  run_example_job:
+  run_tempo_hub:
     runs-on: ubuntu-latest
     steps:
     - name: print out Tempo
@@ -15,6 +15,8 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          cd /var/www/tempo
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
@@ -24,9 +26,21 @@ jobs:
           else
             echo "Disk space is within acceptable limits $current% "
           fi
+  run_tempo_app:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out Tempo
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.56.160"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
           cd /var/www/tempo
           pwd
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t tempo:${{ github.sha }} .
           docker service update --image tempo:${{ github.sha }} tempo-app
 
@@ -63,17 +77,8 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
-
           cd /var/www/tempo
           pwd
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t tempo-job:${{ github.sha }} -f Dockerfile-jobs .
           docker service update --image tempo-job:${{ github.sha }} tempo-job
