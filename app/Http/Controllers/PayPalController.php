@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CoinLog;
 use App\Services\PayPalService;
+use Http;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -32,6 +33,8 @@ class PayPalController extends Controller
 
     public function capture($orderId): JsonResponse
     {
-        return response()->json(["status" => "COMPLETED", "orderId" => $orderId]);
+        $orderDetails = (new PayPalService())->capture($orderId);
+
+        return response()->json([$orderDetails]);
     }
 }

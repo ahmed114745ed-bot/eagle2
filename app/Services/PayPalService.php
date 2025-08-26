@@ -216,6 +216,13 @@ class PayPalService
         return response()->json(['status' => 'failed', 'message' => 'Payment cancelled.',], 500);
     }
 
+    public function capture($orderId)
+    {
+        $response = Http::withToken($this->getAccessToken())
+            ->get(config('paypal.base_url')."/v2/checkout/orders/$orderId");
+
+        return $response->json();
+    }
     public function callback(Request $request): JsonResponse
     {
         $eventType = $request->get('event_type');
