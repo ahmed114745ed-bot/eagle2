@@ -17,15 +17,16 @@ class StripeService {
         try {
 
 
-            $stripe_test_success_url = Setting::where('key', 'stripe_test_success_url')->first();
-            $stripe_test_cancel_url = Setting::where('key', 'stripe_test_cancel_url')->first();
+            $stripe_test_success_url = Setting::where('key', 'stripe_cancel_url')->first();
+            $stripe_test_cancel_url = Setting::where('key', 'stripe_success_url')->first();
+            $stripe_currency = Setting::where('key', 'stripe_currency')->first();
     
             // Create a checkout session
             $session = StripeCheckoutSession::create([
                 'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
-                        'currency' =>  'usd',
+                        'currency' =>  $stripe_currency?->value,
                         'product_data' => [
                             'name' => $request->product_name,
                         ],
