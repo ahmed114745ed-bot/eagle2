@@ -203,9 +203,9 @@ class AuthController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        if (!$this->canLogin($user)) {
-            return Common::apiResponse(false, 'you are blocked', [], 408);
-        }
+        // if (!$this->canLogin($user)) {
+        //     return Common::apiResponse(false, 'you are blocked', [], 408);
+        // }
 
         $user->auth_token = $token;
         event(new DeviceTokenSent($user->id, $user->device_token));
