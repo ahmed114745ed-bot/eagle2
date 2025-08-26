@@ -19,10 +19,10 @@ class DiamondController extends Controller
 {
 
 
-public function calculateMonthlyDiamondReceived()
-{
-    $timezone = getTimezone();
-    $startOfMonth =\Carbon\Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC');
+    public function calculateMonthlyDiamondReceived()
+    {
+        $timezone = getTimezone();
+        $startOfMonth = \Carbon\Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC');
 
         $users = DB::table('users')
             ->select('id', 'agency_id')
@@ -57,17 +57,13 @@ public function calculateMonthlyDiamondReceived()
         }
 
         $totalReceived = DB::table('gift_logs')
-        ->where('receiver_id', $user->id)
-        ->where('created_at', '>=', $startDate)
+            ->where('receiver_id', $user->id)
+            ->where('created_at', '>=', $startDate)
             ->where('agency_id', $user->agency_id)
-        ->selectRaw('SUM(giftPrice) as total')
-        ->value('total');
-
-        DB::table('users')
-            ->where('id', $user->id)
-            ->update([
-                'monthly_diamond_received' => $totalReceived ?? 0
-            ]);
+            ->selectRaw('SUM(giftPrice) as total')
+            ->value('total');
+        $totalDiamond = $totalReceived ?? 0;
+        uploadMonthlyDiamondReceive($user->id, $totalDiamond);
     }
 
     public function calculateSalary()
