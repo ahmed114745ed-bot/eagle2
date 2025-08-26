@@ -100,8 +100,8 @@ class User extends Authenticatable
         'is_frozen',
         'total_charge_level',
         'photo',
+        'org_online_time',
         'monthly_diamond_received',
-        'org_online_time'
     ];
 
 

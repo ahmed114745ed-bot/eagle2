@@ -54,8 +54,10 @@ class ResetUserMonthlyDiamond extends Command
 
                 $this->calculateUserSalary();
             }
+
+
         }catch (\Exception $exception){
             $this->error('reset monthly diamond failed: '.$exception->getMessage());
         }
-      }
+    }
 }
