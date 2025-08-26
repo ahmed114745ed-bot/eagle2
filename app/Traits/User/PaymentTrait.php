@@ -62,6 +62,7 @@ trait PaymentTrait
 
     public function webhookPayment($coinLogId): JsonResponse
     {
+        info($coinLogId);
         $coinLog = CoinLog::where("id", $coinLogId)->first();
 
         if (!$coinLog || $coinLog->status == 1) {
