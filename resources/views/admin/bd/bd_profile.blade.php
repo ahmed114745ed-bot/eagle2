@@ -845,7 +845,7 @@
                     <div class="avatar-grid">
                         
                             
-                            <a href="#" ">
+                            <a href="#" >
                                {{  truncateAndTrim( $bd->total_salary)  }}
                             </a>
                     </div>
