@@ -988,6 +988,7 @@ class RankingService
     {
         $data = $this->cpRepository->getCpRankingWithOutRelation(1);
         $cp_top_2 = $data->take(2);
+       // dd($cp_top_2 -> toArray());
         $topGamer = $this->coinGameUserRepository->topThree();
         return [
             'sender'    => $this->getRankUserAvatars('sender', 'daily'),
@@ -1005,7 +1006,7 @@ class RankingService
     {
         return $this->rankingRepo
             ->getUserRankingImages($type, $rankingType)
-            ->map(fn($item) => optional($item->ranker->profile)->avatar)
+            ->map(fn($item) => optional(@$item?->ranker?->profile)?->avatar)
             ->filter()
             ->values()
             ->toArray();
@@ -1018,7 +1019,7 @@ class RankingService
     {
         return $this->rankingRepo
             ->getUserRankingImages($type, $rankingType)
-            ->map(fn($item) => optional($item->ranker->ownerRoom)->room_cover)
+            ->map(fn($item) => optional(@$item?->ranker?->ownerRoom)?->room_cover)
             ->filter()
             ->values()
             ->toArray();
