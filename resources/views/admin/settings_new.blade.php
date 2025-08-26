@@ -778,7 +778,11 @@ use Modules\Vip\Entities\Vip;
                         <label class="d-block">{{ __('Sound & Video System Setting:') }}</label>
 
                         <div class="row mt-4">
-                           
+                           <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
+                                method="POST">
+                                @csrf
+                               
+                            </form>
                              <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
                                 method="POST">
                                 @csrf
