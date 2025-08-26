@@ -115,7 +115,9 @@ class BdController extends MainController
         // $grid->column('username', __('username'));
         // $grid->column('name', __('Name'));
         $grid->column('username', __('Bd'))->display(function ($name) {
-
+            if (request()->filled('_export_')) {
+                return $name;
+            }
 
 
             $id = $this->id ?? '-';
@@ -144,6 +146,10 @@ class BdController extends MainController
             ";
         });
         $grid->column('default', __('default_status'))->display(function () {
+            if (request()->filled('_export_')) {
+                return $this->default;
+            }
+           
             if ($this->default == 1) {
                 return <<<HTML
                     <span style="display: flex; align-items: center;">
@@ -167,6 +173,9 @@ class BdController extends MainController
 
         $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
+            if (request()->filled('_export_')) {
+                return $name;
+            }
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
             $uid = $user->uuid ?? 'غير معروف';
@@ -213,12 +222,14 @@ class BdController extends MainController
             return truncateAndTrim($this->total_cut, 2);
         });
 
-        $grid->column('transfer_salary', __("transfer_salary"))
+        $col = $grid->column('transfer_salary', __("transfer_salary"))
         ->display(function () {
             return $this->transfer_salary ? 1 : 0;
-        })
-        ->switch(Common::getSwitchStates());
-
+        });
+        
+        if (! request()->filled('_export_')) {
+            $col->switch(Common::getSwitchStates());
+        }
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
@@ -250,7 +261,7 @@ class BdController extends MainController
             $grid->tools(function (Grid\Tools $tools) {
 
 
-                $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
+                // $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
             });
         }
         $grid->disableRowSelector();
@@ -404,7 +415,7 @@ class BdController extends MainController
                     'id',
                     'bd_id',
                     'agency_id',
-                    'salary',
+                    // 'salary',
                     'amount',
                     'month',
                     'year',

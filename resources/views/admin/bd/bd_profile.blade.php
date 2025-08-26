@@ -845,7 +845,7 @@
                     <div class="avatar-grid">
                         
                             
-                            <a href="#" ">
+                            <a href="#" >
                                {{  truncateAndTrim( $bd->total_salary)  }}
                             </a>
                     </div>
@@ -855,7 +855,7 @@
             <div class="performers-card">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-star"></i>
+                        <!-- <i class="fas fa-star"></i> -->
                         {{ __('Agency Count') }}
                     </h2>
                 </div>
@@ -864,7 +864,7 @@
                     <div class="avatar-grid">
                         
                             
-                            <a href="#" ">
+                            <a href="#" >
                                {{ $bd->agencies_count  }}
                             </a>
                     </div>
@@ -931,13 +931,13 @@
 
                                         <td class="user-cell">
                                             <div class="user-avatar">
-                                                <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                <a href="{{ url('admin/users/'. $agency->owner?->id ) }}">
                                                     <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ??'' }}">
                                                 </a>
                                             </div>
                                             <div class="user-info">
                                                 <strong>
-                                                    <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                    <a href="{{ url('admin/users/'.$agency->owner?->id) }}">
                                                         {{ $agency->owner?->name ??'' }}
                                                     </a>
                                                 </strong>
@@ -1123,7 +1123,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>{{ __('Agency ID') }}</th>
-                                    <th>{{ __('Salary') }}</th>
+                                    <!-- <th>{{ __('Salary') }}</th> -->
                                     <th>{{ __('Amount') }}</th>
                                     <th>{{ __('Month') }}</th>
                                     <th>{{ __('Year') }}</th>
@@ -1136,7 +1136,7 @@
                                     <tr>
                                         <td>{{ $target_history->firstItem() + $index }}</td>
                                         <td>{{ $item->agency_id }}</td>
-                                        <td>{{ $item->salary }}</td>
+                                        <!-- <td>{{ $item->salary }}</td> -->
                                         <td>{{ $item->amount }}</td>
                                         <td>{{ $item->month }}</td>
                                         <td>{{ $item->year }}</td>
