@@ -55,6 +55,7 @@ class WeeklyCpController extends Controller
     {
         try {
             $data = $this->weeklyCpService->topOneCurrentWeeklyCp();
+            dd( $data);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
