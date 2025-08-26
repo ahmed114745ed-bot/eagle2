@@ -247,7 +247,7 @@
 .stat-label {
     font-size: 12px;
     color: #7f8c8d;
-    text-transform: uppercase;
+    text-transform: none;
     letter-spacing: 0.5px;
 }
 
@@ -535,7 +535,7 @@
     background: var(--secondary-color);
    
     font-weight: 600;
-    text-transform: uppercase;
+    text-transform: none;
     font-size: 12px;
     letter-spacing: 0.5px;
 }
@@ -1111,54 +1111,75 @@
 
 
 @if($activeTab === 'target_history')
-    <div class="tab-content active" id="target-history-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">{{ __('Target History') }}</h4>
-            </div>
-            @if($target_history && $target_history->count())
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>{{ __('Agency ID') }}</th>
-                                    <!-- <th>{{ __('Salary') }}</th> -->
-                                    <th>{{ __('Amount') }}</th>
-                                    <th>{{ __('Month') }}</th>
-                                    <th>{{ __('Year') }}</th>
-                                    <th>{{ __('Is Paid') }}</th>
-                                    <th>{{ __('Created At') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($target_history as $index => $item)
-                                    <tr>
-                                        <td>{{ $target_history->firstItem() + $index }}</td>
-                                        <td>{{ $item->agency_id }}</td>
-                                        <!-- <td>{{ $item->salary }}</td> -->
-                                        <td>{{ $item->amount }}</td>
-                                        <td>{{ $item->month }}</td>
-                                        <td>{{ $item->year }}</td>
-                                        <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
-                                        <td>{{ $item->created_at }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-wrapper">
-                        {{ $target_history->appends(['tab' => 'target_history'])->links('vendor.pagination.default') }}
-                    </div>
+<div class="tab-content active" id="target-history-tab">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title">{{ __('Target History') }}</h4>
 
-            @else
-                <div class="empty-table">
-                    <i class="fas fa-calendar-times"></i>
-                    <p>{{ __('No target history found') }}</p>
-                </div>
-            @endif
+            <form method="GET" class="form-inline">
+                <input type="hidden" name="tab" value="target_history">
+
+                <select name="month" class="form-control mr-2">
+                    @foreach(range(1,12) as $m)
+                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="year" class="form-control mr-2">
+                    @foreach(range(now()->year-5, now()->year) as $y)
+                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <button type="submit" class="btn btn-primary">{{ __('Filter') }}</button>
+            </form>
         </div>
+
+        @if($target_history && $target_history->count())
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('Agency ID') }}</th>
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('Month') }}</th>
+                            <th>{{ __('Year') }}</th>
+                            <th>{{ __('Is Paid') }}</th>
+                            <th>{{ __('Created At') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($target_history as $index => $item)
+                            <tr>
+                                <td>{{ $target_history->firstItem() + $index }}</td>
+                                <td>{{ $item->agency_id }}</td>
+                                <td>{{ $item->amount }}</td>
+                                <td>{{ $item->month }}</td>
+                                <td>{{ $item->year }}</td>
+                                <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
+                                <td>{{ $item->created_at }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-wrapper">
+                {{ $target_history->appends(request()->except('page'))->links('vendor.pagination.default') }}
+            </div>
+        @else
+            <div class="empty-table">
+                <i class="fas fa-calendar-times"></i>
+                <p>{{ __('No target history found') }}</p>
+            </div>
+        @endif
     </div>
+</div>
 @endif
 
 </div>
