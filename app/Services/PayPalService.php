@@ -286,6 +286,7 @@ class PayPalService
 
         $coinLog = CoinLog::find($coinLogId);
 
+        info($paypalId);
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
                 $captureResponse = Http::withToken($this->getAccessToken())
