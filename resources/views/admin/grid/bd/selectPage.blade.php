@@ -81,8 +81,6 @@ input:checked + .slider:before {
   color: #28a745;
 }
 </style>
-
-
 <div style="width:50%; margin:20px auto; text-align:center;">
     <label for="salaryTransferSwitch" style="margin-bottom:10px; display:block;">
         {{ __('salary_transfer_label') }}
@@ -95,54 +93,26 @@ input:checked + .slider:before {
     </label>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
 document.getElementById('salaryTransferSwitch').addEventListener('change', function () {
-    let checked = this.checked;
     let self = this;
+    let checked = self.checked;
 
-    Swal.fire({
-        title: checked ? "{{ __('salary_transfer_enable_title') }}" : "{{ __('salary_transfer_disable_title') }}",
-        text: checked 
-            ? "{{ __('salary_transfer_enable_text') }}" 
-            : "{{ __('salary_transfer_disable_text') }}",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: checked ? "{{ __('confirm_enable') }}" : "{{ __('confirm_disable') }}",
-        cancelButtonText: "{{ __('cancel') }}",
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch("{{ route('admin.bd.toggle-salary-transfer') }}", {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ enabled: checked ? 1 : 0 })
-            })
-            .then(res => res.json())
-            .then(data => {
-                Swal.fire({
-                    title: "{{ __('success_title') }}",
-                    text: data.message ?? "{{ __('success_message') }}",
-                    icon: "success",
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            })
-            .catch(() => {
-                Swal.fire({
-                    title: "{{ __('error_title') }}",
-                    text: "{{ __('error_message') }}",
-                    icon: "error"
-                });
-                self.checked = !checked; 
-            });
-        } else {
-            self.checked = !checked;
-        }
+    fetch("{{ route('admin.bd.toggle-salary-transfer') }}", {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ enabled: checked ? 1 : 0 })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("تم تحديث حالة تحويل الرواتب:", data.message);
+    })
+    .catch(() => {
+        alert("حدث خطأ، حاول مرة أخرى");
+        self.checked = !checked; // لو حصل خطأ نرجع الحالة القديمة
     });
 });
 </script>
