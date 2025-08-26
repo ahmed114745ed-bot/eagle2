@@ -32,7 +32,7 @@ class WeeklyCpRepository
     public function perviousWeeklyCpWinners($limit = 3)
     {
         return WeeklyStar::previousEvent()->WeeklyCP()->orderBy('start_date', 'desc')->with(['WeeklyCpWinners' => function ($query) {
-            $query->where('type_relation', 'lovely')->with('userOne.profile','userTwo.profile');
+            $query->where('type_relation', 'lovely')->with('userOne.profile', 'userTwo.profile');
         }])->limit($limit)->get();
     }
 
@@ -57,12 +57,13 @@ class WeeklyCpRepository
 
     public function topUser($giftIds, $weeklyCp)
     {
+
         return GiftLog::whereIn('giftId', $giftIds)
             ->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
             ->groupBy('cp_id')
             ->whereBetween('created_at', [
-                $weeklyCp->start_date,
-                $weeklyCp->end_date
+                \Carbon\Carbon::parse($weeklyCp->start_date)->startOfDay(),
+                \Carbon\Carbon::parse($weeklyCp->end_date)->endOfDay()
             ])->whereHas('cps', function ($q) {
                 $q->relation();
             })->with('cp')->orderByDesc('totalGiftNum')->first();

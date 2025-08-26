@@ -52,7 +52,7 @@ class WeeklyCpService
         }
 
         $giftIds = $weeklyCp->gifts->pluck('id')->toArray();
-
+       
         return $this->weeklyCpRepository->topUser($giftIds, $weeklyCp);
     }
 
@@ -69,7 +69,6 @@ class WeeklyCpService
     public function topOneCurrentWeeklyCp()
     {
         $currentWeeklyCp = $this->getCurrentWeeklyCp();
-        
         if (! $currentWeeklyCp) {
             throw new Exception('there is not weekly cp ');
         }
