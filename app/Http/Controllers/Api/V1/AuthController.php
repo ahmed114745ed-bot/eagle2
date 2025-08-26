@@ -168,7 +168,7 @@ class AuthController extends Controller
         $iat = strtotime('now');
         $exp = strtotime('+60days');
         $keyContent = file_get_contents(public_path('files/AuthKey_BKD3JLV6HY.p8'));
-       // $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
+        // $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
 
 
         $token = JWT::encode([
@@ -187,9 +187,12 @@ class AuthController extends Controller
                 'client_id' => $clientId,
                 'client_secret' => $token,
             ]);
-           
-            $claims = explode('.', $res['id_token'])[1];
-            $data = json_decode(base64_decode($claims), true);
+            if ($res->successful()) {
+                $claims = explode('.', $res['id_token'])[1];
+                $data = json_decode(base64_decode($claims), true);
+            } else {
+               // return      Common::apiResponse(0, 'data not full', null, 400);
+            }
         } catch (\Exception $e) {
             return response()->json(['error' => 'wrong credential.', 'message' => $e->getMessage()], 403);
         }
@@ -200,9 +203,9 @@ class AuthController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        if (!$this->canLogin($user)) {
-            return Common::apiResponse(false, 'you are blocked', [], 408);
-        }
+        // if (!$this->canLogin($user)) {
+        //     return Common::apiResponse(false, 'you are blocked', [], 408);
+        // }
 
         $user->auth_token = $token;
         event(new DeviceTokenSent($user->id, $user->device_token));
