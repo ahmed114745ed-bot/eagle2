@@ -39,7 +39,7 @@ class StripeController extends Controller
 
             $request->user_id = auth()->id();
 
-            $coin = Coin::query()->find($request->coin_id);
+            $coin = Coin::find($request->coin_id);
 dd($request->coin_id    ,$coin                                                           );
             $trx = rand (111111111111111111,999999999999999999);
 
