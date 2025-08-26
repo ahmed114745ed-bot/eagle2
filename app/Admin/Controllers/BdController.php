@@ -423,7 +423,8 @@ class BdController extends MainController
                     'created_at'
                 )
                 ->where('bd_id', $bd->id)
-                ->where('month', $month)
+                ->where('bd_id', $bd->id)
+                ->where('amount','!=' ,0)
                 ->where('year', $year)
                 ->latest()
                 ->paginate(10, ['*'], 'target_history_page');

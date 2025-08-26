@@ -313,6 +313,11 @@ class UserRepository extends AbstractRepository
         return $this->model->where('email', $email)->first();
     }
 
+    public function findByAppleId($appleId)
+    {
+        return $this->model->where('apple_id', $appleId)->first();
+    }
+
     public function findByHuawei($huaweiId)
     {
         return $this->model->query()->whereNotNull('huawei_id')->where('huawei_id', $huaweiId)->first();

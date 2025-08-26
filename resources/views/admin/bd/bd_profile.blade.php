@@ -1073,7 +1073,7 @@
                                     </a>
                                 ";
                             } else {
-                                $receiverHtml = "<span class='text-danger'>{{ __('لا يوجد مستلم') }}</span>";
+                                $receiverHtml = '<span class="text-danger">' . __('Unknown') . '</span>';
                             }
                         }
                     @endphp
