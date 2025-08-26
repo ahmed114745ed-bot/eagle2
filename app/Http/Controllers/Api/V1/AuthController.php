@@ -191,13 +191,14 @@ class AuthController extends Controller
                 $claims = explode('.', $res['id_token'])[1];
                 $data = json_decode(base64_decode($claims), true);
             } else {
-                return      Common::apiResponse(0, 'data not full', null, 400);
+               // return      Common::apiResponse(0, 'data not full', null, 400);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => 'wrong credential.', 'message' => $e->getMessage()], 403);
         }
 
         try {
+            dd($data);
             [$user, $token] = $this->authService->loginWithApple($data, $unique_id);
         } catch (\Exception $exception) {
 
