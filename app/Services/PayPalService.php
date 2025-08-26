@@ -290,7 +290,9 @@ class PayPalService
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
                 $captureResponse = Http::withToken($this->getAccessToken())
-                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture", null);
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->withBody('', 'application/json')
+                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
 
                 info('capture order', [$captureResponse]);
 //                if ($captureResponse->successful()) {
