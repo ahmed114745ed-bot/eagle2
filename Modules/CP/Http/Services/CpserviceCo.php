@@ -48,7 +48,7 @@ class CpserviceCo
             }
         }
 
-        if ($cpRelation == 1) {
+        if ($cpRelation ) {
             $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
             $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
 
