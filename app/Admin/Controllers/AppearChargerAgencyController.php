@@ -222,7 +222,8 @@ class AppearChargerAgencyController extends MainController
         $grid = new Grid(new ShippingAgency());
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
-        $grid->model()->with('owner.profile');
+        $grid->model()->with('owner.profile')
+             ->orderByDesc('id');  
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -527,7 +528,7 @@ class AppearChargerAgencyController extends MainController
                     $charges->with($relations);
                 }
 
-                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
+                $charges = $charges->latest()->paginate(2, ['*'], 'charges_page');
                 break;
 
             case 'resived':
