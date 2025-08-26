@@ -52,7 +52,7 @@ class WeeklyCpService
         }
 
         $giftIds = $weeklyCp->gifts->pluck('id')->toArray();
-
+       
         return $this->weeklyCpRepository->topUser($giftIds, $weeklyCp);
     }
 
