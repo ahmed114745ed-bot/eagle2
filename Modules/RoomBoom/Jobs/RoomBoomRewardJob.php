@@ -157,9 +157,6 @@ class RoomBoomRewardJob implements ShouldQueue
         if ($user){
             $expire = $reward['expire_days'];
             if ($reward['target_type'] == 'ware') {
-                $ware = Ware::find($reward['target']);
-                UserCommon::addEvintsWareToUser($user, $ware, $expire);
-
                 $this->wareNotifications[$reward['target']]['user_ids'][] = $userId;
                 if ($token) {
                     $this->wareNotifications[$reward['target']]['tokens'][] = $token;
@@ -291,12 +288,52 @@ class RoomBoomRewardJob implements ShouldQueue
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
     protected function dispatchPendingNotifications(): void
     {
+        $this->dispatchWareNotification();
+
         $this->dispatchAchievementNotification();
 
         $this->dispatchGiftNotification();
     }
+
+    /**
+     * @throws \Throwable
+     */
+    public function dispatchWareNotification(): void
+    {
+        $wareTitle = __('congratulations');
+        $wareBody = __('You have received a gift: :ware');
+
+        $wareIds = array_keys($this->wareNotifications);
+        $wares   = Ware::whereIn('id', $wareIds)->get()->keyBy('id');
+
+        foreach ($this->wareNotifications as $wareId => $notification) {
+            $ware     = $wares[$wareId] ?? null;
+            $wareName = $ware->name ?? __('a special ware');
+            $body     = str_replace(':ware', $wareName, $wareBody);
+
+            foreach ($notification['user_ids'] as $userId) {
+                $user = $this->users[$userId] ?? null;
+                if ($user) {
+                    $expire = $notification['expire_days'] ?? null;
+                    UserCommon::assignRoomBoomWare($user, $ware, $expire);
+                }
+            }
+
+            if (!empty($notification['user_ids'])) {
+                Common::sendOfficialMessage($notification['user_ids'], $wareTitle, $body);
+            }
+
+            if (!empty($notification['tokens'])) {
+                Common::send_firebase_notification($notification['tokens'], $wareTitle, $body);
+            }
+        }
+    }
+
 
     public function dispatchAchievementNotification(): void
     {
