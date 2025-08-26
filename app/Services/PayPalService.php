@@ -226,7 +226,6 @@ class PayPalService
         $resource = $request->get('resource');
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
 
-        info('before payment');
         return $this->webhookPayment($coinLogId);
     }
 
