@@ -161,14 +161,14 @@ class AuthController extends Controller
     {
         $fields = $data;
         $unique_id = $data['apple_id'];
-        $teamId = config('apple.apple_team_id'); // Use the correct environment variable name
-        $keyId = config('apple.apple_key_id'); //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
-        $clientId = config('apple.apple_client_id'); //'com.tikkchat.app'; // Use the correct environment variable name
-        $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
+        $teamId = Common::getSettingValue('apple_team_id') ?? ''; // Use the correct environment variable name
+        $keyId =  Common::getSettingValue('apple_key_id') ?? ''; //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+        $clientId = Common::getSettingValue('apple_client_id') ?? ''; //'com.tikkchat.app'; // Use the correct environment variable name
+        $redirectUri = Common::getSettingValue('apple_redirect_uri') ?? ''; // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
 
-        $keyContent = \Storage::get(config('apple.apple_service_file'));
+        $keyContent = \Storage::get(Common::getSettingValue('apple_service_file'));
 
 
         $token = JWT::encode([
@@ -187,7 +187,7 @@ class AuthController extends Controller
                 'client_id' => $clientId,
                 'client_secret' => $token,
             ]);
-
+            
             $claims = explode('.', $res['id_token'])[1];
             $data = json_decode(base64_decode($claims), true);
         } catch (\Exception $e) {
