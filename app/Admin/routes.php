@@ -413,7 +413,10 @@ Route::group(
 
 
         Route::resource('usersBd', BdController::class);
+        Route::resource('usersBd-settings', BdSelectController::class);
 
+        Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])
+        ->name('bd.toggle-salary-transfer');
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 

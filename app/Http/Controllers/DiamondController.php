@@ -19,11 +19,11 @@ class DiamondController extends Controller
 {
 
 
-    public function calculateMonthlyDiamondReceived()
-    {
-        $timezone = Common::timeZone();
-        $now = Carbon::now($timezone);
-        $startOfMonth = $now->copy()->startOfMonth();
+public function calculateMonthlyDiamondReceived()
+{
+    $timezone = getTimezone();
+    $now =\Carbon\Carbon::now(getTimezone())->startOfDay()->copy()->setTimezone('UTC');
+    $startOfMonth = $now->copy()->startOfMonth();
 
         $users = DB::table('users')
             ->select('id', 'agency_id')

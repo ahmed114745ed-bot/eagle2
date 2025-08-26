@@ -3695,6 +3695,18 @@
 "Cancel": "إلغاء",
 "Removed!": "تم الإزالة!",
 "Error": "خطأ",
-"Something went wrong": "حدث خطأ ما"
+"Something went wrong": "حدث خطأ ما",
+"salary_transfer_label": " إيقاف تحويل الرواتب لجميع الBD",
+  "salary_transfer_enable_title": "تفعيل تحويل الرواتب",
+  "salary_transfer_disable_title": "إيقاف تحويل الرواتب",
+  "salary_transfer_enable_text": "هل تريد تفعيل تحويل الرواتب لجميع الـ BD؟",
+  "salary_transfer_disable_text": "هل تريد إيقاف تحويل الرواتب لجميع الـ BD؟",
+  "confirm_enable": "نعم، فعّل",
+  "confirm_disable": "نعم، أوقف",
+  "cancel": "إلغاء",
+  "success_title": "تم بنجاح 🎉",
+  "success_message": "تم تنفيذ العملية بنجاح",
+  "error_title": "خطأ 🚫",
+  "error_message": "حدث خطأ، حاول مرة أخرى"
 
 }
