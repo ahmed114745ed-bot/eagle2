@@ -351,15 +351,14 @@
                         });
                 },
                 onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                    {{--        return fetch('/paypal/capture-order/' + data.orderID, {--}}
-                    {{--    method: 'POST',--}}
-                    {{--    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }--}}
-                    {{--})--}}
-                    {{--    .then(res => res.json())--}}
-                    {{--    .then(orderData => {--}}
-                    {{--        window.location.href = "/api/paypal-return/{{ $logId }}";--}}
-                    });
+                    return fetch('/paypal/capture/' + data.orderID, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    })
+                        .then(res => res.json())
+                        .then(orderData => {
+                            window.location.href = "/api/paypal-return/{{ $logId }}";
+                        });
                 },
                 onCancel: function() {
                     window.location.href = "/api/paypal-cancel/{{ $logId }}";
