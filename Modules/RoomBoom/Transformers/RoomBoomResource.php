@@ -25,6 +25,7 @@ class RoomBoomResource extends JsonResource
 
     protected function getTopContributors()
     {
+        info(Carbon::today());
         $topContributors = GiftLog::select('sender_id',
             DB::raw('SUM(giftPrice) as total_gift'),
             DB::raw('MIN(created_at) as first_contribution')
@@ -56,6 +57,7 @@ class RoomBoomResource extends JsonResource
         }
 
         return $topContributors->map(function($contributor) {
+            info($contributor->total_gift);
             $user = User::with('profile')->find($contributor->sender_id);
             if ($user) {
                 $user->total_gift = $contributor->total_gift;

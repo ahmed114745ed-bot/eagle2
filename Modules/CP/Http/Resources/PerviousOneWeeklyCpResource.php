@@ -11,7 +11,7 @@ class PerviousOneWeeklyCpResource extends JsonResource
     public function toArray($request)
     {
 
-        $cp = $this->cp;
+        $cp = @$this?->cp;
 
         return [
 
