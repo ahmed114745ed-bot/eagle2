@@ -18,7 +18,7 @@ class RankingResource extends JsonResource
                 'id' => $cp->level_id ?? 0,
                 'img' => $cp->level?->img ?? '',
             ],
-            'exp'           => $cp->total_gifts,
+            'exp'           => $this->total_gifts,
             "userOne"       => [
                 "id"        => $cp->fromUser?->id ?? 0,
                 "uid"       => $cp->fromUser?->uuid ?? '',
