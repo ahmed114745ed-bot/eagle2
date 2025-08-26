@@ -1233,7 +1233,6 @@ html.ltr .dropdown-menu {
             align-items: center;
         }
 
-
         .pagination-info,
         .box-footer .pull-right {
             width: fit-content;
