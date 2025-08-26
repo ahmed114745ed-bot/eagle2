@@ -14,6 +14,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\MessageBag;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Extensions\TargetsExport;
+use App\Models\MonthlyDiamondReceive;
 use Illuminate\Http\Request;
 
 
@@ -462,7 +463,7 @@ class TargetController extends MainController
             $target = Target::find($form->model()->id);
 
             if ($target) {
-                $users = User::where('monthly_diamond_received', '>=', $target->diamonds)->count();
+                $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month',now()->month)->where('year',now()->year)->count();
                 if ($users > 0) {
                     admin_warning('تحذير', __('target_change_warning'));
                 }

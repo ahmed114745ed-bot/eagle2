@@ -38,10 +38,10 @@ class FixedTargetService
 
     private \DateTime $endDate;
 
-    public function __construct(private User $user, private? int $month = null, private? int $year = null)
+    public function __construct(private User $user, private ?int $month = null, private ?int $year = null)
     {
-            $timezone = getTimezone();
-        if (is_null($this->month) || is_null($this->year)){
+        $timezone = getTimezone();
+        if (is_null($this->month) || is_null($this->year)) {
             $tz = new \DateTimeZone($timezone);
             $dt = new \DateTime('now', $tz);
             $this->month = $dt->format('m');
@@ -49,15 +49,15 @@ class FixedTargetService
         }
 
         $joinDate = UsersJoinedAgency::where('user_id', $user->id)
-        ->where('agency_id', $user->agency_id)
-        ->latest()
-        ->value('join_date');
+            ->where('agency_id', $user->agency_id)
+            ->latest()
+            ->value('join_date');
 
         $this->joinDate = Carbon::parse($joinDate, $timezone)->timezone('UTC');
 
 
-        $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->startOfMonth()->timezone('UTC');
-        $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->endOfMonth()->timezone('UTC');
+        $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz: $timezone)->startOfMonth()->timezone('UTC');
+        $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz: $timezone)->endOfMonth()->timezone('UTC');
 
         $targetType           = $this->getUserTargetType($user->id);
         $this->userTargetType = $targetType;
@@ -70,11 +70,19 @@ class FixedTargetService
         return TargetType::REGULAR;
     }
 
-    public function calculateTarget()
+    public function calculateTarget($month = null, $year = null)
     {
+        
         $user           = $this->user;
-        $month_received = $user->monthly_diamond_received;
-  
+        $month_received = $user->getMonthlyDiamondReceived($month, $year);
+
+        /*     $agency=Agency::find($user->agency_id);
+        if ($this->userTargetType == TargetType::FIXED) {
+            if ($agency->users->where("type_user",1)->sum("monthly_diamond_received") >= $agency->monthly_target) {
+                $user = $this->calculateFixedTarget($month_received, $user);
+            }
+        } else {*/
+
         $user = $this->calculateRegularTarget($month_received, $user);
         //        }
         $user->salary_is_updated = false;
@@ -163,7 +171,7 @@ class FixedTargetService
         // logger('agency_usd Achieved:', [$agency_usd]);
         // logger('percentageAchieved Achieved:', [$percentageAchieved]);
         // logger(' Achieved:', [$agency_usd * $percentageAchieved]);
-//        logger(' Achieved: user', [ $t]);
+        //        logger(' Achieved: user', [ $t]);
 
         try {
             $values = [
@@ -235,11 +243,7 @@ class FixedTargetService
                 'target_id' =>  @$target->id,
                 ...$values
             ])->lock();
-
         }
-
-
-
     }
 
     /**
@@ -256,7 +260,7 @@ class FixedTargetService
 
 
                 $times = $this->getUserLiveTime($user);
-                $hours = $times?->hnum ?? 0;     
+                $hours = $times?->hnum ?? 0;
                 $days = $times ? $user->monthly_days : 0;
 
 
@@ -295,16 +299,16 @@ class FixedTargetService
 
 
                 $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db, $percentageAchieved);
-            }else{
+            } else {
 
                 $times = $this->getUserLiveTime($user);
-                $hours = $times?->hnum ?? 0;     
+                $hours = $times?->hnum ?? 0;
                 $days = $times ? $user->monthly_days : 0;
 
 
-                 UserSallary::updateOrCreate(
+                UserSallary::updateOrCreate(
                     [
-                        'user_id' => $user->id ,
+                        'user_id' => $user->id,
                         'month' => $this->month,
                         'year' => $this->year,
                         'user_agency_id' => $user->agency_id,

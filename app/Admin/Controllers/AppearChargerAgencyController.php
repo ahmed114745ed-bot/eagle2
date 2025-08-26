@@ -133,7 +133,7 @@ class AppearChargerAgencyController extends MainController
             case 'members':
                 $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
                     return $agency->mempers()
-                        ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                        ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                         ->with('country', 'agencyUserJob')
                         ->paginate(10, ['*'], 'members_page');
                 });

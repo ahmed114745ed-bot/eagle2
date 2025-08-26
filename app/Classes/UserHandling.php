@@ -92,9 +92,6 @@ class UserHandling
     {
         // decrement total diamond with monthly diamond when user not in agency
         $user->total_diamond_received -= $user->monthly_diamond_received;
-        // set diamond to zero
-        $user->monthly_diamond_received = 0;
-
         $agencyId = $user->agency_id;
         $user->is_host = 0;
         $user->agency_id = 0;
@@ -136,6 +133,7 @@ class UserHandling
 
         $user->monthly_days = 0;
         $user->save();
+        uploadMonthlyDiamondReceive($user->id, 0);
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
         $agencyUserJoined = UsersJoinedAgency::where([
             'user_id' => $user->id,
@@ -185,17 +183,24 @@ class UserHandling
             }
         }
 
-        // update in users tables
-        DB::table('users')
-            ->where('agency_id', $agency_id)
-            ->update([
-                'total_diamond_received' => DB::raw('CASE WHEN total_diamond_received < 0 THEN 0 ELSE total_diamond_received - monthly_diamond_received  END'),
-                'monthly_diamond_received' => 0,
-                'is_host' => 0,
-                'agency_id' => 0,
-                'monthly_days' => 0,
-                'type_user' => 0
-            ]);
+        $users = User::where('agency_id', $agency_id)->get();
+        $users = User::where('agency_id', $agency_id)->get();
+
+        foreach ($users as $user) {
+
+            DB::table('users')
+                ->where('id', $user->id)
+                ->update([
+                    'total_diamond_received' => DB::raw('CASE WHEN total_diamond_received < 0 THEN 0 ELSE total_diamond_received - ' . (int) $user->monthly_diamond_received . ' END'),
+                    'is_host' => 0,
+                    'agency_id' => 0,
+                    'monthly_days' => 0,
+                    'type_user' => 0,
+                ]);
+
+            uploadMonthlyDiamondReceive($user->id, 0);
+        }
+
 
 
         DB::table('live_times')->whereIn('uid', $usersIds)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->delete();

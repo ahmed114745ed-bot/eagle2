@@ -3,15 +3,16 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
-use Encore\Admin\Facades\Admin;
 use App\Models\Agency;
-use App\Models\AgencySallary;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Illuminate\Support\Facades\Session;
+use App\Models\AgencySallary;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class AgencyMangerAgencyesController extends MainController
 {
@@ -90,28 +91,40 @@ class AgencyMangerAgencyesController extends MainController
         $grid->column('target_usd', __('target usd'));
         $grid->column('members', __('members'))->expand(function ($model) {
             $members = $model->mempers()
+                ->select('users.*') // ensure it's still hydrating User models
+                ->leftJoin('monthly_diamond_receives as mdr', function ($join) {
+                    $join->on('users.id', '=', 'mdr.user_id')
+                        ->where('mdr.month', now()->month)
+                        ->where('mdr.year', now()->year);
+                })
                 ->with([
                     'userSallary' => function ($query) {
                         $query->select('id', 'user_id', 'sallary')
                             ->where('month', now()->month)
                             ->where('year', now()->year);
                     },
-                    'profile' => function ($query) {
-                        $query->select('id', 'user_id', 'avatar');
-                    },
-                    'liveTime'
+                    'profile:id,user_id,avatar',
+                    'liveTime',
                 ])
-                ->orderBy('monthly_diamond_received', 'desc')
+                ->withCount('reals')
+                ->orderByDesc('mdr.monthly_diamond_received')
                 ->take(5)
-                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received'])
+                ->get([
+                    'users.id',
+                    'users.uuid',
+                    'users.total_days',
+                    'users.name',
+                    DB::raw('COALESCE(mdr.monthly_diamond_received, 0) as monthly_diamond_received')
+                ])
                 ->map(function ($member) {
                     $avatar = $member->profile ? getImagePath($member->profile?->avatar) : null;
                     $imageHtml = $avatar ? "<img src='{$avatar}' style='max-width:50px;max-height:50px;' />" : 'No Image';
+
                     return [
                         'id' => $member->id ?? 0,
                         'uuid' => $member->uuid ?? 0,
                         'name' => $member->name ?? '',
-                        'reals_count' => count($member->reals) ?? 0,
+                        'reals_count' => $member->reals_count ?? 0,
                         'total_days' => $member->total_days ?? 0,
                         'total_hours' => $member->liveTime->sum("hours") ?? 0,
                         'monthly_diamond_received' => $member->monthly_diamond_received ?? 0,
@@ -125,6 +138,7 @@ class AgencyMangerAgencyesController extends MainController
                 $members->toArray()
             );
         });
+
         return $grid;
     }
 
