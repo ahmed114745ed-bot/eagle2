@@ -220,9 +220,11 @@ class PayPalService
     {
         info('webhook', [$request]);
         $eventType = $request->get('event_type');
+        info('event type', [$eventType]);
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
             return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);
         }
+        info('after event type');
 
         $resource = $request->get('resource');
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
