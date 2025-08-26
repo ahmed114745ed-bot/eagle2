@@ -314,6 +314,13 @@
                             window.location.href = orderData.approval_url;
                             return false; // stop popup
                         });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                    });
+                },
+                onCancel: function(data) {
+                    window.location.href = "/api/paypal-cancel/{{ $logId }}";
                 }
             }).render('#paypal-button');
 
