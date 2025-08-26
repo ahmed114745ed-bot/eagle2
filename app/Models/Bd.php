@@ -30,7 +30,7 @@ class Bd extends Model
 
     public function transactions()
     {
-        return $this->hasMany(Charge::class, 'charger_id', 'app_id')
+        return $this->hasMany(Charge::class, 'charger_id', 'id')
             ->where('user_charger_type', 'bd');
     }
 
