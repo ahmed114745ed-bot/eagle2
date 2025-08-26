@@ -11,10 +11,13 @@ use App\Helpers\LogHelper;
 use Illuminate\Log\LogManager;
 use App\Helpers\UserPackHelper;
 use App\Helpers\UserLevelHelper;
+use Illuminate\Pagination\Paginator;
 use App\Repositories\RankingRepository;
 use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\CP\Transformers\RankingResource;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Modules\CP\Transformers\TopRankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\Api\V1\UserRankingCollection;
@@ -22,8 +25,6 @@ use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
 
 class RankingService
 {
@@ -987,14 +988,14 @@ class RankingService
     public function getTodayTopUsers()
     {
         $data = $this->cpRepository->getCpRankingWithOutRelation(1);
-        $cp_top_2 = $data->take(2);
+        $cp_top_2 = $data->take(3);
        // dd($cp_top_2 -> toArray());
         $topGamer = $this->coinGameUserRepository->topThree();
         return [
             'sender'    => $this->getRankUserAvatars('sender', 'daily'),
             'receiver'  => $this->getRankUserAvatars('receiver', 'daily'),
             'room'      => $this->getRankRoomAvatars('roomOwner', 'daily'),
-            'top_cp' => array_values(RankingResource::collection($cp_top_2)->toArray(request())),
+            'top_cp' => array_values(TopRankingResource::collection($cp_top_2)->toArray(request())),
             'top_gamer' => GameRankingResource::collection($topGamer),
         ];
     }

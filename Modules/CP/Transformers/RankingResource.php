@@ -11,28 +11,27 @@ class RankingResource extends JsonResource
 {
     public function toArray($request)
     {
-        $cp = $this->cp;
         return [
-            'id'            => $cp->id,
+            'id'            => $this->id,
             'level'         => [
-                'id' => $cp->level_id ?? 0,
-                'img' => $cp->level?->img ?? '',
+                'id' => $this->level_id,
+                'img' => $this->level?->img
             ],
-            'exp'           => $this->total_gifts,
+            'exp'           => $this->di,
             "userOne"       => [
-                "id"        => $cp->fromUser?->id ?? 0,
-                "uid"       => $cp->fromUser?->uuid ?? '',
-                "name"      => $cp->fromUser?->name ?? '',
-                "image"     => $cp->fromUser?->profile?->avatar ?? '',
-                "gender"    => $cp->fromUser?->profile?->gender ?? 0,
+                "id"        => $this->fromUser?->id,
+                "uid"       => $this->fromUser?->uuid,
+                "name"      => $this->fromUser?->name,
+                "image"     => $this->fromUser?->profile?->avatar,
+                "gender"    => $this->fromUser?->profile?->gender,
 
             ],
             "userTwo"      => [
-                "id"        => $cp->toUser?->id ?? 0,
-                "uid"       => $cp->toUser?->uuid ?? '',
-                "name"      => $cp->toUser?->name ?? '',
-                "image"     => $cp->toUser?->profile?->avatar ?? '',
-                "gender"    => $cp->toUser?->profile?->gender ?? '',
+                "id"        => $this->toUser?->id,
+                "uid"       => $this->toUser?->uuid,
+                "name"      => $this->toUser?->name,
+                "image"     => $this->toUser?->profile?->avatar,
+                "gender"    => $this->toUser?->profile?->gender,
             ]
         ];
     }
