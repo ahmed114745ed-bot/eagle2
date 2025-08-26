@@ -26,7 +26,7 @@ class StripeService {
                 'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
-                        'currency' =>  $stripe_currency?->value,
+                        'currency' =>  $stripe_currency?->value ?? 'usd',
                         'product_data' => [
                             'name' => $request->product_name,
                         ],
