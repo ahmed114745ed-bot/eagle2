@@ -26,8 +26,8 @@ const GAME_COINS_PLAY = 'game_coins_play_#';
 
 function generateRtcToken($channelName, $uid, $expiresInSeconds = 86400)
 {
-    $appID = config('app.agora_app_id');
-    $appCertificate = config('app.agora_certificate');
+    $appID = Common::getConfig('app_id');
+    $appCertificate = Common::getConfig('agora_app_certificate');
     $role = RtcTokenBuilder2::ROLE_PUBLISHER;
 
     $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $expiresInSeconds);
