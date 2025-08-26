@@ -1159,7 +1159,9 @@
                                 <td>{{ $target_history->firstItem() + $index }}</td>
                                 <td>{{ $item->agency_id }}</td>
                                 <td>{{ $item->amount }}</td>
-                                <td>{{ $item->month }}</td>
+                                <td>
+                                {{ number_format($item->month ?? 0, 2) }}
+                                </td>
                                 <td>{{ $item->year }}</td>
                                 <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
                                 <td>{{ $item->created_at }}</td>
