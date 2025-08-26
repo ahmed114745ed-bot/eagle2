@@ -3,10 +3,10 @@ on:
   push:
     branches: ["zion"]
 jobs:
-  run_example_job:
+  run_zion_hub:
     runs-on: ubuntu-latest
     steps:
-    - name: print out Zion
+    - name: print out Zion Hub
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.81.119"
@@ -15,21 +15,26 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
-          threshold=75
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up Docker system
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
           cd /var/www/zino
           pwd
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          
+  run_zion_app:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out Zion App
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.81.119"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/zino
+          pwd
           docker build -t zion:${{ github.sha }} .
           docker service update --image zion:${{ github.sha }} zion-app
-          
           # Get first container ID of the service
           CONTAINER_ID=$(docker ps --filter "name=zion-app.1" --format "{{.ID}}" | head -n 1)
           # Run artisan command inside that container
@@ -50,3 +55,21 @@ jobs:
           else
             echo "Disk space is within acceptable limits $current% "
           fi
+	  
+ 
+  run_zion_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out Zion Job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.81.119"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |                    
+          cd /var/www/zino
+          pwd
+          docker build -t zion-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image zion-job:${{ github.sha }} zion-job
