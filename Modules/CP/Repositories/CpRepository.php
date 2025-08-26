@@ -371,12 +371,12 @@ class CpRepository
             )
             ->orderByDesc('total_gifts')
             ->limit(20)
-            ->get();
-            // ->map(function ($row) {
-            //     $cp = \App\Models\Cp::with(['level', 'fromUser.profile', 'toUser.profile'])->find($row->cp_id);
-            //     if ($cp) $cp->total_gifts = $row->total_gifts;
-            //     return $cp;
-            // });
+            ->get()
+            ->map(function ($row) {
+                $cp = \App\Models\Cp::with(['level', 'fromUser.profile', 'toUser.profile'])->find($row->cp_id);
+                if ($cp) $cp->total_gifts = $row->total_gifts;
+                return $cp;
+            });
     }
 
 
