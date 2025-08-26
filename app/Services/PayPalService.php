@@ -274,6 +274,7 @@ class PayPalService
                 $data = $response->json();
                 $status = $data['status'] ?? null;
 
+                info($status);
                 switch ($status) {
                     case 'COMPLETED':
                         // Update your system (e.g., mark as paid)
