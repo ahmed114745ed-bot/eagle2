@@ -167,8 +167,8 @@ class AuthController extends Controller
         $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
-
-        $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
+        $keyContent = file_get_contents(storage_path('app/keys/AuthKey_BKD3JLV6HY.p8'));
+       // $keyContent = \Storage::get(public_path('files/AuthKey_BKD3JLV6HY.p8'));
 
 
         $token = JWT::encode([
