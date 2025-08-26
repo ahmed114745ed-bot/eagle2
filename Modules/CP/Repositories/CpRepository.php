@@ -311,8 +311,8 @@ class CpRepository
     public function getCpRanking($relationType, $type)
     {
         $t = is_numeric($type) ? (int) $type : null;
-       // $timezone = getTimezone();
-        $now = \Carbon\Carbon::now();
+        $timezone = getTimezone();
+        $now = \Carbon\Carbon::now($timezone);
 
         return GiftLog::query()
             ->selectRaw('
@@ -371,12 +371,12 @@ class CpRepository
             )
             ->orderByDesc('total_gifts')
             ->limit(20)
-            ->get()
-            ->map(function ($row) {
-                $cp = \App\Models\Cp::with(['level', 'fromUser.profile', 'toUser.profile'])->find($row->cp_id);
-                if ($cp) $cp->total_gifts = $row->total_gifts;
-                return $cp;
-            });
+            ->get();
+            // ->map(function ($row) {
+            //     $cp = \App\Models\Cp::with(['level', 'fromUser.profile', 'toUser.profile'])->find($row->cp_id);
+            //     if ($cp) $cp->total_gifts = $row->total_gifts;
+            //     return $cp;
+            // });
     }
 
 
