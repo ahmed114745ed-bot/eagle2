@@ -80,7 +80,11 @@ trait PaymentTrait
                 (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
             }
         } else {
-            return response()->json(['status' => 'failed', 'reason' => 'User not found']);
+            return response()->json([
+                'status'  => false,
+                'trx'     => $coinLog->trx,
+                'message' => 'Transaction failed.',
+            ]);
         }
         response()->json([
             'status'  => true,
