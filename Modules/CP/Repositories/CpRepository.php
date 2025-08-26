@@ -411,9 +411,9 @@ class CpRepository
                 $q->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id')
                     ->with(['relation:id,type']);
             }])
-            ->get()
-            ->groupBy('cp.relation.type') // just grouping final small set
-            ->map(fn($group) => $group->first()); // pick top 1 per type
+            ->get();
+            // ->groupBy('cp.relation.type') // just grouping final small set
+            // ->map(fn($group) => $group->first()); // pick top 1 per type
 
         return $result;
     }

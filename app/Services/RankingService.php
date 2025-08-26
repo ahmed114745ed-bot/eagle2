@@ -989,7 +989,7 @@ class RankingService
     {
         $data = $this->cpRepository->getCpRankingWithOutRelation(1);
         $cp_top_2 = $data->take(3);
-       // dd($cp_top_2 -> toArray());
+        //dd($cp_top_2 -> toArray());
         $topGamer = $this->coinGameUserRepository->topThree();
         return [
             'sender'    => $this->getRankUserAvatars('sender', 'daily'),
