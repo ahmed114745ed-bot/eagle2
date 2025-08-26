@@ -277,7 +277,6 @@ class PayPalService
                 info($status);
                 switch ($status) {
                     case 'COMPLETED':
-                        // Update your system (e.g., mark as paid)
                         $this->webhookPayment($coinLog->id);
 
                         return response()->json([
@@ -313,6 +312,7 @@ class PayPalService
             ], 500);
 
         } catch (\Exception $e) {
+            info($e->getMessage());
             return response()->json([
                 'status'  => false,
                 'trx'     => $coinLog->trx,

@@ -310,7 +310,6 @@
                     })
                         .then(res => res.json())
                         .then(orderData => {
-                            // Redirect instead of popup
                             window.location.href = orderData.approval_url;
                             return false; // stop popup
                         });
