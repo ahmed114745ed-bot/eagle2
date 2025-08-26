@@ -1158,7 +1158,7 @@
                             <tr>
                                 <td>{{ $target_history->firstItem() + $index }}</td>
                                 <td>{{ $item->agency_id }}</td>
-                                <td>{{  truncateAndTrim( $bd->amount)  }}</td>
+                                <td>{{  truncateAndTrim( $item->amount)  }}</td>
                                 <td>{{ $item->month }}</td>
                                 <td>{{ $item->year }}</td>
                                 <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
