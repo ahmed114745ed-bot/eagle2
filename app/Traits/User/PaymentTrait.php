@@ -68,11 +68,14 @@ trait PaymentTrait
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
         }
 
+
         $coinLog->status = 1;
         $coinLog->save();
 
         $user = $coinLog->user;
         if ($user) {
+            info('in user');
+            info($coinLog->obtained_coins);
             $user->di += $coinLog->obtained_coins;
             $user->save();
             UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
