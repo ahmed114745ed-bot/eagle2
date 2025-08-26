@@ -855,7 +855,7 @@
             <div class="performers-card">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-star"></i>
+                        <!-- <i class="fas fa-star"></i> -->
                         {{ __('Agency Count') }}
                     </h2>
                 </div>
@@ -864,7 +864,7 @@
                     <div class="avatar-grid">
                         
                             
-                            <a href="#" ">
+                            <a href="#" >
                                {{ $bd->agencies_count  }}
                             </a>
                     </div>
@@ -931,13 +931,13 @@
 
                                         <td class="user-cell">
                                             <div class="user-avatar">
-                                                <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                <a href="{{ url('admin/users/profile/'. $agency->owner?->id ) }}">
                                                     <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ??'' }}">
                                                 </a>
                                             </div>
                                             <div class="user-info">
                                                 <strong>
-                                                    <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                    <a href="{{ url('admin/users/profile/'.$agency->owner?->id) }}">
                                                         {{ $agency->owner?->name ??'' }}
                                                     </a>
                                                 </strong>
