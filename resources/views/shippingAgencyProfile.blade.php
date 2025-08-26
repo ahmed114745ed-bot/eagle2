@@ -1282,7 +1282,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                {{ $charges->withQueryString()->links() }}
+                        {{ $charges->withQueryString()->links('vendor.pagination.bootstrap-4') }}
             </div>
         @else
             <div class="empty-state">
@@ -1367,7 +1367,9 @@
                         @endforeach
                     </tbody>
                 </table>
-                {{ $resiveds->withQueryString()->links() }}
+
+                {{ $resiveds->withQueryString()->links('vendor.pagination.bootstrap-4') }}
+
             </div>
         @else
             <p class="text-center text-muted">{{ __('No received charges found.') }}</p>
