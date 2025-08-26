@@ -45,7 +45,6 @@ class RoomBoomRewardJob implements ShouldQueue
 
     /**
      * @throws \Exception
-     * @throws \Throwable
      */
     public function handle()
     {
@@ -334,6 +333,7 @@ class RoomBoomRewardJob implements ShouldQueue
             }
         }
     }
+
 
     public function dispatchAchievementNotification(): void
     {
