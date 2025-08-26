@@ -279,7 +279,6 @@ class PayPalService
     }
     public function callback(Request $request): JsonResponse
     {
-        info('webhook');
         $eventType = $request->get('event_type');
         $resource = $request->get('resource');
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
@@ -292,7 +291,7 @@ class PayPalService
                 $captureResponse = Http::withToken($this->getAccessToken())
                     ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
 
-                info('approve webhook');
+                info('capture order', [$captureResponse]);
 //                if ($captureResponse->successful()) {
 //                    return $this->webhookPayment($coinLogId);
 //                }
