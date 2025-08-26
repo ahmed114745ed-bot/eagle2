@@ -415,7 +415,7 @@ class BdController extends MainController
                     'id',
                     'bd_id',
                     'agency_id',
-                    'salary',
+                    // 'salary',
                     'amount',
                     'month',
                     'year',

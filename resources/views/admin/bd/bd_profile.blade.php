@@ -1123,7 +1123,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>{{ __('Agency ID') }}</th>
-                                    <th>{{ __('Salary') }}</th>
+                                    <!-- <th>{{ __('Salary') }}</th> -->
                                     <th>{{ __('Amount') }}</th>
                                     <th>{{ __('Month') }}</th>
                                     <th>{{ __('Year') }}</th>
@@ -1136,7 +1136,7 @@
                                     <tr>
                                         <td>{{ $target_history->firstItem() + $index }}</td>
                                         <td>{{ $item->agency_id }}</td>
-                                        <td>{{ $item->salary }}</td>
+                                        <!-- <td>{{ $item->salary }}</td> -->
                                         <td>{{ $item->amount }}</td>
                                         <td>{{ $item->month }}</td>
                                         <td>{{ $item->year }}</td>
