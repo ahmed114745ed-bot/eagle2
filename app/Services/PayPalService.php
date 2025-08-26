@@ -279,6 +279,7 @@ class PayPalService
     }
     public function callback(Request $request): JsonResponse
     {
+        info('webhook');
         $eventType = $request->get('event_type');
         $resource = $request->get('resource');
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
