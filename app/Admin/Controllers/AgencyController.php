@@ -626,15 +626,6 @@ class AgencyController extends MainController
                 // }
             });
         }
-        $form->row(function ($row) {
-
-                $row->width(9)->text('phone', __('agency whatsApp number'))
-                ->rules('required')
-                ->attribute('id', 'phone-input')->attribute('maxlength', 10);  
-                $row->hidden('phone_code');
-        });
-
-
         if (Session::has('show_alert')) {
             $form->html('<script>
              $(document).ready(function () {

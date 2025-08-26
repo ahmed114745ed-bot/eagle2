@@ -441,6 +441,37 @@ class UserCommon
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
+    public static function assignRoomBoomWare(User $user, Ware $ware, $expire, $sender = null): void
+    {
+        DB::beginTransaction();
+        try {
+            $arr['user_id']   = $user->id;
+            $arr['type']      = $ware->type;
+            $arr['get_type']  = $ware->get_type;
+            $arr['target_id'] = $ware->id;
+            $arr['num']       = 1;
+            $arr['is_read']   = 1;
+            $arr['days']      = $expire;
+
+
+            $pack = Pack::query()->create($arr);
+
+            if ($sender) {
+                $pack->senderable()->associate($sender);
+                $pack->save();
+            }
+
+            DB::commit();
+
+            (new UserCounterServices)->eventUser($user, 'official-messages');
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
 
     public static function addChargeLevel($userId, $amount)
     {

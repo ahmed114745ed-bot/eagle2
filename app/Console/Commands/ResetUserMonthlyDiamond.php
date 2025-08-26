@@ -46,7 +46,6 @@ class ResetUserMonthlyDiamond extends Command
         try {
             $timezone = getTimezone();
             $dt       = Carbon::now($timezone);
-//        $dt = new \DateTime('now', new \DateTimeZone($timezone));
             if ($dt->format('j') == 1){
                 $carbon = $dt->subDay();
 
@@ -55,8 +54,6 @@ class ResetUserMonthlyDiamond extends Command
 
                 $this->calculateUserSalary();
             }
-
-
         }catch (\Exception $exception){
             $this->error('reset monthly diamond failed: '.$exception->getMessage());
         }

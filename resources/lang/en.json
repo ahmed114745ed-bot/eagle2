@@ -1089,7 +1089,8 @@
 "confirm_disable_transfer_salary": "Are you sure you want to disable transfer salary?",
 "You have received :coin coin.": "You have received :coin coin.",
 "You have received a gift: :ware": "You have received a gift: :ware",
-"banned_from_action":"You are banned from performing this action.",
+    "You have received the gift: :giftName": "You have received the gift: :giftName",
+    "banned_from_action":"You are banned from performing this action.",
 "Super Boom Rules": "Super Boom Rules",
 "Super Boom Rule Details": "Super Boom Rule Details",
 "Create Super Boom Rule": "Create Super Boom Rule",
@@ -1098,5 +1099,14 @@
 "Rules (EN)": "Rules (English)",
 "Content": "Content",
 "Created At": "Created At",
-"Updated At": "Updated At"
+"Updated At": "Updated At",
+"BD Action": "BD Action",
+"Remove BD": "Remove BD",
+"Are you sure?": "Are you sure?",
+"Do you want to remove BD for this user?": "Do you want to remove BD for this user?",
+"Yes, remove it!": "Yes, remove it!",
+"Cancel": "Cancel",
+"Removed!": "Removed!",
+"Error": "Error",
+"Something went wrong": "Something went wrong"
 }
