@@ -25,6 +25,9 @@ class PayPalController extends Controller
         $paypal = new PayPalService();
         [$orderId, $paymentLink] = $paypal->create($request->referenceId, $request->amount, null);
 
+        $coinLog = CoinLog::whereId($request->referenceId)->first();
+        $coinLog->update(['trx' => $orderId]);
+
         return response()->json([
             'id' => $orderId ?? null,
             'approval_url' => $paymentLink,
