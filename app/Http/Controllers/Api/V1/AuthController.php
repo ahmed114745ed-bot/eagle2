@@ -198,7 +198,6 @@ class AuthController extends Controller
         }
 
         try {
-            dd($data);
             [$user, $token] = $this->authService->loginWithApple($data, $unique_id);
         } catch (\Exception $exception) {
 
