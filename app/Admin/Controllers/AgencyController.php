@@ -133,8 +133,13 @@ class AgencyController extends MainController
                     $agency->mempers()->when(isset($uuid), function ($query) use ($uuid) {
                         $query->where('uuid', $uuid);
                     })
-                    ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                    ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
+                    ->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($query) {
+                        $query->where('month', now()->month)
+                            ->where('year', now()->year);
+                    }], 'monthly_diamond_received')
+
                     ->paginate(10, ['*'], 'members_page');
                 // });
                 break;
@@ -372,7 +377,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen')
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
             ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
             ->where(function ($query) {
                 $query
