@@ -318,9 +318,6 @@ class WalletController extends MainController
                 admin_toastr('نوع الوجهة غير موجود', 'error');
                 return back();
             }
-
-
-
             $data = call_user_func($types[$type], $request->all());
             admin_toastr('تم الشحن بنجاح', 'success');
             return back();
@@ -342,8 +339,10 @@ class WalletController extends MainController
         $receiverId = $data['target_id'] ?? null;
 
      
- 
-     
+        if (settings()->get("bd_stop_charge", 0)) {
+
+            throw new \Exception(__('api_responses.freez_charge'));
+        }
 
         $receiver = User::find($receiverId);
         $sender = Bd::find($bdId);
@@ -432,6 +431,14 @@ class WalletController extends MainController
 
             throw new \Exception(__('api_responses.freez_charge'));
         }
+
+
+        if (settings()->get("bd_stop_charge", 0)) {
+
+            throw new \Exception(__('api_responses.freez_charge'));
+        }
+
+        
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
         }
