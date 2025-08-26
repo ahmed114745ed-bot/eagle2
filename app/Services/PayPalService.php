@@ -219,7 +219,6 @@ class PayPalService
     public function callback(Request $request): JsonResponse
     {
         $eventType = $request->get('event_type');
-        info($eventType);
         if ($eventType !== 'CHECKOUT.ORDER.APPROVED') {
             return response()->json(['status' => 'ignored', 'reason' => 'Event type not processed']);
         }
