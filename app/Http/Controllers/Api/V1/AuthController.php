@@ -187,7 +187,7 @@ class AuthController extends Controller
                 'client_id' => $clientId,
                 'client_secret' => $token,
             ]);
-
+           dd($res['id_token']);
             $claims = explode('.', $res['id_token'])[1];
             $data = json_decode(base64_decode($claims), true);
         } catch (\Exception $e) {
