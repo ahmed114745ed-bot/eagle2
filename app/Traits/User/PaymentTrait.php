@@ -68,6 +68,7 @@ trait PaymentTrait
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
         }
 
+
         $coinLog->status = 1;
         $coinLog->save();
 
