@@ -286,9 +286,12 @@ class PayPalService
 
         $coinLog = CoinLog::find($coinLogId);
 
+        info($paypalId);
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
                 $captureResponse = Http::withToken($this->getAccessToken())
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->withBody('', 'application/json')
                     ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
 
                 info('capture order', [$captureResponse]);
