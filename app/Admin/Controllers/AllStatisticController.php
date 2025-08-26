@@ -17,7 +17,7 @@ use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
-
+use App\Models\MonthlyDiamondReceive;
 
 class AllStatisticController extends MainController
 {
@@ -29,7 +29,7 @@ class AllStatisticController extends MainController
         $userId = \Encore\Admin\Facades\Admin::user()->id;
         // if ($userId == 1) {
             $coins                      = User::sum("di");
-            $total_monthly_di_recieved  = User::sum("monthly_diamond_received");
+            $total_monthly_di_recieved  = MonthlyDiamondReceive::sum("monthly_diamond_received");
             $user_sallaries   = UserSallary::query()->whereHas('user', function ($q) {
                 $q->where('agency_id', '!=', 0);
             })->sum(DB::raw('sallary - cut_amount'));
@@ -123,7 +123,7 @@ class AllStatisticController extends MainController
         $allUsersCount = User::query()->count() ?? 0;
         $onlineUsers = DB::table('users')->selectRaw('device_token')->where('online_time', '>=', now()->startOfDay()->timestamp)->where('online_time', '<=', now()->timestamp)->groupBy(['device_token'])->get()->count() ?? 0;
         $coins  = User::sum("di") ?? 0;
-        $total_monthly_di_recieved  = User::sum("monthly_diamond_received") ?? 0;
+        $total_monthly_di_recieved  = MonthlyDiamondReceive::sum("monthly_diamond_received") ?? 0;
         $user_sallaries   = UserSallary::query()->whereHas('user', function ($q) {
             $q->where('agency_id', '!=', 0);
         })->sum(DB::raw('sallary - cut_amount')) ?? 0;

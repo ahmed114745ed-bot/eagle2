@@ -21,7 +21,7 @@ class UsersExport implements FromView
             'old_usd', 'target_usd', 'target_token_usd', 'uuid', 'is_gold_id', 'chat_id', 
             'notification_id', 'vip', 'sub_sender_level', 'sub_receiver_level', 'sub_sender_num', 
             'sub_receiver_num', 'salary', 'monthly_diamond_send', 'total_diamond_send', 
-            'monthly_diamond_received', 'total_diamond_received', 'sender_level', 'received_level', 
+            'total_diamond_received', 'sender_level', 'received_level', 
             'type_user', 'is_manger', 'dashboard_manager_id', 'apple_id', 'today_days', 'monthly_days', 
             'total_days', 'lang', 'lan', 'auth_token', 'unread_count_message', 'country_id', 
             'image_color_id', 'deleted_at', 'current_app_version', 'can_play', 'stopshow_gift', 

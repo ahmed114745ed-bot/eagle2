@@ -49,12 +49,13 @@ class BdSelectController extends MainController
 
     protected function grid2()
     {
-     
-        return new Box(
-            __('admin.Actions'),
-            view('admin.grid.bd.selectPage') 
-        );
+        $transfer_salary = settings()->get('bd_stop_charge');
+        $box1 = new Box(__('admin.Actions'), view('admin.grid.bd.selectPage',compact('transfer_salary')));
+    
+        return $box1->render() ;
     }
+
+
 
     /**
      * Show interface.
@@ -65,20 +66,35 @@ class BdSelectController extends MainController
      */
    
      public function makeDefault(Request $request)
-{
-    $bdId = $request->input('bd_id');
+    {
+        $bdId = $request->input('bd_id');
 
-    Bd::query()->update(['default' => false]);
+        Bd::query()->update(['default' => false]);
 
-    $bd = Bd::findOrFail($bdId);
-    $bd->default = true;
-    $bd->save();
+        $bd = Bd::findOrFail($bdId);
+        $bd->default = true;
+        $bd->save();
 
-    admin_success('تم التحديث', 'تم تعيين BD الافتراضي بنجاح');
+        admin_success('تم التحديث', 'تم تعيين BD الافتراضي بنجاح');
 
-    return redirect()->back();
-    // return redirect()->route('admin.usersBd.index');
+        return redirect()->back();
 
-}
+    }
+
+
+    public function toggleSalaryTransfer(Request $request)
+    {
+            $enabled = (bool) $request->input('enabled');
+        
+            settings()->set("bd_stop_charge", $enabled ? "1" : "0");
+        
+            return response()->json([
+                'status'  => 'success',
+                'message' => $enabled 
+                    ? __('تم تفعيل تحويل الرواتب بنجاح ✅') 
+                    : __('تم إيقاف تحويل الرواتب للجميع 🚫'),
+            ]);
+        
+    }
 
 }

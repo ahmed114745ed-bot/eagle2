@@ -311,7 +311,8 @@ class CpRepository
     public function getCpRanking($relationType, $type)
     {
         $t = is_numeric($type) ? (int) $type : null;
-        $now = now();
+       // $timezone = getTimezone();
+        $now = \Carbon\Carbon::now();
 
         return GiftLog::query()
             ->selectRaw('
@@ -333,16 +334,19 @@ class CpRepository
             ->when(
                 $t === 1,
                 fn($q) =>
-                $q->whereDate('gift_logs.created_at', $now->toDateString())
+                $q->whereBetween('gift_logs.created_at', [
+                    $now->copy()->startOfDay()->toDateTimeString(),
+                    $now->copy()->endOfDay()->toDateTimeString(),
+                ])
             )
 
-            // This week (Sunday–Saturday; change to startOfWeek() without args if you want Monday)
+            // This week (Saturday–Friday in your code)
             ->when(
                 $t === 2,
                 fn($q) =>
                 $q->whereBetween('gift_logs.created_at', [
-                    $now->copy()->startOfWeek(Carbon::SATURDAY)->toDateTimeString(),
-                    $now->copy()->startOfWeek(Carbon::SATURDAY)->addDays(6)->endOfDay()->toDateTimeString(),
+                    $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY)->startOfDay()->toDateTimeString(),
+                    $now->copy()->startOfWeek(\Carbon\Carbon::SATURDAY)->addDays(6)->endOfDay()->toDateTimeString(),
                 ])
             )
 
@@ -351,8 +355,8 @@ class CpRepository
                 $t === 3,
                 fn($q) =>
                 $q->whereBetween('gift_logs.created_at', [
-                    $now->copy()->startOfMonth()->toDateTimeString(),
-                    $now->copy()->endOfMonth()->toDateTimeString(),
+                    $now->copy()->startOfMonth()->startOfDay()->toDateTimeString(),
+                    $now->copy()->endOfMonth()->endOfDay()->toDateTimeString(),
                 ])
             )
 
@@ -374,9 +378,6 @@ class CpRepository
                 return $cp;
             });
     }
-
-
-
 
 
     public function getCpRankingWithOutRelation(int $type)
@@ -410,9 +411,9 @@ class CpRepository
                 $q->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id')
                     ->with(['relation:id,type']);
             }])
-            ->get()
-            ->groupBy('cp.relation.type') // just grouping final small set
-            ->map(fn($group) => $group->first()); // pick top 1 per type
+            ->get();
+            // ->groupBy('cp.relation.type') // just grouping final small set
+            // ->map(fn($group) => $group->first()); // pick top 1 per type
 
         return $result;
     }
@@ -434,7 +435,7 @@ class CpRepository
 
     public function cpUserList($userId, $activeOnly = false)
     {
-        $var =  [1, 4] ;
+        $var =  [1, 4];
 
         return Cp::where(function ($query) use ($userId) {
             $query->where("user_one_id", $userId)

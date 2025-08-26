@@ -133,8 +133,13 @@ class AgencyController extends MainController
                     $agency->mempers()->when(isset($uuid), function ($query) use ($uuid) {
                         $query->where('uuid', $uuid);
                     })
-                    ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                    ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
+                    ->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($query) {
+                        $query->where('month', now()->month)
+                            ->where('year', now()->year);
+                    }], 'monthly_diamond_received')
+
                     ->paginate(10, ['*'], 'members_page');
                 // });
                 break;
@@ -372,7 +377,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen')
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
             ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
             ->where(function ($query) {
                 $query
@@ -506,6 +511,77 @@ class AgencyController extends MainController
             }, __('UUID'))->placeholder(__('search for host by UUID'));
         });
 
+        Admin::style("
+            .box-footer {
+                flex-direction: row-reverse;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px;
+            }
+
+            .pagination-info {
+                margin: 5px 0;
+                white-space: nowrap;
+                text-align: right;
+                width: auto;
+                order: 2;
+            }
+
+            .box-footer .pull-right {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin: 5px 0;
+                order: 1;
+            }
+
+            .box-footer .pull-right .dropdown {
+                margin-left: 5px;
+            }
+
+            .pagination > li > a,
+            .pagination > li > span {
+                min-width: 35px;
+                height: 35px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 5px;
+            }
+
+            .pagination {
+                margin: 0;
+                padding: 0;
+                display: flex;
+            }
+
+            @media (max-width: 576px) {
+                .box-footer {
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                .pagination-info,
+                .box-footer .pull-right {
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    text-align: center;
+                }
+
+                .pagination-info {
+                    order: 1;
+                    margin-bottom: 10px;
+                }
+
+                .box-footer .pull-right {
+                    order: 2;
+                }
+            }
+        ");
+
         return $grid;
     }
 
@@ -581,7 +657,7 @@ class AgencyController extends MainController
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(9)->text('phone', __('agency whatsApp number'))->attribute('id', 'phone-input');
+                // $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
                 // $row->width(12)->hidden('Host_agency')->default(1);
 

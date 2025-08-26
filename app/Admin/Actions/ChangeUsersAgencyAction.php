@@ -39,9 +39,9 @@ class ChangeUsersAgencyAction extends RowAction
         $ownerId = Agency::where('id', $request->old_agency_id)->value('app_owner_id');
 
         $users = User::where('agency_id', $request->old_agency_id)->get();
-        
+
         if ($users->count() === 1 && $users->pluck('id')->first() == $ownerId) {
-            
+
             $error = new MessageBag([
                 'title'   => __('error_title_div'),
                 'message' => __('cant it owner'),
@@ -51,7 +51,7 @@ class ChangeUsersAgencyAction extends RowAction
             throw new \Exception(__('cant it owner'));
         }
         $users = $users->where('id', '!=', $ownerId);
-    
+
         $checkAgencyUser = UsersJoinedAgency::where([
 
             'agency_id' => $request->old_agency_id,
@@ -59,8 +59,8 @@ class ChangeUsersAgencyAction extends RowAction
         ])->where('leave_date', null)->update(['leave_date' => now(), 'status' => 'change agency by admin']);
         foreach ($users as $user) {
             $user->agency_id = $request->new_agency_id;
-            $user->monthly_diamond_received = 0;
             $user->save();
+            uploadMonthlyDiamondReceive($user->id, 0);
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $user->id,
                 'agency_id' => $request->old_agency_id,
