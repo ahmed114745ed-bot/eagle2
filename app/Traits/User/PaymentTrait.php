@@ -62,7 +62,6 @@ trait PaymentTrait
 
     public function webhookPayment($coinLogId): JsonResponse
     {
-        info($coinLogId);
         $coinLog = CoinLog::where("id", $coinLogId)->first();
 
         if (!$coinLog || $coinLog->status == 1) {
@@ -74,6 +73,8 @@ trait PaymentTrait
 
         $user = $coinLog->user;
         if ($user) {
+            info('in user');
+            info($coinLog->obtained_coins);
             $user->di += $coinLog->obtained_coins;
             $user->save();
             UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
