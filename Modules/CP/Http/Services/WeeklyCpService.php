@@ -69,7 +69,7 @@ class WeeklyCpService
     public function topOneCurrentWeeklyCp()
     {
         $currentWeeklyCp = $this->getCurrentWeeklyCp();
-        dd($currentWeeklyCp);
+        
         if (! $currentWeeklyCp) {
             throw new Exception('there is not weekly cp ');
         }
