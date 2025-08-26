@@ -22,6 +22,7 @@ class SettingController extends MainController
         $settings = Setting::pluck('value', 'key')->toArray();
         $timezones = Timezone::all();
         $agora_app_id = Common::getConfig('app_id');
+        $agora_app_certificate = Common::getConfig('agora_app_certificate');
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
         $tencent_server_secret = Common::getConfig('tencent_server_secret');
@@ -70,7 +71,8 @@ class SettingController extends MainController
                 'tencent_server_secret',
                 'soundLibrary',
                 'videoLibrary',
-                'gamesLibrary'
+                'gamesLibrary',
+                'agora_app_certificate'
             ]))));
     }
 

@@ -20,9 +20,8 @@ class DiamondController extends Controller
 
 public function calculateMonthlyDiamondReceived()
 {
-    $timezone = Common::timeZone();
-    $now = Carbon::now($timezone);
-    $startOfMonth = $now->copy()->startOfMonth();
+    $timezone = getTimezone();
+    $startOfMonth =\Carbon\Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC');
 
     $users = DB::table('users')
         ->select('id', 'agency_id')
@@ -50,7 +49,6 @@ public function calculateMonthlyDiamondReceived()
         ->selectRaw('SUM(giftPrice) as total')
         ->value('total');
 
-        // تحديث جدول users
         DB::table('users')
             ->where('id', $user->id)
             ->update([

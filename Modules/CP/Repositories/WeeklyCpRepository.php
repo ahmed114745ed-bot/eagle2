@@ -45,10 +45,12 @@ class WeeklyCpRepository
 
     public function topUsers($giftIds, $weeklyCp, int $perPage = 10)
     {
+        $timezone = getTimezone();
         return GiftLog::whereIn('giftId', $giftIds)->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
-            ->groupBy('cp_id')->whereBetween('created_at', [
-                $weeklyCp->start_date,
-                $weeklyCp->end_date
+            ->groupBy('cp_id')
+           ->whereBetween('created_at', [
+                \Carbon\Carbon::parse($weeklyCp->start_date, $timezone)->startOfDay(),
+            \Carbon\Carbon::parse($weeklyCp->end_date, $timezone)->endOfDay(),
             ])->whereHas('cps', function ($q) {
                 $q->relation();
             })->with('cp')->orderByDesc('totalGiftNum')->paginate($perPage);

@@ -3279,7 +3279,19 @@
     "room-boom-rewards": "oda-patlamasi-odulleri",
     "priority": "öncelik",
 
-    "Reel Comments": "Video Yorumları"
+    "Reel Comments": "Video Yorumları",
+    "salary_transfer_label": "Tüm BD'ler için maaş transferini durdur",
+    "salary_transfer_enable_title": "Maaş Transferini Etkinleştir",
+    "salary_transfer_disable_title": "Maaş Transferini Devre Dışı Bırak",
+    "salary_transfer_enable_text": "Tüm BD'ler için maaş transferini etkinleştirmek istiyor musunuz?",
+    "salary_transfer_disable_text": "Tüm BD'ler için maaş transferini devre dışı bırakmak istiyor musunuz?",
+    "confirm_enable": "Evet, Etkinleştir",
+    "confirm_disable": "Evet, Devre Dışı Bırak",
+    "cancel": "İptal",
+    "success_title": "Başarılı 🎉",
+    "success_message": "İşlem başarıyla tamamlandı",
+    "error_title": "Hata 🚫",
+    "error_message": "Bir hata oluştu, lütfen tekrar deneyin"
 
 
 
