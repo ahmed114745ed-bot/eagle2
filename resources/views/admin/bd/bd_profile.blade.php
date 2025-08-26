@@ -931,13 +931,13 @@
 
                                         <td class="user-cell">
                                             <div class="user-avatar">
-                                                <a href="{{ url('admin/users/profile/'. $agency->owner?->id ) }}">
+                                                <a href="{{ url('admin/users/'. $agency->owner?->id ) }}">
                                                     <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ??'' }}">
                                                 </a>
                                             </div>
                                             <div class="user-info">
                                                 <strong>
-                                                    <a href="{{ url('admin/users/profile/'.$agency->owner?->id) }}">
+                                                    <a href="{{ url('admin/users/'.$agency->owner?->id) }}">
                                                         {{ $agency->owner?->name ??'' }}
                                                     </a>
                                                 </strong>
