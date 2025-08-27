@@ -3,10 +3,10 @@ on:
   push:
     branches: ["dang"]
 jobs:
-  run_dang_job:
+  run_dang_hub:
     runs-on: ubuntu-latest
     steps:
-    - name: print out dang
+    - name: print out dang-hub
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.66.72"
@@ -15,6 +15,9 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          cd /var/www/dang
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
@@ -24,9 +27,21 @@ jobs:
           else
             echo "Disk space is within acceptable limits $current% "
           fi
+ 
+  run_dang_app:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out dang-app
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.66.72"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
           cd /var/www/dang
           pwd
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t dang:${{ github.sha }} .
           docker service update --image dang:${{ github.sha }} dang-app
           
@@ -40,6 +55,7 @@ jobs:
             exit 1
           fi
 
+          
           # check again
           threshold=75
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
@@ -50,3 +66,20 @@ jobs:
           else
             echo "Disk space is within acceptable limits $current% "
           fi
+ 
+  run_dang_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out dang-job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.66.72"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: | 
+          cd /var/www/dang
+          pwd
+          docker build -t dang-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image dang-job:${{ github.sha }} dang-job
