@@ -119,13 +119,15 @@ class TimeEnterRoomController extends MainController
         $start = convertArabicToEnglishNumbers($request->from_date);
         $end = convertArabicToEnglishNumbers($request->to_date);
         $timeRooms = TimeEnterRoom::where('room_id', $request->room_id)->where('user_id', $request->user_id)
-            ->when(isset($start) && isset($end), function ($query) use ($start, $end) {
-                $query->whereBetween('created_at', [
-                    Carbon::parse($start)->startOfDay(),
-                    Carbon::parse($end)->endOfDay()
-                ]);
-            })->orderByDesc('id')->get();
-        dd($start, $end, $timeRooms);
+            // ->when(isset($start) && isset($end), function ($query) use ($start, $end) {
+
+            //     $query->whereBetween('created_at', [
+            //         Carbon::parse($start)->startOfDay(),
+            //         Carbon::parse($end)->endOfDay()
+            //     ]);
+            // })
+            ->orderByDesc('id')->get();
+      dd( $timeRooms);
         $rows = $timeRooms->map(function ($TimeRooms) {
             $start = Carbon::createFromTimestamp($TimeRooms->start_time)->format('m.d H:i:s');
             $end   = @$TimeRooms?->end_time ? Carbon::createFromTimestamp(@$TimeRooms?->end_time)->format('m.d H:i:s') : 'onGoing';
