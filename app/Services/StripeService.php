@@ -41,6 +41,16 @@ class StripeService {
                         'order_id' => $request->order_id,
                     ],
                 ]);
+
+
+                if ($session->payment_intent) {
+                    \Stripe\PaymentIntent::update($session->payment_intent, [
+                        'metadata' => [
+                            'user_id' => $request->user_id,
+                            'order_id' => $request->order_id,
+                        ]
+                    ]);
+                }
     
                 return $session->url;
     
