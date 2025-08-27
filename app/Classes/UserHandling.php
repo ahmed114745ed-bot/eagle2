@@ -62,14 +62,16 @@ class UserHandling
         $timer = TimeEnterRoom::query()->where('user_id', $uid)->where('room_id', $roomId->id)->whereDate('created_at', today())->where('end_time', null)->orderByDesc('id')->first();
         if ($timer) {
             $second = (time() - $timer->start_time);
+            $minutes = ceil((time() - $timer->start_time) / 60);
+
             $timer->end_time = time();
-            $timer->seconds    =  $second;
+            $timer->minutes    =  $minutes;
             $timer->save();
-            $this->realtimeProject($second);
+            $this->realtimeProject($minutes);
         }
     }
 
-    public function realtimeProject($second)
+    public function realtimeProject($minutes)
     {
         $month = Carbon::now()->month;
         $year = Carbon::now()->year;
@@ -82,7 +84,7 @@ class UserHandling
                 'year' => $year,
             ]);
         };
-        $realtimeProject->used += $second;
+        $realtimeProject->used += $minutes;
         $realtimeProject->save();
     }
 

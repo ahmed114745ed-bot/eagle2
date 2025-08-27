@@ -45,6 +45,8 @@
     "Salary transferred to an verified agencies":"تحويل الراتب لوكالة شحن موثوقة",
     "Actions switch charge agency":"إجراءات وكالة الشحن",
    "charge date":"تاريخ الشحن",
+   "room id": "معرّف الغرفة",
+  "times": "الأوقات",
     "registered successfully": "تم التسجيل بنجاح",
     "required": "مطلوب",
     "exists": "محجوز",

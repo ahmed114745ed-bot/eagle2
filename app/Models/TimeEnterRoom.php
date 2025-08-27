@@ -11,4 +11,9 @@ class TimeEnterRoom extends Model
     use HasFactory, TimestampsWithTimezone;
 
     protected $guarded = ['id'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -75,6 +75,7 @@ use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
+use App\Admin\Controllers\TimeEnterRoomController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
@@ -601,6 +602,8 @@ Route::group(
             // Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
         Route::resource('ware-management', WareTabController::class);
+        Route::resource('time-enter-rooms', TimeEnterRoomController::class);
+        Route::get('time-user-room', [TimeEnterRoomController::class, 'userTime']);
 
         Route::resource('user-charges', UsersChargeController::class);
         //         Route::resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
