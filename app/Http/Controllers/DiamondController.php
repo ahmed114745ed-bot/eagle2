@@ -56,14 +56,18 @@ class DiamondController extends Controller
             uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
         }
 
-        $totalReceived = DB::table('gift_logs')
-            ->where('receiver_id', $user->id)
-            ->where('created_at', '>=', $startDate)
-            ->where('agency_id', $user->agency_id)
-            ->selectRaw('SUM(giftPrice) as total')
-            ->value('total');
-        $totalDiamond = $totalReceived ?? 0;
-        uploadMonthlyDiamondReceive($user->id, $totalDiamond);
+        // $totalReceived = DB::table('gift_logs')
+        //     ->where('receiver_id', $user->id)
+        //     ->where('created_at', '>=', $startDate)
+        //     ->where('agency_id', $user->agency_id)
+        //     ->selectRaw('SUM(giftPrice) as total')
+        //     ->value('total');
+        // $totalDiamond = $totalReceived ?? 0;
+        // uploadMonthlyDiamondReceive($user->id, $totalDiamond);
+         return response()->json([
+            'status' => true,
+            'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
+        ]);
     }
 
     public function calculateSalary()
