@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\CloseStatusAppFeature::class,
         Commands\DeleteTrashedUsers::class,
         Commands\FreezeUsersCommand::class,
-        WeeklyCpWinnerConsole::class
+        //WeeklyCpWinnerConsole::class
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -46,6 +46,7 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->runInBackground();
         $schedule->command('realtime-project-utd')->everyMinute()->runInBackground();
+        $schedule->command('kick-users-room')->everyMinute()->runInBackground();
         $schedule->command('users:reset-monthly-days')
             ->monthlyOn(1, '00:00')
             ->timezone(getTimezone())
