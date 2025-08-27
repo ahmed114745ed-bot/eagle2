@@ -75,7 +75,6 @@ class StripeController extends Controller
     {
         Log::info('Stripe Webhook received', [
             'payload' => $request->getContent(),
-            'headers' => $request->headers->all(),
             'all'     => $request->all(),
         ]);
     
@@ -85,8 +84,8 @@ class StripeController extends Controller
         $apiKey = $stripe_test_secret_key?->value;
         Stripe::setApiKey($apiKey);
     
-        $payload       = $request->getContent();
-        $sigHeader     = $request->header('Stripe-Signature');
+        $payload        = $request->getContent();
+        $sigHeader      = $request->header('Stripe-Signature');
         $endpointSecret = $stripe_webhook_secret?->value;
     
         try {
@@ -94,34 +93,46 @@ class StripeController extends Controller
     
             switch ($event->type) {
                 case 'checkout.session.completed':
-                case 'payment_intent.succeeded':
                     $session = $event->data->object;
                     $orderId = $session->metadata->order_id ?? null;
+                    break;
     
-                    if ($orderId) {
-                        $this->webhookPayment($orderId);
-                    } else {
-                        Log::error('Missing order_id in session metadata', ['session' => $session]);
-                    }
+                case 'payment_intent.succeeded':
+                    $paymentIntent = $event->data->object;
+                    $orderId = $paymentIntent->metadata->order_id ?? null;
+                    break;
+    
+                case 'charge.succeeded':
+                case 'charge.updated':
+                    $charge = $event->data->object;
+                    $orderId = $charge->metadata->order_id ?? null;
                     break;
     
                 case 'checkout.session.expired':
                     $session = $event->data->object;
                     $orderId = $session->metadata->order_id ?? null;
-    
                     if ($orderId) {
                         Log::warning("Order {$orderId} marked as expired due to Stripe session expiration.");
                     }
+                    $orderId = null; // عشان ما يستدعيش webhookPayment
                     break;
     
                 case 'payment_intent.failed':
                     $paymentIntent = $event->data->object;
                     Log::error('Payment failed', ['paymentIntent' => $paymentIntent]);
+                    $orderId = null;
                     break;
     
                 default:
                     Log::info("Unhandled event type: {$event->type}");
+                    $orderId = null;
                     break;
+            }
+    
+            if (!empty($orderId)) {
+                $this->webhookPayment($orderId);
+            } else {
+                Log::warning("No order_id found for event {$event->type}");
             }
     
             return response('Webhook Handled', 200);
@@ -132,6 +143,7 @@ class StripeController extends Controller
             return response('Webhook Error: ' . $e->getMessage(), 500);
         }
     }
+    
     
     public function success(Request $request)
     {
