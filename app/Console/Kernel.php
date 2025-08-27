@@ -33,19 +33,19 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/users-reset-monthly-diamond.log'))
             ->runInBackground();
-        
-            $schedule->command('realtime-project')
+
+        $schedule->command('realtime-project')
             ->monthly()
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/realtime-project.log'))
             ->runInBackground();
 
 
-             $schedule->command('realtime-project')
+        $schedule->command('realtime-project')
             ->monthly()
             ->timezone(getTimezone())
             ->runInBackground();
-
+        $schedule->command('realtime-project-utd')->everyHour()->runInBackground();
         $schedule->command('users:reset-monthly-days')
             ->monthlyOn(1, '00:00')
             ->timezone(getTimezone())
@@ -119,7 +119,7 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/game-user-calc.log'))
             ->runInBackground();
-        $schedule->command('realtime-project-utd')->everyHour();
+
 
 
         $schedule->command('app:update-gift-rankings')
