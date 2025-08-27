@@ -45,6 +45,8 @@ class ChangeAgencyAction extends RowAction
         if ($agencyOwner) throw ValidationException::withMessages(['error' => __('This user is the agency owner and cannot be deleted')]);
         $user = User::find($request->id);
         $agencyId=$user->agency_id;
+        uploadMonthlyDiamondReceive($user->id, 0);
+
         $checkAgencyUser = UsersJoinedAgency::where([
             'user_id' => $user->id,
             'agency_id' => $user->agency_id,
@@ -69,17 +71,12 @@ class ChangeAgencyAction extends RowAction
             'join_date' => now(),
             'status' => 'Joined'
         ]);
-        $user->monthly_diamond_received = 0;
+        // $user->monthly_diamond_received = 0;
         $user->agency_id = $request->agency_id;
         $user->type_user = 1;
         $user->save();
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
 
-        // $userSalary = UserSallary::where('user_id',$user->id)->where('month',now()->month)->where('year',now()->year)->first();
-        // if($userSalary){
-        //     $userSalary->user_agency_id = $request->agency_id;
-        //     $userSalary->save();
-        // }
         return $this->response()->success('success')->refresh();
     }
 
