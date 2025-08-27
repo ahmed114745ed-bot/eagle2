@@ -127,7 +127,6 @@ class TimeEnterRoomController extends MainController
                 ]);
             })
             ->orderByDesc('id')->get();
-      dd( $timeRooms);
         $rows = $timeRooms->map(function ($TimeRooms) {
             $start = Carbon::createFromTimestamp($TimeRooms->start_time)->format('m.d H:i:s');
             $end   = @$TimeRooms?->end_time ? Carbon::createFromTimestamp(@$TimeRooms?->end_time)->format('m.d H:i:s') : 'onGoing';
