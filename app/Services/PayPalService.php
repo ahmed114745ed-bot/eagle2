@@ -217,7 +217,7 @@ class PayPalService
             } elseif ($status === 'APPROVED') {
                 $response = Http::withToken($this->getAccessToken())
                     ->withHeaders(['Content-Type' => 'application/json'])
-                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture");
+                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture", []);
 
                 info($response);
 
