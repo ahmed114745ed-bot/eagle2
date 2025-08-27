@@ -19,7 +19,7 @@ class StripeService {
                 $stripe_test_success_url = Setting::where('key', 'stripe_success_url')->first();
                 $stripe_currency = Setting::where('key', 'stripe_currency')->first();
     
-                $amountInCents = $request->amount ;
+                $amountInCents = intval($request->amount * 100);
     
                 $session = StripeCheckoutSession::create([
                     'payment_method_types' => ['card'],
