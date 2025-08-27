@@ -41,9 +41,9 @@ class PayPalController extends Controller
         return response()->json([$orderDetails]);
     }
 
-    public function transactions(): JsonResponse
+    public function transaction($orderId): JsonResponse
     {
-        $transactions = (new PayPalService())->transactions();
+        $transactions = (new PayPalService())->transaction($orderId);
 
         return response()->json([$transactions]);
     }

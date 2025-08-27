@@ -259,24 +259,75 @@ class PayPalService
         ], 500);
     }
 
-//    public function capture($orderId)
-//    {
-//        $response = Http::withToken($this->getAccessToken())
-//            ->get(config('paypal.base_url')."/v2/checkout/orders/$orderId");
-//
-//        return $response->json();
-//    }
-//
-//    public function transactions()
-//    {
-//        $response = Http::withToken($this->getAccessToken())
-//            ->get(config('paypal.base_url').'/v1/reporting/transactions', [
-//                'start_date' => now()->subDay()->toIso8601String(),
-//                'end_date'   => now()->toIso8601String(),
-//            ]);
-//
-//        return $response->json();
-//    }
+    public function capture($orderId): JsonResponse
+    {
+        // Find the coin log for this order
+        $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
+
+        try {
+            // Call PayPal to capture the order
+            $response = Http::withToken($this->getAccessToken())
+                ->withHeaders(['Content-Type' => 'application/json'])
+                ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture");
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $status = $data['status'] ?? null;
+
+                info($status);
+                switch ($status) {
+                    case 'COMPLETED':
+                        $this->webhookPayment($coinLog->id);
+
+                        return response()->json([
+                            'status'  => true,
+                            'trx'     => $coinLog->trx,
+                            'message' => 'Transaction completed successfully.',
+                            'details' => $data
+                        ]);
+
+                    case 'APPROVED':
+                        return response()->json([
+                            'status'  => true,
+                            'trx'     => $coinLog->trx,
+                            'message' => 'Transaction approved, pending capture.',
+                            'details' => $data
+                        ]);
+
+                    default:
+                        return response()->json([
+                            'status'  => false,
+                            'trx'     => $coinLog->trx,
+                            'message' => "Transaction {$status}.",
+                            'details' => $data
+                        ], 400);
+                }
+            }
+
+            return response()->json([
+                'status'  => false,
+                'trx'     => $coinLog->trx,
+                'message' => 'Failed to capture transaction.',
+                'details' => $response->json()
+            ], 500);
+
+        } catch (\Exception $e) {
+            info($e->getMessage());
+            return response()->json([
+                'status'  => false,
+                'trx'     => $coinLog->trx,
+                'message' => 'Exception during capture: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function transaction($orderId)
+    {
+        $response = Http::withToken($this->getAccessToken())
+            ->get(config('paypal.base_url')."/v2/checkout/orders/$orderId");
+
+        return $response->json();
+    }
     public function callback(Request $request): JsonResponse
     {
         $eventType = $request->get('event_type');
@@ -286,8 +337,19 @@ class PayPalService
 
         $coinLog = CoinLog::find($coinLogId);
 
+        info($paypalId);
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
+                $captureResponse = Http::withToken($this->getAccessToken())
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->withBody('', 'application/json')
+                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
+
+                info('capture order', [$captureResponse]);
+//                if ($captureResponse->successful()) {
+//                    return $this->webhookPayment($coinLogId);
+//                }
+
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog?->trx ?? $paypalId,
