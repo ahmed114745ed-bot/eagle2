@@ -34,56 +34,89 @@ class ChangeUsersAgencyAction extends RowAction
      */
     public function handle(Model $model, Request $request)
     {
+        $oldAgencyId = $request->old_agency_id;
+        $newAgencyId = $request->new_agency_id;
 
-        //    $users = User::where('agency_id',$request->old_agency_id)->where('type_user',1)->get();
-        $ownerId = Agency::where('id', $request->old_agency_id)->value('app_owner_id');
+        $ownerId = Agency::where('id', $oldAgencyId)->value('app_owner_id');
 
-        $users = User::where('agency_id', $request->old_agency_id)->get();
+        $users = User::where('agency_id', $oldAgencyId)
+            ->where('id', '!=', $ownerId)
+            ->get();
 
-        if ($users->count() === 1 && $users->pluck('id')->first() == $ownerId) {
-
+        if ($users->isEmpty()) {
             $error = new MessageBag([
-                'title'   => __('error_title_div'),
-                'message' => __('cant it owner'),
+                'title' => __('error_title_div'),
+                'message' => __('cant it owner or no members to move'),
+            ]);
+            session()->flash('error', $error);
+            throw new \Exception(__('cant it owner or no members to move'));
+        }
+
+        UsersJoinedAgency::where('agency_id', $oldAgencyId)
+            ->whereNull('leave_date')
+            ->update([
+                'leave_date' => now(),
+                'status' => 'change agency by admin'
             ]);
 
-            session()->flash('error', $error);
-            throw new \Exception(__('cant it owner'));
-        }
-        $users = $users->where('id', '!=', $ownerId);
-
-        $checkAgencyUser = UsersJoinedAgency::where([
-
-            'agency_id' => $request->old_agency_id,
-            'type' => 2,
-        ])->where('leave_date', null)->update(['leave_date' => now(), 'status' => 'change agency by admin']);
         foreach ($users as $user) {
-            $user->agency_id = $request->new_agency_id;
+
+            $this->handleUserSalaries($user);
+
+            $user->agency_id = $newAgencyId;
             $user->save();
+
             uploadMonthlyDiamondReceive($user->id, 0);
-            $checkAgencyUser = UsersJoinedAgency::where([
+
+            $joined = UsersJoinedAgency::where([
                 'user_id' => $user->id,
-                'agency_id' => $request->old_agency_id,
-                // 'type' => 2,
-            ])->where('leave_date', null)->exists();
-            if (!$checkAgencyUser) {
+                'agency_id' => $newAgencyId
+            ])->whereNull('leave_date')->first();
+
+            if (!$joined) {
                 UsersJoinedAgency::create([
                     'user_id' => $user->id,
-                    'agency_id' => $request->new_agency_id,
+                    'agency_id' => $newAgencyId,
                     'type' => 2,
                     'join_date' => now(),
                     'status' => 'Joined'
                 ]);
             }
         }
-        // $usersSalary = UserSallary::where('user_agency_id',$request->old_agency_id)->where('month',now()->month)->where('year',now()->year)->get();
-        // foreach($usersSalary as $userSalary)
-        // {
-        //     $userSalary->user_agency_id = $request->new_agency_id;
-        //     $userSalary->save();
-        // }
 
         return $this->response()->success('success')->refresh();
+    }
+
+    /**
+     * Handle user's monthly salaries
+     */
+    private function handleUserSalaries(User $user)
+    {
+        $agencyId = $user->agency_id;
+
+        $userSalaries = UserSallary::query()
+            ->where('user_id', $user->id)
+            ->where('user_agency_id', $agencyId)
+            ->latest()
+            ->take(2)
+            ->get();
+
+        if ($userSalaries->isEmpty()) return;
+
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        $currentSalary = $userSalaries[0];
+
+        if ($currentSalary->month == $currentMonth && $currentSalary->year == $currentYear) {
+            if (isset($userSalaries[1]) && $currentSalary->cut_amount >= $currentSalary->sallary) {
+                $prevSalary = $userSalaries[1];
+                $prevSalary->cut_amount += ($currentSalary->cut_amount - $currentSalary->sallary);
+                $prevSalary->save();
+            }
+
+            $currentSalary->update(['is_finished' => 1]);
+        }
     }
 
     public function form()

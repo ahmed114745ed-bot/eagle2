@@ -63,6 +63,4 @@ Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
             'name' => $user->name,
         ];
     }
-
-    return false;
 });
