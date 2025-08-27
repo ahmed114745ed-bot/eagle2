@@ -73,53 +73,62 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
-
         Log::info('Stripe Webhook received', [
             'payload' => $request->getContent(),
             'headers' => $request->headers->all(),
             'all' => $request->all(),
-
         ]);
+    
         $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
         $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
-
+    
         $apiKey = $stripe_test_secret_key?->value;
-
-
         Stripe::setApiKey($apiKey);
-
+    
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
         $endpointSecret = $stripe_webhook_secret?->value;
+    
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
-
+    
             switch ($event->type) {
                 case 'payment_intent.succeeded':
                 case 'checkout.session.completed':
                     $session = $event->data->object;
-
-                    $orderId = $session->metadata->order_id;
-
-                    $this->webhookPayment($orderId);
+                    $orderId = $session->metadata->order_id ?? null;
+    
+                    if ($orderId) {
+                        $this->webhookPayment($orderId);
+                    }
                     break;
-
+    
+                case 'checkout.session.expired':
+                    $session = $event->data->object;
+                    $orderId = $session->metadata->order_id ?? null;
+    
+                    if ($orderId) {
+                        Log::warning("Order {$orderId} marked as expired due to Stripe session expiration.");
+                    }
+                    break;
+    
                 case 'payment_intent.failed':
                     $paymentIntent = $event->data->object;
                     break;
-
+    
                 default:
+                    Log::info("Unhandled event type: {$event->type}");
                     break;
             }
-
+    
             return response('Webhook Handled', 200);
+    
         } catch (SignatureVerificationException $e) {
             return response('Invalid Signature', 400);
         } catch (\Exception $e) {
             return response('Webhook Error: ' . $e->getMessage(), 500);
         }
     }
-
     public function success(Request $request)
     {
 
