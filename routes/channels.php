@@ -52,7 +52,7 @@ Broadcast::channel('presence.user.{id}', function ($user, $id) {
         : false;
 });
 
-Broadcast::channel('presence-room.boom.rewards.{roomId}', function ($user, $roomId) {
+Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
     $isInRoom = RoomVisitor::where('room_id', $roomId)
         ->where('user_id', $user->id)
         ->exists();
@@ -63,6 +63,4 @@ Broadcast::channel('presence-room.boom.rewards.{roomId}', function ($user, $room
             'name' => $user->name,
         ];
     }
-
-    return false;
 });
