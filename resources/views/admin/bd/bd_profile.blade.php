@@ -1022,8 +1022,8 @@
                         // تحديد المستلم (receiver) مع التحقق من وجوده
                         $receiverHtml = '';
 
-                        if ($charge->receiverage) {
-                            $agency = $charge->receiverage;
+                        if ($charge->receiveragency) {
+                            $agency = $charge->receiveragency;
                             if ($agency) {
                                 $cacheKey = "agency_image_{$agency->id}";
                                 $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {
