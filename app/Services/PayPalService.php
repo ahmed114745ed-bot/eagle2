@@ -220,6 +220,7 @@ class PayPalService
                     ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture", (object)[]);
 
                 info($response);
+                info('callback');
 
                 return response()->json([
                     'status'  => true,
@@ -267,11 +268,9 @@ class PayPalService
 
     public function capture($orderId): JsonResponse
     {
-        // Find the coin log for this order
         $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
 
         try {
-            // Call PayPal to capture the order
             $response = Http::withToken($this->getAccessToken())
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture");
@@ -342,15 +341,15 @@ class PayPalService
 
         $coinLog = CoinLog::find($coinLogId);
 
-        info($paypalId);
+//        info($paypalId);
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
-                $captureResponse = Http::withToken($this->getAccessToken())
-                    ->withHeaders(['Content-Type' => 'application/json'])
-                    ->withBody('', 'application/json')
-                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
-
-                info('capture order', [$captureResponse]);
+//                $captureResponse = Http::withToken($this->getAccessToken())
+//                    ->withHeaders(['Content-Type' => 'application/json'])
+//                    ->withBody('', 'application/json')
+//                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
+//
+//                info('capture order', [$captureResponse]);
 //                if ($captureResponse->successful()) {
 //                    return $this->webhookPayment($coinLogId);
 //                }
