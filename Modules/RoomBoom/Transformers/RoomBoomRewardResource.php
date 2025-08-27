@@ -79,10 +79,10 @@ class RoomBoomRewardResource extends JsonResource
     {
         if ($this->target_type == 'ware') {
             $ware = $this->getWare();
-            return $ware?->price ?? '';
+            return $ware?->price ?? 0;
         } elseif ($this->target_type == 'gift') {
             $gift = $this->getGift();
-            return $gift?->price ?? '';
+            return $gift?->price ?? 0;
         } elseif ($this->target_type == 'achievement') {
             return 0;
         } else {
