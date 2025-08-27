@@ -45,7 +45,7 @@ class Kernel extends ConsoleKernel
             ->monthly()
             ->timezone(getTimezone())
             ->runInBackground();
-        $schedule->command('realtime-project-utd')->everyHour()->runInBackground();
+        $schedule->command('realtime-project-utd')->hourly()->runInBackground();
         $schedule->command('users:reset-monthly-days')
             ->monthlyOn(1, '00:00')
             ->timezone(getTimezone())
