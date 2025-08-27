@@ -144,16 +144,15 @@ class RoomController extends Controller
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
 
         $tz = getTimezone();
-        $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
+        $today = Carbon::today($tz)->setTimezone('UTC');
 
         $openBoom = RoomBoom::whereHas('totalRoomGift', function ($q) use ($room) {
             $q->where('room_id', $room->id);
         })
             ->whereNull('ended_at')
             ->whereNotNull('started_at')
-            ->whereDate('started_at', $todayStart)
+            ->whereDate('started_at', $today)
             ->first();
-
 
         $collections = [
             'charisma'          => $this->roomCharisma($owner_id),
