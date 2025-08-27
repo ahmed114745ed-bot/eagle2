@@ -138,7 +138,7 @@ class RoomController extends Controller
         return in_array($tz, timezone_identifiers_list()) ? $tz : 'UTC';
     }
 
-    public function extraRoomData($owner_id): \Illuminate\Http\JsonResponse
+    public function extraRoomData($owner_id): JsonResponse
     {
         $room = $this->roomService->findRoomUser($owner_id);
         if (!$room) return Common::apiResponse(false, 'No Room Founded');
@@ -146,15 +146,14 @@ class RoomController extends Controller
         $tz = getTimezone();
         $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
-        $openBoom = RoomBoom::whereIn('total_room_gift_id', function ($query) use ($room) {
-            $query->select('id')
-                ->from('total_room_gifts')
-                ->where('room_id', $room->id);
+        $openBoom = RoomBoom::whereHas('totalRoomGift', function ($q) use ($room) {
+            $q->where('room_id', $room->id);
         })
             ->whereNull('ended_at')
             ->whereNotNull('started_at')
             ->whereDate('started_at', $todayStart)
             ->first();
+
 
         $collections = [
             'charisma'          => $this->roomCharisma($owner_id),
