@@ -10,13 +10,16 @@ class RoomBoomLevelRepository
 {
     public function getLatestWithRewards(int $roomId): Collection|array
     {
+        $tz = getTimezone();
+        $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
+
         return RoomBoomLevel::with(['roomBoomRewards' => function ($query) {
             $query->orderBy('priority');
-        },  'roomBooms' => function ($query) use ($roomId) {
+        },  'roomBooms' => function ($query) use ($roomId, $todayStart) {
             $query->whereHas('totalRoomGift', function ($q) use ($roomId) {
                 $q->where('room_id', $roomId);
             })
-                ->whereDate('started_at', Carbon::today());
+                ->whereDate('started_at', $todayStart);
         }
         ])->orderBy('level')->get();
     }
