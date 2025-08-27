@@ -227,9 +227,6 @@ class UserController extends MainController
                 if (! $user) {
                     return __('No User');
                 }
-                if ($this->is_bd == 1) {
-                    return "<button class='btn btn-danger btn-sm remove-bd' data-id='{$this->id}'>".__('Remove BD')."</button>";
-                }
                 return app(UserService::class)->adminUserAvatar($user);
             });
 

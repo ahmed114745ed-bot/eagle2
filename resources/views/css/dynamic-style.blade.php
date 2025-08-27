@@ -219,7 +219,7 @@
     .rtl .iti--allow-dropdown .iti__flag-container,
     .rtl .iti--separate-dial-code .iti__flag-container {
         left: auto;
-        right: 0;
+        right: auto;
     }
 
     .box {
@@ -440,6 +440,12 @@
 
     .rtl .box-body .fields-group [class*="col-md-12"] {
         float: left; !important;
+    }
+
+    @media (max-width: 768px) {
+        .rtl .box-body .fields-group [class*="col-md-12"] {
+            float: none; !important;
+        }
     }
 
     .rtl [class*="col-md-12"] {
@@ -1229,7 +1235,7 @@ html.ltr .dropdown-menu {
 
         .pagination-info,
         .box-footer .pull-right {
-            width: 100%;
+            width: fit-content;
             display: flex;
             justify-content: center;
             text-align: center;

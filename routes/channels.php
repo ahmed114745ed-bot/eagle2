@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\RoomVisitor;
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\Room;
 /*
@@ -52,5 +53,14 @@ Broadcast::channel('presence.user.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
-    return ['id' => $user->id, 'name' => $user->name];
+    $isInRoom = RoomVisitor::where('room_id', $roomId)
+        ->where('user_id', $user->id)
+        ->exists();
+
+    if ($isInRoom) {
+        return [
+            'id'   => $user->id,
+            'name' => $user->name,
+        ];
+    }
 });

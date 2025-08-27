@@ -5,6 +5,7 @@ namespace Modules\AgencyApp\Classes\Agencies;
 
 use App\Helpers\Common;
 use App\Models\AgencySallary;
+use App\Models\MonthlyDiamondReceive;
 use App\Models\User;
 use App\Models\UserSallary;
 use Illuminate\Http\Request;
@@ -31,7 +32,8 @@ class AgencyDataSearch
 
         //        $totalDiamond = $isCurrentPeriod ? $dataQuery->get()->sum('monthly_diamond_received') : $paginatedData->sum('target_diamonds');
         $users          = $dataQuery->get();
-        $totalDiamond = $isCurrentPeriod ? $users->sum('monthly_diamond_received') : $users->sum('month_diamond');
+        $userIds = $users->pluck('id')->toArray();
+        $totalDiamond = $isCurrentPeriod ? MonthlyDiamondReceive::whereIn('user_id', $userIds)->where('month', now()->month)->where('year', now()->year)->sum('monthly_diamond_received') : $users->sum('month_diamond');
         $totalusd     = $this->calculateTotalUSD($agency_id, $year, $month);
         $agencySalary = $this->getAgencySalary($agency_id, $month, $year);
 

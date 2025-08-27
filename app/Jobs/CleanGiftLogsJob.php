@@ -17,7 +17,7 @@ class CleanGiftLogsJob  implements ShouldQueue
 
     public function handle()
     {
-        User::select('id', 'monthly_diamond_received', 'agency_id')
+        User::select('id', 'agency_id')
             ->where('agency_id', '!=', 0)
             ->chunk(500, function ($users) {
                 foreach ($users as $user) {

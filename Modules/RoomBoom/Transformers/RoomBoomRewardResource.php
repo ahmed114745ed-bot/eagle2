@@ -18,6 +18,7 @@ class RoomBoomRewardResource extends JsonResource
             'priority' => $this->priority,
             'type' => $this->target_type,
             'image' => $this->getImageUrl(),
+            'price' => $this->getPrice(),
             'gift_image_type' => $this->getGiftImageType() ?? '',
             'title' => $this->getTitle() . ($this->expire_days ? ' - ' . $this->expire_days . ' days' : ''),
             'count' => $this->quantity,
@@ -71,6 +72,21 @@ class RoomBoomRewardResource extends JsonResource
             return 'Achievement';
         } else {
             return '';
+        }
+    }
+
+    protected function getPrice()
+    {
+        if ($this->target_type == 'ware') {
+            $ware = $this->getWare();
+            return $ware?->price ?? '';
+        } elseif ($this->target_type == 'gift') {
+            $gift = $this->getGift();
+            return $gift?->price ?? '';
+        } elseif ($this->target_type == 'achievement') {
+            return 0;
+        } else {
+            return 0;
         }
     }
 }

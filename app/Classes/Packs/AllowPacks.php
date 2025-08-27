@@ -57,8 +57,9 @@ class AllowPacks
 
     public function isPackUsedAndExist(int $id): bool
     {
+        if (!@$this->user?->UserVip) return false;
         return $this->packs
-            ->where('vip_user_id',$this->user?->UserVip->id)
+            ->where('vip_user_id', @$this->user?->UserVip->id)
             ->where('type', $id)
             ->where('is_used', 1)
             ->isNotEmpty();
@@ -75,8 +76,8 @@ class AllowPacks
 
         // Load valid packs for the user
         $this->packs = $this->user->packs()
-            ->whereHas('ware', fn ($q) => $q->where('level', $userVipLevel))
-            ->where(fn ($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+            ->whereHas('ware', fn($q) => $q->where('level', $userVipLevel))
+            ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
             ->whereIn('type', $this->packIds)
             ->with('ware:id,level,type')
             ->get();
@@ -88,7 +89,7 @@ class AllowPacks
             ->where('is_active_for_vip', true)
             ->groupBy('type')
             ->get();
-         
+
         // Load VIP prices
         $this->vipPrices = $this->getVipPrices();
     }
@@ -121,8 +122,8 @@ class AllowPacks
 
             $data[] = [
                 'key' => $key,
-                'title' => __('api.'.$key.'_title', [], 'ar'),
-                'title_en' => __('api.'.$key.'_title', [], 'en'),
+                'title' => __('api.' . $key . '_title', [], 'ar'),
+                'title_en' => __('api.' . $key . '_title', [], 'en'),
                 'description' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level, 'ar'),
                 'description_en' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level, 'en'),
                 'is_active' => $this->isPackUsedAndExist($value),
@@ -131,8 +132,6 @@ class AllowPacks
                 'max' => @$ware->max_level,
                 'min_price' => @$this->vipPrices->where('id', $minLevel)?->first()?->price,
             ];
-            
-
         }
 
         return $data;
@@ -158,9 +157,9 @@ class AllowPacks
         }
 
         if ($isAllow) {
-            return __('api.'.$key.'_description_allow', [], $lang);
+            return __('api.' . $key . '_description_allow', [], $lang);
         }
 
-        return __('api.'.$key.'_description', ['minLevel' => $minLevel, 'maxLevel' => $maxLevel], $lang);
+        return __('api.' . $key . '_description', ['minLevel' => $minLevel, 'maxLevel' => $maxLevel], $lang);
     }
 }

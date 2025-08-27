@@ -56,14 +56,6 @@ class ResetUserMonthlyDiamond extends Command
             }
 
 
-
-            DB::statement("
-            UPDATE users
-            SET monthly_diamond_received = 0
-            WHERE agency_id != 0
-        ");
-
-
         }catch (\Exception $exception){
             $this->error('reset monthly diamond failed: '.$exception->getMessage());
         }

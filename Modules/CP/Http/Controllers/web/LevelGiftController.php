@@ -120,7 +120,12 @@ class LevelGiftController extends MainController
             }
         });
 
-        $grid->column('expire', __('expire'));
+        $grid->column('expire', __('expire'))->display(function ($value) {
+            if($this?->type !== "coins"){
+                return  $value;
+            }
+            return  '';
+        });
         $grid->column('gender', __('gender'))->display(function ($value) {
             $map = [
                 'all'    => __('all'),
@@ -172,7 +177,7 @@ class LevelGiftController extends MainController
             ->when("coins", fn() => $this->addCoinsFields($form))
             ->when("achievement", fn() => $this->addAchievementFields($form));
 
-        $form->number('expire', __('expire'));
+        $form->number('expire', __('expire'))->default(0);
         $form->select('gender', __('gender'))->options([
             'all' => __('all'),
             'male' => __('Male'),

@@ -33,8 +33,10 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
 use App\Models\Config as ConfigModel;
+use Carbon\Carbon;
 use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
+
 /**
  * @method static withoutAppends()
  */
@@ -52,6 +54,9 @@ class User extends Authenticatable
     protected $loadedPacks = null;
 
     protected $specialPack = null;
+
+    const TYPE_REGULAR = 0;
+    const TYPE_HOST = 1;
 
     /**
      * The attributes that are mass assignable.
@@ -99,7 +104,8 @@ class User extends Authenticatable
         'is_frozen',
         'total_charge_level',
         'photo',
-        'org_online_time'
+        'org_online_time',
+        'monthly_diamond_received',
     ];
 
 
@@ -189,6 +195,50 @@ class User extends Authenticatable
         return $this->hasOne(Vip::class, 'level', 'total_received_level')
             ->where('type', 1);
     }
+
+    public function monthlyDiamondReceive()
+    {
+        return $this->hasMany(MonthlyDiamondReceive::class, 'user_id', 'id');
+    }
+    public function currentMonthlyDiamond()
+    {
+        return $this->hasOne(MonthlyDiamondReceive::class, 'user_id', 'id')
+            ->where('month', now()->month)
+            ->where('year', now()->year);
+    }
+
+    public function getMonthlyDiamondReceivedAttribute()
+    {
+        return $this->getMonthlyDiamondReceived();
+    }
+
+    // method for passing params
+    public function getMonthlyDiamondReceived($month = null, $year = null)
+    {
+        $month = $month ?? now(getTimezone())->month;
+        $year  = $year ?? now(getTimezone())->year;
+  
+        return $this->monthlyDiamondReceive()
+            ->where('month', $month)
+            ->where('year', $year)
+            ->value('monthly_diamond_received') ?? 0;
+    }
+
+    public function setMonthlyDiamondReceivedAttribute($value)
+    {
+        $date = \Carbon\Carbon::now(getTimezone());
+
+        $record = $this->monthlyDiamondReceive()
+            ->firstOrNew([
+                'month' => $date->month,
+                'year'  => $date->year,
+            ]);
+
+        $record->monthly_diamond_received = ($record->monthly_diamond_received ?? 0) + $value;
+
+        $record->save();
+    }
+
 
     public function getUserTypeAttribute()
     {
@@ -1236,7 +1286,7 @@ class User extends Authenticatable
                 ->orderByDesc('id')
                 ->sum(DB::raw('cut_amount'));
 
-            return truncateAndTrim($userSallary ??0);
+            return truncateAndTrim($userSallary ?? 0);
         }
 
         return 0;
@@ -1376,7 +1426,7 @@ class User extends Authenticatable
                 ->with('ware')
                 ->where('type', 25)
                 ->where('is_used', true)
-                ->whereHas('ware', fn ($q) => $q->where('value', $this->special_id))
+                ->whereHas('ware', fn($q) => $q->where('value', $this->special_id))
                 ->first();
         }
 
@@ -1675,7 +1725,7 @@ class User extends Authenticatable
                     $start = $join->join_date;
                     $end = $join->leave_date ?? now()->endOfMonth();
                     $query->where('user_agency_id', $this->agency_id)
-                        ->where(fn($q) => $q->whereBetween('created_at', [$start, $end])->orWhereBetween('updated_at', [$start, $end ]));
+                        ->where(fn($q) => $q->whereBetween('created_at', [$start, $end])->orWhereBetween('updated_at', [$start, $end]));
                 } else {
                     $query->whereRaw('1 = 0');
                 }
@@ -1807,7 +1857,7 @@ class User extends Authenticatable
             ->withTimestamps()
             ->where(function ($query) {
                 $query->where('user_gifts.expire', 0)
-                      ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
+                    ->orWhereRaw('DATE_ADD(user_gifts.created_at, INTERVAL user_gifts.expire DAY) > NOW()');
             });
     }
 
@@ -1824,5 +1874,3 @@ class User extends Authenticatable
 }
 
 }
-
-
