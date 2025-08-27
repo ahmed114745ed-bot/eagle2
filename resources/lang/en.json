@@ -1089,7 +1089,8 @@
 "confirm_disable_transfer_salary": "Are you sure you want to disable transfer salary?",
 "You have received :coin coin.": "You have received :coin coin.",
 "You have received a gift: :ware": "You have received a gift: :ware",
-"banned_from_action":"You are banned from performing this action.",
+    "You have received the gift: :giftName": "You have received the gift: :giftName",
+    "banned_from_action":"You are banned from performing this action.",
 "Super Boom Rules": "Super Boom Rules",
 "Super Boom Rule Details": "Super Boom Rule Details",
 "Create Super Boom Rule": "Create Super Boom Rule",
@@ -1107,5 +1108,17 @@
 "Cancel": "Cancel",
 "Removed!": "Removed!",
 "Error": "Error",
-"Something went wrong": "Something went wrong"
+"Something went wrong": "Something went wrong",
+"salary_transfer_label": "Stop salary transfer for all BDs",
+"salary_transfer_enable_title": "Enable Salary Transfer",
+"salary_transfer_disable_title": "Disable Salary Transfer",
+"salary_transfer_enable_text": "Do you want to enable salary transfer for all BDs?",
+"salary_transfer_disable_text": "Do you want to disable salary transfer for all BDs?",
+"confirm_enable": "Yes, Enable",
+"confirm_disable": "Yes, Disable",
+"cancel": "Cancel",
+"success_title": "Success 🎉",
+"success_message": "The operation was completed successfully",
+"error_title": "Error 🚫",
+"error_message": "An error occurred, please try again"
 }

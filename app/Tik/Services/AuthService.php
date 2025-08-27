@@ -134,7 +134,6 @@ class AuthService
     public function loginWithGoogle($request)
     {
         
-        logger()->info('Google login request data:', $request);
 
         if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
@@ -240,7 +239,7 @@ class AuthService
 
     public function loginWithApple($request, $unique_id)
     {
-        $user = $this->userRepository->findByEmail($request['email']);
+        $user = $this->userRepository->findByAppleId($request['apple_id']);
         if (!$user) {
             $data = [
                 'name' => implode('@', explode('@', $request['email'], -1)),

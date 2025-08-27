@@ -60,7 +60,7 @@ trait PaymentTrait
         return $data;
     }
 
-    public function webhookPayment($coinLogId): JsonResponse
+    public function webhookPayment($coinLogId)
     {
         $coinLog = CoinLog::where("id", $coinLogId)->first();
 
@@ -71,17 +71,46 @@ trait PaymentTrait
         $coinLog->status = 1;
         $coinLog->save();
 
+        \Log::error("coinLogId Signature coinLogId ", [
+            'coinLog' => $coinLogId,
+            '$coinLog->user' => $coinLog->user,
+            
+        ]);
         $user = $coinLog->user;
+        $amountBefore = $user->di;
         if ($user) {
+
+        
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $coinLog->obtained_coins,
+                $amountBefore,
+                UserCoinLogType::PAYMENT,
+            );
+
             $user->di += $coinLog->obtained_coins;
             $user->save();
+
+            \Log::error("obtained_coins Signature coinLogId ", [
+                'coinLog' => $coinLogId,
+                '$coinLog->obtained_coins' => $coinLog->obtained_coins,
+                
+            ]);
             UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
             if ($user instanceof User) {
                 (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
             }
         } else {
-            return response()->json(['status' => 'failed', 'reason' => 'User not found']);
+            return response()->json([
+                'status'  => false,
+                'trx'     => $coinLog->trx,
+                'message' => 'Transaction failed.',
+            ]);
         }
-        return response()->json(['status' => 'success', 'data' => []]);
+        response()->json([
+            'status'  => true,
+            'trx'     => $coinLog?->trx,
+            'message' => 'Transaction completed successfully.',
+        ]);
     }
 }

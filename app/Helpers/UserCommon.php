@@ -444,7 +444,7 @@ class UserCommon
     /**
      * @throws \Throwable
      */
-    public static function assignRoomBoomWare(User $user, Ware $ware, $expir, $sender = null): void
+    public static function assignRoomBoomWare(User $user, Ware $ware, $expire, $sender = null): void
     {
         DB::beginTransaction();
         try {
@@ -454,7 +454,7 @@ class UserCommon
             $arr['target_id'] = $ware->id;
             $arr['num']       = 1;
             $arr['is_read']   = 1;
-            $arr['days']      = $expir;
+            $arr['days']      = $expire;
 
 
             $pack = Pack::query()->create($arr);

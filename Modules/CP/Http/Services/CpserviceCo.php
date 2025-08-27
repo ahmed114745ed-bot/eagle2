@@ -48,16 +48,23 @@ class CpserviceCo
             }
         }
 
-        if ($cpRelation->cp_one == 1) {
+        if ($cpRelation ) {
             $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
             $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
 
+        
             if ($existingCpOne) {
+                Log::info("CP Request blocked: User {$user->id} already sent CP to {$cpRelation->id}");
                 return Common::apiResponse(0, __('You have already sent a CP request before.'));
             }
+
             if ($existingCptwo) {
+                Log::info("CP Request blocked: User {$request->user_id} already received CP from {$cpRelation->id}");
                 return Common::apiResponse(0, __('They have already sent a CP request to you, please accept it.'));
             }
+
+            Log::info("CP Request sent: User {$user->id} is sending CP to {$request->user_id}");
+
         }
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && $existingCp->status == CpStatus::PENDING->value && $cpRelation->type != 'solution') {
@@ -299,7 +306,7 @@ class CpserviceCo
         $type = request("type") ?? 1;
 
         $data = $this->cpRepository->getCpRanking($relationType, $type);
-
+     
         $first = $data->take(3);
         $second = $data->skip(3);
         $user = request()->user();

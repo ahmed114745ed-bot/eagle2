@@ -22,16 +22,24 @@ class AgencyStatisticController extends Controller
         $year = date('Y');
 
         $activeAgencyCount = Agency::whereHas('agencySalaries', function ($q) use ($month, $year) {
-                $q->where('month', $month)
-                    ->where('year', $year);
-            })
+            $q->where('month', $month)
+                ->where('year', $year);
+        })
             ->count();
-        $agencySalaries = AgencySallary::where('month', $month)->where('year', $year)->sum (\DB::raw('sallary - cut_amount'));
-        $users = User::where("is_host",1)->whereNotNull("agency_id")->count();
+        $agencySalaries = AgencySallary::where('month', $month)->where('year', $year)->sum(\DB::raw('sallary - cut_amount'));
+        $users = User::where("is_host", 1)->whereNotNull("agency_id")->count();
 
-        $topUsers = User::select("id","name","email","monthly_diamond_received")->with("profile:id,avatar,user_id")->orderBy("monthly_diamond_received")->take(10)->get();
-
-        $agenciesWithSalaries = Agency::select("id","name","salary")->get();
+        $topUsers = User::select("users.id", "users.name", "users.email")
+            ->with("profile:id,avatar,user_id")
+            ->join('monthly_diamond_receives as mdr', function ($join) {
+                $join->on('mdr.user_id', '=', 'users.id')
+                    ->where('mdr.month', now()->month)
+                    ->where('mdr.year', now()->year);
+            })
+            ->orderByDesc("mdr.monthly_diamond_received")
+            ->take(10)
+            ->get();
+        $agenciesWithSalaries = Agency::select("id", "name", "salary")->get();
         $data = [
             "agencies" => $agencies,
             "activeAgencyCount" => $activeAgencyCount,

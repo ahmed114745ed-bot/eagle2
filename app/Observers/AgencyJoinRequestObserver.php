@@ -14,15 +14,16 @@ class AgencyJoinRequestObserver
             $user = User::query()->find($agencyJoinRequest->user_id);
             if ($user) {
                 $user->agency_id = $agencyJoinRequest->agency_id;
-                $user->monthly_diamond_received = 0;
+
                 $user->type_user = 1;
                 $user->save();
+                uploadMonthlyDiamondReceive($user->id, 0);
                 $agid = $user->agency_id;
 
                 if ($agid == '' || $agid == null || $agid == 0) {
-                    $user->monthly_diamond_received = 0;
                     $user->coins = 0;
                     $user->save();
+                    uploadMonthlyDiamondReceive($user->id, 0);
                 }
                 // CustomNotification::acceptAgency($agency, $user);
             }
