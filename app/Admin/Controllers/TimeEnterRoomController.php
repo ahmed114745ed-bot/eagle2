@@ -116,7 +116,6 @@ class TimeEnterRoomController extends MainController
 
     public function userTime(Request $request)
     {
-        dd($request->from_date,$request->to_date);
         $start = convertArabicToEnglishNumbers($request->from_date);
         $end = convertArabicToEnglishNumbers($request->to_date);
         $timeRooms = TimeEnterRoom::where('room_id', $request->room_id)->where('user_id', $request->user_id)
