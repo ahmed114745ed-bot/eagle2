@@ -11,7 +11,7 @@ class RoomBoomLevelRepository
     public function getLatestWithRewards(int $roomId): Collection|array
     {
         $tz = getTimezone();
-        $today = Carbon::today($tz)->setTimezone('UTC');
+        $today = Carbon::today($tz);
 
         info($tz);
         info($today);
