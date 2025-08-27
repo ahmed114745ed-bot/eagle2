@@ -406,6 +406,7 @@ class BdController extends MainController
             case 'transactions':
                 $transactions = $bd->transactions()
                     ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+                    ->with('receiveragency')
                     ->latest()
                     ->paginate(10, ['*'], 'transactions_page');
                 break;

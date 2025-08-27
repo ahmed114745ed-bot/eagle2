@@ -56,7 +56,7 @@
 
 .slider:before {
   position: absolute;
-  content: "لا";
+  content: attr(data-label-off);
   height: 26px;
   width: 26px;
   left: 4px;
@@ -77,7 +77,7 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(46px);
-  content: "نعم";
+  content: attr(data-label-on);
   color: #28a745;
 }
 </style>
@@ -89,7 +89,7 @@ input:checked + .slider:before {
     <label class="switch">
         <input type="checkbox" id="salaryTransferSwitch" 
                {{ $transfer_salary ? 'checked' : '' }}>
-        <span class="slider"></span>
+        <span class="slider" data-label-on="{{ __('Yes') }}" data-label-off="{{ __('No') }}"></span>
     </label>
 </div>
 
