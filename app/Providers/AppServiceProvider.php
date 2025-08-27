@@ -122,12 +122,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected function setupAppSettings(): void
     {
-        if (! Schema::hasTable('settings')) {
-            config(['app.name' => 'Default']);
-            Cache::put('app_title', 'Default Title', now()->addHours(24));
 
-            return;
-        }
         $locale = app()->getLocale();
         $key = $locale === 'ar' ? 'app_title_ar' : 'app_title_en';
 
@@ -222,10 +217,6 @@ class AppServiceProvider extends ServiceProvider
 
     protected function setupLanguages(): void
     {
-        if (! Schema::hasTable('languages')) {
-            return;
-        }
-
         $enabledLanguages = Cache::rememberForever('languages', function () {
             return Language::where('is_enabled', true)
                 ->pluck('name', 'code')
