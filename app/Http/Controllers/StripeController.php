@@ -23,103 +23,142 @@ class StripeController extends Controller
     public function __construct(public StripeService $stripeService) {}
     public function pay(Request $request)
     {
-      
-
         $request->validate([
             'product_name' => 'required|string|max:255',
-            'amount' => 'required|numeric',
-            'quantity' => 'required|integer|min:1',
-            'coin_id' => 'required|numeric'
+            'amount'       => 'required|numeric',
+            'quantity'     => 'required|integer|min:1',
+            'coin_id'      => 'required|numeric'
         ]);
+    
         try {
-           
             $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
-        
             $apiKey = $stripe_test_secret_key?->value;
-
-            $request->user_id = auth()->id();
-
-            $coin = Coin::find($request->coin_id);
-            $trx = rand (111111111111111111,999999999999999999);
-
-            $order = CoinLog::query()->create(
-                [
-                    'paid_usd' => $coin->usd,
-                    'user_id' => auth()->id(),
-                    'obtained_coins' => $coin->coin,
-                    'method' => 'card',
-                    'trx' => $trx,
-                    'status' => 0
-                ]
-            );
-
-            $request->order_id = $order->id;
-
-            $link = $this->stripeService->pay($apiKey, $request);
-
-
+    
+            $coin = Coin::findOrFail($request->coin_id);
+            $trx  = rand(111111111111111111, 999999999999999999);
+    
+            // إنشاء الطلب في النظام
+            $order = CoinLog::query()->create([
+                'coin_id'        => $coin->id,
+                'paid_usd'       => $coin->usd,
+                'user_id'        => auth()->id(),
+                'obtained_coins' => $coin->coin,
+                'method'         => 'card',
+                'trx'            => $trx,
+                'status'         => 0
+            ]);
+    
+            $paymentRequest = new \Illuminate\Http\Request([
+                'product_name' => $request->product_name,
+                'amount'       => $request->amount,
+                'quantity'     => $request->quantity,
+                'order_id'     => $order->id,
+            ]);
+    
+            $link = $this->stripeService->pay($apiKey, $paymentRequest);
+    
             return response()->json([
                 'message' => 'Link generated successfully',
-                'link' => $link
+                'link'    => $link
             ]);
+    
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error generating payment link: ' . $e->getMessage(),
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
-
-
+    
+    
     public function handleWebhook(Request $request)
     {
-
         Log::info('Stripe Webhook received', [
             'payload' => $request->getContent(),
-            'headers' => $request->headers->all(),
-            'all' => $request->all(),
-
+            'all'     => $request->all(),
         ]);
+    
         $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
-        $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
-
+        $stripe_webhook_secret  = Setting::where('key', 'stripe_webhook_secret')->first();
+    
         $apiKey = $stripe_test_secret_key?->value;
-
-
         Stripe::setApiKey($apiKey);
-
-        $payload = $request->getContent();
-        $sigHeader = $request->header('Stripe-Signature');
+    
+        $payload        = $request->getContent();
+        $sigHeader      = $request->header('Stripe-Signature');
         $endpointSecret = $stripe_webhook_secret?->value;
+    
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
-
+    
             switch ($event->type) {
-                case 'payment_intent.succeeded':
                 case 'checkout.session.completed':
                     $session = $event->data->object;
-
-                    $orderId = $session->metadata->order_id;
-
-                    $this->webhookPayment($orderId);
+                    $orderId = $session->metadata->order_id ?? null;
                     break;
+    
+                case 'payment_intent.succeeded':
+                    $paymentIntent = $event->data->object;
+                    $orderId = $paymentIntent->metadata->order_id ?? null;
+                    break;
+    
+                case 'charge.succeeded':
+                case 'charge.updated':
+                    $charge = $event->data->object;
+                    $orderId = $charge->metadata->order_id ?? null;
+                    Log::info("Order {$orderId} marked.");
+                    Log::info("Order {$charge} marked.");
 
+                    break;
+    
+                case 'checkout.session.expired':
+                    $session = $event->data->object;
+                    $orderId = $session->metadata->order_id ?? null;
+                    if ($orderId) {
+                        Log::warning("Order {$orderId} marked as expired due to Stripe session expiration.");
+                    }
+                    $orderId = null; 
+                    break;
+    
                 case 'payment_intent.failed':
                     $paymentIntent = $event->data->object;
+                    Log::error('Payment failed', ['paymentIntent' => $paymentIntent]);
+                    $orderId = null;
                     break;
-
+    
                 default:
+                    Log::info("Unhandled event type: {$event->type}");
+                    $orderId = null;
                     break;
             }
-
+    
+            if (!empty($orderId)) {
+                $this->webhookPayment($orderId);
+            } else {
+                Log::warning("No order_id found for event {$event->type}");
+            }
+    
             return response('Webhook Handled', 200);
+    
         } catch (SignatureVerificationException $e) {
+            Log::error("Stripe Signature verification failed", [
+                'error' => $e->getMessage(),
+                'payload' => $payload ?? null,
+                'sigHeader' => $sigHeader ?? null,
+            ]);
             return response('Invalid Signature', 400);
+        
         } catch (\Exception $e) {
+            Log::error("Stripe Webhook error", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'payload' => $payload ?? null,
+            ]);
             return response('Webhook Error: ' . $e->getMessage(), 500);
         }
     }
-
+    
+    
     public function success(Request $request)
     {
 
