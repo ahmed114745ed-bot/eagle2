@@ -154,7 +154,6 @@ class RoomController extends Controller
             ->whereDate('started_at', $todayStart)
             ->first();
 
-
         $collections = [
             'charisma'          => $this->roomCharisma($owner_id),
             'achievements'      => $this->achievementLevels($owner_id),
