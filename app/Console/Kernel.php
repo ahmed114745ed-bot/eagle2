@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\CloseStatusAppFeature::class,
         Commands\DeleteTrashedUsers::class,
         Commands\FreezeUsersCommand::class,
-        //WeeklyCpWinnerConsole::class
+        WeeklyCpWinnerConsole::class
     ];
 
     protected function schedule(Schedule $schedule): void
