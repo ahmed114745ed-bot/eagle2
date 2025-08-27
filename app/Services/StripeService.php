@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CoinLog;
 use App\Models\Setting;
 use Database\Seeders\config;
 use Illuminate\Support\Facades\Log;
@@ -10,54 +11,53 @@ use Stripe\Stripe;
 
 class StripeService {
 
-        public function pay($apiKey, $request)
-        {
-            Stripe::setApiKey($apiKey);
-    
-            try {
-                $stripe_test_cancel_url = Setting::where('key', 'stripe_cancel_url')->first();
-                $stripe_test_success_url = Setting::where('key', 'stripe_success_url')->first();
-                $stripe_currency = Setting::where('key', 'stripe_currency')->first();
-    
-                $amountInCents = intval($request->amount * 100);
-    
-                $session = StripeCheckoutSession::create([
-                    'payment_method_types' => ['card'],
-                    'line_items' => [[
-                        'price_data' => [
-                            'currency' => $stripe_currency?->value ?? 'usd',
-                            'product_data' => [
-                                'name' => $request->product_name,
-                            ],
-                            'unit_amount' => $amountInCents,
+    public function pay(array $settings, array $data): string
+    {
+        Stripe::setApiKey($settings['secret_key']);
+
+        try {
+            $amountInCents = intval($data['amount'] * 100);
+
+            $session = StripeCheckoutSession::create([
+                'payment_method_types' => ['card'],
+                'line_items' => [[
+                    'price_data' => [
+                        'currency' => $settings['currency'] ?? 'usd',
+                        'product_data' => [
+                            'name' => $data['product_name'],
                         ],
-                        'quantity' => $request->quantity ?? 1,
-                    ]],
-                    'mode' => 'payment',
-                    'success_url' => $stripe_test_success_url?->value . '?session_id={CHECKOUT_SESSION_ID}',
-                    'cancel_url' => $stripe_test_cancel_url?->value,
-                    'metadata' => [
-                        'user_id' => $request->user_id,
-                        'order_id' => $request->order_id,
+                        'unit_amount' => $amountInCents,
                     ],
-                ]);
+                    'quantity' => $data['quantity'] ?? 1,
+                ]],
+                'mode' => 'payment',
+                'success_url' => $settings['success_url'] . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url'  => $settings['cancel_url'],
+                'metadata' => [
+                    'user_id'  => $data['user_id'],
+                    'order_id' => $data['order_id'],
+                ],
+            ]);
 
+            CoinLog::where('id', $data['order_id'])
+                ->update(['trx' => $session->id]);
 
-                \App\Models\CoinLog::where('id', $request->order_id)
-                ->update([
-                    'trx' => $session->id
-                ]);
+            Log::info("Stripe session created", [
+                'session_id' => $session->id,
+                'order_id'   => $data['order_id'],
+            ]);
 
-                Log::error("Stripe Webhook error", [
-                    'payload' => $session ?? null,
-                ]);
-    
-                return $session->url;
-    
-            } catch (\Exception $e) {
-                throw new \Exception('Error generating payment link: ' . $e->getMessage());
-            }
+            return $session->url;
+
+        } catch (\Exception $e) {
+            Log::error("Stripe payment error", [
+                'message' => $e->getMessage(),
+                'data'    => $data,
+            ]);
+
+            throw new \Exception('Error generating payment link: ' . $e->getMessage());
         }
     }
+}
     
 

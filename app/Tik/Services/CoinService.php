@@ -5,6 +5,7 @@ namespace App\Tik\Services;
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;
 use App\Services\PayPalService;
+use App\Services\StripeService;
 use App\Services\ZiniPaymentService;
 use Exception;
 use App\Helpers\Common;
@@ -20,6 +21,7 @@ use App\Tik\Repositories\PaymentCoinRepository;
 class CoinService
 {
     public function __construct(
+        public StripeService $stripeService,
         private readonly CoinRepository $coinRepository,
         private readonly CoinLogRepository $coinLogRepository,
         private readonly PaymentCoinRepository $paymentCoinRepository,
@@ -63,27 +65,14 @@ class CoinService
                 'user_id' => $user->id
             ];
             if ($paymentMethod == 'strip') {
-                $stripe_test_secret_key = config('stripe.test_secret_key');
-                $is_stripe_active = config('is_strip_active');
-                $stripe_currency = config('stripe.currency');
-                $stripe_webhook_secret = config('stripe.webhook_secret');
 
-                $data['stripe_test_secret_key'] = $stripe_test_secret_key;
-                $data['is_stripe_active'] = $is_stripe_active;
-                $data['stripe_currency'] = $stripe_currency;
-                $data['stripe_webhook_secret'] = $stripe_webhook_secret;
-
-                if(!$stripe_test_secret_key
-                || !$is_stripe_active
-                || !$stripe_currency
-                || !$stripe_webhook_secret
-                ){
+                $settings = $this->getStripeSettings();
+                if (!$this->validateStripeSettings($settings)) {
                     return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 }
-                $strip = new \App\Classes\PaymentGateways\Stripe();
-                $res = $strip->make($data);
+                $sessionUrl = $this->createStripePayment($settings, $data);
+                return Common::apiResponse(1, 'ok', $sessionUrl, 200);
 
-                return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($paymentMethod == 'fawry') {
                 $Active = config('is_fawry_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
@@ -204,4 +193,36 @@ class CoinService
     {
         return $this->coinLogRepository->getShippingAgencyCoinLogs($id);
     }
+
+
+    private function getStripeSettings(): array
+    {
+        return [
+            'secret_key'      => Setting::where('key', 'stripe_test_secret_key')->first()?->value,
+            'cancel_url'      => Setting::where('key', 'stripe_cancel_url')->first()?->value,
+            'success_url'     => Setting::where('key', 'stripe_success_url')->first()?->value,
+            'currency'        => Setting::where('key', 'stripe_currency')->first()?->value,
+            'is_active'       => Setting::where('key', 'is_strip_active')->first()?->value,
+            'webhook_secret'  => Setting::where('key', 'stripe_webhook_secret')->first()?->value,
+        ];
+    }
+
+
+    private function validateStripeSettings(array $settings): bool
+    {
+        return !(
+            empty($settings['secret_key']) ||
+            empty($settings['is_active']) ||
+            empty($settings['currency']) ||
+            empty($settings['webhook_secret'])
+        );
+    }
+
+
+    private function createStripePayment(array $settings, $request)
+    {
+
+        return $this->stripeService->pay($settings['secret_key'], $request);
+    }
+
 }
