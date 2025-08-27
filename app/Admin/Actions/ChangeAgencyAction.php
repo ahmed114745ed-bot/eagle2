@@ -41,29 +41,26 @@ class ChangeAgencyAction extends RowAction
      */
     public function handle(Model $model, Request $request)
     {
-        $agencyOwner = Agency::query()->where('owner_id', $request->id)->orWhere('app_owner_id', $request->id)->exists();
-        if ($agencyOwner) throw ValidationException::withMessages(['error' => __('This user is the agency owner and cannot be deleted')]);
         $user = User::find($request->id);
-        $agencyId=$user->agency_id;
+
+        $agencyOwner = Agency::query()
+            ->where('owner_id', $request->id)
+            ->orWhere('app_owner_id', $request->id)
+            ->exists();
+        if ($agencyOwner) {
+            throw ValidationException::withMessages([
+                'error' => __('This user is the agency owner and cannot be deleted')
+            ]);
+        }
+
+        $oldAgencyId = $user->agency_id;
+
         uploadMonthlyDiamondReceive($user->id, 0);
 
-        $checkAgencyUser = UsersJoinedAgency::where([
-            'user_id' => $user->id,
-            'agency_id' => $user->agency_id,
-        ])->where('leave_date', null)->first();
-        if (!$checkAgencyUser) {
-            UsersJoinedAgency::create([
-                'user_id' => $user->id,
-                'agency_id' => $user->agency_id,
-                'type' => 2,
-                'join_date' => now(),
-                'leave_date' => now(),
-                'status' => 'change agency by admin',
-                'kicked_by_admin' => Auth::id(),
-            ]);
-        } else {
-            $checkAgencyUser->update(['leave_date' => now(), 'status' => 'change agency by admin', 'kicked_by_admin' => Auth::id()]);
-        }
+        $this->handleUserSalaries($user);
+
+        $this->updatePreviousAgencyJoined($user, $oldAgencyId);
+
         UsersJoinedAgency::create([
             'user_id' => $user->id,
             'agency_id' => $request->agency_id,
@@ -71,15 +68,67 @@ class ChangeAgencyAction extends RowAction
             'join_date' => now(),
             'status' => 'Joined'
         ]);
-        // $user->monthly_diamond_received = 0;
+
         $user->agency_id = $request->agency_id;
-        $user->type_user = 1;
+        $user->type_user = User::TYPE_HOST;
         $user->save();
-        AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
+
+        AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $oldAgencyId])->delete();
 
         return $this->response()->success('success')->refresh();
     }
 
+    private function handleUserSalaries(User $user)
+    {
+        $agencyId = $user->agency_id;
+        $userSalaries = UserSallary::query()
+            ->where('user_id', $user->id)
+            ->where('user_agency_id', $agencyId)
+            ->latest()
+            ->take(2)
+            ->get();
+
+        if ($userSalaries->isEmpty()) return;
+
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        $currentSalary = $userSalaries[0];
+        if ($currentSalary->month == $currentMonth && $currentSalary->year == $currentYear) {
+            if (isset($userSalaries[1]) && $currentSalary->cut_amount >= $currentSalary->sallary) {
+                $prevSalary = $userSalaries[1];
+                $prevSalary->cut_amount += ($currentSalary->cut_amount - $currentSalary->sallary);
+                $prevSalary->save();
+            }
+            $currentSalary->update(['is_finished' => 1]);
+        }
+    }
+
+    private function updatePreviousAgencyJoined(User $user, $agencyId)
+    {
+        $checkAgencyUser = UsersJoinedAgency::where([
+            'user_id' => $user->id,
+            'agency_id' => $agencyId,
+        ])->whereNull('leave_date')->first();
+
+        if (!$checkAgencyUser) {
+            UsersJoinedAgency::create([
+                'user_id' => $user->id,
+                'agency_id' => $agencyId,
+                'type' => 2,
+                'join_date' => now(),
+                'leave_date' => now(),
+                'status' => 'change agency by admin',
+                'kicked_by_admin' => Auth::id(),
+            ]);
+        } else {
+            $checkAgencyUser->update([
+                'leave_date' => now(),
+                'status' => 'change agency by admin',
+                'kicked_by_admin' => Auth::id()
+            ]);
+        }
+    }
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
