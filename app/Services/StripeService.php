@@ -41,6 +41,16 @@ class StripeService {
                         'order_id' => $request->order_id,
                     ],
                 ]);
+
+
+                \App\Models\CoinLog::where('id', $request->order_id)
+                ->update([
+                    'trx' => $session->id
+                ]);
+
+                Log::error("Stripe Webhook error", [
+                    'payload' => $session ?? null,
+                ]);
     
                 return $session->url;
     
