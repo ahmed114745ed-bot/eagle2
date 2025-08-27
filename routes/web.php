@@ -416,7 +416,7 @@ Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
     Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
 //    Route::get('/capture/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
-    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
+//    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
 
 
