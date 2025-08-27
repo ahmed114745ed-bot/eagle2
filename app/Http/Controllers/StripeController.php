@@ -23,6 +23,8 @@ class StripeController extends Controller
     public function __construct(public StripeService $stripeService) {}
     public function pay(Request $request)
     {
+      
+
         $request->validate([
             'product_name' => 'required|string|max:255',
             'amount' => 'required|numeric',
@@ -30,12 +32,14 @@ class StripeController extends Controller
             'coin_id' => 'required|numeric'
         ]);
         try {
-            $apiKey = config('stripe.test_secret_key');
+           
+            $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
+        
+            $apiKey = $stripe_test_secret_key?->value;
 
             $request->user_id = auth()->id();
 
-            $coin = Coin::query()->find($request->coin_id);
-
+            $coin = Coin::find($request->coin_id);
             $trx = rand (111111111111111111,999999999999999999);
 
             $order = CoinLog::query()->create(
@@ -69,10 +73,18 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
+
+        Log::info('Stripe Webhook received', [
+            'payload' => $request->getContent(),
+            'headers' => $request->headers->all(),
+            'all' => $request->all(),
+
+        ]);
         $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
         $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
 
-        $apiKey = $stripe_test_secret_key;
+        $apiKey = $stripe_test_secret_key?->value;
+
 
         Stripe::setApiKey($apiKey);
 
@@ -110,16 +122,19 @@ class StripeController extends Controller
 
     public function success(Request $request)
     {
-        Stripe::setApiKey(config('stripe.test_secret_key'));
 
-        $sessionId = $request->get('session_id');
+        // $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
 
-        if (!$sessionId) {
-            return response('Missing session ID', 400);
-        }
+        // Stripe::setApiKey($stripe_test_secret_key?->value);
+
+        // $sessionId = $request->get('session_id');
+
+        // if (!$sessionId) {
+        //     return response('Missing session ID', 400);
+        // }
 
         try {
-            Session::retrieve($sessionId);
+            // Session::retrieve($sessionId);
 
             return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
         } catch (\Exception $e) {

@@ -986,7 +986,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>{{ __('Name') }}</th>
+                    <!-- <th>{{ __('Name') }}</th> -->
                     <th>{{ __('receiver') }}</th>
                     <th>{{ __('usd') }}</th>
                     <th>{{ __('amount') }}</th>
@@ -1022,8 +1022,8 @@
                         // تحديد المستلم (receiver) مع التحقق من وجوده
                         $receiverHtml = '';
 
-                        if ($charge->agency) {
-                            $agency = $charge->agency;
+                        if ($charge->receiveragency) {
+                            $agency = $charge->receiveragency;
                             if ($agency) {
                                 $cacheKey = "agency_image_{$agency->id}";
                                 $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {
@@ -1079,12 +1079,12 @@
                     @endphp
                     <tr>
                         <td>{{ $transactions->firstItem() + $index }}</td>
-                        <td>
+                        <!-- <td>
                             <a href="{{ $userUrl }}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
                                 <img src="{{ getImagePath($userImage) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%;">
                                 <span>{{ $userName }}</span>
                             </a>
-                        </td>
+                        </td> -->
                         <td>{!! $receiverHtml !!}</td>
                         <td>{{ number_format($charge->usd ?? 0, 2) }}</td>
                         <td>{{ number_format($charge->amount ?? 0, 2) }}</td>
