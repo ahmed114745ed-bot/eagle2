@@ -215,6 +215,12 @@ class PayPalService
                     'message' => 'Transaction completed successfully.',
                 ]);
             } elseif ($status === 'APPROVED') {
+                $response = Http::withToken($this->getAccessToken())
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture");
+
+                info($response);
+
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog->trx,
@@ -274,7 +280,6 @@ class PayPalService
                 $data = $response->json();
                 $status = $data['status'] ?? null;
 
-                info($status);
                 switch ($status) {
                     case 'COMPLETED':
                         $this->webhookPayment($coinLog->id);
