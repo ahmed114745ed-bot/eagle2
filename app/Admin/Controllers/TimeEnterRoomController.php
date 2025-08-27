@@ -125,10 +125,10 @@ class TimeEnterRoomController extends MainController
                     Carbon::parse($end)->endOfDay()
                 ]);
             })->orderByDesc('id')->get();
-
+       // dd($start, $end, $timeRooms);
         $rows = $timeRooms->map(function ($TimeRooms) {
             $start = Carbon::createFromTimestamp($TimeRooms->start_time)->format('m.d H:i:s');
-            $end   = Carbon::createFromTimestamp(@$TimeRooms?->end_time)->format('m.d H:i:s');
+            $end   = @$TimeRooms?->end_time ? Carbon::createFromTimestamp(@$TimeRooms?->end_time)->format('m.d H:i:s') : 'onGoing';
 
             return [
                 'start' => $start,
