@@ -77,7 +77,17 @@ trait PaymentTrait
             
         ]);
         $user = $coinLog->user;
+        $amountBefore = $user->di;
         if ($user) {
+
+        
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $coinLog->obtained_coins,
+                $amountBefore,
+                UserCoinLogType::PAYMENT,
+            );
+
             $user->di += $coinLog->obtained_coins;
             $user->save();
 

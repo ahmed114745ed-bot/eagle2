@@ -24,8 +24,6 @@ class StripeController extends Controller
     public function pay(Request $request)
     {
         $request->validate([
-            'product_name' => 'required|string|max:255',
-            'amount'       => 'required|numeric',
             'quantity'     => 'required|integer|min:1',
             'coin_id'      => 'required|numeric'
         ]);
@@ -49,8 +47,8 @@ class StripeController extends Controller
             ]);
     
             $paymentRequest = new \Illuminate\Http\Request([
-                'product_name' => $request->product_name,
-                'amount'       => $request->amount,
+                'product_name' => $coin->coin,
+                'amount'       => $coin->usd,
                 'quantity'     => $request->quantity,
                 'order_id'     => $order->id,
             ]);
