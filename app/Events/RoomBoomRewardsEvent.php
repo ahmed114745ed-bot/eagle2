@@ -23,7 +23,7 @@ class RoomBoomRewardsEvent implements ShouldBroadcast
 
     public function broadcastOn(): Channel
     {
-        return new PresenceChannel('room.boom.rewards.' . $this->roomId);
+        return new PresenceChannel('presence.room.boom.rewards.' . $this->roomId);
     }
 
     public function broadcastAs(): string
