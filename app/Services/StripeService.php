@@ -24,7 +24,7 @@ class StripeService {
                     'price_data' => [
                         'currency' => $settings['currency'] ?? 'usd',
                         'product_data' => [
-                            'name' => $data['product_name'],
+                            'name' => 'coins',
                         ],
                         'unit_amount' => $amountInCents,
                     ],
