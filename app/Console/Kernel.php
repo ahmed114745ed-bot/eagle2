@@ -5,6 +5,7 @@ namespace App\Console;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\CP\Console\WeeklyCpWinnerConsole;
 use Modules\TribeReward\Jobs\AgencyTribeRewardJob;
 use Modules\TribeReward\Jobs\CleanExpiredAgencyRewardsJob;
 
@@ -16,6 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\CloseStatusAppFeature::class,
         Commands\DeleteTrashedUsers::class,
         Commands\FreezeUsersCommand::class,
+        WeeklyCpWinnerConsole::class
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -31,19 +33,19 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/users-reset-monthly-diamond.log'))
             ->runInBackground();
-        
-            $schedule->command('realtime-project')
+
+        $schedule->command('realtime-project')
             ->monthly()
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/realtime-project.log'))
             ->runInBackground();
 
 
-             $schedule->command('realtime-project')
+        $schedule->command('realtime-project')
             ->monthly()
             ->timezone(getTimezone())
             ->runInBackground();
-
+        $schedule->command('realtime-project-utd')->everyHour()->runInBackground();
         $schedule->command('users:reset-monthly-days')
             ->monthlyOn(1, '00:00')
             ->timezone(getTimezone())
@@ -117,7 +119,18 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/game-user-calc.log'))
             ->runInBackground();
-        $schedule->command('realtime-project-utd')->everyHour();
+
+
+
+        $schedule->command('app:update-gift-rankings')
+            ->everyThirtySeconds()
+            ->runInBackground();
+
+        $schedule->command('weekly-cp-winner')
+            ->weekly()
+            ->timezone(getTimezone())
+            ->appendOutputTo(storage_path('logs/weekly-cp-winner.log'))
+            ->runInBackground();
 
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()
