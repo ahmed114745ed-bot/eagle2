@@ -204,11 +204,11 @@ class PayPalService
         $response = Http::withToken($this->getAccessToken())
             ->get(config('paypal.base_url')."/v2/checkout/orders/$coinLog->trx");
 
-        $response = Http::withToken($this->getAccessToken())
+        $captureResponse = Http::withToken($this->getAccessToken())
             ->withHeaders(['Content-Type' => 'application/json'])
             ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture", (object)[]);
 
-        info($response);
+        info($captureResponse);
         info('capture');
         if ($response->successful()) {
             $data = $response->json();
