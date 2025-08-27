@@ -10,5 +10,5 @@ class MomentGallery extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

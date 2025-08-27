@@ -12,7 +12,7 @@ class UserSallary extends Model
 
     protected $table = 'user_sallaries';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $casts = [
         'agency_sallary' => 'double',

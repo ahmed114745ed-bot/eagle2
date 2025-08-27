@@ -14,7 +14,7 @@ class RewardLevelInterval extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $table = 'reward_level_intervals';
 

@@ -11,7 +11,7 @@ class BlackList extends Model
 
     protected $table = 'black_lists';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

@@ -13,7 +13,7 @@ class LeaveAgencyRequest extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function agency()
     {

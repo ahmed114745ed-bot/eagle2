@@ -14,7 +14,7 @@ class RoomTopUser extends Model
 
     protected $table = 'room_top_users';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {
