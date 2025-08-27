@@ -54,6 +54,9 @@ class User extends Authenticatable
 
     protected $specialPack = null;
 
+    const TYPE_REGULAR = 0;
+    const TYPE_HOST = 1;
+
     /**
      * The attributes that are mass assignable.
      *
