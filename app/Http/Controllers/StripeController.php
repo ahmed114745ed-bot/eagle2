@@ -81,7 +81,7 @@ class StripeController extends Controller
         $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
         $stripe_webhook_secret  = Setting::where('key', 'stripe_webhook_secret')->first();
     
-        $apiKey        = $stripe_test_secret_key?->value;
+        $apiKey         = $stripe_test_secret_key?->value;
         $endpointSecret = $stripe_webhook_secret?->value;
     
         Stripe::setApiKey($apiKey);
@@ -97,12 +97,19 @@ class StripeController extends Controller
             switch ($event->type) {
                 case 'checkout.session.completed':
                     $session = $event->data->object;
-                    $trxId   = $session->id; // هذا نفس القيمة التي خزنتها في CoinLog->trx
+    
+                    if (!empty($session->metadata->order_id)) {
+                        $orderId = $session->metadata->order_id;
+                        $trxId   = $session->id;
+                        Log::info("checkout.session.completed: order_id={$orderId}, trx={$trxId}");
+                    } else {
+                        $trxId   = $session->id;
+                    }
                     break;
     
                 case 'payment_intent.succeeded':
                     $paymentIntent = $event->data->object;
-                    $trxId   = $paymentIntent->id; 
+                    $trxId   = $paymentIntent->id;
                     break;
     
                 case 'charge.succeeded':
@@ -130,20 +137,30 @@ class StripeController extends Controller
                     break;
             }
     
-            // لو فيه trxId نجيب منه order_id
-            if (!empty($trxId)) {
+            // لو orderId موجود من metadata نحدثه مباشرة
+            if (!empty($orderId)) {
+                $coinLog = \App\Models\CoinLog::find($orderId);
+                if ($coinLog) {
+                    $coinLog->trx = $trxId; 
+                    $coinLog->save();
+    
+                    Log::info("Updated CoinLog {$orderId} with trx {$trxId}");
+                    $this->webhookPayment($orderId);
+                } else {
+                    Log::warning("No CoinLog found with order_id {$orderId}");
+                }
+            }
+            elseif (!empty($trxId)) {
                 $coinLog = \App\Models\CoinLog::where('trx', $trxId)->first();
                 if ($coinLog) {
                     $orderId = $coinLog->id;
                     Log::info("Found CoinLog for trx {$trxId}, order {$orderId}");
-    
-                    // نفذ عملية تأكيد الدفع
                     $this->webhookPayment($orderId);
                 } else {
                     Log::warning("No CoinLog found for trx {$trxId}");
                 }
             } else {
-                Log::warning("No trxId extracted for event {$event->type}");
+                Log::warning("No trxId or orderId extracted for event {$event->type}");
             }
     
             return response('Webhook Handled', 200);
@@ -165,6 +182,7 @@ class StripeController extends Controller
             return response('Webhook Error: ' . $e->getMessage(), 500);
         }
     }
+    
     
     
     
