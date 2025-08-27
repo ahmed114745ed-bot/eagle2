@@ -3,30 +3,45 @@ on:
   push:
     branches: ["moonlight"]
 jobs:
-  run_example_job:
+  run_moonlight_hub:
     runs-on: ubuntu-latest
     steps:
-    - name: print out moonlight
+    - name: print out moonlight-hub
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.13.3"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 22m
+        command_timeout: 20m
         script: |
-          threshold=75
+          cd /var/www/moonlight
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
             echo "Disk space is more than $threshold% utilized"
           # Execute the command to clean up Docker system
             docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
           else
-            echo "Disk space is within acceptable limits $current%"
+            echo "Disk space is within acceptable limits $current% "
           fi
+ 
+  run_moonlight_app:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out moonlight-app
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.13.3"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
           cd /var/www/moonlight
           pwd
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t moonlight:${{ github.sha }} .
           docker service update --image moonlight:${{ github.sha }} moonlight-app
           
@@ -40,13 +55,31 @@ jobs:
             exit 1
           fi
 
+          
           # check again
-          threshold=80
+          threshold=75
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
             echo "Disk space is more than $threshold% utilized"
           # Execute the command to clean up Docker system
             docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
           else
-            echo "Disk space is within acceptable limits $current%"
+            echo "Disk space is within acceptable limits $current% "
           fi
+ 
+  run_moonlight_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out moonlight-job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.13.3"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: | 
+          cd /var/www/moonlight
+          pwd
+          docker build -t moonlight-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image moonlight-job:${{ github.sha }} moonlight-job
