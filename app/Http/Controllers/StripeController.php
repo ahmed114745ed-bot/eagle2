@@ -106,6 +106,9 @@ class StripeController extends Controller
                 case 'charge.updated':
                     $charge = $event->data->object;
                     $orderId = $charge->metadata->order_id ?? null;
+                    Log::info("Order {$orderId} marked.");
+                    Log::info("Order {$charge} marked.");
+
                     break;
     
                 case 'checkout.session.expired':
@@ -114,7 +117,7 @@ class StripeController extends Controller
                     if ($orderId) {
                         Log::warning("Order {$orderId} marked as expired due to Stripe session expiration.");
                     }
-                    $orderId = null; // عشان ما يستدعيش webhookPayment
+                    $orderId = null; 
                     break;
     
                 case 'payment_intent.failed':
@@ -138,8 +141,19 @@ class StripeController extends Controller
             return response('Webhook Handled', 200);
     
         } catch (SignatureVerificationException $e) {
+            Log::error("Stripe Signature verification failed", [
+                'error' => $e->getMessage(),
+                'payload' => $payload ?? null,
+                'sigHeader' => $sigHeader ?? null,
+            ]);
             return response('Invalid Signature', 400);
+        
         } catch (\Exception $e) {
+            Log::error("Stripe Webhook error", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'payload' => $payload ?? null,
+            ]);
             return response('Webhook Error: ' . $e->getMessage(), 500);
         }
     }
