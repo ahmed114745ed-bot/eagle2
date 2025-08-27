@@ -222,7 +222,7 @@ class CoinService
     private function createStripePayment(array $settings, $request)
     {
 
-        return $this->stripeService->pay($settings['secret_key'], $request);
+        return $this->stripeService->pay($settings, $request);
     }
 
 }
