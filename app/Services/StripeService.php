@@ -43,14 +43,14 @@ class StripeService {
                 ]);
 
 
-                if ($session->payment_intent) {
-                    \Stripe\PaymentIntent::update($session->payment_intent, [
-                        'metadata' => [
-                            'user_id' => $request->user_id,
-                            'order_id' => $request->order_id,
-                        ]
-                    ]);
-                }
+                \App\Models\CoinLog::where('id', $request->order_id)
+                ->update([
+                    'trx' => $session->id
+                ]);
+
+                Log::error("Stripe Webhook error", [
+                    'payload' => $session ?? null,
+                ]);
     
                 return $session->url;
     
