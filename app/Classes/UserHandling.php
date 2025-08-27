@@ -72,7 +72,7 @@ class UserHandling
 
     public function checkIfUserHostByIds(array $userIds): array
     {
-        return \App\Models\User::query()
+        return User::query()
             ->whereIn('id', $userIds)
             ->where(fn($q) => $q->where('agency_id', '!=', 0)->where('agency_id', '!=', null))
             ->where('type_user', '!=', 0)
@@ -90,67 +90,80 @@ class UserHandling
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void
     {
-        // decrement total diamond with monthly diamond when user not in agency
+        $this->resetUserAgencyData($user);
+        $this->handleUserSalaries($user);
+        $this->clearUserAgencyLogs($user);
+        $this->updateUserJoinedAgency($user, $isApp);
+    }
+    
+    private function resetUserAgencyData(User &$user)
+    {
         $user->total_diamond_received -= $user->monthly_diamond_received;
-        $agencyId = $user->agency_id;
-        $user->is_host = 0;
+        $user->is_host = User::TYPE_REGULAR;
         $user->agency_id = 0;
-        $user->type_user = 0;
-
-
-        // set user salary this month to zero
-        $values = [
-            // 'sallary'        => 0,
-            // 'cut_amount'     => 0,
-            // 'agency_sallary' => 0
-            'is_finished' =>  1,
-        ];
-
-        $user_sallaries = UserSallary::query()
-            ->where([
-                'user_id' => $user->id,
-            ])->where('user_agency_id', $agencyId)
-            ->orderBy('id', 'desc')
-            ->take(2)
-            ->get();
-
-        if ($user_sallaries->isNotEmpty()) {
-            if ($user_sallaries[0]->month == now()->month && $user_sallaries[0]->year == now()->year && count($user_sallaries) >= 2) {
-                $user_salary_this_month = $user_sallaries[0];
-                $user_salary_befor_month = $user_sallaries[1];
-                if ($user_salary_this_month->cut_amount >= $user_salary_this_month->sallary) {
-                    $user_salary_befor_month->cut_amount += ($user_salary_this_month->cut_amount - $user_salary_this_month->sallary);
-                    $user_salary_befor_month->save();
-                }
-                $user_salary_this_month->update($values);
-            } elseif ($user_sallaries[0]->month == now()->month && $user_sallaries[0]->year == now()->year && count($user_sallaries) < 2) {
-                $user_sallaries[0]->update($values);
-            }
-        }
-
-        GiftLog::query()->where('receiver_id', $user->id)->where('agency_id', $agencyId)->update(['agency_id' => 0]);
-        LiveTime::query()->where('uid', $user->id)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->delete();
-
+        $user->type_user = User::TYPE_REGULAR;
         $user->monthly_days = 0;
         $user->save();
+    
         uploadMonthlyDiamondReceive($user->id, 0);
+    }
+    
+    private function handleUserSalaries(User $user)
+    {
+        $agencyId = $user->agency_id;
+        $userSalaries = UserSallary::query()
+            ->where('user_id', $user->id)
+            ->where('user_agency_id', $agencyId)
+            ->latest()
+            ->take(2)
+            ->get();
+    
+        if ($userSalaries->isEmpty()) return;
+    
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+    
+        $currentSalary = $userSalaries[0];
+        if ($currentSalary->month == $currentMonth && $currentSalary->year == $currentYear) {
+            if (isset($userSalaries[1]) && $currentSalary->cut_amount >= $currentSalary->sallary) {
+                $prevSalary = $userSalaries[1];
+                $prevSalary->cut_amount += ($currentSalary->cut_amount - $currentSalary->sallary);
+                $prevSalary->save();
+            }
+            $currentSalary->update(['is_finished' => 1]);
+        }
+    }
+    
+    private function clearUserAgencyLogs(User $user)
+    {
+        $agencyId = $user->agency_id;
+        GiftLog::query()->where('receiver_id', $user->id)->where('agency_id', $agencyId)->update(['agency_id' => 0]);
+        LiveTime::query()->where('uid', $user->id)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->delete();
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
-        $agencyUserJoined = UsersJoinedAgency::where([
+    }
+    
+    private function updateUserJoinedAgency(User $user, $isApp)
+    {
+        $agencyId = $user->agency_id;
+        $joined = UsersJoinedAgency::where([
             'user_id' => $user->id,
             'agency_id' =>  $agencyId,
             'type' => 2,
         ])->whereNull('leave_date')->first();
-
-        if ($agencyUserJoined) {
-            $agencyUserJoined->leave_date = now();
-            $agencyUserJoined->status = 'kick off';
-            if ($isApp) {
-                $agencyUserJoined->kicked_by_app = auth()->id();
-            } else {
-                $agencyUserJoined->kicked_by_admin = auth()->id();
-            }
-            $agencyUserJoined->save();
+    
+        if (!$joined) return;
+    
+        $joined->leave_date = now();
+        $joined->status = 'kick off';
+        if ($isApp) {
+            $joined->kicked_by_app = auth()->id();
+        } else {
+            $joined->kicked_by_admin = auth()->id();
         }
+        $joined->save();
     }
 
     public function kickOfAllUsersFromAgency(\App\Models\Agency $agency)
