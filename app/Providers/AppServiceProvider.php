@@ -82,24 +82,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-
-        DB::listen(function ($query) {
-            if (\Str::contains($query->sql, 'information_schema`.`tables')) {
-                $trace = collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))
-                    ->map(function ($t) {
-                        return \Arr::only($t, ['file','line','class','function']);
-                    })
-                    ->filter(fn ($t) => isset($t['file']))
-                    ->values()
-                    ->take(30)
-                    ->all();
-
-                \Log::info('INFO_SCHEMA_TABLES query', [
-                    'sql'   => $query->sql,
-                    'trace' => $trace,
-                ]);
-            }
-        });
         Schema::defaultStringLength(191);
 
         $this->setupAppSettings();
