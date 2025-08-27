@@ -13,8 +13,6 @@ class RoomBoomLevelRepository
         $tz = getTimezone();
         $today = Carbon::today($tz);
 
-        info($tz);
-        info($today);
         return RoomBoomLevel::with(['roomBoomRewards' => function ($query) {
             $query->orderBy('priority');
         },  'roomBooms' => function ($query) use ($roomId, $today) {
