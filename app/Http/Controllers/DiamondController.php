@@ -64,6 +64,10 @@ class DiamondController extends Controller
             ->value('total');
         $totalDiamond = $totalReceived ?? 0;
         uploadMonthlyDiamondReceive($user->id, $totalDiamond);
+         return response()->json([
+            'status' => true,
+            'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
+        ]);
     }
 
     public function calculateSalary()
