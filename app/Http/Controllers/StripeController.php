@@ -23,83 +23,85 @@ class StripeController extends Controller
     public function __construct(public StripeService $stripeService) {}
     public function pay(Request $request)
     {
-      
-
         $request->validate([
             'product_name' => 'required|string|max:255',
-            'amount' => 'required|numeric',
-            'quantity' => 'required|integer|min:1',
-            'coin_id' => 'required|numeric'
+            'amount'       => 'required|numeric',
+            'quantity'     => 'required|integer|min:1',
+            'coin_id'      => 'required|numeric'
         ]);
+    
         try {
-           
             $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
-        
             $apiKey = $stripe_test_secret_key?->value;
-
-            $request->user_id = auth()->id();
-
-            $coin = Coin::find($request->coin_id);
-            $trx = rand (111111111111111111,999999999999999999);
-
-            $order = CoinLog::query()->create(
-                [
-                    'paid_usd' => $coin->usd,
-                    'user_id' => auth()->id(),
-                    'obtained_coins' => $coin->coin,
-                    'method' => 'card',
-                    'trx' => $trx,
-                    'status' => 0
-                ]
-            );
-
-            $request->order_id = $order->id;
-
-            $link = $this->stripeService->pay($apiKey, $request);
-
-
+    
+            $coin = Coin::findOrFail($request->coin_id);
+            $trx  = rand(111111111111111111, 999999999999999999);
+    
+            // إنشاء الطلب في النظام
+            $order = CoinLog::query()->create([
+                'coin_id'        => $coin->id,
+                'paid_usd'       => $coin->usd,
+                'user_id'        => auth()->id(),
+                'obtained_coins' => $coin->coin,
+                'method'         => 'card',
+                'trx'            => $trx,
+                'status'         => 0
+            ]);
+    
+            $paymentRequest = new \Illuminate\Http\Request([
+                'product_name' => $request->product_name,
+                'amount'       => $request->amount,
+                'quantity'     => $request->quantity,
+                'order_id'     => $order->id,
+            ]);
+    
+            $link = $this->stripeService->pay($apiKey, $paymentRequest);
+    
             return response()->json([
                 'message' => 'Link generated successfully',
-                'link' => $link
+                'link'    => $link
             ]);
+    
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error generating payment link: ' . $e->getMessage(),
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
-
-
+    
+    
     public function handleWebhook(Request $request)
     {
         Log::info('Stripe Webhook received', [
             'payload' => $request->getContent(),
             'headers' => $request->headers->all(),
-            'all' => $request->all(),
+            'all'     => $request->all(),
         ]);
     
         $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
-        $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
+        $stripe_webhook_secret  = Setting::where('key', 'stripe_webhook_secret')->first();
     
         $apiKey = $stripe_test_secret_key?->value;
         Stripe::setApiKey($apiKey);
     
-        $payload = $request->getContent();
-        $sigHeader = $request->header('Stripe-Signature');
+        $payload       = $request->getContent();
+        $sigHeader     = $request->header('Stripe-Signature');
         $endpointSecret = $stripe_webhook_secret?->value;
     
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
     
             switch ($event->type) {
-                case 'payment_intent.succeeded':
                 case 'checkout.session.completed':
+                case 'payment_intent.succeeded':
                     $session = $event->data->object;
                     $orderId = $session->metadata->order_id ?? null;
     
                     if ($orderId) {
                         $this->webhookPayment($orderId);
+                    } else {
+                        Log::error('Missing order_id in session metadata', ['session' => $session]);
                     }
                     break;
     
@@ -114,6 +116,7 @@ class StripeController extends Controller
     
                 case 'payment_intent.failed':
                     $paymentIntent = $event->data->object;
+                    Log::error('Payment failed', ['paymentIntent' => $paymentIntent]);
                     break;
     
                 default:
@@ -129,6 +132,7 @@ class StripeController extends Controller
             return response('Webhook Error: ' . $e->getMessage(), 500);
         }
     }
+    
     public function success(Request $request)
     {
 
