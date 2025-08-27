@@ -16,9 +16,9 @@ class StripeService {
         Stripe::setApiKey($apiKey);
         try {
 
-
-            $stripe_test_success_url = Setting::where('key', 'stripe_cancel_url')->first();
-            $stripe_test_cancel_url = Setting::where('key', 'stripe_success_url')->first();
+           
+            $stripe_test_cancel_url = Setting::where('key', 'stripe_cancel_url')->first();
+            $stripe_test_success_url = Setting::where('key', 'stripe_success_url')->first();
             $stripe_currency = Setting::where('key', 'stripe_currency')->first();
     
             // Create a checkout session
