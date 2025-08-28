@@ -78,7 +78,7 @@ trait PaymentTrait
         }
 
         $coinLogId = $coinLog->id;
-        
+
         if ($coinLog->status == 1) {
             return response()->json([
                 'status' => 'failed',
