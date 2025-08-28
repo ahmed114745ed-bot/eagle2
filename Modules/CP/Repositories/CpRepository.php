@@ -80,8 +80,8 @@ class CpRepository
                     $query->where("user_two_id", $userId)
                         ->where("user_one_id", $otherUserId);
                 });
-        })
-            ->whereHas("cpRelation", function ($q) {
+
+        })->whereHas("cpRelation", function ($q) {
                 $q->where('type', '!=', 'solution');
             })
             ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
