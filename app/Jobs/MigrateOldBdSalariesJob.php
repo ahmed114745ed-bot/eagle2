@@ -8,7 +8,9 @@ use App\Models\Bd;
 use App\Models\BDSallary;
 use App\Models\BdAgencyHostSallary;
 use App\Models\BdSalary;
+use App\Models\Charge;
 use App\Models\UserSallary;
+use App\Services\BdAgencyHostSallaryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -49,47 +51,78 @@ class MigrateOldBdSalariesJob implements ShouldQueue
     
     /**
      * دالة لترحيل شهر 8 فقط
-     */private function migrateAugustSalaries(): void
+     */
+    private function migrateAugustSalaries(): void
     {
-        $bds = BD::all();
-
+        $bds   = BD::all();
+        $month = 8;
+        $year  = now()->year;
+    
         foreach ($bds as $bd) {
-            $bdId = $bd->id;
-            $month = 8;
-            $year  = now()->year;
-
+            $bdId    = $bd->id;
+            $bdAppId = $bd->app_id;
+    
+            $agencies = Agency::where(function ($q) use ($bdId, $bdAppId) {
+                    $q->where('bd_id', $bdId)
+                      ->orWhere('bd_id', $bdAppId);
+                })->get();
+    
             $totalSalary = 0;
-            $totalCut    = 0;
-
-            $agencies = Agency::where('bd_id', $bd->app_id)->get();
-
+    
             foreach ($agencies as $agency) {
                 $userSalaries = UserSallary::where('user_agency_id', $agency->id)
                     ->where('month', $month)
                     ->where('year', $year)
                     ->get();
-
+    
                 foreach ($userSalaries as $userSallary) {
-                    BdAgencyHostSallary::updateOrCreate(
-                        [
+                    $expectedAmount = $userSallary?->dB ?? 0;
+    
+                    $oldTotal = BdAgencyHostSallary::where([
                             'bd_id'     => $bdId,
                             'agency_id' => $agency->id,
                             'user_id'   => $userSallary->user_id,
                             'month'     => $month,
                             'year'      => $year,
-                        ],
-                        [
-                            'amount'        => $userSallary?->dB ?? 0,
-                            'bd_user_id'    => $bd->id,
-                            'created_at'    => $userSallary->created_at,
-                        ]
-                    );
-
-                    $totalSalary += $userSallary->dB;
-                    $totalCut    += $userSallary->cut_amount ?? 0;
+                        ])->sum('amount');
+    
+                    $diff = $expectedAmount - $oldTotal;
+    
+                    if ($oldTotal == 0) {
+                        BdAgencyHostSallary::create([
+                            'bd_id'      => $bdId,
+                            'agency_id'  => $agency->id,
+                            'user_id'    => $userSallary->user_id,
+                            'month'      => $month,
+                            'year'       => $year,
+                            'amount'     => $expectedAmount,
+                            'oldDbValue' => 0,
+                        ]);
+                    } elseif ($diff != 0) {
+                        BdAgencyHostSallary::create([
+                            'bd_id'      => $bdId,
+                            'agency_id'  => $agency->id,
+                            'user_id'    => $userSallary->user_id,
+                            'month'      => $month,
+                            'year'       => $year,
+                            'amount'     => $diff,
+                            'oldDbValue' => $oldTotal, 
+                        ]);
+                    }
+    
+                    $totalSalary += $expectedAmount; 
                 }
             }
-
+    
+            $totalCut = Charge::where('charger_type', 'bd')
+                ->where(function ($q) use ($bdId, $bdAppId) {
+                    $q->where('charger_id', $bdId)
+                      ->orWhere('charger_id', $bdAppId);
+                })
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->sum('usd');
+    
             BdSalary::updateOrCreate(
                 [
                     'bd_id' => $bdId,
@@ -103,10 +136,8 @@ class MigrateOldBdSalariesJob implements ShouldQueue
             );
         }
     }
-
-
-
-
+    
+    
     
     /**
      * دالة مشتركة لتنفيذ عملية الترحيل (عشان تمنع التكرار)
