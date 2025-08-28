@@ -48,19 +48,19 @@ class CpserviceCo
             }
         }
 
-        if ($cpRelation) {
-            $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
-            $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
-
-
-            if ($existingCpOne) {
-                return Common::apiResponse(0, __('You have already sent a CP request before.'));
-            }
-
-            if ($existingCptwo) {
-                return Common::apiResponse(0, __('They have already sent a CP request to you, please accept it.'));
-            }
-        }
+//        if ($cpRelation) {
+//            $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
+//            $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
+//
+//
+//            if ($existingCpOne) {
+//                return Common::apiResponse(0, __('You have already sent a CP request before.'));
+//            }
+//
+//            if ($existingCptwo) {
+//                return Common::apiResponse(0, __('They have already sent a CP request to you, please accept it.'));
+//            }
+//        }
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && $existingCp->status == CpStatus::PENDING->value && $cpRelation->type != 'solution') {
             return Common::apiResponse(0, __("You have already sent a CP request before."));
