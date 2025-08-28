@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Helpers\LogHelper;
 use App\Models\CoinLog;
 use App\Models\GameWallet;
 use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Log\LogManager;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
@@ -294,21 +296,12 @@ class PayPalService
 
         $coinLog = CoinLog::find($coinLogId);
 
-//        info($paypalId);
+
+        LogHelper::info($eventType, $resource->all());
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
-//                $captureResponse = Http::withToken($this->getAccessToken())
-//                    ->withHeaders(['Content-Type' => 'application/json'])
-//                    ->withBody('', 'application/json')
-//                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
-//
-//                info('capture order', [$captureResponse]);
-//                if ($captureResponse->successful()) {
-//                    return $this->webhookPayment($coinLogId);
-//                }
+
                 Log::info($eventType);
-
-
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog?->trx ?? $paypalId,
@@ -317,7 +310,7 @@ class PayPalService
 
             case 'PAYMENT.CAPTURE.COMPLETED':
                 Log::info($paypalId);
-                return $this->webhookPayment($coinLogId,$paypalId);
+                return $this->webhookPayment($coinLogId,$paypalId, method: 'paypal');
 
             case 'PAYMENT.CAPTURE.DENIED':
                 return response()->json([
