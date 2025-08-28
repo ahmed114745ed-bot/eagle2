@@ -12,7 +12,7 @@ class HomeCarousel extends Model
 
     protected $table = 'home_carousels';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

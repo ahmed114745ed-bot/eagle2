@@ -11,7 +11,7 @@ class SalaryTrx extends Model
 
     protected $table = 'salary_trxs';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

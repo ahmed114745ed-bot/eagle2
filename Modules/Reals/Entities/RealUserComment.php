@@ -12,7 +12,7 @@ class RealUserComment extends Model
 
     protected $fillable = [];
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

@@ -11,7 +11,7 @@ class OfficialMessage extends Model
 
     protected $table = 'official_messages';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

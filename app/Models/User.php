@@ -96,7 +96,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'user_diamond',
+//        'user_diamond',
         'total_sender_level',
         'total_received_level',
         'original_uuid',
@@ -104,7 +104,7 @@ class User extends Authenticatable
         'total_charge_level',
         'photo',
         'org_online_time',
-        'monthly_diamond_received',
+//        'monthly_diamond_received',
     ];
 
 
@@ -216,7 +216,7 @@ class User extends Authenticatable
     {
         $month = $month ?? now(getTimezone())->month;
         $year  = $year ?? now(getTimezone())->year;
-  
+
         return $this->monthlyDiamondReceive()
             ->where('month', $month)
             ->where('year', $year)
@@ -1475,7 +1475,7 @@ class User extends Authenticatable
         return $this->attributes['online_time'] ?? null;
     }
 
- 
+
 
     public function getRealOnlineTimeAttribute()
     {
@@ -1738,10 +1738,10 @@ class User extends Authenticatable
         if (!$join) {
             return 0;
         }
-    
+
         $start = $join->join_date;
         $end =  now();
-    
+
         $userSalary = UserSallary::query()
             ->where('user_id', $this->id)
             ->where('user_agency_id', $this->agency_id)

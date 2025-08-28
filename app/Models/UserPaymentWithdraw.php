@@ -10,7 +10,7 @@ class UserPaymentWithdraw extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function payment_withdraw_type()
     {

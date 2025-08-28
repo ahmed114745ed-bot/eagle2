@@ -11,5 +11,5 @@ class Box extends Model
 
     protected $table = 'boxs';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }
