@@ -33,6 +33,7 @@ jobs:
             fi
   run_zion_app:
     runs-on: ubuntu-latest
+    needs: run_zion_hub
     steps:
       - name: print out Zion App
         uses: appleboy/ssh-action@v1.2.1
@@ -78,6 +79,7 @@ jobs:
             fi
   run_zion_job:
     runs-on: ubuntu-latest
+    needs: run_zion_hub
     steps:
       - name: print out Zion Job
         uses: appleboy/ssh-action@v1.2.1
