@@ -61,7 +61,7 @@ trait PaymentTrait
         return $data;
     }
 
-    public function webhookPayment($coinLogId, $trx, $method = null)
+    public function webhookPayment( $trx , $method = null)
     {
         info('Webhook Payment Triggered', ['trx' => $trx]);
 
@@ -77,6 +77,8 @@ trait PaymentTrait
             ]);
         }
 
+        $coinLogId = $coinLog->id;
+        
         if ($coinLog->status == 1) {
             return response()->json([
                 'status' => 'failed',

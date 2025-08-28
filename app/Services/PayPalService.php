@@ -324,7 +324,7 @@ class PayPalService
 
             case 'PAYMENT.CAPTURE.COMPLETED':
                 Log::info($paypalId);
-                return $this->webhookPayment($coinLogId,$paypalId, method: 'paypal');
+                return $this->webhookPayment($paypalId, method: 'paypal');
 
             case 'PAYMENT.CAPTURE.DENIED':
                 $coinLog->update(['status' => PaymentStatus::CANCELED]);
