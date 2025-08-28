@@ -461,6 +461,7 @@ class BdController extends MainController
 
     public function sync($days = 0)
     {
+        $days = request()->query('days', 0);
         $bds = DB::table('admin_users')
             ->where('type', 'bd')
             ->where('app_id', '!=', 0)
