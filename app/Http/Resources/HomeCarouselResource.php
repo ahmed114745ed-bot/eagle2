@@ -9,63 +9,137 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class HomeCarouselResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
-     */
-    private function getRoomTwoLastPk(int $roomId)
+
+    private function getUrl()
     {
-        return Pk::query()
-            ->where('room_id', $roomId)
-            ->orderByDesc('created_at')
-            ->limit(2)
-            ->get();
+        if ($this->type === 'link' || $this->event_type === 'event') {
+            return $this->url ?? '';
+        }
+
+        if (in_array($this->event_type, [
+            'pk_event',
+            'weekly_star',
+            'charge_event',
+            'event_period',
+            'weekly_cp'
+        ])) {
+            return @$this?->generalRole?->url ?? '';
+        }
+
+        return '';
+    }
+
+    private function getRoomData($ownerRoom, $pks)
+    {
+        if ($this->type !== 'room') {
+            return [];
+        }
+
+        return [
+            'room' => [
+                "id"              => @$ownerRoom->id ?? 0,
+                "owner_id"        => @$this->user->id ?? 0,
+                "owner_uuid"      => @$this->user->uuid ?? 0,
+                "room_name"       => @$ownerRoom->room_name ?? '',
+                "room_cover"      => @$ownerRoom->room_cover ?? '',
+                "room_background" => @$ownerRoom->final_room_image ?? '',
+                "mode"            => @$ownerRoom->mode ?? 0,
+                "giftPrice"       => @$ownerRoom->session_string ?? "0",
+                "is_pk"           => !empty($pks[0]) && $pks[0]->end_at >= now() ? $pks[0]->status : 0,
+                "show_pk"         => @$ownerRoom->is_show_pk ?? 0,
+                "password_status" => !empty(@$ownerRoom->room_pass),
+                "type-number"     => @$ownerRoom->room_type ?? 0,
+                "type"            => @$ownerRoom->myType ?: new \stdClass(),
+            ]
+        ];
     }
 
     public function toArray($request)
     {
-        $roomPass = $this->room?->room_pass ?? '';
-        $ownerRoom = $this->user?->ownerRoom;
-        $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom?->id) : null;
+        $roomPass  = $this->room->room_pass ?? '';
+        $ownerRoom = @$this->user?->ownerRoom;
+        $pks       = $ownerRoom ? @$ownerRoom->pks()->latest('created_at')->limit(2)->get() : null;
+
         [$avatar, $cpAvatar, $nameOne, $nameTwo] = Common::switch_events($this->event_type);
 
-        $urlEvent = GeneralRole::where('type', $this->event_type)->first();
-        $data =  [
+        $data = [
             'id'         => $this->id,
-            'img'        => $this->img ?: '',
-            'type'   => $this->type ?? '',
-            'url'        => ($this->type == 'link' || $this->event_type == 'event') ? ($this->url ?? '') : (($this->event_type == 'pk_event' || $this->event_type == 'weekly_star' || $this->event_type == 'charge_event' || $this->event_type == 'event_period' || $this->event_type == 'weekly_cp') ? ($urlEvent->url ?? '') : ''),
-            'isLocked'   =>   $roomPass != '' || $roomPass != null,
-            'owner_id'   =>  $this->owner_id ?? 0,
-            'avatar' => $avatar ?? "profile/g0lEsx7Joe.jpg",
+            'img'        => $this->img ?? '',
+            'type'       => $this->type ?? '',
+            'url'        => $this->getUrl(),
+            'isLocked'   => !empty($roomPass),
+            'owner_id'   => $this->owner_id ?? 0,
+            'avatar'     => $avatar ?? "profile/g0lEsx7Joe.jpg",
             'event_type' => $this->event_type,
         ];
-        if ($this->event_type == 'weekly_cp') {
-             $data['cp_winner_name_one'] = $nameOne;
-             $data['cp_avatar_two'] = $cpAvatar ?? "profile/g0lEsx7Joe.jpg";
-             $data['cp_winner_name_two'] = $nameTwo;
+
+        if ($this->event_type === 'weekly_cp') {
+            $data += [
+                'cp_winner_name_one' => $nameOne,
+                'cp_avatar_two'      => $cpAvatar ?? "profile/g0lEsx7Joe.jpg",
+                'cp_winner_name_two' => $nameTwo,
+            ];
         }
 
-        if ($this->type == 'room') {
-            $data += ['room' => [
-                "id" => @$ownerRoom->id ?? 0,
-                "owner_id" => @@$this->user->id ?? 0,
-                "owner_uuid" => @$this->user->uuid ?? 0,
-                "room_name" => @$ownerRoom->room_name ?? '',
-                "room_cover" => @$ownerRoom->room_cover ?? '',
-                "room_background" => @$ownerRoom->final_room_image ?? '',
-                "mode" => @$ownerRoom->mode ?? 0,
-                'giftPrice' => @$ownerRoom->session_string ?? "0",
-                "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
-                "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
-                'password_status'     => !(@$ownerRoom->room_pass == ""),
-                'type-number'                => @$ownerRoom->room_type ?? 0,
-                'type' => @$ownerRoom->myType ?: new \stdClass(),
-            ]];
-        }
-
-        return $data;
+        return $data + $this->getRoomData($ownerRoom, $pks);
     }
 }
+
+
+
+
+
+
+// private function getRoomTwoLastPk(int $roomId)
+//     {
+//         return Pk::query()
+//             ->where('room_id', $roomId)
+//             ->orderByDesc('created_at')
+//             ->limit(2)
+//             ->get();
+//     }
+
+//     public function toArray($request)
+//     {
+//         $roomPass = $this->room?->room_pass ?? '';
+//         $ownerRoom = $this->user?->ownerRoom;
+//         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom?->id) : null;
+//         [$avatar, $cpAvatar, $nameOne, $nameTwo] = Common::switch_events($this->event_type);
+
+//         $urlEvent = GeneralRole::where('type', $this->event_type)->first();
+//         $data =  [
+//             'id'         => $this->id,
+//             'img'        => $this->img ?: '',
+//             'type'   => $this->type ?? '',
+//             'url'        => ($this->type == 'link' || $this->event_type == 'event') ? ($this->url ?? '') : (($this->event_type == 'pk_event' || $this->event_type == 'weekly_star' || $this->event_type == 'charge_event' || $this->event_type == 'event_period' || $this->event_type == 'weekly_cp') ? ($urlEvent->url ?? '') : ''),
+//             'isLocked'   =>   $roomPass != '' || $roomPass != null,
+//             'owner_id'   =>  $this->owner_id ?? 0,
+//             'avatar' => $avatar ?? "profile/g0lEsx7Joe.jpg",
+//             'event_type' => $this->event_type,
+//         ];
+//         if ($this->event_type == 'weekly_cp') {
+//              $data['cp_winner_name_one'] = $nameOne;
+//              $data['cp_avatar_two'] = $cpAvatar ?? "profile/g0lEsx7Joe.jpg";
+//              $data['cp_winner_name_two'] = $nameTwo;
+//         }
+
+//         if ($this->type == 'room') {
+//             $data += ['room' => [
+//                 "id" => @$ownerRoom->id ?? 0,
+//                 "owner_id" => @@$this->user->id ?? 0,
+//                 "owner_uuid" => @$this->user->uuid ?? 0,
+//                 "room_name" => @$ownerRoom->room_name ?? '',
+//                 "room_cover" => @$ownerRoom->room_cover ?? '',
+//                 "room_background" => @$ownerRoom->final_room_image ?? '',
+//                 "mode" => @$ownerRoom->mode ?? 0,
+//                 'giftPrice' => @$ownerRoom->session_string ?? "0",
+//                 "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
+//                 "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
+//                 'password_status'     => !(@$ownerRoom->room_pass == ""),
+//                 'type-number'                => @$ownerRoom->room_type ?? 0,
+//                 'type' => @$ownerRoom->myType ?: new \stdClass(),
+//             ]];
+//         }
+
+//         return $data;
+//     }
