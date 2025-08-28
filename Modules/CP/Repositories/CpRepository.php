@@ -80,8 +80,8 @@ class CpRepository
                     $query->where("user_two_id", $userId)
                         ->where("user_one_id", $otherUserId);
                 });
-        })
-            ->whereHas("cpRelation", function ($q) {
+
+        })->whereHas("cpRelation", function ($q) {
                 $q->where('type', '!=', 'solution');
             })
             ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
@@ -336,8 +336,8 @@ class CpRepository
                 $t === 1,
                 fn($q) =>
                 $q->whereBetween('gift_logs.created_at', [
-                    $now->copy()->startOfDay()->toDateTimeString(),
-                    $now->copy()->endOfDay()->toDateTimeString(),
+                    $now->startOfDay(),
+                    $now->endOfDay(),
                 ])
             )
 
@@ -387,7 +387,7 @@ class CpRepository
             ->whereNotNull('cp_id')
             ->join('cps', 'gift_logs.cp_id', '=', 'cps.id')
             ->join('cp_relations', 'cps.cp_relation_id', '=', 'cp_relations.id')
-            ->whereNotNull('cp_relations.type');
+            ->whereNotNull('cp_relations.type')->where('cp_relations.type', 'lovely');
 
         // Apply date filters
         $query->when($type, function ($query) use ($type) {
