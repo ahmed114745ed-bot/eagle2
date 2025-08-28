@@ -62,8 +62,11 @@ trait PaymentTrait
 
     public function webhookPayment($coinLogId)
     {
+        info('coin log id', [$coinLogId]);
         $coinLog = CoinLog::where("id", $coinLogId)->first();
 
+        info('coin log', $coinLog);
+        info('coin log status', [$coinLog->status]);
         if (!$coinLog || $coinLog->status == 1) {
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
         }
@@ -78,6 +81,7 @@ trait PaymentTrait
         ]);
         $user = $coinLog->user;
         $amountBefore = $user->di;
+        info('user', [$user]);
         if ($user) {
 
 
@@ -102,6 +106,7 @@ trait PaymentTrait
                 (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
             }
         } else {
+            info('no user');
             return response()->json([
                 'status'  => false,
                 'trx'     => $coinLog->trx,
