@@ -133,10 +133,6 @@ class RoomController extends Controller
 
             Log::info("Room  successfully", [
                 'user_id'   => $user->id,
-                'room_id'   => $room->id,
-                'room_type' => $room->type,
-                'is_live'   => $room->is_live,
-                'balance'   => $user->di,
             ]);
         
 
