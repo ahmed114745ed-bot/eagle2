@@ -297,7 +297,7 @@ class PayPalService
         $coinLog = CoinLog::find($coinLogId);
 
 
-        LogHelper::info($eventType, $resource->all());
+        LogHelper::info($eventType, $request->all());
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
 
