@@ -246,9 +246,9 @@ class Common
         if ($statusCode === null) {
             $statusCode = $success ? 200 : 422;
         }
-
+        $resourceData = null; 
         $paginationData = null;
-        $resourceData = [];
+
         // Check if data is a collection directly or a paginated resource
         if ($paginationKey === null) {
             if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
