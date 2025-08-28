@@ -11,7 +11,7 @@ class Winner extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $fillable = ['id', 'weekly_star_id', 'user_id', 'level'];
 

@@ -13,5 +13,5 @@ class CpRoomHistory extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

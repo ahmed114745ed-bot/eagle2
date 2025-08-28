@@ -27,7 +27,7 @@ class Room extends Model
 
     public static $withoutAppends = false;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $appends = ['lang', 'country'];
 

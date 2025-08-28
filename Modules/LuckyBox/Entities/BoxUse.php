@@ -13,7 +13,7 @@ class BoxUse extends Model
 
     protected $table = 'box_uses';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

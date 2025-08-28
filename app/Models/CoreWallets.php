@@ -11,7 +11,7 @@ class CoreWallets extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $casts = ['updated_at' => 'datetime:Y-m-d H:i:s'];
 

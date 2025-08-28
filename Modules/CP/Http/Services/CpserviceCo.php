@@ -51,6 +51,8 @@ class CpserviceCo
         if ($cpRelation) {
             $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
             $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
+
+
             if ($existingCpOne) {
                 return Common::apiResponse(0, __('You have already sent a CP request before.'));
             }
@@ -218,8 +220,7 @@ class CpserviceCo
 
     public function respondToRequest(Request $request)
     {
-
-        /// Todo get message_id to update status in this message
+        // Todo get message_id to update status in this message
         $messageId = $request->message_id;
 
         $message = ChatMessage::find($messageId);
@@ -299,7 +300,7 @@ class CpserviceCo
         $type = request("type") ?? 1;
 
         $data = $this->cpRepository->getCpRanking($relationType, $type);
-     
+
         $first = $data->take(3);
         $second = $data->skip(3);
         $user = request()->user();

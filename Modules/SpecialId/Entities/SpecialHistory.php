@@ -15,7 +15,7 @@ class SpecialHistory extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $table = 'special_id_histories';
 

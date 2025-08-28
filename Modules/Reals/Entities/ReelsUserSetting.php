@@ -11,7 +11,7 @@ class ReelsUserSetting extends Model
 
     protected $fillable = [];
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $table = 'reels_user_settings';
 }

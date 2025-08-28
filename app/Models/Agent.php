@@ -10,7 +10,7 @@ class Agent extends Authenticatable
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $table = 'admin_users';
 }
