@@ -12,7 +12,7 @@ class RequestBackgroundImage extends Model
 
     protected $table = 'request_background_images';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public static function boot()
     {

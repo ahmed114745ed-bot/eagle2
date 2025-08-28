@@ -11,7 +11,7 @@ class AgencyJoinRequest extends Model
 
     protected $table = 'agency_join_requests';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function admin()
     {

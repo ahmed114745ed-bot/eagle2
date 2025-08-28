@@ -14,7 +14,7 @@ class AgentSalaryRequest extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function agent()
     {

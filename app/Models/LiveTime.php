@@ -11,5 +11,5 @@ class LiveTime extends Model
 
     protected $table = 'live_times';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

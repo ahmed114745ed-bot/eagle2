@@ -11,7 +11,7 @@ class CpLevelGift extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
      protected $appends = ['type_ware'];
 
     public function cp_level()
@@ -49,7 +49,7 @@ class CpLevelGift extends Model
             }
             if ($model->ware_item_id) {
                 unset($model->ware_item_id);
-            }            
+            }
             if ($model->vip_item_id) {
                 unset($model->vip_item_id);
             }
@@ -64,11 +64,11 @@ class CpLevelGift extends Model
     {
         return $this->belongsTo(Ware::class, 'ware_item_id');
     }
-    
+
     public function vip_item()
     {
         return $this->belongsTo(OVip::class, 'vip_item_id');
     }
-    
+
 }
 

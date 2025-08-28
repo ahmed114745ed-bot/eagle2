@@ -18,7 +18,7 @@ class RewardTarget extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $appends = ['target1', 'target2', 'target3', 'target4'];
 
