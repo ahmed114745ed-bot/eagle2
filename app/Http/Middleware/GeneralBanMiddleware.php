@@ -24,7 +24,7 @@ class GeneralBanMiddleware
         $message = UserHandling::hasReasonOfBan($user->uuid, $request);
 
         if ($message){
-            return  Common::apiResponse(0, $message, null, 377);
+            return  Common::apiResponse(0, $message, null, 501);
         }
 
         return $next($request);

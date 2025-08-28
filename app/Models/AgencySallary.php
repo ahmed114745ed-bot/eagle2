@@ -11,7 +11,7 @@ class AgencySallary extends Model
 
     protected $table = 'agency_sallaries';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function getTotalSalaryAttribute()
     {

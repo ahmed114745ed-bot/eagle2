@@ -313,6 +313,11 @@ class UserRepository extends AbstractRepository
         return $this->model->where('email', $email)->first();
     }
 
+    public function findByAppleId($appleId)
+    {
+        return $this->model->where('apple_id', $appleId)->first();
+    }
+
     public function findByHuawei($huaweiId)
     {
         return $this->model->query()->whereNotNull('huawei_id')->where('huawei_id', $huaweiId)->first();
@@ -349,11 +354,17 @@ class UserRepository extends AbstractRepository
 
     public function findUsersByAgencyId($agencyId, $perPage, $page)
     {
-        return $this->model->where('agency_id', $agencyId)->orderBy('monthly_diamond_received', 'desc')->paginate($perPage, ['*'], 'page', $page);
+        return $this->model->where('agency_id', $agencyId)->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
+        $q->where('month', now()->month)
+          ->where('year', now()->year);
+    }], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc')->paginate($perPage, ['*'], 'page', $page);
     }
     public function findUsersByAgencyIdI($agencyId)
     {
-        return $this->model->where('agency_id', $agencyId)->orderBy('monthly_diamond_received', 'desc');
+        return $this->model->where('agency_id', $agencyId)->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
+        $q->where('month', now()->month)
+          ->where('year', now()->year);
+    }], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc');
     }
 
     public function getIdsByAgencyId($agencyId)

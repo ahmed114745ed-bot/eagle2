@@ -21,7 +21,11 @@ class OVipNewResource extends JsonResource
             $activePrivilegeIds = $oVip->privilegs?->pluck('id')?->toArray() ?? [];
             $wares = $oVip->wares ?? collect();
         }
-        $diff = Carbon::now()->diff(Carbon::createFromTimestamp($this->expire));
+        $diff = null;
+        if ($this->expire) {
+            $expireDate = Carbon::createFromTimestamp($this->expire);
+            $diff = Carbon::now()->diff($expireDate);
+        }
 
         return [
             "target_id" => $this->id,
@@ -29,7 +33,9 @@ class OVipNewResource extends JsonResource
             "is_used" => $this->is_used == 1,
             "using" => $this->using == 1,
             'expire' => $this->expire != 0 ? ($this->expire == null ? 0 : date("Y-m-d H:i:s", $this->expire)) : 0,
-            'remaining_time' => $this->expire == null ? sprintf('%dd', $this->days) :  sprintf('%dd %dh %dm', $diff->d, $diff->h, $diff->i),
+            'remaining_time' => $this->expire && $diff
+                    ? sprintf('%dd %dh %dm', $diff->days, $diff->h, $diff->i)
+                    : sprintf('%dd', $this->days),
 
             'vip' => [
                 'id' => $oVip?->id ?? '',

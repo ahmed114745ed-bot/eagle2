@@ -50,6 +50,7 @@ use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
+use App\Models\MonthlyDiamondReceive;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
 use App\Models\UsersJoinedAgency;
 
@@ -229,7 +230,9 @@ class AgencyService
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
-            $this->userRepository->update(['agency_id' => $agency->id, 'monthly_diamond_received' => 0], $user->id);
+            $this->userRepository->update(['agency_id' => $agency->id], $user->id);
+            $userMonthlyDiamond =  MonthlyDiamondReceive::where('user_id', $user->id)->where('month', now()->month)->where('year', now()->year)->first();
+            if ($userMonthlyDiamond) $userMonthlyDiamond->update(['monthly_diamond_received' => 0]);
             $this->userRepository->updateTypeUser($user);
             // $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
             // if (!$checkAgencyUser) {
@@ -498,9 +501,9 @@ class AgencyService
         if ($Host_agency == 1) {
             $user->type_user = 2;
             $user->agency_id = $agency->id;
-            $user->monthly_diamond_received = 0;
             $user->is_host = 1;
             $user->save();
+            uploadMonthlyDiamondReceive($user->id, 0);
         }
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
@@ -654,7 +657,7 @@ class AgencyService
 
     public function dailyReport($user, $month, $year, $agencyId = null)
     {
-         $timezone = Common::timeZone();
+        $timezone = Common::timeZone();
         $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
         $joinedAgency = $member ??  $owner;
@@ -671,7 +674,7 @@ class AgencyService
         }
 
         $timezone = getTimezone();
-//        $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
+        //        $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
         $nowInTimezone = Carbon::now($timezone);
 
 
@@ -687,9 +690,9 @@ class AgencyService
             //     ? Carbon::parse($joinRecord->leave_date)
             //     : $endOfMonth;
             $joinedDate = Carbon::parse($joinRecord->join_date, $timezone)->startOfDay();
-        $leaveDate = $joinRecord->leave_date
-            ? Carbon::parse($joinRecord->leave_date, $timezone)->endOfDay()
-            : $endOfMonth;
+            $leaveDate = $joinRecord->leave_date
+                ? Carbon::parse($joinRecord->leave_date, $timezone)->endOfDay()
+                : $endOfMonth;
         } else {
             $joinedDate = null;
             $leaveDate = $endOfMonth;
@@ -710,12 +713,12 @@ class AgencyService
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
-          //$data->day = Carbon::parse($data->date)->day;
-          $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
+            //$data->day = Carbon::parse($data->date)->day;
+            $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
             return $data;
         });
-        $dailyTimes = $dailyTimes->map(function ($data) use ($timezone){
-           // $data->day = Carbon::parse($data->date)->day;
+        $dailyTimes = $dailyTimes->map(function ($data) use ($timezone) {
+            // $data->day = Carbon::parse($data->date)->day;
             $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
             return $data;
         });

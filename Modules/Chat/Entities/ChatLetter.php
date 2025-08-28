@@ -12,5 +12,5 @@ class ChatLetter extends Model
 
     protected $table = 'chat_letters';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

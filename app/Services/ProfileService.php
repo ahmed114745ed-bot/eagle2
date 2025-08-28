@@ -39,7 +39,7 @@ class ProfileService
         }
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
-        $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country', 'image']);
+        $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country']);
 
         if ($profileData) $profile = $this->profileRepo->updateProfile($user->profile, $profileData, $user->id);
         $profile = Profile::where('user_id', $request->user()->id)->first();

@@ -4,15 +4,16 @@ use Carbon\Carbon;
 use App\Helpers\Common;
 use Encore\Admin\Admin;
 use App\Classes\AppSetting;
+use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use App\Models\MonthlyDiamondReceive;
 use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-use Modules\Reals\Http\Services\FfmpegService;
 use Yasser\AgoraToken\RtmTokenBuilder;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
+use Illuminate\Validation\ValidationException;
+use Modules\Reals\Http\Services\FfmpegService;
 
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
@@ -26,8 +27,8 @@ const GAME_COINS_PLAY = 'game_coins_play_#';
 
 function generateRtcToken($channelName, $uid, $expiresInSeconds = 86400)
 {
-    $appID = config('app.agora_app_id');
-    $appCertificate = config('app.agora_certificate');
+    $appID = Common::getConfig('app_id');
+    $appCertificate = Common::getConfig('agora_app_certificate');
     $role = RtcTokenBuilder2::ROLE_PUBLISHER;
 
     $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $expiresInSeconds);
@@ -179,6 +180,24 @@ if (!function_exists('upload')) {
         $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
         $file->storeAs('videos', $uniqueFileName, 'gcs');
         return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
+    }
+}
+
+
+if (!function_exists('uploadMonthlyDiamondReceive')) {
+    function uploadMonthlyDiamondReceive($user_id, $monthlyDiamondValue)
+    {
+        $date = \Carbon\Carbon::now(getTimezone());
+        MonthlyDiamondReceive::updateOrCreate(
+            [
+                'user_id' => $user_id,
+                'month' => $date->month,
+                'year'  => $date->year,
+            ],
+            [
+                'monthly_diamond_received' => $monthlyDiamondValue,
+            ]
+        );
     }
 }
 
@@ -664,6 +683,36 @@ if (!function_exists('getTimezone')) {
     }
 }
 
+if (! function_exists('getFavIcon')) {
+    function getFavIcon() : ?string
+    {
+        return \Cache::rememberForever('favicon', function () {
+            $favIcon = DB::table('settings')->where('key', 'app_fav_icon')->value('value');
+
+            if ($favIcon) {
+                return getImagePath($favIcon);
+            }
+
+            return asset('images/app-logo.png');
+        });
+    }
+}
+
+if (!function_exists('getAppLogo')) {
+    function getAppLogo(): string
+    {
+        return Cache::rememberForever('appLogo', function () {
+            $logo = DB::table('settings')->where('key', 'app_logo')->value('value');
+
+            if ($logo) {
+                return getImagePath($logo);
+            }
+
+            return asset('images/app-logo.png');
+        });
+    }
+}
+
 
 if (!function_exists('getToday')) {
     function getToday(): array
@@ -679,7 +728,7 @@ if (! function_exists('validateUploadedFileType')) {
      */
     function validateUploadedFileType(UploadedFile $file, $itemId = null): string
     {
-        $allowedExtensions = ['svga','svg', 'mp4', 'alpha', 'vap', 'png'];
+        $allowedExtensions = ['svga', 'svg', 'mp4', 'alpha', 'vap', 'png'];
         $ext = strtolower($file->guessExtension());
         $originalExt = strtolower($file->getClientOriginalExtension());
 
