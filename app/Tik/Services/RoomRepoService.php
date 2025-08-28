@@ -58,7 +58,9 @@ class RoomRepoService
         $userId = $user->id;
         $data = array_merge($request->all(), ['uid' => $userId]);
         $paidRoom = Config::where('name', 'paid_room')->first();
-
+        \Log::info("data", [
+            'balance_before' => $data,
+        ]);
         if ($paidRoom && $paidRoom->value){
             $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
             if ($user->di < $paidRoomAmount->value){
