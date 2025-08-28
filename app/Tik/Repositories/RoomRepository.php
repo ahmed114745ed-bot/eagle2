@@ -249,7 +249,7 @@ class RoomRepository extends AbstractRepository
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
             $q->whereIn('type', ['single_live', 'multi_live']);
-            })->simplePaginate(10);
+            })->paginate(10);
     }
 
     public function getRoomsByGameId($gameId = null, array $with = [])
