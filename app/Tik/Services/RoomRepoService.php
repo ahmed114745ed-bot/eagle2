@@ -59,9 +59,7 @@ class RoomRepoService
         $data = array_merge($request->all(), ['uid' => $userId]);
         unset($data['show']);
         $paidRoom = Config::where('name', 'paid_room')->first();
-        \Log::info("data", [
-            'balance_before' => $data,
-        ]);
+ 
         if ($paidRoom && $paidRoom->value){
             $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
             if ($user->di < $paidRoomAmount->value){
@@ -80,11 +78,6 @@ class RoomRepoService
             $user->save();
 
 
-            \Log::info("User $userId paid $paidRoomAmount->value for creating a room.", [
-                'balance_before' => $amountBefore,
-                'balance_after'  => $user->di,
-                'room_data'      => $data
-            ]);
         }
 
         $room = $this->repository->create($data);

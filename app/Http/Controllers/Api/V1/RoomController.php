@@ -130,10 +130,6 @@ class RoomController extends Controller
             if ($room) {
                 return Common::apiResponse(true, 'you are already have a room', new RoomResource($room), 200);
             }
-
-            Log::info("Room  successfully", [
-                'user_id'   => $user->id,
-            ]);
         
 
             $room = $this->roomService->create($request, $user);
