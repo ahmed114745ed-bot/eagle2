@@ -219,6 +219,8 @@ class PayPalService
                     ->withHeaders(['Content-Type' => 'application/json'])
                     ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture", (object)[]);
 
+                info($response);
+                info('callback');
                 if ($response->successful()) {
                     $data = $response->json();
 
@@ -313,6 +315,7 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.COMPLETED':
+                info('WEBHOOK COMPLETED');
                 return $this->webhookPayment($coinLogId);
 
             case 'PAYMENT.CAPTURE.DENIED':

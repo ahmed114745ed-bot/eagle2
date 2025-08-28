@@ -74,13 +74,13 @@ trait PaymentTrait
         \Log::error("coinLogId Signature coinLogId ", [
             'coinLog' => $coinLogId,
             '$coinLog->user' => $coinLog->user,
-            
+
         ]);
         $user = $coinLog->user;
         $amountBefore = $user->di;
         if ($user) {
 
-        
+
             UserCoinLogHelper::logByType(
                 $user->id,
                 $coinLog->obtained_coins,
@@ -91,10 +91,11 @@ trait PaymentTrait
             $user->di += $coinLog->obtained_coins;
             $user->save();
 
-            \Log::error("obtained_coins Signature coinLogId ", [
+            info("obtained_coins Signature coinLogId ", [
                 'coinLog' => $coinLogId,
                 '$coinLog->obtained_coins' => $coinLog->obtained_coins,
-                
+                'user_id'   => $user->id,
+                'user_di'   => $user->di,
             ]);
             UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
             if ($user instanceof User) {
