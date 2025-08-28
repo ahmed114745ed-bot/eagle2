@@ -4,6 +4,7 @@ namespace App\Traits\User;
 
 use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
+use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
 use App\Models\User;
@@ -69,8 +70,8 @@ trait PaymentTrait
             $coinLog = CoinLog::where("trx", $trx)->first();
         // }
 
-        info('coin log', $coinLog);
-        info('coin log status', [$coinLog->status]);
+        LogHelper::info('coin log', $coinLog);
+        LogHelper::info('coin log status', $coinLog->status);
         if (!$coinLog || $coinLog->status == 1) {
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
         }
