@@ -246,7 +246,7 @@ class Common
         }
 
         $paginationData = null;
-
+        $resourceData = [];
         // Check if data is a collection directly or a paginated resource
         if ($paginationKey === null) {
             if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
