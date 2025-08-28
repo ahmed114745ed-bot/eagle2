@@ -57,6 +57,7 @@ class RoomRepoService
     {
         $userId = $user->id;
         $data = array_merge($request->all(), ['uid' => $userId]);
+        unset($data['show']);
         $paidRoom = Config::where('name', 'paid_room')->first();
         \Log::info("data", [
             'balance_before' => $data,
