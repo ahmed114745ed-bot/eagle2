@@ -219,6 +219,20 @@ class PayPalService
                     ->withHeaders(['Content-Type' => 'application/json'])
                     ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture", (object)[]);
 
+                if ($response->successful()) {
+                    $data = $response->json();
+
+                    $captureStatus = $data['purchase_units'][0]['payments']['captures'][0]['status'] ?? null;
+
+                    if ($captureStatus === 'COMPLETED') {
+                        return response()->json([
+                            'status'  => true,
+                            'trx'     => $coinLog->trx,
+                            'message' => 'Transaction completed successfully.',
+                        ]);
+                    }
+                }
+
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog->trx,

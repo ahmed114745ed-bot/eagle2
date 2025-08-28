@@ -76,6 +76,11 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/redis-get-data.log'))
             ->runInBackground();
 
+            $schedule->command('update-room-ban')
+            ->everyFiveMinutes()
+            ->appendOutputTo(storage_path('logs/update-room-ban'))
+            ->runInBackground();
+
 
         $schedule->command('weekly-star-winner')
             ->dailyAt('00:00')
