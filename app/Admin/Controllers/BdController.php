@@ -456,4 +456,29 @@ class BdController extends MainController
 
         return $show;
     }
+
+
+
+    public function sync()
+    {
+        $bds = DB::table('admin_users')
+            ->where('type', 'bd')
+            ->where('app_id', '!=', 0)
+            ->get();
+
+        $updated = 0;
+
+        foreach ($bds as $bd) {
+            $affected = DB::table('agencies')
+                ->where('bd_id', $bd->app_id) 
+                ->update(['bd_id' => $bd->id]);   
+
+            $updated += $affected;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "تم تحديث $updated وكالة بالـ bd المناسب."
+        ]);
+    }
 }

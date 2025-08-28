@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\BdController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
@@ -380,6 +381,7 @@ Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondControll
 Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
+Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
 
 
 Route::get('/charge-agency-export-report', [
