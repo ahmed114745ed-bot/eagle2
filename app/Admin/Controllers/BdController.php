@@ -483,7 +483,7 @@ class BdController extends MainController
     
         return response()->json([
             'status' => 'success',
-            'message' => "تم تحديث $updated وكالة بالـ bd المناسب."
+            'message' => $updated 
         ]);
     }
 }
