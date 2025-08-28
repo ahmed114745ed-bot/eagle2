@@ -99,7 +99,7 @@ class RoomController extends Controller
     {
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
         $rooms = $this->roomService->getAllRooms($request);
-        return Common::apiResponse(true, '', RoomResource::collection($rooms), 200, Common::getPaginates($rooms));
+        return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
     }
 
     public function room_countries()
