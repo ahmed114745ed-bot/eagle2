@@ -118,7 +118,7 @@ trait PaymentTrait
                 'message' => 'Transaction failed.',
             ]);
         }
-        response()->json([
+        return response()->json([
             'status'  => true,
             'trx'     => $coinLog?->trx,
             'message' => 'Transaction completed successfully.',
