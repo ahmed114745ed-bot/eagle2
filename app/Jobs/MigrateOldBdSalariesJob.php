@@ -10,6 +10,7 @@ use App\Models\BdAgencyHostSallary;
 use App\Models\BdSalary;
 use App\Models\Charge;
 use App\Models\UserSallary;
+use App\Services\BdAgencyHostSallaryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -53,21 +54,20 @@ class MigrateOldBdSalariesJob implements ShouldQueue
      */
     private function migrateAugustSalaries(): void
     {
-        $bds = BD::all();
+        $bds   = BD::all();
+        $month = 8;
+        $year  = now()->year;
     
         foreach ($bds as $bd) {
-            $bdId    = $bd->id;     
-            $bdAppId = $bd->app_id;  
-    
-            $month = 8;
-            $year  = now()->year;
-    
-            $totalSalary = 0;
+            $bdId    = $bd->id;
+            $bdAppId = $bd->app_id;
     
             $agencies = Agency::where(function ($q) use ($bdId, $bdAppId) {
                     $q->where('bd_id', $bdId)
                       ->orWhere('bd_id', $bdAppId);
                 })->get();
+    
+            $totalSalary = 0;
     
             foreach ($agencies as $agency) {
                 $userSalaries = UserSallary::where('user_agency_id', $agency->id)
@@ -76,22 +76,41 @@ class MigrateOldBdSalariesJob implements ShouldQueue
                     ->get();
     
                 foreach ($userSalaries as $userSallary) {
-                    BdAgencyHostSallary::updateOrCreate(
-                        [
+                    $expectedAmount = $userSallary?->dB ?? 0;
+    
+                    $oldTotal = BdAgencyHostSallary::where([
                             'bd_id'     => $bdId,
                             'agency_id' => $agency->id,
                             'user_id'   => $userSallary->user_id,
                             'month'     => $month,
                             'year'      => $year,
-                        ],
-                        [
-                            'amount'     => $userSallary?->dB ?? 0,
-                            'bd_user_id' => $bdId,
-                            'created_at' => $userSallary->created_at,
-                        ]
-                    );
+                        ])->sum('amount');
     
-                    $totalSalary += $userSallary->dB;
+                    $diff = $expectedAmount - $oldTotal;
+    
+                    if ($oldTotal == 0) {
+                        BdAgencyHostSallary::create([
+                            'bd_id'      => $bdId,
+                            'agency_id'  => $agency->id,
+                            'user_id'    => $userSallary->user_id,
+                            'month'      => $month,
+                            'year'       => $year,
+                            'amount'     => $expectedAmount,
+                            'oldDbValue' => 0,
+                        ]);
+                    } elseif ($diff != 0) {
+                        BdAgencyHostSallary::create([
+                            'bd_id'      => $bdId,
+                            'agency_id'  => $agency->id,
+                            'user_id'    => $userSallary->user_id,
+                            'month'      => $month,
+                            'year'       => $year,
+                            'amount'     => $diff,
+                            'oldDbValue' => $oldTotal, 
+                        ]);
+                    }
+    
+                    $totalSalary += $expectedAmount; 
                 }
             }
     
@@ -118,10 +137,7 @@ class MigrateOldBdSalariesJob implements ShouldQueue
         }
     }
     
-
-
-
-
+    
     
     /**
      * دالة مشتركة لتنفيذ عملية الترحيل (عشان تمنع التكرار)
