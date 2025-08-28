@@ -119,7 +119,7 @@ class MigrateOldBdSalariesJob implements ShouldQueue
                     $q->where('charger_id', $bdId)
                       ->orWhere('charger_id', $bdAppId);
                 })
-                ->whereMonth('created_at', $month)
+                // ->whereMonth('created_at', $month)
                 ->whereYear('created_at', $year)
                 ->sum('usd');
     
@@ -138,10 +138,7 @@ class MigrateOldBdSalariesJob implements ShouldQueue
     }
     
     
-    
-    /**
-     * دالة مشتركة لتنفيذ عملية الترحيل (عشان تمنع التكرار)
-     */
+  
     private function processBdSalary($bdSalary): void
     {
         $bdAppId = $bdSalary->bd_id;
@@ -198,3 +195,10 @@ class MigrateOldBdSalariesJob implements ShouldQueue
     }
     
 }
+
+
+
+
+
+
+
