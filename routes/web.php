@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\BdController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
@@ -380,6 +381,7 @@ Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondControll
 Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
+Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
 
 
 Route::get('/charge-agency-export-report', [
@@ -405,6 +407,7 @@ Route::get('get-setting/{key}', function ($key) {
 
 // In your web.php
 Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
+Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
 
 Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
 
@@ -416,7 +419,7 @@ Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
     Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
 //    Route::get('/capture/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
-    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
+//    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
 
 

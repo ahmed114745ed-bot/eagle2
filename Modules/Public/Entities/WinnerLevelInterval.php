@@ -9,7 +9,7 @@ class WinnerLevelInterval extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function levelInterval()
     {

@@ -11,7 +11,7 @@ class GameChargeHistory extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected static function boot()
     {

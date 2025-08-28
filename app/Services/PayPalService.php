@@ -219,8 +219,19 @@ class PayPalService
                     ->withHeaders(['Content-Type' => 'application/json'])
                     ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture", (object)[]);
 
-                info($response);
-                info('callback');
+                if ($response->successful()) {
+                    $data = $response->json();
+
+                    $captureStatus = $data['purchase_units'][0]['payments']['captures'][0]['status'] ?? null;
+
+                    if ($captureStatus === 'COMPLETED') {
+                        return response()->json([
+                            'status'  => true,
+                            'trx'     => $coinLog->trx,
+                            'message' => 'Transaction completed successfully.',
+                        ]);
+                    }
+                }
 
                 return response()->json([
                     'status'  => true,
@@ -264,65 +275,6 @@ class PayPalService
             'trx'     => $coinLog->trx,
             'message' => 'Transaction cancelled.',
         ], 500);
-    }
-
-    public function capture($orderId): JsonResponse
-    {
-        $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
-
-        try {
-            $response = Http::withToken($this->getAccessToken())
-                ->withHeaders(['Content-Type' => 'application/json'])
-                ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture");
-
-            if ($response->successful()) {
-                $data = $response->json();
-                $status = $data['status'] ?? null;
-
-                switch ($status) {
-                    case 'COMPLETED':
-                        $this->webhookPayment($coinLog->id);
-
-                        return response()->json([
-                            'status'  => true,
-                            'trx'     => $coinLog->trx,
-                            'message' => 'Transaction completed successfully.',
-                            'details' => $data
-                        ]);
-
-                    case 'APPROVED':
-                        return response()->json([
-                            'status'  => true,
-                            'trx'     => $coinLog->trx,
-                            'message' => 'Transaction approved, pending capture.',
-                            'details' => $data
-                        ]);
-
-                    default:
-                        return response()->json([
-                            'status'  => false,
-                            'trx'     => $coinLog->trx,
-                            'message' => "Transaction {$status}.",
-                            'details' => $data
-                        ], 400);
-                }
-            }
-
-            return response()->json([
-                'status'  => false,
-                'trx'     => $coinLog->trx,
-                'message' => 'Failed to capture transaction.',
-                'details' => $response->json()
-            ], 500);
-
-        } catch (\Exception $e) {
-            info($e->getMessage());
-            return response()->json([
-                'status'  => false,
-                'trx'     => $coinLog->trx,
-                'message' => 'Exception during capture: ' . $e->getMessage(),
-            ], 500);
-        }
     }
 
     public function transaction($orderId)

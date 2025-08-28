@@ -12,5 +12,5 @@ class EarnedDiamond extends Model
 
     protected $table = 'earned_diamonds';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

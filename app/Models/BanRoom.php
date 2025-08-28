@@ -11,7 +11,7 @@ class BanRoom extends Model
 
     protected $table = 'bans_rooms';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function room()
     {

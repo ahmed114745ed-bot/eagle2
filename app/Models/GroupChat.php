@@ -11,7 +11,7 @@ class GroupChat extends Model
 
     protected $table = 'group_chat';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

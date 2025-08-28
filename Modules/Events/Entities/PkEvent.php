@@ -14,7 +14,7 @@ class PkEvent extends Model
 {
     use EventModel, HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $appends = ['start_date_local', 'end_date_local'];
 

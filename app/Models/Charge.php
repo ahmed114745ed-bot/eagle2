@@ -11,7 +11,7 @@ class Charge extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $casts = [
         'created_at' => 'datetime',

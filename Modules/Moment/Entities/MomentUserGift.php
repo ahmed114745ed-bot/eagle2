@@ -12,7 +12,7 @@ class MomentUserGift extends Model
 
     protected $table = 'moment_user_gifts';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {
