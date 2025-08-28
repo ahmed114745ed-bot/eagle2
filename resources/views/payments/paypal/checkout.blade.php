@@ -350,16 +350,20 @@
                         });
                 },
                 onApprove: function(data, actions) {
-                    return fetch('/paypal/capture/' + data.orderID, {
+                    return fetch("/api/paypal-return/{{ $logId }}", {
                         method: 'POST',
                         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                     })
                         .then(res => res.json())
                         .then(orderData => {
+                            console.log("✅ Capture Success:", orderData);
+
                             window.location.href = "/api/paypal-return/{{ $logId }}";
                         });
                 },
                 onCancel: function() {
+                    console.error("❌ Capture failed:", err);
+
                     window.location.href = "/api/paypal-cancel/{{ $logId }}";
                 }
             }).render('#card-button');
