@@ -60,10 +60,17 @@ trait PaymentTrait
         return $data;
     }
 
-    public function webhookPayment($coinLogId)
+    public function webhookPayment($coinLogId, $trx)
     {
-        $coinLog = CoinLog::where("id", $coinLogId)->first();
+        // info('coin log id', [$coinLogId]);
+        // $coinLog = CoinLog::where("id", $coinLogId)->first();
+        // if (! $coinLog){
+            info('coin log trx', [$trx]);
+            $coinLog = CoinLog::where("trx", $trx)->first();
+        // }
 
+        info('coin log', $coinLog);
+        info('coin log status', [$coinLog->status]);
         if (!$coinLog || $coinLog->status == 1) {
             return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
         }
@@ -74,13 +81,14 @@ trait PaymentTrait
         \Log::error("coinLogId Signature coinLogId ", [
             'coinLog' => $coinLogId,
             '$coinLog->user' => $coinLog->user,
-            
+
         ]);
         $user = $coinLog->user;
         $amountBefore = $user->di;
+        info('user', [$user]);
         if ($user) {
 
-        
+
             UserCoinLogHelper::logByType(
                 $user->id,
                 $coinLog->obtained_coins,
@@ -91,16 +99,18 @@ trait PaymentTrait
             $user->di += $coinLog->obtained_coins;
             $user->save();
 
-            \Log::error("obtained_coins Signature coinLogId ", [
+            info("obtained_coins Signature coinLogId ", [
                 'coinLog' => $coinLogId,
                 '$coinLog->obtained_coins' => $coinLog->obtained_coins,
-                
+                'user_id'   => $user->id,
+                'user_di'   => $user->di,
             ]);
             UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
             if ($user instanceof User) {
                 (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
             }
         } else {
+            info('no user');
             return response()->json([
                 'status'  => false,
                 'trx'     => $coinLog->trx,
