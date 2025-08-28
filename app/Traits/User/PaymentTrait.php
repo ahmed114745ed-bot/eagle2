@@ -62,12 +62,12 @@ trait PaymentTrait
 
     public function webhookPayment($coinLogId, $trx)
     {
-        info('coin log id', [$coinLogId]);
-        $coinLog = CoinLog::where("id", $coinLogId)->first();
-        if (! $coinLog){
+        // info('coin log id', [$coinLogId]);
+        // $coinLog = CoinLog::where("id", $coinLogId)->first();
+        // if (! $coinLog){
             info('coin log trx', [$trx]);
             $coinLog = CoinLog::where("trx", $trx)->first();
-        }
+        // }
 
         info('coin log', $coinLog);
         info('coin log status', [$coinLog->status]);
