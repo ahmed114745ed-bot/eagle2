@@ -75,11 +75,12 @@ class CpRepository
     {
         return Cp::where(function ($query) use ($userId, $otherUserId) {
             $query->where("user_one_id", $userId)
-                ->where("user_two_id", $otherUserId);
+                ->where("user_two_id", $otherUserId)
+                ->orWhere(function ($query) use ($userId, $otherUserId) {
+                    $query->where("user_two_id", $userId)
+                        ->where("user_one_id", $otherUserId);
+                });
 
-        })->orWhere(function ($query) use ($userId, $otherUserId) {
-            $query->where("user_two_id", $userId)
-                ->where("user_one_id", $otherUserId);
         })->whereHas("cpRelation", function ($q) {
                 $q->where('type', '!=', 'solution');
             })
