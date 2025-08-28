@@ -11,12 +11,12 @@ class UserBoxGift extends Model
 
     protected $table = 'user_box_gifts';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
     protected static function booted()
     {
         static::created(function ($gift) {
             if (($gift->user_id ?? null) && ($gift->coins ?? 0) > 0) {
-            
+
             }
         });
     }

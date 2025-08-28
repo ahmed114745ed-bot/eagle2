@@ -14,7 +14,7 @@ class GiftLog extends Model
 
     protected $table = 'gift_logs';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function gift()
     {

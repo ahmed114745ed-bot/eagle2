@@ -84,7 +84,7 @@ class UserObserver
             if ($user->agency_id) {
                 if ($user->is_host == 0) {
                     $user->coins = 0;
-                    $user->monthly_diamond_received = 0;
+                    uploadMonthlyDiamondReceive($user->id, 0);
                 }
                 $user->is_host = 1;
             }

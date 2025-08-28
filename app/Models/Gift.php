@@ -13,7 +13,7 @@ class Gift extends Model
     use AchievementGift, TimestampsWithTimezone;
 
     // protected $fillable=['use_count'];
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function luckyGift()
     {

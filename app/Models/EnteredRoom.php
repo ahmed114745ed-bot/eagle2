@@ -11,7 +11,7 @@ class EnteredRoom extends Model
 
     protected $table = 'entered_rooms';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function room()
     {

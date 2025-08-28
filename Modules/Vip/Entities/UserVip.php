@@ -18,7 +18,7 @@ class UserVip extends Model
 
     protected $table = 'users_vips';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function senderable(): MorphTo
     {

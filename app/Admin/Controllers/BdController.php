@@ -406,6 +406,7 @@ class BdController extends MainController
             case 'transactions':
                 $transactions = $bd->transactions()
                     ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+                    ->with('receiveragency')
                     ->latest()
                     ->paginate(10, ['*'], 'transactions_page');
                 break;
@@ -423,7 +424,8 @@ class BdController extends MainController
                     'created_at'
                 )
                 ->where('bd_id', $bd->id)
-                ->where('month', $month)
+                ->where('bd_id', $bd->id)
+                ->where('amount','!=' ,0)
                 ->where('year', $year)
                 ->latest()
                 ->paginate(10, ['*'], 'target_history_page');
@@ -453,5 +455,35 @@ class BdController extends MainController
         $this->extendShow($show);
 
         return $show;
+    }
+
+
+
+    public function sync($days = 0)
+    {
+        $days = request()->query('days', 0);
+        $bds = DB::table('admin_users')
+            ->where('type', 'bd')
+            ->where('app_id', '!=', 0)
+            ->get();
+    
+        $updated = 0;
+    
+        foreach ($bds as $bd) {
+            $query = DB::table('agencies')
+                ->where('bd_id', $bd->app_id);
+    
+            if ($days > 0) {
+                $query->where('created_at', '<=', now()->subDays($days));
+            }
+    
+            $affected = $query->update(['bd_id' => $bd->id]);   
+            $updated += $affected;
+        }
+    
+        return response()->json([
+            'status' => 'success',
+            'message' => $updated 
+        ]);
     }
 }

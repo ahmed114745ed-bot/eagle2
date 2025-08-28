@@ -10,7 +10,7 @@ class UserChargeEvent extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function winner()
     {

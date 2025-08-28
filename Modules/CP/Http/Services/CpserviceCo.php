@@ -48,16 +48,16 @@ class CpserviceCo
             }
         }
 
-        if ($cpRelation->cp_one == 1) {
+        if ($cpRelation ) {
             $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
             $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
 
-            if ($existingCpOne) {
+
+            if ($existingCpOne && $existingCptwo) {
+
                 return Common::apiResponse(0, __('You have already sent a CP request before.'));
             }
-            if ($existingCptwo) {
-                return Common::apiResponse(0, __('They have already sent a CP request to you, please accept it.'));
-            }
+
         }
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && $existingCp->status == CpStatus::PENDING->value && $cpRelation->type != 'solution') {
@@ -218,8 +218,7 @@ class CpserviceCo
 
     public function respondToRequest(Request $request)
     {
-
-        /// Todo get message_id to update status in this message
+        // Todo get message_id to update status in this message
         $messageId = $request->message_id;
 
         $message = ChatMessage::find($messageId);

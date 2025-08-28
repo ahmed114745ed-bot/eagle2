@@ -14,7 +14,7 @@ class MomentCommint extends Model
 
     protected $table = 'moment_user_comments';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

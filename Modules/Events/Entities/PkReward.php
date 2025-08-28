@@ -15,7 +15,7 @@ class PkReward extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $appends = ['target1', 'target2', 'target3', 'target4'];
 

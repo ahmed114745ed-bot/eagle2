@@ -133,8 +133,13 @@ class AgencyController extends MainController
                     $agency->mempers()->when(isset($uuid), function ($query) use ($uuid) {
                         $query->where('uuid', $uuid);
                     })
-                    ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                    ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                     ->with('country', 'agencyUserJob')
+                    ->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($query) {
+                        $query->where('month', now()->month)
+                            ->where('year', now()->year);
+                    }], 'monthly_diamond_received')
+
                     ->paginate(10, ['*'], 'members_page');
                 // });
                 break;
@@ -372,7 +377,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img','is_frozen')
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen')
             ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid')])
             ->where(function ($query) {
                 $query
@@ -627,211 +632,175 @@ class AgencyController extends MainController
     protected function form()
     {
         $form = new Form(new Agency());
+    
         $this->disableFormTools($form);
+    
+        $this->addHiddenFields($form);
+        $this->addMainFields($form);
+        $this->addPhoneFields($form);
+        $this->addSavingLogic($form);
+        $this->addSavedLogic($form);
+        $this->addFooter($form);
+    
+        return $form;
+    }
+    
+    protected function addHiddenFields(Form $form)
+    {
         $form->hidden('type', __('type'))->default(1);
         $form->hidden('is_frozen', __('is_frozen'))->default(0);
-
+    }
+    
+    protected function addMainFields(Form $form)
+    {
         $form->display('ID');
+    
         if (!$form->isEditing()) {
             $form->row(function ($row) {
-                $row->width(12)->select('bd_id', __('bd id'))->options(function ($value) {
-                    $ops2 = [];
-                    foreach (User::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->id . '_' . $user->name;
-                    }
-                    return $ops2;
-                })->ajax('/api/search/users-bd2', 'id', 'name');
-                $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                    $ops2 = [];
-                    foreach (Bd::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                    }
-                    return $ops2;
-                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
-
+                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name');
+                $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                // $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
-
-                // $row->width(12)->hidden('Host_agency')->default(1);
-
-                // if (!Auth::user()->isRole('Agencies Managers')) {
-                //     $row->width(12)->hidden('Shipping_agency')->default(0);
-                // }
             });
         } else {
-
-
             $form->row(function ($row) {
-
-                $row->width(12)->select('bd_id', __('bd id'))->options(function ($value) {
-                    $ops2 = [];
-                    foreach (Bd::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->id . '_' . $user->username;
-                    }
-                    return $ops2;
-                })->ajax('/api/search/users-bd2', 'id', 'name');
-
-                $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                    $ops2 = [];
-                    foreach (User::Where('id', $value)->get() as $user) {
-                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                    }
-                    return $ops2;
-                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
+                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions(true))->ajax('/api/search/users-bd2', 'id', 'name');
+                $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions(true))->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                // $row->width(12)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
-
-                // $row->width(12)->hidden('Host_agency')->default(1);
-
-
-                // if (!Auth::user()->isRole('Agencies Managers')) {
-                //     $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
-                // }
             });
         }
+    }
+    
+    protected function bdOptions($editing = false)
+    {
+        return function ($value) use ($editing) {
+            $ops = [];
+            foreach (Bd::where('id', $value)->get() as $user) {
+                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
+            }
+            return $ops;
+        };
+    }
+    
+    protected function ownerOptions($editing = false)
+    {
+        return function ($value) use ($editing) {
+            $ops = [];
+            foreach (User::where('id', $value)->get() as $user) {
+                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
+            }
+            return $ops;
+        };
+    }
+    
+    protected function addPhoneFields(Form $form)
+    {
         $form->row(function ($row) {
-
-                $row->width(9)->text('phone', __('agency whatsApp number'))
-                ->rules('required')
-                ->attribute('id', 'phone-input')->attribute('maxlength', 10);  
-                $row->hidden('phone_code');
+            $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input')->attribute('maxlength', 10);  
+            $row->hidden('phone_code');
         });
-
-
+    
         if (Session::has('show_alert')) {
-            $form->html('<script>
-             $(document).ready(function () {
-                 alert("الرجاء اختيار نوع الوكالة اولا");
-             });
-         </script>');
+            $form->html('<script>alert("الرجاء اختيار نوع الوكالة اولا");</script>');
         }
+    
+        Admin::script($this->phoneJs());
+    }
+    
+    protected function phoneJs()
+    {
+        return <<<JS
+            function initPhoneInputById(inputId, hiddenId) {
+                const input = document.querySelector(inputId);
+                const hidden = document.querySelector(hiddenId);
+                if (!input || input.classList.contains('iti-initialized')) return;
+            
+                const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
+                input.classList.add('iti-initialized');
+            
+                if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
+            
+                input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
+                const form = input.closest('form');
+                if(form && !form.classList.contains('phone-init')){
+                    form.addEventListener('submit', function(){
+                        if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                    });
+                    form.classList.add('phone-init');
+        }
+    }
+    
+    function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
+    initAllPhones();
+    $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
+    JS;
+    }
+    
+    protected function addSavingLogic(Form $form)
+    {
+        $form->saving(function (Form $form) {
+            $appOwnerId = $form->input('app_owner_id');
+            $originalOwnerId = $form->model()->getOriginal('app_owner_id');
+            $newOwnerId = request()->app_owner_id;
+            $form->model()->type = 1;
+    
+            if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
+                Common::userJoinAgency($originalOwnerId, $newOwnerId, $form->model()->id);
+                User::find($originalOwnerId)->update([
+                    'type_user' => 0,
+                    'agency_id' => 0,
+                    'is_host' => 0,
+                ]);
+                uploadMonthlyDiamondReceive($originalOwnerId, 0);
 
-        Admin::script(<<<'JS'
-         function initPhoneInputById(inputId, hiddenId) {
-                    const input = document.querySelector(inputId);
-                    const hidden = document.querySelector(hiddenId);
-
-                    if (input && !input.classList.contains('iti-initialized')) {
-                        const iti = window.intlTelInput(input, {
-                            separateDialCode: true,
-                            preferredCountries: ["eg"],
-                            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-                        });
-
-                        input.classList.add('iti-initialized');
-
-                        // ⬅️ لو في تعديل، رجّع الرقم مع الكود
-                        if (input.value && hidden && hidden.value) {
-                            iti.setNumber(hidden.value + input.value);
-                        }
-
-                        // ⬅️ عند تغيير الدولة أو الرقم، حدّث الحقل المخفي
-                        input.addEventListener("countrychange", function () {
-                            if (hidden) {
-                                hidden.value = "+" + iti.getSelectedCountryData().dialCode;
-                            }
-                        });
-
-                        // ⬅️ عند حفظ الفورم
-                        const form = input.closest('form');
-                        if (form && !form.classList.contains('phone-init')) {
-                            form.addEventListener('submit', function () {
-                                if (hidden) {
-                                    hidden.value = "+" + iti.getSelectedCountryData().dialCode;
-                                }
-                                // نرجّع رقم الهاتف من غير كود
-                                input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
-                            });
-                            form.classList.add('phone-init');
-                        }
-                    }
-                }
-
-                function initAllPhones() {
-                    initPhoneInputById("#phone-input", "input[name='phone_code']");
-                }
-
-                initAllPhones();
-                $(document).on('pjax:complete', function () {
-                    setTimeout(initAllPhones, 100);
-                });
-
-    JS);
-
-    $form->saving(function (Form $form) {
-
-        $appOwnerId = $form->input('app_owner_id');
-        // $Host_agency = $form->input('Host_agency');
-
-        // $Shipping_agency = $form->input('Shipping_agency') ;
-        $host = 0;
-        $form->model()->type = 1;
-        $originalOwnerId = $form->model()->getOriginal('app_owner_id');
-        $newOwnerId = request()->app_owner_id;
-        // $newOwnerId = $form->model()->app_owner_id;
-        // Create admin dashboard for agency when accept it
-        $modelExists = $form->model()->exists;
-        // if (!$modelExists)  Common::createUserAdmin($appOwnerId);
-
-
-        if ($modelExists &&  $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
-            //   Common::createUserAdmin($appOwnerId);
-            $user = User::find($originalOwnerId);
-
-            $agencyId = $form->model()->id;
-            Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
-
-            // Admin::where('username', $user->uuid)->delete();
-            $user->update([
-                'type_user' => 0,
-                'agency_id' => 0,
-                'is_host' => 0,
+            }
+    
+            User::where('id', intval($appOwnerId))->update([
+                'type_user' => 2,
+                'is_host' => 1,
+                'agency_id' => $form->model()->id,
             ]);
-
-        }
-
-
-        User::where('id', intval($appOwnerId))->update([
-            'type_user' => 2,
-            'is_host' => 1,
-            'agency_id' => $form->model()->id,
-
-        ]);
-
-    });
-
-    $form->saved(function (Form $form) {
-        
-        User::where('id', intval( $form->model()->app_owner_id))->update([
-            'type_user' => 2,
-            'is_host' => 1,
-            'agency_id' => $form->model()->id,
-
-        ]);
-        $checkAgencyUser = UsersJoinedAgency::where([
-            'user_id' => $form->model()->app_owner_id,
-            'agency_id' => $form->model()->id,
-            'type' => 1,
-        ])->where('leave_date', null)->exists();
-        if (!$checkAgencyUser) {
-            UsersJoinedAgency::create([
-                'user_id' => $form->model()->app_owner_id,
+        });
+    }
+    
+    protected function addSavedLogic(Form $form)
+    {
+        $form->saved(function (Form $form) {
+            $appOwnerId = intval($form->model()->app_owner_id);
+    
+            User::where('id', $appOwnerId)->update([
+                'type_user' => 2,
+                'is_host' => 1,
+                'agency_id' => $form->model()->id,
+            ]);
+    
+            $exists = UsersJoinedAgency::where([
+                'user_id' => $appOwnerId,
                 'agency_id' => $form->model()->id,
                 'type' => 1,
-                'join_date' => now(),
-                'status' => 'Joined',
-            ]);
-        }
-    });
+            ])->whereNull('leave_date')->exists();
+    
+            if (!$exists) {
+                UsersJoinedAgency::create([
+                    'user_id' => $appOwnerId,
+                    'agency_id' => $form->model()->id,
+                    'type' => 1,
+                    'join_date' => now(),
+                    'status' => 'Joined',
+                ]);
+            }
+        });
+    }
+    
+    protected function addFooter(Form $form)
+    {
         $form->footer(function ($footer) {
             $footer->disableEditingCheck();
             $footer->disableCreatingCheck();
         });
-
-        return $form;
     }
 
     public function usersGrid($id)

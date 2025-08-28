@@ -11,5 +11,5 @@ class SilverHestory extends Model
 
     protected $table = 'silver_histories';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

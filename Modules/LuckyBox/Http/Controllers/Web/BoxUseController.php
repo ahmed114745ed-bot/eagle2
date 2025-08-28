@@ -115,6 +115,8 @@ class BoxUseController extends MainController
             });
         });
 
+        $grid->model()->orderByDesc('id');
+
         $grid->id(__('ID'));
 
         $grid->column('user_id', __('User'))->display(function () {
@@ -145,23 +147,13 @@ class BoxUseController extends MainController
         });
 
         $grid->column('box_id', __('Box'))->display(function () {
-            $box = $this->box;
-            if (!$box) return '-';
+           
 
-            $name = $box->name ?? 'Unknown Box';
-            $boxUrl = admin_url('boxes/' . $box->id);
+            $name = $this->type == 0 ? __('normal') : __('super');
 
-            $defaultImage = asset("images/box-icon.jpg");
-            $avatarPath = $box->image ?? null;
-            $avatar = $avatarPath ? getImagePath($avatarPath) : $defaultImage;
 
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-
-            return "<a href='$boxUrl' style='text-decoration: none;'>
+            return "<a  style='text-decoration: none;'>
                         <div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
-                            <img src='$avatar' alt='Box Image' style='width: 40px; height: 40px; border-radius: 50%;'>
                             <span style='color: var(--primary-color); font-weight: bold;'>$name</span>
                         </div>
                     </a>";
@@ -201,11 +193,27 @@ class BoxUseController extends MainController
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->end_at(__('end_at'));
-        $grid->users_num(__('users_num'));
-        $grid->column('type', __('Type'))->display(function ($value) {
-            return $value == 1 ? __('type_global') : __('type_local');
+        $grid->column('end_at', __('end_at'))->display(function ($value) {
+            $start = \Carbon\Carbon::parse($this->created_at);
+            $end   = \Carbon\Carbon::parse($value);
+
+            if ($this->type == 1) {
+                // الفرق بالدقايق
+                $diff = $end->diffInMinutes($start);
+                return $diff . ' ' . __('minutes');
+            } elseif ($this->type == 0) {
+                // الفرق بالساعات
+                $diff = $end->diffInHours($start);
+                return $diff . ' ' . __('hours');
+            }
+
+            return '-';
         });
+
+        $grid->users_num(__('users_num'));
+        // $grid->column('type', __('Type'))->display(function ($value) {
+        //     return $value == 1 ? __('type_global') : __('type_local');
+        // });
         $grid->label(__('label'));
         $grid->used_num(__('used_num'));
         $grid->not_used_num(__('not_used_num'));
