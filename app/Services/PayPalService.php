@@ -209,6 +209,7 @@ class PayPalService
 
             $status = $data['status'] ?? null;
             if ($status === 'COMPLETED') {
+                info('callback COMPLETED');
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog->trx,
@@ -220,7 +221,7 @@ class PayPalService
                     ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture", (object)[]);
 
                 info($response);
-                info('callback');
+                info('callback APPROVED');
                 if ($response->successful()) {
                     $data = $response->json();
 
@@ -241,12 +242,14 @@ class PayPalService
                     'message' => 'Transaction approved, pending capture.',
                 ]);
             } elseif ($status === 'PENDING') {
+                info('callback PENDING');
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog->trx,
                     'message' => 'Transaction pending. Awaiting PayPal review.',
                 ]);
             } elseif (in_array($status, ['DENIED', 'FAILED', 'VOIDED', 'CANCELLED'])) {
+                info('callback DENIED FAILED VOIDED CANCELLED');
                 return response()->json([
                     'status'  => false,
                     'trx'     => $coinLog->trx,
@@ -270,6 +273,7 @@ class PayPalService
 
     public function cancel($orderId): JsonResponse
     {
+        info('callback cancel endpoint');
         $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
 
         return response()->json([
@@ -298,6 +302,7 @@ class PayPalService
 //        info($paypalId);
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
+                info('WEBHOOK APPROVED');
 //                $captureResponse = Http::withToken($this->getAccessToken())
 //                    ->withHeaders(['Content-Type' => 'application/json'])
 //                    ->withBody('', 'application/json')
@@ -319,6 +324,7 @@ class PayPalService
                 return $this->webhookPayment($coinLogId);
 
             case 'PAYMENT.CAPTURE.DENIED':
+                info('WEBHOOK DENIED');
                 return response()->json([
                     'status'  => false,
                     'trx'     => $coinLog?->trx ?? $paypalId,
