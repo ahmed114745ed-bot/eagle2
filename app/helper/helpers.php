@@ -683,6 +683,36 @@ if (!function_exists('getTimezone')) {
     }
 }
 
+if (! function_exists('getFavIcon')) {
+    function getFavIcon() : ?string
+    {
+        return \Cache::rememberForever('favicon', function () {
+            $favIcon = DB::table('settings')->where('key', 'app_fav_icon')->value('value');
+
+            if ($favIcon) {
+                return getImagePath($favIcon);
+            }
+
+            return asset('images/app-logo.png');
+        });
+    }
+}
+
+if (!function_exists('getAppLogo')) {
+    function getAppLogo(): string
+    {
+        return Cache::rememberForever('appLogo', function () {
+            $logo = DB::table('settings')->where('key', 'app_logo')->value('value');
+
+            if ($logo) {
+                return getImagePath($logo);
+            }
+
+            return asset('images/app-logo.png');
+        });
+    }
+}
+
 
 if (!function_exists('getToday')) {
     function getToday(): array

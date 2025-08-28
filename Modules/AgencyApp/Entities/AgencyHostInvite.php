@@ -12,7 +12,7 @@ class AgencyHostInvite extends Model
 
     protected $fillable = [];
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function userInvite()
     {

@@ -16,7 +16,7 @@ class Moment extends Model
 
     protected $table = 'moment';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function comments()
     {

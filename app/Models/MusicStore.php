@@ -10,7 +10,7 @@ class MusicStore extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $table = 'music_store';
 }

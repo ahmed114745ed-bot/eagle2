@@ -10,7 +10,7 @@ class Pk extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function getT1PerAttribute()
     {
