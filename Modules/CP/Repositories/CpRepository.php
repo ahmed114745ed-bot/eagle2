@@ -336,8 +336,8 @@ class CpRepository
                 $t === 1,
                 fn($q) =>
                 $q->whereBetween('gift_logs.created_at', [
-                    $now->copy()->startOfDay()->toDateTimeString(),
-                    $now->copy()->endOfDay()->toDateTimeString(),
+                    $now->startOfDay(),
+                    $now->endOfDay(),
                 ])
             )
 
