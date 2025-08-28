@@ -8,6 +8,7 @@ use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
@@ -305,6 +306,8 @@ class PayPalService
 //                if ($captureResponse->successful()) {
 //                    return $this->webhookPayment($coinLogId);
 //                }
+                Log::info($eventType);
+
 
                 return response()->json([
                     'status'  => true,
@@ -313,7 +316,8 @@ class PayPalService
                 ]);
 
             case 'PAYMENT.CAPTURE.COMPLETED':
-                return $this->webhookPayment($coinLogId);
+                Log::info($paypalId);
+                return $this->webhookPayment($coinLogId,$paypalId);
 
             case 'PAYMENT.CAPTURE.DENIED':
                 return response()->json([
