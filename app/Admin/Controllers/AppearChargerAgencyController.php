@@ -133,7 +133,7 @@ class AppearChargerAgencyController extends MainController
             case 'members':
                 $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
                     return $agency->mempers()
-                        ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                        ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                         ->with('country', 'agencyUserJob')
                         ->paginate(10, ['*'], 'members_page');
                 });
@@ -222,7 +222,8 @@ class AppearChargerAgencyController extends MainController
         $grid = new Grid(new ShippingAgency());
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
-        $grid->model()->with('owner.profile');
+        $grid->model()->with('owner.profile')
+             ->orderByDesc('id');  
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -527,7 +528,7 @@ class AppearChargerAgencyController extends MainController
                     $charges->with($relations);
                 }
 
-                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
+                $charges = $charges->latest()->paginate(2, ['*'], 'charges_page');
                 break;
 
             case 'resived':

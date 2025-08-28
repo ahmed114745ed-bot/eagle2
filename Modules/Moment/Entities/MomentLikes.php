@@ -14,7 +14,7 @@ class MomentLikes extends Model
 
     protected $table = 'moment_user_likes';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {

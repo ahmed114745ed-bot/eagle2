@@ -115,7 +115,9 @@ class BdController extends MainController
         // $grid->column('username', __('username'));
         // $grid->column('name', __('Name'));
         $grid->column('username', __('Bd'))->display(function ($name) {
-
+            if (request()->filled('_export_')) {
+                return $name;
+            }
 
 
             $id = $this->id ?? '-';
@@ -144,6 +146,10 @@ class BdController extends MainController
             ";
         });
         $grid->column('default', __('default_status'))->display(function () {
+            if (request()->filled('_export_')) {
+                return $this->default;
+            }
+           
             if ($this->default == 1) {
                 return <<<HTML
                     <span style="display: flex; align-items: center;">
@@ -167,6 +173,9 @@ class BdController extends MainController
 
         $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
+            if (request()->filled('_export_')) {
+                return $name;
+            }
             if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
             $uid = $user->uuid ?? 'غير معروف';
@@ -213,12 +222,14 @@ class BdController extends MainController
             return truncateAndTrim($this->total_cut, 2);
         });
 
-        $grid->column('transfer_salary', __("transfer_salary"))
+        $col = $grid->column('transfer_salary', __("transfer_salary"))
         ->display(function () {
             return $this->transfer_salary ? 1 : 0;
-        })
-        ->switch(Common::getSwitchStates());
-
+        });
+        
+        if (! request()->filled('_export_')) {
+            $col->switch(Common::getSwitchStates());
+        }
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
@@ -250,7 +261,7 @@ class BdController extends MainController
             $grid->tools(function (Grid\Tools $tools) {
 
 
-                $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
+                // $tools->append('<a href="' . route('admin.userBd.select') . '" class="btn btn-sm btn-primary"><i class="fa fa-user"></i> اختيار BD</a>');
             });
         }
         $grid->disableRowSelector();
@@ -395,6 +406,7 @@ class BdController extends MainController
             case 'transactions':
                 $transactions = $bd->transactions()
                     ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+                    ->with('receiveragency')
                     ->latest()
                     ->paginate(10, ['*'], 'transactions_page');
                 break;
@@ -404,7 +416,7 @@ class BdController extends MainController
                     'id',
                     'bd_id',
                     'agency_id',
-                    'salary',
+                    // 'salary',
                     'amount',
                     'month',
                     'year',
@@ -412,7 +424,8 @@ class BdController extends MainController
                     'created_at'
                 )
                 ->where('bd_id', $bd->id)
-                ->where('month', $month)
+                ->where('bd_id', $bd->id)
+                ->where('amount','!=' ,0)
                 ->where('year', $year)
                 ->latest()
                 ->paginate(10, ['*'], 'target_history_page');
@@ -442,5 +455,30 @@ class BdController extends MainController
         $this->extendShow($show);
 
         return $show;
+    }
+
+
+
+    public function sync()
+    {
+        $bds = DB::table('admin_users')
+            ->where('type', 'bd')
+            ->where('app_id', '!=', 0)
+            ->get();
+
+        $updated = 0;
+
+        foreach ($bds as $bd) {
+            $affected = DB::table('agencies')
+                ->where('bd_id', $bd->app_id) 
+                ->update(['bd_id' => $bd->id]);   
+
+            $updated += $affected;
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "تم تحديث $updated وكالة بالـ bd المناسب."
+        ]);
     }
 }

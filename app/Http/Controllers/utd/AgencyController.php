@@ -66,7 +66,7 @@ class AgencyController extends Controller
     {
         try {
             $data = $this->agencyService->allActiveAgencies($request->id);
-            $data = $data->map(function($agency){
+            $data = $data->map(function ($agency) {
                 return [
                     'id' => $agency->id,
                     'name' => $agency->name,
@@ -84,16 +84,24 @@ class AgencyController extends Controller
         try {
             $data = $this->agencyService->agencyById($request->id);
 
-            $memebrs =             $data->mempers()
+            $members = $data->mempers()
+                ->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
+                    $q->where('month', now()->month)
+                        ->where('year', now()->year);
+                }], 'monthly_diamond_received')
                 ->orderBy('monthly_diamond_received', 'desc')
-                ->with(['userSallary' => function ($query) {
-                    $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
-                }, 'profile' => function ($query) {
-                    $query->select('id', 'user_id', 'avatar');
-                }])
+                ->with([
+                    'userSallary' => function ($query) {
+                        $query->select('id', 'user_id', 'sallary')
+                            ->where('month', now()->month)
+                            ->where('year', now()->year);
+                    },
+                    'profile:id,user_id,avatar'
+                ])
                 ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received']);
 
-            return Common::apiResponse(true, 'success', $memebrs);
+
+            return Common::apiResponse(true, 'success', $members);
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
@@ -180,7 +188,7 @@ class AgencyController extends Controller
             'url' => 'nullable',
             'img' => 'required|mimes:jpeg,png,jpg',
             'contents' => 'nullable',
-          
+
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());

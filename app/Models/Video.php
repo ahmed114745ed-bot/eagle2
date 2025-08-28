@@ -9,7 +9,7 @@ class Video extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $casts = [
         'shares_num' => 'integer',

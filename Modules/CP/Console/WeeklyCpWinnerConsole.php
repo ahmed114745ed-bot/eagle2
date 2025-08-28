@@ -91,5 +91,12 @@ class WeeklyCpWinnerConsole extends Command
                 }
             }
         }
+
+        $newWeeklyCp = $weeklyCp->replicate();
+        $newWeeklyCp->start_date = now(getTimezone())->toDateString();
+        $newWeeklyCp->end_date   = now(getTimezone())->addWeek()->toDateString();
+        $newWeeklyCp->save();
+
+        $newWeeklyCp->gifts()->sync($weeklyCp->gifts->pluck('id')->toArray());
     }
 }

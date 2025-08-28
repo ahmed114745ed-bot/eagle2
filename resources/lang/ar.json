@@ -30,8 +30,9 @@
 "Create weekly cp": "إنشاء CP أسبوعي",
 "Delete weekly cp": "حذف CP أسبوعي",
 "Edit weekly cp": "تعديل CP أسبوعي",
+"certificate":"شهادة",
 
-  
+
     "This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.": "تم إغلاق هذة الغرفة ولن تستطيع الدخول حتي يتم الغاء الحظر عن هذه الغرفة من خلال مشرفين الغرفة",    "action": "عمليات",
     "All Managers": " (DB)جميع المدرين ",
     "zego token":"رمز زيجو",
@@ -3541,6 +3542,7 @@
 "Normal": "عادي",
  "Hot": "ساخن",
 "Super": "سوبر",
+"super": "سوبر",
 "All Status": "جميع الحالات",
 "Expired": "منتهي الصلاحية",
 "Users Picked": "المستخدمون المختارون",
@@ -3642,7 +3644,8 @@
 "Achievement Reward": "مكافأة الإنجاز",
 "You have received a new achievement.": "لقد حصلت على إنجاز جديد.",
 "You have received a gift: :ware": "لقد حصلت على إهداء :ware",
-"Use Zego": "استخدام زيجو",
+    "You have received the gift: :giftName": "لقد حصلت على الهدية: :giftName",
+    "Use Zego": "استخدام زيجو",
 "stope": "متوقف",
 "restored": "تمت الاستعادة",
 "restore": "استعادة",
@@ -3687,6 +3690,28 @@
 "enable_transfer_salary_success": "تم تفعيل تحويل المرتب بنجاح",
 "disable_transfer_salary_success": "تم تعطيل تحويل المرتب بنجاح",
 "confirm_enable_transfer_salary": "هل أنت متأكد من تفعيل تحويل المرتب؟",
-"confirm_disable_transfer_salary": "هل أنت متأكد من تعطيل تحويل المرتب؟"
+"confirm_disable_transfer_salary": "هل أنت متأكد من تعطيل تحويل المرتب؟",
+
+"BD Action": "إجراء BD",
+"Remove BD": "إزالة BD",
+"Are you sure?": "هل أنت متأكد؟",
+"Do you want to remove BD for this user?": "هل تريد إزالة BD لهذا المستخدم؟",
+"Yes, remove it!": "نعم، أزلها!",
+"Cancel": "إلغاء",
+"Removed!": "تم الإزالة!",
+"Error": "خطأ",
+"Something went wrong": "حدث خطأ ما",
+"salary_transfer_label": " إيقاف تحويل الرواتب لجميع الBD",
+  "salary_transfer_enable_title": "تفعيل تحويل الرواتب",
+  "salary_transfer_disable_title": "إيقاف تحويل الرواتب",
+  "salary_transfer_enable_text": "هل تريد تفعيل تحويل الرواتب لجميع الـ BD؟",
+  "salary_transfer_disable_text": "هل تريد إيقاف تحويل الرواتب لجميع الـ BD؟",
+  "confirm_enable": "نعم، فعّل",
+  "confirm_disable": "نعم، أوقف",
+  "cancel": "إلغاء",
+  "success_title": "تم بنجاح 🎉",
+  "success_message": "تم تنفيذ العملية بنجاح",
+  "error_title": "خطأ 🚫",
+  "error_message": "حدث خطأ، حاول مرة أخرى"
 
 }

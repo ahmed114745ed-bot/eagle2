@@ -30,7 +30,7 @@ class Bd extends Model
 
     public function transactions()
     {
-        return $this->hasMany(Charge::class, 'charger_id', 'app_id')
+        return $this->hasMany(Charge::class, 'charger_id', 'id')
             ->where('user_charger_type', 'bd');
     }
 
@@ -109,6 +109,17 @@ class Bd extends Model
                         ->orWhere('bd_id', 0);
                 })->update(['bd_id' => $model->id]);
             }
+
+            if ($model->app_id) {
+                $userApp = User::find($model->getOriginal('app_id')); 
+                if ($userApp) {
+                    $userApp->is_bd = 0;
+                    $userApp->type_user = 0;
+                    $userApp->agency_id = 0;
+                    $userApp->save();
+                }
+            }
+
         });
     }
 

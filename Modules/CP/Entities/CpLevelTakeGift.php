@@ -9,5 +9,5 @@ class CpLevelTakeGift extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

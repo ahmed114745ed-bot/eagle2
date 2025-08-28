@@ -176,7 +176,6 @@ class ConfigController extends Controller
         Cache::forget('pusher_config');
 
         $keys = array_keys($request->all());
-
         foreach ($keys as $key) {
             $config = Config::where('name', $key)->first();
 

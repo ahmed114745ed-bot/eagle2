@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CoinLog;
 use App\Services\PayPalService;
+use Http;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -24,6 +25,9 @@ class PayPalController extends Controller
         $paypal = new PayPalService();
         [$orderId, $paymentLink] = $paypal->create($request->referenceId, $request->amount, null);
 
+        $coinLog = CoinLog::whereId($request->referenceId)->first();
+        $coinLog->update(['trx' => $orderId]);
+
         return response()->json([
             'id' => $orderId ?? null,
             'approval_url' => $paymentLink,
@@ -32,6 +36,15 @@ class PayPalController extends Controller
 
     public function capture($orderId): JsonResponse
     {
-        return response()->json(["status" => "COMPLETED", "orderId" => $orderId]);
+        $orderDetails = (new PayPalService())->capture($orderId);
+
+        return response()->json([$orderDetails]);
+    }
+
+    public function transaction($orderId): JsonResponse
+    {
+        $transactions = (new PayPalService())->transaction($orderId);
+
+        return response()->json([$transactions]);
     }
 }

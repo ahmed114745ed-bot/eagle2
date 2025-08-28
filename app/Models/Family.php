@@ -12,7 +12,7 @@ class Family extends Model
 {
     use ResourceTrait, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $appends = [];
 

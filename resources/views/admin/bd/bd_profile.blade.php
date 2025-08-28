@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -253,7 +247,7 @@
 .stat-label {
     font-size: 12px;
     color: #7f8c8d;
-    text-transform: uppercase;
+    text-transform: none;
     letter-spacing: 0.5px;
 }
 
@@ -541,7 +535,7 @@
     background: var(--secondary-color);
    
     font-weight: 600;
-    text-transform: uppercase;
+    text-transform: none;
     font-size: 12px;
     letter-spacing: 0.5px;
 }
@@ -812,7 +806,6 @@
     </style>
 
 
-</head>
 <body>
 
 <div class="agency-profile-container">
@@ -823,7 +816,7 @@
         <img src="{{ getImagePath($bd->avatar) }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
-        <h1 class="agency-name">{{ $bd->name ??'' }}</h1>
+        <h1 class="agency-name">{{ $bd->username ??'' }}</h1>
         <div class="agency-meta">
             <div class="meta-item">
                 <span class="meta-label">{{ __("ID") }}:</span>
@@ -852,7 +845,7 @@
                     <div class="avatar-grid">
                         
                             
-                            <a href="#" ">
+                            <a href="#" >
                                {{  truncateAndTrim( $bd->total_salary)  }}
                             </a>
                     </div>
@@ -862,7 +855,7 @@
             <div class="performers-card">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-star"></i>
+                        <!-- <i class="fas fa-star"></i> -->
                         {{ __('Agency Count') }}
                     </h2>
                 </div>
@@ -871,7 +864,7 @@
                     <div class="avatar-grid">
                         
                             
-                            <a href="#" ">
+                            <a href="#" >
                                {{ $bd->agencies_count  }}
                             </a>
                     </div>
@@ -938,13 +931,13 @@
 
                                         <td class="user-cell">
                                             <div class="user-avatar">
-                                                <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                <a href="{{ url('admin/users/'. $agency->owner?->id ) }}">
                                                     <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ??'' }}">
                                                 </a>
                                             </div>
                                             <div class="user-info">
                                                 <strong>
-                                                    <a href="{{ url("admin/users/profile/.$agency->owner?->id") }}">
+                                                    <a href="{{ url('admin/users/'.$agency->owner?->id) }}">
                                                         {{ $agency->owner?->name ??'' }}
                                                     </a>
                                                 </strong>
@@ -993,7 +986,7 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>{{ __('Name') }}</th>
+                    <!-- <th>{{ __('Name') }}</th> -->
                     <th>{{ __('receiver') }}</th>
                     <th>{{ __('usd') }}</th>
                     <th>{{ __('amount') }}</th>
@@ -1029,8 +1022,8 @@
                         // تحديد المستلم (receiver) مع التحقق من وجوده
                         $receiverHtml = '';
 
-                        if ($charge->agency) {
-                            $agency = $charge->agency;
+                        if ($charge->receiveragency) {
+                            $agency = $charge->receiveragency;
                             if ($agency) {
                                 $cacheKey = "agency_image_{$agency->id}";
                                 $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {
@@ -1080,18 +1073,18 @@
                                     </a>
                                 ";
                             } else {
-                                $receiverHtml = "<span class='text-danger'>{{ __('لا يوجد مستلم') }}</span>";
+                                $receiverHtml = '<span class="text-danger">' . __('Unknown') . '</span>';
                             }
                         }
                     @endphp
                     <tr>
                         <td>{{ $transactions->firstItem() + $index }}</td>
-                        <td>
+                        <!-- <td>
                             <a href="{{ $userUrl }}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
                                 <img src="{{ getImagePath($userImage) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%;">
                                 <span>{{ $userName }}</span>
                             </a>
-                        </td>
+                        </td> -->
                         <td>{!! $receiverHtml !!}</td>
                         <td>{{ number_format($charge->usd ?? 0, 2) }}</td>
                         <td>{{ number_format($charge->amount ?? 0, 2) }}</td>
@@ -1118,62 +1111,82 @@
 
 
 @if($activeTab === 'target_history')
-    <div class="tab-content active" id="target-history-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">{{ __('Target History') }}</h4>
-            </div>
-            @if($target_history && $target_history->count())
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>{{ __('Agency ID') }}</th>
-                                    <th>{{ __('Salary') }}</th>
-                                    <th>{{ __('Amount') }}</th>
-                                    <th>{{ __('Month') }}</th>
-                                    <th>{{ __('Year') }}</th>
-                                    <th>{{ __('Is Paid') }}</th>
-                                    <th>{{ __('Created At') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($target_history as $index => $item)
-                                    <tr>
-                                        <td>{{ $target_history->firstItem() + $index }}</td>
-                                        <td>{{ $item->agency_id }}</td>
-                                        <td>{{ $item->salary }}</td>
-                                        <td>{{ $item->amount }}</td>
-                                        <td>{{ $item->month }}</td>
-                                        <td>{{ $item->year }}</td>
-                                        <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
-                                        <td>{{ $item->created_at }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-wrapper">
-                        {{ $target_history->appends(['tab' => 'target_history'])->links('vendor.pagination.default') }}
-                    </div>
+<div class="tab-content active" id="target-history-tab">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title">{{ __('Target History') }}</h4>
 
-            @else
-                <div class="empty-table">
-                    <i class="fas fa-calendar-times"></i>
-                    <p>{{ __('No target history found') }}</p>
-                </div>
-            @endif
+            <form method="GET" class="form-inline">
+                <input type="hidden" name="tab" value="target_history">
+
+                <select name="month" class="form-control mr-2">
+                    @foreach(range(1,12) as $m)
+                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="year" class="form-control mr-2">
+                    @foreach(range(now()->year-5, now()->year) as $y)
+                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                            {{ $y }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <button type="submit" class="btn btn-primary">{{ __('Filter') }}</button>
+            </form>
         </div>
+
+        @if($target_history && $target_history->count())
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('Agency ID') }}</th>
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('Month') }}</th>
+                            <th>{{ __('Year') }}</th>
+                            <th>{{ __('Is Paid') }}</th>
+                            <th>{{ __('Created At') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($target_history as $index => $item)
+                            <tr>
+                                <td>{{ $target_history->firstItem() + $index }}</td>
+                                <td>{{ $item->agency_id }}</td>
+                                <td>{{  truncateAndTrim( $item->amount)  }}</td>
+                                <td>{{ $item->month }}</td>
+                                <td>{{ $item->year }}</td>
+                                <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
+                                <td>{{ $item->created_at }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-wrapper">
+                {{ $target_history->appends(request()->except('page'))->links('vendor.pagination.default') }}
+            </div>
+        @else
+            <div class="empty-table">
+                <i class="fas fa-calendar-times"></i>
+                <p>{{ __('No target history found') }}</p>
+            </div>
+        @endif
     </div>
+</div>
 @endif
 
 </div>
-<!-- jQuery أولاً -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script> 
 
 
     <script>

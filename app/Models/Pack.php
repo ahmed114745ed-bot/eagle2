@@ -13,7 +13,7 @@ class Pack extends Model
 {
     use SoftDeletes, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $dates = ['deleted_at'];
 

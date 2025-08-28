@@ -9,5 +9,5 @@ class UserRelationAvilable extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 }

@@ -11,7 +11,7 @@ class Coin extends Model
 {
     use SoftDeletes, TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function paymentGateway(): BelongsTo
     {
