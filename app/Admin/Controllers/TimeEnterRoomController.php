@@ -50,9 +50,7 @@ class TimeEnterRoomController extends MainController
 
         $grid = new Grid(new TimeEnterRoom());
         $grid->disableRowSelector();
-        $grid->model()
-            ->selectRaw('user_id, room_id, SUM(minutes) as total_minutes, COUNT(*) as total_records')
-            ->groupBy('user_id', 'room_id');
+
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
@@ -73,6 +71,17 @@ class TimeEnterRoomController extends MainController
                 }, __('To Date'), 'to_date')->date();
             });
         });
+        $start = convertArabicToEnglishNumbers(request('from_date'));
+        $end = convertArabicToEnglishNumbers(request('to_date'));
+        $grid->model()->when(!empty($start) && !empty($end), function ($query) use ($start, $end) {
+
+            $query->whereBetween('created_at', [
+                Carbon::parse($start)->startOfDay(),
+                Carbon::parse($end)->endOfDay()
+            ]);
+        })
+            ->selectRaw('user_id, room_id, SUM(minutes) as total_minutes, COUNT(*) as total_records')
+            ->groupBy('user_id', 'room_id');
         $grid->column('user_id', __('user id'));
         $grid->column('user.name', __('user'));
         $grid->column('room_id', __('room id'));
@@ -88,10 +97,10 @@ class TimeEnterRoomController extends MainController
 
         Admin::script("
             $(document).on('click', '.show-same-device-modal', function() {
-                var userId = $(this).data('user-id');
-                var roomId = $(this).data('room-id');
-                var fromDate = $('input[name=\"from_date\"]').val();
-                var toDate   = $('input[name=\"to_date\"]').val();
+                var userId   = $(this).data('user-id');
+                var roomId   = $(this).data('room-id');
+                var fromDate = '" . request('from_date') . "';
+                var toDate   = '" . request('to_date') . "';
 
                 $('#timeUsersModal .modal-body').html('Loading...');
                 $('#timeUsersModal').modal('show');
@@ -116,11 +125,12 @@ class TimeEnterRoomController extends MainController
 
     public function userTime(Request $request)
     {
+        
         $start = convertArabicToEnglishNumbers($request->from_date);
         $end = convertArabicToEnglishNumbers($request->to_date);
+        
         $timeRooms = TimeEnterRoom::where('room_id', $request->room_id)->where('user_id', $request->user_id)
-            ->when(!empty($start) && !empty($end), function ($query) use ($start, $end) {
-
+            ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($start)->startOfDay(),
                     Carbon::parse($end)->endOfDay()
