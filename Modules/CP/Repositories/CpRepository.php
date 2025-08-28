@@ -387,7 +387,7 @@ class CpRepository
             ->whereNotNull('cp_id')
             ->join('cps', 'gift_logs.cp_id', '=', 'cps.id')
             ->join('cp_relations', 'cps.cp_relation_id', '=', 'cp_relations.id')
-            ->whereNotNull('cp_relations.type');
+            ->whereNotNull('cp_relations.type')->where('cp_relations.type', 'lovely');
 
         // Apply date filters
         $query->when($type, function ($query) use ($type) {
