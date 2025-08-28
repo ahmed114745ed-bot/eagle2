@@ -256,6 +256,7 @@ class PayPalService
                     'message' => "Transaction {$status}.",
                 ]);
             } else {
+                info('callback else failed');
                 return response()->json([
                     'status'  => false,
                     'trx'     => $coinLog->trx,
@@ -263,6 +264,7 @@ class PayPalService
                 ]);
             }
         } else {
+            info('callback Failed to retrieve transaction from PayPal.');
             return response()->json([
                 'status'  => false,
                 'trx'     => $coinLog->trx,
@@ -332,6 +334,7 @@ class PayPalService
                 ]);
 
             default:
+                info('WEBHOOK Default Failed.');
                 return response()->json([
                     'status'  => 'ignored',
                     'trx'     => $coinLog?->trx ?? $paypalId,
