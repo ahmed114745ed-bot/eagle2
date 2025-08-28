@@ -299,8 +299,6 @@ class PayPalService
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
         $paypalId   = $resource['id'] ?? null;
 
-        $coinLog = CoinLog::find($coinLogId);
-
 //        info($paypalId);
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
@@ -317,19 +315,19 @@ class PayPalService
 
                 return response()->json([
                     'status'  => true,
-                    'trx'     => $coinLog?->trx ?? $paypalId,
+                    'trx'     => $paypalId,
                     'message' => 'Transaction approved, pending capture.',
                 ]);
 
             case 'PAYMENT.CAPTURE.COMPLETED':
                 info('WEBHOOK COMPLETED');
-                return $this->webhookPayment($coinLogId);
+                return $this->webhookPayment($coinLogId, $paypalId);
 
             case 'PAYMENT.CAPTURE.DENIED':
                 info('WEBHOOK DENIED');
                 return response()->json([
                     'status'  => false,
-                    'trx'     => $coinLog?->trx ?? $paypalId,
+                    'trx'     => $paypalId,
                     'message' => 'Transaction denied.',
                 ]);
 
@@ -337,7 +335,7 @@ class PayPalService
                 info('WEBHOOK Default Failed.');
                 return response()->json([
                     'status'  => 'ignored',
-                    'trx'     => $coinLog?->trx ?? $paypalId,
+                    'trx'     => $paypalId,
                     'message' => "Event type {$eventType} not processed.",
                 ]);
         }
