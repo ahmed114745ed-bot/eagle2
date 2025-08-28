@@ -2,19 +2,17 @@
 
 namespace App\Services;
 
+use App\Enums\Payments\PaymentStatus;
 use App\Helpers\LogHelper;
 use App\Models\CoinLog;
 use App\Models\GameWallet;
 use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Log\LogManager;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
-use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
-use PayPalCheckoutSdk\Core\ProductionEnvironment;
 
 class PayPalService
 {
@@ -294,7 +292,15 @@ class PayPalService
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
         $paypalId   = $resource['id'] ?? null;
 
-        $coinLog = CoinLog::find($coinLogId);
+        $coinLog = CoinLog::where('trx', $paypalId)->first();
+
+        if (! $coinLog){
+            return response()->json([
+                'status'  => 'ignored',
+                'trx'     =>  $paypalId,
+                'message' => "Failed",
+            ]);
+        }
 
 
         LogHelper::info($eventType, $request->all());
@@ -304,8 +310,16 @@ class PayPalService
                 Log::info($eventType);
                 return response()->json([
                     'status'  => true,
-                    'trx'     => $coinLog?->trx ?? $paypalId,
+                    'trx'     =>  $paypalId,
                     'message' => 'Transaction approved, pending capture.',
+                ]);
+
+            case 'PAYMENT.CAPTURE.PENDING':
+                $coinLog->update(['status' => PaymentStatus::PENDING]);
+                return response()->json([
+                    'status'  => true,
+                    'trx'     => $paypalId,
+                    'message' => 'Transaction pending',
                 ]);
 
             case 'PAYMENT.CAPTURE.COMPLETED':
@@ -313,10 +327,20 @@ class PayPalService
                 return $this->webhookPayment($coinLogId,$paypalId, method: 'paypal');
 
             case 'PAYMENT.CAPTURE.DENIED':
+                $coinLog->update(['status' => PaymentStatus::CANCELED]);
+
                 return response()->json([
                     'status'  => false,
-                    'trx'     => $coinLog?->trx ?? $paypalId,
+                    'trx'     =>  $paypalId,
                     'message' => 'Transaction denied.',
+                ]);
+
+            case 'PAYMENT.CAPTURE.DECLINED':
+                $coinLog->update(['status' => PaymentStatus::CANCELED]);
+                return response()->json([
+                    'status'  => false,
+                    'trx'     => $paypalId,
+                    'message' => 'Transaction declined.',
                 ]);
 
             default:
