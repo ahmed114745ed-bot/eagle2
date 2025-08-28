@@ -120,14 +120,34 @@ class RoomController extends Controller
         $user = $request->user();
 
         try {
+
+            Log::info("start created successfully", [
+                'user_id'   => $user->id,
+           
+            ]);
+        
             $room = $this->roomService->findRoomUser($user->id);
             if ($room) {
                 return Common::apiResponse(true, 'you are already have a room', new RoomResource($room), 200);
             }
 
+            Log::info("Room  successfully", [
+                'user_id'   => $user->id,
+                'room_id'   => $room->id,
+                'room_type' => $room->type,
+                'is_live'   => $room->is_live,
+                'balance'   => $user->di,
+            ]);
+        
+
             $room = $this->roomService->create($request, $user);
             return Common::apiResponse(true, 'created', new RoomResource($room), 200);
         } catch (Exception $exception) {
+            Log::error("Failed to create room", [
+                'user_id' => $user->id,
+                'message' => $exception->getMessage(),
+                'trace'   => $exception->getTraceAsString()
+            ]);
             return Common::apiResponse(false, $exception->getMessage(), null, 400);
         }
     }

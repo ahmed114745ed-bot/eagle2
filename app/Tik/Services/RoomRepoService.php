@@ -75,6 +75,13 @@ class RoomRepoService
 
             $user->di = $user->di - $paidRoomAmount->value;
             $user->save();
+
+
+            \Log::info("User $userId paid $paidRoomAmount->value for creating a room.", [
+                'balance_before' => $amountBefore,
+                'balance_after'  => $user->di,
+                'room_data'      => $data
+            ]);
         }
 
         $room = $this->repository->create($data);
