@@ -18,7 +18,7 @@ class VerifyPayPalWebhook extends PayPalService
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $headers = $request->headers;
+        $headers = $request->headers->all();
 
 
         $payload = file_get_contents('php://input');
