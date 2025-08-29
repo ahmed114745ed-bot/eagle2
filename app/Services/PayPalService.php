@@ -35,17 +35,17 @@ class PayPalService
 
     protected function getAccessToken(): string
     {
-        $headers = [
-            'Content-Type'  => 'application/x-www-form-urlencoded',
-            'Authorization' => 'Basic ' . base64_encode(config('paypal.client_id') . ':' . config('paypal.client_secret'))
-        ];
+        $response = Http::asForm()
+            ->withBasicAuth(config('paypal.client_id'), config('paypal.client_secret'))
+            ->post(config('paypal.base_url') . '/v1/oauth2/token', [
+                'grant_type' => 'client_credentials',
+            ]);
 
-        $response = Http::withHeaders($headers)
-            ->withBody('grant_type=client_credentials')
-            ->post(config('paypal.base_url') . '/v1/oauth2/token');
+        if ($response->failed()) {
+            throw new \Exception('Failed to retrieve PayPal access token: ' . $response->body());
+        }
 
-
-        return json_decode($response->body())->access_token;
+        return $response->json()['access_token'];
     }
 
     /**
