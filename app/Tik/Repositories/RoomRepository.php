@@ -98,21 +98,23 @@ class RoomRepository extends AbstractRepository
         $roomType = $req->room_type ?? 'audio';
         $user = $req?->user();
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
-
-        $result = $this->model->withLuckyBoxFlag($user->id)->with([
-            'backgroundImage',
-            'lastPk',
-            'background',
+        $result = $this->model->withLuckyBoxFlag($user->id)
+            ->select(['id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at',])
+            ->with([
+            'backgroundImage:request_background_images.id,owner_room_id,img',
+            'lastPk:id,room_id',
+            'background:id',
             'roomVisitorUsers' => fn($q) => $q->limit(5),
             'myClass',
-            'roomCategory',
+            'roomCategory:id,type',
             'myType',
             'roomVisitors.user.packs',
             'owner.enabledMedals',
             'owner.country',
             'owner.eligiblePacks.ware',
+            'owner.profile',
             'owner.medals.achievementLevel.achievement',
-            'boxUse'
+            'boxUse',
         ])
         ->withCount('roomVisitors')
         ->whereHas('owner')
@@ -247,7 +249,7 @@ class RoomRepository extends AbstractRepository
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
             $q->whereIn('type', ['single_live', 'multi_live']);
-        })->paginate(10);
+            })->paginate(10);
     }
 
     public function getRoomsByGameId($gameId = null, array $with = [])
