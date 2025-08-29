@@ -35,10 +35,12 @@ class VerifyPayPalWebhook extends PayPalService
         $response = Http::withToken($accessToken)
             ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', $verificationData);
 
-        LogHelper::info('this is middleware ', $response);
-        /*if ($response->json('verification_status') !== 'SUCCESS') {
+        LogHelper::info('this is middleware ', [
+            'status' => $response->status(),
+            'body'   => $response->json(),
+        ]);        if ($response->json('verification_status') !== 'SUCCESS') {
             return response()->json(['status' => 'unauthorized'], 401);
-        }*/
+        }
 
         return $next($request);
     }
