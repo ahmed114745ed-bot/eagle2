@@ -18,18 +18,18 @@ class VerifyPayPalWebhook extends PayPalService
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $headers = $request->headers->all();
+        $headers = getallheaders();
 
 
         $payload = file_get_contents('php://input');
 
         $response = Http::withToken(app(PayPalService::class)->getAccessToken())
             ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', [
-                'auth_algo'         => $headers['PAYPAL-AUTH-ALGO'],
-                'cert_url'          => $headers['PAYPAL-CERT-URL'],
-                'transmission_id'   => $headers['PAYPAL-TRANSMISSION-ID'],
-                'transmission_sig'  => $headers['PAYPAL-TRANSMISSION-SIG'],
-                'transmission_time' => $headers['PAYPAL-TRANSMISSION-TIME'],
+                'auth_algo'         => @$headers['PAYPAL-AUTH-ALGO'],
+                'cert_url'          => @$headers['PAYPAL-CERT-URL'],
+                'transmission_id'   => @$headers['PAYPAL-TRANSMISSION-ID'],
+                'transmission_sig'  => @$headers['PAYPAL-TRANSMISSION-SIG'],
+                'transmission_time' => @$headers['PAYPAL-TRANSMISSION-TIME'],
                 'webhook_id'        => config('paypal.webhook_id'), // must match dashboard
                 'webhook_event'     => $payload, // full JSON body
             ]);
