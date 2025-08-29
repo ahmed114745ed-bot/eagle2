@@ -13,26 +13,19 @@ class HomeCarouselController extends Controller
 {
     public function index(Request $request)
     {
-        $user =Auth::user();
-        // logger('Headers:', $request->headers->all());
-        // logger('Request Data:', $request->all());
-    
+        $user = Auth::user();
+
         if ($request->hasHeader('x-notification-id')) {
-            $notificationId = $request->header('x-notification-id');
-            $user->notification_id = $notificationId;
-            $user->save();
+            $user->update(['notification_id' => $request->header('x-notification-id')]);
         }
 
-        $items = HomeCarousel::query()
-         ->where('enable', 1)->orderBy('sort');
-        if ($request->type != null) {
-            $items = $items->where('type', $request->type);
-        }
-        if ($request->category == 'charge_event') {
-            $items = $items->where('event_type', 'charge_event');
-        }
-        $items = $items->get();
-        $data = HomeCarouselResource::collection($items);
-        return Common::apiResponse(1, '', $data);
+        $items = HomeCarousel::query()->with('user','room','generalRole')
+            ->where('enable', 1)
+            ->orderBy('sort')
+            ->when($request->type, fn($q) => $q->where('type', $request->type))
+            ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
+            ->get();
+
+        return Common::apiResponse(1, '', HomeCarouselResource::collection($items));
     }
 }

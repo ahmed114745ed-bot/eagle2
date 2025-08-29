@@ -57,8 +57,9 @@ class RoomRepoService
     {
         $userId = $user->id;
         $data = array_merge($request->all(), ['uid' => $userId]);
+        unset($data['show']);
         $paidRoom = Config::where('name', 'paid_room')->first();
-
+ 
         if ($paidRoom && $paidRoom->value){
             $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
             if ($user->di < $paidRoomAmount->value){
@@ -75,6 +76,8 @@ class RoomRepoService
 
             $user->di = $user->di - $paidRoomAmount->value;
             $user->save();
+
+
         }
 
         $room = $this->repository->create($data);

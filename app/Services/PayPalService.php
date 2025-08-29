@@ -2,16 +2,17 @@
 
 namespace App\Services;
 
+use App\Enums\Payments\PaymentStatus;
+use App\Helpers\LogHelper;
 use App\Models\CoinLog;
 use App\Models\GameWallet;
 use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
-use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
-use PayPalCheckoutSdk\Core\ProductionEnvironment;
 
 class PayPalService
 {
@@ -34,17 +35,17 @@ class PayPalService
 
     protected function getAccessToken(): string
     {
-        $headers = [
-            'Content-Type'  => 'application/x-www-form-urlencoded',
-            'Authorization' => 'Basic ' . base64_encode(config('paypal.client_id') . ':' . config('paypal.client_secret'))
-        ];
+        $response = Http::asForm()
+            ->withBasicAuth(config('paypal.client_id'), config('paypal.client_secret'))
+            ->post(config('paypal.base_url') . '/v1/oauth2/token', [
+                'grant_type' => 'client_credentials',
+            ]);
 
-        $response = Http::withHeaders($headers)
-            ->withBody('grant_type=client_credentials')
-            ->post(config('paypal.base_url') . '/v1/oauth2/token');
+        if ($response->failed()) {
+            throw new \Exception('Failed to retrieve PayPal access token: ' . $response->body());
+        }
 
-
-        return json_decode($response->body())->access_token;
+        return $response->json()['access_token'];
     }
 
     /**
@@ -209,7 +210,6 @@ class PayPalService
 
             $status = $data['status'] ?? null;
             if ($status === 'COMPLETED') {
-                info('callback COMPLETED');
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog->trx,
@@ -220,8 +220,6 @@ class PayPalService
                     ->withHeaders(['Content-Type' => 'application/json'])
                     ->post(config('paypal.base_url') . "/v2/checkout/orders/{$coinLog->trx}/capture", (object)[]);
 
-                info($response);
-                info('callback APPROVED');
                 if ($response->successful()) {
                     $data = $response->json();
 
@@ -242,21 +240,18 @@ class PayPalService
                     'message' => 'Transaction approved, pending capture.',
                 ]);
             } elseif ($status === 'PENDING') {
-                info('callback PENDING');
                 return response()->json([
                     'status'  => true,
                     'trx'     => $coinLog->trx,
                     'message' => 'Transaction pending. Awaiting PayPal review.',
                 ]);
             } elseif (in_array($status, ['DENIED', 'FAILED', 'VOIDED', 'CANCELLED'])) {
-                info('callback DENIED FAILED VOIDED CANCELLED');
                 return response()->json([
                     'status'  => false,
                     'trx'     => $coinLog->trx,
                     'message' => "Transaction {$status}.",
                 ]);
             } else {
-                info('callback else failed');
                 return response()->json([
                     'status'  => false,
                     'trx'     => $coinLog->trx,
@@ -264,7 +259,6 @@ class PayPalService
                 ]);
             }
         } else {
-            info('callback Failed to retrieve transaction from PayPal.');
             return response()->json([
                 'status'  => false,
                 'trx'     => $coinLog->trx,
@@ -275,7 +269,6 @@ class PayPalService
 
     public function cancel($orderId): JsonResponse
     {
-        info('callback cancel endpoint');
         $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
 
         return response()->json([
@@ -299,43 +292,61 @@ class PayPalService
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
         $paypalId   = $resource['id'] ?? null;
 
-//        info($paypalId);
+        $coinLog = CoinLog::where('trx', $paypalId)->first();
+
+        if (! $coinLog){
+            return response()->json([
+                'status'  => 'ignored',
+                'trx'     =>  $paypalId,
+                'message' => "Failed",
+            ]);
+        }
+
+
+        LogHelper::info($eventType, $request->all());
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
-                info('WEBHOOK APPROVED');
-//                $captureResponse = Http::withToken($this->getAccessToken())
-//                    ->withHeaders(['Content-Type' => 'application/json'])
-//                    ->withBody('', 'application/json')
-//                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
-//
-//                info('capture order', [$captureResponse]);
-//                if ($captureResponse->successful()) {
-//                    return $this->webhookPayment($coinLogId);
-//                }
 
+                Log::info($eventType);
                 return response()->json([
                     'status'  => true,
-                    'trx'     => $paypalId,
+                    'trx'     =>  $paypalId,
                     'message' => 'Transaction approved, pending capture.',
                 ]);
 
+            case 'PAYMENT.CAPTURE.PENDING':
+                $coinLog->update(['status' => PaymentStatus::PENDING]);
+                return response()->json([
+                    'status'  => true,
+                    'trx'     => $paypalId,
+                    'message' => 'Transaction pending',
+                ]);
+
             case 'PAYMENT.CAPTURE.COMPLETED':
-                info('WEBHOOK COMPLETED');
-                return $this->webhookPayment($coinLogId, $paypalId);
+                Log::info($paypalId);
+                return $this->webhookPayment($paypalId, method: 'paypal');
 
             case 'PAYMENT.CAPTURE.DENIED':
-                info('WEBHOOK DENIED');
+                $coinLog->update(['status' => PaymentStatus::CANCELED]);
+
                 return response()->json([
                     'status'  => false,
-                    'trx'     => $paypalId,
+                    'trx'     =>  $paypalId,
                     'message' => 'Transaction denied.',
                 ]);
 
+            case 'PAYMENT.CAPTURE.DECLINED':
+                $coinLog->update(['status' => PaymentStatus::CANCELED]);
+                return response()->json([
+                    'status'  => false,
+                    'trx'     => $paypalId,
+                    'message' => 'Transaction declined.',
+                ]);
+
             default:
-                info('WEBHOOK Default Failed.');
                 return response()->json([
                     'status'  => 'ignored',
-                    'trx'     => $paypalId,
+                    'trx'     => $coinLog?->trx ?? $paypalId,
                     'message' => "Event type {$eventType} not processed.",
                 ]);
         }

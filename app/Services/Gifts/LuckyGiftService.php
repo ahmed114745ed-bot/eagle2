@@ -527,7 +527,7 @@ class LuckyGiftService
      */
     public function isPopular(mixed $cashback_percentage): bool
     {
-        return $cashback_percentage >= 250;
+        return $cashback_percentage >= 5;
     }
 
     /**
