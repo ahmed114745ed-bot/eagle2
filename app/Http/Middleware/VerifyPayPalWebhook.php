@@ -20,26 +20,27 @@ class VerifyPayPalWebhook extends PayPalService
     {
         $headers = $request->headers;
 
-        $verificationData = [
-            'auth_algo'         => $headers->get('paypal-auth-algo'),
-            'cert_url'          => $headers->get('paypal-cert-url'),
-            'transmission_id'   => $headers->get('paypal-transmission-id'),
-            'transmission_sig'  => $headers->get('paypal-transmission-sig'),
-            'transmission_time' => $headers->get('paypal-transmission-time'),
-            'webhook_id'        => config('paypal.webhook_id'),
-            'webhook_event'     => $request->all(),
-        ];
 
-        $accessToken = (new PayPalService())->getAccessToken();
+        $payload = file_get_contents('php://input');
 
-        $response = Http::withToken($accessToken)
-            ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', $verificationData);
+        $response = Http::withToken(app(PayPalService::class)->getAccessToken())
+            ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', [
+                'auth_algo'         => $headers['PAYPAL-AUTH-ALGO'],
+                'cert_url'          => $headers['PAYPAL-CERT-URL'],
+                'transmission_id'   => $headers['PAYPAL-TRANSMISSION-ID'],
+                'transmission_sig'  => $headers['PAYPAL-TRANSMISSION-SIG'],
+                'transmission_time' => $headers['PAYPAL-TRANSMISSION-TIME'],
+                'webhook_id'        => config('paypal.webhook_id'), // must match dashboard
+                'webhook_event'     => $payload, // full JSON body
+            ]);
 
         LogHelper::info('this is middleware ', [
+            'headers' => $headers,
             'base_url' => config('paypal.base_url'),
             'status' => $response->status(),
             'body'   => $response->json(),
-        ]);        if ($response->json('verification_status') !== 'SUCCESS') {
+        ]);
+        if ($response->json('verification_status') !== 'SUCCESS') {
             return response()->json(['status' => 'unauthorized'], 401);
         }
 
