@@ -145,7 +145,7 @@ class HomeCarouselController extends MainController
                 $file = request()->file('img');
                 $toWebpAndUpload = ImageConverter::toWebpAndUpload($file, 'banners');
                 if ($toWebpAndUpload) {
-                    $form->model()->img = $toWebpAndUpload;
+                    $form->img = $toWebpAndUpload;
                 }
 
             }
