@@ -25,7 +25,9 @@ class ImagePath extends \Encore\Admin\Form\Field\Image
         $this->callInterventionMethods($image->getRealPath());
 
         $path = ImageConverter::toWebpAndUpload($image, 'banners', $this->resolution);
-//        $path = $this->uploadAndDeleteOriginal($image);
+        if (!$path) {
+            $path = $this->uploadAndDeleteOriginal($image);
+        }
 
         $this->uploadAndDeleteOriginalThumbnail($image);
 
