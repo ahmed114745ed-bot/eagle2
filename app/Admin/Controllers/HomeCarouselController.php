@@ -141,14 +141,14 @@ class HomeCarouselController extends MainController
             });
 
         $form->saving(function (Form $form) {
-            if (request()->hasFile('img')) {
+            /*if (request()->hasFile('img')) {
                 $file = request()->file('img');
                 $toWebpAndUpload = ImageConverter::toWebpAndUpload($file, 'banners');
                 if ($toWebpAndUpload) {
                     $form->img = $toWebpAndUpload;
                 }
 
-            }
+            }*/
         });
 
         return $form;
