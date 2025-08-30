@@ -45,7 +45,6 @@ class GiftLogService
      */
     public function sendGift($request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        dd("dddddddddddddddddddddddddddddddd");
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
             $data    = $request;
@@ -91,7 +90,6 @@ class GiftLogService
             //        $percentageValues = $this->getReceivedAndSanderPercentage();
             //decrement the user coins
             $sendPrice = (int)($totalPrice);
-            dd($type);
             if ($type !== 'bag') {
                 $amountBefore = $user->di;
 
@@ -223,8 +221,6 @@ class GiftLogService
      */
     private function checkGiftAvailability($user, $gift, $number, $type, $totalPrice)
     {
-
-
         if ($type == 'bag') {
 
             $existingGiftCount = UserGift::where('user_id', $user->id)
