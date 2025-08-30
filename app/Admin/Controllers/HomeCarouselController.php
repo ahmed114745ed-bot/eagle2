@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Tik\Services\Files\ImageConverter;
 use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -138,6 +139,17 @@ class HomeCarouselController extends MainController
                     $form->url('url', trans('url'));
                 });
             });
+
+        $form->saving(function (Form $form) {
+            if (request()->hasFile('img')) {
+                $file = request()->file('img');
+                $toWebpAndUpload = ImageConverter::toWebpAndUpload($file, 'banners');
+                if ($toWebpAndUpload) {
+                    $form->model()->img = $toWebpAndUpload;
+                }
+
+            }
+        });
 
         return $form;
     }
