@@ -10,7 +10,6 @@ class ImageConverter
     /**
      * Convert an uploaded image to WebP and upload directly to GCS.
      *
-     * @param  UploadedFile  $file
      * @param  string  $folder  Folder to save file on it (e.g., "images")
      * @param  int  $qScale  Quality scale (0–100, default 80)
      * @return string|false Public URL or false on failure
@@ -38,8 +37,16 @@ class ImageConverter
             return false;
         }
 
+        // Convert file path into UploadedFile
+        $uploadedFile = new UploadedFile(
+            $tempOutput,                     // Absolute path
+            basename($tempOutput),           // Original file name
+            'image/webp',                    // Mime type
+            null,                            // Size (null = auto)
+            true                             // Test mode (skip file upload checks)
+        );
 
-        $path = Common::upload($folder, $tempOutput);
+        $path = Common::upload($folder, $uploadedFile);
 
         // Delete temp file
         unlink($tempOutput);
