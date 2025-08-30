@@ -45,6 +45,7 @@ class GiftLogService
      */
     public function sendGift($request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+        dd("dddddddddddddddddddddddddddddddd");
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
             $data    = $request;

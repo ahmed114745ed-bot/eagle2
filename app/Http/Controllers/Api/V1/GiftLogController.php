@@ -267,7 +267,6 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        dd("dddddddddddd");
         $close_open_gifts = settings()->get('close_open_gifts');
 
         if ($close_open_gifts == 1) {
