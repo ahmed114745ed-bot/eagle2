@@ -90,7 +90,7 @@ class GiftLogService
             //        $percentageValues = $this->getReceivedAndSanderPercentage();
             //decrement the user coins
             $sendPrice = (int)($totalPrice);
-            Log::info($type);
+            dd($type);
             if ($type !== 'bag') {
                 $amountBefore = $user->di;
 
