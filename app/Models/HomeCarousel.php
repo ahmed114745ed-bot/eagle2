@@ -6,13 +6,14 @@ use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDeleteIfCreatedByDeveloper;
+use Modules\Events\Entities\GeneralRole;
 
 class HomeCarousel extends Model
 {
     use PreventDeleteIfCreatedByDeveloper;
     protected $table = 'home_carousels';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {
@@ -23,6 +24,12 @@ class HomeCarousel extends Model
     {
         return $this->hasOne(Room::class, 'uid', 'owner_id');
     }
+
+    public function generalRole()
+    {
+        return $this->hasOne(GeneralRole::class, 'type', 'event_type');
+    }
+
 
     protected static function boot()
     {

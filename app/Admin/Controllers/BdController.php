@@ -456,4 +456,34 @@ class BdController extends MainController
 
         return $show;
     }
+
+
+
+    public function sync($days = 0)
+    {
+        $days = request()->query('days', 0);
+        $bds = DB::table('admin_users')
+            ->where('type', 'bd')
+            ->where('app_id', '!=', 0)
+            ->get();
+    
+        $updated = 0;
+    
+        foreach ($bds as $bd) {
+            $query = DB::table('agencies')
+                ->where('bd_id', $bd->app_id);
+    
+            if ($days > 0) {
+                $query->where('created_at', '<=', now()->subDays($days));
+            }
+    
+            $affected = $query->update(['bd_id' => $bd->id]);   
+            $updated += $affected;
+        }
+    
+        return response()->json([
+            'status' => 'success',
+            'message' => $updated 
+        ]);
+    }
 }

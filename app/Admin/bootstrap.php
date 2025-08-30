@@ -28,17 +28,9 @@ use Illuminate\Support\Facades\Schema;
 
 //Encore\Admin\Form::forget( ['map', 'editor']);
 //Admin::js('/packages/customization/js/main.js');
-if (Schema::hasTable('settings')) {
-    $favicon = DB::table('settings')->where('key', 'app_fav_icon')->value('value');
 
-    if ($favicon) {
-        Admin::favicon(getImagePath($favicon)); // Use the correct path
-    } else {
-        Admin::favicon(asset('images/app-logo.png')); // Default favicon
-    }
-} else {
-    Admin::favicon(asset('images/app-logo.png')); // Default favicon
-}
+Admin::favicon(getFavIcon());
+
 
 Admin::css ('css/admin.css');
 Admin::js(asset('js/laravel_admin.js'));

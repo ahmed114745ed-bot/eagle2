@@ -11,7 +11,7 @@ class BanRoom extends Model
     use PreventDeleteIfCreatedByDeveloper;
 
     protected $table='bans_rooms';
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function room()
     {
@@ -33,7 +33,7 @@ class BanRoom extends Model
         parent::boot();
         static::preventDeleteByDeveloper();
         static::preventCreateByDeveloper();
-        
-    
+
+
     }
 }

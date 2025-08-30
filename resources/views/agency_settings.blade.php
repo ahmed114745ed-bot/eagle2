@@ -377,6 +377,57 @@
     .btn-sm {
         margin: 0 !important;
     }
+
+    /* للشاشات الصغيرة (موبايل) */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .all-page {
+        flex-direction: column;
+        display: flex;
+    }
+
+    .settings-sidebar {
+        width: 100%;
+        padding: 10px;
+        box-shadow: none;
+        position: relative;
+    }
+
+    .settings-sidebar h2 {
+        margin-bottom: 10px;
+    }
+
+    .settings-menu {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .settings-menu button {
+        flex: 1 1 45%;
+        font-size: 14px;
+        padding: 10px;
+        margin: 2px 0;
+    }
+
+    .settings-content {
+        width: 100% !important;
+        padding: 10px;
+    }
+
+    .form {
+        width: 100% !important;
+    }
+
+    .badge-upload-container {
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+    }
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -385,7 +436,7 @@
 <body>
     <div class="all-page">
         <div class="settings-sidebar">
-            <h2>{{ __('Settings') }}</h2>
+            <h2 onclick="toggleMenu()">☰ {{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('PercentageTarget')"
                     style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Percentage target') }}</button>
@@ -602,6 +653,8 @@
 
 
         <script>
+
+            
             function previewImage(input, previewId) {
                 const preview = document.getElementById(previewId);
                 const file = input.files[0];

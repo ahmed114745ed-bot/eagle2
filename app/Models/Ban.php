@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ban extends Model
 {
     use PreventDeleteIfCreatedByDeveloper;
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     public function user()
     {
@@ -30,8 +30,8 @@ class Ban extends Model
         parent::boot();
         static::preventDeleteByDeveloper();
         static::preventCreateByDeveloper();
-        
-    
+
+
     }
 
 }

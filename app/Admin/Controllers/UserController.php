@@ -172,6 +172,7 @@ class UserController extends MainController
 //            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
             'senderLevel',
             'receiverLevel',
+            'monthlyDiamondReceive',
             'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])->withCount('sameDeviceUsers');
 
@@ -268,14 +269,14 @@ class UserController extends MainController
         $permission = $this->permission_name;
 
 
- 
-       
+
+
         $grid->column('bd_action', __('BD Action'))->display(function () {
             if ($this->is_bd == 1) {
-             
+
                 $form = '<form method="POST" action="' . route('users.remove', $this->id) . '" style="display:inline">';
-                $form .= csrf_field(); 
-                $form .= method_field('POST'); 
+                $form .= csrf_field();
+                $form .= method_field('POST');
                 $form .= '<button type="submit" class="btn btn-danger btn-sm">'
                     . __('Remove BD') . '</button>';
                 $form .= '</form>';
@@ -283,7 +284,7 @@ class UserController extends MainController
             }
             return '';
         });
-        
+
 
         Admin::script("
                     $(document).on('click', '.show-same-device-modal', function() {
@@ -655,7 +656,7 @@ class UserController extends MainController
         //             $('.btn-file').hide(); // Hide browse/upload buttons (common Bootstrap Fileinput class)
         //             $('.fileinput-upload').hide(); // Hide upload buttons if present
         //             $('input[type="file"]').prop('disabled', true); // Prevent any file selection
-   
+
         //         });
         //     JS
         // );
@@ -983,7 +984,7 @@ class UserController extends MainController
         $user = User::findOrFail($id);
         $user->is_bd = 0;
         $user->save();
-    
+
         return redirect()->back();
     }
 

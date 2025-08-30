@@ -12,7 +12,7 @@ class UserTarget extends Model
 
     protected $table = 'user_target';
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $casts = [
         'extras' => 'json',

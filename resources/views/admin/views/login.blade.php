@@ -1,17 +1,7 @@
 @php
-    use Illuminate\Support\Facades\Schema;
-    use Illuminate\Support\Facades\DB;
 
-    $logo = asset('images/app-logo.png'); // Default logo
+        $logo = getAppLogo();
 
-    if (Schema::hasTable('settings')) {
-        $logoDb = DB::table('settings')->where('key', 'app_logo')->value('value');
-
-
-        if ($logoDb) {
-            $logo = getImagePath( $logoDb);
-        }
-    }
 @endphp
 
 <!DOCTYPE html>
@@ -111,7 +101,7 @@
         $btn.prop('disabled', true).text('{{ trans('admin.logging_in') ?? 'Logging in...' }}');
         });
     });
-    
+
 </script>
 </body>
 </html>

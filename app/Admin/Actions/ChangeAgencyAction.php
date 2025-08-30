@@ -68,7 +68,6 @@ class ChangeAgencyAction extends RowAction
         ]);
 
         $user->agency_id = $request->agency_id;
-        $user->type_user = User::TYPE_HOST;
         $user->save();
 
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $oldAgencyId])->delete();

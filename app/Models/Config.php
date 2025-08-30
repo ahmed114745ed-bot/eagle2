@@ -11,7 +11,7 @@ class Config extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected static function boot()
     {

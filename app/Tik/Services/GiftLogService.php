@@ -24,6 +24,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
+use Illuminate\Support\Facades\Log;
 use Modules\RoomBoom\Services\RoomBoomGiftService;
 
 
@@ -89,7 +90,6 @@ class GiftLogService
             //        $percentageValues = $this->getReceivedAndSanderPercentage();
             //decrement the user coins
             $sendPrice = (int)($totalPrice);
-
             if ($type !== 'bag') {
                 $amountBefore = $user->di;
 
@@ -221,8 +221,6 @@ class GiftLogService
      */
     private function checkGiftAvailability($user, $gift, $number, $type, $totalPrice)
     {
-
-
         if ($type == 'bag') {
 
             $existingGiftCount = UserGift::where('user_id', $user->id)

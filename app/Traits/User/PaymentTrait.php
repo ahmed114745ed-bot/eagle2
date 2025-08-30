@@ -4,6 +4,7 @@ namespace App\Traits\User;
 
 use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
+use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
 use App\Models\User;
@@ -60,57 +61,84 @@ trait PaymentTrait
         return $data;
     }
 
-    public function webhookPayment($coinLogId)
+    public function webhookPayment( $trx , $method = null)
     {
-        $coinLog = CoinLog::where("id", $coinLogId)->first();
+        info('Webhook Payment Triggered', ['trx' => $trx]);
 
-        if (!$coinLog || $coinLog->status == 1) {
-            return response()->json(['status' => 'failed', 'reason' => 'Item not found or already processed']);
+        // Fetch coin log
+        $coinLog = CoinLog::where('trx', $trx)
+            ->when($method != null, fn($q) => $q->where('method', $method))
+            ->first();
+
+        if (!$coinLog) {
+            return response()->json([
+                'status' => 'failed',
+                'reason' => 'Transaction not found',
+            ]);
         }
 
-        $coinLog->status = 1;
-        $coinLog->save();
+        $coinLogId = $coinLog->id;
 
-        \Log::error("coinLogId Signature coinLogId ", [
-            'coinLog' => $coinLogId,
-            '$coinLog->user' => $coinLog->user,
-            
-        ]);
-        $user = $coinLog->user;
-        $amountBefore = $user->di;
-        if ($user) {
-
-        
-            UserCoinLogHelper::logByType(
-                $user->id,
-                $coinLog->obtained_coins,
-                $amountBefore,
-                UserCoinLogType::PAYMENT,
-            );
-
-            $user->di += $coinLog->obtained_coins;
-            $user->save();
-
-            \Log::error("obtained_coins Signature coinLogId ", [
-                'coinLog' => $coinLogId,
-                '$coinLog->obtained_coins' => $coinLog->obtained_coins,
-                
+        if ($coinLog->status == 1) {
+            return response()->json([
+                'status' => 'failed',
+                'reason' => 'Transaction already processed',
             ]);
-            UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
-            if ($user instanceof User) {
-                (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
-            }
-        } else {
+        }
+
+        // Mark as processed
+        $coinLog->update(['status' => 1]);
+
+        LogHelper::info('CoinLog processed', [
+            'coinLogId' => $coinLogId,
+            'trx'       => $coinLog->trx,
+            'user_id'   => $coinLog->user_id,
+        ]);
+
+        $user = $coinLog->user;
+
+        if (!$user) {
+            info('No user found for CoinLog', ['coinLogId' => $coinLogId]);
+
             return response()->json([
                 'status'  => false,
                 'trx'     => $coinLog->trx,
-                'message' => 'Transaction failed.',
+                'message' => 'Transaction failed. User not found.',
             ]);
         }
-        response()->json([
+
+        // Update user balance
+        $amountBefore = $user->di;
+        $user->increment('di', $coinLog->obtained_coins);
+
+        // Log transaction
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $coinLog->obtained_coins,
+            $amountBefore,
+            UserCoinLogType::PAYMENT,
+        );
+
+        info('Coins credited', [
+            'coinLogId'     => $coinLogId,
+            'trx'           => $coinLog->trx,
+            'obtainedCoins' => $coinLog->obtained_coins,
+            'user_id'       => $user->id,
+            'balance_after' => $user->di,
+        ]);
+
+        // Add extra features
+        UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
+
+        if ($user instanceof User) {
+            (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
+        }
+
+        return response()->json([
             'status'  => true,
-            'trx'     => $coinLog?->trx,
+            'trx'     => $coinLog->trx,
             'message' => 'Transaction completed successfully.',
         ]);
     }
+
 }
