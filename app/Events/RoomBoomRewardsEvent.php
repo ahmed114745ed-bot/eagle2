@@ -45,4 +45,9 @@ class RoomBoomRewardsEvent implements ShouldBroadcast
                 ]),
         ];
     }
+
+    public function broadcastQueue()
+    {
+        return 'roomBoomRewards';
+    }
 }
