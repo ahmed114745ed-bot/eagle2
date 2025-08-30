@@ -37,6 +37,7 @@ class ImagePath extends \Encore\Admin\Form\Field\Image
     public function setResolution($resolution)
     {
         $this->resolution = $resolution;
+        return $this;
     }
 
 }
