@@ -20,10 +20,10 @@ class ImagePath extends Image
 
         $this->name = $this->getStoreName($image);
 
+
+        $this->callInterventionMethods($image->getRealPath());
+
         $path = ImageConverter::toWebpAndUpload($image, 'banners');
-
-//        $this->callInterventionMethods($image->getRealPath());
-
 //        $path = $this->uploadAndDeleteOriginal($image);
 
         $this->uploadAndDeleteOriginalThumbnail($image);
