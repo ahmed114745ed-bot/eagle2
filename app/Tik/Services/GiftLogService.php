@@ -59,7 +59,7 @@ class GiftLogService
             //get the gift data from id in the parameter
             $gift = $this->giftRepository->findById($giftId);
             // Validation if gift return null
-            if (!$gift) return Common::apiResponse(0, 'Gift does not exist or has been removed', null, 404);
+            if (!$gift) return  throw new \Exception('Gift does not exist or has been removed');
 
             // receivers ids
             $receiversIds = explode(',', $data['toUid']);
@@ -76,12 +76,12 @@ class GiftLogService
             // Get Room Data
             $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status');
             // Validation if no room
-            if (!$room) return Common::apiResponse(0, 'room does not exist', null, 404);
+            if (!$room)  throw new \Exception('room does not exist');
 
             // validation if this gift vip < user vip then throw Exception
             /** @var User $user*/
             $vip_level = $user->UserVip?->level;
-            if (@$vip_level < $gift->vip_level) return Common::apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');
+            if (@$vip_level < $gift->vip_level) throw new \Exception('vip ' . $gift->vip_level . ' to send this gift');
 
             // get received users data
             $receivedUsers = $this->UserRepository->getUsers($receiversIds);
@@ -140,7 +140,7 @@ class GiftLogService
                     $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                     // dd($cpIds);
                 } catch (\Exception $e) {
-                    throw new \Exception('not found');
+
                 }
             }
 
