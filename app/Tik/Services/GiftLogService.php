@@ -24,6 +24,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
+use Illuminate\Support\Facades\Log;
 use Modules\RoomBoom\Services\RoomBoomGiftService;
 
 
@@ -89,7 +90,7 @@ class GiftLogService
             //        $percentageValues = $this->getReceivedAndSanderPercentage();
             //decrement the user coins
             $sendPrice = (int)($totalPrice);
-
+            Log::info($type);
             if ($type !== 'bag') {
                 $amountBefore = $user->di;
 
