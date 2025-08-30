@@ -117,7 +117,7 @@ class HomeCarouselController extends MainController
 
         $form->display(__('admin.ID'));
         $form->number('sort', __('sort'));
-        $form->imagePath('img', trans('img'))->setResolution(10)->required();
+        $form->imagePath('img', trans('img'))->setResolution(100)->required();
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
         $form->select('form', trans('time view type'))->options([0 => __(''), 1 => __('hours'), 2 => __('days'), 3 => __('month')])
             ->when(1, function (Form $form) {
