@@ -3,11 +3,12 @@
 namespace App\Admin\Fields;
 
 use App\Tik\Services\Files\ImageConverter;
-use Encore\Admin\Form\Field\ImageField;
 
-class ImagePath extends Image
+
+class ImagePath extends \Encore\Admin\Form\Field\Image
 {
 
+    private int $resolution = 80;
     public function prepare($image)
     {
         if ($this->picker) {
@@ -23,12 +24,17 @@ class ImagePath extends Image
 
         $this->callInterventionMethods($image->getRealPath());
 
-        $path = ImageConverter::toWebpAndUpload($image, 'banners');
+        $path = ImageConverter::toWebpAndUpload($image, 'banners', $this->resolution);
 //        $path = $this->uploadAndDeleteOriginal($image);
 
         $this->uploadAndDeleteOriginalThumbnail($image);
 
         return $path;
+    }
+
+    public function setResolution($resolution)
+    {
+        $this->resolution = $resolution;
     }
 
 }
