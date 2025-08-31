@@ -5,20 +5,21 @@ namespace App\Admin\Controllers;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Layout\Content;
 use App\Models\GameWallet;
 use Illuminate\Http\Request;
+use Encore\Admin\Layout\Content;
 use App\Models\GameChargeHistory;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 
-class GameChargeHistoryController extends AdminController
+class GameChargeHistoryController extends MainController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title = 'Game Charge History';
+   // protected $title = 'Game Charge History';
 
 
     public function index(Content $content)
