@@ -79,17 +79,29 @@ class SpecialHistoryController extends MainController
                 $filter->equal('ware.value', __('UUID'));
             });
 
-             $filter->column(1 / 2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     if ($from = request('from_date')) {
                         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
                         $query->whereDate('created_at',  $start);
                     }
                 }, __('start date'), 'from_date')->date();
+            });
 
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {}, __('end date'), 'end_date')->date();
             });
         });
+        if ($end = request('end_date')) {
+            $endDate = \Carbon\Carbon::parse(convertArabicToEnglishNumbers($end))->toDateString();
 
+            $grid->model()->whereHas('ware', function ($q) use ($endDate) {
+                $q->whereRaw(
+                    "DATE(DATE_ADD(special_id_histories.created_at, INTERVAL wares.expire DAY)) = ?",
+                    [$endDate]
+                );
+            });
+        }
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))->display(function () {
             $name = @$this->user->name ?? '';
