@@ -143,7 +143,7 @@ class RoomRepository extends AbstractRepository
 
         $result->orderByDesc('pin');
 
-        if ($topRooms) {
+        if ($topRooms && $roomType != 'live') {
             $result->orderByRaw('is_top = 1 DESC');
         }else {
             $result->where(function ($query) {
