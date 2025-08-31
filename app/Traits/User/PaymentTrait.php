@@ -61,12 +61,11 @@ trait PaymentTrait
         return $data;
     }
 
-    public function webhookPayment( $trx , $method = null)
+    public function webhookPayment( $orderId , $method = null)
     {
-        info('Webhook Payment Triggered', ['trx' => $trx]);
 
         // Fetch coin log
-        $coinLog = CoinLog::where('id', $trx)
+        $coinLog = CoinLog::where('id', $orderId)
             ->when($method != null, fn($q) => $q->where('method', $method))
             ->first();
 
@@ -119,13 +118,13 @@ trait PaymentTrait
             UserCoinLogType::PAYMENT,
         );
 
-        info('Coins credited', [
-            'coinLogId'     => $coinLogId,
-            'trx'           => $coinLog->trx,
-            'obtainedCoins' => $coinLog->obtained_coins,
-            'user_id'       => $user->id,
-            'balance_after' => $user->di,
-        ]);
+        // info('Coins credited', [
+        //     'coinLogId'     => $coinLogId,
+        //     'trx'           => $coinLog->trx,
+        //     'obtainedCoins' => $coinLog->obtained_coins,
+        //     'user_id'       => $user->id,
+        //     'balance_after' => $user->di,
+        // ]);
 
         // Add extra features
         UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
