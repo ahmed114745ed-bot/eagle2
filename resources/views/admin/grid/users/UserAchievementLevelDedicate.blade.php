@@ -219,7 +219,7 @@
                     @foreach ($achievementValidImage as $data)
                     <label class="image-option">
                         <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
-                        <img src="{{ getImagePath($data->file) }}" class="img-thumbnail" width="150" height="200">
+                        <img src="{{ getImagePath($data->file) }}" class="img-fluid img-thumbnail" style="max-width:200px; height:auto;">
                     </label>
                     @endforeach
                 </div>
