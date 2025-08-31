@@ -135,16 +135,16 @@ class AuthService
     {
         
 
-        if (!$request['id_token']) throw new \Exception('google id token missing');
-        $client = new Google_Client();
+       // if (!$request['id_token']) throw new \Exception('google id token missing');
+        // $client = new Google_Client();
 
-        // $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
+        // // $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
 
-        $payload = $client->verifyIdToken($request['id_token']);
-        if (!$payload) {
-            throw new \Exception('Google ID Token not found or invalid');
-        }
-        $google_id = $payload['sub'];
+        // $payload = $client->verifyIdToken($request['id_token']);
+        // if (!$payload) {
+        //     throw new \Exception('Google ID Token not found or invalid');
+        // }
+        // $google_id = $payload['sub'];
 
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
@@ -215,10 +215,7 @@ class AuthService
             $user->save();
             $user->load('profile');
             $profile = $user->profile;
-            if ($profile) {
-                $profile->fill($data);
-                $profile->save();
-            } else {
+            if (!$profile) 
                 $profile = Profile::create([
                     'gender' => null,
                     'birthday' => null,
