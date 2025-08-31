@@ -87,7 +87,7 @@ trait PaymentTrait
         }
 
         // Mark as processed
-        $coinLog->update(['status' => 1, 'trx' => $trx]);
+        $coinLog->update(['status' => 1]);
 
         LogHelper::info('CoinLog processed', [
             'coinLogId' => $coinLogId,
