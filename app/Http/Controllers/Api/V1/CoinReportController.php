@@ -77,13 +77,14 @@ class CoinReportController extends Controller
         $user = auth()->user();
         $paymentCoins = PaymentCoin::orderBy('type')->pluck('type')->toArray();
         $data = CoinLog::where("user_id", $user->id)
-        ->whereIn('method', $paymentCoins)
-        ->when(request("start_date") && request("end_date"), function ($q) {
-            $q->whereDate("created_at", ">=", request("start_date"))
-              ->whereDate("created_at", "<=", request("end_date"));
-        })
-        ->orderBy("created_at", "desc")
-        ->paginate(10);//->get();
+            ->where('status', 1)
+            ->whereIn('method', $paymentCoins)
+            ->when(request("start_date") && request("end_date"), function ($q) {
+                $q->whereDate("created_at", ">=", request("start_date"))
+                    ->whereDate("created_at", "<=", request("end_date"));
+            })
+            ->orderBy("created_at", "desc")
+            ->paginate(10);//->get();
         return RechargeCoinsReportResource::collection($data);
     }
 
