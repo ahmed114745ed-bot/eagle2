@@ -84,7 +84,6 @@ class PaymentMethodController extends Controller
 
         $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantRefNumber)->first();
         $order = CoinLog::where('trx', $merchantRefNumber)->first();
-        info($orderStatus);
         if ($orderStatus === 'PAID') {
             $this->webhookPayment($order->id);
             $order->pid = $fawryRefNumber;
