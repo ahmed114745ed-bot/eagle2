@@ -638,7 +638,7 @@ class AgencyService
 
     public function kickAgency($auth, $userId)
     {
-        $user_kicked = $this->userRepository->findById($userId);
+        $user_kicked = $this->userRepository->searchUserById($userId);
         if (!$user_kicked) throw new Exception('user not found');
         if ($user_kicked->agency_id != $auth->ownAgency->id || $user_kicked->id == $auth->ownAgency->app_owner_id) throw new Exception('لا يمكنك ازاله هذا المستخدم!');
         UserHandling::kickUserFromAgency($user_kicked, 1);
