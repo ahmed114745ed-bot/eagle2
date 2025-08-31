@@ -5,8 +5,7 @@ namespace App\Admin\Controllers;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Config;
+use Encore\Admin\Layout\Content;
 use App\Models\GameWallet;
 use Illuminate\Http\Request;
 use App\Models\GameChargeHistory;
@@ -19,8 +18,15 @@ class GameChargeHistoryController extends AdminController
      *
      * @var string
      */
-    protected $title = 'GameChargeHistory';
+    protected $title = 'Game Charge History';
 
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('Game Charge History'))
+            ->body($this->grid()));
+    }
     /**
      * Make a grid builder.
      *
