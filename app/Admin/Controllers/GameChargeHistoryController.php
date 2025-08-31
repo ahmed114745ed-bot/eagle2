@@ -33,11 +33,9 @@ class GameChargeHistoryController extends AdminController
         $grid->model()->orderByDesc('id');
         $grid->column('id', __('Id'));
         $grid->column('value', __('Value'));
-        $grid->actions(function ($actions) {
-            $actions->disableDelete();
-            $actions->disableEdit();
-            $actions->disableView();
-        });
+        $grid->column('created_at', trans('admin.created_at'));
+        $grid->disableActions();
+        $grid->disableRowSelector();
 
         return $grid;
     }
@@ -75,11 +73,11 @@ class GameChargeHistoryController extends AdminController
         $form->saving(function (Form $form) {
 
             $balance  = $form->input('value') * config("app.one_coins") * 4;
-            $gameWallet = GameWallet::whereMonth("created_at",date("m"))->whereYear("created_at",date("Y"))->first();
+            $gameWallet = GameWallet::whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"))->first();
             if ($gameWallet) {
                 $gameWallet->balance += $balance;
                 $gameWallet->save();
-            }else{
+            } else {
                 GameWallet::create([
                     'balance' => $balance,
                 ]);
