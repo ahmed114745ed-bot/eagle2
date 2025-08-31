@@ -43,7 +43,7 @@ class StripeService {
                 ->update(['trx' => $session->id]);
 
             Log::info("Stripe session created", [
-                'session_id' => $session->id,
+                'session' => $session,
                 'order_id'   => $data['order_id'],
             ]);
 
