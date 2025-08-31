@@ -127,7 +127,7 @@ class AchievementDedicateController extends MainController
             }
             $path = @$this->admin->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $url = $path ?? $defaultImage;
 
             // Check if the image exists
             if (!isImageExists($url)) {
