@@ -265,7 +265,7 @@ class GiftLogService
             'room_name'         => $room->room_name ?: '',
             "room_mode"         => $room->mode,
             "room_cover"        => $room->room_cover ?? '',
-            "room_background"   => $room->final_room_image ?? '',
+            "room_background"   => $room->final_room_image ?? '', 
             'from_name'         => $user->name,
             'to_name'           => $receivedUser->name,
             'gift_price'        => $gift->price,
