@@ -45,8 +45,14 @@ class AgencyUsersTargetResource extends JsonResource
         $to = $leaveDate->lessThan($endOfMonth) ? $leaveDate : $endOfMonth;
 
 
-
-
+        \Log::info('Date Range Calculation', [
+            'joinedDate'    => $joinedDate->toDateString(),
+            'leaveDate'     => $leaveDate->toDateString(),
+            'startOfMonth'  => $startOfMonth->toDateString(),
+            'endOfMonth'    => $endOfMonth->toDateString(),
+            'from'          => $from->toDateString(),
+            'to'            => $to->toDateString(),
+        ]);
         $agencySallary = UserSallary::query()
         ->where('user_id', $this->id)
         ->where('user_agency_id', $this->agency_id)
