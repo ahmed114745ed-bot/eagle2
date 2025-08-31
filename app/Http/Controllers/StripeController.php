@@ -187,20 +187,18 @@ class StripeController extends Controller
     public function success(Request $request)
     {
 
-        // $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
 
-        // Stripe::setApiKey($stripe_test_secret_key?->value);
 
-        // $sessionId = $request->get('session_id');
-
-        // if (!$sessionId) {
-        //     return response('Missing session ID', 400);
-        // }
 
         try {
-            // Session::retrieve($sessionId);
+            $orderId = $request->get('orderId');
 
-            return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
+            $coin = CoinLog::find($orderId);
+            return response()->json([
+                'status'  => true,
+                'trx'     => $coin->trx,
+                'message' => 'Transaction completed successfully.',
+            ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'failed', 'message' => 'Payment failed.',], 500);
         }

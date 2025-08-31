@@ -31,7 +31,7 @@ class StripeService {
                     'quantity' => $data['quantity'] ?? 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => $settings['success_url'] . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => $settings['success_url'] . '?orderId=' . $data['order_id'],
                 'cancel_url'  => $settings['cancel_url'],
                 'metadata' => [
                     'user_id'  => $data['user_id'],
