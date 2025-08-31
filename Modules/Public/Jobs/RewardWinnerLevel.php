@@ -52,7 +52,7 @@ class RewardWinnerLevel implements ShouldQueue
                 } elseif ($rewad->type == "vip") {
                     $vip = OVip::query()->find($rewad->target);
                     if (!$vip) return;
-                    UserCommon::addVipToUser($user, $vip, $rewad->expire);
+                    UserCommon::addVipToUser($user, $vip, $rewad->expire,null,'reward-winner-level');
                 } elseif ($rewad->type == "ware") {
                     $ware = Ware::query()->find($rewad->target);
                     if (!$ware) return;

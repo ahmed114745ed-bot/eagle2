@@ -96,7 +96,7 @@ class VipService
         $this->packRepository->deleteExpirePack();
         $this->packRepository->unUseOldPack($user_id);
 
-        VipCommon::createUserVip($vip ,$user , $vip->expire  , null ,'',$qty ,$sender_id,$total);
+        VipCommon::createUserVip($vip ,$user , $vip->expire  , null ,'',$qty ,$sender_id,$total,'buy-vip');
 
         $countWares = $this->wareRepository->countWareByLevel($vip->level);
 
@@ -242,7 +242,7 @@ class VipService
                     $this->userVipRepository->update($updateData, $userVip->id);
                 } else {
 
-                    VipCommon::createUserVip($vip ,$user ,($expire * $qty)  , null ,'',$qty ,$sender_id ,$total);
+                    VipCommon::createUserVip($vip ,$user ,($expire * $qty)  , null ,'',$qty ,$sender_id ,$total,'buy-with-active');
 
                 }               
 
@@ -286,7 +286,7 @@ class VipService
                 $this->packRepository->deleteExpirePack();
 
               
-                VipCommon::createUserVip($vip ,$user ,($expire * $qty)  , null ,'',$qty ,$sender_id,$total);
+                VipCommon::createUserVip($vip ,$user ,($expire * $qty)  , null ,'',$qty ,$sender_id,$total,'buy-vips-per');
 
                 DB::commit();
 

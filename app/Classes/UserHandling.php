@@ -78,15 +78,15 @@ class UserHandling
             ->where('type_user', '!=', 0)
             ->pluck('id')->toArray();
     }
-    public function AddUserVip(User $user, $type = null)
+    public function AddUserVip(User $user, $type = null,$receiveType=null)
     {
-        $vip = OVip::query()->whereLevel(2)->first();
+        // $vip = OVip::query()->whereLevel(2)->first();
 
-        if ($vip) {
+        // if ($vip) {
 
-            VipCommon::createUserVip($vip ,$user ,$vip->expire , null ,$type);
+        //     VipCommon::createUserVip($vip ,$user ,$vip->expire , null ,$type,1,0,0,$receiveType);
 
-        }
+        // }
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void
     {
