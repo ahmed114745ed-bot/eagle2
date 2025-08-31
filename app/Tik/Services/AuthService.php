@@ -135,10 +135,10 @@ class AuthService
     {
         
 
-       if (!$request['id_token']) throw new \Exception('google id token missing');
+        if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
 
-        // // $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
+        // $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
 
         $payload = $client->verifyIdToken($request['id_token']);
         if (!$payload) {
@@ -204,6 +204,7 @@ class AuthService
      */
     public function storeImage($request, $data, $user)
     {
+        
         if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
             $img = $request['image'];
             $imageType = $img->getClientOriginalExtension();
@@ -215,7 +216,7 @@ class AuthService
             $user->save();
             $user->load('profile');
             $profile = $user->profile;
-            if (!$profile) 
+            if (!$profile) {
                 $profile = Profile::create([
                     'gender' => null,
                     'birthday' => null,
