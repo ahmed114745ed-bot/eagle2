@@ -121,10 +121,7 @@ class RoomController extends Controller
 
         try {
 
-            Log::info("start created successfully", [
-                'user_id'   => $user->id,
-           
-            ]);
+    
         
             $room = $this->roomService->findRoomUser($user->id);
             if ($room) {

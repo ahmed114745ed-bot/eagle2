@@ -112,8 +112,9 @@ class RoomRepository extends AbstractRepository
             'owner.enabledMedals',
             'owner.country',
             'owner.eligiblePacks.ware',
+            'owner.profile',
             'owner.medals.achievementLevel.achievement',
-            'boxUse'
+            'boxUse',
         ])
         ->withCount('roomVisitors')
         ->whereHas('owner')
@@ -248,7 +249,7 @@ class RoomRepository extends AbstractRepository
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
             $q->whereIn('type', ['single_live', 'multi_live']);
-            })->simplePaginate(10);
+            })->paginate(10);
     }
 
     public function getRoomsByGameId($gameId = null, array $with = [])

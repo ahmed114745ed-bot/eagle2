@@ -2,16 +2,17 @@
 
 namespace App\Services;
 
+use App\Enums\Payments\PaymentStatus;
+use App\Helpers\LogHelper;
 use App\Models\CoinLog;
 use App\Models\GameWallet;
 use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
-use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
-use PayPalCheckoutSdk\Core\ProductionEnvironment;
 
 class PayPalService
 {
@@ -34,17 +35,17 @@ class PayPalService
 
     protected function getAccessToken(): string
     {
-        $headers = [
-            'Content-Type'  => 'application/x-www-form-urlencoded',
-            'Authorization' => 'Basic ' . base64_encode(config('paypal.client_id') . ':' . config('paypal.client_secret'))
-        ];
+        $response = Http::asForm()
+            ->withBasicAuth(config('paypal.client_id'), config('paypal.client_secret'))
+            ->post(config('paypal.base_url') . '/v1/oauth2/token', [
+                'grant_type' => 'client_credentials',
+            ]);
 
-        $response = Http::withHeaders($headers)
-            ->withBody('grant_type=client_credentials')
-            ->post(config('paypal.base_url') . '/v1/oauth2/token');
+        if ($response->failed()) {
+            throw new \Exception('Failed to retrieve PayPal access token: ' . $response->body());
+        }
 
-
-        return json_decode($response->body())->access_token;
+        return $response->json()['access_token'];
     }
 
     /**
@@ -291,38 +292,70 @@ class PayPalService
         $coinLogId = $resource['purchase_units'][0]['reference_id'] ?? null;
         $paypalId   = $resource['id'] ?? null;
 
-        $coinLog = CoinLog::find($coinLogId);
+        $coinLog = CoinLog::where('trx', $paypalId)->first();
 
-//        info($paypalId);
+        if (! $coinLog){
+            return response()->json([
+                'status'  => 'ignored',
+                'trx'     =>  $paypalId,
+                'message' => "Failed",
+            ]);
+        }
+
+
+        LogHelper::info($eventType, $request->all());
         switch ($eventType) {
             case 'CHECKOUT.ORDER.APPROVED':
-//                $captureResponse = Http::withToken($this->getAccessToken())
-//                    ->withHeaders(['Content-Type' => 'application/json'])
-//                    ->withBody('', 'application/json')
-//                    ->post(config('paypal.base_url') . "/v2/checkout/orders/{$paypalId}/capture");
-//
-//                info('capture order', [$captureResponse]);
-//                if ($captureResponse->successful()) {
-//                    return $this->webhookPayment($coinLogId);
-//                }
 
+                Log::info($eventType);
+                info('APPROVED', ['trx' => $coinLog->trx]);
+                info('APPROVED', ['payment id' => $paypalId]);
                 return response()->json([
                     'status'  => true,
-                    'trx'     => $coinLog?->trx ?? $paypalId,
+                    'trx'     =>  $paypalId,
                     'message' => 'Transaction approved, pending capture.',
                 ]);
 
+            case 'PAYMENT.CAPTURE.PENDING':
+                info('PENDING', ['trx' => $coinLog->trx]);
+                info('PENDING', ['payment id' => $paypalId]);
+                $coinLog->update(['status' => PaymentStatus::PENDING, 'trx' => $paypalId]);
+                return response()->json([
+                    'status'  => true,
+                    'trx'     => $paypalId,
+                    'message' => 'Transaction pending',
+                ]);
+
             case 'PAYMENT.CAPTURE.COMPLETED':
-                return $this->webhookPayment($coinLogId);
+                info('COMPLETED', ['trx' => $coinLog->trx]);
+                info('COMPLETED', ['payment id' => $paypalId]);
+                return $this->webhookPayment($paypalId, method: 'paypal');
 
             case 'PAYMENT.CAPTURE.DENIED':
+                info('DENIED', ['trx' => $coinLog->trx]);
+                info('DENIED', ['payment id' => $paypalId]);
+                $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $paypalId]);
+
                 return response()->json([
                     'status'  => false,
-                    'trx'     => $coinLog?->trx ?? $paypalId,
+                    'trx'     =>  $paypalId,
                     'message' => 'Transaction denied.',
                 ]);
 
+            case 'PAYMENT.CAPTURE.DECLINED':
+                info('DECLINED', ['trx' => $coinLog->trx]);
+                info('DECLINED', ['payment id' => $paypalId]);
+                $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $paypalId]);
+                return response()->json([
+                    'status'  => false,
+                    'trx'     => $paypalId,
+                    'message' => 'Transaction declined.',
+                ]);
+
             default:
+                info('default', ['trx' => $coinLog->trx]);
+                info('default', ['payment id' => $paypalId]);
+                $coinLog->update(['trx' => $paypalId]);
                 return response()->json([
                     'status'  => 'ignored',
                     'trx'     => $coinLog?->trx ?? $paypalId,
