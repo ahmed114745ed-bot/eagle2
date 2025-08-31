@@ -151,10 +151,10 @@ class ChargeEventController extends Controller
                 $user->save();
             } elseif ($reward->type == "vip") {
                 $vip = OVip::query()->find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire);
+                UserCommon::addVipToUser($user, $vip, $reward->expire,null,'charge-event');
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
-                UserCommon::addEvintsWareToUser($user, $ware, $reward->expire);
+                UserCommon::addEvintsWareToUser($user, $ware, $reward->expire,null,'charge-event');
             } elseif ($reward->type == "achievement") {
                 $attributes = [
                     'user_id'       => $user->id,

@@ -159,7 +159,7 @@ class OldRoomBoomRewardJob implements ShouldQueue
             $expire = $reward['expire_days'];
             if ($reward['target_type'] == 'ware') {
                 $ware = Ware::find($reward->target);
-                UserCommon::addEvintsWareToUser($user, $ware, $expire);
+                UserCommon::addEvintsWareToUser($user, $ware, $expire,null,'room-boom');
             }
             if ($reward['target_type'] == 'achieve') {
                 $target = $reward->target;

@@ -198,6 +198,7 @@ class DedicateWareController extends Controller
                 $arr['num'] = 1; //$qty;
                 $arr['expire'] = $request->days ? time() + (($request->days ?? $ware->expire) * 86400) : 0;
                 $arr['is_read'] = 1;
+                $arr['receive_type'] = 'dedicate-wares';
 
                 $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
                 $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;

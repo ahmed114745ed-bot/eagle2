@@ -79,9 +79,10 @@ class SpecialIdRequestController extends Controller
                     'is_read'   => 1,
                     'use_num'   => $ware->num,
                     'price'     => $total_price,
+                    'receive_type'     => 'special-id-update',
                 ];
                 Pack::create($packData);
-            
+
               
                 // Upgrade user level
                 (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
