@@ -84,7 +84,7 @@ class CpRepository
         })->whereHas("cpRelation", function ($q) {
                 $q->where('type', '!=', 'solution');
             })
-            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value, CpStatus::STOPED])
+            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
     }
 
@@ -169,14 +169,14 @@ class CpRepository
     public function checkExistingCpSendingOne($userId, $cpId)
     {
         return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
-            $query->where('user_one_id', $userId);
-        })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value, CpStatus::STOPED])->first();
+            $query->where('user_one_id', $userId)->orWhere('user_two_id', $userId);
+        })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
     }
 
     public function checkExistingCpSendingTwo($userId, $cpId)
     {
         return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
-            $query->where('user_two_id', $userId);
+            $query->where('user_two_id', $userId)->orWhere('user_one_id', $userId);
         })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
     }
 
