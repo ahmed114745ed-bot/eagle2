@@ -103,7 +103,7 @@ class AgencyUsersTargetResource extends JsonResource
 
 
         $hasColor = Common::hasInPack(@$this->id, 18, true);
-
+        
         return [
             'id' => $this->id ?? 0,
             'name' => $this->name ?? '',
@@ -114,7 +114,7 @@ class AgencyUsersTargetResource extends JsonResource
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'salary' => (float) $agencySallary ?? 0,
             'target' => [
-                'id' => @$target->target_id ?? 0,
+                'id' => @$this->lastSallary?->target_id ?? 0,
                 'user_diamonds' => (float) ($this->lastSallary?->achieved_diamond ?? 0),
                 'user_hours'    =>  $this->lastSallary?->achieved_hours ?? 0,
                 'user_days'     =>  $this->lastSallary?->achieved_days ?? 0,
