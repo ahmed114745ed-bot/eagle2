@@ -98,7 +98,7 @@ class StripeController extends Controller
     
                     if (!empty($session->metadata->order_id)) {
                         $orderId = $session->metadata->order_id;
-                        $trxId   = $session->id;
+                        $trxId   = $session->payment_intent;
                         Log::info("checkout.session.completed: order_id={$orderId}, trx={$trxId}");
                     } else {
                         $trxId   = $session->id;
