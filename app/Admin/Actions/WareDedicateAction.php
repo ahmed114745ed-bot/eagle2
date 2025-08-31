@@ -102,6 +102,7 @@ class WareDedicateAction extends Action
 
             $arr['is_read'] = 1;
             $arr['days'] = $request->days ? $request->days ?? $ware->expire : 0;
+            $arr['receive_type'] ='wares-dash-dedicate';
 
             $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
             // $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;

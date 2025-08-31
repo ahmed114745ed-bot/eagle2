@@ -197,6 +197,8 @@ class SpecialIdRequestController extends MainController
                     $arr['is_read']   = 1;
                     $arr['use_num']   = $ware->num;
                     $arr['price']     = $total_price;
+                    $arr['receive_type'] ='special-id-form';
+
                     $newPack = Pack::query()->create($arr);
                     DB::commit();
                     (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);

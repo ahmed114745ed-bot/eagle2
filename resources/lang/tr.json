@@ -3236,7 +3236,7 @@
     "Not enough available quantity for this reward.": "Bu ödül için yeterli miktar yok.",
     "This reward has expired.": "Bu ödülün süresi doldu.",
 
-    "You have already sent a CP request before.": "Daha önce bir CP isteği gönderdiniz.",
+    "You have already sent/received a CP request before.": "Daha önce bir CP isteği gönderdiniz veya aldınız.",
     "You can only send this relation to one user only.": "Bu ilişkiyi yalnızca bir kullanıcıya gönderebilirsiniz.",
     "There is no CP relation.": "CP ilişkisi yok.",
     "There is no CP relation between the users.": "Kullanıcılar arasında CP ilişkisi yok.",
