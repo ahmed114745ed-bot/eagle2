@@ -4,7 +4,7 @@
 <style>
 
     .uniform-image {
-    width: 500px;   /* fixed width */
+    width: 250px;   /* fixed width */
     height: 200px;  /* fixed height */
     object-fit: cover;   /* crop nicely without distortion */
     border-radius: 8px;  /* optional: rounded corners for nicer UI */
