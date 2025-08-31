@@ -343,12 +343,12 @@ class Common
                     'path'          => $data->path(),
                     'per_page'      => $data->perPage(),
                     'to'            => $data->lastItem(),
-                    'last_page'     => 0,
-                    'total'         => 0,
+                    'last_page'     => null,
+                    'total'         => null,
                 ],
                 'links' => [
-                    'first' => '',
-                    'last'  => '',
+                    'first' => null,
+                    'last'  => null,
                     'prev'  => $data->previousPageUrl(),
                     'next'  => $data->nextPageUrl(),
                 ]
