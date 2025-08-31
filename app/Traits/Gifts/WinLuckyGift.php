@@ -3,6 +3,7 @@
 namespace App\Traits\Gifts;
 
 use App\Jobs\AllOpeningRoomsZegoRequest;
+use Illuminate\Support\Facades\Log;
 
 trait WinLuckyGift
 {
@@ -16,7 +17,7 @@ trait WinLuckyGift
 
     public function sendToZegoLuckyGift($zigoData)
     {
-
+        Log::info($zigoData);
         $d     = [ 
             "messageContent" => [
                 "msg"     => "SHBL",
@@ -31,6 +32,7 @@ trait WinLuckyGift
                 'gNum' => $zigoData['percentage']/*$zigoData['gift_price']*/,
 
                 'gift_price'   => @$zigoData['gift_price'],
+                'room_id'   => @$zigoData['room_id'],
                 'room_name'   => @$zigoData['room_name'],
                 'room_cover'   =>  @$zigoData['room_cover'],
                 'room_background'   => @$zigoData['room_background'], 
