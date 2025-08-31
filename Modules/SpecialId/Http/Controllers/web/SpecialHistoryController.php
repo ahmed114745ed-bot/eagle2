@@ -78,6 +78,16 @@ class SpecialHistoryController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('ware.value', __('UUID'));
             });
+
+             $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($from = request('from_date')) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                        $query->whereDate('created_at',  $start);
+                    }
+                }, __('start date'), 'from_date')->date();
+
+            });
         });
 
         $grid->column('id', __('Id'));
