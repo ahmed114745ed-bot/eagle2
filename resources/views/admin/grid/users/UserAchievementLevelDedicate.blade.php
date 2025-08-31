@@ -217,14 +217,19 @@
                 <label class="form-label">{{ __('admin.selectImage') }}</label>
                 <div class="image-scroll-container">
                     @foreach ($achievementValidImage as $data)
-                    <label class="image-option">
-                        <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
-                        <img src="{{ getImagePath($data->file) }}" class="img-fluid img-thumbnail" style="max-width:200px; height:auto;">
-                    </label>
+                        @if (!empty($data->file))
+                            <label class="image-option">
+                                <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
+                                <img src="{{ getImagePath($data->file) }}" 
+                                    class="img-fluid img-thumbnail" 
+                                    style="max-width:200px; height:auto;">
+                            </label>
+                        @endif
                     @endforeach
                 </div>
             </div>
         </div>
+
     <br>
     <br>
         <div class="d-grid mt-4">
