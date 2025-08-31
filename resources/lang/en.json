@@ -1120,5 +1120,6 @@
 "success_title": "Success 🎉",
 "success_message": "The operation was completed successfully",
 "error_title": "Error 🚫",
-"error_message": "An error occurred, please try again"
+"error_message": "An error occurred, please try again",
+"receive_type":"Receive Type"
 }

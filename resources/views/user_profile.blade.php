@@ -1271,7 +1271,7 @@
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
                             <th>{{ __('expire') }}</th>
-                            <th>{{ __('slug') }}</th>
+                            <th>{{ __('receive_type') }}</th>
                             <th>{{ __('action') }}</th>
 
                         </tr>
@@ -1379,7 +1379,7 @@
                             <th>{{ __('expire') }}</th>
                             <th>{{ __('qty') }}</th>
                             <th>{{ __('total Price') }}</th>
-                            <th>{{ __('slug') }}</th>
+                            <th>{{ __('receive_type') }}</th>
                             <th>{{ __('action') }}</th>
 
                         </tr>
