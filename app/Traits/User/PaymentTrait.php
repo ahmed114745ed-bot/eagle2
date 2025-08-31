@@ -66,7 +66,7 @@ trait PaymentTrait
         info('Webhook Payment Triggered', ['trx' => $trx]);
 
         // Fetch coin log
-        $coinLog = CoinLog::where('trx', $trx)
+        $coinLog = CoinLog::where('id', $trx)
             ->when($method != null, fn($q) => $q->where('method', $method))
             ->first();
 
