@@ -205,5 +205,11 @@ class LevelController extends MainController
         }
 
         Parent::update($id);
+
+        $relation_id = $request->route('relation_id');
+
+        return redirect()->route('admin.cp-levels.index', [
+            'relation_id' => $relation_id
+        ]);
     }
 }
