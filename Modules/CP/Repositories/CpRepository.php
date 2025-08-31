@@ -38,7 +38,7 @@ class CpRepository
 
     public function findCpBetweenUsers($userOne, $userTwo, $type = null)
     {
-        return Cp::where(function ($query) use ($userOne, $userTwo) {
+        return Cp::lockForUpdate()->where(function ($query) use ($userOne, $userTwo) {
             $query->where(function ($q) use ($userOne, $userTwo) {
                 $q->where('user_one_id', $userOne)
                     ->where('user_two_id', $userTwo);

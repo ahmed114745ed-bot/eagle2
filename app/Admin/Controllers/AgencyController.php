@@ -657,7 +657,7 @@ class AgencyController extends MainController
 
         if (!$form->isEditing()) {
             $form->row(function ($row) {
-                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'username');
+                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name');
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
@@ -665,7 +665,7 @@ class AgencyController extends MainController
             });
         } else {
             $form->row(function ($row) {
-                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions(true))->ajax('/api/search/users-bd2', 'id', 'username');
+                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions(true))->ajax('/api/search/users-bd2', 'id', 'name');
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions(true))->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
@@ -678,7 +678,7 @@ class AgencyController extends MainController
         return function ($value) use ($editing) {
             $ops = [];
             foreach (Bd::where('id', $value)->get() as $user) {
-                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
+                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
             }
             return $ops;
         };
