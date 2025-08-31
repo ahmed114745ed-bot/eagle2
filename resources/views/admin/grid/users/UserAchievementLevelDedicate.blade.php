@@ -2,6 +2,14 @@
 
 
 <style>
+
+    .uniform-image {
+    width: 150px;   /* fixed width */
+    height: 200px;  /* fixed height */
+    object-fit: cover;   /* crop nicely without distortion */
+    border-radius: 8px;  /* optional: rounded corners for nicer UI */
+}
+
     .achievement-container {
         max-width: 800px;
         margin: 2rem auto;
@@ -221,14 +229,14 @@
                             <label class="image-option">
                                 <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
                                 <img src="{{ getImagePath($data->file) }}" 
-                                    class="img-fluid img-thumbnail" 
-                                    style="max-width:200px; height:auto;">
+                                    class="uniform-image img-thumbnail">
                             </label>
                         @endif
                     @endforeach
                 </div>
             </div>
         </div>
+
 
     <br>
     <br>
