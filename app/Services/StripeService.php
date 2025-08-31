@@ -42,7 +42,7 @@ class StripeService {
             CoinLog::where('id', $data['order_id'])
                 ->update(['trx' => $session->id]);
 
-                $endSession = \Stripe\Checkout\Session::retrieve($_GET['session_id']);
+                $endSession = \Stripe\Checkout\Session::retrieve($session->id);
 
                    $paymentIntentId = $endSession->payment_intent;
             Log::info("Stripe session created", [
