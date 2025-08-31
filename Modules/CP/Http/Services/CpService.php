@@ -230,10 +230,10 @@ class CpService
         $vip = OVip::find($vipId);
         if ($vip) {
             if ($rewardGender == $userOneGender || $rewardGender == 'all'){
-                VipCommon::createUserVip($vip,$userOne,  $expire);
+                VipCommon::createUserVip($vip,$userOne,  $expire,0,'',1,0,0,'cp-gifts');
             }
             if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-                VipCommon::createUserVip( $vip,$userTwo, $expire);
+                VipCommon::createUserVip( $vip,$userTwo, $expire,0,'',1,0,0,'cp-gifts');
             }
         }
     }
@@ -243,10 +243,10 @@ class CpService
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
 
         if ($rewardGender == $userOneGender || $rewardGender == 'all') {
-            UserCommon::addEvintsWareToUser($userOne, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userOne, $ware, $reward->expire,null,'cp-gift');
         }
         if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-            UserCommon::addEvintsWareToUser($userTwo, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userTwo, $ware, $reward->expire,null,'cp-gift');
         }
     }
 

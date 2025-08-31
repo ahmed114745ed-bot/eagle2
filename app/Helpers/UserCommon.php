@@ -260,7 +260,8 @@ class UserCommon
     public static function userVip(User $user)
     {
         $vip = OVip::query()->first();
-        $user_vip_check = UserVip::query()->where('user_id', $user->id)->where('level', '>=', $vip->level)->first();
+        $user_vip_check = UserVip::query()->where('user_id', $user->id)
+        ->where('level', '>=', $vip->level)->first();
         $expire = $vip->expire;
 
 
@@ -332,10 +333,10 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null)
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null,$receiveType)
     {
         DB::beginTransaction();
-        VipCommon::createUserVip($vip ,$user ,$expire , null ,'',);
+        VipCommon::createUserVip($vip ,$user ,$expire , null ,'',1,0,0,$receiveType);
         DB::commit();
         // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
         // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -402,7 +403,7 @@ class UserCommon
     }
 
 
-    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null)
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null,$receiveType = null)
     {
         $title = __('congratulations');
         $body = __('You have received a gift: :ware', ['ware' => $ware->name]);
@@ -416,6 +417,7 @@ class UserCommon
             $arr['num']       = 1;
             $arr['is_read']   = 1;
             $arr['days']      = $expir;
+            $arr['receive_type']      = $receiveType;
 
 
             $pack = Pack::query()->create($arr);
@@ -455,6 +457,7 @@ class UserCommon
             $arr['num']       = 1;
             $arr['is_read']   = 1;
             $arr['days']      = $expire;
+            $arr['receive_type']      = 'room-boom';
 
 
             $pack = Pack::query()->create($arr);

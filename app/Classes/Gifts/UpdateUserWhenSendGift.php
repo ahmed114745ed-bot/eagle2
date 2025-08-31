@@ -143,7 +143,7 @@ class UpdateUserWhenSendGift
      */
     public function sendFromBagAndRemoveGift(int $totalCoins, User $senderUser, int $giftId, int $number)
     {
-        Log::info("gooooooooooood");
+        Log::info(['user_id' =>  $senderUser->id,'gift_id'=>$giftId]);
         $senderUser->enableSaving = false;
         $senderUser->monthly_diamond_send += $totalCoins;
         $senderUser->total_diamond_send   += $totalCoins;
@@ -152,6 +152,7 @@ class UpdateUserWhenSendGift
 
         $userGift = UserGift::where('user_id', $senderUser->id)
             ->where('gift_id', $giftId)
+            ->where('quantity', '>',0)
             ->where(function($query) {
                 $query->where('expire', 0)
                     ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');

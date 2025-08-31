@@ -2817,8 +2817,8 @@
 "Not enough available quantity for this reward.": "इस पुरस्कार के लिए पर्याप्त मात्रा उपलब्ध नहीं है।",
 "This reward has expired.": "इस पुरस्कार की समय सीमा समाप्त हो गई है।",
 
-"You have already sent a CP request before.": "आप पहले ही एक CP अनुरोध भेज चुके हैं।",
-"You can only send this relation to one user only.": "आप यह संबंध केवल एक उपयोगकर्ता को ही भेज सकते हैं।",
+    "You have already sent/received a CP request before.": "आप पहले ही एक CP अनुरोध भेज/प्राप्त कर चुके हैं।",
+    "You can only send this relation to one user only.": "आप यह संबंध केवल एक उपयोगकर्ता को ही भेज सकते हैं।",
 "There is no CP relation.": "कोई CP संबंध नहीं है।",
 "There is no CP relation between the users.": "उपयोगकर्ताओं के बीच कोई CP संबंध नहीं है।",
 "You are already in a relation with this user.": "आप पहले से ही इस उपयोगकर्ता के साथ संबंध में हैं।",

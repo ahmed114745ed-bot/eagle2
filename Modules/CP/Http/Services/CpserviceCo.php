@@ -52,16 +52,15 @@ class CpserviceCo
             $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
             $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
 
-
             if ($existingCpOne && $existingCptwo) {
 
-                return Common::apiResponse(0, __('You have already sent a CP request before.'));
+                return Common::apiResponse(0, __('You have already sent/received a CP request before.'));
             }
 
         }
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && $existingCp->status == CpStatus::PENDING->value && $cpRelation->type != 'solution') {
-            return Common::apiResponse(0, __("You have already sent a CP request before."));
+            return Common::apiResponse(0, __("You have already sent/received a CP request before."));
         }
 
         if ($existingCp && in_array($existingCp->status, [CpStatus::ACTIVE->value, CpStatus::RESTORED->value]) && $cpRelation->type != 'solution') {
@@ -216,6 +215,9 @@ class CpserviceCo
         return Common::apiResponse(1, '', RequestCpResource::collection($data));
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function respondToRequest(Request $request)
     {
         // Todo get message_id to update status in this message
@@ -230,9 +232,11 @@ class CpserviceCo
 
         if ($cp?->relation?->type == 'solution') {
             if ($request->status == 1) {
-                $cpBetweenUsers = $this->cpRepository->findCpBetweenUsers($cp->user_one_id, $cp->user_two_id);
-                $cpBetweenUsers->status = 3;
-                $cpBetweenUsers->save();
+                DB::transaction(function () use ($cp){
+                    $cpBetweenUsers = $this->cpRepository->findCpBetweenUsers($cp->user_one_id, $cp->user_two_id);
+                    $cpBetweenUsers->status = 3;
+                    $cpBetweenUsers->save();
+                });
             }
 
             /* $message->message = json_encode($decryptedData);

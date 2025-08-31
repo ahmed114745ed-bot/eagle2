@@ -126,6 +126,8 @@ class AdminSpecialIdController extends Controller
             $arr['num'] = 1; //$qty;
             $arr['expire'] = $ware->expire ? time() + ($ware->expire * 86400) : 0;
             $arr['is_read'] = 1;
+            $arr['receive_type'] = 'admin-send-special-id';
+            
             Pack::query()->create($arr);
             DB::commit();
             CustomNotification::wareVip($user, $request->days, $ware->name, $ware->show_img);

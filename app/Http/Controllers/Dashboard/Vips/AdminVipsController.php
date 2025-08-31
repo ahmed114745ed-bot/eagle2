@@ -91,7 +91,7 @@ class AdminVipsController extends Controller
         $userVip = UserVip::query()->where($uniqueAttributes)->first();
         if (!$userVip) {
    
-            VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id() ,'',);
+            VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id() ,'',1,0,0,'admin-vip');
 
         }
         else {

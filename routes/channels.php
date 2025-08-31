@@ -53,14 +53,8 @@ Broadcast::channel('presence.user.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
-    $isInRoom = RoomVisitor::where('room_id', $roomId)
-        ->where('user_id', $user->id)
-        ->exists();
-
-    if ($isInRoom) {
-        return [
-            'id'   => $user->id,
-            'name' => $user->name,
-        ];
-    }
+    return [
+        'id'   => $user->id,
+        'name' => $user->name,
+    ];
 });
