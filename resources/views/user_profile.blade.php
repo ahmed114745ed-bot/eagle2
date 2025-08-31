@@ -2210,7 +2210,7 @@
                                 </td>
                                 <td>
                                     @if(!empty($giftSLog->room))
-                                        <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
+                                        <a href="{{ url('admin/rooms/' .  $giftSLog->room->id) }}" target="_blank"
                                            class="d-flex align-items-center text-decoration-none">
                                             <img src="{{ $url }}"
                                                  width="30" height="30"
