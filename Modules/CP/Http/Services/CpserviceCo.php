@@ -54,13 +54,13 @@ class CpserviceCo
 
             if ($existingCpOne && $existingCptwo) {
 
-                return Common::apiResponse(0, __('You have already sent a CP request before.'));
+                return Common::apiResponse(0, __('You have already sent/received a CP request before.'));
             }
 
         }
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
         if ($existingCp && $existingCp->status == CpStatus::PENDING->value && $cpRelation->type != 'solution') {
-            return Common::apiResponse(0, __("You have already sent a CP request before."));
+            return Common::apiResponse(0, __("You have already sent/received a CP request before."));
         }
 
         if ($existingCp && in_array($existingCp->status, [CpStatus::ACTIVE->value, CpStatus::RESTORED->value]) && $cpRelation->type != 'solution') {
