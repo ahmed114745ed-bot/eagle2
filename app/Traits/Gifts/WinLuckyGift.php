@@ -17,7 +17,7 @@ trait WinLuckyGift
     public function sendToZegoLuckyGift($zigoData)
     {
 
-        $d     = [
+        $d     = [ 
             "messageContent" => [
                 "msg"     => "SHBL",
                 'event' => 'win.lucky.gift.event',
@@ -29,6 +29,15 @@ trait WinLuckyGift
                 'per'   => $zigoData['cache_value'],
                 'isPass' => $zigoData['is_room_pass'],
                 'gNum' => $zigoData['percentage']/*$zigoData['gift_price']*/,
+
+                'gift_price'   => @$zigoData['gift_price'],
+                'room_name'   => @$zigoData['room_name'],
+                'room_cover'   =>  @$zigoData['room_cover'],
+                'room_background'   => @$zigoData['room_background'], 
+                'room_mode'   =>  @$zigoData['room_mode'],
+                'room_uuid'   =>  @$zigoData['room_uuid'],
+                'room_owner_id'   =>  @$zigoData['room_owner_id'],
+                'is_password'   =>   @$zigoData['is_password'],
             ]
         ];
         $json  = json_encode($d);
