@@ -107,7 +107,7 @@ class StripeController extends Controller
     
                 case 'payment_intent.succeeded':
                     $paymentIntent = $event->data->object;
-                    $trxId   = $paymentIntent->id;
+                    $trxId   = $paymentIntent->payment_intent;
                     break;
     
                 case 'charge.succeeded':
