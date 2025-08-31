@@ -52,7 +52,6 @@ class CpserviceCo
             $existingCpOne = $this->cpRepository->checkExistingCpSendingOne($user->id, $cpRelation->id);
             $existingCptwo = $this->cpRepository->checkExistingCpSendingTwo($request->user_id, $cpRelation->id);
 
-
             if ($existingCpOne && $existingCptwo) {
 
                 return Common::apiResponse(0, __('You have already sent a CP request before.'));
