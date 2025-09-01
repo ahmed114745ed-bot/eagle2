@@ -666,8 +666,7 @@ class AgencyService
         }
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
         ->where('agency_id', $user->agency_id)
-        // ->latest('join_date')
-        ->latest() 
+        ->latest('join_date')
         ->first();
 
         if (!$joinRecord) {
@@ -685,8 +684,7 @@ class AgencyService
             $year,
             $month,
             $timezone,
-            $joinRecord,
-            $endOfMonth
+            $joinRecord
         );
         
 
@@ -787,30 +785,31 @@ class AgencyService
     }
 
 
-    protected function getReportDateRange($year, $month, $timezone, $joinRecord, $endOfMonth)
+    protected function getReportDateRange($year, $month, $timezone, $joinRecord)
     {
         $firstDayLocal = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
-        $startOfMonth = $firstDayLocal->copy()->startOfDay();
-        $endOfMonth   = $firstDayLocal->copy()->endOfMonth()->endOfDay();
-
+        $startOfMonth  = $firstDayLocal->copy()->startOfDay();
+        $endOfMonth    = $firstDayLocal->copy()->endOfMonth()->endOfDay();
+    
         if ($joinRecord) {
-            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone)->startOfDay();
+            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone);
+    
             $leaveDate  = $joinRecord->leave_date
-                ? Carbon::parse($joinRecord->leave_date, $timezone)->endOfDay()
+                ? Carbon::parse($joinRecord->leave_date, $timezone)
                 : $endOfMonth;
         } else {
             $joinedDate = null;
             $leaveDate  = $endOfMonth;
         }
-
+    
         $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth))
             ? $joinedDate
             : $startOfMonth;
-
+    
         $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth))
             ? $leaveDate
             : $endOfMonth;
-
+    
         return [$startDate, $endDate, $joinedDate, $leaveDate];
     }
 
