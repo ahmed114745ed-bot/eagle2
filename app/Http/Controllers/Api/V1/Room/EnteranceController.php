@@ -244,7 +244,7 @@ class EnteranceController extends Controller
 
         $ban = Common::ifRoomHasband($owner_id);
         if ($ban) {
-            return Common::apiResponse(0, __('This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.'), ['ban' => true],404);
+            return Common::apiResponse(0, __('This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.'), ['ban' => true],402);
         }
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
