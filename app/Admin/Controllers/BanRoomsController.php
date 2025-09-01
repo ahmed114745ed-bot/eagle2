@@ -177,7 +177,7 @@ class BanRoomsController extends MainController
 
         $grid->column('created_at', __('Expire'))->display(function () {
             $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
-            return now()->diffForHumans($banExpiration, true);
+            return $banExpiration;
         });
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('Delete'))->display(function () {
