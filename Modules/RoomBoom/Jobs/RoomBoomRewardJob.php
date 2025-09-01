@@ -188,9 +188,9 @@ class RoomBoomRewardJob implements ShouldQueue
             'updated_at' => now()
         ];
 
-        $this->giftNotifications['user_ids'][] = $userId;
+        $this->achievementNotifications['user_ids'][] = $userId;
         if ($token) {
-            $this->giftNotifications['tokens'][] = $token;
+            $this->achievementNotifications['tokens'][] = $token;
         }
     }
 
