@@ -94,6 +94,7 @@ class RoomBoomRewardJob implements ShouldQueue
     {
         foreach ($topContributorIds as $i => $userId) {
             $reward = $this->getNextAvailableReward($rewardItems);
+            info('distributeTopContributors', $reward);
             if (!$reward) break;
 
             $this->distributeBoomRewards($userId, $reward);
@@ -138,6 +139,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
         foreach ($visitorIds as $i => $visitorId){
             $reward = $this->getNextAvailableReward($rewardItems);
+            info('distributeVisitorRewards', $reward);
             if (!$reward) break;
 
             $this->distributeBoomRewards($visitorId, $reward);
@@ -227,6 +229,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
     protected function getNextAvailableReward(&$rewardItems)
     {
+        info('rewardItems', $rewardItems);
         foreach ($rewardItems as &$reward) {
             if ($reward['quantity'] > 0) {
                 $reward['quantity']--;
