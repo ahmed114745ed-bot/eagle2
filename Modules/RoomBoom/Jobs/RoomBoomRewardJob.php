@@ -94,7 +94,6 @@ class RoomBoomRewardJob implements ShouldQueue
     {
         foreach ($topContributorIds as $i => $userId) {
             $reward = $this->getNextAvailableReward($rewardItems);
-            info('distributeTopContributors', $reward);
             if (!$reward) break;
 
             $this->distributeBoomRewards($userId, $reward);
@@ -206,7 +205,6 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $this->giftInsertData[] = $giftData;
 
-        info('rewardTarget', [$reward['target']]);
         $this->giftNotifications[$reward['target']]['user_ids'][] = $userId;
         if ($token) {
             $this->giftNotifications[$reward['target']]['tokens'][] = $token;
@@ -359,13 +357,10 @@ class RoomBoomRewardJob implements ShouldQueue
         $giftTitle = __('Gift Reward');
         $giftBody = __('You have received the gift: :giftName');
         $giftIds = array_keys($this->giftNotifications);
-        info('giftIds', $giftIds);
         $gifts = Gift::whereIn('id', $giftIds)->get()->keyBy('id');
-        info('gifts', [$gifts]);
 
         foreach ($this->giftNotifications as $giftId => $notification) {
             $giftName = $gifts[$giftId]->name ?? __('a special gift');
-            info($giftName);
 
             $body = str_replace(':giftName', $giftName, $giftBody);
 
