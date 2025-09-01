@@ -39,7 +39,7 @@ class CoinGameUserAllController extends AdminController
     
         $grid->column('id', __('Round ID'))->sortable();
     
-        $grid->column('result', __('Result'))->display(function ($value) {
+        $grid->column('type', __('Result'))->display(function ($value) {
             if ($value == 1) {
                 return "<span class='label label-success'>".__('Win')."</span>";
             }
