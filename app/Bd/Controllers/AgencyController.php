@@ -703,8 +703,20 @@ class AgencyController extends MainController
     protected function addPhoneFields(Form $form)
     {
         $form->row(function ($row) {
-            $row->width(9)->text('phone', __('agency whatsApp number'))->attribute('id', 'phone-input')->attribute('maxlength', 10);
-            $row->hidden('phone_code');
+            $row->width(9)->text('phone', __('agency whatsApp number'))
+                ->rules('required')
+                ->attribute('id', 'phone-input')
+                ->attribute('maxlength', 13)
+                ->default(function ($form) {
+                    if ($form->model()->phone && $form->model()->phone_code) {
+                        return $form->model()->phone;
+                    }
+                    return null;
+                });
+    
+            $row->hidden('phone_code')->default(function ($form) {
+                return $form->model()->phone_code ?? '';
+            });
         });
     
         if (Session::has('show_alert')) {
@@ -714,27 +726,28 @@ class AgencyController extends MainController
         Admin::script($this->phoneJs());
     }
     
+
     protected function phoneJs()
     {
         return <<<JS
-    function initPhoneInputById(inputId, hiddenId) {
-        const input = document.querySelector(inputId);
-        const hidden = document.querySelector(hiddenId);
-        if (!input || input.classList.contains('iti-initialized')) return;
-    
-        const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
-        input.classList.add('iti-initialized');
-    
-        if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
-    
-        input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
-        const form = input.closest('form');
-        if(form && !form.classList.contains('phone-init')){
-            form.addEventListener('submit', function(){
-                if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
-                input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
-            });
-            form.classList.add('phone-init');
+            function initPhoneInputById(inputId, hiddenId) {
+                const input = document.querySelector(inputId);
+                const hidden = document.querySelector(hiddenId);
+                if (!input || input.classList.contains('iti-initialized')) return;
+            
+                const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
+                input.classList.add('iti-initialized');
+            
+                if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
+            
+                input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
+                const form = input.closest('form');
+                if(form && !form.classList.contains('phone-init')){
+                    form.addEventListener('submit', function(){
+                        if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                        input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
+                    });
+                    form.classList.add('phone-init');
         }
     }
     
@@ -743,7 +756,6 @@ class AgencyController extends MainController
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
     JS;
     }
-    
     protected function addSavingLogic(Form $form)
     {
         $form->saving(function (Form $form) {
