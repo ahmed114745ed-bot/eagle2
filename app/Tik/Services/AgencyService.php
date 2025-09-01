@@ -680,25 +680,15 @@ class AgencyService
 
 
         [$startOfMonth, $endOfMonth] = Carbon::startAndEndOfMonthUTC($year, $month, $timezone);
-        /*$startOfMonth = $firstDay->copy()->setTimezone('UTC');
-        $endOfMonth = $firstDay->copy()->endOfMonth()->setTimezone('UTC');*/
-
-
-        if ($joinRecord) {
-            // $joinedDate = Carbon::parse($joinRecord->join_date);
-
-            // $leaveDate = $joinRecord->leave_date
-            //     ? Carbon::parse($joinRecord->leave_date)
-            //     : $endOfMonth;
-            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone)->startOfDay();
-            $leaveDate = $joinRecord->leave_date
-                ? Carbon::parse($joinRecord->leave_date, $timezone)->endOfDay()
-                : $endOfMonth;
-        } else {
-            $joinedDate = null;
-            $leaveDate = $endOfMonth;
-        }
-
+      
+        [$startDate, $endDate, $joinedDate, $leaveDate] = $this->getReportDateRange(
+            $year,
+            $month,
+            $timezone,
+            $joinRecord,
+            $endOfMonth
+        );
+        
 
 
         $reportStart = 1;
@@ -794,6 +784,34 @@ class AgencyService
         }
 
         return $data;
+    }
+
+
+    protected function getReportDateRange($year, $month, $timezone, $joinRecord, $endOfMonth)
+    {
+        $firstDayLocal = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
+        $startOfMonth = $firstDayLocal->copy()->startOfDay();
+        $endOfMonth   = $firstDayLocal->copy()->endOfMonth()->endOfDay();
+
+        if ($joinRecord) {
+            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone)->startOfDay();
+            $leaveDate  = $joinRecord->leave_date
+                ? Carbon::parse($joinRecord->leave_date, $timezone)->endOfDay()
+                : $endOfMonth;
+        } else {
+            $joinedDate = null;
+            $leaveDate  = $endOfMonth;
+        }
+
+        $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth))
+            ? $joinedDate
+            : $startOfMonth;
+
+        $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth))
+            ? $leaveDate
+            : $endOfMonth;
+
+        return [$startDate, $endDate, $joinedDate, $leaveDate];
     }
 
     public function dataAgency()
