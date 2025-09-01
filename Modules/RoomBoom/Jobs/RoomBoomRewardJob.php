@@ -342,8 +342,13 @@ class RoomBoomRewardJob implements ShouldQueue
             $achievementTitle = __('Achievement Reward');
             $achievementBody = __('You have received a new achievement.');
 
-            Common::sendOfficialMessage($this->achievementNotifications['user_ids'], $achievementTitle, $achievementBody);
-            Common::send_firebase_notification($this->achievementNotifications['tokens'], $achievementTitle, $achievementBody);
+            if (!empty($notification['user_ids'])) {
+                Common::sendOfficialMessage($this->achievementNotifications['user_ids'], $achievementTitle, $achievementBody);
+            }
+
+            if (!empty($notification['tokens'])) {
+                Common::send_firebase_notification($this->achievementNotifications['tokens'], $achievementTitle, $achievementBody);
+            }
         }
     }
 
@@ -357,10 +362,15 @@ class RoomBoomRewardJob implements ShouldQueue
         foreach ($this->giftNotifications as $giftId => $notification) {
             $giftName = $gifts[$giftId]->name ?? __('a special gift');
 
-            $giftBody = str_replace(':giftName', $giftName, $giftBody);
+            $body = str_replace(':giftName', $giftName, $giftBody);
 
-            Common::sendOfficialMessage($notification['user_ids'], $giftTitle, $giftBody);
-            Common::send_firebase_notification($notification['tokens'], $giftTitle, $giftBody);
+            if (!empty($notification['user_ids'])) {
+                Common::sendOfficialMessage($notification['user_ids'], $giftTitle, $body);
+            }
+
+            if (!empty($notification['tokens'])) {
+                Common::send_firebase_notification($notification['tokens'], $giftTitle, $body);
+            }
         }
     }
 }
