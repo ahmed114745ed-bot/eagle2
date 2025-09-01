@@ -700,13 +700,7 @@ class AgencyService
         // $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
-        \Log::info('Fetching daily times', [
-            'user_id'   => $user->id,
-            'startDate' => $startDate,
-            'endDate'   => $endDate,
-            'joinedDate'   => $joinedDate,
-            'leaveDate'   => $leaveDate,
-        ]);
+   
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
             //$data->day = Carbon::parse($data->date)->day;
             $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
