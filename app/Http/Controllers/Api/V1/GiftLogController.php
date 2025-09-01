@@ -228,7 +228,7 @@ class GiftLogController extends Controller
                     'isExpensive'   => $totalPrice >= 2000,
                     'num_gift'      => $zigoData['number'],
                     "plural"        => $zigoData['plural'],
-                    'gift_price'    =>$totalPrice,// $zigoData['room_session'],
+                    'gift_price'    => $totalPrice, // $zigoData['room_session'],
                     'coins'         => @$zigoData['coins'] ?? '0',
                     'is_lucky_gift' => (bool)$zigoData['is_lucky_gift'],
                     'type' => @$zigoData['gift_image_type'] ?? 'mp4'
@@ -302,13 +302,14 @@ class GiftLogController extends Controller
 
     public function giftLogsList(Request $request)
     {
-        $user = $request->user();
+        $userId = $request->user()->id;
         if ($request->user_id) {
-            $user = User::query()->find($request->user_id);
+            $user = User::where('id', $request->user_id)->exists();
             if (!$user) return Common::apiResponse(0, 'not found', null, 404);
+            $userId = $request->user_id;
         }
         $gl = GiftLog::select('giftId', DB::raw('SUM(giftNum) as t'))
-            ->where('receiver_id', $user->id)
+            ->where('receiver_id', $userId)
             ->whereHas('gift')
             ->where('giftId', '!=', 0)
             ->groupBy('giftId')
