@@ -665,9 +665,9 @@ class AgencyService
             return [];
         }
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
-            ->where('agency_id', $user->agency_id)
-            ->latest('join_date')
-            ->first();
+        ->where('agency_id', $user->agency_id)
+        ->latest('join_date')
+        ->first();
 
         if (!$joinRecord) {
             $joinRecord =  null;
@@ -679,25 +679,14 @@ class AgencyService
 
 
         [$startOfMonth, $endOfMonth] = Carbon::startAndEndOfMonthUTC($year, $month, $timezone);
-        /*$startOfMonth = $firstDay->copy()->setTimezone('UTC');
-        $endOfMonth = $firstDay->copy()->endOfMonth()->setTimezone('UTC');*/
-
-
-        if ($joinRecord) {
-            // $joinedDate = Carbon::parse($joinRecord->join_date);
-
-            // $leaveDate = $joinRecord->leave_date
-            //     ? Carbon::parse($joinRecord->leave_date)
-            //     : $endOfMonth;
-            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone)->startOfDay();
-            $leaveDate = $joinRecord->leave_date
-                ? Carbon::parse($joinRecord->leave_date, $timezone)->endOfDay()
-                : $endOfMonth;
-        } else {
-            $joinedDate = null;
-            $leaveDate = $endOfMonth;
-        }
-
+      
+        [$startDate, $endDate, $joinedDate, $leaveDate] = $this->getReportDateRange(
+            $year,
+            $month,
+            $timezone,
+            $joinRecord
+        );
+        
 
 
         $reportStart = 1;
@@ -707,11 +696,11 @@ class AgencyService
         $endDay = $isThisMonth ? $nowInTimezone->day : $endOfMonth->day;
 
 
-        $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth)) ? $joinedDate : $startOfMonth;
-        $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
+        // $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth)) ? $joinedDate : $startOfMonth;
+        // $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
         $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
-
+   
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
             //$data->day = Carbon::parse($data->date)->day;
             $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
@@ -787,6 +776,35 @@ class AgencyService
         }
 
         return $data;
+    }
+
+
+    protected function getReportDateRange($year, $month, $timezone, $joinRecord)
+    {
+        $firstDayLocal = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
+        $startOfMonth  = $firstDayLocal->copy()->startOfDay();
+        $endOfMonth    = $firstDayLocal->copy()->endOfMonth()->endOfDay();
+    
+        if ($joinRecord) {
+            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone);
+    
+            $leaveDate  = $joinRecord->leave_date
+                ? Carbon::parse($joinRecord->leave_date, $timezone)
+                : $endOfMonth;
+        } else {
+            $joinedDate = null;
+            $leaveDate  = $endOfMonth;
+        }
+    
+        $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth))
+            ? $joinedDate
+            : $startOfMonth;
+    
+        $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth))
+            ? $leaveDate
+            : $endOfMonth;
+    
+        return [$startDate, $endDate, $joinedDate, $leaveDate];
     }
 
     public function dataAgency()

@@ -56,6 +56,7 @@ class AgencyUsersTargetResource extends JsonResource
         $agencySallary = UserSallary::query()
         ->where('user_id', $this->id)
         ->where('user_agency_id', $this->agency_id)
+        ->where('is_finished', 0)
         ->where(fn($q) => $q->whereBetween('created_at', [$from, $to])->orWhereBetween('updated_at', [$from, $to ]))
         ->latest()
         ->value('agency_sallary');
