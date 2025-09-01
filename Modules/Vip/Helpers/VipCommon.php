@@ -225,7 +225,7 @@ class VipCommon
    
 
         if ($existingPack) {
-            $existingPack->update(['is_used' => $userVip->is_used]);
+            $existingPack->update(['is_used' => $userVip->is_used , 'receive_type'=> 'vip-'.$userVip->level ]);
         } else {
             Pack::create([
                 'user_id'     => $user->id,
@@ -238,7 +238,7 @@ class VipCommon
                 'vip_user_id' => $userVip->id,
                 'is_used'     => $userVip->is_used,
                 'using'       => 1,
-                'receive_type'=> 'vip-'.$userVip->id
+                'receive_type'=> 'vip-'.$userVip->level
 
            ]);
         }

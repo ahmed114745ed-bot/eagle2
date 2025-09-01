@@ -3709,6 +3709,7 @@
   "success_title": "تم بنجاح 🎉",
   "success_message": "تم تنفيذ العملية بنجاح",
   "error_title": "خطأ 🚫",
-  "error_message": "حدث خطأ، حاول مرة أخرى"
+  "error_message": "حدث خطأ، حاول مرة أخرى",
+  "receive_type":"نوع الاستلام"
 
 }
