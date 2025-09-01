@@ -667,7 +667,7 @@ class AgencyService
         $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
             ->where('agency_id', $user->agency_id)
             ->latest('join_date')
-            ->first();
+            ->latest();
 
         if (!$joinRecord) {
             $joinRecord =  null;
