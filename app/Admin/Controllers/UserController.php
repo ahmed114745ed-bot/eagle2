@@ -163,17 +163,17 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','transfer_salary','is_bd'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di', 'transfer_salary', 'is_bd'])
             ->with([
-            'profile',
-            'agency',
-            'userSetting',
-//            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
-            'senderLevel',
-            'receiverLevel',
-            'monthlyDiamondReceive',
-            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ])->withCount('sameDeviceUsers');
+                'profile',
+                'agency',
+                'userSetting',
+                //            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
+                'senderLevel',
+                'receiverLevel',
+                'monthlyDiamondReceive',
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])->withCount('sameDeviceUsers');
 
         if (request()->online == 1) {
             $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)
@@ -277,7 +277,7 @@ class UserController extends MainController
             }
             return '';
         });
-        
+
         Admin::script(<<<'JS'
             $(document).on('click', '.remove-bd-btn', function (e) {
                 e.preventDefault();
@@ -311,7 +311,7 @@ class UserController extends MainController
                 });
             });
         JS);
-        
+
 
 
         Admin::script("
@@ -472,6 +472,7 @@ class UserController extends MainController
 
     public function show($id, Content $content,)
     {
+        $timezone = Common::timeZone();
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
         $start = request('start_at');
@@ -534,11 +535,11 @@ class UserController extends MainController
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
             $q->where('sender_id', $id);
-        })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end) {
-            $query->whereBetween('created_at', [
-                Carbon::parse($start)->startOfDay(),
-                Carbon::parse($end)->endOfDay()
-            ]);
+        })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end, $timezone) {
+            $startUtc = Carbon::parse($start, $timezone)->startOfDay()->timezone('UTC');
+            $endUtc   = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
+
+            $query->whereBetween('created_at', [$startUtc, $endUtc]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
             $query->where('agency_id', $agencyId);
         })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
@@ -547,11 +548,11 @@ class UserController extends MainController
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
             $q->where('sender_id', $id);
-        })->when(isset($start) && isset($end), function ($query) use ($start, $end) {
-            $query->whereBetween('created_at', [
-                Carbon::parse($start)->startOfDay(),
-                Carbon::parse($end)->endOfDay()
-            ]);
+        })->when(isset($start) && isset($end), function ($query) use ($start, $end, $timezone) {
+            $startUtc = Carbon::parse($start, $timezone)->startOfDay()->timezone('UTC');
+            $endUtc   = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
+
+            $query->whereBetween('created_at', [$startUtc, $endUtc]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
             $query->where('agency_id', $agencyId);
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
@@ -571,7 +572,7 @@ class UserController extends MainController
 
 
         $countries = $this->countries();
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
+        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
@@ -660,7 +661,7 @@ class UserController extends MainController
 
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
 
-       // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
+        // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
@@ -962,7 +963,7 @@ class UserController extends MainController
         return Redirect::back();
     }
 
-// app/Admin/Controllers/UsersAppController.php
+    // app/Admin/Controllers/UsersAppController.php
 
     public function ajaxSameDeviceUsersTable($id)
     {
@@ -1014,6 +1015,4 @@ class UserController extends MainController
 
         return redirect()->back();
     }
-
-
 }
