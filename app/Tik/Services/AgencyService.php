@@ -716,6 +716,8 @@ class AgencyService
             'user_id'   => $user->id,
             'startDate' => $startDate,
             'endDate'   => $endDate,
+            'joinedDate'   => $joinedDate,
+            'leaveDate'   => $leaveDate,
         ]);
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
             //$data->day = Carbon::parse($data->date)->day;
