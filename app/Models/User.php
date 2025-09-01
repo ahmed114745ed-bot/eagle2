@@ -374,6 +374,7 @@ class User extends Authenticatable
         $userSallary = UserSallary::query()
             ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
             ->where('user_id', $this->id)
+            ->where('is_finished', 0)
             ->where('user_agency_id', '=', $agencyId)
             ->where('month', $month)
             ->where('year', $year)
