@@ -698,16 +698,29 @@ class AgencyController extends MainController
     protected function addPhoneFields(Form $form)
     {
         $form->row(function ($row) {
-            $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input')->attribute('maxlength', 10);
-            $row->hidden('phone_code');
+            $row->width(9)->text('phone', __('agency whatsApp number'))
+                ->rules('required')
+                ->attribute('id', 'phone-input')
+                ->attribute('maxlength', 12)
+                ->default(function ($form) {
+                    if ($form->model()->phone && $form->model()->phone_code) {
+                        return $form->model()->phone;
+                    }
+                    return null;
+                });
+    
+            $row->hidden('phone_code')->default(function ($form) {
+                return $form->model()->phone_code ?? '';
+            });
         });
-
+    
         if (Session::has('show_alert')) {
             $form->html('<script>alert("الرجاء اختيار نوع الوكالة اولا");</script>');
         }
-
+    
         Admin::script($this->phoneJs());
     }
+    
 
     protected function phoneJs()
     {
