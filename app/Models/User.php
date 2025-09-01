@@ -1719,6 +1719,7 @@ class User extends Authenticatable
         $join = $this->latestJoin()->first();
 
         return $this->hasOne(UserSallary::class, 'user_id')
+            ->where('is_finished', 0)
             ->where(function ($query) use ($join) {
                 if ($join) {
                     $start = $join->join_date;
