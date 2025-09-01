@@ -149,6 +149,7 @@ class VipService
         $userVip->update([
             'sender_id' => $from->id,
             'user_id'   => $toUser->id,
+            'receive_type'=>'send-vip'
         ]);
 
         return $userVip;
