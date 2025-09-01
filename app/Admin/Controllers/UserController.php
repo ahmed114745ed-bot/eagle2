@@ -537,8 +537,8 @@ class UserController extends MainController
             $q->where('sender_id', $id);
         })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end,$timezone) {
             $query->whereBetween('created_at', [
-                Carbon::parse($start,$timezone)->startOfDay(),
-                Carbon::parse($end,$timezone)->endOfDay()
+                Carbon::parse($start,$timezone),
+                Carbon::parse($end,$timezone)
             ]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
             $query->where('agency_id', $agencyId);
