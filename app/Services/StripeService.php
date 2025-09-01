@@ -31,7 +31,7 @@ class StripeService {
                     'quantity' => $data['quantity'] ?? 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => $settings['success_url'] . '?session_id={CHECKOUT_SESSION_ID}',
+                'success_url' => $settings['success_url'] . '?orderId=' . $data['order_id'],
                 'cancel_url'  => $settings['cancel_url'],
                 'metadata' => [
                     'user_id'  => $data['user_id'],
@@ -42,8 +42,12 @@ class StripeService {
             CoinLog::where('id', $data['order_id'])
                 ->update(['trx' => $session->id]);
 
+                $endSession = \Stripe\Checkout\Session::retrieve($session->id);
+
+                   $paymentIntentId = $endSession->payment_intent;
             Log::info("Stripe session created", [
-                'session_id' => $session->id,
+                'session' => $session,
+                'paymentIntentId' => $paymentIntentId,
                 'order_id'   => $data['order_id'],
             ]);
 

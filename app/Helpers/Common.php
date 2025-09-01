@@ -246,7 +246,7 @@ class Common
         if ($statusCode === null) {
             $statusCode = $success ? 200 : 422;
         }
-        $resourceData = null; 
+        $resourceData = null;
         $paginationData = null;
 
         // Check if data is a collection directly or a paginated resource
@@ -290,9 +290,10 @@ class Common
         if ($paginates) {
 
             foreach ($paginates as $paginationKey => $paginationCollection) {
-                if ($resourceData instanceof LengthAwarePaginator ||
-                    $resourceData instanceof Paginator ||
-                    $resourceData instanceof CursorPaginator) {
+                if ($paginationCollection instanceof LengthAwarePaginator ||
+                    $paginationCollection instanceof Paginator ||
+                    $paginationCollection instanceof CursorPaginator) {
+
                     $paginationData = self::paginationData($paginationCollection);
                     $data[$paginationKey] = $paginationCollection->getCollection();
                 }
@@ -1129,6 +1130,8 @@ class Common
                         'vip_user_id' => $userVip->id,
                         'is_used' => $userVip->is_used,
                         'using' => 1,
+
+
                     ]
                 );
 

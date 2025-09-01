@@ -114,7 +114,7 @@ class PKEventWinnerCommand extends Command
                     break;
                 case "vip":
                     $vip = OVip::find($reward->target);
-                    UserCommon::addVipToUser($user, $vip, $reward->expire);
+                    UserCommon::addVipToUser($user, $vip, $reward->expire,null,'pk-event');
                     break;
                 case "ware":
                     $ware = Ware::find($reward->target);

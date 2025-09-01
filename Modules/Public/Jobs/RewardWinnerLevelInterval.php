@@ -59,7 +59,7 @@ class RewardWinnerLevelInterval implements ShouldQueue
                         $user->save();
                     } elseif ($rewad->type == "vip") {
                         $vip = OVip::query()->find($rewad->target);
-                        if ($vip) UserCommon::addVipToUser($user, $vip, $rewad->expire);
+                        if ($vip) UserCommon::addVipToUser($user, $vip, $rewad->expire,null,'reward-winner-interval');
                     } elseif ($rewad->type == "ware") {
                         $ware = Ware::query()->find($rewad->target);
                         if ($ware) UserCommon::addWareToUser($user, $ware, $rewad->expire);

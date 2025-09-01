@@ -5,22 +5,29 @@ namespace App\Admin\Controllers;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Config;
 use App\Models\GameWallet;
 use Illuminate\Http\Request;
+use Encore\Admin\Layout\Content;
 use App\Models\GameChargeHistory;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 
-class GameChargeHistoryController extends AdminController
+class GameChargeHistoryController extends MainController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title = 'GameChargeHistory';
+   // protected $title = 'Game Charge History';
 
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('Game Charge History'))
+            ->body($this->grid()));
+    }
     /**
      * Make a grid builder.
      *
@@ -33,11 +40,9 @@ class GameChargeHistoryController extends AdminController
         $grid->model()->orderByDesc('id');
         $grid->column('id', __('Id'));
         $grid->column('value', __('Value'));
-        $grid->actions(function ($actions) {
-            $actions->disableDelete();
-            $actions->disableEdit();
-            $actions->disableView();
-        });
+        $grid->column('created_at', trans('admin.created_at'));
+        $grid->disableActions();
+        $grid->disableRowSelector();
 
         return $grid;
     }
@@ -75,11 +80,11 @@ class GameChargeHistoryController extends AdminController
         $form->saving(function (Form $form) {
 
             $balance  = $form->input('value') * config("app.one_coins") * 4;
-            $gameWallet = GameWallet::whereMonth("created_at",date("m"))->whereYear("created_at",date("Y"))->first();
+            $gameWallet = GameWallet::whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"))->first();
             if ($gameWallet) {
                 $gameWallet->balance += $balance;
                 $gameWallet->save();
-            }else{
+            } else {
                 GameWallet::create([
                     'balance' => $balance,
                 ]);

@@ -4,7 +4,6 @@ namespace Modules\TribeReward\Services;
 
 use App\Helpers\UserCommon;
 use App\Models\GiftLog;
-use App\Models\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use Carbon\Carbon;
@@ -12,6 +11,7 @@ use Exception;
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\TribeReward\Entities\AgencyReward;
 use Modules\TribeReward\Entities\TribePeriod;
+use Modules\Vip\Entities\OVip;
 
 class TribeService
 {
@@ -103,7 +103,7 @@ class TribeService
                 switch ($AgencyReward->target_type) {
                     case "vip":
                         $vip = OVip::find($AgencyReward->target);
-                        UserCommon::addVipToUser($user, $vip, $AgencyReward->expire_days, $userOwnAgency);
+                        UserCommon::addVipToUser($user, $vip, $AgencyReward->expire_days, $userOwnAgency,'tribe');
                         break;
                     case "ware":
                         $ware = Ware::find($AgencyReward->target);

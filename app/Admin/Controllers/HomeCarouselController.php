@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Tik\Services\Files\ImageConverter;
 use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -116,7 +117,7 @@ class HomeCarouselController extends MainController
 
         $form->display(__('admin.ID'));
         $form->number('sort', __('sort'));
-        $form->image('img', trans('img'))->required();
+        $form->imagePath('img', trans('img'))->setResolution(80)->required();
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
         $form->select('form', trans('time view type'))->options([0 => __(''), 1 => __('hours'), 2 => __('days'), 3 => __('month')])
             ->when(1, function (Form $form) {
@@ -138,6 +139,17 @@ class HomeCarouselController extends MainController
                     $form->url('url', trans('url'));
                 });
             });
+
+        $form->saving(function (Form $form) {
+            /*if (request()->hasFile('img')) {
+                $file = request()->file('img');
+                $toWebpAndUpload = ImageConverter::toWebpAndUpload($file, 'banners');
+                if ($toWebpAndUpload) {
+                    $form->img = $toWebpAndUpload;
+                }
+
+            }*/
+        });
 
         return $form;
     }
