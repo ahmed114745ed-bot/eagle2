@@ -472,6 +472,7 @@ class UserController extends MainController
 
     public function show($id, Content $content,)
     {
+        $timezone = Common::timeZone();
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
         $start = request('start_at');
@@ -534,10 +535,10 @@ class UserController extends MainController
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
             $q->where('sender_id', $id);
-        })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end) {
+        })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end,$timezone) {
             $query->whereBetween('created_at', [
-                Carbon::parse($start)->startOfDay(),
-                Carbon::parse($end)->endOfDay()
+                Carbon::parse($start,$timezone)->startOfDay(),
+                Carbon::parse($end,$timezone)->endOfDay()
             ]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
             $query->where('agency_id', $agencyId);
@@ -547,10 +548,10 @@ class UserController extends MainController
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
             $q->where('sender_id', $id);
-        })->when(isset($start) && isset($end), function ($query) use ($start, $end) {
+        })->when(isset($start) && isset($end), function ($query) use ($start, $end,$timezone) {
             $query->whereBetween('created_at', [
-                Carbon::parse($start)->startOfDay(),
-                Carbon::parse($end)->endOfDay()
+                Carbon::parse($start,$timezone)->startOfDay(),
+                Carbon::parse($end,$timezone)->endOfDay()
             ]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
             $query->where('agency_id', $agencyId);
