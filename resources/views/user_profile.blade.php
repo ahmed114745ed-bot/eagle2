@@ -2297,7 +2297,7 @@
                                 @endif
                                 <td>{{ $giftSLog->giftNum }}</td>
                                 <td>{{  $giftSLog->giftPrice}}</td>
-                                <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->format('Y-m-d H:i') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->timezone($timezone)->format('Y-m-d H:i') }}</td>
                             </tr>
                         @endforeach
                         </tbody>
