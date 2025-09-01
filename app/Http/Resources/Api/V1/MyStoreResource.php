@@ -50,7 +50,7 @@ class MyStoreResource extends JsonResource
 
             'my_store' => [
                 'id' => $this->id,
-                'coins_new' => numToStringNew($this->di),
+                'coins_new' => $this->di,
                 'coins' => (string)$this->di,
                 'diamonds' =>  (string)$diamonds,
                 'silver_coins' => (string)$this->gold,
