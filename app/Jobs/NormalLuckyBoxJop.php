@@ -63,9 +63,9 @@ class NormalLuckyBoxJop implements ShouldQueue
 
             $winnerBox = UserBoxGift::where('box_uses_id', $userBox->box_id)->exists();
             if (!$winnerBox) {
-                CustomNotification::closedLuckyBosWithReturnCoins($user, $userBox->unused_coins, $userBox?->image, 0);
+                CustomNotification::closedLuckyBosWithReturnCoins($user, $userBox->unused_coins, @$userBox?->image, 0);
             } else {
-                CustomNotification::closeLuckyBox($user, $userBox?->image, 0);
+                CustomNotification::closeLuckyBox($user, @$userBox?->image, 0);
             }
             foreach ($usersRoomVisit as $userRoomVisit) {
 

@@ -87,7 +87,7 @@ class AgencyController extends MainController
         if (! Admin::user()->can('*')) {
             Permission::check('show-' . $this->permission_name);
         }
-
+        $timezone = getTimezone();
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $uuid = request('uuid');
@@ -242,8 +242,8 @@ class AgencyController extends MainController
 
         $sumTargets = GiftLog::where('agency_id', $agencyId)
             ->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth(),
+                Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC'),
+                Carbon::now($timezone)->endOfMonth()->copy()->setTimezone('UTC'),
             ])
             ->sum('giftPrice');
 
