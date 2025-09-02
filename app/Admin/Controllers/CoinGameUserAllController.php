@@ -239,7 +239,7 @@ class CoinGameUserAllController extends AdminController
             $gameIdHtml = "game-{$game->id}";
         
             // حدد الرابط قبل الـ HEREDOC
-            $urlLink = admin_url("games/{$game->id}");
+            $urlLink = admin_url("all-games/{$game->id}");
         
             return <<<HTML
             <a href="{$urlLink}" style="
