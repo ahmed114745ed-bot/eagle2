@@ -76,7 +76,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $this->distributeTopContributors($topContributorIds, $rewardItems);
 
-        $this->distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards);
+        $this->distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards, $rewardItems);
 
         $this->distributeVisitorRewards($rewardItems, $room);
 
@@ -104,7 +104,7 @@ class RoomBoomRewardJob implements ShouldQueue
     /**
      * @throws \Exception
      */
-    public function distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards): void
+    public function distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards, &$rewardItems): void
     {
         if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
             if ($rewards->isNotEmpty()){
