@@ -96,7 +96,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('app:update-game-wallet')
             ->monthlyOn(1, '00:00')
-            ->timezone(getTimezone())
+            ->timezone('UTC')
             ->appendOutputTo(storage_path('logs/app-update-game-wallet.log'))
             ->runInBackground();
 
