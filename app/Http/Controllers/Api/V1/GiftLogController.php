@@ -310,6 +310,7 @@ class GiftLogController extends Controller
         }
         $gl = GiftLog::select('giftId', DB::raw('SUM(giftNum) as t'))
             ->where('receiver_id', $userId)
+            ->with('receiver:id,sub_receiver_level,sub_sender_level')
             ->whereHas('gift')
             ->where('giftId', '!=', 0)
             ->groupBy('giftId')
