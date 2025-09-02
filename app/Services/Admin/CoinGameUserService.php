@@ -192,7 +192,7 @@ class CoinGameUserService
         $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v));
         $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v));
         $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v));
-        if (! Admin::user()->can('details-switch-coin-game-users-report') && !Admin::user()->can('*')) {
+        if ( Admin::user()->can('details-switch-coin-game-users-report') || Admin::user()->can('*')) {
 
             $grid->column('details', __('Details'))->display(function () {
 
