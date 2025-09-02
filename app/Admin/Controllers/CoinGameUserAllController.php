@@ -125,10 +125,10 @@ class CoinGameUserAllController extends AdminController
      */
     protected function renderInfoBoxes(Row $row, $totals): void
     {
-        $row->column(3, new InfoBox(__('Total Played'), 'gamepad', 'blue', '', truncateAndTrim($totals->total_played ?? 0, 2) . ' 🎮'));
-        $row->column(3, new InfoBox(__('Total Loss'), 'times-circle', 'red', '', truncateAndTrim($totals->total_loss ?? 0, 2) . ' ❌'));
-        $row->column(3, new InfoBox(__('Total Win'), 'trophy', 'orange', '', truncateAndTrim($totals->total_win ?? 0, 2) . ' 🏆'));
-        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green', '', truncateAndTrim($totals->app_profit ?? 0, 2) . ' 💰'));
+        $row->column(3, new InfoBox(__('Total Played'), '', 'blue', '', truncateAndTrim($totals->total_played ?? 0, 2) . ' 🎮'));
+        $row->column(3, new InfoBox(__('Total Loss'), '', 'red', '', truncateAndTrim($totals->total_loss ?? 0, 2) . ' ❌'));
+        $row->column(3, new InfoBox(__('Total Win'), '', 'orange', '', truncateAndTrim($totals->total_win ?? 0, 2) . ' 🏆'));
+        $row->column(3, new InfoBox(__('App Profit'), '', 'green', '', truncateAndTrim($totals->app_profit ?? 0, 2) . ' 💰'));
     }
     
 
