@@ -159,7 +159,7 @@ class CoinGameUserService
             $url = getImagePath($game->image) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
 
-            $imageTag = handleShowImageWithTypes($game->id, $url, 50, 50);
+            $imageTag = handleShowImageWithTypes($game->id, $url, 50, 50,0);
             $gameIdHtml = "game-{$game->id}";
             $urlLink = admin_url("all-games/{$game->id}");
 
