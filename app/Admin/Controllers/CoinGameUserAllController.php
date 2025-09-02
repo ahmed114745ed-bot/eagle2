@@ -260,7 +260,7 @@ class CoinGameUserAllController extends AdminController
                 color: inherit;
                 transition: background-color 0.2s ease;
             ">
-                <img src="{$imageTag}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;">
+                $imageTag
                 <div>
                     <strong style="font-size:16px;">{$name}</strong><br>
                     <span style="font-size:13px;">
