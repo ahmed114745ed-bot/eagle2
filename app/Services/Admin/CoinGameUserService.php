@@ -2,6 +2,7 @@
 
 namespace App\Services\Admin;
 
+use App\Admin\Widgets\CustomInfoBox;
 use App\Models\CoinGameUserAll;
 use App\Models\User;
 use App\Models\AllGame;
@@ -87,10 +88,17 @@ class CoinGameUserService
      */
     public function renderInfoBoxes(Row $row, $totals): void
     {
-        $row->column(3, new InfoBox(__('Total Played'), 'gamepad', 'blue', '', number_format($totals->total_played ?? 0, 2)));
-        $row->column(3, new InfoBox(__('Total Loss'), 'times-circle', 'red', '', number_format($totals->total_loss ?? 0, 2)));
-        $row->column(3, new InfoBox(__('Total Win'), 'trophy', 'orange', '', number_format($totals->total_win ?? 0, 2)));
-        $row->column(3, new InfoBox(__('App Profit'), 'dollar', 'green', '', number_format($totals->app_profit ?? 0, 2)));
+    //     $row->column(6, new InfoBox(__('Total Played'), 'gamepad', 'blue', '', number_format($totals->total_played ?? 0, 2) ) );
+    //     $row->column(6, new InfoBox(__('Total Loss'), 'times-circle', 'red', '', number_format($totals->total_loss ?? 0, 2)));
+    //     $row->column(6, new InfoBox(__('Total Win'), 'trophy', 'orange', '', number_format($totals->total_win ?? 0, 2)));
+    //     $row->column(6, new InfoBox(__('App Profit'), 'dollar', 'green', '', number_format($totals->app_profit ?? 0, 2)));
+    $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2)  , '50px'));
+    $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2) , '50px'));
+    $row->column(3, new CustomInfoBox(__('Total Win'), 'trophy', 'orange',  number_format($totals->total_win ?? 0, 2) , '50px'));
+    $row->column(3, new CustomInfoBox(__('App Profit'), 'dollar', 'green',  number_format($totals->app_profit ?? 0, 2) , '50px'));
+
+    
+    
     }
 
     /**
