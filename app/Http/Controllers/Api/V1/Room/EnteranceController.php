@@ -71,7 +71,7 @@ class EnteranceController extends Controller
                 'app_id' => "783657445",
                 'app_sign' => "1e9df9f9cf7554a706280a483588d70c88c2456fdcba0424bf393f3455e70bc9"
             ],
-            'library' => $library == 1 ? 'zego' : 'agora',
+            'library' => /*$library == 1 ?*/ 'zego' /*: 'agora'*/,
 
         ];
         return Common::apiResponse(1, '', $data);
