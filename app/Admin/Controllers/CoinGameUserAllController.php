@@ -127,10 +127,10 @@ class CoinGameUserAllController extends AdminController
      */
     protected function renderInfoBoxes(Row $row, $totals): void
     {
-        $row->column(3, new InfoBox(__('Total Played'), '', 'blue', '', truncateAndTrim($totals->total_played ?? 0, 2) . ' 🎮'));
-        $row->column(3, new InfoBox(__('Total Loss'), '', 'red', '', truncateAndTrim($totals->total_loss ?? 0, 2) . ' ❌'));
-        $row->column(3, new InfoBox(__('Total Win'), '', 'orange', '', truncateAndTrim($totals->total_win ?? 0, 2) . ' 🏆'));
-        $row->column(3, new InfoBox(__('App Profit'), '', 'green', '', truncateAndTrim($totals->app_profit ?? 0, 2) . ' 💰'));
+        $row->column(3, new InfoBox(__('Total Played'), '', 'blue', '', number_format($totals->total_played ?? 0, 2) . ' 🎮'));
+        $row->column(3, new InfoBox(__('Total Loss'), '', 'red', '', number_format($totals->total_loss ?? 0, 2) . ' ❌'));
+        $row->column(3, new InfoBox(__('Total Win'), '', 'orange', '', number_format($totals->total_win ?? 0, 2) . ' 🏆'));
+        $row->column(3, new InfoBox(__('App Profit'), '', 'green', '', number_format($totals->app_profit ?? 0, 2) . ' 💰'));
     }
     
 
@@ -145,6 +145,19 @@ class CoinGameUserAllController extends AdminController
             ->where('game_id', $gameId)
             ->orderByDesc('id');
     
+        $grid->filter(function (Grid\Filter $filter) {
+                $filter->disableIdFilter();
+            
+                $filter->where(function ($query) {
+                    $query->where('id', $this->input);
+                }, __('ID'))->placeholder(__('ID'));
+            
+                $filter->between('created_at', __('Created At'))->datetime([
+                    'format' => 'YYYY-MM-DD HH:mm:ss',
+                    'locale' => 'en'
+                ]);
+            });
+            
         $this->configureGridColumns($grid);
         $this->configureGridOptions($grid);
     
@@ -258,10 +271,17 @@ class CoinGameUserAllController extends AdminController
         });
         
         
-        $grid->column('total_played', __('Total Played'));
-        $grid->column('total_loss', __('Total Loss'));
-        $grid->column('total_win', __('Total Win'));
-        $grid->column('app_profit', __('App Profit'));
+        $grid->column('total_played', __('Total Played'))
+                ->display(fn($value) => number_format($value));
+        
+        $grid->column('total_loss', __('Total Loss'))
+                ->display(fn($value) => number_format($value));
+        
+        $grid->column('total_win', __('Total Win'))
+                ->display(fn($value) => number_format($value));
+        
+        $grid->column('app_profit', __('App Profit'))
+                ->display(fn($value) => number_format($value));
 
         $grid->column('details', __('Details'))->display(function () {
             $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}");
