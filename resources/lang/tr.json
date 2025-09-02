@@ -3236,7 +3236,7 @@
     "Not enough available quantity for this reward.": "Bu ödül için yeterli miktar yok.",
     "This reward has expired.": "Bu ödülün süresi doldu.",
 
-    "You have already sent a CP request before.": "Daha önce bir CP isteği gönderdiniz.",
+    "You have already sent/received a CP request before.": "Daha önce bir CP isteği gönderdiniz veya aldınız.",
     "You can only send this relation to one user only.": "Bu ilişkiyi yalnızca bir kullanıcıya gönderebilirsiniz.",
     "There is no CP relation.": "CP ilişkisi yok.",
     "There is no CP relation between the users.": "Kullanıcılar arasında CP ilişkisi yok.",
@@ -3291,7 +3291,30 @@
     "success_title": "Başarılı 🎉",
     "success_message": "İşlem başarıyla tamamlandı",
     "error_title": "Hata 🚫",
-    "error_message": "Bir hata oluştu, lütfen tekrar deneyin"
+    "error_message": "Bir hata oluştu, lütfen tekrar deneyin",
+    "coin_game_users": "Oyun Kayıtları",
+    "coin_game_users_description": "Her kullanıcı ve oyun için bir kez göster",
+    "user": "Kullanıcı",
+    "game": "Oyun",
+    "coins": "Puan",
+    "app_profit": "Uygulama Karı",
+    "type": "Tür",
+    "created_at": "Oluşturulma Tarihi",
+    "round_details": "  Detayları",
+    "round_id": "Tur ID",
+    "Total Played": "Toplam Oynanan",
+    "Total Loss": "Toplam Kayıp",
+    "Total Win": "Toplam Kazanç",
+    "App Profit": "Uygulama Karı",
+    "round_details": "Tur Detayları",
+    "Round ID": "Tur Kimliği",
+    "Result": "Sonuç",
+    "Win": "Kazanç",
+    "Lose": "Kayıp",
+    "Bet Amount": "Bahis Miktarı",
+    "Created at": "Oluşturulma Tarihi",
+    "User": "Kullanıcı",
+    "Game": "Oyun"
 
 
 

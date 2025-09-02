@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Models\PaymentCoin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\EventCoinsReportResource;
@@ -41,7 +42,7 @@ class CoinReportController extends Controller
 
         return Common::apiResponse(1, '', $data, 200);
     }
-    
+
     public function givinCoins()
     {
         $user = auth()->user();
@@ -74,15 +75,16 @@ class CoinReportController extends Controller
     public function rechargeCoins()
     {
         $user = auth()->user();
+        $paymentCoins = PaymentCoin::orderBy('type')->pluck('type')->toArray();
         $data = CoinLog::where("user_id", $user->id)
-        ->where("status", '=',1)
-        ->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay','fawry'])
-        ->when(request("start_date") && request("end_date"), function ($q) {
-            $q->whereDate("created_at", ">=", request("start_date"))
-              ->whereDate("created_at", "<=", request("end_date"));
-        })
-        ->orderBy("created_at", "desc")
-        ->paginate(10);//->get();
+            ->where('status', 1)
+            ->whereIn('method', $paymentCoins)
+            ->when(request("start_date") && request("end_date"), function ($q) {
+                $q->whereDate("created_at", ">=", request("start_date"))
+                    ->whereDate("created_at", "<=", request("end_date"));
+            })
+            ->orderBy("created_at", "desc")
+            ->paginate(10);//->get();
         return RechargeCoinsReportResource::collection($data);
     }
 

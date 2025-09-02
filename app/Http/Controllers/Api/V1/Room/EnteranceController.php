@@ -73,10 +73,10 @@ class EnteranceController extends Controller
             'agora_app_id' => $agora_app_id,
             'zego' => [
                 'server_secret' => $zego_server_secret,
-                'app_id' => $zego_app_id,
-                'app_sign' => $app_sign,
+                'app_id' => "783657445",
+                'app_sign' => "1e9df9f9cf7554a706280a483588d70c88c2456fdcba0424bf393f3455e70bc9"
             ],
-            'library' => $library == 1 ? 'zego' : 'agora',
+            'library' => /*$library == 1 ?*/ 'zego' /*: 'agora'*/,
 
         ];
         return Common::apiResponse(1, '', $data);
@@ -249,7 +249,7 @@ class EnteranceController extends Controller
 
         $ban = Common::ifRoomHasband($owner_id);
         if ($ban) {
-            return Common::apiResponse(0, __('This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.'), ['ban' => true]);
+            return Common::apiResponse(0, __('This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.'), ['ban' => true],402);
         }
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 

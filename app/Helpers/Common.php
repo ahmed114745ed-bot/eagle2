@@ -1130,6 +1130,8 @@ class Common
                         'vip_user_id' => $userVip->id,
                         'is_used' => $userVip->is_used,
                         'using' => 1,
+
+
                     ]
                 );
 

@@ -2816,8 +2816,8 @@
 "Not enough available quantity for this reward.": "इस पुरस्कार के लिए पर्याप्त मात्रा उपलब्ध नहीं है।",
 "This reward has expired.": "इस पुरस्कार की समय सीमा समाप्त हो गई है।",
 
-"You have already sent a CP request before.": "आप पहले ही एक CP अनुरोध भेज चुके हैं।",
-"You can only send this relation to one user only.": "आप यह संबंध केवल एक उपयोगकर्ता को ही भेज सकते हैं।",
+    "You have already sent/received a CP request before.": "आप पहले ही एक CP अनुरोध भेज/प्राप्त कर चुके हैं।",
+    "You can only send this relation to one user only.": "आप यह संबंध केवल एक उपयोगकर्ता को ही भेज सकते हैं।",
 "There is no CP relation.": "कोई CP संबंध नहीं है।",
 "There is no CP relation between the users.": "उपयोगकर्ताओं के बीच कोई CP संबंध नहीं है।",
 "You are already in a relation with this user.": "आप पहले से ही इस उपयोगकर्ता के साथ संबंध में हैं।",
@@ -2871,7 +2871,30 @@
 "success_title": "सफलता 🎉",
 "success_message": "ऑपरेशन सफलतापूर्वक पूरा हुआ",
 "error_title": "त्रुटि 🚫",
-"error_message": "एक त्रुटि हुई, कृपया पुनः प्रयास करें"
+"error_message": "एक त्रुटि हुई, कृपया पुनः प्रयास करें",
+"coin_game_users": "खेल रिकॉर्ड",
+"coin_game_users_description": "प्रत्येक उपयोगकर्ता के लिए प्रत्येक खेल केवल एक बार दिखाएँ",
+"user": "उपयोगकर्ता",
+"game": "खेल",
+"coins": "सिक्के",
+"app_profit": "ऐप लाभ",
+"type": "प्रकार",
+"created_at": "बनाई गई तारीख",
+"round_details": " विवरण",
+"round_id": "राउंड आईडी",
+"Total Played": "कुल खेला गया",
+"Total Loss": "कुल नुकसान",
+"Total Win": "कुल जीत",
+"App Profit": "ऐप लाभ",
+"round_details": "राउंड विवरण",
+"Round ID": "राउंड आईडी",
+"Result": "परिणाम",
+"Win": "जीत",
+"Lose": "हार",
+"Bet Amount": "दांव राशि",
+"Created at": "बनाने की तारीख",
+"User": "उपयोगकर्ता",
+"Game": "खेल"
 
 
 

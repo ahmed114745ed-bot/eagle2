@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Admin\Fields\Image;
+use App\Admin\Fields\ImagePath;
 use App\Classes\UserHandling;
 use App\Helpers\CustomNotification;
 use App\Helpers\ManagerHelper;
@@ -62,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Form::extend('image', Image::class);
+        Form::extend('imagePath', ImagePath::class);
 
         if ($this->app->isLocal()) {
             $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);

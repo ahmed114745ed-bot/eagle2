@@ -10,6 +10,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\RoomVisitor;
+use Carbon\Carbon;
 use Modules\Vip\Entities\VipPrivilege;
 use App\Exports\AgencyCharge;
 use App\Models\DeleteAccount;
@@ -423,5 +424,54 @@ Route::group(['prefix' => 'paypal', ], function () { //'middleware' => 'throttle
 //    Route::get('/capture/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
 //    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
+
+
+
+
+Route::get('/test-games', function () {
+
+    $fromDate= request()->get('fromDate');
+    $toDate= request()->get('toDate');
+    $userId= request()->get('userId');
+
+    $records = CoinGameUserAll::where('user_id', $userId)
+    ->whereBetween('created_at', [$fromDate, $toDate])
+    ->orderBy('created_at', 'desc')
+    ->get();
+
+    return $records;
+})->name('test-games');
+
+use App\Models\CoinGameUserAll;
+
+
+
+
+
+
+Route::get('/archive-old-coin-games', function () {
+    $now = Carbon::now();
+    $start = $now->copy()->subMonth(); 
+    $end = $now->copy()->subYears(2); 
+
+    $current = $start->copy();
+
+    while ($current->greaterThanOrEqualTo($end)) {
+        $year = $current->year;
+        $month = $current->month;
+
+        Artisan::call('coin_game:archive', [
+            'year' => $year,
+            'month' => $month,
+        ]);
+
+        echo "Archived: {$year}-{$month}<br>";
+
+        $current->subMonth();
+    }
+
+    return "✅ Archiving finished!";
+});
+
 
 

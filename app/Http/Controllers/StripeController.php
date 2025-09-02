@@ -98,7 +98,7 @@ class StripeController extends Controller
     
                     if (!empty($session->metadata->order_id)) {
                         $orderId = $session->metadata->order_id;
-                        $trxId   = $session->id;
+                        $trxId   = $session->payment_intent;
                         Log::info("checkout.session.completed: order_id={$orderId}, trx={$trxId}");
                     } else {
                         $trxId   = $session->id;
@@ -107,7 +107,7 @@ class StripeController extends Controller
     
                 case 'payment_intent.succeeded':
                     $paymentIntent = $event->data->object;
-                    $trxId   = $paymentIntent->id;
+                    $trxId   = $paymentIntent->payment_intent;
                     break;
     
                 case 'charge.succeeded':
@@ -187,20 +187,18 @@ class StripeController extends Controller
     public function success(Request $request)
     {
 
-        // $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
 
-        // Stripe::setApiKey($stripe_test_secret_key?->value);
 
-        // $sessionId = $request->get('session_id');
-
-        // if (!$sessionId) {
-        //     return response('Missing session ID', 400);
-        // }
 
         try {
-            // Session::retrieve($sessionId);
+            $orderId = $request->get('orderId');
 
-            return response()->json(['status' => 'success', 'message' => 'Payment successful.',]);
+            $coin = CoinLog::find($orderId);
+            return response()->json([
+                'status'  => true,
+                'trx'     => $coin->trx,
+                'message' => 'Transaction completed successfully.',
+            ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'failed', 'message' => 'Payment failed.',], 500);
         }

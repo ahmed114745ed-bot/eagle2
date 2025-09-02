@@ -149,7 +149,7 @@ class BdController extends MainController
             if (request()->filled('_export_')) {
                 return $this->default;
             }
-           
+
             if ($this->default == 1) {
                 return <<<HTML
                     <span style="display: flex; align-items: center;">
@@ -223,10 +223,10 @@ class BdController extends MainController
         });
 
         $col = $grid->column('transfer_salary', __("transfer_salary"))
-        ->display(function () {
-            return $this->transfer_salary ? 1 : 0;
-        });
-        
+            ->display(function () {
+                return $this->transfer_salary ? 1 : 0;
+            });
+
         if (! request()->filled('_export_')) {
             $col->switch(Common::getSwitchStates());
         }
@@ -255,7 +255,7 @@ class BdController extends MainController
         });
 
 
-    
+
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
@@ -303,7 +303,7 @@ class BdController extends MainController
 
         $form->hidden('transfer_salary', __('transfer_salary'));
 
-        
+
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
                 $ops2 = [];
@@ -327,18 +327,28 @@ class BdController extends MainController
 
         $form->hidden('type', __('Type'))->value('bd');
         $form->hidden('transfer_salary', __('transfer_salary'));
-        
+
         $form->saving(function (Form $form) {
-            $originalAppId = $form->model()->getOriginal('app_id');
-            $userExists = \App\Models\User::find($originalAppId);
 
-            if ($originalAppId && $originalAppId != $form->app_id) {
 
-                if ($userExists) {
-                    admin_error('تحذير', 'app_user_change_denied');
-                    $form->app_id = $originalAppId;
+            $isEditing = $form->isEditing();
+            if ($isEditing) {
+                $originalAppId = $form->model()->getOriginal('app_id');
+                $newAppId = $form->input('app_id');
+                if ($originalAppId !=  $newAppId) {
+                    $OldUserAppId = \App\Models\User::find($originalAppId);
+                    if ($OldUserAppId) {
+                        $OldUserAppId->is_bd = 0;
+                        $OldUserAppId->save();
+                    }
+
+                    $newUserAppId = \App\Models\User::find($newAppId);
+                    $newUserAppId->is_bd = 1;
+                    $newUserAppId->save();
+                    $form->app_id = $newAppId;
                 }
             }
+        
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password   = Hash::make($form->password);
             }
@@ -385,9 +395,9 @@ class BdController extends MainController
         $year = request('year') ?? now()->year;
         $month = request('month') ?? now()->month;
         $tab = request()->query('tab', 'agencies');
-    
+
         $bd = Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
-    
+
         $id = $bd->id;
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($bd->avatar);
@@ -395,14 +405,14 @@ class BdController extends MainController
             $imageUrl = $defaultImage;
         }
         $bd->display_image = $imageUrl;
-    
+
         $agencies = $transactions = $target_history = null;
-    
+
         switch ($tab) {
             case 'agencies':
                 $agencies = $bd->agencies()->paginate(10, ['*'], 'agencies_page');
                 break;
-    
+
             case 'transactions':
                 $transactions = $bd->transactions()
                     ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
@@ -410,9 +420,9 @@ class BdController extends MainController
                     ->latest()
                     ->paginate(10, ['*'], 'transactions_page');
                 break;
-    
+
             case 'target_history':
-                $target_history =BdAgencyHostSallary::select(
+                $target_history = BdAgencyHostSallary::select(
                     'id',
                     'bd_id',
                     'agency_id',
@@ -423,18 +433,18 @@ class BdController extends MainController
                     'bd_user_id',
                     'created_at'
                 )
-                ->where('bd_id', $bd->id)
-                ->where('bd_id', $bd->id)
-                ->where('amount','!=' ,0)
-                ->where('year', $year)
-                ->latest()
-                ->paginate(10, ['*'], 'target_history_page');
+                    ->where('bd_id', $bd->id)
+                    ->where('bd_id', $bd->id)
+                    ->where('amount', '!=', 0)
+                    ->where('year', $year)
+                    ->latest()
+                    ->paginate(10, ['*'], 'target_history_page');
                 break;
         }
-    
+
         return view('admin.bd.bd_profile', compact('bd', 'agencies', 'transactions', 'target_history'));
     }
-    
+
 
     protected function detail($id)
     {
@@ -466,24 +476,24 @@ class BdController extends MainController
             ->where('type', 'bd')
             ->where('app_id', '!=', 0)
             ->get();
-    
+
         $updated = 0;
-    
+
         foreach ($bds as $bd) {
             $query = DB::table('agencies')
                 ->where('bd_id', $bd->app_id);
-    
+
             if ($days > 0) {
                 $query->where('created_at', '<=', now()->subDays($days));
             }
-    
-            $affected = $query->update(['bd_id' => $bd->id]);   
+
+            $affected = $query->update(['bd_id' => $bd->id]);
             $updated += $affected;
         }
-    
+
         return response()->json([
             'status' => 'success',
-            'message' => $updated 
+            'message' => $updated
         ]);
     }
 }

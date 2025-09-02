@@ -1271,6 +1271,7 @@
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
                             <th>{{ __('expire') }}</th>
+                            <th>{{ __('receive_type') }}</th>
                             <th>{{ __('action') }}</th>
 
                         </tr>
@@ -1325,6 +1326,8 @@
 
                                     </td>
                                     <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :$pack->days  }}</td>
+                                    <td>{{ $pack->receive_type }}</td>
+
                                     <td>
                                         <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
@@ -1376,6 +1379,7 @@
                             <th>{{ __('expire') }}</th>
                             <th>{{ __('qty') }}</th>
                             <th>{{ __('total Price') }}</th>
+                            <th>{{ __('receive_type') }}</th>
                             <th>{{ __('action') }}</th>
 
                         </tr>
@@ -1395,6 +1399,8 @@
                                     </td> 
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
+                                    <td>{{ @$userVip->receive_type ?? 0 }}</td>
+                                    
                                     <td>
                                         <div class="d-flex">
 
@@ -2210,7 +2216,7 @@
                                 </td>
                                 <td>
                                     @if(!empty($giftSLog->room))
-                                        <a href="{{ url('admin/users/' . $ownerRoom) }}" target="_blank"
+                                        <a href="{{ url('admin/rooms/' .  $giftSLog->room->id) }}" target="_blank"
                                            class="d-flex align-items-center text-decoration-none">
                                             <img src="{{ $url }}"
                                                  width="30" height="30"

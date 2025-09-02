@@ -67,35 +67,29 @@ trait CalcsTrait
 
     public static function getLevel($user_id = null, $type = null, $is_image = false)
     {
-        $user = User::query()->find($user_id);
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
         $giftLogs = self::getTotalGiftPrice($user_id);
         $star_num = $giftLogs->where('receiver_id', $user_id)->sum('giftPrice');
         $gold_num = $giftLogs->where('sender_id', $user_id)->sum('giftPrice');
         $vip_num  = $gold_num; //count by purchased coins
 
-        if ($type == 1) {
-            $total = $star_num;
-        } elseif ($type == 2) {
-            $total = $gold_num;
-        } elseif ($type == 3) {
-            $total = $vip_num;
-        } else {
-            $total = 0;
-        }
+        $value = match ($type) {
+            1 => $star_num,
+            2 => $gold_num,
+            3 => $vip_num,
+            default => 0,
+        };
 
-        if ($type == 1) {
-            $exp = $star_num * 1;
-        } elseif ($type == 2) {
-            $exp = $gold_num * 1;
-        } elseif ($type == 3) {
-            $exp = $vip_num * 1;
-        } else {
-            $exp = 0;
-        }
+        $total = $value;
+        $exp   = $value * 1;
+        $level = Vip::collectionBuilder()->where('type', $type)->where('exp', '<=', $exp)->orderByDesc('exp')->limit(1)->value('level');
 
-        $level = Vip::query()->where(['type' => $type])->where('exp', '<=', $exp)->orderByDesc('exp')->limit(1)->value('level');
-
-        //------------------------------------------------
+        //-----receiver-------------------------------------------
         if ($type == 1) {
             $level += @$user->sub_receiver_level;
         } elseif ($type == 2) {
@@ -104,18 +98,31 @@ trait CalcsTrait
 
         //--------------------------------------------------------
 
-        if ($is_image != false) {
-            if ($level > 0) {
-                $img = Vip::query()->where(['level' => $level, 'type' => $type])->value('img');
-                return $img;
-            } else {
-                if ($level == '0') {
-                    $img = Vip::query()->where(['level' => $level, 'type' => $type])->value('img');
-                    return $img;
-                } else {
-                    return '';
-                }
+        // if ($is_image != false) {
+        //     if ($level > 0) {
+        //         $img = Vip::query()->where(['level' => $level, 'type' => $type])->value('img');
+        //         return $img;
+        //     } else {
+        //         if ($level == '0') {
+        //             $img = Vip::query()->where(['level' => $level, 'type' => $type])->value('img');
+        //             return $img;
+        //         } else {
+        //             return '';
+        //         }
+        //     }
+        // } else {
+        //     self::handelLevelLog($user_id, $type, $level, $total);
+        //     return $level ?: 0;
+        // }
+
+        if ($is_image) {
+            if ($level >= 0) {
+                return Vip::collectionBuilder()
+                    ->where(['level' => $level, 'type' => $type])
+                    ->value('img') ?? '';
             }
+
+            return '';
         } else {
             self::handelLevelLog($user_id, $type, $level, $total);
             return $level ?: 0;
@@ -1017,7 +1024,7 @@ trait CalcsTrait
         }
 
         $uvip = $user->UserVip;
-        if (!$uvip ) return new \stdClass();
+        if (!$uvip) return new \stdClass();
 
         $vip = OVip::query()->find($uvip->vip_id);
         if (!$vip) return new \stdClass();
@@ -1414,50 +1421,49 @@ trait CalcsTrait
 
 
     public static function level_center_room_admins(User $user)
-{
-    static $cache = []; 
-    if (isset($cache[$user->id])) {
-        return $cache[$user->id];
+    {
+        static $cache = [];
+        if (isset($cache[$user->id])) {
+            return $cache[$user->id];
+        }
+
+        $expPercentages = config('exp_percentages', ['exp_received_percentage' => 1, 'exp_sender_percentage' => 1]);
+
+        $vipsData = DB::table('vips')->get()->groupBy('type');
+
+        $receivedNum = floor(($user->total_received_diamonds ?? 0) * ($expPercentages['exp_received_percentage'] ?? 1));
+        $senderNum = floor(($user->total_sender_diamonds ?? 0) * ($expPercentages['exp_sender_percentage'] ?? 1));
+
+        $star_level = $user->total_received_level ?? 0;
+        $gold_level = $user->total_sender_level ?? 0;
+
+        $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
+        $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+        $nextStarData = self::getNextLevelDataFromCache(1, $star_level, $vipsData);
+        $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
+
+        $receiver_diff = $nextStarData['next_exp'] - $current_star_num;
+        $sender_diff = $nextGoldData['next_exp'] - $current_gold_num;
+        $data = [
+            'receiver_num' => $receivedNum,
+            'sender_num' => $senderNum,
+            'receiver_level' => $star_level,
+            'sender_level' => $gold_level,
+            'prev_receiver_num' => $current_star_num,
+            'prev_sender_num' => $current_gold_num,
+            'next_receiver_num' => $nextStarData['next_exp'] ?? 0,
+            'next_receiver_level' => $nextStarData['next_level'] ?? 0,
+            'next_sender_num' => $nextGoldData['next_exp'] ?? 0,
+            'next_sender_level' => $nextGoldData['next_level'] ?? 0,
+            'receiver_per' => ($receiver_diff > 0) ? max(0, min(1, ($receivedNum - $current_star_num) / $receiver_diff)) : 1,
+            'sender_per' => ($sender_diff > 0) ? max(0, min(1, ($senderNum - $current_gold_num) / $sender_diff)) : 1,
+
+            'exp-sender' => $expPercentages['exp_sender_percentage'] ?? 1,
+            'exp-receiver' => $expPercentages['exp_received_percentage'] ?? 1,
+        ];
+
+        $cache[$user->id] = $data;
+
+        return $data;
     }
-
-    $expPercentages = config('exp_percentages', ['exp_received_percentage' => 1, 'exp_sender_percentage' => 1]);
-
-    $vipsData = DB::table('vips')->get()->groupBy('type');
-
-    $receivedNum = floor(($user->total_received_diamonds ?? 0) * ($expPercentages['exp_received_percentage'] ?? 1));
-    $senderNum = floor(($user->total_sender_diamonds ?? 0) * ($expPercentages['exp_sender_percentage'] ?? 1));
-
-    $star_level = $user->total_received_level ?? 0;
-    $gold_level = $user->total_sender_level ?? 0;
-
-    $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
-    $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
-    $nextStarData = self::getNextLevelDataFromCache(1, $star_level, $vipsData);
-    $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
-
-    $receiver_diff = $nextStarData['next_exp'] - $current_star_num;
-    $sender_diff = $nextGoldData['next_exp'] - $current_gold_num;
-    $data = [
-        'receiver_num' => $receivedNum,
-        'sender_num' => $senderNum,
-        'receiver_level' => $star_level,
-        'sender_level' => $gold_level,
-        'prev_receiver_num' => $current_star_num,
-        'prev_sender_num' => $current_gold_num,
-        'next_receiver_num' => $nextStarData['next_exp'] ?? 0,
-        'next_receiver_level' => $nextStarData['next_level'] ?? 0,
-        'next_sender_num' => $nextGoldData['next_exp'] ?? 0,
-        'next_sender_level' => $nextGoldData['next_level'] ?? 0,
-        'receiver_per' => ($receiver_diff > 0) ? max(0, min(1, ($receivedNum - $current_star_num)/$receiver_diff)) : 1,
-        'sender_per' => ($sender_diff > 0) ? max(0, min(1, ($senderNum - $current_gold_num)/$sender_diff)) : 1,
-    
-        'exp-sender' => $expPercentages['exp_sender_percentage'] ?? 1,
-        'exp-receiver' => $expPercentages['exp_received_percentage'] ?? 1,
-    ];
-
-    $cache[$user->id] = $data;
-
-    return $data;
-}
-
 }
