@@ -5,6 +5,7 @@ namespace Modules\RoomBoom\Services;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
@@ -52,13 +53,19 @@ class RoomBoomGiftService
 
                 if (!$existingNotActiveBoom) {
                     $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->latest()->value('id');
-                    RoomBoom::create([
-                        'total_room_gift_id' => $totalRoomGift->id,
-                        'room_boom_level_id' => $level->id,
-                        'started_at' => Carbon::now(),
-                        'total_gifts_value' => $newTotal,
-                        'trigger_gift_id' => $giftLogId
-                    ]);
+                    try {
+                        RoomBoom::create([
+                            'total_room_gift_id' => $totalRoomGift->id,
+                            'room_boom_level_id' => $level->id,
+                            'started_at' => Carbon::now(),
+                            'total_gifts_value' => $newTotal,
+                            'trigger_gift_id' => $giftLogId
+                        ]);
+                    } catch (QueryException $e) {
+                        if ($e->errorInfo[1] != 1062) {
+                            throw $e;
+                        }
+                    }
                 }
             }
 
@@ -71,13 +78,23 @@ class RoomBoomGiftService
                 if (!$existingBoom) {
                     $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->value('id');
 
-                    $existingBoom = RoomBoom::create([
-                        'total_room_gift_id' => $totalRoomGift->id,
-                        'room_boom_level_id' => $currentLevel->id,
-                        'started_at' => Carbon::now(),
-                        'total_gifts_value' => $newTotal,
-                        'trigger_gift_id' => $giftLogId
-                    ]);
+                    try {
+                        $existingBoom = RoomBoom::create([
+                            'total_room_gift_id' => $totalRoomGift->id,
+                            'room_boom_level_id' => $currentLevel->id,
+                            'started_at' => Carbon::now(),
+                            'total_gifts_value' => $newTotal,
+                            'trigger_gift_id' => $giftLogId
+                        ]);
+                    } catch (QueryException $e) {
+                        if ($e->errorInfo[1] == 1062) {
+                            $existingBoom = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
+                                ->where('room_boom_level_id', $currentLevel->id)
+                                ->first();
+                        } else {
+                            throw $e;
+                        }
+                    }
 
                     $d = [
                         "messageContent" => [
