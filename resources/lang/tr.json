@@ -3291,7 +3291,30 @@
     "success_title": "Başarılı 🎉",
     "success_message": "İşlem başarıyla tamamlandı",
     "error_title": "Hata 🚫",
-    "error_message": "Bir hata oluştu, lütfen tekrar deneyin"
+    "error_message": "Bir hata oluştu, lütfen tekrar deneyin",
+    "coin_game_users": "Oyun Kayıtları",
+    "coin_game_users_description": "Her kullanıcı ve oyun için bir kez göster",
+    "user": "Kullanıcı",
+    "game": "Oyun",
+    "coins": "Puan",
+    "app_profit": "Uygulama Karı",
+    "type": "Tür",
+    "created_at": "Oluşturulma Tarihi",
+    "round_details": "  Detayları",
+    "round_id": "Tur ID",
+    "Total Played": "Toplam Oynanan",
+    "Total Loss": "Toplam Kayıp",
+    "Total Win": "Toplam Kazanç",
+    "App Profit": "Uygulama Karı",
+    "round_details": "Tur Detayları",
+    "Round ID": "Tur Kimliği",
+    "Result": "Sonuç",
+    "Win": "Kazanç",
+    "Lose": "Kayıp",
+    "Bet Amount": "Bahis Miktarı",
+    "Created at": "Oluşturulma Tarihi",
+    "User": "Kullanıcı",
+    "Game": "Oyun"
 
 
 
