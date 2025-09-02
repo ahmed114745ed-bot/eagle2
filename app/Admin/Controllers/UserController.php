@@ -36,7 +36,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Selectable\ImageColors;
 use Illuminate\Support\Facades\Cache;
-use App\Admin\Actions\DeletePackAction;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
@@ -45,8 +44,6 @@ use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
-use App\Admin\Actions\DeleteUserVipAction;
-use App\Admin\Actions\EditPackExpireAction;
 use App\Models\Profile;
 use App\Models\UsersJoinedAgency;
 
@@ -470,7 +467,7 @@ class UserController extends MainController
         return $this->form()->update($id);
     }
 
-    public function show($id, Content $content,)
+    public function show($id, Content $content)
     {
         $timezone = Common::timeZone();
         $month = request('month'); // e.g., "5" for May

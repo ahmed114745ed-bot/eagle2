@@ -47,6 +47,11 @@ class AdminPermissionRefact extends Seeder
                         'except' => [],
                         'additional' => [],
                     ],
+                    [
+                        'key' => 'coin-game-users-report',
+                        'except' => ['show', 'edit','create', 'delete'],
+                        'additional' => ['details-switch'],
+                    ],
                 ],
             ],
             [
