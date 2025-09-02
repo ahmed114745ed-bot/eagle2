@@ -25,7 +25,6 @@ class RoomBoomResource extends JsonResource
 
     protected function getTopContributors()
     {
-        info(Carbon::today());
         $topContributors = GiftLog::select('sender_id',
             DB::raw('SUM(giftPrice) as total_gift'),
             DB::raw('MIN(created_at) as first_contribution')
@@ -42,18 +41,18 @@ class RoomBoomResource extends JsonResource
 
 
         if ($topContributors->isEmpty()) {
-            return collect([$this->getEmptyUser()]);
-//            $lastGift = GiftLog::find($this->final_gift_id);
-//            if ($lastGift) {
-//                $user = User::with('profile')->find($lastGift->sender_id);
-//                if ($user) {
-//                    $user->total_gift = GiftLog::where('room_boom_uuid', $lastGift->room_boom_uuid)
-//                        ->where('sender_id', $lastGift->sender_id)
-//                        ->sum('giftPrice');
-//
-//                    return collect([$user]);
-//                }
-//            }
+//            return collect([$this->getEmptyUser()]);
+            $lastGift = GiftLog::find($this->final_gift_id);
+            if ($lastGift) {
+                $user = User::with('profile')->find($lastGift->sender_id);
+                if ($user) {
+                    $user->total_gift = GiftLog::where('room_boom_uuid', $lastGift->room_boom_uuid)
+                        ->where('sender_id', $lastGift->sender_id)
+                        ->sum('giftPrice');
+
+                    return collect([$user]);
+                }
+            }
         }
 
         return $topContributors->map(function($contributor) {
