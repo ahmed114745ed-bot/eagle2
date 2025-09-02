@@ -67,10 +67,11 @@ class EnteranceController extends Controller
         $data = [
             'agora_app_id' => $agora_app_id,
             'zego' => [
-                'app_id' => "783657445",
-                'app_sign' => "1e9df9f9cf7554a706280a483588d70c88c2456fdcba0424bf393f3455e70bc9",
+                'server_secret' => $zego_server_secret,
+                'app_id' => "1e9df9f9cf7554a706280a483588d70c88c2456fdcba0424bf393f3455e70bc9",
+                'app_sign' => "783657445"
             ],
-            'library' => /*$library == 1 ? */'zego' /*: 'agora'*/,
+            'library' => $library == 1 ? 'zego' : 'agora',
 
         ];
         return Common::apiResponse(1, '', $data);
