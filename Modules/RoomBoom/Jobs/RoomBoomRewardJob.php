@@ -110,8 +110,10 @@ class RoomBoomRewardJob implements ShouldQueue
             if ($rewards->isNotEmpty()){
 
                 if (empty($topContributorIds)) {
+                    info('topContributorIds');
                     $chosenReward = $this->getNextAvailableReward($rewardItems);
                 } else {
+                    info('not topContributorIds');
                     $chosenReward = $rewards->random();
                 }
 
