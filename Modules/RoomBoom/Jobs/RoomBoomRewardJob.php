@@ -112,20 +112,19 @@ class RoomBoomRewardJob implements ShouldQueue
                 if (empty($topContributorIds)) {
                     $chosenReward = $this->getNextAvailableReward($rewardItems);
                 } else {
-                    $chosenReward = $rewards->random();
+                    $randomReward = $rewards->random();
+                    $chosenReward = [
+                        'id'          => $randomReward->id,
+                        'target_type' => $randomReward->target_type,
+                        'target'      => $randomReward->target,
+                        'expire_days' => $randomReward->expire_days,
+                        'priority'    => $randomReward->priority,
+                        'quantity'    => 1,
+                    ];
                 }
 
-                $rewardArray = [
-                    'id'          => $chosenReward->id,
-                    'target_type' => $chosenReward->target_type,
-                    'target'      => $chosenReward->target,
-                    'expire_days' => $chosenReward->expire_days,
-                    'priority'    => $chosenReward->priority,
-                    'quantity'    => 1,
-                ];
-
-                $this->distributeBoomRewards($lastTriggerSenderId, $rewardArray);
-                $this->assignWinnerData($lastTriggerSenderId, $rewardArray);
+                $this->distributeBoomRewards($lastTriggerSenderId, $chosenReward);
+                $this->assignWinnerData($lastTriggerSenderId, $chosenReward);
             }
         }
     }
