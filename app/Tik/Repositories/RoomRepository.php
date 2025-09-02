@@ -99,7 +99,7 @@ class RoomRepository extends AbstractRepository
         $roomType = $req->room_type ?? 'audio';
         $user = $req?->user();
         // $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
-        $topRooms = null;;
+        $topRooms = 1;;
 
         $blockedUserIds = Pack::query()
             ->select('user_id')
