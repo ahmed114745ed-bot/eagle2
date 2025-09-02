@@ -368,6 +368,7 @@ class RoomBoomRewardJob implements ShouldQueue
                 Common::sendOfficialMessage($notification['user_ids'], $giftTitle, $body);
             }
 
+            info('token', $notification['tokens']);
             if (!empty($notification['tokens'])) {
                 Common::send_firebase_notification($notification['tokens'], $giftTitle, $body);
             }

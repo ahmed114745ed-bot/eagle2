@@ -769,6 +769,7 @@ class Common
     }
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
+        info('in notification');
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
         $isGroup = false;
