@@ -234,23 +234,22 @@ class CoinGameUserAllController extends AdminController
         $grid->column('game_id', __('Game'))->display(function ($gameId) {
             $game = AllGame::find($gameId);
             if (!$game) return '-';
-
+        
             $defaultImage = asset('images/businessman-icon.jpg');
             $path = $game->image;
-
-
             $url = getImagePath($path) ?? $defaultImage;
-
-            if (! isImageExists($url)) {
+        
+            // تحقق من وجود الصورة
+            if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-
-            $image = handleShowImageWithTypes($game->id, $url, 50, 50);
-
+        
+            $imageTag = handleShowImageWithTypes($game->id, $url, 50, 50);
             $name = $game->name;
-
-            return "
-            <a href='" . url("admin/games/{$game->id}") . "' style='
+            $gameIdHtml = "game-{$game->id}";
+        
+            return <<<HTML
+            <a href="{$this->adminUrl("games/{$game->id}")}" style="
                 display: flex;
                 align-items: center;
                 gap: 10px;
@@ -258,27 +257,26 @@ class CoinGameUserAllController extends AdminController
                 text-decoration: none;
                 color: inherit;
                 transition: background-color 0.2s ease;
-            '>
-                <img src='{$image}' style='width:40px; height:40px; border-radius:8px; object-fit:cover;'>
+            ">
+                <img src="{$imageTag}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;">
                 <div>
-                    <strong style='font-size:16px;'>{$name}</strong><br>
-                    <span style='font-size:13px;'>ID: <span id='game-{$game->id}'>{$game->id}</span>
-                        <button onclick=\"event.preventDefault(); event.stopPropagation(); copyToClipboard('game-{$game->id}')\" style='
+                    <strong style="font-size:16px;">{$name}</strong><br>
+                    <span style="font-size:13px;">
+                        ID: <span id="{$gameIdHtml}">{$game->id}</span>
+                        <button onclick="event.preventDefault(); event.stopPropagation(); copyToClipboard('{$gameIdHtml}')" style="
                             background: none;
                             border: none;
                             cursor: pointer;
                             margin-left: 5px;
                             font-size: 13px;
                             color: #007bff;
-                        ' title='Copy ID'>📝</button>
+                        " title="Copy ID">📝</button>
                     </span>
                 </div>
             </a>
-
-            
-            ";
+        HTML;
         });
-
+        
         $grid->column('total_played', __('Total Played'));
         $grid->column('total_loss', __('Total Loss'));
         $grid->column('total_win', __('Total Win'));
