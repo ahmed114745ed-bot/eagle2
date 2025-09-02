@@ -235,7 +235,18 @@ class CoinGameUserAllController extends AdminController
             $game = AllGame::find($gameId);
             if (!$game) return '-';
 
-            $imageUrl = $game->image ?? asset('images/default-game.png'); // الصورة الإفتراضية
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $path = $game->image;
+
+
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (! isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($game->id, $url, 50, 50);
+
             $name = $game->name;
 
             return "
@@ -248,7 +259,7 @@ class CoinGameUserAllController extends AdminController
                 color: inherit;
                 transition: background-color 0.2s ease;
             '>
-                <img src='{$imageUrl}' style='width:40px; height:40px; border-radius:8px; object-fit:cover;'>
+                <img src='{$image}' style='width:40px; height:40px; border-radius:8px; object-fit:cover;'>
                 <div>
                     <strong style='font-size:16px;'>{$name}</strong><br>
                     <span style='font-size:13px;'>ID: <span id='game-{$game->id}'>{$game->id}</span>
