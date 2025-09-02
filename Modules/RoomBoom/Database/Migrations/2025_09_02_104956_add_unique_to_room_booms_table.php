@@ -26,7 +26,7 @@ class AddUniqueToRoomBoomsTable extends Migration
     public function down()
     {
         Schema::table('room_booms', function (Blueprint $table) {
-            $table->dropUnique('unique_roomboom_level'); // use the name here
+            $table->dropUnique('unique_roomboom_level');
         });
     }
 }
