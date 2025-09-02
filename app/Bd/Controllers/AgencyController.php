@@ -704,7 +704,6 @@ class AgencyController extends MainController
     {
         $form->row(function ($row) {
             $row->width(9)->text('phone', __('agency whatsApp number'))
-                ->rules('required')
                 ->attribute('id', 'phone-input')
                 ->attribute('maxlength', 13)
                 ->default(function ($form) {
