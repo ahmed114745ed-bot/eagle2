@@ -239,7 +239,6 @@ class CoinGameUserAllController extends AdminController
             $path = $game->image;
             $url = getImagePath($path) ?? $defaultImage;
         
-            // تحقق من وجود الصورة
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
@@ -248,8 +247,11 @@ class CoinGameUserAllController extends AdminController
             $name = $game->name;
             $gameIdHtml = "game-{$game->id}";
         
+            // حدد الرابط قبل الـ HEREDOC
+            $urlLink = admin_url("games/{$game->id}");
+        
             return <<<HTML
-            <a href="{$this->adminUrl("games/{$game->id}")}" style="
+            <a href="{$urlLink}" style="
                 display: flex;
                 align-items: center;
                 gap: 10px;
@@ -276,6 +278,7 @@ class CoinGameUserAllController extends AdminController
             </a>
         HTML;
         });
+        
         
         $grid->column('total_played', __('Total Played'));
         $grid->column('total_loss', __('Total Loss'));
