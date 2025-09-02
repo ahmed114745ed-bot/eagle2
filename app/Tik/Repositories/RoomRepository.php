@@ -98,8 +98,8 @@ class RoomRepository extends AbstractRepository
     {
         $roomType = $req->room_type ?? 'audio';
         $user = $req?->user();
-        // $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
-        $topRooms = 0;
+        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+   
 
         $blockedUserIds = Pack::query()
             ->select('user_id')
@@ -144,7 +144,7 @@ class RoomRepository extends AbstractRepository
 
         $result->orderByDesc('pin');
 
-        if ($topRooms && $roomType !== 'live') {
+        if ($topRooms && $roomType != 'live') {
             $result->orderByRaw('is_top = 1 DESC');
         }else {
             $result->where(function ($query) {
