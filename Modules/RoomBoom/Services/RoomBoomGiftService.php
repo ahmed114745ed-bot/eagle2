@@ -48,6 +48,7 @@ class RoomBoomGiftService
             foreach ($levelsToActivate as $level){
                 $existingNotActiveBoom = RoomBoom::where('room_boom_level_id', $level->id)
                     ->where('total_room_gift_id', $totalRoomGift->id)
+                    ->lockForUpdate()
                     ->first();
 
                 if (!$existingNotActiveBoom) {
