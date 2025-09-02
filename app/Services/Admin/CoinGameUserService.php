@@ -133,7 +133,7 @@ class CoinGameUserService
 
         $grid->model()
         ->with([
-            'user:id,name,uuid,original_uuid', 
+            'user:id,name,uuid', 
             'user.profile:id,user_id,avatar',
             'user.packs',
             'game'])
