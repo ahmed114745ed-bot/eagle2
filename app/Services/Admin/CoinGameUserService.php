@@ -233,10 +233,15 @@ HTML;
         });
     
         $grid->column('round_id', __('Round ID'))->sortable();
-        $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v));
-        $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v));
-        $grid->column('first_played', __('Start Date'))->display(fn($v) => $v)->sortable();
-        $grid->column('last_played', __('End Date'))->display(fn($v) => $v)->sortable();
+        $grid->column('total_loss', __('Total Loss'))->display(function($v) {
+            return "<span style='color:red; font-weight:bold;'>" . number_format($v) . "</span>";
+        });
+        
+        $grid->column('total_win', __('Total Win'))->display(function($v) {
+            return "<span style='color:green; font-weight:bold;'>" . number_format($v) . "</span>";
+        });        
+        $grid->column('first_played', __('Start Date'))->display(fn($v) => $v);
+        $grid->column('last_played', __('End Date'))->display(fn($v) => $v);
     
         $grid->tools(function ($tools) {
             $tools->append('<a href="' . admin_url('coin-game-users-reports') . '" class="btn btn-sm btn-default">
