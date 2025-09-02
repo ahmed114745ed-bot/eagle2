@@ -20,7 +20,7 @@ use App\Services\Admin\CoinGameUserService;
 
 class CoinGameUserAllController extends AdminController
 {
-    protected $permission_name = 'coin-game-users';
+    protected $permission_name = 'coin-game-users-report';
     protected $service;
 
     public function __construct(CoinGameUserService $service)

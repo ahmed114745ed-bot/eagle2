@@ -10,6 +10,8 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\InfoBox;
 use App\Admin\Services\UserService;
+use Encore\Admin\Facades\Admin;
+
 
 class CoinGameUserService
 {
@@ -50,8 +52,8 @@ class CoinGameUserService
             $user = $filters['user'];
             $query->whereHas('user', function ($q) use ($user) {
                 $q->where('name', 'like', "%{$user}%")
-                  ->orWhere('uuid', 'like', "%{$user}%")
-                  ->orWhere('id', 'like', "%{$user}%");
+                    ->orWhere('uuid', 'like', "%{$user}%")
+                    ->orWhere('id', 'like', "%{$user}%");
             });
         }
 
@@ -88,17 +90,14 @@ class CoinGameUserService
      */
     public function renderInfoBoxes(Row $row, $totals): void
     {
-    //     $row->column(6, new InfoBox(__('Total Played'), 'gamepad', 'blue', '', number_format($totals->total_played ?? 0, 2) ) );
-    //     $row->column(6, new InfoBox(__('Total Loss'), 'times-circle', 'red', '', number_format($totals->total_loss ?? 0, 2)));
-    //     $row->column(6, new InfoBox(__('Total Win'), 'trophy', 'orange', '', number_format($totals->total_win ?? 0, 2)));
-    //     $row->column(6, new InfoBox(__('App Profit'), 'dollar', 'green', '', number_format($totals->app_profit ?? 0, 2)));
-    $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2)  , '50px'));
-    $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2) , '50px'));
-    $row->column(3, new CustomInfoBox(__('Total Win'), 'trophy', 'orange',  number_format($totals->total_win ?? 0, 2) , '50px'));
-    $row->column(3, new CustomInfoBox(__('App Profit'), 'dollar', 'green',  number_format($totals->app_profit ?? 0, 2) , '50px'));
-
-    
-    
+        //     $row->column(6, new InfoBox(__('Total Played'), 'gamepad', 'blue', '', number_format($totals->total_played ?? 0, 2) ) );
+        //     $row->column(6, new InfoBox(__('Total Loss'), 'times-circle', 'red', '', number_format($totals->total_loss ?? 0, 2)));
+        //     $row->column(6, new InfoBox(__('Total Win'), 'trophy', 'orange', '', number_format($totals->total_win ?? 0, 2)));
+        //     $row->column(6, new InfoBox(__('App Profit'), 'dollar', 'green', '', number_format($totals->app_profit ?? 0, 2)));
+        $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('Total Win'), 'trophy', 'orange',  number_format($totals->total_win ?? 0, 2), '50px'));
+        $row->column(3, new CustomInfoBox(__('App Profit'), 'dollar', 'green',  number_format($totals->app_profit ?? 0, 2), '50px'));
     }
 
     /**
@@ -113,15 +112,15 @@ class CoinGameUserService
             $filter->where(function ($query) {
                 $query->whereHas('user', function ($q) {
                     $q->where('name', 'like', "%{$this->input}%")
-                      ->orWhere('uuid', 'like', "%{$this->input}%")
-                      ->orWhere('id', 'like', "%{$this->input}%");
+                        ->orWhere('uuid', 'like', "%{$this->input}%")
+                        ->orWhere('id', 'like', "%{$this->input}%");
                 });
             }, __('user'))->placeholder(__('UUID'));
 
             $filter->where(function ($query) {
                 $query->whereHas('game', function ($q) {
                     $q->where('name', 'like', "%{$this->input}%")
-                      ->orWhere('id', 'like', "%{$this->input}%");
+                        ->orWhere('id', 'like', "%{$this->input}%");
                 });
             }, __('game'))->placeholder(__('name') . __('---') . __('id'));
 
@@ -140,11 +139,12 @@ class CoinGameUserService
         $grid = new Grid(new CoinGameUserAll());
 
         $grid->model()
-        ->with([
-            'user:id,name,uuid', 
-            'user.profile:id,user_id,avatar',
-            'user.packs',
-            'game'])
+            ->with([
+                'user:id,name,uuid',
+                'user.profile:id,user_id,avatar',
+                'user.packs',
+                'game'
+            ])
             ->selectRaw("
                 user_id,
                 game_id,
@@ -159,23 +159,23 @@ class CoinGameUserService
         $this->applyGridFilters($grid);
 
         $grid->column('user_id', __('user'))->display(function () {
-            $user = $this->user; 
+            $user = $this->user;
             if (!$user) return __('No User');
             return app(UserService::class)->adminUserBasicInfo($user);
         });
-        
+
         $grid->column('game_id', __('Game'))->display(function () {
             $game = $this->game; // لم يعد يحتاج find()
             if (!$game) return '-';
-            
+
             $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($game->image) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
-        
-            $imageTag = handleShowImageWithTypes($game->id, $url, 50, 50,0);
+
+            $imageTag = handleShowImageWithTypes($game->id, $url, 50, 50, 0);
             $gameIdHtml = "game-{$game->id}";
             $urlLink = admin_url("all-games/{$game->id}");
-        
+
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
                 $imageTag
@@ -192,17 +192,19 @@ class CoinGameUserService
         $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v));
         $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v));
         $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v));
-        $grid->column('details', __('Details'))->display(function () {
-            
-            $filters = request()->only(['created_at', 'user_id', 'game_id']);
-            $queryString = http_build_query($filters);
-            $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
-            return "<a href='{$url}' class='btn btn-sm btn-primary'>
-                        <i class='fa fa-eye'></i> ".__('round_details')."
-                    </a>";
+        if (! Admin::user()->can('details-switch-coin-game-users-report') && !Admin::user()->can('*')) {
 
-        });
-        
+            $grid->column('details', __('Details'))->display(function () {
+
+                $filters = request()->only(['created_at', 'user_id', 'game_id']);
+                $queryString = http_build_query($filters);
+                $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}&{$queryString}");
+                return "<a href='{$url}' class='btn btn-sm btn-primary'>
+                        <i class='fa fa-eye'></i> " . __('round_details') . "
+                    </a>";
+            });
+        }
+
 
         $grid->disableCreateButton();
         $grid->disableActions();
@@ -217,7 +219,7 @@ class CoinGameUserService
     public function buildShowAllGrid($userId, $gameId): Grid
     {
         $grid = new Grid(new CoinGameUserAll());
-    
+
         $createdAt = request('created_at', []);
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
             $grid->model()->whereBetween('created_at', [$createdAt['start'], $createdAt['end']]);
@@ -234,7 +236,7 @@ class CoinGameUserService
             ->where('game_id', $gameId)
             ->groupBy('round_id')
             ->orderByDesc('round_id');
-    
+
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
             $filter->where(fn($q) => $q->where('round_id', $this->input), __('Round ID'))->placeholder(__('Round ID'));
@@ -243,18 +245,18 @@ class CoinGameUserService
                 'locale' => 'en'
             ]);
         });
-    
+
         $grid->column('round_id', __('Round ID'))->sortable();
-        $grid->column('total_loss', __('Total Loss'))->display(function($v) {
+        $grid->column('total_loss', __('Total Loss'))->display(function ($v) {
             return "<span style='color:red; font-weight:bold;'>" . number_format($v) . "</span>";
         });
-        
-        $grid->column('total_win', __('Total Win'))->display(function($v) {
+
+        $grid->column('total_win', __('Total Win'))->display(function ($v) {
             return "<span style='color:green; font-weight:bold;'>" . number_format($v) . "</span>";
-        });        
+        });
         $grid->column('first_played', __('Start Date'))->display(fn($v) => $v);
         $grid->column('last_played', __('End Date'))->display(fn($v) => $v);
-    
+
         $grid->tools(function ($tools) {
             $tools->append('<a href="' . admin_url('coin-game-users-reports') . '" class="btn btn-sm btn-default">
                 <i class="fa fa-arrow-left"></i> ' . __('Back') . '</a>');
@@ -263,9 +265,7 @@ class CoinGameUserService
         $grid->disableExport();
         $grid->disableRowSelector();
         $grid->disableActions();
-    
+
         return $grid;
     }
-    
-    
 }
