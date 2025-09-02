@@ -67,7 +67,12 @@ trait CalcsTrait
 
     public static function getLevel($user_id = null, $type = null, $is_image = false)
     {
-        $user = User::query()->find($user_id);
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
         $giftLogs = self::getTotalGiftPrice($user_id);
         $star_num = $giftLogs->where('receiver_id', $user_id)->sum('giftPrice');
         $gold_num = $giftLogs->where('sender_id', $user_id)->sum('giftPrice');
@@ -82,9 +87,9 @@ trait CalcsTrait
 
         $total = $value;
         $exp   = $value * 1;
-        $level = Vip::query()->where(['type' => $type])->where('exp', '<=', $exp)->orderByDesc('exp')->limit(1)->value('level');
+        $level = Vip::collectionBuilder()->where('type', $type)->where('exp', '<=', $exp)->orderByDesc('exp')->limit(1)->value('level');
 
-        //------------------------------------------------
+        //-----receiver-------------------------------------------
         if ($type == 1) {
             $level += @$user->sub_receiver_level;
         } elseif ($type == 2) {
@@ -112,7 +117,7 @@ trait CalcsTrait
 
         if ($is_image) {
             if ($level >= 0) {
-                return Vip::query()
+                return Vip::collectionBuilder()
                     ->where(['level' => $level, 'type' => $type])
                     ->value('img') ?? '';
             }
