@@ -275,16 +275,7 @@ class CoinGameUserAllController extends AdminController
                 </div>
             </a>
 
-            <script>
-                function copyToClipboard(elementId) {
-                    const text = document.getElementById(elementId)?.textContent;
-                    if (text) {
-                        navigator.clipboard.writeText(text).then(() => {
-                            toastr.success('" . e(trans('Copied')) . "');
-                        });
-                    }
-                }
-            </script>
+            
             ";
         });
 
