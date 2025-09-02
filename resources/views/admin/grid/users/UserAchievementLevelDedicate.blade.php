@@ -2,6 +2,14 @@
 
 
 <style>
+
+    .uniform-image {
+    width: 250px;   /* fixed width */
+    height: 200px;  /* fixed height */
+   /* // object-fit: cover;   crop nicely without distortion */
+    border-radius: 8px;   /*optional: rounded corners for nicer UI */
+}
+
     .achievement-container {
         max-width: 800px;
         margin: 2rem auto;
@@ -217,14 +225,19 @@
                 <label class="form-label">{{ __('admin.selectImage') }}</label>
                 <div class="image-scroll-container">
                     @foreach ($achievementValidImage as $data)
-                    <label class="image-option">
-                        <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
-                        <img src="{{ getImagePath($data->file) }}" class="img-thumbnail" width="100" height="100">
-                    </label>
+                        @if (!empty($data->file))
+                            <label class="image-option">
+                                <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
+                                <img src="{{ getImagePath($data->file) }}" 
+                                    class="uniform-image img-thumbnail">
+                            </label>
+                        @endif
                     @endforeach
                 </div>
             </div>
         </div>
+
+
     <br>
     <br>
         <div class="d-grid mt-4">

@@ -527,7 +527,7 @@ class LuckyGiftService
      */
     public function isPopular(mixed $cashback_percentage): bool
     {
-        return $cashback_percentage >= 250;
+        return $cashback_percentage >= 5;
     }
 
     /**
@@ -551,7 +551,15 @@ class LuckyGiftService
             'percentage'   => $cashback_percentage,
             'is_room_pass' => ($room->room_pass != null && $room->room_pass != ''),
             'gift_price'   => $gift->price,
-            'cache_value'  => ceil($cashbackValue ?? 0.0)
+            'cache_value'  => ceil($cashbackValue ?? 0.0),
+            'gift_price'   => @$gift->price,
+            'room_name'   => $room->room_name ?: '',
+            'room_cover'   => $room->room_cover ?? '',
+            'room_background'   =>$room->final_room_image ?? '', 
+            'room_mode'   =>  $room->mode,
+            'room_uuid'   => $room->owner?->uuid ?: 0,
+            'room_owner_id'   => $room->uid ?: 0,
+            'is_password'   =>  (bool)(@$room->room_pass),
 
         ];
         $this->sendToZegoLuckyGift($zigoData);

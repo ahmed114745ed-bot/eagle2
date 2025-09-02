@@ -109,7 +109,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('app:update-game-wallet')
             ->monthlyOn(1, '00:00')
-            ->timezone(getTimezone())
+            ->timezone('UTC')
             ->appendOutputTo(storage_path('logs/app-update-game-wallet.log'))
             ->runInBackground();
 
@@ -120,11 +120,11 @@ class Kernel extends ConsoleKernel
             ->runInBackground();
 
 
-        $schedule->command('game:user-calc')
-            ->monthly()
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/game-user-calc.log'))
-            ->runInBackground();
+        // $schedule->command('game:user-calc')
+        //     ->monthly()
+        //     ->timezone(getTimezone())
+        //     ->appendOutputTo(storage_path('logs/game-user-calc.log'))
+        //     ->runInBackground();
 
 
 
@@ -138,6 +138,11 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/weekly-cp-winner.log'))
             ->runInBackground();
 
+        $schedule->command('coin_game:archive')
+            ->monthlyOn(1, '00:30')
+            ->timezone(getTimezone())
+            ->withoutOverlapping()
+            ->runInBackground();
         // $schedule->command('users:freeze-unfinished')
         //     ->everySecond()
         //     ->timezone(getTimezone())

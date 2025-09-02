@@ -24,6 +24,8 @@ use Illuminate\Log\Logger;
 use App\Models\RoomVisitor;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
+use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
@@ -245,7 +247,7 @@ class Common
         if ($statusCode === null) {
             $statusCode = $success ? 200 : 422;
         }
-
+        $resourceData = null;
         $paginationData = null;
 
         // Check if data is a collection directly or a paginated resource
@@ -253,11 +255,15 @@ class Common
             if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
                 $resourceData = $data->resource;
 
-                if ($resourceData instanceof LengthAwarePaginator) {
+                if ($resourceData instanceof LengthAwarePaginator ||
+                    $resourceData instanceof Paginator ||
+                    $resourceData instanceof CursorPaginator) {
                     $paginationData = self::paginationData($resourceData);
                     $data = $resourceData->getCollection();
                 }
-            } elseif ($data instanceof LengthAwarePaginator) {
+            } elseif ($resourceData instanceof LengthAwarePaginator ||
+                $resourceData instanceof Paginator ||
+                $resourceData instanceof CursorPaginator) {
                 $paginationData = self::paginationData($data);
                 $data = $data->getCollection();
             }
@@ -269,11 +275,15 @@ class Common
             if ($dataForPagination instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
                 $resourceData = $dataForPagination->resource;
 
-                if ($resourceData instanceof LengthAwarePaginator) {
+                if ($resourceData instanceof LengthAwarePaginator ||
+                    $resourceData instanceof Paginator ||
+                    $resourceData instanceof CursorPaginator) {
                     $paginationData = self::paginationData($resourceData);
                     $data[$paginationKey] = $dataForPagination->getCollection();
                 }
-            } elseif ($dataForPagination instanceof LengthAwarePaginator) {
+            } elseif ($resourceData instanceof LengthAwarePaginator ||
+                $resourceData instanceof Paginator ||
+                $resourceData instanceof CursorPaginator) {
                 $paginationData = self::paginationData($dataForPagination);
                 $data[$paginationKey] = $dataForPagination->getCollection();
             }
@@ -281,7 +291,10 @@ class Common
         if ($paginates) {
 
             foreach ($paginates as $paginationKey => $paginationCollection) {
-                if ($paginationCollection instanceof LengthAwarePaginator) {
+                if ($paginationCollection instanceof LengthAwarePaginator ||
+                    $paginationCollection instanceof Paginator ||
+                    $paginationCollection instanceof CursorPaginator) {
+
                     $paginationData = self::paginationData($paginationCollection);
                     $data[$paginationKey] = $paginationCollection->getCollection();
                 }
@@ -301,37 +314,78 @@ class Common
     }
 
     // Pagination data formatting function remains unchanged
-    public static function paginationData($data)
+    public static function paginationData($data): ?array
     {
-        return [
-            'meta' => [
-                'current_page'  => $data->currentPage(),
-                'from'          => $data->firstItem(),
-                'last_page'     => $data->lastPage(),
-                'path'          => $data->path(),
-                'per_page'      => $data->perPage(),
-                'to'            => $data->lastItem(),
-                'total'         => $data->total(),
-            ],
-            'links' => [
-                'first' => $data->url(1),
-                'last'  => $data->url($data->lastPage()),
-                'prev'  => $data->previousPageUrl(),
-                'next'  => $data->nextPageUrl(),
-            ],
-        ];
+        if ($data instanceof LengthAwarePaginator) {
+            return [
+                'meta' => [
+                    'current_page'  => $data->currentPage(),
+                    'from'          => $data->firstItem(),
+                    'last_page'     => $data->lastPage(),
+                    'path'          => $data->path(),
+                    'per_page'      => $data->perPage(),
+                    'to'            => $data->lastItem(),
+                    'total'         => $data->total(),
+                ],
+                'links' => [
+                    'first' => $data->url(1),
+                    'last'  => $data->url($data->lastPage()),
+                    'prev'  => $data->previousPageUrl(),
+                    'next'  => $data->nextPageUrl(),
+                ]
+            ];
+        }
+
+        if ($data instanceof Paginator) {
+            return [
+                'meta' => [
+                    'current_page'  => $data->currentPage(),
+                    'from'          => $data->firstItem(),
+                    'path'          => $data->path(),
+                    'per_page'      => $data->perPage(),
+                    'to'            => $data->lastItem(),
+                    'last_page'     => null,
+                    'total'         => null,
+                ],
+                'links' => [
+                    'first' => null,
+                    'last'  => null,
+                    'prev'  => $data->previousPageUrl(),
+                    'next'  => $data->nextPageUrl(),
+                ]
+            ];
+        }
+
+        if ($data instanceof CursorPaginator) {
+            return [
+                'meta' => [
+                    'per_page'      => $data->perPage(),
+                    'path'          => $data->path(),
+                    'next_cursor'   => optional($data->nextCursor())->encode(),
+                    'prev_cursor'   => optional($data->previousCursor())->encode(),
+                ],
+                'links' => [
+                    'prev'  => $data->previousPageUrl(),
+                    'next'  => $data->nextPageUrl(),
+                ]
+            ];
+        }
+
+        return null;
     }
 
     public static function getPaginates($collection)
     {
+        $isLengthAware = $collection instanceof LengthAwarePaginator;
+
         return [
             'per_page' => $collection->perPage(),
             'path' => $collection->path(),
-            'total' => $collection->total(),
+            'total' =>  $isLengthAware ? $collection->total() : null,
             'current_page' => $collection->currentPage(),
             'next_page_url' => $collection->nextPageUrl(),
             'previous_page_url' => $collection->previousPageUrl(),
-            'last_page' => $collection->lastPage(),
+            'last_page' =>  $isLengthAware ? $collection->lastPage() : null,
             'has_more_pages' => $collection->hasMorePages(),
             'from' => $collection->firstItem(),
             'to' => $collection->lastItem(),
@@ -1357,6 +1411,8 @@ class Common
                         'vip_user_id' => $userVip->id,
                         'is_used' => $userVip->is_used,
                         'using' => 1,
+
+
                     ]
                 );
 

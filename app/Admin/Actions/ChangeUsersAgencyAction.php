@@ -3,6 +3,8 @@
 namespace App\Admin\Actions;
 
 
+use App\Models\AgencyUserJob;
+use App\Models\GiftLog;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\UserSallary;
@@ -62,7 +64,7 @@ class ChangeUsersAgencyAction extends RowAction
         foreach ($users as $user) {
 
             $this->handleUserSalaries($user);
-
+            $this->clearUserAgencyLogs($user ,$oldAgencyId);
             $user->agency_id = $newAgencyId;
             $user->save();
 
@@ -117,6 +119,14 @@ class ChangeUsersAgencyAction extends RowAction
 
             $currentSalary->update(['is_finished' => 1]);
         }
+    }
+
+
+    private function clearUserAgencyLogs(User $user,$agencyId)
+    {
+        GiftLog::query()->where('receiver_id', $user->id)
+        ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
+        AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
     }
 
     public function form()

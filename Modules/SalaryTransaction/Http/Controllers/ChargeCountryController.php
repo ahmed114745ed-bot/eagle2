@@ -45,7 +45,7 @@ class ChargeCountryController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('charge-country'))
             ->body($this->detail($id)));
     }
@@ -59,7 +59,7 @@ class ChargeCountryController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('charge-country'))
             ->body($this->form()->edit($id)));
     }
@@ -75,39 +75,61 @@ class ChargeCountryController extends MainController
     {
         $grid = new Grid(new ChargeCountry());
 
-        $grid->id(__('Id'));
-        $grid->column('country.name',trans('name'));
-        $grid->column('country.e_name',trans('english name'));
-        $grid->column('country.phone_code',trans('phone code'));
-        $grid->column('country.language',trans ('language'));
-        $grid->column('country.flag', __('flag'))
-            ->display(function ($value) {
-                if (request()->filled('_export_')) {
-                    return '=IMAGE("' . getImagePath($value) . '","flag",1)';
-                }
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
 
-                $url = getImagePath($value);
-                return "<img src=\"{$url}\" style=\"max-height:30px\" class=\"img img-thumbnail\" />";
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $input = $this->input;
+                    $query->orWhereHas('country', function ($q) use ($input) {
+                        $q->where('name', 'like', "%$input%")
+                            ->orWhere('e_name', 'like', "%$input%");
+                    });
+                }, __('name'));
             });
+        });
+
+        $grid->id(__('Id'));
+        $grid->column('country.name', trans('arabic name'));
+        $grid->column('country.e_name', trans('english name'));
+        $grid->column('country.phone_code', trans('phone code'));
+        $grid->column('country.language', trans('language'));
+        if (!request()->filled('_export_')) {
+            $grid->column('country.flag', __('flag'))
+                ->display(function ($value) {
+                    if (request()->filled('_export_')) {
+                        return '=IMAGE("' . getImagePath($value) . '","flag",1)';
+                    }
+
+                    $url = getImagePath($value);
+                    return "<img src=\"{$url}\" style=\"max-height:30px\" class=\"img img-thumbnail\" />";
+                });
+        }
+
         $this->extendGrid($grid);
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
+
 
         return $grid;
     }
 
-    protected function detail($id)
-    {
-        $show = new Show(ChargeCountry::findOrFail($id));
+    // protected function detail($id)
+    // {
+    //     $show = new Show(ChargeCountry::findOrFail($id));
 
-        $show->id(__('admin.ID'));
-        $show->pid('pid');
-        $show->name('name');
-        $show->emoji('emoji');
-        $show->t_length('t_length');
-        $show->enable('enable');
-        $show->sort('sort');
-        $this->extendShow ($show);
-        return $show;
-    }
+    //     $show->id(__('admin.ID'));
+    //     $show->pid('pid');
+    //     $show->name('name');
+    //     $show->emoji('emoji');
+    //     $show->t_length('t_length');
+    //     $show->enable('enable');
+    //     $show->sort('sort');
+    //     $this->extendShow($show);
+    //     return $show;
+    // }
 
     /**
      * Make a form builder.
@@ -120,19 +142,41 @@ class ChargeCountryController extends MainController
         $this->disableFormTools($form);
 
         $form->display(__('admin.ID'));
-        $form->select('country_id', __('country'))->options (function (){
-            $ops = [0=>'root'];
-            $ps = Country::query ()->WhereDoesntHave('chargeCountry')->get ();
-            foreach ($ps as $p){
-                $ops[$p->id] = $p->name;
-            }
-            return $ops;
-        })->rules(function ($form) {
-            if (!$id = $form->model()->id) {
-                return 'unique:charge_countries,country_id';
-            }
+        if (!$form->isEditing()) {
+            $form->select('country_id', __('country'))->options(function () {
+                $ps = Country::query()->WhereDoesntHave('chargeCountry')->get();
+                foreach ($ps as $p) {
+                    $ops[$p->id] = $p->name;
+                }
+                return $ops;
+            })->rules(function ($form) {
+                if (!$id = $form->model()->id) {
+                    return 'unique:charge_countries,country_id';
+                }
+            });
+        } else {
 
-        });
+            $form->select('country_id', __('Country'))
+                ->options(function () use ($form) {
+                    $ps = Country::query()
+                        ->where(function ($q) use ($form) {
+                            $q->whereDoesntHave('chargeCountry')
+                                ->orWhere('id', $form->model()->country_id); // include current country
+                        })
+                        ->get();
+
+                    foreach ($ps as $p) {
+                        $ops[$p->id] = $p->name;
+                    }
+
+                    return $ops;
+                })
+                ->rules(function ($form) {
+                    if (!$id = $form->model()->id) {
+                        return 'unique:charge_countries,country_id';
+                    }
+                });
+        }
 
         Admin::script(<<<'JS'
             $(document).on('pjax:start', function () {

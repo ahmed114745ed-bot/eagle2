@@ -84,6 +84,8 @@ class SpecialIdController extends Controller
             $arr['is_read']   = 1;
             $arr['use_num']   = $ware->num;
             $arr['price']     = $total_price;
+            $arr['receive_type'] = 'buy-special-id';
+
             $newPack = Pack::query()->create($arr);
 
             $amountBefore = $user->di;

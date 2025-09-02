@@ -48,8 +48,8 @@ class UserRewardsWeeklyCp
     public static function assignVip($vipId, $expire, $userOne, $userTwo)
     {
         $vip = OVip::find($vipId);
-        UserCommon::addVipToUser($userOne, $vip, $expire);
-        UserCommon::addVipToUser($userTwo, $vip, $expire);
+        UserCommon::addVipToUser($userOne, $vip, $expire,null,'weekly-cp');
+        UserCommon::addVipToUser($userTwo, $vip, $expire,null,'weekly-cp');
     }
 
     public static  function assignWare($ware, $reward, $userOne, $userTwo)
@@ -67,15 +67,15 @@ class UserRewardsWeeklyCp
             self::assignWareToUserByGender($ware, $reward->expire, $userOne, 2);
             self::assignWareToUserByGender($ware, $reward->expire, $userTwo, 2);
         } else {
-            UserCommon::addEvintsWareToUser($userOne, $ware, $reward->expire);
-            UserCommon::addEvintsWareToUser($userTwo, $ware, $reward->expire);
+            UserCommon::addEvintsWareToUser($userOne, $ware, $reward->expire ,null,'weekly-cp');
+            UserCommon::addEvintsWareToUser($userTwo, $ware, $reward->expire ,null,'weekly-cp');
         }
     }
 
     public  static function assignWareToUserByGender($ware, $expire, $user, $gender)
     {
         if ($user->profile?->gender === $gender) {
-            UserCommon::addEvintsWareToUser($user, $ware, $expire);
+            UserCommon::addEvintsWareToUser($user, $ware, $expire,null,'weekly-cp');
         }
     }
     public static function assignAchievement($itemId, $expire, $userOne, $userTwo)

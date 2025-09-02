@@ -50,7 +50,7 @@ class VipDedicateAction extends Action
             $enableVipAuto = config('admin.isUsed_vip');
 
 
-            VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id() );
+            VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id(),'',1,0,0,'dedicate' );
 
 
             DB::commit();

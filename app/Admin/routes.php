@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\SuperBoomRuleController;
@@ -614,6 +615,8 @@ Route::group(
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });
         Route::get('gift-summary', [GiftLogSummaryController::class, 'index']);
+        Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
+        Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
 
 
 });

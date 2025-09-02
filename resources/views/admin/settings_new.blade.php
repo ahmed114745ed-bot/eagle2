@@ -520,9 +520,9 @@ use Modules\Vip\Entities\Vip;
 
             <button onclick="showSection('appSettings')" class="position-relative">
                 {{ __('App settings') }}
-                <div class="ribbon-banner">
+                {{-- <div class="ribbon-banner">
                     <span>{{ __('soon') }}</span>
-                </div>
+                </div> --}}
             </button>
 
             <button onclick="showSection('realTimeSetting')">{{ __('Sound & Video') }}</button>

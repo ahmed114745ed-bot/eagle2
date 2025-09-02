@@ -112,6 +112,12 @@ class Room extends Model
         return $this->belongsTo(RoomCategory::class, 'room_type')->select('name', 'img');
     }
 
+    public function pks()
+    {
+        return $this->hasMany(Pk::class, 'room_id', 'id');
+    }
+
+
     public function gifts()
     {
         return $this->hasMany(GiftLog::class, 'roomowner_id', 'uid');
@@ -160,7 +166,6 @@ class Room extends Model
     public function getMicrophoneOnlyUsersAttribute()
     {
         return  $this->attributes['microphone'] ?? '';
-
     }
     public function getAllMicrophoneAttribute()
     {
@@ -214,7 +219,7 @@ class Room extends Model
             )
             ->count();*/
 
-        return $validVisitors->count() ;
+        return $validVisitors->count();
     }
 
     public function roomVisitors(): HasMany
@@ -259,9 +264,9 @@ class Room extends Model
             'uid',
             'id'
         )->where('request_background_images.status', 1)->where(function ($q) {
-                    $q->where('expair', '>=', now()->timestamp)
-                        ->orWhere('expair', 0);
-                })->orderByDesc('id');
+            $q->where('expair', '>=', now()->timestamp)
+                ->orWhere('expair', 0);
+        })->orderByDesc('id');
     }
 
     public function getVisitorsImages()
@@ -284,7 +289,7 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
-   //  dd($this->backgroundImage?->img);
+        //  dd($this->backgroundImage?->img);
         $var = /*$this->mode == '3' ?
             'custom_image/back-black.png' :*/
             ($this->backgroundImage?->img ?: ($this->background?->img ?: (request()->default_background ?? DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img)));

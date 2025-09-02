@@ -76,7 +76,7 @@ class WeeklyStarWinner extends Command
 
                         }elseif ($reward->type == "vip"){
                             $vip=OVip::query()->find($reward->target);
-                            UserCommon::addVipToUser($entry->sender,$vip,$reward->expire);
+                            UserCommon::addVipToUser($entry->sender,$vip,$reward->expire,null,'weekly-star');
 
                         }elseif ($reward->type == "ware"){
                             $ware=Ware::query()->find($reward->target);
