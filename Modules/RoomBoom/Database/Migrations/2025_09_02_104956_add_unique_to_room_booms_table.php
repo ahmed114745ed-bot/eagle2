@@ -14,7 +14,7 @@ class AddUniqueToRoomBoomsTable extends Migration
     public function up()
     {
         Schema::table('room_booms', function (Blueprint $table) {
-            $table->unique(['total_room_gift_id', 'room_boom_level_id']);
+            $table->unique(['total_room_gift_id', 'room_boom_level_id'], 'unique_roomboom_level');
         });
     }
 
@@ -26,7 +26,7 @@ class AddUniqueToRoomBoomsTable extends Migration
     public function down()
     {
         Schema::table('room_booms', function (Blueprint $table) {
-            $table->dropUnique(['total_room_gift_id', 'room_boom_level_id']);
+            $table->dropUnique('unique_roomboom_level');
         });
     }
 }
