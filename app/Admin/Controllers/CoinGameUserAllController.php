@@ -29,7 +29,7 @@ class CoinGameUserAllController extends AdminController
         $query = $this->applyFilters(CoinGameUserAll::query(), $filters);
     
         $totals = $this->calculateTotals($query);
-    
+
         return $content
             ->title(__('coin_game_users'))
             ->description(__('coin_game_users_description'))
@@ -195,30 +195,8 @@ class CoinGameUserAllController extends AdminController
         ->groupBy('user_id', 'game_id')
         ->orderByDesc('total_played');
 
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-            $filter->disableIdFilter();
+        $this->applyGridFilters($grid);
 
-            $filter->where(function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', "%{$this->input}%")
-                      ->orWhere('uuid', 'like', "%{$this->input}%")
-                      ->orWhere('id', 'like', "%{$this->input}%");
-                });
-            }, __('user'))->placeholder(__('UUID'));
-
-            $filter->where(function ($query) {
-                $query->whereHas('game', function ($q) {
-                    $q->where('name', 'like', "%{$this->input}%")
-                    ->orWhere('id', 'like', "%{$this->input}%");
-                });
-            }, __('game'))->placeholder(__('name').__('---').__('id'));
-
-            $filter->between('created_at', __('Created At'))->datetime([
-                'format' => 'YYYY-MM-DD HH:mm:ss', 
-                'locale' => 'en' 
-            ]);
-        });
 
         $grid->column('user_id', __('user'))
 
@@ -299,4 +277,33 @@ class CoinGameUserAllController extends AdminController
 
         return $grid;
     }
+
+
+    protected function applyGridFilters(Grid $grid)
+{
+    $grid->filter(function (Grid\Filter $filter) {
+        $filter->expand();
+        $filter->disableIdFilter();
+
+        $filter->where(function ($query) {
+            $query->whereHas('user', function ($q) {
+                $q->where('name', 'like', "%{$this->input}%")
+                  ->orWhere('uuid', 'like', "%{$this->input}%")
+                  ->orWhere('id', 'like', "%{$this->input}%");
+            });
+        }, __('user'))->placeholder(__('UUID'));
+
+        $filter->where(function ($query) {
+            $query->whereHas('game', function ($q) {
+                $q->where('name', 'like', "%{$this->input}%")
+                  ->orWhere('id', 'like', "%{$this->input}%");
+            });
+        }, __('game'))->placeholder(__('name') . __('---') . __('id'));
+
+        $filter->between('created_at', __('Created At'))->datetime([
+            'format' => 'YYYY-MM-DD HH:mm:ss', 
+            'locale' => 'en'
+        ]);
+    });
+}
 }
