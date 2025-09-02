@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Layout\Row;
 use Illuminate\Support\Facades\DB;
+use App\Admin\Services\UserService;
+
 class CoinGameUserAllController extends AdminController
 {
     use HasResourceActions;
@@ -218,20 +220,61 @@ class CoinGameUserAllController extends AdminController
             ]);
         });
 
-        $grid->column('user_id', __('user'))->display(function ($userId) {
-            $user = User::find($userId);
-            if (!$user) return '-';
-            $name = $user->name;
-            $uuid = $user->uuid;
-            $path = $user->image;
-            $url = $path ?? asset("images/businessman-icon.jpg");
-            $image = "<img src='{$url}' style='width:40px;height:40px;border-radius:50%;'>";
-            return "<div style='display:flex;align-items:center;gap:10px;'>$image<div><strong>$name</strong><br><small style='color:#aaa;'>UID: $uuid</small></div></div>";
+        $grid->column('user_id', __('user'))
+
+        ->display(function ($userId) {
+            $user = User::with('profile')->find($userId);
+            if (! $user) {
+                return __('No User');
+            }
+            return app(UserService::class)->adminUserAvatar($user);
         });
 
-        $grid->column('game_id', __('game'))->display(function ($gameId) {
+
+        $grid->column('game_id', __('Game'))->display(function ($gameId) {
             $game = AllGame::find($gameId);
-            return $game ? "<strong>{$game->name}</strong>" : '-';
+            if (!$game) return '-';
+
+            $imageUrl = $game->image ?? asset('images/default-game.png'); // الصورة الإفتراضية
+            $name = $game->name;
+
+            return "
+            <a href='" . url("admin/games/{$game->id}") . "' style='
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px;
+                text-decoration: none;
+                color: inherit;
+                transition: background-color 0.2s ease;
+            '>
+                <img src='{$imageUrl}' style='width:40px; height:40px; border-radius:8px; object-fit:cover;'>
+                <div>
+                    <strong style='font-size:16px;'>{$name}</strong><br>
+                    <span style='font-size:13px;'>ID: <span id='game-{$game->id}'>{$game->id}</span>
+                        <button onclick=\"event.preventDefault(); event.stopPropagation(); copyToClipboard('game-{$game->id}')\" style='
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            margin-left: 5px;
+                            font-size: 13px;
+                            color: #007bff;
+                        ' title='Copy ID'>📝</button>
+                    </span>
+                </div>
+            </a>
+
+            <script>
+                function copyToClipboard(elementId) {
+                    const text = document.getElementById(elementId)?.textContent;
+                    if (text) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            toastr.success('" . e(trans('Copied')) . "');
+                        });
+                    }
+                }
+            </script>
+            ";
         });
 
         $grid->column('total_played', __('Total Played'));
