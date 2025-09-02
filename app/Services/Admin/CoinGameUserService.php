@@ -132,6 +132,11 @@ class CoinGameUserService
         $grid = new Grid(new CoinGameUserAll());
 
         $grid->model()
+        ->with([
+            'user:id,name,uuid,original_uuid', 
+            'user.profile:id,user_id,avatar',
+            'user.packs',
+            'game'])
             ->selectRaw("
                 user_id,
                 game_id,
@@ -145,24 +150,24 @@ class CoinGameUserService
 
         $this->applyGridFilters($grid);
 
-        $grid->column('user_id', __('user'))->display(function ($userId) {
-            $user = User::with('profile')->find($userId);
+        $grid->column('user_id', __('user'))->display(function () {
+            $user = $this->user; 
             if (!$user) return __('No User');
-            return app(UserService::class)->adminUserAvatar($user);
+            return app(UserService::class)->adminUserBasicInfo($user);
         });
-
-        $grid->column('game_id', __('Game'))->display(function ($gameId) {
-            $game = AllGame::find($gameId);
+        
+        $grid->column('game_id', __('Game'))->display(function () {
+            $game = $this->game; // لم يعد يحتاج find()
             if (!$game) return '-';
-
+            
             $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($game->image) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
-
+        
             $imageTag = handleShowImageWithTypes($game->id, $url, 50, 50,0);
             $gameIdHtml = "game-{$game->id}";
             $urlLink = admin_url("all-games/{$game->id}");
-
+        
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
                 $imageTag
@@ -174,9 +179,8 @@ class CoinGameUserService
                     </span>
                 </div>
             </a>
-HTML;
+        HTML;
         });
-
         $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v));
         $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v));
         $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v));
