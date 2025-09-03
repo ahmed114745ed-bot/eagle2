@@ -363,6 +363,32 @@ class WareTabController extends MainController
         }
 
         $script = <<<SCRIPT
+             $("#img2").fileinput({
+                    allowedFileExtensions: ["jpg", "png", "gif", "svga", "mp4"],
+                    previewFileExtSettings: {
+                        'svga': function(ext) {
+                            return ext.match(/(svga)$/i); // treat .svga as valid preview
+                        }
+                    },
+                    previewTemplates: {
+                        svga: '<div class="file-preview-frame" id="{previewId}" data-fileindex="{fileindex}">' +
+                              '<div class="rtlSvga" id="svga_{fileindex}" style="width:100px;height:100px;"></div>' +
+                              '</div>'
+                    }
+                });
+
+                $(document).on('fileloaded', '#img2', function(event, file, previewId, index, reader) {
+                    if (file.name.endsWith('.svga')) {
+                        const player = new SVGA.Player('#svga_' + index);
+                        const parser = new SVGA.Parser('#svga_' + index);
+
+                        parser.load(reader.result, function(videoItem) {
+                            player.setVideoItem(videoItem);
+                            player.startAnimation();
+                        });
+                    }
+                });
+
              $(document).ready(function() {
                  function toggleWinProbability() {
                      var type = $('#type').val();
