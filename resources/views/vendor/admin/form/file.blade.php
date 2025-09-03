@@ -28,3 +28,24 @@
 
     </div>
 </div>
+ <script>
+     // Extend Bootstrap-Fileinput defaults
+     $(function () {
+
+         // Support `.svga` as a custom preview type
+         $.fn.fileinput.defaults.previewFileExtSettings.svga = function (ext) {
+             return ext.match(/(svga)$/i);
+         };
+
+         // Override template for svga
+         $.fn.fileinput.defaults.previewContentTemplates.svga =
+             '<div class="file-preview-frame krajee-default kv-preview-thumb">' +
+             '<div class="kv-file-content">' +
+             '<div class="svga-player" style="width:120px;height:120px;"></div>' +
+             '</div>' +
+             '<div class="file-thumbnail-footer">' +
+             '<div class="file-footer-caption">{caption}</div>' +
+             '</div>' +
+             '</div>';
+     });
+ </script>
