@@ -15,8 +15,8 @@ class GiftResource extends JsonResource
      */
     public function toArray($request)
     {
-        $userId = request('user_id') ?? request()->user()->id;
-        $hasPivotType11 = $request->query('type') == 11 && isset($this->pivot);
+//        $userId = request('user_id') ?? request()->user()->id;
+//        $hasPivotType11 = $request->query('type') == 11 && isset($this->pivot);
         return [
             'id' => $this->id,
             'name' =>  $this->name,
@@ -26,7 +26,7 @@ class GiftResource extends JsonResource
             'show_img' => $this->show_img ?: '',
             'show_img2' => $this->show_img2 ?: '',
             'vip_level' => $this->vip_level ?: 0,
-            'is_on' => ($this->vip_level <= Common::getLevel($userId, 3)) ? 1 : 0,
+            'is_on' => ($this->vip_level <= Common::getLevel($this->receiver, 3)) ? 1 : 0,
             'music_gift' => $this->music_gift ? 1 : 0,
             'international_gift' => $this->international_gift ? 1 : 0,
             'image_type' => $this->image_type ?? '',

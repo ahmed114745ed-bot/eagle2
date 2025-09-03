@@ -76,7 +76,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $this->distributeTopContributors($topContributorIds, $rewardItems);
 
-        $this->distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards);
+        $this->distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards, $rewardItems);
 
         $this->distributeVisitorRewards($rewardItems, $room);
 
@@ -104,23 +104,27 @@ class RoomBoomRewardJob implements ShouldQueue
     /**
      * @throws \Exception
      */
-    public function distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards): void
+    public function distributeLastTriggerSender($lastTriggerSenderId, $topContributorIds, $rewards, &$rewardItems): void
     {
         if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
             if ($rewards->isNotEmpty()){
-                $randomReward = $rewards->random();
 
-                $rewardArray = [
-                    'id'          => $randomReward->id,
-                    'target_type' => $randomReward->target_type,
-                    'target'      => $randomReward->target,
-                    'expire_days' => $randomReward->expire_days,
-                    'priority'    => $randomReward->priority,
-                    'quantity'    => 1,
-                ];
+                if (empty($topContributorIds)) {
+                    $chosenReward = $this->getNextAvailableReward($rewardItems);
+                } else {
+                    $randomReward = $rewards->random();
+                    $chosenReward = [
+                        'id'          => $randomReward->id,
+                        'target_type' => $randomReward->target_type,
+                        'target'      => $randomReward->target,
+                        'expire_days' => $randomReward->expire_days,
+                        'priority'    => $randomReward->priority,
+                        'quantity'    => 1,
+                    ];
+                }
 
-                $this->distributeBoomRewards($lastTriggerSenderId, $rewardArray);
-                $this->assignWinnerData($lastTriggerSenderId, $rewardArray);
+                $this->distributeBoomRewards($lastTriggerSenderId, $chosenReward);
+                $this->assignWinnerData($lastTriggerSenderId, $chosenReward);
             }
         }
     }
