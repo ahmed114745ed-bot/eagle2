@@ -13,13 +13,11 @@
                 $uniqueId = 'file_' . uniqid();
             @endphp
 
-            <div style="margin-bottom:10px;">
-                @if(in_array($ext, ['png','jpg','jpeg','gif','webp','svg']))
-                    <img src="{{ $url }}" class="img img-thumbnail" style="max-height:150px">
-                @else
+            @if(!in_array($ext, ['png','jpg','jpeg','gif','webp','svg']))
+                <div style="margin-bottom:10px;">
                     {!! handleShowImageWithTypes($uniqueId, $url, 100, 100, 10) !!}
-                @endif
-            </div>
+                </div>
+            @endif
         @endif
 
         <input type="file" class="{{$class}}" name="{{$name}}" {!! $attributes !!} />
