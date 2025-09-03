@@ -5,6 +5,7 @@ namespace Modules\Vip\Entities;
 use App\Models\Admin;
 use App\Models\Pack;
 use App\Models\User;
+use App\Traits\AutoReceiveType;
 use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ use Modules\Vip\Entities\OVip;
 
 class UserVip extends Model
 {
-    use TimestampsWithTimezone, SoftDeletes;
+    use TimestampsWithTimezone, SoftDeletes ,AutoReceiveType;
 
     protected $table = 'users_vips';
 
