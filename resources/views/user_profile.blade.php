@@ -1244,19 +1244,16 @@
             </div>
             <div class="box-body">
                 <div class="nav-scroll-container">
-                    <ul class="nav nav-pills">
-                        @foreach($types as $id => $name)
-                            @php
-                             $defaultType = $types->keys()->first();
-                                $selectedType = request()->get('type', $defaultType); // Default to 1
-                            @endphp
-                            <li class="{{ $selectedType == $id ? 'active' : '' }}">
-                                <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">
-                                    {{ __($name) }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+                  
+                        <ul class="nav nav-pills">
+                            @foreach($types as $id => $name)
+                                <li class="{{ $type == $id ? 'active' : '' }}">
+                                    <a href="{{ request()->fullUrlWithQuery(['type' => $id, 'pack_page' => 1]) }}" class="charge_action">
+                                        {{ __($name) }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
                 </div>
             </div>
 
@@ -1350,6 +1347,7 @@
 
             <div class="pagination-wrapper">
                 {{ $packs?->appends([
+                     'type'        => $type, 
                     'vip_page' => $userVips?->currentPage(),
                     'salary_page' => $salaries?->currentPage(),
                     'gift_page' => $giftSLogs?->currentPage(),
