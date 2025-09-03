@@ -308,6 +308,14 @@ class GiftLogController extends Controller
             if (!$user) return Common::apiResponse(0, 'not found', null, 404);
             $userId = $request->user_id;
         }
+        $giftTotal = GiftLog::where(function ($q) use ($userId) {
+            $q->where('receiver_id', $userId)
+                ->orWhere('sender_id', $userId);
+        })
+            ->selectRaw('receiver_id, sender_id, SUM(giftPrice) as totalPrice')
+            ->groupBy('receiver_id', 'sender_id')
+            ->get();
+
         $gl = GiftLog::select('giftId', DB::raw('SUM(giftNum) as t'))
             ->where('receiver_id', $userId)
             ->with('receiver:id,sub_receiver_level,sub_sender_level')
@@ -317,6 +325,9 @@ class GiftLogController extends Controller
             ->orderByDesc('t')
             ->with('gift')
             ->get();
+
+        GiftLogResource::setGiftTotal($giftTotal);
+
         return Common::apiResponse(1, 'ok', GiftLogResource::collection($gl));
     }
 

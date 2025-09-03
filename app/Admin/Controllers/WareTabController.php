@@ -23,7 +23,6 @@ use App\Admin\Controllers\MainController;
 use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\FfmpegService;
 use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Public\Http\Services\UserCounterServices;
 
 
 class WareTabController extends MainController
@@ -301,10 +300,62 @@ class WareTabController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-        $form->file('img2', trans('svg'))
-            ->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            });
+//        $form->image('img2', trans('svg'))
+//            ->name(function () use ($form){
+//                $defaultImage = asset("images/image.png");
+//
+//                $url = getImagePath($form->model()->img2) ?? $defaultImage;
+//                if (!isImageExists($url)) {
+//                    $url = $defaultImage;
+//                }
+//                return handleShowImageWithTypes($form->model()->id, $url, 50, 50);
+////                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+//            });
+
+        $form->display('img2', 'Preview')->with(function ($value) {
+            if (!$value) {
+                return null;
+            }
+            $url = getImagePath($value) ?? asset("images/image.png");
+            $uniqueId = 'form_' . ($this->id ?? uniqid());
+
+            return handleShowImageWithTypes($uniqueId, $url, 100, 100, 10);
+        });
+
+        // build preview (for edit mode when a value exists)
+//         $previewHtml = '';
+//         if ($form->model() && $form->model()->img2) {
+//             $url = getImagePath($form->model()->img2) ?? asset('images/image.png');
+//             $uniqueId = 'media_' . ($form->model()->id ?? uniqid());
+
+//             // wrap with a box that visually matches the image field
+//             $previewHtml = sprintf(
+//                 '<div class="kv-preview-thumb" style="display:inline-block;border:1px solid #e5e5e5;border-radius:6px;width:160px;height:160px;overflow:hidden;margin-bottom:8px;padding:6px;background:#f7f7f7;">
+//             %s
+//          </div>',
+//                 handleShowImageWithTypes($uniqueId, $url, 148, 148, 10) // inner size a bit smaller due to padding
+//             );
+//         }
+
+//         // give the input a unique id so we can target only this field
+//         $inputId = 'img2_input_' . Str::random(8);
+
+//         $form->file('img2', trans('svg'))
+//             ->attribute(['id' => $inputId])
+//             ->name(function ($file) {
+//                 return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+//             })
+
+//             ->help($previewHtml);
+
+//         // hide the default built-in file preview **only for this field**
+//         Admin::script("
+//     $(function () {
+//         var box = $('#{$inputId}').closest('.file-input');
+//         box.find('.file-preview').remove(); // remove grey icon preview
+//     });
+// ");
+
 
 
         if ($form->isEditing()) {
@@ -321,6 +372,32 @@ class WareTabController extends MainController
         }
 
         $script = <<<SCRIPT
+             $("#img2").fileinput({
+                    allowedFileExtensions: ["jpg", "png", "gif", "svga", "mp4"],
+                    previewFileExtSettings: {
+                        'svga': function(ext) {
+                            return ext.match(/(svga)$/i); // treat .svga as valid preview
+                        }
+                    },
+                    previewTemplates: {
+                        svga: '<div class="file-preview-frame" id="{previewId}" data-fileindex="{fileindex}">' +
+                              '<div class="rtlSvga" id="svga_{fileindex}" style="width:100px;height:100px;"></div>' +
+                              '</div>'
+                    }
+                });
+
+                $(document).on('fileloaded', '#img2', function(event, file, previewId, index, reader) {
+                    if (file.name.endsWith('.svga')) {
+                        const player = new SVGA.Player('#svga_' + index);
+                        const parser = new SVGA.Parser('#svga_' + index);
+
+                        parser.load(reader.result, function(videoItem) {
+                            player.setVideoItem(videoItem);
+                            player.startAnimation();
+                        });
+                    }
+                });
+
              $(document).ready(function() {
                  function toggleWinProbability() {
                      var type = $('#type').val();
@@ -401,13 +478,12 @@ class WareTabController extends MainController
 
                 if ($img2 instanceof UploadedFile) {
                     /** @var FileService $fileService*/
-                    $fileService = app( FileService::class);
+                    $fileService = app(FileService::class);
                     $ext = $fileService->getExtension($img2, $wareId, getFromService: true);
 
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
                 }
-
             });
         }
         $form->saving(function (Form $form) {
