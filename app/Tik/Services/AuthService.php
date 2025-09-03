@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Models\User;
 use DB;
 use Google_Client;
 use Mockery\Exception;
@@ -143,7 +144,7 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
-        
+
 
         if (!$request['id_token']) throw new \Exception('google id token missing');
         $client = new Google_Client();
@@ -218,7 +219,7 @@ class AuthService
      */
     public function storeImage($request, $data, $user)
     {
-        
+
         if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
             $img = $request['image'];
             $imageType = $img->getClientOriginalExtension();
