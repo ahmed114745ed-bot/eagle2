@@ -73,6 +73,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
+
         if (! $giftLogs) {
             $giftLogs = self::getTotalGiftPrice($user_id);
         } else {
