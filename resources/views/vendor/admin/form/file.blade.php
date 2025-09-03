@@ -28,3 +28,25 @@
 
     </div>
 </div>
+
+<script>
+    $('.file').fileinput({
+        allowedPreviewTypes: ['image', 'html', 'text', 'video', 'audio', 'flash', 'object'],
+        previewFileExtSettings: {
+            'svga': function(ext) {
+                return ext.match(/(svga)$/i);
+            }
+        },
+        previewFileIcon: '',
+        previewContentTemplates: {
+            svga: '<div class="file-preview-frame">' +
+                '<div class="kv-file-content">' +
+                '{data}' +
+                '</div>' +
+                '<div class="file-thumbnail-footer">' +
+                '<div class="file-footer-caption">{caption}</div>' +
+                '</div>' +
+                '</div>'
+        }
+    });
+</script>
