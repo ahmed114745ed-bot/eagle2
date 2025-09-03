@@ -149,7 +149,7 @@ class ChatRoomService
                             $sub->where('chat_rooms.type', 'friends')
                                 ->orWhere(function ($sq) {
                                     $sq->where('chat_rooms.type', 'guest');
-                                })->having('distinct_users_count', '>=', 2);
+                                });
                         });
                 })
                     ->orWhere(function ($query) use ($topChats, $user) {
@@ -159,10 +159,10 @@ class ChatRoomService
                                 $sub->where('chat_rooms.type', 'friends')
                                     ->orWhere(function ($sq) {
                                         $sq->where('chat_rooms.type', 'guest');
-                                    })->having('distinct_users_count', '>=', 2);;
+                                    });
                             });
                     });
-            })
+            })->havingRaw("((chat_rooms.type = 'friends') OR (chat_rooms.type = 'guest' AND distinct_users_count >= 2))")
             ->when($uuid, function ($q) use ($uuid) {
                 $q->where(function ($q) use ($uuid) {
                     $q->whereHas('userOne', function ($qq) use ($uuid) {
