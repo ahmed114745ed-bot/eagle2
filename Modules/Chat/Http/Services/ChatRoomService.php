@@ -148,9 +148,8 @@ class ChatRoomService
                         ->where(function ($sub) {
                             $sub->where('chat_rooms.type', 'friends')
                                 ->orWhere(function ($sq) {
-                                    $sq->where('chat_rooms.type', 'guest')
-                                        ->where('distinct_users_count', '>=', 2);
-                                });
+                                    $sq->where('chat_rooms.type', 'guest');
+                                })->having('distinct_users_count', '>=', 2);
                         });
                 })
                     ->orWhere(function ($query) use ($topChats, $user) {
@@ -159,9 +158,8 @@ class ChatRoomService
                             ->where(function ($sub) {
                                 $sub->where('chat_rooms.type', 'friends')
                                     ->orWhere(function ($sq) {
-                                        $sq->where('chat_rooms.type', 'guest')
-                                            ->where('distinct_users_count', '>=', 2);
-                                    });
+                                        $sq->where('chat_rooms.type', 'guest');
+                                    })->having('distinct_users_count', '>=', 2);;
                             });
                     });
             })
