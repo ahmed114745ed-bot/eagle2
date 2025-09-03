@@ -138,7 +138,8 @@ class ChatRoomService
         ])->WhereHas('messages')
             ->select(
                 'chat_rooms.*',
-                DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at')
+                DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at'),
+                DB::raw('(SELECT COUNT(DISTINCT user_id) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS distinct_users_count')
             )
             ->where(function ($q) use ($topChats, $user) {
                 $q->where(function ($query) use ($topChats, $user) {
@@ -187,6 +188,9 @@ class ChatRoomService
             ->orderByDesc('last_message_created_at')
             ->paginate(20);
 
+        foreach ($friends as $room) {
+            info($room->distinct_users_count);
+        }
         // // Get chat requests (guest)
         // $guestChats = ChatRoom::WhereHas('messages')
         //     ->select('chat_rooms.*')
