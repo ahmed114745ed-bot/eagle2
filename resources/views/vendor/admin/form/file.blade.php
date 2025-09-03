@@ -33,10 +33,21 @@
 <script>
     document.getElementById("file-input-img2").addEventListener("change", function(e) {
         const file = e.target.files[0];
-        if (!file) return;
+        if (!file) return; // nothing selected yet
 
-        const ext = file.name.split(".").pop().toLowerCase();
-        if (ext === "svga") {
+        let ext = "";
+        if (file.name && file.name.indexOf(".") !== -1) {
+            ext = file.name.split(".").pop().toLowerCase();
+        }
+
+        if (ext && ["png","jpg","jpeg","gif","webp","svg"].indexOf(ext) !== -1) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById("preview-container").innerHTML =
+                    `<img src="${ev.target.result}" class="img img-thumbnail" style="max-height:150px;" />`;
+            };
+            reader.readAsDataURL(file);
+        } else if (ext === "svga") {
             const reader = new FileReader();
             reader.onload = function(ev) {
                 const container = document.getElementById("preview-container");
@@ -50,14 +61,7 @@
                     player.startAnimation();
                 });
             };
-            reader.readAsArrayBuffer(file); // ✅ important for SVGA
-        } else if (["png","jpg","jpeg","gif","webp","svg"].includes(ext)) {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                document.getElementById("preview-container").innerHTML =
-                    `<img src="${ev.target.result}" class="img img-thumbnail" style="max-height:150px;" />`;
-            };
-            reader.readAsDataURL(file);
+            reader.readAsArrayBuffer(file); // ✅ important for SVGA!
         } else {
             document.getElementById("preview-container").innerHTML =
                 `<div style="padding:10px;border:1px solid #ccc;display:inline-block;">
