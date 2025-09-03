@@ -28,16 +28,3 @@
 
     </div>
 </div>
-
-<div id="svga-container" style="width:200px;height:200px"></div>
-
-<script src="https://unpkg.com/svga.lite/svga.lite.min.js"></script>
-<script>
-    const player = new SVGA.Player('#svga-container');
-    const parser = new SVGA.Parser('#svga-container');
-
-    parser.load('{{ $url }}').then(videoItem => {
-        player.setVideoItem(videoItem);
-        player.startAnimation();
-    });
-</script>
