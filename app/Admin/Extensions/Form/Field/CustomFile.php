@@ -18,10 +18,6 @@ class CustomFile extends File
             return "<img src='{$url}' class='file-preview-image img-responsive' style='max-height:150px'>";
         }
 
-        return "<div class='kv-file-content'>" .
-            handleShowImageWithTypes($uniqueId, $url, 100, 100, 10) .
-            "</div>";
-
         return handleShowImageWithTypes($uniqueId, $url, 100, 100, 10);
     }
 }

@@ -301,13 +301,13 @@ class WareTabController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-//        $form->file('img2', trans('svg'))
-//            ->name(function ($file) {
-//                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-//            });
-        \Encore\Admin\Form::extend('customfile', CustomFile::class);
-        $form->customfile('img2', 'Upload Image/Animation');
-
+        $form->file('img2', trans('svg'))
+            ->name(function ($file) {
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            });
+//        \Encore\Admin\Form::extend('customfile', CustomFile::class);
+//        $form->customfile('img2', 'Upload Image/Animation');
+//
 
         // build preview (for edit mode when a value exists)
 //         $previewHtml = '';
