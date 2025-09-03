@@ -239,7 +239,11 @@ class CoinGameUserService
 
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
-            $filter->where(fn($q) => $q->where('round_id', $this->input), __('Round ID'))->placeholder(__('Round ID'));
+            $filter->where(function ($q) {
+                $input = $this->input;
+                $q->where('round_id', 'like', "%{$input}%");
+            }, __('Round ID'))->placeholder(__('Round ID'));
+            
             $filter->between('created_at', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
