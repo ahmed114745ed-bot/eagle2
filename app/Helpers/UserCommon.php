@@ -345,8 +345,11 @@ class UserCommon
         // Common::send_firebase_notification($tokens_notfacion, $title, $body);
     }
 
-    public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)
+    public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null , $receiveType = null )
     {
+        $receiveType = $receiveType ?? 'not-sending';
+
+
         $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
 
         $title = __('congratulations');
@@ -386,6 +389,7 @@ class UserCommon
             //            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
             $arr['is_read'] = 1;
             $arr['days'] = $ware->expire;
+            $arr['receive_type']      = $receiveType;
 
             $pack = Pack::query()->create($arr);
             $pack->senderable()->associate($sender);

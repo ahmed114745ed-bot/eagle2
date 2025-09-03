@@ -146,7 +146,7 @@ class DailyGiftController extends Controller
         } elseif ($type == "ware") {
 
             $ware = Ware::query()->find($target);
-            if ($ware) UserCommon::addWareToUser($user, $ware, $expire);
+            if ($ware) UserCommon::addWareToUser($user, $ware, $expire,null ,'daily-gifts');
         } elseif ($type == "achievement") {
             $attributes = [
                 'user_id'      => $user->id,

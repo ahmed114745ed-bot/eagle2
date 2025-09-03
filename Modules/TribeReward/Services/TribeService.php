@@ -107,7 +107,7 @@ class TribeService
                         break;
                     case "ware":
                         $ware = Ware::find($AgencyReward->target);
-                        UserCommon::addWareToUser($user, $ware, $AgencyReward->expire_days, $userOwnAgency);
+                        UserCommon::addWareToUser($user, $ware, $AgencyReward->expire_days, $userOwnAgency,'tribe');
                         break;
                     case "achievement":
                         $dateTimestamp = Carbon::parse($AgencyReward->expire_days)->format("Y-m-d H:i:s");
