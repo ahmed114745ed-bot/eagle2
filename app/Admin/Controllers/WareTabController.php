@@ -313,10 +313,10 @@ class WareTabController extends MainController
                 'id' => 'file-input-img2' // add an ID so we can target it with JS
             ]);
 
-        $form->display('img2', 'Preview')->with(function ($value) use ($form) {
+        $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return null;
 
-            $url = \Storage::disk(config('admin.upload.disk'))->url($form->img2);
+            $url = \Storage::disk(config('admin.upload.disk'))->url($value);
             $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
             $uniqueId = 'file_' . uniqid();
 
