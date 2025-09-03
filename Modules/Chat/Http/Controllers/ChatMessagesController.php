@@ -65,6 +65,9 @@ class ChatMessagesController extends Controller
 
         $totalDistinctUsers = $this->chatService->countDistinctUsersInRoom($chatRoom->id);
 
+        info($chatRoom->type);
+        info($total_message);
+        info($totalDistinctUsers);
         if ($chatRoom->type == 'guest' && $total_message >= 3 && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 404,
