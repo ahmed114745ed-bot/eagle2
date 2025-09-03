@@ -306,14 +306,12 @@ class WareTabController extends MainController
 //                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
 //            });
 
-//        $form->file('img2', trans('svg'))
-//            ->name(function ($file) {
-//                return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
-//            })   ->attribute([
-//                'id' => 'file-input-img2' // add an ID so we can target it with JS
-//            ]);
-
-        $form->file('img2', trans('svg'));
+        $form->file('img2', trans('svg'))
+            ->name(function ($file) {
+                return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
+            })   ->attribute([
+                'id' => 'file-input-img2' // add an ID so we can target it with JS
+            ]);
 
         $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return null;

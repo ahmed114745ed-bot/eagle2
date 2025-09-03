@@ -31,45 +31,45 @@
 
 <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.2/build/svga.min.js"></script>
 <script>
-    document.getElementById("file-input-img2").addEventListener("change", function(e) {
-        const file = e.target.files[0];
-        if (!file) return; // nothing selected yet
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.querySelector("input[name='img2']");  // ✅ select by name
+        if (!input) return; // avoid null error
 
-        let ext = "";
-        if (file.name && file.name.indexOf(".") !== -1) {
-            ext = file.name.split(".").pop().toLowerCase();
-        }
+        const previewContainer = document.getElementById("preview-container");
 
-        if (ext && ["png","jpg","jpeg","gif","webp","svg"].indexOf(ext) !== -1) {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                document.getElementById("preview-container").innerHTML =
-                    `<img src="${ev.target.result}" class="img img-thumbnail" style="max-height:150px;" />`;
-            };
-            reader.readAsDataURL(file);
-        } else if (ext === "svga") {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                const container = document.getElementById("preview-container");
-                container.innerHTML = `<canvas id="svga-canvas" width="200" height="200"></canvas>`;
+        input.addEventListener("change", function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-                const player = new SVGA.Player('#svga-canvas');
-                const parser = new SVGA.Parser('#svga-canvas');
+            let ext = "";
+            if (file.name.indexOf(".") !== -1) {
+                ext = file.name.split(".").pop().toLowerCase();
+            }
 
-                // 🔥 Convert ArrayBuffer to Uint8Array here
-                const uint8 = new Uint8Array(ev.target.result);
-
-                parser.load(uint8, function(videoItem) {
-                    player.setVideoItem(videoItem);
-                    player.startAnimation();
-                });
-            };
-            reader.readAsArrayBuffer(file); // ✅ this is correct
-        } else {
-            document.getElementById("preview-container").innerHTML =
-                `<div style="padding:10px;border:1px solid #ccc;display:inline-block;">
+            if (["png","jpg","jpeg","gif","webp","svg"].includes(ext)) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    previewContainer.innerHTML = `<img src="${ev.target.result}" class="img img-thumbnail" style="max-height:150px;" />`;
+                };
+                reader.readAsDataURL(file);
+            } else if (ext === "svga") {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    previewContainer.innerHTML = `<canvas id="svga-canvas" width="200" height="200"></canvas>`;
+                    const player = new SVGA.Player('#svga-canvas');
+                    const parser = new SVGA.Parser('#svga-canvas');
+                    const uint8 = new Uint8Array(ev.target.result);
+                    parser.load(uint8, function(videoItem) {
+                        player.setVideoItem(videoItem);
+                        player.startAnimation();
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                previewContainer.innerHTML = `<div style="padding:10px;border:1px solid #ccc;display:inline-block;">
                 <strong>Selected file:</strong> ${file.name}
-             </div>`;
-        }
+            </div>`;
+            }
+        });
     });
 </script>
