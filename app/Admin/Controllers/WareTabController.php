@@ -305,12 +305,6 @@ class WareTabController extends MainController
         //     ->name(function ($file) {
         //         return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         //     });
-
-        $form->file('img2', trans('svg'))
-            ->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            });
-
         $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) {
                 return null;
@@ -320,6 +314,12 @@ class WareTabController extends MainController
 
             return handleShowImageWithTypes($uniqueId, $url, 100, 100, 10);
         });
+        $form->file('img2', trans('svg'))
+            ->name(function ($file) {
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            });
+
+
 
 
 
