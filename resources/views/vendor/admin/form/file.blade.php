@@ -56,12 +56,15 @@
                 const player = new SVGA.Player('#svga-canvas');
                 const parser = new SVGA.Parser('#svga-canvas');
 
-                parser.load(ev.target.result, function(videoItem) {
+                // 🔥 Convert ArrayBuffer to Uint8Array here
+                const uint8 = new Uint8Array(ev.target.result);
+
+                parser.load(uint8, function(videoItem) {
                     player.setVideoItem(videoItem);
                     player.startAnimation();
                 });
             };
-            reader.readAsArrayBuffer(file); // ✅ important for SVGA!
+            reader.readAsArrayBuffer(file); // ✅ this is correct
         } else {
             document.getElementById("preview-container").innerHTML =
                 `<div style="padding:10px;border:1px solid #ccc;display:inline-block;">
