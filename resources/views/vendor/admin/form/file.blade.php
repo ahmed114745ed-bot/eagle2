@@ -1,51 +1,68 @@
 <div class="{{$viewClass['form-group']}} {!! !$errors->has($errorKey) ? '' : 'has-error' !!}">
-
     <label for="{{$id}}" class="{{$viewClass['label']}} control-label">{{$label}}</label>
 
     <div class="{{$viewClass['field']}}">
 
         @include('admin::form.error')
 
-        @if($value)
-            @php
-                $url = \Illuminate\Support\Facades\Storage::disk(config('admin.upload.disk'))->url($value);
-                $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
-                $uniqueId = 'file_' . uniqid();
-            @endphp
+        <div id="preview-{{ $id }}" style="margin-bottom:10px;">
+            @if($value)
+                @php
+                    $url = \Illuminate\Support\Facades\Storage::disk(config('admin.upload.disk'))->url($value);
+                    $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+                    $uniqueId = 'file_' . uniqid();
+                @endphp
 
-            <div style="margin-bottom:10px;">
                 @if(in_array($ext, ['png','jpg','jpeg','gif','webp','svg']))
                     <img src="{{ $url }}" class="img img-thumbnail" style="max-height:150px">
                 @else
                     {!! handleShowImageWithTypes($uniqueId, $url, 100, 100, 10) !!}
                 @endif
-            </div>
-        @endif
+            @endif
+        </div>
 
-        <input type="file" class="{{$class}}" name="{{$name}}" {!! $attributes !!} />
+        <input type="file" id="input-{{ $id }}" class="{{$class}}" name="{{$name}}" {!! $attributes !!} />
 
         @include('admin::form.help-block')
-
     </div>
 </div>
- <script>
-     // Extend Bootstrap-Fileinput defaults
-     $(function () {
 
-         // Support `.svga` as a custom preview type
-         $.fn.fileinput.defaults.previewFileExtSettings.svga = function (ext) {
-             return ext.match(/(svga)$/i);
-         };
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let input = document.getElementById("input-{{ $id }}");
+        let preview = document.getElementById("preview-{{ $id }}");
 
-         // Override template for svga
-         $.fn.fileinput.defaults.previewContentTemplates.svga =
-             '<div class="file-preview-frame krajee-default kv-preview-thumb">' +
-             '<div class="kv-file-content">' +
-             '<div class="svga-player" style="width:120px;height:120px;"></div>' +
-             '</div>' +
-             '<div class="file-thumbnail-footer">' +
-             '<div class="file-footer-caption">{caption}</div>' +
-             '</div>' +
-             '</div>';
-     });
- </script>
+        input.addEventListener("change", function(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            let ext = file.name.split('.').pop().toLowerCase();
+            preview.innerHTML = '';
+
+            if (["png","jpg","jpeg","gif","webp","svg"].includes(ext)) {
+                let url = URL.createObjectURL(file);
+                preview.innerHTML = `<img src="${url}" class="img img-thumbnail" style="max-height:150px">`;
+            }
+            else if (ext === "mp4") {
+                let url = URL.createObjectURL(file);
+                preview.innerHTML = `
+                <video width="100" height="100" controls autoplay loop muted>
+                   <source src="${url}" type="video/mp4">
+                </video>`;
+            }
+            else if (ext === "svga" || ext === "zz") {
+                let url = URL.createObjectURL(file);
+                let uniqueId = "svga_" + Date.now();
+                preview.innerHTML = `<div id="${uniqueId}" style="width:100px;height:100px;"></div>`;
+
+                // Init SVGA player
+                let player = new SVGA.Player("#" + uniqueId);
+                let parser = new SVGA.Parser("#" + uniqueId);
+                parser.load(url, function(videoItem) {
+                    player.setVideoItem(videoItem);
+                    player.startAnimation();
+                });
+            }
+        });
+    });
+</script>
