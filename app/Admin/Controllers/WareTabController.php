@@ -309,9 +309,10 @@ class WareTabController extends MainController
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
                 return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
-            })   ->attribute([
-                'id' => 'file-input-img2' // add an ID so we can target it with JS
-            ]);
+            })
+            ->attribute([
+                'id' => 'file-input-img2'
+            ])->help('<div id="preview-img2" style="margin-top:10px;"></div>');
 
         $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return null;
@@ -326,6 +327,56 @@ class WareTabController extends MainController
 
             return "<img src='{$url}' style='max-height:150px' class='img img-thumbnail' />";
         });
+
+        Admin::script(<<<'JS'
+    $(document).ready(function () {
+        $('#file-input-img2').on('change', function (event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            let ext = file.name.split('.').pop().toLowerCase();
+
+            // clear old preview
+            $('#preview-img2').empty();
+
+            if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#preview-img2').html(
+                        `<img src="${e.target.result}" style="max-height:150px" class="img img-thumbnail" />`
+                    );
+                };
+                reader.readAsDataURL(file);
+            } else if (['mp4','mov','webm'].includes(ext)) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#preview-img2').html(
+                        `<video src="${e.target.result}" controls style="max-height:150px"></video>`
+                    );
+                };
+                reader.readAsDataURL(file);
+            } else if (ext === 'svga') {
+                let uniqueId = 'svga_preview_' + Date.now();
+                $('#preview-img2').html(`<div id="${uniqueId}" style="width:150px;height:150px;"></div>`);
+
+                let player = new SVGA.Player('#' + uniqueId);
+                player.loops = 0; // infinite loop
+                player.clearsAfterStop = false;
+                let parser = new SVGA.Parser('#' + uniqueId);
+
+                let blobUrl = URL.createObjectURL(file);
+
+                parser.load(blobUrl, function(videoItem) {
+                    player.setVideoItem(videoItem);
+                    player.startAnimation();
+                });
+            } else {
+                $('#preview-img2').html(`<p>Selected file: ${file.name}</p>`);
+            }
+        });
+    });
+JS);
+
 //        \Encore\Admin\Form::extend('customfile', CustomFile::class);
 //        $form->customfile('img2', 'Upload Image/Animation');
 //
@@ -363,42 +414,6 @@ class WareTabController extends MainController
 //         box.find('.file-preview').remove(); // remove grey icon preview
 //     });
 // ");
-
-
-        $form->html('
-    <div id="preview-container" style="margin-bottom:10px;"></div>
-
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const input = document.getElementById("file-input-img2");
-        const previewContainer = document.getElementById("preview-container");
-
-        input.addEventListener("change", function (e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Get file extension
-            const ext = file.name.split(".").pop().toLowerCase();
-
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                if (["png","jpg","jpeg","gif","webp","svg"].includes(ext)) {
-                    previewContainer.innerHTML = `<img src="${event.target.result}" class="img img-thumbnail" style="max-height:150px;" />`;
-                } else {
-                    // For non-images: show custom output (like your handleShowImageWithTypes)
-                    // Since handleShowImageWithTypes is PHP, we can only mimic something here
-                    previewContainer.innerHTML = `
-                        <div style="padding:10px;border:1px solid #ccc;display:inline-block;">
-                            <strong>Selected file:</strong> ${file.name}
-                        </div>
-                    `;
-                }
-            };
-            reader.readAsDataURL(file);
-        });
-    });
-    </script>
-');
 
         if ($form->isEditing()) {
             $form->select('image_type1', __('image_type'))->options(
@@ -444,13 +459,6 @@ class WareTabController extends MainController
              </script>');
             }
         }
-
-
-
-
-
-
-
 
         if (request('type') == 18) $form->color('color', trans('color'));
         if ((request('type') && request('type') == 5) || ($form->isEditing() && $ware && ($ware->type == 5))) {
