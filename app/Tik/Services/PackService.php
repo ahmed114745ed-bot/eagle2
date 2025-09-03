@@ -70,33 +70,7 @@ class PackService
         return  $data;
     }
 
-    public function unlock_dress($userId)
-    {
-        $vip = Common::getLevel($userId, 3);
-        $types = [4, 5, 6, 7, 8];
-        $ids = $this->packRepository->getTargetIdsByUserAndType($userId, $types);
-
-        $wares = $this->wareRepository->getWaresByConditions($vip, $types, $ids);
-
-        if ($wares->isEmpty()) return 0;
-
-        foreach ($wares as $ware) {
-            $pack = $this->packRepository->getExistingPack($userId, $ware->type, $ware->id);
-            if ($pack) continue;
-
-            $data = [
-                'user_id'   => $userId,
-                'type'      => $ware->type,
-                'target_id' => $ware->id,
-                'expire'    => $ware->expire ? time() + ($ware->expire * 86400) : 0,
-                'is_read'   => 1,
-            ];
-
-            $this->packRepository->create($data);
-        }
-        return true;
-    }
-
+  
     public function usedPack($user, $itemId)
     {
         $supportedTypes = [4, 5, 6, 7, 28];
