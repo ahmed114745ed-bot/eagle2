@@ -26,3 +26,30 @@
 
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const input = document.querySelector('input[name="img2"]');
+        const previewContainer = document.createElement("div");
+        input.parentNode.appendChild(previewContainer);
+
+        input.addEventListener("change", function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
+                    previewContainer.innerHTML = `<img src="${e.target.result}" style="max-height:150px" class="img img-thumbnail" />`;
+                } else {
+                    // here you could call handleShowImageWithTypes but you'd need a JS version
+                    previewContainer.innerHTML = `<span class="label label-info">${file.name}</span>`;
+                }
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+</script>
