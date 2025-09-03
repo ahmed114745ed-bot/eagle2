@@ -60,6 +60,8 @@ class ExtendCardService
                 'num' => 1,
                 'expire' => $ware->expire ? now()->addDays($expire)->timestamp : 0,
                 'use_num' => $ware->num,
+                'receive_type' => 'extend-card-ware',
+
             ]);
       
         }
