@@ -1,62 +1,51 @@
 <div class="{{$viewClass['form-group']}} {!! !$errors->has($errorKey) ? '' : 'has-error' !!}">
+
     <label for="{{$id}}" class="{{$viewClass['label']}} control-label">{{$label}}</label>
+
     <div class="{{$viewClass['field']}}">
 
         @include('admin::form.error')
 
-        <input type="file"
-               id="file-input-{{ $id }}"
-               class="{{$class}}"
-               name="{{$name}}"
-            {!! $attributes !!}>
-
-        {{-- Our custom preview container --}}
-        <div id="preview-{{ $id }}" style="margin-top:10px;">
-            @if($value)
-                @php
-                    $url = \Illuminate\Support\Facades\Storage::disk(config('admin.upload.disk'))->url($value);
-                    $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
-                    $uniqueId = 'file_' . uniqid();
-                @endphp
-
-                @if(in_array($ext, ['png','jpg','jpeg','gif','webp','svg']))
-                    <img src="{{ $url }}" class="img img-thumbnail" style="max-height:150px">
-                @else
-                    {!! handleShowImageWithTypes($uniqueId, $url, 100, 100, 10) !!}
-                @endif
-            @endif
-        </div>
+        <input type="file" class="{{$class}}" name="{{$name}}" {!! $attributes !!} />
 
         @include('admin::form.help-block')
+
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const input = document.getElementById('file-input-{{ $id }}');
-        input.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const ext = file.name.split('.').pop().toLowerCase();
-            const preview = document.getElementById('preview-{{ $id }}');
-            preview.innerHTML = ''; // reset
-
-            if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
-                const url = URL.createObjectURL(file);
-                preview.innerHTML = `<img src="${url}" class="img img-thumbnail" style="max-height:150px">`;
-            } else if (ext === 'svga' || ext === 'zz' || ext === 'mp4') {
-                // either directly inline or call your PHP helper equivalent in JS
-                preview.innerHTML = `<div id="svga_{{ $id }}" style="width:100px;height:100px;"></div>`;
-
-                // Init SVGA player dynamically
-                var player = new SVGA.Player('#svga_{{ $id }}');
-                var parser = new SVGA.Parser('#svga_{{ $id }}');
-                parser.load(URL.createObjectURL(file), function(videoItem) {
-                    player.setVideoItem(videoItem);
-                    player.startAnimation();
-                });
+    $('input[name="img2"]').fileinput({
+        allowedPreviewTypes: ['image', 'html', 'text', 'video', 'audio', 'flash', 'object'],
+        previewFileExtSettings: {
+            // define what counts as "image"
+            'image': function(ext) {
+                return /(jpg|jpeg|png|gif|webp|svg|svga)$/i.test(ext);
+            },
+            'svga': function(ext) {
+                return /(svga)$/i.test(ext);
             }
-        });
+        },
+        previewContentTemplates: {
+            svga: '<div class="file-preview-frame krajee-default kv-preview-thumb">' +
+                '<div class="kv-file-content">' +
+                '<div id="svga-preview" style="width:100px;height:100px;"></div>' +
+                '</div>' +
+                '<div class="file-thumbnail-footer"><div class="file-footer-caption">{caption}</div></div>' +
+                '</div>'
+        }
     });
+
+    $.fn.fileinput.defaults.previewFileExtSettings.image = function(ext) {
+        return /(jpg|jpeg|gif|png|webp|svg|svga)$/i.test(ext);
+    };
+
+    $.fn.fileinput.defaults.previewContentTemplates.svga =
+        '<div class="file-preview-frame krajee-default kv-preview-thumb">' +
+        '<div class="kv-file-content">' +
+        '<div class="svga-container"></div>' +
+        '</div>' +
+        '<div class="file-thumbnail-footer">' +
+        '<div class="file-footer-caption">{caption}</div>' +
+        '</div>' +
+        '</div>';
 </script>
