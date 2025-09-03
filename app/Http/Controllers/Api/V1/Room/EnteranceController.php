@@ -68,8 +68,8 @@ class EnteranceController extends Controller
             'agora_app_id' => $agora_app_id,
             'zego' => [
                 'server_secret' => $zego_server_secret,
-                'app_id' => "783657445",
-                'app_sign' => "1e9df9f9cf7554a706280a483588d70c88c2456fdcba0424bf393f3455e70bc9"
+                'app_id' => $zego_app_id,
+                'app_sign' => $app_sign
             ],
             'library' => /*$library == 1 ?*/ 'zego' /*: 'agora'*/,
 
