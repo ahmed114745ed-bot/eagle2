@@ -300,17 +300,18 @@ class WareTabController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-//        $form->image('img2', trans('svg'))
-//            ->name(function () use ($form){
-//                $defaultImage = asset("images/image.png");
-//
-//                $url = getImagePath($form->model()->img2) ?? $defaultImage;
-//                if (!isImageExists($url)) {
-//                    $url = $defaultImage;
-//                }
-//                return handleShowImageWithTypes($form->model()->id, $url, 50, 50);
-////                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-//            });
+        $form->image('img2', trans('svg'))
+            ->uniqueName() // ensure unique saving
+            ->help(function ($value) {
+                $defaultImage = asset("images/image.png");
+                $url = getImagePath($value) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $uniqueId = 'form_' . (request()->route('id') ?? uniqid());
+
+                return handleShowImageWithTypes($uniqueId, $url, 50, 50);
+            });
 
         $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) {
