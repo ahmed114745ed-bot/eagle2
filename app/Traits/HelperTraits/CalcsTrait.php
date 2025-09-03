@@ -65,7 +65,7 @@ trait CalcsTrait
         })->get(['receiver_id', 'sender_id', 'giftPrice']);
     }
 
-    public static function getLevel($user_id = null, $type = null, $is_image = false)
+    public static function getLevel($user_id = null, $type = null, $is_image = false, $giftLogs = null)
     {
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
@@ -73,7 +73,15 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        $giftLogs = self::getTotalGiftPrice($user_id);
+        if (! $giftLogs) {
+            $giftLogs = self::getTotalGiftPrice($user_id);
+        } else {
+            $giftLogs = $giftLogs->where(function ($log) use ($user_id) {
+                return $log->receiver_id == $user_id || $log->sender_id == $user_id;
+            });
+        }
+
+//        $giftLogs = self::getTotalGiftPrice($user_id);
         $star_num = $giftLogs->where('receiver_id', $user_id)->sum('giftPrice');
         $gold_num = $giftLogs->where('sender_id', $user_id)->sum('giftPrice');
         $vip_num  = $gold_num; //count by purchased coins
