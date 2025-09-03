@@ -63,7 +63,9 @@ class ChatMessagesController extends Controller
 
         $total_message = $this->chatService->countMessagesByUserInRoom($chatRoom->id, $user->id);
 
-        if ($chatRoom->type == 'guest' && $total_message >= 3) {
+        $totalDistinctUsers = $this->chatService->countDistinctUsersInRoom($chatRoom->id);
+
+        if ($chatRoom->type == 'guest' && $total_message >= 3 && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 404,
                 'message' => 'You have reached the limit for sending messages',

@@ -39,6 +39,14 @@ class ChatMessage extends Model
         return $query->where('chat_room_id', $chatRoomId)->where('user_id', $userId);
     }
 
+    public function scopeDistinctUserInRoom($query, $chatRoomId)
+    {
+        return $query->where('chat_room_id', $chatRoomId)
+            ->select('user_id')
+            ->distinct()
+            ->limit(2);
+    }
+
     public function scopeOwnedBy($query, $userId)
     {
         return $query->where('user_id', $userId);
