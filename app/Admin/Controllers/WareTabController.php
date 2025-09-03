@@ -300,45 +300,45 @@ class WareTabController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-        // $form->file('img2', trans('svg'))
-        //     ->name(function ($file) {
-        //         return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        //     });
+        $form->file('img2', trans('svg'))
+            ->name(function ($file) {
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            });
 
 
         // build preview (for edit mode when a value exists)
-        $previewHtml = '';
-        if ($form->model() && $form->model()->img2) {
-            $url = getImagePath($form->model()->img2) ?? asset('images/image.png');
-            $uniqueId = 'media_' . ($form->model()->id ?? uniqid());
+//         $previewHtml = '';
+//         if ($form->model() && $form->model()->img2) {
+//             $url = getImagePath($form->model()->img2) ?? asset('images/image.png');
+//             $uniqueId = 'media_' . ($form->model()->id ?? uniqid());
 
-            // wrap with a box that visually matches the image field
-            $previewHtml = sprintf(
-                '<div class="kv-preview-thumb" style="display:inline-block;border:1px solid #e5e5e5;border-radius:6px;width:160px;height:160px;overflow:hidden;margin-bottom:8px;padding:6px;background:#f7f7f7;">
-            %s
-         </div>',
-                handleShowImageWithTypes($uniqueId, $url, 148, 148, 10) // inner size a bit smaller due to padding
-            );
-        }
+//             // wrap with a box that visually matches the image field
+//             $previewHtml = sprintf(
+//                 '<div class="kv-preview-thumb" style="display:inline-block;border:1px solid #e5e5e5;border-radius:6px;width:160px;height:160px;overflow:hidden;margin-bottom:8px;padding:6px;background:#f7f7f7;">
+//             %s
+//          </div>',
+//                 handleShowImageWithTypes($uniqueId, $url, 148, 148, 10) // inner size a bit smaller due to padding
+//             );
+//         }
 
-        // give the input a unique id so we can target only this field
-        $inputId = 'img2_input_' . Str::random(8);
+//         // give the input a unique id so we can target only this field
+//         $inputId = 'img2_input_' . Str::random(8);
 
-        $form->file('img2', trans('svg'))
-            ->attribute(['id' => $inputId])
-            ->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            })
+//         $form->file('img2', trans('svg'))
+//             ->attribute(['id' => $inputId])
+//             ->name(function ($file) {
+//                 return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+//             })
 
-            ->help($previewHtml);
+//             ->help($previewHtml);
 
-        // hide the default built-in file preview **only for this field**
-        Admin::script("
-    $(function () {
-        var box = $('#{$inputId}').closest('.file-input');
-        box.find('.file-preview').remove(); // remove grey icon preview
-    });
-");
+//         // hide the default built-in file preview **only for this field**
+//         Admin::script("
+//     $(function () {
+//         var box = $('#{$inputId}').closest('.file-input');
+//         box.find('.file-preview').remove(); // remove grey icon preview
+//     });
+// ");
 
 
 
