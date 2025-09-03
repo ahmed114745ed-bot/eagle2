@@ -187,9 +187,6 @@ class ChatRoomService
             ->orderByDesc('last_message_created_at')
             ->paginate(20);
 
-        foreach ($friends as $room) {
-            info($room->distinct_users_count);
-        }
         // // Get chat requests (guest)
         // $guestChats = ChatRoom::WhereHas('messages')
         //     ->select('chat_rooms.*')
