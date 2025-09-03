@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\AutoReceiveType;
 use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Modules\Vip\Entities\UserVip;
 
 class Pack extends Model
 {
-    use SoftDeletes, TimestampsWithTimezone;
+    use SoftDeletes, TimestampsWithTimezone ,AutoReceiveType;
 
     protected $guarded = [];
 
