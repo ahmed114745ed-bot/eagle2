@@ -246,7 +246,7 @@ class AgencyService
             $this->usersJoinedAgencyRepository->create($joinAgencyData);
             // }
             // add vip to user
-            UserCommon::userVip($user);
+            UserCommon::userVip($user,'request-action-agency');
             CustomNotification::acceptAgencyApp($agency, $user);
         }
         return true;
@@ -1165,7 +1165,7 @@ class AgencyService
         ];
         $this->agencyJoinRequestRepository->update($data, $id);
         if ($request->status == 1) {
-            UserCommon::userVip($user);
+            UserCommon::userVip($user , 'updatea-gency-join-request');
             $this->userRepository->update(['type_user' => 1, 'monthly_diamond_received' => 0], $user->id);
         }
         return true;

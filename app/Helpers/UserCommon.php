@@ -257,7 +257,7 @@ class UserCommon
         return $user_statistic;
     }
 
-    public static function userVip(User $user)
+    public static function userVip(User $user ,$receiveType = 'vip-check')
     {
         $vip = OVip::query()->first();
         $user_vip_check = UserVip::query()->where('user_id', $user->id)
@@ -266,7 +266,7 @@ class UserCommon
 
 
         if (!$user_vip_check) {
-            VipCommon::createUserVip($vip ,$user ,$vip->expire , null,'',);
+            VipCommon::createUserVip($vip ,$user ,$vip->expire , null,'',1,0,0,$receiveType);
 
         }
     }
