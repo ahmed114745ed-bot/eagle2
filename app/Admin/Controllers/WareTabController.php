@@ -300,18 +300,27 @@ class WareTabController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-        $form->image('img2', trans('svg'))
-            ->name(function () use ($form){
-                $defaultImage = asset("images/image.png");
+//        $form->image('img2', trans('svg'))
+//            ->name(function () use ($form){
+//                $defaultImage = asset("images/image.png");
+//
+//                $url = getImagePath($form->model()->img2) ?? $defaultImage;
+//                if (!isImageExists($url)) {
+//                    $url = $defaultImage;
+//                }
+//                return handleShowImageWithTypes($form->model()->id, $url, 50, 50);
+////                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+//            });
 
-                $url = getImagePath($form->model()->img2) ?? $defaultImage;
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                return handleShowImageWithTypes($form->model()->id, $url, 50, 50);
-//                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            });
+        $form->display('img2', 'Preview')->with(function ($value) {
+            if (!$value) {
+                return null;
+            }
+            $url = getImagePath($value) ?? asset("images/image.png");
+            $uniqueId = 'form_' . ($this->id ?? uniqid());
 
+            return handleShowImageWithTypes($uniqueId, $url, 100, 100, 10);
+        });
 
         // build preview (for edit mode when a value exists)
 //         $previewHtml = '';
