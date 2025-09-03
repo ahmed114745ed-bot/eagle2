@@ -1073,7 +1073,7 @@ class UserService
 
     public function sendPack($user, $request)
     {
-        $pack = $this->packRepository->pack($request->pack_id, $user->id);
+        $pack = $this->packRepository->UnusedPack($request->pack_id, $user->id);
         if (!$pack) return Common::apiResponse(0, 'item not found or expired', null, 404);
         $ware = $this->wareRepository->findOrFail($pack->target_id);
         if (!$ware) return Common::apiResponse(0, 'product not found', null, 404);
