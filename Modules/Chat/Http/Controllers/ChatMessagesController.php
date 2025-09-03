@@ -43,7 +43,6 @@ class ChatMessagesController extends Controller
 
     public function store(ChatStoreRequest $request)
     {
-        info('im here');
         $user = $request->user();
 
         if ($this->chatService->isUserBlocked($request->user()->id, $request->user_id)) {
@@ -66,14 +65,10 @@ class ChatMessagesController extends Controller
 
         $totalDistinctUsers = $this->chatService->countDistinctUsersInRoom($chatRoom->id);
 
-        info($chatRoom->type);
-        info($total_message);
-        info($totalDistinctUsers);
-
         if ($chatRoom->type == 'guest' && $total_message >= 3 && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 404,
-                'message' => 'You have reached the limit for sending messages testttttttt',
+                'message' => 'You have reached the limit for sending messages',
             ], 404);
         }
 
