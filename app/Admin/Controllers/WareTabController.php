@@ -309,9 +309,10 @@ class WareTabController extends MainController
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
                 return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
-            })   ->attribute([
-                'id' => 'file-input-img2' // add an ID so we can target it with JS
-            ]);
+            })
+            ->attribute([
+                'id' => 'file-input-img2'
+            ])->help('<div id="preview-img2" style="margin-top:10px;"></div>');
 
         $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return null;
@@ -326,6 +327,41 @@ class WareTabController extends MainController
 
             return "<img src='{$url}' style='max-height:150px' class='img img-thumbnail' />";
         });
+
+        Admin::script(<<<'JS'
+    $(document).ready(function () {
+        $('#file-input-img2').on('change', function (event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                let fileUrl = e.target.result;
+                let ext = file.name.split('.').pop().toLowerCase();
+
+                // clear old preview
+                $('#preview-img2').empty();
+
+                if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
+                    // image preview
+                    $('#preview-img2').html(
+                        `<img src="${fileUrl}" style="max-height:150px" class="img img-thumbnail" />`
+                    );
+                } else if (['mp4','mov','webm'].includes(ext)) {
+                    // video preview
+                    $('#preview-img2').html(
+                        `<video src="${fileUrl}" controls style="max-height:150px"></video>`
+                    );
+                } else {
+                    // fallback text
+                    $('#preview-img2').html(`<p>Selected file: ${file.name}</p>`);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+JS);
+
 //        \Encore\Admin\Form::extend('customfile', CustomFile::class);
 //        $form->customfile('img2', 'Upload Image/Animation');
 //
