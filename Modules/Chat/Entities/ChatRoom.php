@@ -40,20 +40,6 @@ class ChatRoom extends Model
         return $this->belongsTo(User::class, 'user_id2');
     }
 
-    public function getTypeAttribute($value)
-    {
-        if ($value === 'guest') {
-            $distinctUsers = $this->distinct_users_count
-                ?? $this->messages()->distinct('user_id')->count('user_id');
-
-            if ($distinctUsers >= 2) {
-                return 'friends';
-            }
-        }
-
-        return $value;
-    }
-
     public function scopeBetweenUsers($query, $userId, $otherUserId)
     {
         return $query->where('user_id', $userId)->where('user_id2', $otherUserId)

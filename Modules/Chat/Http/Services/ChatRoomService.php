@@ -131,21 +131,38 @@ class ChatRoomService
         $topChats = $user->chats->pluck('id')->toArray();
 
         // Get user chats (friends)
-        $friends = ChatRoom::WhereHas('messages')
+        $friends = ChatRoom::withCount([
+            'messages as distinct_users_count' => function ($query) {
+                $query->select(DB::raw("COUNT(DISTINCT user_id)"));
+            }
+        ])->WhereHas('messages')
             ->select(
                 'chat_rooms.*',
-                DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at')
+                DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at'),
+                DB::raw('(SELECT COUNT(DISTINCT user_id) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS distinct_users_count')
             )
             ->where(function ($q) use ($topChats, $user) {
                 $q->where(function ($query) use ($topChats, $user) {
                     $query->whereNotIn('chat_rooms.id', $topChats)
                         ->where('chat_rooms.user_id', $user->id)
-                        ->where('chat_rooms.type', 'friends');
+                        ->where(function ($sub) {
+                            $sub->where('chat_rooms.type', 'friends')
+                                ->orWhere(function ($sq) {
+                                    $sq->where('chat_rooms.type', 'guest')
+                                        ->having('distinct_users_count', '>=', 2);
+                                });
+                        });
                 })
                     ->orWhere(function ($query) use ($topChats, $user) {
                         $query->whereNotIn('chat_rooms.id', $topChats)
                             ->where('chat_rooms.user_id2', $user->id)
-                            ->where('chat_rooms.type', 'friends');
+                            ->where(function ($sub) {
+                                $sub->where('chat_rooms.type', 'friends')
+                                    ->orWhere(function ($sq) {
+                                        $sq->where('chat_rooms.type', 'guest')
+                                            ->having('distinct_users_count', '>=', 2);
+                                    });
+                            });
                     });
             })
             ->when($uuid, function ($q) use ($uuid) {
@@ -171,6 +188,9 @@ class ChatRoomService
             ->orderByDesc('last_message_created_at')
             ->paginate(20);
 
+        foreach ($friends as $room) {
+            info($room->distinct_users_count);
+        }
         // // Get chat requests (guest)
         // $guestChats = ChatRoom::WhereHas('messages')
         //     ->select('chat_rooms.*')
@@ -317,7 +337,7 @@ class ChatRoomService
             $roomResource = new ChatRoomResourcePusher($checkRoom);
             event(new OpenChat($roomResource->toResponse(request())->getData()->data, $user2 ??$user , $checkRoom));
         } catch (\Throwable $th) {
-           
+
             throw $th;
         }
     }
