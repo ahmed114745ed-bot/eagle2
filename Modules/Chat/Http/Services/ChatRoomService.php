@@ -138,7 +138,8 @@ class ChatRoomService
         ])->WhereHas('messages')
             ->select(
                 'chat_rooms.*',
-                DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at')
+                DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at'),
+                DB::raw('(SELECT COUNT(DISTINCT user_id) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS distinct_users_count')
             )
             ->where(function ($q) use ($topChats, $user) {
                 $q->where(function ($query) use ($topChats, $user) {
@@ -147,8 +148,7 @@ class ChatRoomService
                         ->where(function ($sub) {
                             $sub->where('chat_rooms.type', 'friends')
                                 ->orWhere(function ($sq) {
-                                    $sq->where('chat_rooms.type', 'guest')
-                                        ->having('distinct_users_count', '>=', 2);
+                                    $sq->where('chat_rooms.type', 'guest');
                                 });
                         });
                 })
@@ -158,12 +158,11 @@ class ChatRoomService
                             ->where(function ($sub) {
                                 $sub->where('chat_rooms.type', 'friends')
                                     ->orWhere(function ($sq) {
-                                        $sq->where('chat_rooms.type', 'guest')
-                                            ->having('distinct_users_count', '>=', 2);
+                                        $sq->where('chat_rooms.type', 'guest');
                                     });
                             });
                     });
-            })
+            })->havingRaw("((chat_rooms.type = 'friends') OR (chat_rooms.type = 'guest' AND distinct_users_count >= 2))")
             ->when($uuid, function ($q) use ($uuid) {
                 $q->where(function ($q) use ($uuid) {
                     $q->whereHas('userOne', function ($qq) use ($uuid) {

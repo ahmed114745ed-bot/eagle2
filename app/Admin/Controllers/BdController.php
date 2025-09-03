@@ -221,15 +221,18 @@ class BdController extends MainController
         $grid->column('total_cut', __('Cut amount'))->display(function () {
             return truncateAndTrim($this->total_cut, 2);
         });
+        if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $col = $grid->column('transfer_salary', __("transfer_salary"))
+                ->display(function () {
+                    return $this->transfer_salary ? 1 : 0;
+                });
 
-        $col = $grid->column('transfer_salary', __("transfer_salary"))
-            ->display(function () {
-                return $this->transfer_salary ? 1 : 0;
-            });
-
-        if (! request()->filled('_export_')) {
-            $col->switch(Common::getSwitchStates());
+            if (! request()->filled('_export_')) {
+                $col->switch(Common::getSwitchStates());
+            }
         }
+
+
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
@@ -348,7 +351,7 @@ class BdController extends MainController
                     $form->app_id = $newAppId;
                 }
             }
-        
+
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password   = Hash::make($form->password);
             }
