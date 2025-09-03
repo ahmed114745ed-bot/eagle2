@@ -309,7 +309,9 @@ class WareTabController extends MainController
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
                 return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
-            });
+            })   ->attribute([
+                'id' => 'file-input-img2' // add an ID so we can target it with JS
+            ]);
 
         $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return null;
@@ -363,6 +365,40 @@ class WareTabController extends MainController
 // ");
 
 
+        $form->html('
+    <div id="preview-container" style="margin-bottom:10px;"></div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("file-input-img2");
+        const previewContainer = document.getElementById("preview-container");
+
+        input.addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Get file extension
+            const ext = file.name.split(".").pop().toLowerCase();
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                if (["png","jpg","jpeg","gif","webp","svg"].includes(ext)) {
+                    previewContainer.innerHTML = `<img src="${event.target.result}" class="img img-thumbnail" style="max-height:150px;" />`;
+                } else {
+                    // For non-images: show custom output (like your handleShowImageWithTypes)
+                    // Since handleShowImageWithTypes is PHP, we can only mimic something here
+                    previewContainer.innerHTML = `
+                        <div style="padding:10px;border:1px solid #ccc;display:inline-block;">
+                            <strong>Selected file:</strong> ${file.name}
+                        </div>
+                    `;
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+    </script>
+');
 
         if ($form->isEditing()) {
             $form->select('image_type1', __('image_type'))->options(
