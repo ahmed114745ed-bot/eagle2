@@ -180,7 +180,7 @@ class EncorUsersController extends AdminController
 
         $grid = new Grid(new $userModel());
 
-        $grid->model()
+        $grid->model()->where('type', "!=", 'bd')
             ->where('is_preview', 0)
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');
