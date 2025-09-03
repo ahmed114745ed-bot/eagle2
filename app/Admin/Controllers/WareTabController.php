@@ -300,7 +300,7 @@ class WareTabController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-        $form->image('img2', trans('svg'))
+        $form->file('img2', trans('svg'))
             ->uniqueName()
             ->help(
                 (function () use ($form) {
@@ -311,7 +311,6 @@ class WareTabController extends MainController
                     }
                     $uniqueId = 'form_' . ($form->model()->id ?? uniqid());
 
-                    // This should return a string (HTML), not a closure
                     return handleShowImageWithTypes($uniqueId, $url, 50, 50);
                 })()
             );
