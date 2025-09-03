@@ -43,7 +43,7 @@ class ChatMessage extends Model
     {
         return $query->where('chat_room_id', $chatRoomId)
             ->select('user_id')
-            ->distinct()
+            ->distinct('user_id')
             ->limit(2);
     }
 
