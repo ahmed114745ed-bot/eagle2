@@ -13,9 +13,9 @@ trait AutoReceiveType
             $model->setDefaultReceiveType();
         });
 
-        static::updating(function ($model) {
-            $model->setDefaultReceiveType();
-        });
+        // static::updating(function ($model) {
+        //     $model->setDefaultReceiveType();
+        // });
     }
 
  
