@@ -5,6 +5,7 @@ use Encore\Admin\Form\Field\File;
 
 class CustomFile extends File
 {
+    protected $view = 'admin::form.file';
     protected function preview()
     {
         if (!$this->value) return '';
