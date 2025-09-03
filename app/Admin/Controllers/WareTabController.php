@@ -301,8 +301,15 @@ class WareTabController extends MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
         $form->image('img2', trans('svg'))
-            ->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            ->name(function () use ($form){
+                $defaultImage = asset("images/image.png");
+
+                $url = getImagePath($form->model()->img2) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($form->model()->id, $url, 50, 50);
+//                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
             });
 
 
