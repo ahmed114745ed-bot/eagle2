@@ -1399,7 +1399,32 @@
                                     </td> 
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
-                                    <td>{{ @$userVip->receive_type ?? 0 }}</td>
+                                  <td>
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            {{-- Always show type --}}
+                                            <span style="font-weight: 600; color: #444;">
+                                                {{ @$userVip->receive_type ?? '' }}
+                                            </span>
+
+                                            {{-- If send-vip, show sender below --}}
+                                            @if(@$userVip->receive_type === 'send-vip' && @$userVip->sender)
+                                                @php
+                                                    $name = @$userVip->sender->name ?? 'Unknown User';
+                                                    $showUrl = url("admin/users/" . @$userVip->sender->id);
+                                                @endphp
+
+                                                <a href="{{ $showUrl }}" 
+                                                style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                        sender:
+                                                    </span>
+                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                        {{ $name }}
+                                                    </span>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </td>
                                     
                                     <td>
                                         <div class="d-flex">

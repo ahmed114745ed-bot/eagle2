@@ -238,7 +238,7 @@ class VipCommon
                 'vip_user_id' => $userVip->id,
                 'is_used'     => $userVip->is_used,
                 'using'       => 1,
-                'receive_type'=> 'vip-'.$userVip->level
+                'receive_type'=> 'send-vip-'.$userVip->level
 
            ]);
         }
