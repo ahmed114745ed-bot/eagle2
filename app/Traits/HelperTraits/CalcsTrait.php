@@ -67,12 +67,10 @@ trait CalcsTrait
 
     public static function getLevel($user_id = null, $type = null, $is_image = false, $giftLogs = null)
     {
-        Log::info('getLevel called', compact('user_id', 'type', 'is_image'));
     
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
             if (!$user) {
-                Log::warning("User not found", ['user_id' => $user_id]);
                 return new \stdClass();
             }
         } else {
@@ -81,19 +79,16 @@ trait CalcsTrait
     
         if (!$giftLogs) {
             $giftLogs = self::getTotalGiftPrice($user_id);
-            Log::info('GiftLogs fetched', ['count' => $giftLogs->count()]);
         } else {
             $giftLogs = $giftLogs->where(function ($log) use ($user_id) {
                 return $log->receiver_id == $user_id || $log->sender_id == $user_id;
             });
-            Log::info('GiftLogs filtered', ['count' => $giftLogs->count()]);
         }
     
         $star_num = $giftLogs->where('receiver_id', $user_id)->sum('giftPrice');
         $gold_num = $giftLogs->where('sender_id', $user_id)->sum('giftPrice');
         $vip_num  = $gold_num;
     
-        Log::info('Calculated values', compact('star_num', 'gold_num', 'vip_num'));
     
         $value = match ($type) {
             1 => $star_num,
@@ -102,7 +97,6 @@ trait CalcsTrait
             default => 0,
         };
     
-        Log::info('Value selected by type', compact('value'));
     
         $total = $value;
         $exp   = $value * 1;
@@ -113,7 +107,6 @@ trait CalcsTrait
             ->limit(1)
             ->value('level');
     
-        Log::info('Base level calculated', compact('level'));
     
         if ($type == 1) {
             $level += @$user->sub_receiver_level;
@@ -121,7 +114,6 @@ trait CalcsTrait
             $level += @$user->sub_sender_level;
         }
     
-        Log::info('Final level after sub adjustments', ['level' => $level]);
     
         if ($is_image) {
             $img = '';
@@ -130,11 +122,9 @@ trait CalcsTrait
                     ->where(['level' => $level, 'type' => $type])
                     ->value('img') ?? '';
             }
-            Log::info('Returning image', ['img' => $img]);
             return $img;
         } else {
             self::handelLevelLog($user_id, $type, $level, $total);
-            Log::info('Returning level', ['level' => $level]);
             return $level ?: 0;
         }
     }

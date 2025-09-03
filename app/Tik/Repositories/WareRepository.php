@@ -73,12 +73,6 @@ class WareRepository extends AbstractRepository
 
     public function getWaresByConditions($vipLevel, array $types, array $ids)
     {
-
-        \Log::info('getWaresByConditions called', [
-            'vipLevel' => $vipLevel,
-            'types'    => $types,
-            'excluded_ids' => $ids,
-        ]);
         return $this->model
             ->where(['get_type' => 1, 'enable' => 1])
             ->where('level', '<=', $vipLevel)
