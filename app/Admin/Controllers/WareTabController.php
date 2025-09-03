@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Extensions\Form\Field\CustomImage;
+use App\Admin\Extensions\Form\Field\CustomFile;
 use App\Admin\Services\FileService;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
@@ -305,8 +305,8 @@ class WareTabController extends MainController
 //            ->name(function ($file) {
 //                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
 //            });
-        \Encore\Admin\Form::extend('customimage', CustomImage::class);
-        $form->customimage('img2', 'Upload Image/Animation');
+        \Encore\Admin\Form::extend('customfile', CustomFile::class);
+        $form->customfile('img2', 'Upload Image/Animation');
 
 
         // build preview (for edit mode when a value exists)
