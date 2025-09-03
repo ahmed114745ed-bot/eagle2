@@ -349,50 +349,6 @@ trait RoomTrait
 
 
 
-    public static function unlock_wares($user_id, $cp_id = null)
-    {
-        if ($cp_id) {
-            $level = self::getCpLevel($cp_id);
-            $get_type = 8;
-        } else {
-            $get_type = 1;
-            $level = self::getLevel($user_id, 3);
-        }
-        $type = [4, 5, 6, 7, 8];
-        foreach ($type as $k => &$v) {
-            $where['get_type'] = $get_type;
-            $where['enable'] = 1;
-            $where['level'] = ['elt', $level];
-            $where['type'] = $v;
-            $wares = DB::table('wares')->where($where)->selectRaw('id,type,expire')->orderByRaw("id desc")->limit(1)->first();
-            if (!$wares) {
-                continue;
-            }
-            $where_pack['user_id'] = $user_id;
-            $where_pack['get_type'] = $get_type;
-            $where_pack['type'] = $v;
-            $target_id = DB::table('pack')->where($where_pack)->value('target_id');
-            if ($wares->id == $target_id) {
-                continue;
-            }
-            if (!$target_id) {
-                $arr['user_id'] = $user_id;
-                $arr['get_type'] = $get_type;
-                $arr['type'] = $v;
-                $arr['target_id'] = $wares->id;
-                $arr['addtime'] = time();
-                $arr['expire'] = $wares['expire'] ? time() + $wares['expire'] * 86400 : 0;
-                $res = Db::table('pack')->insert($arr);
-            } else {
-                $res = DB::table('pack')->where($where_pack)->update(['target_id' => $wares['id']]);
-            }
-            if ($res && in_array($v, [4, 5, 6, 7]) && $get_type == 1) {
-                $dress = 'dress_' . $v;
-                DB::table('users')->where(['id' => $user_id])->update([$dress => $wares['id']]);
-            }
-        }
-    }
-
 
     public static function update_user_total($user_id = null, $type = null, $coins = null)
     {
