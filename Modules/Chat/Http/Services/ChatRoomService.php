@@ -149,7 +149,7 @@ class ChatRoomService
                             $sub->where('chat_rooms.type', 'friends')
                                 ->orWhere(function ($sq) {
                                     $sq->where('chat_rooms.type', 'guest')
-                                        ->having('distinct_users_count', '>=', 2);
+                                        ->where('distinct_users_count', '>=', 2);
                                 });
                         });
                 })
@@ -160,7 +160,7 @@ class ChatRoomService
                                 $sub->where('chat_rooms.type', 'friends')
                                     ->orWhere(function ($sq) {
                                         $sq->where('chat_rooms.type', 'guest')
-                                            ->having('distinct_users_count', '>=', 2);
+                                            ->where('distinct_users_count', '>=', 2);
                                     });
                             });
                     });
@@ -188,9 +188,6 @@ class ChatRoomService
             ->orderByDesc('last_message_created_at')
             ->paginate(20);
 
-        foreach ($friends as $room) {
-            info($room->distinct_users_count);
-        }
         // // Get chat requests (guest)
         // $guestChats = ChatRoom::WhereHas('messages')
         //     ->select('chat_rooms.*')
