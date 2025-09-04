@@ -27,4 +27,54 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/svgaplayerweb@2.3.0/build/svga.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#file-input-img2').on('change', function (event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            let ext = file.name.split('.').pop().toLowerCase();
+
+            $('#preview-img2').empty();
+            $('#preview-display-img2').empty();
+
+            if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    let html = `<img src="${e.target.result}" style="max-height:150px" class="img img-thumbnail" />`;
+                    $('#preview-img2').html(html);
+                    $('#preview-display-img2').html(html);
+                };
+                reader.readAsDataURL(file);
+            } else if (['mp4','mov','webm'].includes(ext)) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    let html = `<video src="${e.target.result}" controls style="max-height:150px"></video>`;
+                    $('#preview-img2').html(html);
+                    $('#preview-display-img2').html(html);
+                };
+                reader.readAsDataURL(file);
+            } else if (ext === 'svga') {
+                let uniqueId = 'svga_preview_' + Date.now();
+                let html = `<div id="${uniqueId}" style="width:150px;height:150px;"></div>`;
+                $('#preview-img2').html(html);
+                $('#preview-display-img2').html(html);
+
+                let player = new SVGA.Player('#' + uniqueId);
+                player.loops = 0;
+                player.clearsAfterStop = false;
+                let parser = new SVGA.Parser('#' + uniqueId);
+                let blobUrl = URL.createObjectURL(file);
+
+                parser.load(blobUrl, function(videoItem) {
+                    player.setVideoItem(videoItem);
+                    player.startAnimation();
+                });
+            } else {
+                let html = `<p>Selected file: ${file.name}</p>`;
+                $('#preview-img2').html(html);
+                $('#preview-display-img2').html(html);
+            }
+        });
+    });
+</script>
