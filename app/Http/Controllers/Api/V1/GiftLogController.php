@@ -357,6 +357,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+        abort(503);
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return Common::apiResponse(0, __('api_responses.try_again'));
