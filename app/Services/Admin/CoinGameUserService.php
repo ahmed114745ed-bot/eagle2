@@ -161,7 +161,7 @@ class CoinGameUserService
         $grid->column('user_id', __('user'))->display(function () {
             $user = $this->user;
             if (!$user) return __('No User');
-            return app(UserService::class)->adminUserBasicInfo($user);
+            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
         });
 
         $grid->column('game_id', __('Game'))->display(function () {
@@ -243,7 +243,7 @@ class CoinGameUserService
                 $input = $this->input;
                 $q->where('round_id', 'like', "%{$input}%");
             }, __('Round ID'))->placeholder(__('Round ID'));
-            
+
             $filter->between('created_at', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
