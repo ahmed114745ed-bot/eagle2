@@ -43,7 +43,7 @@ class HistoryAgencyResource extends JsonResource
             $target = $isOwner ? $this->calculateTarget($heroGiftLog) : 0;
         
             return [
-                'star'   => ReceiverGiftLogResource::collection($giftLog),
+                'star'   => ReceiverGiftLogForKickedResource::collection($giftLog),
                 'heroes' => SenderGiftLogResource::collection($heroGiftLog),
                 'salary' => $isOwner ? (string) $salary : '0',
                 'target' => $target,
