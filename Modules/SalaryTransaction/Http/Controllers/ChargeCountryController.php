@@ -143,7 +143,7 @@ class ChargeCountryController extends MainController
         $form->display(__('admin.ID'));
         if (!$form->isEditing()) {
             $form->select('country_id', __('country'))->options(function () {
-                $ps = Country::query()->WhereDoesntHave('chargeCountry')->get();
+                $ps = Country::query()->where('status', 1)->WhereDoesntHave('chargeCountry')->get();
                 $ops = [];
                 foreach ($ps as $p) {
                     $ops[$p->id] = app()->getLocale() === 'ar' ? $p->name : $p->e_name;
@@ -158,7 +158,7 @@ class ChargeCountryController extends MainController
 
             $form->select('country_id', __('Country'))
                 ->options(function () use ($form) {
-                    $ps = Country::query()->where('status', 1)
+                    $ps = Country::query()
                         ->where(function ($q) use ($form) {
                             $q->whereDoesntHave('chargeCountry')
                                 ->orWhere('id', $form->model()->country_id); // include current country
