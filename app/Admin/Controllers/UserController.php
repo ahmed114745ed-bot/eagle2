@@ -263,7 +263,7 @@ class UserController extends MainController
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
 
-        $grid->column('versions', __('Versions'))->modal(__('Versions'), function () {
+        $grid->column('versions', __('versions'))->modal(__('versions'), function () {
             $data = [
                 ['iOS',     $this->ios_version],
                 ['Huawei',  $this->huawei_version],
