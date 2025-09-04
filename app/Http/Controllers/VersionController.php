@@ -51,6 +51,8 @@ class VersionController extends Controller
         $isRoomBoomVideoUpdated = $this->isUpdated('room_boom_video_update_at', @$request->room_boom_video_update_at);
         $reelSettings = Setting::where('key', 'reel_status')->first();
         $images = $this->isUpdated('images_updated_at', @$request->images_time);
+        $ground = $this->isUpdated('ground_updated_at', @$request->ground_time);
+        $colorsUpdate = $this->isUpdated('colors_updated_at', @$request->colors_updated_time);
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (int)$version,
@@ -68,8 +70,8 @@ class VersionController extends Controller
                 'bubble_frame' => $isBubbleFrameUpdated,
                 'room_boom_videos' => $isRoomBoomVideoUpdated,
                 'wapple' => $wapple ?? false,
-                'colors' => settings()->get('colors_updated_at') ?? false,
-                'background' => settings()->get('ground_updated_at') ?? false,
+                'colors' =>  $colorsUpdate,
+                'background' => $ground,
                 'host_agency' => (bool)\Cache::get('host_agency'),
                 'color_time'  => $isColorSettingUpdated,
                 //intro - frames - extradata - emoji
