@@ -37,7 +37,9 @@ class UserResource extends JsonResource
         $vip_level = (gettype($vip) == 'array') ? $vip['level'] : 0;
         // $frame  = Common::getUserDress($this->id, $this->dress_1, 4, 'img2') ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1');
         $frameDress  = $this->dress1;
-        $frame  = ($this->packs->where('type', 4)->first() != null) ? (($frameDress != null) ? $frameDress->img2 : '') : '';
+
+        
+        $frame = Common::getUserDress($this->id, $this->dress_1, 4, 'show_img', true);
 
         $pass_status = false;
         $now_room    = Room::query()->where('uid', $this->now_room_uid)->first();

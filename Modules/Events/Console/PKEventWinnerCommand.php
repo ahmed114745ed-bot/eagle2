@@ -114,11 +114,11 @@ class PKEventWinnerCommand extends Command
                     break;
                 case "vip":
                     $vip = OVip::find($reward->target);
-                    UserCommon::addVipToUser($user, $vip, $reward->expire);
+                    UserCommon::addVipToUser($user, $vip, $reward->expire,null,'pk-event');
                     break;
                 case "ware":
                     $ware = Ware::find($reward->target);
-                    UserCommon::addWareToUser($user, $ware, $reward->expire);
+                    UserCommon::addWareToUser($user, $ware, $reward->expire , null ,'pk-event');
                     break;
                 case "achievement":
                     $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");

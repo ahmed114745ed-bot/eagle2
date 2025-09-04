@@ -78,15 +78,15 @@ class UserHandling
             ->where('type_user', '!=', 0)
             ->pluck('id')->toArray();
     }
-    public function AddUserVip(User $user, $type = null)
+    public function AddUserVip(User $user, $type = null,$receiveType=null)
     {
-        $vip = OVip::query()->whereLevel(2)->first();
+        // $vip = OVip::query()->whereLevel(2)->first();
 
-        if ($vip) {
+        // if ($vip) {
 
-            VipCommon::createUserVip($vip ,$user ,$vip->expire , null ,$type);
+        //     VipCommon::createUserVip($vip ,$user ,$vip->expire , null ,$type,1,0,0,$receiveType);
 
-        }
+        // }
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void
     {
@@ -138,11 +138,8 @@ class UserHandling
     private function clearUserAgencyLogs(User $user)
     {
         $agencyId = $user->agency_id;
-        GiftLog::query()->where('receiver_id', $user->id)->where('agency_id', $agencyId)->update(['agency_id' => 0]);
-        LiveTime::query()->where('uid', $user->id)
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->delete();
+        GiftLog::query()->where('receiver_id', $user->id)
+        ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
     }
     

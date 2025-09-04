@@ -125,9 +125,9 @@ class AchievementDedicateController extends MainController
             if (request()->filled('_export_')) {
                 return "{$name} (ID: {$id})";
             }
-            $path = $this->admin->avatar ?? null;
+            $path = @$this->admin->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $url = $path ?? $defaultImage;
 
             // Check if the image exists
             if (!isImageExists($url)) {

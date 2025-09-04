@@ -14,11 +14,11 @@ class CoinsTarget
     public static function assignVipUser($vipId, $expire, $userOne)
     {
         $vip = OVip::find($vipId);
-        UserCommon::addVipToUser($userOne, $vip, $expire);
+        UserCommon::addVipToUser($userOne, $vip, $expire,null,'coins-target');
     }
 
-    public static function assignWareUser($ware, $reward, $user){
-        UserCommon::addWareToUser($user, $ware, $reward->expire);
+    public static function assignWareUser($ware, $reward, $user ){
+        UserCommon::addWareToUser($user, $ware, $reward->expire , null ,'coin-target');
     }
 
     public static function assignAchievementUser($itemId, $expire, $userOne)

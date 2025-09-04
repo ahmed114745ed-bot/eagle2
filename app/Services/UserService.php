@@ -213,32 +213,7 @@ class UserService
 
 
 
-    public function unlockDressHand($userId)
-    {
-        $vip = Common::getLevel($userId, 3);
-        $types = [4, 5, 6, 7, 8];
-        $ids = $this->packRepository->getTargetIdsByUserAndType($userId, $types);
 
-        $wares = $this->packRepository->getWaresByConditions($vip, $types, $ids);
-
-        if ($wares->isEmpty()) return 0;
-
-        foreach ($wares as $ware) {
-            $pack = $this->packRepository->getExistingPack($userId, $ware->type, $ware->id);
-            if ($pack) continue;
-
-            $data = [
-                'user_id'   => $userId,
-                'type'      => $ware->type,
-                'target_id' => $ware->id,
-                'expire'    => $ware->expire ? time() + ($ware->expire * 86400) : 0,
-                'is_read'   => 1,
-            ];
-
-            $this->packRepository->createPack($data);
-        }
-        return count($wares);
-    }
 
     public function updateLocation($userId, $lat, $log)
     {
@@ -1073,7 +1048,7 @@ class UserService
 
     public function sendPack($user, $request)
     {
-        $pack = $this->packRepository->pack($request->pack_id, $user->id);
+        $pack = $this->packRepository->UnusedPack($request->pack_id, $user->id);
         if (!$pack) return Common::apiResponse(0, 'item not found or expired', null, 404);
         $ware = $this->wareRepository->findOrFail($pack->target_id);
         if (!$ware) return Common::apiResponse(0, 'product not found', null, 404);
@@ -1081,6 +1056,7 @@ class UserService
         if (!$to) return Common::apiResponse(0, 'user not found', null, 404);
         $pack->user_id   = $to->id;
         $pack->sender_id = $user->id;
+        $pack->receive_type = 'send-ware';
         $pack->save();
         CustomNotification::mallSend($user, $to, $pack->type, $ware->show_img);
         return Common::apiResponse(1, 'sent successfully');
@@ -1141,7 +1117,7 @@ class UserService
             'next_exp'      => @$secondLevel ?  @$secondLevel->exp ?? 0 : ($currentLevel->exp ?? 0),
             'next_img'      => @$secondLevel ? @$secondLevel->img ?? '' : $currentLevel->img ?? '',
             'remaining'     => @$remaining ?? 0,
-            'progress'      => (integer)(@$progress?? 0) ,
+            'progress'      => (int)(@$progress ?? 0),
             'exp_charge' =>  $expPercentages['exp_charge_percentage'] ?? 1,
         ];
 
@@ -1166,7 +1142,7 @@ class UserService
                 ->exists();
 
             if (! $exists) {
-              
+
                 $user->is_bd = 0;
                 $user->save();
             }

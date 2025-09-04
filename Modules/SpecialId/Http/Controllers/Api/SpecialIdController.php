@@ -22,90 +22,120 @@ class SpecialIdController extends Controller
 {
     public function buySpecialId(Request $request)
     {
-        $user    = $request->user();
+        $user       = $request->user();
         $special_id = $request->special_id;
-        if (!$special_id) return Common::apiResponse(0, 'missing params', null, 422);
-        $ware = Ware::query()->isNotUsedInPacks()->where('id', $special_id)
+
+        if (!$special_id) {
+            return Common::apiResponse(false, 'missing params', null, 422);
+        }
+
+        // Check ware availability
+        $ware = Ware::query()
+            ->isNotUsedInPacks()
+            ->where('id', $special_id)
             ->where('enable', 1)
             ->first();
-        if (!$ware) return Common::apiResponse(0, 'item not found or not for sale', null, 404);
-        /*$check_athor=Pack::query()->where('user_id', $user->id)->whereType(25)->where('target_id','!=', $special_id)->first();
-        if ($check_athor) return Common::apiResponse(0, 'انت بلفعل ستخدم احدي المعرفات الخاصه!', null, 404);
-        */
-        $pack        = Pack::query()->where('user_id', $user->id)->where('target_id', $special_id)->first();
-        $total_price = $ware->price;
-        if ($user->di < $total_price) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
-        if ($pack) {
-            if ($pack->expire == 0) return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
-            if ($pack->expire > now()->timestamp) {
-                if ($ware->expire != 0) {
-                    DB::beginTransaction();
-                    try {
-                        $pack->expire += (now()->addDays($ware->expire)->timestamp * 86400);
-                        $pack->price += $total_price;
 
-                        $amountBefore = $user->di;
-                        $logAmount = -abs($total_price);
-                        UserCoinLogHelper::logByType(
-                            $user->id ,
-                            $logAmount,
-                            $amountBefore,
-                            UserCoinLogType::PACK,
-                            $ware->name
-                        );
-
-                        $user->decrement('di', $total_price);
-                        $pack->save();
-                        $user->save();
-                
-                        DB::commit();
-                        (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
-                        return Common::apiResponse(1, 'success process');
-                    } catch (\Exception $exception) {
-                        DB::rollBack();
-                        return Common::apiResponse(0, 'fail', null, 400);
-                    }
-                } else {
-                    return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
-                }
-            } else {
-                $pack->delete();
-            }
+        if (!$ware) {
+            return Common::apiResponse(false, 'item not found or not for sale', null, 404);
         }
 
-        DB::beginTransaction();
-        try {
-            $arr['user_id']   = $user->id;
-            $arr['type']      = $ware->type;
-            $arr['get_type']  = $ware->get_type;
-            $arr['target_id'] = $ware->id;
-            $arr['num']       = 1; //$qty;
-            $arr['expire']    = $ware->expire ? now()->addDays($ware->expire)->timestamp  : 0;
-            $arr['is_read']   = 1;
-            $arr['use_num']   = $ware->num;
-            $arr['price']     = $total_price;
-            $newPack = Pack::query()->create($arr);
+        $total_price = $ware->price;
 
-            $amountBefore = $user->di;
-            $logAmount = -abs($total_price);
-            UserCoinLogHelper::logByType(
-                $user->id ,
-                $logAmount,
-                $amountBefore,
-                UserCoinLogType::PACK,
-                $ware->name
-            );
-            $user->decrement('di', $total_price);
-         
-            
+        if ($user->di < $total_price) {
+            return Common::apiResponse(false, 'Insufficient balance, please go to recharge!', null, 407);
+        }
+
+        // Check existing pack
+        $pack = Pack::query()
+            ->where('user_id', $user->id)
+            ->where('target_id', $special_id)
+            ->first();
+
+        try {
+            DB::beginTransaction();
+
+            if ($pack) {
+                if ($pack->expire == 0) {
+                    return Common::apiResponse(false, 'you already have this item permanently', null, 405);
+                }
+
+                if (!is_null($pack->expire) && $pack->expire > now()->timestamp) {
+                    if ($ware->expire == 0) {
+                        return Common::apiResponse(false, 'you already have this item in your pack', null, 405);
+                    }
+
+                    // Extend expire
+                    $pack->expire = now()->addDays($ware->expire)->timestamp;
+                } elseif (is_null($pack->expire)) {
+                    if ($ware->expire == 0) {
+                        return Common::apiResponse(false, 'you already have this item in your pack', null, 405);
+                    }
+
+                    // Add more days
+                    $pack->days += $ware->expire;
+                } else {
+                    // expired => remove
+                    $pack->delete();
+                    $pack = null;
+                }
+
+                if ($pack) {
+                    $pack->price += $total_price;
+                    $pack->save();
+                }
+            }
+
+            // If no pack, create new
+            if (!$pack) {
+                $pack = Pack::create([
+                    'user_id'       => $user->id,
+                    'type'          => $ware->type,
+                    'get_type'      => $ware->get_type,
+                    'target_id'     => $ware->id,
+                    'num'           => 1,
+                    'days'          => $ware->expire,
+                    'is_read'       => 1,
+                    'use_num'       => $ware->num,
+                    'price'         => $total_price,
+                    'receive_type'  => 'buy-special-id',
+                ]);
+            }
+
+            // Deduct balance + log
+            $this->deductAndLog($user, $total_price, $ware->name);
+
             DB::commit();
+
+            // Upgrade service
             (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
-            return Common::apiResponse(1, 'success process');
-        } catch (\Exception $exception) {
+
+            return Common::apiResponse(true, 'success process');
+        } catch (\Exception $e) {
             DB::rollBack();
-            return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
+            return Common::apiResponse(false, 'an error occurred please try again later!', null, 400);
         }
     }
+
+    /**
+     * Deduct balance and log transaction
+     */
+    protected function deductAndLog($user, $amount, $wareName)
+    {
+        $amountBefore = $user->di;
+        $logAmount    = -abs($amount);
+
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $logAmount,
+            $amountBefore,
+            UserCoinLogType::PACK,
+            $wareName
+        );
+
+        $user->decrement('di', $amount);
+    }
+
 
     public function usePackItem(Request $request)
     {
@@ -129,8 +159,14 @@ class SpecialIdController extends Controller
                     ->where('id', '!=', $pack->id)
                     ->update(['is_used' => 0]);
             }
+            if (is_null($pack->expire)) {
+                $expire =    $pack->days ? now()->addDays($pack->days)->timestamp  : 0;
+                $pack->update(['is_used' => $status, 'use_num' => 1, 'expire' => $expire]);
+            } else {
+                $pack->update(['is_used' => $status, 'use_num' => 1]);
+            }
 
-            $pack->update(['is_used' => $status, 'use_num' => 1]);
+
             SpecialHistory::where('user_id', $user->id)->where('ware_id', '!=', $pack->target_id)->update(['status' => 0]);
             $specialHistory =  SpecialHistory::where([
                 'user_id' => $user->id,

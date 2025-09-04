@@ -63,13 +63,14 @@ class ChatMessagesController extends Controller
 
         $total_message = $this->chatService->countMessagesByUserInRoom($chatRoom->id, $user->id);
 
-        if ($chatRoom->type == 'guest' && $total_message >= 3) {
+        $totalDistinctUsers = $this->chatService->countDistinctUsersInRoom($chatRoom->id);
+
+        if ($chatRoom->type == 'guest' && $total_message >= 3 && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 404,
                 'message' => 'You have reached the limit for sending messages',
             ], 404);
         }
-
 
         //get user 2
         if ($chatRoom->user_id == $user->id) {
@@ -122,10 +123,17 @@ class ChatMessagesController extends Controller
         $response = $this->messageService->handleMessage($request, $message, $user, $user2, $chatRoom);
 
         //add status for message
+        if ($totalDistinctUsers >= 2) {
+            $chatRoom->type = 'friend';
+        }
 
-        // return $user2;
-        event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
-        event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
+        try {
+            // return $user2;
+            event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
+            event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
+        } catch (\Throwable $e) {
+        }
+
         return [
             'message' =>    $response['message_resource'],
             'card' =>  new ChatRoomResource($chatRoom)
@@ -134,7 +142,7 @@ class ChatMessagesController extends Controller
 
     private function isValidFileExtension($file, $validExtensions)
     {
-        $extension = $file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExteension();
 
         return in_array($extension, $validExtensions);
     }

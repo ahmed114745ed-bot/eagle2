@@ -3,6 +3,7 @@
 namespace App\Tik\Repositories;
 
 use App\Models\EnteredRoom;
+use App\Models\Pack;
 use App\Models\Room;
 use App\Models\RoomPrivateMessages;
 use Auth;
@@ -98,8 +99,19 @@ class RoomRepository extends AbstractRepository
         $roomType = $req->room_type ?? 'audio';
         $user = $req?->user();
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+
+        $blockedUserIds = Pack::query()
+            ->select('user_id')
+            ->where('type', 16)
+            ->where('is_used', 1)
+            ->where(function ($q) {
+                $q->where('expire', 0)
+                    ->orWhere('expire', '>=', now()->timestamp);
+            })
+            ->pluck('user_id');
+
         $result = $this->model->withLuckyBoxFlag($user->id)
-            ->select(['id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at',])
+            ->select(['id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
             ->with([
             'backgroundImage:request_background_images.id,owner_room_id,img',
             'lastPk:id,room_id',
@@ -118,47 +130,36 @@ class RoomRepository extends AbstractRepository
         ])
         ->withCount('roomVisitors')
         ->whereHas('owner')
-        ->whereDoesntHave('owner.packs', function ($q) {
-            $q->where('type', 16)
-                ->where('is_used', 1)
-                ->where(function ($q) {
-                    $q->where('expire', 0)
-                        ->orWhere('expire', '>=', now()->timestamp);
-                });
-        })
+        ->whereNotIn('uid', $blockedUserIds)
+//        ->whereDoesntHave('owner.packs', function ($q) {
+//            $q->where('type', 16)
+//                ->where('is_used', 1)
+//                ->where(function ($q) {
+//                    $q->where('expire', 0)
+//                        ->orWhere('expire', '>=', now()->timestamp);
+//                });
+//        })
         ->where('room_status', 1);
 
-        // الترتيب الأساسي: الدبوس أولاً ثم عدد الزوار ثم الساعة الساخنة
         $result->orderByDesc('pin');
 
-
-        // إذا كان make_rooms_top صحيحاً، نضيف شروط إضافية
-        if ($topRooms) {
-//            $result->where(function ($query) {
-//                $query->where(fn($q) => $q->has("roomVisitors"))
-//                    ->orWhere(fn($q) => $q->where('pin', 1))
-//                    ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
-//            });
-
+        if ($topRooms && $roomType != 'live') {
             $result->orderByRaw('is_top = 1 DESC');
         }else {
             $result->where(function ($query) {
-                $query->whereHas('roomVisitors')
-                    ->orWhere('pin', 1);
+                $query->whereHas('roomVisitors')->orWhere('pin', 1);
             });
         }
         $result->orderByDesc('room_visitors_count');
 
         $result->orderByDesc('hour_hot');
 
-        // تصفية حسب البلد إذا تم توفيره
         if (!is_null($req->country_id)) {
             $result->whereHas('owner', function ($q) use ($req) {
                 $q->where('country_id', $req->country_id);
             });
         }
 
-        // تطبيق الفلاتر بناءً على معامل 'filter'
         switch ($req->filter) {
             case 'boss':
                 $roomIds = EnteredRoom::query()
@@ -239,12 +240,10 @@ class RoomRepository extends AbstractRepository
                 break;
         }
 
-        // تصفية حسب IDs إذا تم توفيرها
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);
         }
 
-        // تصفية حسب نوع الغرفة
         return $result->when($roomType != 'live', function ($q) use ($roomType) {
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {

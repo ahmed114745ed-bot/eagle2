@@ -84,6 +84,15 @@ class VipCollectionBuilderService
         return $this;
     }
 
+    public function limit(int $count): static
+    {
+        $this->query = $this->useCache
+            ? $this->query->take($count)
+            : $this->query->limit($count);
+
+        return $this;
+    }
+
     public function count(): int
     {
         return $this->query->count();

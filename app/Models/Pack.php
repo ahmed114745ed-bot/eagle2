@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\AutoReceiveType;
 use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Modules\Vip\Entities\UserVip;
 
 class Pack extends Model
 {
-    use SoftDeletes, TimestampsWithTimezone;
+    use SoftDeletes, TimestampsWithTimezone, AutoReceiveType;
 
     protected $guarded = [];
 
@@ -34,7 +35,7 @@ class Pack extends Model
 
     public function sender()
     {
-        return $this->belongTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function admin()
@@ -160,7 +161,12 @@ class Pack extends Model
 
     public function getFormattedExpireAttribute()
     {
-        return $this->expire ? date('Y-m-d H:i:s', $this->expire) : 0;
+        if (!is_null($this->expire)) {
+            return date('Y-m-d H:i:s', $this->expire);
+        }
+
+        // if expire is NULL
+        return $this->days ?? 0;
     }
 
     public function getIsDressAttribute()
@@ -211,5 +217,4 @@ class Pack extends Model
         }
         return Carbon::parse($this->created_at)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
-
 }

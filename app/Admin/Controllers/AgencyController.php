@@ -87,7 +87,7 @@ class AgencyController extends MainController
         if (! Admin::user()->can('*')) {
             Permission::check('show-' . $this->permission_name);
         }
-
+        $timezone = getTimezone();
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $uuid = request('uuid');
@@ -242,8 +242,8 @@ class AgencyController extends MainController
 
         $sumTargets = GiftLog::where('agency_id', $agencyId)
             ->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth(),
+                Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC'),
+                Carbon::now($timezone)->endOfMonth()->copy()->setTimezone('UTC'),
             ])
             ->sum('giftPrice');
 
@@ -450,15 +450,15 @@ class AgencyController extends MainController
 
         $grid->column('phone', trans('phone'))->display(function ($number) {
             if (!$number) return '-';
-        
+
             $iconUrl = asset('images/phone.jpg');
             $phoneCode = $this->phone_code;
             $locale = app()->getLocale();
-        
+
             // RTL لو عربي، LTR لو إنجليزي
             $direction = ($locale === 'ar') ? 'row-reverse' : 'row';
             $margin = ($locale === 'ar') ? 'margin-left:5px;' : 'margin-right:5px;';
-        
+
             return "
                 <div style='display: ; align-items: center; flex-direction: {$direction};'>
                     <img src='{$iconUrl}' alt='flag' width='20' height='20' style='{$margin} filter: invert(1);'>
@@ -632,29 +632,29 @@ class AgencyController extends MainController
     protected function form()
     {
         $form = new Form(new Agency());
-    
+
         $this->disableFormTools($form);
-    
+
         $this->addHiddenFields($form);
         $this->addMainFields($form);
         $this->addPhoneFields($form);
         $this->addSavingLogic($form);
         $this->addSavedLogic($form);
         $this->addFooter($form);
-    
+
         return $form;
     }
-    
+
     protected function addHiddenFields(Form $form)
     {
         $form->hidden('type', __('type'))->default(1);
         $form->hidden('is_frozen', __('is_frozen'))->default(0);
     }
-    
+
     protected function addMainFields(Form $form)
     {
         $form->display('ID');
-    
+
         if (!$form->isEditing()) {
             $form->row(function ($row) {
                 $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name');
@@ -672,18 +672,18 @@ class AgencyController extends MainController
             });
         }
     }
-    
+
     protected function bdOptions($editing = false)
     {
         return function ($value) use ($editing) {
             $ops = [];
             foreach (Bd::where('id', $value)->get() as $user) {
-                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
+                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
             }
             return $ops;
         };
     }
-    
+
     protected function ownerOptions($editing = false)
     {
         return function ($value) use ($editing) {
@@ -694,12 +694,24 @@ class AgencyController extends MainController
             return $ops;
         };
     }
-    
+
     protected function addPhoneFields(Form $form)
     {
         $form->row(function ($row) {
-            $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input')->attribute('maxlength', 10);  
-            $row->hidden('phone_code');
+            $row->width(9)->text('phone', __('agency whatsApp number'))
+                ->rules('required')
+                ->attribute('id', 'phone-input')
+                ->attribute('maxlength', 12)
+                ->default(function ($form) {
+                    if ($form->model()->phone && $form->model()->phone_code) {
+                        return $form->model()->phone;
+                    }
+                    return null;
+                });
+    
+            $row->hidden('phone_code')->default(function ($form) {
+                return $form->model()->phone_code ?? '';
+            });
         });
     
         if (Session::has('show_alert')) {
@@ -709,6 +721,7 @@ class AgencyController extends MainController
         Admin::script($this->phoneJs());
     }
     
+
     protected function phoneJs()
     {
         return <<<JS
@@ -738,15 +751,17 @@ class AgencyController extends MainController
     $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
     JS;
     }
-    
+
     protected function addSavingLogic(Form $form)
     {
+
         $form->saving(function (Form $form) {
+            $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
-    
+
             if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $form->model()->id);
                 User::find($originalOwnerId)->update([
@@ -755,34 +770,39 @@ class AgencyController extends MainController
                     'is_host' => 0,
                 ]);
                 uploadMonthlyDiamondReceive($originalOwnerId, 0);
-
             }
-    
+
             User::where('id', intval($appOwnerId))->update([
                 'type_user' => 2,
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
+
+
+            if (!request('bd_id') && $isEditing) {
+                $admin =  Bd::where('default', 1)->first();
+                $form->bd_id = $admin->id;
+            }
         });
     }
-    
+
     protected function addSavedLogic(Form $form)
     {
         $form->saved(function (Form $form) {
             $appOwnerId = intval($form->model()->app_owner_id);
-    
+
             User::where('id', $appOwnerId)->update([
                 'type_user' => 2,
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
-    
+
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
                 'agency_id' => $form->model()->id,
                 'type' => 1,
             ])->whereNull('leave_date')->exists();
-    
+
             if (!$exists) {
                 UsersJoinedAgency::create([
                     'user_id' => $appOwnerId,
@@ -794,7 +814,7 @@ class AgencyController extends MainController
             }
         });
     }
-    
+
     protected function addFooter(Form $form)
     {
         $form->footer(function ($footer) {
@@ -1054,7 +1074,7 @@ class AgencyController extends MainController
             UsersJoinedAgency::create($joinAgencyData);
         }
         // add vip to user
-        UserCommon::userVip($user);
+        UserCommon::userVip($user,'acceptJoin');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([

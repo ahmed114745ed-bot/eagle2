@@ -204,6 +204,7 @@ class AuthService
      */
     public function storeImage($request, $data, $user)
     {
+        
         if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
             $img = $request['image'];
             $imageType = $img->getClientOriginalExtension();
@@ -215,10 +216,7 @@ class AuthService
             $user->save();
             $user->load('profile');
             $profile = $user->profile;
-            if ($profile) {
-                $profile->fill($data);
-                $profile->save();
-            } else {
+            if (!$profile) {
                 $profile = Profile::create([
                     'gender' => null,
                     'birthday' => null,

@@ -374,6 +374,7 @@ class User extends Authenticatable
         $userSallary = UserSallary::query()
             ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
             ->where('user_id', $this->id)
+            ->where('is_finished', 0)
             ->where('user_agency_id', '=', $agencyId)
             ->where('month', $month)
             ->where('year', $year)
@@ -1719,6 +1720,7 @@ class User extends Authenticatable
         $join = $this->latestJoin()->first();
 
         return $this->hasOne(UserSallary::class, 'user_id')
+            ->where('is_finished', 0)
             ->where(function ($query) use ($join) {
                 if ($join) {
                     $start = $join->join_date;
@@ -1872,4 +1874,10 @@ class User extends Authenticatable
                     });
 }
 
+
+
+public function giftLogs()
+{
+    return $this->hasMany(GiftLog::class, 'receiver_id');
+}
 }

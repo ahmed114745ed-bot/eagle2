@@ -36,7 +36,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Selectable\ImageColors;
 use Illuminate\Support\Facades\Cache;
-use App\Admin\Actions\DeletePackAction;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
@@ -45,8 +44,6 @@ use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
-use App\Admin\Actions\DeleteUserVipAction;
-use App\Admin\Actions\EditPackExpireAction;
 use App\Models\Profile;
 use App\Models\UsersJoinedAgency;
 
@@ -163,17 +160,17 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','transfer_salary','is_bd'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','huawei_version','android_version','ios_version', 'transfer_salary', 'is_bd'])
             ->with([
-            'profile',
-            'agency',
-            'userSetting',
-//            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
-            'senderLevel',
-            'receiverLevel',
-            'monthlyDiamondReceive',
-            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ])->withCount('sameDeviceUsers');
+                'profile',
+                'agency',
+                'userSetting',
+                //            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
+                'senderLevel',
+                'receiverLevel',
+                'monthlyDiamondReceive',
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])->withCount('sameDeviceUsers');
 
         if (request()->online == 1) {
             $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)
@@ -265,24 +262,66 @@ class UserController extends MainController
             $count = $this->same_device_users_count;
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
+
+        $grid->column('versions', __('versions'))->modal(__('versions'), function () {
+            $data = [
+                ['iOS',     $this->ios_version],
+                ['Huawei',  $this->huawei_version],
+                ['Android', $this->android_version],
+            ];
+
+            return new Table(
+                [__('Name'), __('Version')], // headers
+                $data                        // rows
+            );
+        });
         $permission = $this->permission_name;
 
 
+        // $grid->column('bd_action', __('BD Action'))->display(function () {
+        //     if ($this->is_bd == 1) {
+        //         $btn  = '<button type="button" class="btn btn-danger btn-sm remove-bd-btn" ';
+        //         $btn .= 'data-id="' . $this->id . '" data-url="' . route('users.remove', $this->id) . '">';
+        //         $btn .= __('Remove BD') . '</button>';
+        //         return $btn;
+        //     }
+        //     return '';
+        // });
 
+        // Admin::script(<<<'JS'
+        //     $(document).on('click', '.remove-bd-btn', function (e) {
+        //         e.preventDefault();
+        //         let btn = $(this);
+        //         let url = btn.data('url');
 
-        $grid->column('bd_action', __('BD Action'))->display(function () {
-            if ($this->is_bd == 1) {
+        //         Swal.fire({
+        //             title: 'هل أنت متأكد؟',
+        //             text: "لن تستطيع التراجع بعد الحذف!",
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#d33',
+        //             cancelButtonColor: '#3085d6',
+        //             confirmButtonText: 'نعم، احذف',
+        //             cancelButtonText: 'إلغاء'
+        //         }).then((result) => {
+        //             if (result.value) {
+        //                 let form = $('<form>', {
+        //                     'method': 'POST',
+        //                     'action': url
+        //                 }).append($('<input>', {
+        //                     'type': 'hidden',
+        //                     'name': '_token',
+        //                     'value': LA.token
+        //                 })).append($('<input>', {
+        //                     'type': 'hidden',
+        //                     'name': '_method',
+        //                     'value': 'POST'  
+        //                 }));
+        //                 form.appendTo('body').submit();
+        //             }
+        //         });
+        //     });
+        // JS);
 
-                $form = '<form method="POST" action="' . route('users.remove', $this->id) . '" style="display:inline">';
-                $form .= csrf_field();
-                $form .= method_field('POST');
-                $form .= '<button type="submit" class="btn btn-danger btn-sm">'
-                    . __('Remove BD') . '</button>';
-                $form .= '</form>';
-                return $form;
-            }
-            return '';
-        });
 
 
         Admin::script("
@@ -441,8 +480,9 @@ class UserController extends MainController
         return $this->form()->update($id);
     }
 
-    public function show($id, Content $content,)
+    public function show($id, Content $content)
     {
+        $timezone = Common::timeZone();
         $month = request('month'); // e.g., "5" for May
         $year = request('year');
         $start = request('start_at');
@@ -505,11 +545,11 @@ class UserController extends MainController
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
             $q->where('sender_id', $id);
-        })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end) {
-            $query->whereBetween('created_at', [
-                Carbon::parse($start)->startOfDay(),
-                Carbon::parse($end)->endOfDay()
-            ]);
+        })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end, $timezone) {
+            $startUtc = Carbon::parse($start, $timezone)->startOfDay()->timezone('UTC');
+            $endUtc   = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
+
+            $query->whereBetween('created_at', [$startUtc, $endUtc]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
             $query->where('agency_id', $agencyId);
         })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
@@ -518,11 +558,11 @@ class UserController extends MainController
             $q->where('receiver_id', $id);
         })->when($giftType == 'sender', function ($q) use ($id) {
             $q->where('sender_id', $id);
-        })->when(isset($start) && isset($end), function ($query) use ($start, $end) {
-            $query->whereBetween('created_at', [
-                Carbon::parse($start)->startOfDay(),
-                Carbon::parse($end)->endOfDay()
-            ]);
+        })->when(isset($start) && isset($end), function ($query) use ($start, $end, $timezone) {
+            $startUtc = Carbon::parse($start, $timezone)->startOfDay()->timezone('UTC');
+            $endUtc   = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
+
+            $query->whereBetween('created_at', [$startUtc, $endUtc]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
             $query->where('agency_id', $agencyId);
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
@@ -542,7 +582,7 @@ class UserController extends MainController
 
 
         $countries = $this->countries();
-        $data = compact('user', 'packs', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
+        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
@@ -631,7 +671,7 @@ class UserController extends MainController
 
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
 
-       // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
+        // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
@@ -933,7 +973,7 @@ class UserController extends MainController
         return Redirect::back();
     }
 
-// app/Admin/Controllers/UsersAppController.php
+    // app/Admin/Controllers/UsersAppController.php
 
     public function ajaxSameDeviceUsersTable($id)
     {
@@ -979,13 +1019,10 @@ class UserController extends MainController
     {
 
         Bd::where('app_id', $id)->update(['app_id' => 0]);
-
         $user = User::findOrFail($id);
         $user->is_bd = 0;
         $user->save();
 
         return redirect()->back();
     }
-
-
 }

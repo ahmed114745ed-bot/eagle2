@@ -17,25 +17,24 @@ class GiftRepository extends AbstractRepository
     public function all($type)
     {
         $user = Auth::user();
-     
-       
+
+
         if ($type == 11 && $user) {
-       
+
             return $user->myGifts()
                 ->withPivot('quantity')
-                ->where('enable', 1)
                 ->orderBy('use_count', 'desc')
                 ->orderByRaw('ISNULL(`sort`), `sort`')
                 ->orderBy('price')
                 ->get();
         }
-    
+
         $query = $this->model->newQuery()->where('enable', 1);
-    
+
         if ($type) {
             $query->where('type', $type);
         }
-    
+
         return $query->orderBy('use_count', 'desc')
             ->orderByRaw('ISNULL(`sort`), `sort`')
             ->orderBy('price')
@@ -44,13 +43,13 @@ class GiftRepository extends AbstractRepository
 
     public function get_images()
     {
-       
+
             return $this->model->query()
                 ->where('enable', 1)
-                ->pluck('img'); 
-       
+                ->pluck('img');
+
     }
-    
+
     public function allGifts($page, $perPage)
     {
         $gifts = $this->model->query()->where('type', '!=', 8)->orderBy("use_count", "desc");

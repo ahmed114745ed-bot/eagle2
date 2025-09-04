@@ -2,6 +2,7 @@
 
 namespace App\Admin\Actions;
 
+use App\Helpers\PackHelper;
 use Carbon\Carbon;
 use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
@@ -83,6 +84,7 @@ class DedicateAction extends RowAction
                 $arr['num'] = 1; //$qty;
                 $arr['expire'] = $request->days ? time() + (($request->days ?? $ware->expire) * 86400) : 0;
                 $arr['is_read'] = 1;
+                $arr['receive_type'] ='dash-dedicate';
 
                 $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
                 $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;
@@ -92,6 +94,8 @@ class DedicateAction extends RowAction
                     $user->special_id = $ware->value;
                     $user->save();
                 }
+
+
                 DB::commit();
                 (new UserCounterServices)->eventUser($user,'mybag',1);
                 CustomNotification::wareVip($user, $request->days, $ware->name, $ware->show_img);
@@ -123,7 +127,7 @@ class DedicateAction extends RowAction
                 $userVip = UserVip::query()->where($uniqueAttributes)->first();
                 if (!$userVip) {
 
-                    VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id() );
+                    VipCommon::createUserVip($vip ,$user ,$request->days , auth()->id() ,'',1,0,0,'dash-dedicate');
 
                 } else {
                     $userVip->qty++;

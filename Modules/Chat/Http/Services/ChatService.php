@@ -44,6 +44,11 @@ class ChatService
         return $this->chatRepository->countMessagesByUserInRoom($chatRoomId, $userId);
     }
 
+    public function countDistinctUsersInRoom($chatRoomId)
+    {
+        return $this->chatRepository->countDistinctUsersInRoom($chatRoomId);
+    }
+
     public function createChatMessage(array $data)
     {
         return $this->chatRepository->createChatMessage($data);

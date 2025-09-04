@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\LogHelper;
 use App\Services\PayPalService;
 use Closure;
 use Illuminate\Http\Request;
@@ -17,22 +18,31 @@ class VerifyPayPalWebhook extends PayPalService
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $headers = $request->headers;
+        // Get headers as array (case-insensitive normalization)
+        $headers = array_change_key_case(getallheaders(), CASE_UPPER);
+
+        // Get the JSON payload as array
+        $payload = $request->json()->all();
 
         $verificationData = [
-            'auth_algo'         => $headers->get('paypal-auth-algo'),
-            'cert_url'          => $headers->get('paypal-cert-url'),
-            'transmission_id'   => $headers->get('paypal-transmission-id'),
-            'transmission_sig'  => $headers->get('paypal-transmission-sig'),
-            'transmission_time' => $headers->get('paypal-transmission-time'),
-            'webhook_id'        => config('paypal.webhook_id'),
-            'webhook_event'     => $request->all(),
+            'auth_algo'         => $headers['PAYPAL-AUTH-ALGO'] ?? null,
+            'cert_url'          => $headers['PAYPAL-CERT-URL'] ?? null,
+            'transmission_id'   => $headers['PAYPAL-TRANSMISSION-ID'] ?? null,
+            'transmission_sig'  => $headers['PAYPAL-TRANSMISSION-SIG'] ?? null,
+            'transmission_time' => $headers['PAYPAL-TRANSMISSION-TIME'] ?? null,
+            'webhook_id'        => config('paypal.webhook_id'), // must match dashboard
+            'webhook_event'     => $payload, // ✅ JSON object, not string
         ];
 
-        $accessToken = (new PayPalService())->getAccessToken();
-
-        $response = Http::withToken($accessToken)
+        $response = Http::withToken(app(PayPalService::class)->getAccessToken())
             ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', $verificationData);
+
+        LogHelper::info('PayPal webhook verification', [
+            'headers'  => $headers,
+            'payload'  => $payload,
+            'status'   => $response->status(),
+            'response' => $response->json(),
+        ]);
 
         if ($response->json('verification_status') !== 'SUCCESS') {
             return response()->json(['status' => 'unauthorized'], 401);
@@ -40,4 +50,5 @@ class VerifyPayPalWebhook extends PayPalService
 
         return $next($request);
     }
+
 }

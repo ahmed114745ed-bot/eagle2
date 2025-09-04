@@ -56,7 +56,7 @@ class BoxController extends Controller
         $box = Box::query()->find($request->box_id);
         if (!$box) return Common::apiResponse(0, ' box not found', null, 404);
         if (($box->type == 0) && !$request->users_num) return Common::apiResponse(0, 'missing number of users', null, 422);
-        if ($user->di < $box->coins)  return Common::apiResponse(0, 'low balance', null, 407);
+        if ($user->di < $box->coins)  return Common::apiResponse(0, __('low balance'), null, 407);
 
         $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
         // if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
@@ -79,7 +79,7 @@ class BoxController extends Controller
         $box = Box::query()->find($request->box_id);
         if (!$box) return Common::apiResponse(0, ' box not found', null, 404);
         if (($box->type == 0) && !$request->users_num) return Common::apiResponse(0, 'missing number of users', null, 422);
-        if ($user->di < $box->coins)  return Common::apiResponse(0, 'low balance', null, 407);
+        if ($user->di < $box->coins)  return Common::apiResponse(0, __('low balance'), null, 407);
 
         $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
         // if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
@@ -125,6 +125,10 @@ class BoxController extends Controller
 
     public function normalBox($box_use,  $user, $request)
     {
+        if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => $request->bid])->exists()) {
+            return Common::apiResponse(0, 'used it before', null, 403);
+        }
+
 
         if ($box_use->users_num != $box_use->used_num) {
 
@@ -152,9 +156,6 @@ class BoxController extends Controller
                 'label' => $box_use->label,
             ];
 
-            if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => $request->bid])->exists()) {
-                return Common::apiResponse(0, 'used it before', null, 403);
-            }
 
             UserBoxGift::query()->create($data);
 
@@ -162,7 +163,7 @@ class BoxController extends Controller
             $box_use->used_num += 1;
             $box_use->unused_coins -= $coins;
             $box_use->save();
-           // dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
+            // dispatch(new OpenBoxJob($request->bid, $user->id, $user->name))->onQueue('luckyBox');
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
                 $user->id,
@@ -175,6 +176,9 @@ class BoxController extends Controller
 
             if ($box_use->not_used_num == 0) {
                 dispatch(new NormalBoxRtmJob($box_use->id))->onQueue('test-super-lucky-box');
+            }
+            if ($coins > 0) {
+                CustomNotification::luckyBox($user, $coins, $box_use->box->image);
             }
             return Common::apiResponse(1, 'لقد حصل ال مستخدم علي مكسب', ['is_win' => true, 'coins' => (int) $coins], 200);
         } else {

@@ -62,6 +62,7 @@ class MallService
                     'use_num'   => $ware->num,
                     'price'     => $totalPrice,
                     'price_item' => $ware->price,
+                    'receive_type' => 'buy-ware',
                     'days' => $ware->expire ?  $ware->expire  : 0,
                 ];
                 $this->packRepository->create($data);
@@ -114,6 +115,8 @@ class MallService
                 'is_read'   => 1,
                 'use_num'   => $ware->num,
                 'price'     => $totalPrice,
+                'receive_type' => 'send-ware',
+
             ];
             $this->packRepository->create($data);
 
