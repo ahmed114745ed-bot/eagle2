@@ -278,49 +278,49 @@ class UserController extends MainController
         $permission = $this->permission_name;
 
 
-        $grid->column('bd_action', __('BD Action'))->display(function () {
-            if ($this->is_bd == 1) {
-                $btn  = '<button type="button" class="btn btn-danger btn-sm remove-bd-btn" ';
-                $btn .= 'data-id="' . $this->id . '" data-url="' . route('users.remove', $this->id) . '">';
-                $btn .= __('Remove BD') . '</button>';
-                return $btn;
-            }
-            return '';
-        });
+        // $grid->column('bd_action', __('BD Action'))->display(function () {
+        //     if ($this->is_bd == 1) {
+        //         $btn  = '<button type="button" class="btn btn-danger btn-sm remove-bd-btn" ';
+        //         $btn .= 'data-id="' . $this->id . '" data-url="' . route('users.remove', $this->id) . '">';
+        //         $btn .= __('Remove BD') . '</button>';
+        //         return $btn;
+        //     }
+        //     return '';
+        // });
 
-        Admin::script(<<<'JS'
-            $(document).on('click', '.remove-bd-btn', function (e) {
-                e.preventDefault();
-                let btn = $(this);
-                let url = btn.data('url');
+        // Admin::script(<<<'JS'
+        //     $(document).on('click', '.remove-bd-btn', function (e) {
+        //         e.preventDefault();
+        //         let btn = $(this);
+        //         let url = btn.data('url');
         
-                Swal.fire({
-                    title: 'هل أنت متأكد؟',
-                    text: "لن تستطيع التراجع بعد الحذف!",
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'نعم، احذف',
-                    cancelButtonText: 'إلغاء'
-                }).then((result) => {
-                    if (result.value) {
-                        let form = $('<form>', {
-                            'method': 'POST',
-                            'action': url
-                        }).append($('<input>', {
-                            'type': 'hidden',
-                            'name': '_token',
-                            'value': LA.token
-                        })).append($('<input>', {
-                            'type': 'hidden',
-                            'name': '_method',
-                            'value': 'POST'  
-                        }));
-                        form.appendTo('body').submit();
-                    }
-                });
-            });
-        JS);
+        //         Swal.fire({
+        //             title: 'هل أنت متأكد؟',
+        //             text: "لن تستطيع التراجع بعد الحذف!",
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#d33',
+        //             cancelButtonColor: '#3085d6',
+        //             confirmButtonText: 'نعم، احذف',
+        //             cancelButtonText: 'إلغاء'
+        //         }).then((result) => {
+        //             if (result.value) {
+        //                 let form = $('<form>', {
+        //                     'method': 'POST',
+        //                     'action': url
+        //                 }).append($('<input>', {
+        //                     'type': 'hidden',
+        //                     'name': '_token',
+        //                     'value': LA.token
+        //                 })).append($('<input>', {
+        //                     'type': 'hidden',
+        //                     'name': '_method',
+        //                     'value': 'POST'  
+        //                 }));
+        //                 form.appendTo('body').submit();
+        //             }
+        //         });
+        //     });
+        // JS);
 
 
 
