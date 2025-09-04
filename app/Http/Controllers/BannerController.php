@@ -104,7 +104,7 @@ class BannerController extends Controller
             ->where('is_active', true)
             ->whereNotNull('publish_at')
             ->inRandomOrder()
-            ->first();
+            ->get();
         //    return Common::apiResponse(true, 'successful', null);
         }
         // UserBannerShow::where("user_id", $user->id)->delete();
