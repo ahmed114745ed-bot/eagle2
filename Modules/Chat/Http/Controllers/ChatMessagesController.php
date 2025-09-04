@@ -72,7 +72,6 @@ class ChatMessagesController extends Controller
             ], 404);
         }
 
-
         //get user 2
         if ($chatRoom->user_id == $user->id) {
             $user2 = User::withoutAppends()->find($chatRoom->user_id2);
@@ -124,6 +123,9 @@ class ChatMessagesController extends Controller
         $response = $this->messageService->handleMessage($request, $message, $user, $user2, $chatRoom);
 
         //add status for message
+        if ($totalDistinctUsers >= 2) {
+            $chatRoom->type = 'friend';
+        }
 
         try {
             // return $user2;
