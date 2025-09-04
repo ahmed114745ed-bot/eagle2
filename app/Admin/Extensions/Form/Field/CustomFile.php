@@ -24,26 +24,27 @@ class CustomFile extends File
 
     protected function initialPreviewConfig(): array
     {
-        $ext = strtolower(pathinfo($this->value, PATHINFO_EXTENSION));
+        $uniqueId = 'svga_' . uniqid();
 
-        if ($ext === 'svga') {
-            $uniqueId = 'svga_' . uniqid();
+        $config = [
+            'caption'          => basename($this->value),
+            'key'              => 0,
+            'type'             => 'html',
+            'filetype'         => 'svg',
+            'previewAsData'    => false,
+            'previewFileIcon'  => "<div id='{$uniqueId}' style='width:100px;height:100px;'></div>
+            <script>
+                var player = new SVGA.Player('#{$uniqueId}');
+                var parser = new SVGA.Parser('#{$uniqueId}');
+                parser.load('".url($this->value)."', function(videoItem) {
+                    player.setVideoItem(videoItem);
+                    player.startAnimation();
+                });
+            </script>",
+        ];
 
-            return [[
-                'caption' => basename($this->value),
-                'key' => 0,
-                'type' => 'html',
-                'filetype' => 'svga',
-                'previewAsData' => true, // render raw HTML, not icon
-                'data' => "<div id='{$uniqueId}' class='rtlSvga' style='width:100px;height:100px;'></div>",
-            ]];
-        }
-
-        // default for other files
-        return [[
-            'caption' => basename($this->value),
-            'key' => 0,
-        ]];
+        return [$config];
     }
+
 
 }
