@@ -94,7 +94,6 @@ class ChargeCountryController extends MainController
         $grid->column('country.name', trans('arabic name'));
         $grid->column('country.e_name', trans('english name'));
         $grid->column('country.phone_code', trans('phone code'));
-        $grid->column('country.language', trans('language'));
         if (!request()->filled('_export_')) {
             $grid->column('country.flag', __('flag'))
                 ->display(function ($value) {
@@ -159,7 +158,7 @@ class ChargeCountryController extends MainController
 
             $form->select('country_id', __('Country'))
                 ->options(function () use ($form) {
-                    $ps = Country::query()
+                    $ps = Country::query()->where('status', 1)
                         ->where(function ($q) use ($form) {
                             $q->whereDoesntHave('chargeCountry')
                                 ->orWhere('id', $form->model()->country_id); // include current country
