@@ -240,6 +240,12 @@ class ChatRoomService
             })
             ->where('chat_rooms.type', 'guest')
             ->has('messages')
+            ->withCount([
+                'messages as distinct_users_count' => function($query) {
+                    $query->select(DB::raw("COUNT(DISTINCT user_id)"));
+                }
+            ])
+            ->having('distinct_users_count', '>=', 2)
             // ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
             // ->orderBy('chat_messages.id', 'desc')
             ->paginate(20);
