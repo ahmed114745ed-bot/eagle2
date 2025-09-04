@@ -42,18 +42,6 @@ class UserService
             }
         }
 
-        // Register JS ONCE globally (safe)
-        Admin::script("
-        window.copyToClipboard = function(elementId) {
-            const text = document.getElementById(elementId)?.textContent;
-            if (text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    toastr.success('" . e(trans('Copied')) . "');
-                });
-            }
-        }
-    ");
-
         return <<<HTML
         <a href="{$this->adminUserUrl($user->id)}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
             {$image}
