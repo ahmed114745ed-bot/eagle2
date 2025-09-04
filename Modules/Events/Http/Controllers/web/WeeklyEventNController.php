@@ -73,7 +73,34 @@ class WeeklyEventNController extends MainController
     protected function grid()
     {
         $grid = new Grid(new WeeklyStar());
-        $grid->model()->whereType("weekly_star");
+        $grid->model()->whereType("weekly_star")->orderByDesc("id");
+
+        // $grid->filter(function (Grid\Filter $filter) {
+        //     $filter->expand();
+
+        //     // Start Date
+        //     $filter->column(1 / 2, function ($filter) {
+        //         $filter->where(function ($query) {
+        //             if ($this->input) {
+        //                 $query->whereDate('start_date_local',  $this->input);
+        //             }
+        //         }, __('Start Date'), 'from_date')
+        //             ->date()
+        //             ->default(convertArabicToEnglishNumbers(request('from_date')));
+        //     });
+
+        //     // End Date
+        //     $filter->column(1 / 2, function ($filter) {
+        //         $filter->where(function ($query) {
+        //             if ($this->input) {
+        //                 $query->whereDate('end_date_local', $this->input);
+        //             }
+        //         }, __('End Date'), 'to_date')
+        //             ->date()
+        //             ->default(convertArabicToEnglishNumbers(request('to_date')));
+        //     });
+        // });
+
         $grid->column('id', __('Id'));
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
