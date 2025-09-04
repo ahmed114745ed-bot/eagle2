@@ -125,9 +125,13 @@ class ChatMessagesController extends Controller
 
         //add status for message
 
-        // return $user2;
-        event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
-        event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
+        try {
+            // return $user2;
+            event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
+            event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
+        } catch (\Throwable $e) {
+        }
+
         return [
             'message' =>    $response['message_resource'],
             'card' =>  new ChatRoomResource($chatRoom)

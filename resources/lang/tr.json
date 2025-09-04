@@ -3314,7 +3314,9 @@
     "Bet Amount": "Bahis Miktarı",
     "Created at": "Oluşturulma Tarihi",
     "User": "Kullanıcı",
-    "Game": "Oyun"
+    "Game": "Oyun",
+      "filters.expired_zero_or_null": "Süresi dolmuş (Sıfır veya Boş)",
+  "filters.yes": "Evet"
 
 
 
