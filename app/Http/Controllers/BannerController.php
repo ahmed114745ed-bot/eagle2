@@ -89,7 +89,7 @@ class BannerController extends Controller
             $q->where('is_active', true)
                 ->whereNotNull('publish_at')
                 ->where(function ($subQuery) use ($now) {
-                    $subQuery->whereRaw("DATE_ADD(created_at, INTERVAL COALESCE(expire, 0) DAY) > ?", [$now])
+                    $subQuery->whereRaw("DATE_ADD(publish_at, INTERVAL COALESCE(expire, 0) DAY) > ?", [$now])
                         ->orWhereNull('expire')
                         ->orWhere('expire', 0);
                 });
