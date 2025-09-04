@@ -2,19 +2,20 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Admin;
+use Modules\Vip\Entities\OVip;
+use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
-use Modules\Events\Entities\Reward;
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Auth\Permission;
 use App\Services\AppFeatureService;
-use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Events\Entities\Reward;
 use Modules\Events\Entities\WeeklyStar;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class WeeklyEventGiftNController extends MainController
 {
@@ -208,23 +209,25 @@ class WeeklyEventGiftNController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
-        $grid->column('image', __('image'))->display(function ($path) {
-            if ($this->type == 'ware') {
-                $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? ($ware->show_img ?? '');
-            } elseif ($this->type == 'vip') {
-                $vips = OVip::find($this->target);
-                $path = $vips->img ?? '';
-            } elseif ($this->type == 'achievement') {
-                $path = $this->target;
-            } else {
-                $path = 'coin.png';
-            }
+        if (!request()->filled('_export_')) {
+            $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->type == 'ware') {
+                    $ware = Ware::find($this->target);
+                    $path = $ware->img2 ?? ($ware->show_img ?? '');
+                } elseif ($this->type == 'vip') {
+                    $vips = OVip::find($this->target);
+                    $path = $vips->img ?? '';
+                } elseif ($this->type == 'achievement') {
+                    $path = $this->target;
+                } else {
+                    $path = 'coin.png';
+                }
 
-            /** @var Gift $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
         $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
@@ -328,22 +331,8 @@ class WeeklyEventGiftNController extends MainController
 
         $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
-                $form->select('target1', trans('wares'))->options(function () {
-                    $ops = [0 => ''];
-                    $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
-                    foreach ($wares as  $ware) {
-                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
-
-                        if ($ware->type == 4) {
-                            $ops[$ware->id] .= '_' . 'bubble';
-                        } elseif ($ware->type == 5) {
-                            $ops[$ware->id] .= '_' . 'intro';
-                        } elseif ($ware->type == 6) {
-                            $ops[$ware->id] .= '_' . 'frame';
-                        }
-                    }
-                    return $ops;
-                });
+                $this->addWareField($form);
+                 $form->number('expire', __('expire'));
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
@@ -353,6 +342,7 @@ class WeeklyEventGiftNController extends MainController
                     }
                     return $ops;
                 });
+                 $form->number('expire', __('expire'));
             })
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"));
@@ -360,13 +350,36 @@ class WeeklyEventGiftNController extends MainController
                 $form->image("target4", __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
+                 $form->number('expire', __('expire'));
             })->rules('required');
-        $form->number('expire', __('expire'));
+       
         $form->saved(function (Form $form) {
             $route = url('admin/weekly-events-gift/' . request('weekly_event_id'));
             return redirect($route);
         });
         return $form;
+    }
+
+    protected function addWareField(Form $form)
+    {
+        $prefix = 'wares';
+        $form->belongsTo('target1', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
+            $form->setElementName($prefix . 'target1')
+                ->select('id', __('wares'))
+                ->options(function ($id) {
+                    if (!$id) return [];
+                    $ware = Ware::find($id);
+                    return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
+                })
+                ->attribute([
+                    'data-image-select' => 1,
+                    'data-load-url' => admin_url('wares-by-id')
+                ]);
+
+            $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
+
+            $this->addWareJs();
+        });
     }
 
     protected function detail($id)

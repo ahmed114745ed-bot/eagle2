@@ -94,7 +94,6 @@ class ChargeCountryController extends MainController
         $grid->column('country.name', trans('arabic name'));
         $grid->column('country.e_name', trans('english name'));
         $grid->column('country.phone_code', trans('phone code'));
-        $grid->column('country.language', trans('language'));
         if (!request()->filled('_export_')) {
             $grid->column('country.flag', __('flag'))
                 ->display(function ($value) {
@@ -144,7 +143,7 @@ class ChargeCountryController extends MainController
         $form->display(__('admin.ID'));
         if (!$form->isEditing()) {
             $form->select('country_id', __('country'))->options(function () {
-                $ps = Country::query()->WhereDoesntHave('chargeCountry')->get();
+                $ps = Country::query()->where('status', 1)->WhereDoesntHave('chargeCountry')->get();
                 $ops = [];
                 foreach ($ps as $p) {
                     $ops[$p->id] = app()->getLocale() === 'ar' ? $p->name : $p->e_name;
