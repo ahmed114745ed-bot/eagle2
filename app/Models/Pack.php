@@ -35,7 +35,7 @@ class Pack extends Model
 
     public function sender()
     {
-        return $this->belongTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function admin()
