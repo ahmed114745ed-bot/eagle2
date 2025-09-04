@@ -56,7 +56,7 @@
                 reader.readAsDataURL(file);
             } else if (ext === 'svga') {
                 let uniqueId = 'svga_preview_' + Date.now();
-                let html = `<div id="${uniqueId}" style="width:150px;height:150px;"></div>`;
+                let html = `<div id="${uniqueId}" style="height:150px;"></div>`;
                 $('#preview-img2').html(html);
                 $('#preview-display-img2').html(html);
 
@@ -78,3 +78,7 @@
         });
     });
 </script>
+
+<style>
+
+</style>
