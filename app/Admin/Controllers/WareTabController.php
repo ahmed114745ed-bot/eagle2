@@ -327,10 +327,7 @@ class WareTabController extends MainController
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
                 return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
-            })
-            ->attribute([
-                'id' => 'file-input-img2'
-            ])->help('<div id="preview-img2" style="margin-top:10px;"></div>')->hidePreview();
+            })->hidePreview();
 
 //        $form->file('img2', trans('svg'))
 //            ->name(function ($file) {
