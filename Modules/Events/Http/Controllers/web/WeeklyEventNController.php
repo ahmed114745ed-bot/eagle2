@@ -75,47 +75,48 @@ class WeeklyEventNController extends MainController
         $grid = new Grid(new WeeklyStar());
         $grid->model()->whereType("weekly_star")->orderByDesc("id");
 
-        // $grid->filter(function (Grid\Filter $filter) {
-        //     $filter->expand();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
 
-        //     // Start Date
-        //     $filter->column(1 / 2, function ($filter) {
-        //         $filter->where(function ($query) {
-        //             if ($this->input) {
-        //                 $query->whereDate('start_date_local',  $this->input);
-        //             }
-        //         }, __('Start Date'), 'from_date')
-        //             ->date()
-        //             ->default(convertArabicToEnglishNumbers(request('from_date')));
-        //     });
 
-        //     // End Date
-        //     $filter->column(1 / 2, function ($filter) {
-        //         $filter->where(function ($query) {
-        //             if ($this->input) {
-        //                 $query->whereDate('end_date_local', $this->input);
-        //             }
-        //         }, __('End Date'), 'to_date')
-        //             ->date()
-        //             ->default(convertArabicToEnglishNumbers(request('to_date')));
-        //     });
-        // });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->whereDate('start_date', convertArabicToEnglishNumbers($this->input));
+                    }
+                }, __('Start Date'), 'from_date')
+                    ->date()
+                    ->default(convertArabicToEnglishNumbers(request('from_date')));
+            });
 
+            // End Date
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+
+                        $query->whereDate('end_date', convertArabicToEnglishNumbers($this->input));
+                    }
+                }, __('End Date'), 'to_date')
+                    ->date()
+                    ->default(convertArabicToEnglishNumbers(request('to_date')));
+            });
+        });
         $grid->column('id', __('Id'));
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
+        if (!request()->filled('_export_')) {
+            if (Admin::user()->can('browse-' . 'weekly_star_rewards') || Admin::user()->can('*')) {
+                $grid->column(__('procedures'))->display(function () {
+                    // توليد الروابط
+                    $url1 = url('admin/weekly-events-gift/' . $this->id);
 
-        if (Admin::user()->can('browse-' . 'weekly_star_rewards') || Admin::user()->can('*')) {
-            $grid->column(__('procedures'))->display(function () {
-                // توليد الروابط
-                $url1 = url('admin/weekly-events-gift/' . $this->id);
-
-                // إنشاء أزرار HTML
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
-                // دمج الأزرار في سلسلة واحدة وإرجاعها
-                return $button1;
-            });
+                    // إنشاء أزرار HTML
+                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
+                    // دمج الأزرار في سلسلة واحدة وإرجاعها
+                    return $button1;
+                });
+            }
         }
         $this->extendGrid($grid);
         return $grid;
