@@ -27,13 +27,11 @@ class WareObserver
             } elseif ($ware->type == 12) {
 
                 settings()->set('wappel_frame_updated_at', $timestamp);
-            }elseif ($ware->type == 28) {
+            } elseif ($ware->type == 28) {
 
                 settings()->set('profile_frame_updated', $timestamp);
             }
         }
-
-
     }
 
     /**
@@ -46,6 +44,8 @@ class WareObserver
         $timestamp = Carbon::now()->timestamp;
         if ($ware->type == 12) {
             settings()->set('wappel_frame_updated_at',  $timestamp);
+        } elseif ($ware->type == 28) {
+            settings()->set('profile_frame_updated',  $timestamp);
         }
         if ((!$isEnableOld && $ware->enable) || ($isEnableOld && !$ware->enable) || $svgOld != $ware->img2) {
             if ($ware->type == 6) {
@@ -54,8 +54,6 @@ class WareObserver
                 settings()->set('frame_updated_at',  $timestamp);
             } elseif ($ware->type == 1) {
                 settings()->set('extra_updated_at',  $timestamp);
-            } elseif ($ware->type == 28) {
-                settings()->set('profile_frame_updated',  $timestamp);
             }
         }
 

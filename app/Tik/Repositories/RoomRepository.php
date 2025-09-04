@@ -143,7 +143,7 @@ class RoomRepository extends AbstractRepository
 
         $result->orderByDesc('pin');
 
-        if ($topRooms) {
+        if ($topRooms && $roomType != 'live') {
             $result->orderByRaw('is_top = 1 DESC');
         }else {
             $result->where(function ($query) {
@@ -248,7 +248,7 @@ class RoomRepository extends AbstractRepository
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
             $q->whereIn('type', ['single_live', 'multi_live']);
-            })->simplePaginate(10);
+            })->paginate(10);
     }
 
     public function getRoomsByGameId($gameId = null, array $with = [])

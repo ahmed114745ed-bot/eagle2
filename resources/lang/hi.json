@@ -2872,7 +2872,32 @@
 "success_title": "सफलता 🎉",
 "success_message": "ऑपरेशन सफलतापूर्वक पूरा हुआ",
 "error_title": "त्रुटि 🚫",
-"error_message": "एक त्रुटि हुई, कृपया पुनः प्रयास करें"
+"error_message": "एक त्रुटि हुई, कृपया पुनः प्रयास करें",
+"coin_game_users": "खेल रिकॉर्ड",
+"coin_game_users_description": "प्रत्येक उपयोगकर्ता के लिए प्रत्येक खेल केवल एक बार दिखाएँ",
+"user": "उपयोगकर्ता",
+"game": "खेल",
+"coins": "सिक्के",
+"app_profit": "ऐप लाभ",
+"type": "प्रकार",
+"created_at": "बनाई गई तारीख",
+"round_details": " विवरण",
+"round_id": "राउंड आईडी",
+"Total Played": "कुल खेला गया",
+"Total Loss": "कुल नुकसान",
+"Total Win": "कुल जीत",
+"App Profit": "ऐप लाभ",
+"round_details": "राउंड विवरण",
+"Round ID": "राउंड आईडी",
+"Result": "परिणाम",
+"Win": "जीत",
+"Lose": "हार",
+"Bet Amount": "दांव राशि",
+"Created at": "बनाने की तारीख",
+"User": "उपयोगकर्ता",
+"Game": "खेल",
+  "filters.expired_zero_or_null": "समाप्त (शून्य या खाली)",
+  "filters.yes": "हाँ"
 
 
 

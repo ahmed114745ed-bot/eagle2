@@ -72,45 +72,94 @@ class BannerController extends Controller
 
 
 
+
     public function index2()
     {
         $user = Auth::user();
         $now = now();
-       $dataShow = UserBannerShow::whereHas("banner", function ($q) use ($now) {
+
+        $banner = $this->getNextBannerForUser($user, $now);
+    
+        return $this->respondWithBanner($user, $banner);
+    }
+    
+    private function getUserSeenBanners($user, $now)
+    {
+        return UserBannerShow::whereHas("banner", function ($q) use ($now) {
             $q->where('is_active', true)
-            ->whereNotNull('publish_at')
-            ->where(function ($q) use ($now) {
-                $q->whereRaw("DATE_ADD(created_at, INTERVAL COALESCE(expire, 0) DAY) > ?", [$now])
+                ->whereNotNull('publish_at')
+                ->where(function ($subQuery) use ($now) {
+                    $subQuery->whereRaw(
+                        "DATE_ADD(publish_at, INTERVAL COALESCE(expire, 0) DAY) > ?",
+                        [$now]
+                    )
                     ->orWhereNull('expire')
                     ->orWhere('expire', 0);
-            });
-        })->where("user_id", $user->id)->get();
-
-
-        $ids = $dataShow->pluck('banner_id');
-        $banners = $this->bannerServices->index2($ids);
-        if (empty($banners)) {
-            UserBannerShow::where("user_id", $user->id)->delete();
-            $banners = Banner::query()
+                });
+        })
+        ->where("user_id", $user->id)
+        ->pluck('banner_id');
+    }
+    
+    
+    private function getNextBannerForUser($user, $now)
+    {
+        $seenBannerIds = $this->getUserSeenBanners($user, $now);
+    
+        $banner = $this->bannerServices->index2($seenBannerIds);
+        if (!$banner) {
+            $this->resetUserSeenBanners($user);
+            return $this->getAnyRandomBanner();
+        }
+    
+        return $banner;
+    }
+    
+    
+    private function resetUserSeenBanners($user)
+    {
+        UserBannerShow::where("user_id", $user->id)->delete();
+    }
+    
+    private function getAnyRandomBanner()
+    {
+        $banner = Banner::query()
             ->where('is_active', true)
             ->whereNotNull('publish_at')
             ->inRandomOrder()
             ->first();
-        //    return Common::apiResponse(true, 'successful', null);
-        }
-        // UserBannerShow::where("user_id", $user->id)->delete();
-        try {
-            if ($banners) {
-                $baner_new = new UserBannerShow();
-                $baner_new->user_id = $user->id;
-                $baner_new->banner_id = $banners->id;
-                $baner_new->save();
-            }
-            return Common::apiResponse(true, 'successful', new BannerResource($banners));
-        } catch (\Exception $exception) {
-            return Common::apiResponse(true, 'successful', null);
-        };
-    }
-
     
+    
+        return $banner;
+    }
+    
+    private function saveUserBannerShow($user, $banner)
+    {
+        if ($banner && !UserBannerShow::where('user_id', $user->id)
+            ->where('banner_id', $banner->id)
+            ->exists()
+        ) {
+            UserBannerShow::create([
+                'user_id'   => $user->id,
+                'banner_id' => $banner->id,
+            ]);
+        }
+    }
+    
+    private function respondWithBanner($user, $banner)
+    {
+        try {
+            $this->saveUserBannerShow($user, $banner);
+    
+            return Common::apiResponse(true, 'successful', $banner ? new BannerResource($banner) : null);
+        } catch (\Exception $exception) {
+    
+            return Common::apiResponse(false, 'failed', null);
+        }
+    }
+    
+
+
+
+
 }

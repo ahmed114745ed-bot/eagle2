@@ -228,7 +228,7 @@ class GiftLogController extends Controller
                     'isExpensive'   => $totalPrice >= 2000,
                     'num_gift'      => $zigoData['number'],
                     "plural"        => $zigoData['plural'],
-                    'gift_price'    =>$totalPrice,// $zigoData['room_session'],
+                    'gift_price'    => $totalPrice, // $zigoData['room_session'],
                     'coins'         => @$zigoData['coins'] ?? '0',
                     'is_lucky_gift' => (bool)$zigoData['is_lucky_gift'],
                     'type' => @$zigoData['gift_image_type'] ?? 'mp4'
@@ -302,19 +302,32 @@ class GiftLogController extends Controller
 
     public function giftLogsList(Request $request)
     {
-        $user = $request->user();
+        $userId = $request->user()->id;
         if ($request->user_id) {
-            $user = User::query()->find($request->user_id);
+            $user = User::where('id', $request->user_id)->exists();
             if (!$user) return Common::apiResponse(0, 'not found', null, 404);
+            $userId = $request->user_id;
         }
+        $giftTotal = GiftLog::where(function ($q) use ($userId) {
+            $q->where('receiver_id', $userId)
+                ->orWhere('sender_id', $userId);
+        })
+            ->selectRaw('receiver_id, sender_id, SUM(giftPrice) as totalPrice')
+            ->groupBy('receiver_id', 'sender_id')
+            ->get();
+
         $gl = GiftLog::select('giftId', DB::raw('SUM(giftNum) as t'))
-            ->where('receiver_id', $user->id)
+            ->where('receiver_id', $userId)
+            ->with('receiver:id,sub_receiver_level,sub_sender_level')
             ->whereHas('gift')
             ->where('giftId', '!=', 0)
             ->groupBy('giftId')
             ->orderByDesc('t')
             ->with('gift')
             ->get();
+
+        GiftLogResource::setGiftTotal($giftTotal);
+
         return Common::apiResponse(1, 'ok', GiftLogResource::collection($gl));
     }
 

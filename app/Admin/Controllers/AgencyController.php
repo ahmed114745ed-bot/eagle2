@@ -87,7 +87,7 @@ class AgencyController extends MainController
         if (! Admin::user()->can('*')) {
             Permission::check('show-' . $this->permission_name);
         }
-
+        $timezone = getTimezone();
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $uuid = request('uuid');
@@ -242,8 +242,8 @@ class AgencyController extends MainController
 
         $sumTargets = GiftLog::where('agency_id', $agencyId)
             ->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth(),
+                Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC'),
+                Carbon::now($timezone)->endOfMonth()->copy()->setTimezone('UTC'),
             ])
             ->sum('giftPrice');
 
@@ -698,16 +698,29 @@ class AgencyController extends MainController
     protected function addPhoneFields(Form $form)
     {
         $form->row(function ($row) {
-            $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input')->attribute('maxlength', 10);
-            $row->hidden('phone_code');
+            $row->width(9)->text('phone', __('agency whatsApp number'))
+                ->rules('required')
+                ->attribute('id', 'phone-input')
+                ->attribute('maxlength', 12)
+                ->default(function ($form) {
+                    if ($form->model()->phone && $form->model()->phone_code) {
+                        return $form->model()->phone;
+                    }
+                    return null;
+                });
+    
+            $row->hidden('phone_code')->default(function ($form) {
+                return $form->model()->phone_code ?? '';
+            });
         });
-
+    
         if (Session::has('show_alert')) {
             $form->html('<script>alert("الرجاء اختيار نوع الوكالة اولا");</script>');
         }
-
+    
         Admin::script($this->phoneJs());
     }
+    
 
     protected function phoneJs()
     {
@@ -1061,7 +1074,7 @@ class AgencyController extends MainController
             UsersJoinedAgency::create($joinAgencyData);
         }
         // add vip to user
-        UserCommon::userVip($user);
+        UserCommon::userVip($user,'acceptJoin');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([
