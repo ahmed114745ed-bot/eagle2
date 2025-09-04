@@ -24,7 +24,7 @@ trait DefaultBdAssignmentTrait
 
 
         static::updating(function ($model) {
-            if (empty($model->id)) {
+            if (empty($model->bd_id)) {
                 $defaultBd = Bd::where('type', 'bd')
                                 ->where('default', true)
                                 ->first();

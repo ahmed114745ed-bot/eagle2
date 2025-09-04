@@ -2,6 +2,7 @@
 
 namespace App\Admin\Actions;
 
+use App\Models\GiftLog;
 use Modules\Vip\Entities\OVip;
 use App\Models\AgencyUserJob;
 use App\Models\Pack;
@@ -41,40 +42,43 @@ class ChangeAgencyAction extends RowAction
      */
     public function handle(Model $model, Request $request)
     {
-        $user = User::find($request->id);
-
-        $agencyOwner = Agency::query()
-            ->where('owner_id', $request->id)
-            ->orWhere('app_owner_id', $request->id)
-            ->exists();
-        if ($agencyOwner) {
-            throw ValidationException::withMessages([
-                'error' => __('This user is the agency owner and cannot be deleted')
-            ]);
-        }
-
-        $oldAgencyId = $user->agency_id;
-
-        uploadMonthlyDiamondReceive($user->id, 0);
-
-        $this->handleUserSalaries($user);
-
-        $this->updatePreviousAgencyJoined($user, $oldAgencyId);
-
-        UsersJoinedAgency::create([
-            'user_id' => $user->id,
-            'agency_id' => $request->agency_id,
-            'type' => 2,
-            'join_date' => now(),
-            'status' => 'Joined'
-        ]);
-
-        $user->agency_id = $request->agency_id;
-        $user->save();
-
-        AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $oldAgencyId])->delete();
-
-        return $this->response()->success('success')->refresh();
+        return DB::transaction(function () use ($request) {
+                $user = User::find($request->id);
+        
+                $agencyOwner = Agency::query()
+                    ->where('owner_id', $request->id)
+                    ->orWhere('app_owner_id', $request->id)
+                    ->exists();
+        
+                if ($agencyOwner) {
+                    throw ValidationException::withMessages([
+                        'error' => __('This user is the agency owner and cannot be deleted')
+                    ]);
+                }
+        
+                $oldAgencyId = $user->agency_id;
+        
+                uploadMonthlyDiamondReceive($user->id, 0);
+        
+                $this->handleUserSalaries($user);
+                $this->clearUserAgencyLogs($user ,$oldAgencyId);
+        
+                $this->updatePreviousAgencyJoined($user, $oldAgencyId);
+        
+                UsersJoinedAgency::create([
+                    'user_id'   => $user->id,
+                    'agency_id' => $request->agency_id,
+                    'type'      => 2,
+                    'join_date' => now(),
+                    'status'    => 'Joined',
+                ]);
+        
+                $user->agency_id = $request->agency_id;
+                $user->save();
+    
+        
+                return $this->response()->success('success')->refresh();
+         });
     }
 
     private function handleUserSalaries(User $user)
@@ -101,6 +105,10 @@ class ChangeAgencyAction extends RowAction
             }
             $currentSalary->update(['is_finished' => 1]);
         }
+
+
+
+        
     }
 
     private function updatePreviousAgencyJoined(User $user, $agencyId)
@@ -127,6 +135,14 @@ class ChangeAgencyAction extends RowAction
                 'kicked_by_admin' => Auth::id()
             ]);
         }
+    }
+
+
+    private function clearUserAgencyLogs(User $user,$agencyId)
+    {
+        GiftLog::query()->where('receiver_id', $user->id)
+        ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
+        AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
     }
     public function form()
     {

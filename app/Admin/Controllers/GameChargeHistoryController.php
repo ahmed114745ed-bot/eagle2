@@ -19,7 +19,7 @@ class GameChargeHistoryController extends MainController
      *
      * @var string
      */
-   // protected $title = 'Game Charge History';
+   protected $title = 'Game Charge History';
 
 
     public function index(Content $content)
@@ -28,6 +28,28 @@ class GameChargeHistoryController extends MainController
             ->title(trans('Game Charge History'))
             ->body($this->grid()));
     }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans(__($this->title)))
+            ->body($this->form()));
+    }
+
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans(__($this->title)))
+            ->body($this->detail($id)));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans(__($this->title)))
+            ->body($this->form()->edit($id)));
+    }
+
     /**
      * Make a grid builder.
      *

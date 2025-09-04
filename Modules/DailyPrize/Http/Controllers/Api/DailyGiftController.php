@@ -142,11 +142,11 @@ class DailyGiftController extends Controller
             $user->save();
         } elseif ($type == "vip") {
             $vip = OVip::query()->find($target);
-            if ($vip) UserCommon::addVipToUser($user, $vip, $expire);
+            if ($vip) UserCommon::addVipToUser($user, $vip, $expire,null ,'daily-gift');
         } elseif ($type == "ware") {
 
             $ware = Ware::query()->find($target);
-            if ($ware) UserCommon::addWareToUser($user, $ware, $expire);
+            if ($ware) UserCommon::addWareToUser($user, $ware, $expire,null ,'daily-gifts');
         } elseif ($type == "achievement") {
             $attributes = [
                 'user_id'      => $user->id,

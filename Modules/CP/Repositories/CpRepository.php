@@ -38,7 +38,7 @@ class CpRepository
 
     public function findCpBetweenUsers($userOne, $userTwo, $type = null)
     {
-        return Cp::where(function ($query) use ($userOne, $userTwo) {
+        return Cp::lockForUpdate()->where(function ($query) use ($userOne, $userTwo) {
             $query->where(function ($q) use ($userOne, $userTwo) {
                 $q->where('user_one_id', $userOne)
                     ->where('user_two_id', $userTwo);
@@ -169,14 +169,14 @@ class CpRepository
     public function checkExistingCpSendingOne($userId, $cpId)
     {
         return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
-            $query->where('user_one_id', $userId);
+            $query->where('user_one_id', $userId)->orWhere('user_two_id', $userId);
         })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
     }
 
     public function checkExistingCpSendingTwo($userId, $cpId)
     {
         return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
-            $query->where('user_two_id', $userId);
+            $query->where('user_two_id', $userId)->orWhere('user_one_id', $userId);
         })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
     }
 

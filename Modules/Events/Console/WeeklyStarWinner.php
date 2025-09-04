@@ -76,11 +76,11 @@ class WeeklyStarWinner extends Command
 
                         }elseif ($reward->type == "vip"){
                             $vip=OVip::query()->find($reward->target);
-                            UserCommon::addVipToUser($entry->sender,$vip,$reward->expire);
+                            UserCommon::addVipToUser($entry->sender,$vip,$reward->expire,null,'weekly-star');
 
                         }elseif ($reward->type == "ware"){
                             $ware=Ware::query()->find($reward->target);
-                            UserCommon::addWareToUser($entry->sender,$ware,$reward->expire);
+                            UserCommon::addWareToUser($entry->sender,$ware,$reward->expire ,null ,'weekly-star');
                         }elseif ($reward->type == "achievement"){
                             $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
                             $attributes = [

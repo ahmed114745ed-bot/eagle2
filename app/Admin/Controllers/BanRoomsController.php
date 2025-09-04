@@ -2,19 +2,21 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\BanRoomAction;
 use App\Models\Ban;
-use App\Models\BanRoom;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Models\BanRoom;
 use App\Models\BanType;
 use App\Admin\Actions\BanUser;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Actions\DeleteBans;
 use Illuminate\Support\Facades\DB;
+use App\Admin\Actions\BanRoomAction;
 use App\Http\Controllers\Controller;
+use App\Admin\Actions\DedicateAction;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
 
@@ -174,10 +176,32 @@ class BanRoomsController extends MainController
         });
 
         $grid->duration(__('Duration'));
+        $grid->column('created_at', __('expire'))->display(function () {
+            $timezone = getTimezone();
 
-        $grid->column('created_at', __('Expire'))->display(function () {
-            $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
-            return now()->diffForHumans($banExpiration, true);
+            // Get raw UTC datetime
+            $createdAt = \Carbon\Carbon::parse($this->getAttributes()['created_at'], 'UTC');
+
+            // Add ban duration and convert to user's timezone
+            $banExpiration = $createdAt->addHours($this->duration)->setTimezone($timezone);
+
+            $now = now($timezone);
+
+            // Get total remaining minutes
+            $diffInMinutes = $now->diffInMinutes($banExpiration, false);
+
+            if ($diffInMinutes <= 0) {
+                return 'منتهي'; // Expired
+            }
+
+            $hours = floor($diffInMinutes / 60);
+            $minutes = $diffInMinutes % 60;
+
+            if ($hours >= 1) {
+                return "{$hours}h:{$minutes}m";
+            } else {
+                return "{$minutes}" . ' ' . __('minute');
+            }
         });
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('Delete'))->display(function () {
