@@ -452,6 +452,9 @@ class UserCommon
      */
     public static function assignRoomBoomWare(User $user, Ware $ware, $expire, $sender = null): void
     {
+
+          \Log::info("expire bom pack " .  $expire);
+
         DB::beginTransaction();
         try {
             $arr['user_id']   = $user->id;
@@ -465,6 +468,7 @@ class UserCommon
 
 
             $pack = Pack::query()->create($arr);
+            \Log::info('Created Pack:', $pack->toArray());
 
             if ($sender) {
                 $pack->senderable()->associate($sender);
