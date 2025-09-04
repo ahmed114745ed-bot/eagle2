@@ -315,7 +315,7 @@ class WareTabController extends MainController
 
             if (!in_array($ext, ['png','jpg','jpeg','gif','webp','svg'])) {
                 return "<div id='preview-display-img2'>" .
-                    handleShowImageWithTypes($uniqueId, $url, 100, 100, 10) .
+                    handleShowImageWithTypes($uniqueId, $url, null, 100, 10) .
                     "</div>";
             }
 
@@ -326,7 +326,7 @@ class WareTabController extends MainController
 
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
-                return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
+                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
             })
             ->attribute([
                 'id' => 'file-input-img2'
@@ -347,9 +347,6 @@ class WareTabController extends MainController
 //                'initialPreviewConfig' => [],
 //            ])
 //            ->hidePreview();
-
-//        Admin::script(<<<'JS'
-//        JS);
 
 //        \Encore\Admin\Form::extend('customfile', CustomFile::class);
 //        $form->customfile('img2', 'Upload Image/Animation');
