@@ -72,58 +72,97 @@ class BannerController extends Controller
 
 
 
+
     public function index2()
     {
         $user = Auth::user();
         $now = now();
-
+    
+        Log::info("Banner rotation started", [
+            'user_id' => $user->id,
+            'now'     => $now
+        ]);
+    
         $banner = $this->getNextBannerForUser($user, $now);
-
+    
         return $this->respondWithBanner($user, $banner);
     }
-
+    
     private function getUserSeenBanners($user, $now)
     {
-        return UserBannerShow::whereHas("banner", function ($q) use ($now) {
+        $seen = UserBannerShow::whereHas("banner", function ($q) use ($now) {
             $q->where('is_active', true)
                 ->whereNotNull('publish_at')
                 ->where(function ($subQuery) use ($now) {
-                    //publish_at
                     $subQuery->whereRaw("DATE_ADD(created_at, INTERVAL COALESCE(expire, 0) DAY) > ?", [$now])
                         ->orWhereNull('expire')
                         ->orWhere('expire', 0);
                 });
         })->where("user_id", $user->id)->pluck('banner_id');
+    
+        Log::info("Fetched seen banners", [
+            'user_id' => $user->id,
+            'count'   => $seen->count(),
+            'ids'     => $seen->toArray(),
+        ]);
+    
+        return $seen;
     }
-
+    
     private function getNextBannerForUser($user, $now)
     {
         $seenBannerIds = $this->getUserSeenBanners($user, $now);
-
+    
         $banner = $this->bannerServices->index2($seenBannerIds);
-
-        if (!$banner) {
+    
+        if ($banner) {
+            Log::info("Found new banner", [
+                'user_id'   => $user->id,
+                'banner_id' => $banner->id,
+            ]);
+        } else {
+            Log::warning("No new banners available, resetting seen banners", [
+                'user_id' => $user->id,
+            ]);
             $this->resetUserSeenBanners($user);
             $banner = $this->getAnyRandomBanner();
+    
+            if ($banner) {
+                Log::info("Restarted rotation with new banner", [
+                    'user_id'   => $user->id,
+                    'banner_id' => $banner->id,
+                ]);
+            } else {
+                Log::error("No banners found at all", [
+                    'user_id' => $user->id,
+                ]);
+            }
         }
-
+    
         return $banner;
     }
-
+    
     private function resetUserSeenBanners($user)
     {
         UserBannerShow::where("user_id", $user->id)->delete();
+        Log::info("Reset user seen banners", ['user_id' => $user->id]);
     }
-
+    
     private function getAnyRandomBanner()
     {
-        return Banner::query()
+        $banner = Banner::query()
             ->where('is_active', true)
             ->whereNotNull('publish_at')
             ->inRandomOrder()
             ->first();
+    
+        Log::info("Fetched random banner", [
+            'banner_id' => $banner?->id,
+        ]);
+    
+        return $banner;
     }
-
+    
     private function saveUserBannerShow($user, $banner)
     {
         if ($banner && !UserBannerShow::where('user_id', $user->id)
@@ -134,20 +173,35 @@ class BannerController extends Controller
                 'user_id'   => $user->id,
                 'banner_id' => $banner->id,
             ]);
+    
+            Log::info("Saved user banner show", [
+                'user_id'   => $user->id,
+                'banner_id' => $banner->id,
+            ]);
         }
     }
-
+    
     private function respondWithBanner($user, $banner)
     {
         try {
             $this->saveUserBannerShow($user, $banner);
+    
+            Log::info("Response prepared", [
+                'user_id'   => $user->id,
+                'banner_id' => $banner?->id,
+            ]);
+    
             return Common::apiResponse(true, 'successful', $banner ? new BannerResource($banner) : null);
         } catch (\Exception $exception) {
+            Log::error("Error responding with banner", [
+                'user_id' => $user->id,
+                'error'   => $exception->getMessage(),
+            ]);
+    
             return Common::apiResponse(false, 'failed', null);
         }
     }
-
-
+    
 
 
 
