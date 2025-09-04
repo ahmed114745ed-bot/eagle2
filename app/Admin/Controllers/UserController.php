@@ -224,7 +224,7 @@ class UserController extends MainController
                 if (! $user) {
                     return __('No User');
                 }
-                return app(UserService::class)->adminUserAvatar($user);
+                return ''/*app(UserService::class)->adminUserAvatar($user)*/;
             });
 
 
@@ -314,7 +314,7 @@ class UserController extends MainController
         //                 })).append($('<input>', {
         //                     'type': 'hidden',
         //                     'name': '_method',
-        //                     'value': 'POST'  
+        //                     'value': 'POST'
         //                 }));
         //                 form.appendTo('body').submit();
         //             }
