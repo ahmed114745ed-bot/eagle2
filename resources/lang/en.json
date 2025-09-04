@@ -1140,5 +1140,7 @@
 "Bet Amount": "Bet Amount",
 "Created at": "Created at",
 "User": "User",
-"Game": "Game"
+"Game": "Game",
+  "filters.expired_zero_or_null": "Expired (Zero or Null)",
+  "filters.yes": "Yes"
 }

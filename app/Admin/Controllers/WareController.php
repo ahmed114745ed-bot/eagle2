@@ -127,6 +127,16 @@ class WareController extends MainController
 
                 ]);
             });
+
+
+            $filter->where(function ($query) {
+                $query->whereNull('expire')->orWhere('expire', 0);
+            }, trans('filters.expired_zero_or_null'))->checkbox([
+                1 => trans('filters.yes'),
+            ]);
+            
+            
+    
         });
 
         $grid->id(__('ID'));

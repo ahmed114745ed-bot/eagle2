@@ -1875,4 +1875,10 @@ class User extends Authenticatable
                     });
 }
 
+
+
+public function giftLogs()
+{
+    return $this->hasMany(GiftLog::class, 'receiver_id');
+}
 }
