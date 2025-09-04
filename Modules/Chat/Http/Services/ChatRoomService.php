@@ -245,7 +245,7 @@ class ChatRoomService
                     $query->select(DB::raw("COUNT(DISTINCT user_id)"));
                 }
             ])
-            ->having('distinct_users_count', '>=', 2)
+            ->having('distinct_users_count', '<', 2)
             // ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
             // ->orderBy('chat_messages.id', 'desc')
             ->paginate(20);
