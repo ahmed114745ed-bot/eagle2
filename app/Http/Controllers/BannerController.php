@@ -76,6 +76,7 @@ class BannerController extends Controller
     {
         $user = Auth::user();
         $now = now();
+
         $dataShow = UserBannerShow::whereHas("banner", function ($q) use ($now) {
             $q->where('is_active', true)
                 ->whereNotNull('publish_at')
@@ -85,7 +86,6 @@ class BannerController extends Controller
                         ->orWhere('expire', 0);
                 });
         })->where("user_id", $user->id)->get();
-
 
         $ids = $dataShow->pluck('banner_id');
         $banners = $this->bannerServices->index2($ids);
