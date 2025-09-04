@@ -64,12 +64,15 @@ class EnteranceController extends Controller
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
+        $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
+        
         $data = [
             'agora_app_id' => $agora_app_id,
             'zego' => [
                 'server_secret' => $zego_server_secret,
                 'app_id' => $zego_app_id,
-                'app_sign' => $app_sign
+                'app_sign' => $app_sign,
+                'filter' => $zego_filter_enabled == 1 ? true : false,
             ],
             'library' => /*$library == 1 ?*/ 'zego' /*: 'agora'*/,
 

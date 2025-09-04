@@ -2895,7 +2895,9 @@
 "Bet Amount": "दांव राशि",
 "Created at": "बनाने की तारीख",
 "User": "उपयोगकर्ता",
-"Game": "खेल"
+"Game": "खेल",
+  "filters.expired_zero_or_null": "समाप्त (शून्य या खाली)",
+  "filters.yes": "हाँ"
 
 
 

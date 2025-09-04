@@ -15,7 +15,7 @@ use Modules\Vip\Entities\OVip;
 
 class UserVip extends Model
 {
-    use TimestampsWithTimezone, SoftDeletes ,AutoReceiveType;
+    use TimestampsWithTimezone, SoftDeletes, AutoReceiveType;
 
     protected $table = 'users_vips';
 
@@ -24,6 +24,11 @@ class UserVip extends Model
     public function senderable(): MorphTo
     {
         return $this->morphTo(null, 'sender_type', 'sender_id');
+    }
+
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function OVip()
@@ -48,9 +53,7 @@ class UserVip extends Model
     }
     protected static function booted()
     {
-        static::created(function ($userVip) {
-
-        });
+        static::created(function ($userVip) {});
     }
 
     public function user()
