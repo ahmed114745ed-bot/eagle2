@@ -21,9 +21,6 @@ class Conversation implements ShouldBroadcastNow
     public $check_room ;
     public function __construct($message ,$user2 ,$check_room)
     {
-        info($message);
-        info($user2);
-        info($this->check_room);
         $this->message = $message;
         $this->user2 = $user2;
         $this->check_room = $check_room;
