@@ -13,10 +13,10 @@ use App\Models\Ware;
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user, int $expire = 0 ,$dashUserId = 0 ,$typeSend = '' ,$qty = 1, $senderId = 0 , $total = 0 ,$receiveType='not-sending'): bool
+    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending'): bool
     {
         try {
-            DB::transaction(function () use ($vip, $user, $expire ,$dashUserId ,$typeSend ,$senderId,$qty,$total,$receiveType) {
+            DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType) {
                 $vipp = UserVip::create([
                     'type'      => 1,
                     'sender_id' => $senderId,
@@ -29,56 +29,54 @@ class VipCommon
                     'price'     => $vip?->price,
                     'total'     => $total,
                     'is_used'   => 0,
-                    'dash_user_id'   =>$dashUserId ?? 0,
-                    'type_send' =>$typeSend,
-                    'receive_type' =>$receiveType
-                    
-                ]);
-              
+                    'dash_user_id'   => $dashUserId ?? 0,
+                    'type_send' => $typeSend,
+                    'receive_type' => $receiveType
 
+                ]);
             });
 
 
-                Common::sendOfficialMessage(
-                    $user->id,
-                    __('congratulations'),
-                      __('vip_gift_message')
-                );
-    
-                $tokens_notification = [
-                    DB::table('users')->where('id', $user->id)->value('notification_id')
-                ];
-    
-                Common::send_firebase_notification(
-                    $tokens_notification,
-                    config('app.name_ar'),
-                    __('vip_gift_message') . $user->name
-                );
-    
+            Common::sendOfficialMessage(
+                $user->id,
+                __('congratulations'),
+                __('vip_gift_message')
+            );
+
+            $tokens_notification = [
+                DB::table('users')->where('id', $user->id)->value('notification_id')
+            ];
+
+            Common::send_firebase_notification(
+                $tokens_notification,
+                config('app.name_ar'),
+                __('vip_gift_message') . $user->name
+            );
+
             return true;
         } catch (\Throwable $e) {
             \Log::error($e->getMessage());
             return false;
         }
     }
-    
-    
+
+
     public static function handleVipActivation(UserVip $userVip): void
     {
         $userVip->loadMissing(['user', 'OVip.privilegs']);
-    
+
         match ($userVip->using) {
             0 => self::handleInitialActivation($userVip),
             1 => self::handleReactivation($userVip),
             default => throw new \InvalidArgumentException('Invalid is_using value'),
         };
     }
-    
+
     protected static function handleInitialActivation(UserVip $userVip): void
     {
         $user = $userVip->user;
         $vip  = $userVip->OVip;
-    
+
         self::updateVipUsage($userVip);
         self::deactivateOtherUserVips($user, $userVip);
         self::deactivateOldUserPacks($userVip, $vip, $user);
@@ -86,19 +84,19 @@ class VipCommon
         self::assignWaresToUser($vip, $userVip, $user);
         self::updateUserCurrentVip($user);
     }
-    
+
     protected static function handleReactivation(UserVip $userVip): void
     {
         $user = $userVip->user;
         $vip  = $userVip->OVip;
-    
+
         self::updateVipUsage($userVip);
         self::deactivateOtherUserVips($user, $userVip);
         self::deactivateOldUserPacks($userVip, $vip, $user);
         self::assignWaresToUser($vip, $userVip, $user);
         self::updateUserCurrentVip($user);
     }
-    
+
     public static function deactivateVip(UserVip $vip): void
     {
         if ($vip) {
@@ -129,7 +127,7 @@ class VipCommon
             ->where('is_used', 1)
             ->where(function ($q) {
                 $q->where('expire', 0)
-                ->orWhere('expire', '>=', now()->timestamp);
+                    ->orWhere('expire', '>=', now()->timestamp);
             })->first();
 
         if ($vip) {
@@ -194,7 +192,7 @@ class VipCommon
             ->where('is_used', 1)
             ->where(function ($q) {
                 $q->where('expire', 0)
-                ->orWhere('expire', '>=', now()->timestamp);
+                    ->orWhere('expire', '>=', now()->timestamp);
             })
             ->orderByDesc('level')
             ->first();
@@ -219,13 +217,13 @@ class VipCommon
             ->where('vip_user_id', $userVip->id)
             ->where(function ($q) {
                 $q->where('expire', '>=', now()->timestamp)
-                ->orWhere('expire', 0);
+                    ->orWhere('expire', 0);
             })->first();
 
-   
+
 
         if ($existingPack) {
-            $existingPack->update(['is_used' => $userVip->is_used , 'receive_type'=> 'vip-'.$userVip->level ]);
+            $existingPack->update(['is_used' => $userVip->is_used]);
         } else {
             Pack::create([
                 'user_id'     => $user->id,
@@ -238,9 +236,9 @@ class VipCommon
                 'vip_user_id' => $userVip->id,
                 'is_used'     => $userVip->is_used,
                 'using'       => 1,
-                'receive_type'=> 'send-vip-'.$userVip->level
+                'receive_type' => $userVip->receive_type .'-'. $userVip->level
 
-           ]);
+            ]);
         }
 
         if (in_array($ware->type, [4, 5, 6])) {
@@ -249,7 +247,7 @@ class VipCommon
         }
     }
 
-    
+
 
 
     public static function  unUsePack($type, $user)
@@ -274,11 +272,4 @@ class VipCommon
             $user->save();
         }
     }
-
-
-
-  
-
-
-
 }
