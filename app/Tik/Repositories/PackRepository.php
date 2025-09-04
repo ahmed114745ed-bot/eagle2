@@ -96,22 +96,22 @@ class PackRepository extends AbstractRepository
         $this->model->query()->where('expire', '!=', 0)->where('expire', '<=', Carbon::now()->timestamp)->delete();
         return true;
     }
-    
+
     public function unUseOldPack($userId)
     {
         $this->model->where('user_id', $userId)->update(['is_used' => 0]);
     }
-    
 
-//    public function packsJoinWithGift($userId, $type): \Illuminate\Support\Collection
-//    {
-//        return $this->model->join('gifts as b', 'packs.target_id', '=', 'b.id')
-//            ->where(['packs.user_id' => $userId, 'packs.type' => $type])
-//            ->selectRaw("packs.*,b.name,b.show_img,b.price")
-//            ->get();
-//    }
 
-    public function packsJoinWithGift($userId, $type,array $additionalRelations = []): Collection|array
+    //    public function packsJoinWithGift($userId, $type): \Illuminate\Support\Collection
+    //    {
+    //        return $this->model->join('gifts as b', 'packs.target_id', '=', 'b.id')
+    //            ->where(['packs.user_id' => $userId, 'packs.type' => $type])
+    //            ->selectRaw("packs.*,b.name,b.show_img,b.price")
+    //            ->get();
+    //    }
+
+    public function packsJoinWithGift($userId, $type, array $additionalRelations = []): Collection|array
     {
         return $this->model
             ->with(array_merge(['gift:id,name,show_img,price'], $additionalRelations))
@@ -120,15 +120,15 @@ class PackRepository extends AbstractRepository
             ->get();
     }
 
-//    public function packsJoinWithWare($userId, $type): \Illuminate\Support\Collection
-//    {
-//        return $this->model->join('wares as b', 'packs.target_id', '=', 'b.id')
-//            ->where(['packs.user_id' => $userId, 'packs.type' => $type])
-//            ->selectRaw("packs.*,b.name,b.show_img,b.title,b.color, b.img2 as img2")
-//            ->get();
-//    }
+    //    public function packsJoinWithWare($userId, $type): \Illuminate\Support\Collection
+    //    {
+    //        return $this->model->join('wares as b', 'packs.target_id', '=', 'b.id')
+    //            ->where(['packs.user_id' => $userId, 'packs.type' => $type])
+    //            ->selectRaw("packs.*,b.name,b.show_img,b.title,b.color, b.img2 as img2")
+    //            ->get();
+    //    }
 
-    public function packsJoinWithWare($userId, $type,array $additionalRelations = []): Collection|array
+    public function packsJoinWithWare($userId, $type, array $additionalRelations = []): Collection|array
     {
         return $this->model
             ->with(array_merge(['ware:id,id,name,show_img,title,color,img2,image_type'], $additionalRelations))
@@ -160,26 +160,26 @@ class PackRepository extends AbstractRepository
         return DB::transaction(function () use ($userId, $packId, $expire) {
             $pack = $this->model->query()
                 ->where(['user_id' => $userId, 'id' => $packId])
-                ->lockForUpdate() 
+                ->lockForUpdate()
                 ->first();
-    
+
             if (!$pack) {
                 return false;
             }
-    
+
             $this->isFirstUse($pack)
                 ? $this->markFirstUse($pack, $expire)
                 : $this->incrementUse($pack);
-    
+
             return true;
         });
     }
-    
+
     private function isFirstUse($pack): bool
     {
         return (int) $pack->using === 0;
     }
-    
+
     private function markFirstUse($pack, string $expire): void
     {
         $pack->update([
@@ -189,11 +189,11 @@ class PackRepository extends AbstractRepository
             'expire'  => $expire,
         ]);
     }
-    
+
     private function incrementUse($pack): void
     {
         $pack->update([
-            'is_used' => 1, 
+            'is_used' => 1,
             'use_num' => $pack->use_num + 1,
         ]);
     }
@@ -217,5 +217,10 @@ class PackRepository extends AbstractRepository
         return $this->model->query()->where('id', $id)->where('user_id', $userId)->where('is_used', 0)->where(function ($q) {
             $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
         })->first();
+    }
+
+    public function UnusedPack($id, $userId)
+    {
+        return $this->model->query()->where('id', $id)->where('user_id', $userId)->where('is_used', 0)->whereNull('expire')->first();
     }
 }

@@ -31,6 +31,8 @@ class BaishunGameController extends Controller
 
         $id = $this->findUserByToken($request->code ?? $request->ss_token);
 
+        Log::info("User found", ['id' => $id, 'current_di' => $userDi ?? null, 'currency_diff' => $request->currency_diff]);
+
         if (!$id) {
             $responseArray = [
                 'code' => 1,
@@ -66,6 +68,11 @@ class BaishunGameController extends Controller
                     throw new \RuntimeException('insufficient');
                 }
 
+                Log::info("Checking order existence", [
+                    'order_id' => $request->order_id,
+                    'exists' => $orderExists
+                ]);
+
                 $amountBefore = $user->di;
 
                 $helperAmount = $request->currency_diff > 0 ? $request->currency_diff : 0;
@@ -79,6 +86,11 @@ class BaishunGameController extends Controller
                     $helperAmount
                 );
 
+                Log::info("Before updating balance", [
+                    'user_id' => $id,
+                    'di_before' => $amountBefore,
+                    'currency_diff' => $request->currency_diff
+                ]);
 
                 DB::table('users')->where('id', $id)->update([
                     'di' => DB::raw('di + ' . (int) $request->currency_diff)
@@ -101,6 +113,12 @@ class BaishunGameController extends Controller
                     'updated_at' => now()
                 ]);
             });
+
+
+            Log::info("After updating balance", [
+                'user_id' => $id,
+                'di_after' => $userDi
+            ]);
 
         } catch (\RuntimeException $e) {
             if ($e->getMessage() === 'insufficient') {

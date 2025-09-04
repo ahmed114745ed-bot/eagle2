@@ -35,6 +35,11 @@ class ChatRepository
         return ChatMessage::ByUserInRoom($chatRoomId, $userId)->count();
     }
 
+    public function countDistinctUsersInRoom($chatRoomId)
+    {
+        return ChatMessage::distinctUserInRoom($chatRoomId)->count();
+    }
+
     public function createChatMessage($data)
     {
         return ChatMessage::create($data);
