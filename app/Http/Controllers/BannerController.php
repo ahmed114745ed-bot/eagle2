@@ -79,8 +79,8 @@ class BannerController extends Controller
        $dataShow = UserBannerShow::whereHas("banner", function ($q) use ($now) {
             $q->where('is_active', true)
                 ->whereNotNull('publish_at')
-                ->where(function ($q) use ($now) {
-                    $q->whereRaw("DATE_ADD(created_at, INTERVAL COALESCE(expire, 0) DAY) > ?", [$now])
+                ->where(function ($subQuery) use ($now) {
+                    $subQuery->whereRaw("DATE_ADD(created_at, INTERVAL COALESCE(expire, 0) DAY) > ?", [$now])
                         ->orWhereNull('expire')
                         ->orWhere('expire', 0);
             });
