@@ -501,6 +501,8 @@ use Modules\Vip\Entities\Vip;
         right: 95px;
     }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
 
 </head>
 
@@ -846,6 +848,8 @@ use Modules\Vip\Entities\Vip;
                                                        name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
                                                 <label for="zegoRadio" class="switch"></label>
                                             </div> --}}
+
+                                   
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -875,6 +879,24 @@ use Modules\Vip\Entities\Vip;
                                                         class="form-control" required>
                                                 </div>
                                             </div>
+                                            <input type="hidden" name="zego_filter_enabled" value="0">
+
+                                            <input type="checkbox"
+                                                name="zego_filter_enabled"
+                                                value="1"
+                                                data-bootstrap-switch
+                                                {{ $zego_filter_enabled ? 'checked' : '' }}>
+
+                                                <script>
+                                                    function initZegoSwitch() {
+                                                        $('input[data-bootstrap-switch]').each(function () {
+                                                            $(this).bootstrapSwitch('state', $(this).prop('checked'), true);
+                                                        });
+                                                    }
+
+                                                    $(document).ready(initZegoSwitch);
+                                                    $(document).on('pjax:success', initZegoSwitch);
+                                                </script>  
                                         </div>
                                         <button type="submit"
                                             class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>

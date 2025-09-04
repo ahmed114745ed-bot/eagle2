@@ -154,23 +154,4 @@
     });
 
 
-
-
-    function fixSidebarMenu() {
-    $('.sidebar-menu li.treeview')
-        .removeClass('menu-open')
-        .children('ul.treeview-menu').hide();
-
-    let $active = $('.sidebar-menu li.active').closest('.treeview');
-    $active.addClass('menu-open');
-    $active.children('ul.treeview-menu').show();
-    }
-
-    $(document).on('pjax:end ready', function () {
-        fixSidebarMenu();
-    });
-
-    $(document).ready(function () {
-        fixSidebarMenu();
-    });
 </script>
