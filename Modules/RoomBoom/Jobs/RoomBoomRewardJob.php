@@ -324,7 +324,7 @@ class RoomBoomRewardJob implements ShouldQueue
             foreach ($notification['user_ids'] as $userId) {
                 $user = $this->users[$userId] ?? null;
                 if ($user) {
-                    $expire = $notification['expire_days'] ?? null;
+                    $expire = @$notification['expire_days'];
                     UserCommon::assignRoomBoomWare($user, $ware, $expire);
                 }
             }
