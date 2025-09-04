@@ -322,19 +322,27 @@ class WareTabController extends MainController
 
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
-                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+                return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
             })
-            ->options([
-                'showPreview' => false,
-//                'showCaption' => false,
-                'showRemove'  => false,
-                'showUpload'  => false,
-                'showCancel'  => false,
-                'dropZoneEnabled' => false,     // no drag & drop area
-                'initialPreview' => [],         // don’t render existing file
-                'initialPreviewConfig' => [],
-            ])
-            ->removable(false);
+            ->attribute([
+                'id' => 'file-input-img2'
+            ])->help('<div id="preview-img2" style="margin-top:10px;"></div>')->hidePreview();
+
+//        $form->file('img2', trans('svg'))
+//            ->name(function ($file) {
+//                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+//            })
+//            ->options([
+//                'showPreview' => false,
+////                'showCaption' => false,
+////                'showRemove'  => false,
+////                'showUpload'  => false,
+////                'showCancel'  => false,
+////                'dropZoneEnabled' => false,     // no drag & drop area
+//                'initialPreview' => [],         // don’t render existing file
+//                'initialPreviewConfig' => [],
+//            ])
+//            ->hidePreview();
 
         Admin::script(<<<'JS'
     $(document).ready(function () {
