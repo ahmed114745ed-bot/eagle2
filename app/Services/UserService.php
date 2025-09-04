@@ -1054,9 +1054,6 @@ class UserService
         if (!$ware) return Common::apiResponse(0, 'product not found', null, 404);
         $to = User::query()->searchByUuid($request->touid)->first();
         if (!$to) return Common::apiResponse(0, 'user not found', null, 404);
-        if (!is_null($pack->dash_user_id)) {
-            $pack->dash_user_id = null;
-        }
         $pack->user_id   = $to->id;
         $pack->sender_id = $user->id;
         $pack->receive_type = 'send-ware';
