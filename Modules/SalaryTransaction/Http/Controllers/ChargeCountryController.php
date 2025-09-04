@@ -145,8 +145,9 @@ class ChargeCountryController extends MainController
         if (!$form->isEditing()) {
             $form->select('country_id', __('country'))->options(function () {
                 $ps = Country::query()->WhereDoesntHave('chargeCountry')->get();
+                $ops = [];
                 foreach ($ps as $p) {
-                    $ops[$p->id] = $p->name;
+                    $ops[$p->id] = app()->getLocale() === 'ar' ? $p->name : $p->e_name;
                 }
                 return $ops;
             })->rules(function ($form) {

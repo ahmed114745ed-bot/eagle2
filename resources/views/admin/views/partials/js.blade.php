@@ -152,4 +152,6 @@
     $(document).on('click', '.add-form-row', function () {
         setTimeout(initPhoneInput, 100);
     });
+
+
 </script>
