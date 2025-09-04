@@ -327,14 +327,14 @@ class WareTabController extends MainController
             ->options([
                 'showPreview' => false,
 //                'showCaption' => false,
-//                'showRemove'  => false,
-//                'showUpload'  => false,
-//                'showCancel'  => false,
-//                'dropZoneEnabled' => false,     // no drag & drop area
+                'showRemove'  => false,
+                'showUpload'  => false,
+                'showCancel'  => false,
+                'dropZoneEnabled' => false,     // no drag & drop area
                 'initialPreview' => [],         // don’t render existing file
                 'initialPreviewConfig' => [],
             ])
-            ->hidePreview();
+            ->removable(false);
 
         Admin::script(<<<'JS'
     $(document).ready(function () {
