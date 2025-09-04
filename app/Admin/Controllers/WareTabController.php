@@ -306,6 +306,20 @@ class WareTabController extends MainController
 //                return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
 //            });
 
+        $form->display('img2', 'Preview')->with(function ($value) {
+            if (!$value) return null;
+
+            $url = \Storage::disk(config('admin.upload.disk'))->url($value);
+            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+            $uniqueId = 'file_' . uniqid();
+
+            if (!in_array($ext, ['png','jpg','jpeg','gif','webp','svg'])) {
+                return handleShowImageWithTypes($uniqueId, $url, 100, 100, 10);
+            }
+
+            return "<img src='{$url}' style='max-height:150px' class='img img-thumbnail' />";
+        });
+
         $form->file('img2', trans('svg'))
             ->name(function ($file) {
                 return 'svga_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
@@ -313,20 +327,6 @@ class WareTabController extends MainController
             ->attribute([
                 'id' => 'file-input-img2'
             ])->help('<div id="preview-img2" style="margin-top:10px;"></div>');
-
-//        $form->display('img2', 'Preview')->with(function ($value) {
-//            if (!$value) return null;
-//
-//            $url = \Storage::disk(config('admin.upload.disk'))->url($value);
-//            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
-//            $uniqueId = 'file_' . uniqid();
-//
-//            if (!in_array($ext, ['png','jpg','jpeg','gif','webp','svg'])) {
-//                return handleShowImageWithTypes($uniqueId, $url, 100, 100, 10);
-//            }
-//
-//            return "<img src='{$url}' style='max-height:150px' class='img img-thumbnail' />";
-//        });
 
         Admin::script(<<<'JS'
     $(document).ready(function () {
