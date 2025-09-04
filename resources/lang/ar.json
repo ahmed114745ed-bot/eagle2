@@ -3738,6 +3738,8 @@
   "Bet Amount": "المبلغ الملقي",
   "Created at": "تاريخ الإنشاء",
   "User": "المستخدم",
-  "Game": "اللعبة"
+  "Game": "اللعبة",
+    "filters.expired_zero_or_null": "منتهي (صفر أو فارغ)",
+  "filters.yes": "نعم"
 
 }
