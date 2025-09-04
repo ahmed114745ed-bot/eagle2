@@ -160,7 +160,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di', 'transfer_salary', 'is_bd'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','huawei_version','android_version','ios_version', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
                 'agency',
@@ -263,16 +263,16 @@ class UserController extends MainController
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
 
-        $grid->column('versions', __('versions'))->modal(__('versions'), function ($model) {
+        $grid->column('versions', __('Versions'))->modal(__('Versions'), function () {
             $data = [
-                ['name' => 'iOS',     'version' => $model->ios_version],
-                ['name' => 'Huawei',  'version' => $model->huawei_version],
-                ['name' => 'Android', 'version' => $model->android_version],
+                ['iOS',     $this->ios_version],
+                ['Huawei',  $this->huawei_version],
+                ['Android', $this->android_version],
             ];
 
             return new Table(
-                [__('Name'), __('Version')], // table headers
-                $data                         // rows
+                [__('Name'), __('Version')], // headers
+                $data                        // rows
             );
         });
         $permission = $this->permission_name;
@@ -293,7 +293,7 @@ class UserController extends MainController
         //         e.preventDefault();
         //         let btn = $(this);
         //         let url = btn.data('url');
-        
+
         //         Swal.fire({
         //             title: 'هل أنت متأكد؟',
         //             text: "لن تستطيع التراجع بعد الحذف!",
