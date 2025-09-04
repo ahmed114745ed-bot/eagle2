@@ -107,7 +107,7 @@ class UserRepository extends Repository
     {
         return Bd::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
                     ->where(function ($query) use ($key) {
-                        
+
                             $query->orWhere('id', 'like', '%' . $key . '%');
                     })
                    ->paginate($perPage, ['*'], 'page', $page);
@@ -194,7 +194,8 @@ class UserRepository extends Repository
             'agencyJoinRequest' => fn($q) => $q->where('status', '!=', 2),
             'packs.ware',
             'country',
-            'manager'
+            'manager',
+            'profile'
         ])
             ->find($userId);
     }

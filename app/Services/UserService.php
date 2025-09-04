@@ -213,7 +213,7 @@ class UserService
 
 
 
-   
+
 
     public function updateLocation($userId, $lat, $log)
     {
@@ -1056,6 +1056,7 @@ class UserService
         if (!$to) return Common::apiResponse(0, 'user not found', null, 404);
         $pack->user_id   = $to->id;
         $pack->sender_id = $user->id;
+        $pack->receive_type = 'send-ware';
         $pack->save();
         CustomNotification::mallSend($user, $to, $pack->type, $ware->show_img);
         return Common::apiResponse(1, 'sent successfully');
@@ -1116,7 +1117,7 @@ class UserService
             'next_exp'      => @$secondLevel ?  @$secondLevel->exp ?? 0 : ($currentLevel->exp ?? 0),
             'next_img'      => @$secondLevel ? @$secondLevel->img ?? '' : $currentLevel->img ?? '',
             'remaining'     => @$remaining ?? 0,
-            'progress'      => (integer)(@$progress?? 0) ,
+            'progress'      => (int)(@$progress ?? 0),
             'exp_charge' =>  $expPercentages['exp_charge_percentage'] ?? 1,
         ];
 
@@ -1141,7 +1142,7 @@ class UserService
                 ->exists();
 
             if (! $exists) {
-              
+
                 $user->is_bd = 0;
                 $user->save();
             }
