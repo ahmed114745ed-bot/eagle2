@@ -1179,10 +1179,19 @@
                 </a>
                      @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-                        <button type="submit" class="btn btn-danger edit_user_item_model_btn">
+                        <button type="submit" class="btn btn-success edit_user_item_model_btn">
                             {{ __('edit') }}
                         </button>
                  @endif
+
+                 @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
+                     <button type="button"
+                            class="btn btn-danger remove-bd-btn"
+                            data-id="{{ $user->id }}"
+                            data-url="{{ route('users.remove', $user->id) }}">
+                        {{ __('Remove BD') }}
+                    </button>
+                @endif
             </div>
         </div>
     </div>
@@ -2607,7 +2616,37 @@
 
     $(document).ready(function () {
 
-
+    $(document).on('click', '.remove-bd-btn', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+                let url = btn.data('url');
+        
+                Swal.fire({
+                    title: 'هل أنت متأكد؟',
+                    text: "لن تستطيع التراجع بعد الحذف!",
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'نعم، احذف',
+                    cancelButtonText: 'إلغاء'
+                }).then((result) => {
+                    if (result.value) {
+                        let form = $('<form>', {
+                            'method': 'POST',
+                            'action': url
+                        }).append($('<input>', {
+                            'type': 'hidden',
+                            'name': '_token',
+                            'value': LA.token
+                        })).append($('<input>', {
+                            'type': 'hidden',
+                            'name': '_method',
+                            'value': 'POST'  
+                        }));
+                        form.appendTo('body').submit();
+                    }
+                });
+            });
 
          $('#agency_id').select2({
         placeholder: 'Select agency',
