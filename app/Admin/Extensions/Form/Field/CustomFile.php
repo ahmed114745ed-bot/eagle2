@@ -15,6 +15,7 @@ class CustomFile extends File
         $uniqueId = 'file_' . uniqid();
 
         if (in_array($ext, ['png','jpg','jpeg','gif','webp','svg'])) {
+            info('hiiiii');
             return "<img src='{$url}' class='file-preview-image img-responsive' style='max-height:150px'>";
         }
 

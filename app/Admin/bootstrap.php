@@ -18,7 +18,8 @@
  *
  */
 
- use Encore\Admin\Form;
+use App\Admin\Extensions\Form\Field\CustomFile;
+use Encore\Admin\Form;
  use App\Admin\Extensions\Form\Field\DynamicFields;
  use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +56,7 @@ view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
 });
 
 Form::extend('dynamicFields', DynamicFields::class);
+Form::extend('customFile', CustomFile::class);
 
 
 Encore\Admin\Admin::script(<<<'JS'
