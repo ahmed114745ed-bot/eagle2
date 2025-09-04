@@ -85,18 +85,22 @@ class BannerController extends Controller
     
     private function getUserSeenBanners($user, $now)
     {
-        $seen = UserBannerShow::whereHas("banner", function ($q) use ($now) {
+        return UserBannerShow::whereHas("banner", function ($q) use ($now) {
             $q->where('is_active', true)
                 ->whereNotNull('publish_at')
                 ->where(function ($subQuery) use ($now) {
-                    $subQuery->whereRaw("DATE_ADD(publish_at, INTERVAL COALESCE(expire, 0) DAY) > ?", [$now])
-                        ->orWhereNull('expire')
-                        ->orWhere('expire', 0);
+                    $subQuery->whereRaw(
+                        "DATE_ADD(publish_at, INTERVAL COALESCE(expire, 0) DAY) > ?",
+                        [$now]
+                    )
+                    ->orWhereNull('expire')
+                    ->orWhere('expire', 0);
                 });
-        })->where("user_id", $user->id)->pluck('banner_id');
-    
-        return $seen;
+        })
+        ->where("user_id", $user->id)
+        ->pluck('banner_id');
     }
+    
     
     private function getNextBannerForUser($user, $now)
     {
