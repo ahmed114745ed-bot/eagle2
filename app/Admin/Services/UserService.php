@@ -6,24 +6,23 @@ namespace App\Admin\Services;
 
 use App\Helpers\LogHelper;
 use App\Helpers\UserLevelHelper;
+use App\Models\Admin;
 use Modules\Vip\Entities\Vip;
 
 class UserService
 {
     public function adminUserAvatar($user, bool $withoutLevels = false): string
     {
-
         if (! $user) return __('No user');
 
-        $uid = $user->original_uuid;
-        $special = $user->uuid;
+        $uid = e($user->original_uuid);
+        $special = e($user->uuid);
 
         $defaultImage = asset('images/businessman-icon.jpg');
-        $path = $user->profile->avatar ?? null;
+        $path = $user->profile?->avatar; // prevent null crash
 
         $url = getImagePath($path) ?? $defaultImage;
 
-        // Avoid calling external resources unless necessary
         if (! isImageExists($url)) {
             $url = $defaultImage;
         }
@@ -32,113 +31,20 @@ class UserService
 
         // Level-related data
         $levelImages = '';
-
         if (! $withoutLevels) {
-
             $receiverImg = getImagePath(UserLevelHelper::getReceiverImage($user));
-            $senderImg = getImagePath(UserLevelHelper::getSenderImage($user));
+            $senderImg   = getImagePath(UserLevelHelper::getSenderImage($user));
 
-
-            $chargerImg = null;
-
-            // HTML rendering for levels
-            foreach ([$receiverImg, $senderImg, $chargerImg] as $img) {
+            foreach ([$receiverImg, $senderImg] as $img) {
                 if (!empty($img)) {
-                    $levelImages .= "<img src='$img' style='width: 32px; height: 14px;'> ";
+                    $levelImages .= "<img src='{$img}' style='width:32px;height:14px;margin-right:2px;'>";
                 }
             }
         }
-        admin_toastr();
-        return "
-    <a href='" . url("admin/users/{$user->id}") . "' style='
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px;
-        text-decoration: none;
-        color: inherit;
-        transition: background-color 0.2s ease;
-    ' >
-        $image
-        <div>
-            <strong style='font-size: 16px;'>{$user->name}</strong><br>
-            <span style='font-size: 13px;'>
-                UID: <span id='uid-{$user->id}'>{$uid}</span>
-                <button onclick=\"event.preventDefault(); event.stopPropagation(); copyToClipboard('uid-{$user->id}')\" style='
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    margin-left: 5px;
-                    font-size: 13px;
-                    color: #007bff;
-                ' title='Copy UID'>📝</button>
-            </span><br>
-            <span style='font-size: 13px;'>Special: {$special}</span><br>
-            $levelImages
-        </div>
-    </a>
 
-    <script>
-        function copyToClipboard(elementId) {
-            const text = document.getElementById(elementId)?.textContent;
-            if (text) {
-                navigator.clipboard.writeText(text).then(() => {
-                        toastr.success('" . e(trans('Copied')) . "');
-                });
-            }
-        }
-    </script>
-";
-    }
-
-
-    public function adminUserBasicInfo($user): string
-{
-    if (!$user) return __('No User');
-
-    $uid = $user->original_uuid;
-    $special = $user->uuid;
-
-    $defaultImage = asset('images/businessman-icon.jpg');
-    $path = $user->profile->avatar ?? null;
-
-    $url = getImagePath($path) ?? $defaultImage;
-    if (!isImageExists($url)) {
-        $url = $defaultImage;
-    }
-
-    $image = handleShowImageWithTypes($user->id, $url, 50, 50);
-
-    return "
-    <a href='" . url("admin/users/{$user->id}") . "' style='
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px;
-        text-decoration: none;
-        color: inherit;
-        transition: background-color 0.2s ease;
-    '>
-        $image
-        <div>
-            <strong style='font-size: 16px;'>{$user->name}</strong><br>
-            <span style='font-size: 13px;'>
-                UID: <span id='uid-{$user->id}'>{$uid}</span>
-                <button onclick=\"event.preventDefault(); event.stopPropagation(); copyToClipboard('uid-{$user->id}')\" style='
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    margin-left: 5px;
-                    font-size: 13px;
-                    color: #007bff;
-                ' title='Copy UID'>📝</button>
-            </span><br>
-            <span style='font-size: 13px;'>Special: {$special}</span>
-        </div>
-    </a>
-
-    <script>
-        function copyToClipboard(elementId) {
+        // Register JS ONCE globally (safe)
+        Admin::script("
+        window.copyToClipboard = function(elementId) {
             const text = document.getElementById(elementId)?.textContent;
             if (text) {
                 navigator.clipboard.writeText(text).then(() => {
@@ -146,9 +52,32 @@ class UserService
                 });
             }
         }
-    </script>
-    ";
-}
+    ");
+
+        return <<<HTML
+        <a href="{$this->adminUserUrl($user->id)}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
+            {$image}
+            <div>
+                <strong style="font-size:16px;">{$user->name}</strong><br>
+                <span style="font-size:13px;">
+                    UID: <span id="uid-{$user->id}">{$uid}</span>
+                    <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('uid-{$user->id}')"
+                        style="background:none;border:none;cursor:pointer;margin-left:5px;font-size:13px;color:#007bff;"
+                        title="Copy UID">📝</button>
+                </span><br>
+                <span style="font-size:13px;">Special: {$special}</span><br>
+                {$levelImages}
+            </div>
+        </a>
+    HTML;
+    }
+
+    protected function adminUserUrl($id): string
+    {
+        return url("admin/users/{$id}");
+    }
+
+
 
 
 
