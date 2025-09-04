@@ -307,17 +307,21 @@ class WareTabController extends MainController
 //            });
 
         $form->display('img2', 'Preview')->with(function ($value) {
-            if (!$value) return null;
+            if (!$value) return "<div id='preview-display-img2'></div>";
 
             $url = \Storage::disk(config('admin.upload.disk'))->url($value);
             $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
             $uniqueId = 'file_' . uniqid();
 
             if (!in_array($ext, ['png','jpg','jpeg','gif','webp','svg'])) {
-                return handleShowImageWithTypes($uniqueId, $url, 100, 100, 10);
+                return "<div id='preview-display-img2'>" .
+                    handleShowImageWithTypes($uniqueId, $url, 100, 100, 10) .
+                    "</div>";
             }
 
-            return "<img src='{$url}' style='max-height:150px' class='img img-thumbnail' />";
+            return "<div id='preview-display-img2'>
+                <img src='{$url}' style='max-height:150px' class='img img-thumbnail' />
+            </div>";
         });
 
         $form->file('img2', trans('svg'))
@@ -345,53 +349,57 @@ class WareTabController extends MainController
 //            ->hidePreview();
 
         Admin::script(<<<'JS'
-    $(document).ready(function () {
-        $('#file-input-img2').on('change', function (event) {
-            let file = event.target.files[0];
-            if (!file) return;
+            $(document).ready(function () {
+                $('#file-input-img2').on('change', function (event) {
+                    let file = event.target.files[0];
+                    if (!file) return;
 
-            let ext = file.name.split('.').pop().toLowerCase();
+                    let ext = file.name.split('.').pop().toLowerCase();
 
-            // clear old preview
-            $('#preview-img2').empty();
+                    // clear old previews
+                    $('#preview-img2').empty();
+                    $('#preview-display-img2').empty();
 
-            if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#preview-img2').html(
-                        `<img src="${e.target.result}" style="max-height:150px" class="img img-thumbnail" />`
-                    );
-                };
-                reader.readAsDataURL(file);
-            } else if (['mp4','mov','webm'].includes(ext)) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#preview-img2').html(
-                        `<video src="${e.target.result}" controls style="max-height:150px"></video>`
-                    );
-                };
-                reader.readAsDataURL(file);
-            } else if (ext === 'svga') {
-                let uniqueId = 'svga_preview_' + Date.now();
-                $('#preview-img2').html(`<div id="${uniqueId}" style="width:150px;height:150px;"></div>`);
+                    if (['png','jpg','jpeg','gif','webp','svg'].includes(ext)) {
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let html = `<img src="${e.target.result}" style="max-height:150px" class="img img-thumbnail" />`;
+                            $('#preview-img2').html(html);
+                            $('#preview-display-img2').html(html);
+                        };
+                        reader.readAsDataURL(file);
+                    } else if (['mp4','mov','webm'].includes(ext)) {
+                        let reader = new FileReader();
+                        reader.onload = function (e) {
+                            let html = `<video src="${e.target.result}" controls style="max-height:150px"></video>`;
+                            $('#preview-img2').html(html);
+                            $('#preview-display-img2').html(html);
+                        };
+                        reader.readAsDataURL(file);
+                    } else if (ext === 'svga') {
+                        let uniqueId = 'svga_preview_' + Date.now();
+                        let html = `<div id="${uniqueId}" style="width:150px;height:150px;"></div>`;
+                        $('#preview-img2').html(html);
+                        $('#preview-display-img2').html(html);
 
-                let player = new SVGA.Player('#' + uniqueId);
-                player.loops = 0; // infinite loop
-                player.clearsAfterStop = false;
-                let parser = new SVGA.Parser('#' + uniqueId);
+                        let player = new SVGA.Player('#' + uniqueId);
+                        player.loops = 0;
+                        player.clearsAfterStop = false;
+                        let parser = new SVGA.Parser('#' + uniqueId);
+                        let blobUrl = URL.createObjectURL(file);
 
-                let blobUrl = URL.createObjectURL(file);
-
-                parser.load(blobUrl, function(videoItem) {
-                    player.setVideoItem(videoItem);
-                    player.startAnimation();
+                        parser.load(blobUrl, function(videoItem) {
+                            player.setVideoItem(videoItem);
+                            player.startAnimation();
+                        });
+                    } else {
+                        let html = `<p>Selected file: ${file.name}</p>`;
+                        $('#preview-img2').html(html);
+                        $('#preview-display-img2').html(html);
+                    }
                 });
-            } else {
-                $('#preview-img2').html(`<p>Selected file: ${file.name}</p>`);
-            }
-        });
-    });
-JS);
+            });
+        JS);
 
 //        \Encore\Admin\Form::extend('customfile', CustomFile::class);
 //        $form->customfile('img2', 'Upload Image/Animation');
