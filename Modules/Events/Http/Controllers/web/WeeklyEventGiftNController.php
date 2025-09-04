@@ -332,6 +332,7 @@ class WeeklyEventGiftNController extends MainController
         $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
+                 $form->number('expire', __('expire'));
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
@@ -341,6 +342,7 @@ class WeeklyEventGiftNController extends MainController
                     }
                     return $ops;
                 });
+                 $form->number('expire', __('expire'));
             })
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"));
@@ -348,8 +350,9 @@ class WeeklyEventGiftNController extends MainController
                 $form->image("target4", __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
+                 $form->number('expire', __('expire'));
             })->rules('required');
-        $form->number('expire', __('expire'));
+       
         $form->saved(function (Form $form) {
             $route = url('admin/weekly-events-gift/' . request('weekly_event_id'));
             return redirect($route);

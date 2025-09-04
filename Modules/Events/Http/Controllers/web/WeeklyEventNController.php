@@ -183,7 +183,8 @@ class WeeklyEventNController extends MainController
 
     public function show($id, Content $content)
     {
-        return parent::show($id, $content
+        return parent::show($id, $content->title(__('weekly-events-new'))
+        
             ->row("<h3>" . __('weekly Star') . "</h3>")->row(function ($row) use ($id) {
                 $row->column(12, $this->weeklyStar($id));
             })
@@ -223,26 +224,27 @@ class WeeklyEventNController extends MainController
         $grid = new Grid(new Reward);
         $grid->model()->where('weekly_star_id', $id);
 
-        $grid->column('level', trans('level'));
+        $grid->column('level', trans('winners'));
         $grid->column('type', trans('type'))->display(function ($type) {
 
             return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
         });
-        $grid->column('target', trans('target'))->display(function ($target) {
+        $grid->column('target', trans('gift'))->display(function ($target) {
 
             if ($this->type == "coins") {
                 return $target;
             } elseif ($this->type == "ware") {
                 $ware = Ware::find($target);
-                return $ware->name;
+                return  $ware ? ($ware->name ?? '') : "";
             } elseif ($this->type == "vip") {
                 $vip = OVip::find($target);
-                return $vip->name;
+                return  $vip ? ($vip->name ?? '') : "";
             } else {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+         $grid->column('expire', trans('expire'));
 
         $grid->disableActions();
         $grid->disableCreateButton();
