@@ -5,6 +5,7 @@ namespace Modules\Vip\Entities;
 use App\Models\Admin;
 use App\Models\Pack;
 use App\Models\User;
+use App\Traits\AutoReceiveType;
 use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ use Modules\Vip\Entities\OVip;
 
 class UserVip extends Model
 {
-    use TimestampsWithTimezone, SoftDeletes;
+    use TimestampsWithTimezone, SoftDeletes, AutoReceiveType;
 
     protected $table = 'users_vips';
 
@@ -23,6 +24,11 @@ class UserVip extends Model
     public function senderable(): MorphTo
     {
         return $this->morphTo(null, 'sender_type', 'sender_id');
+    }
+
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function OVip()
@@ -47,9 +53,7 @@ class UserVip extends Model
     }
     protected static function booted()
     {
-        static::created(function ($userVip) {
-
-        });
+        static::created(function ($userVip) {});
     }
 
     public function user()

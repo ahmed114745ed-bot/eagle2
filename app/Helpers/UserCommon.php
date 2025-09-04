@@ -257,7 +257,7 @@ class UserCommon
         return $user_statistic;
     }
 
-    public static function userVip(User $user)
+    public static function userVip(User $user ,$receiveType = 'vip-check')
     {
         $vip = OVip::query()->first();
         $user_vip_check = UserVip::query()->where('user_id', $user->id)
@@ -266,7 +266,7 @@ class UserCommon
 
 
         if (!$user_vip_check) {
-            VipCommon::createUserVip($vip ,$user ,$vip->expire , null,'',);
+            VipCommon::createUserVip($vip ,$user ,$vip->expire , null,'',1,0,0,$receiveType);
 
         }
     }
@@ -345,8 +345,11 @@ class UserCommon
         // Common::send_firebase_notification($tokens_notfacion, $title, $body);
     }
 
-    public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null)
+    public static function addWareToUser(User $user, Ware $ware, $expir, $sender = null , $receiveType = null )
     {
+        $receiveType = $receiveType ?? 'not-sending';
+
+
         $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
 
         $title = __('congratulations');
@@ -386,6 +389,7 @@ class UserCommon
             //            $arr['expire'] = $expir ? time() + ($expir * 86400) : ($ware->expire ? time() + ($ware->expire * 86400) : 0);
             $arr['is_read'] = 1;
             $arr['days'] = $ware->expire;
+            $arr['receive_type']      = $receiveType;
 
             $pack = Pack::query()->create($arr);
             $pack->senderable()->associate($sender);
@@ -448,6 +452,9 @@ class UserCommon
      */
     public static function assignRoomBoomWare(User $user, Ware $ware, $expire, $sender = null): void
     {
+
+          \Log::info("expire bom pack " .  $expire);
+
         DB::beginTransaction();
         try {
             $arr['user_id']   = $user->id;
@@ -461,6 +468,7 @@ class UserCommon
 
 
             $pack = Pack::query()->create($arr);
+          //  \Log::info('Created Pack:', $pack->toArray());
 
             if ($sender) {
                 $pack->senderable()->associate($sender);

@@ -269,7 +269,7 @@ class AdminPermissionRefact extends Seeder
                     [
                         'key' => 'BD',
                         'except' => [],
-                        'additional' => ['delete-switch', 'choose-switch'],
+                        'additional' => ['delete-switch', 'choose-switch','stop-salary-switch'],
                     ],
                 ],
             ],

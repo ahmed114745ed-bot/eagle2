@@ -704,7 +704,6 @@ class AgencyController extends MainController
     {
         $form->row(function ($row) {
             $row->width(9)->text('phone', __('agency whatsApp number'))
-                ->rules('required')
                 ->attribute('id', 'phone-input')
                 ->attribute('maxlength', 13)
                 ->default(function ($form) {
@@ -1086,7 +1085,7 @@ class AgencyController extends MainController
             UsersJoinedAgency::create($joinAgencyData);
         }
         // add vip to user
-        UserCommon::userVip($user);
+        UserCommon::userVip($user,'accept-join-bd');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([

@@ -69,9 +69,9 @@ class EnteranceController extends Controller
             'zego' => [
                 'server_secret' => $zego_server_secret,
                 'app_id' => $zego_app_id,
-                'app_sign' => $app_sign,
+                'app_sign' => $app_sign
             ],
-            'library' => $library == 1 ? 'zego' : 'agora',
+            'library' => /*$library == 1 ?*/ 'zego' /*: 'agora'*/,
 
         ];
         return Common::apiResponse(1, '', $data);
