@@ -160,7 +160,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di', 'transfer_salary', 'is_bd'])
+            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'uuid', 'special_id', 'di','huawei_version','android_version','ios_version', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
                 'agency',
@@ -263,64 +263,64 @@ class UserController extends MainController
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
 
-        $grid->column('versions', __('versions'))->modal(__('versions'), function ($model) {
+        $grid->column('versions', __('versions'))->modal(__('versions'), function () {
             $data = [
-                ['name' => 'iOS',     'version' => $model->ios_version],
-                ['name' => 'Huawei',  'version' => $model->huawei_version],
-                ['name' => 'Android', 'version' => $model->android_version],
+                ['iOS',     $this->ios_version],
+                ['Huawei',  $this->huawei_version],
+                ['Android', $this->android_version],
             ];
 
             return new Table(
-                [__('Name'), __('Version')], // table headers
-                $data                         // rows
+                [__('Name'), __('Version')], // headers
+                $data                        // rows
             );
         });
         $permission = $this->permission_name;
 
 
-        $grid->column('bd_action', __('BD Action'))->display(function () {
-            if ($this->is_bd == 1) {
-                $btn  = '<button type="button" class="btn btn-danger btn-sm remove-bd-btn" ';
-                $btn .= 'data-id="' . $this->id . '" data-url="' . route('users.remove', $this->id) . '">';
-                $btn .= __('Remove BD') . '</button>';
-                return $btn;
-            }
-            return '';
-        });
+        // $grid->column('bd_action', __('BD Action'))->display(function () {
+        //     if ($this->is_bd == 1) {
+        //         $btn  = '<button type="button" class="btn btn-danger btn-sm remove-bd-btn" ';
+        //         $btn .= 'data-id="' . $this->id . '" data-url="' . route('users.remove', $this->id) . '">';
+        //         $btn .= __('Remove BD') . '</button>';
+        //         return $btn;
+        //     }
+        //     return '';
+        // });
 
-        Admin::script(<<<'JS'
-            $(document).on('click', '.remove-bd-btn', function (e) {
-                e.preventDefault();
-                let btn = $(this);
-                let url = btn.data('url');
-        
-                Swal.fire({
-                    title: 'هل أنت متأكد؟',
-                    text: "لن تستطيع التراجع بعد الحذف!",
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'نعم، احذف',
-                    cancelButtonText: 'إلغاء'
-                }).then((result) => {
-                    if (result.value) {
-                        let form = $('<form>', {
-                            'method': 'POST',
-                            'action': url
-                        }).append($('<input>', {
-                            'type': 'hidden',
-                            'name': '_token',
-                            'value': LA.token
-                        })).append($('<input>', {
-                            'type': 'hidden',
-                            'name': '_method',
-                            'value': 'POST'  
-                        }));
-                        form.appendTo('body').submit();
-                    }
-                });
-            });
-        JS);
+        // Admin::script(<<<'JS'
+        //     $(document).on('click', '.remove-bd-btn', function (e) {
+        //         e.preventDefault();
+        //         let btn = $(this);
+        //         let url = btn.data('url');
+
+        //         Swal.fire({
+        //             title: 'هل أنت متأكد؟',
+        //             text: "لن تستطيع التراجع بعد الحذف!",
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#d33',
+        //             cancelButtonColor: '#3085d6',
+        //             confirmButtonText: 'نعم، احذف',
+        //             cancelButtonText: 'إلغاء'
+        //         }).then((result) => {
+        //             if (result.value) {
+        //                 let form = $('<form>', {
+        //                     'method': 'POST',
+        //                     'action': url
+        //                 }).append($('<input>', {
+        //                     'type': 'hidden',
+        //                     'name': '_token',
+        //                     'value': LA.token
+        //                 })).append($('<input>', {
+        //                     'type': 'hidden',
+        //                     'name': '_method',
+        //                     'value': 'POST'  
+        //                 }));
+        //                 form.appendTo('body').submit();
+        //             }
+        //         });
+        //     });
+        // JS);
 
 
 

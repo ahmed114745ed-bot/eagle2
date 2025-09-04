@@ -145,6 +145,7 @@ class ChargeCountryController extends MainController
         if (!$form->isEditing()) {
             $form->select('country_id', __('country'))->options(function () {
                 $ps = Country::query()->WhereDoesntHave('chargeCountry')->get();
+                 $ops = [];
                 foreach ($ps as $p) {
                     $ops[$p->id] = $p->name;
                 }
