@@ -262,6 +262,19 @@ class UserController extends MainController
             $count = $this->same_device_users_count;
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
+
+        $grid->column('versions', __('versions'))->modal(__('versions'), function ($model) {
+            $data = [
+                ['name' => 'iOS',     'version' => $model->ios_version],
+                ['name' => 'Huawei',  'version' => $model->huawei_version],
+                ['name' => 'Android', 'version' => $model->android_version],
+            ];
+
+            return new Table(
+                [__('Name'), __('Version')], // table headers
+                $data                         // rows
+            );
+        });
         $permission = $this->permission_name;
 
 
@@ -569,7 +582,7 @@ class UserController extends MainController
 
 
         $countries = $this->countries();
-        $data = compact('user', 'packs', 'type','userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
+        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'countries');
         return  parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
