@@ -317,7 +317,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $wareIds = array_keys($this->wareNotifications);
         $wares   = Ware::whereIn('id', $wareIds)->get()->keyBy('id');
-        $expire = $this->wareNotifications['expire_days'];
+        $expire = @$this->wareNotifications['expire_days'];
         
         foreach ($this->wareNotifications as $wareId => $notification) {
              \Log::info($notification);
@@ -326,7 +326,7 @@ class RoomBoomRewardJob implements ShouldQueue
             $body     = str_replace(':ware', $wareName, $wareBody);
              
             foreach ($notification['user_ids'] as $userId) {
-                $user = $this->users[$userId] ?? null;
+                $user = @$this->users[$userId] ?? null;
                 if ($user) {
                             \Log::info("user bom");
                             \Log::info("expire bom " .  $expire);
