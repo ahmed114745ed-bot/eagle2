@@ -57,6 +57,8 @@ view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
 
 Form::extend('dynamicFields', DynamicFields::class);
 Form::extend('customFile', CustomFile::class);
+Admin::js('/vendor/svga/svga.min.js');
+
 
 
 Encore\Admin\Admin::script(<<<'JS'
