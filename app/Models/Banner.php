@@ -22,7 +22,7 @@ class Banner extends Model
 
     public function scopeWhereIsNotSeen(Builder $query, $utcTimestamp): Builder
     {
-        return $query->whereDate('publish_at', '<=', Carbon::createFromTimestamp($utcTimestamp, 'utc'));
+        return $query->whereDate('publish_at', '>', Carbon::createFromTimestamp($utcTimestamp, 'utc'));
     }
 
     public function getPublishAttribute()
