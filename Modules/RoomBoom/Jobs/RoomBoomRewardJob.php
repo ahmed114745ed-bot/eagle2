@@ -163,6 +163,8 @@ class RoomBoomRewardJob implements ShouldQueue
             $expire = $reward['expire_days'];
             if ($reward['target_type'] == 'ware') {
                 $this->wareNotifications[$reward['target']]['user_ids'][] = $userId;
+                $this->wareNotifications['expire_days'] = $expire;
+
                 if ($token) {
                     $this->wareNotifications[$reward['target']]['tokens'][] = $token;
                 }
@@ -315,18 +317,18 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $wareIds = array_keys($this->wareNotifications);
         $wares   = Ware::whereIn('id', $wareIds)->get()->keyBy('id');
-
+        $expire = $this->wareNotifications['expire_days'];
+        
         foreach ($this->wareNotifications as $wareId => $notification) {
+             \Log::info($notification);
             $ware     = $wares[$wareId] ?? null;
             $wareName = $ware->name ?? __('a special ware');
             $body     = str_replace(':ware', $wareName, $wareBody);
-
+             
             foreach ($notification['user_ids'] as $userId) {
                 $user = $this->users[$userId] ?? null;
                 if ($user) {
                             \Log::info("user bom");
-
-                    $expire = @$notification['expire_days'];
                             \Log::info("expire bom " .  $expire);
 
                     UserCommon::assignRoomBoomWare($user, $ware, $expire);
