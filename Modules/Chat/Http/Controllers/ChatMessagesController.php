@@ -125,12 +125,12 @@ class ChatMessagesController extends Controller
 
         //add status for message
 
-        try {
+//        try {
             // return $user2;
             event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
             event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
-        } catch (\Throwable $e) {
-        }
+//        } catch (\Throwable $e) {
+//        }
 
         return [
             'message' =>    $response['message_resource'],
@@ -140,7 +140,7 @@ class ChatMessagesController extends Controller
 
     private function isValidFileExtension($file, $validExtensions)
     {
-        $extension = $file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExteension();
 
         return in_array($extension, $validExtensions);
     }
