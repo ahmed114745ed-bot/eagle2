@@ -100,13 +100,12 @@ class StripeController extends Controller
             }
 
             if (!in_array($status, self::SUCCESS_STATUSES)) {
-                $this->markCoinLogAsFailed($orderId, $trxId, $status);
                 return response('Ignored: not successful', 200);
             }
             
-
-            $this->markCoinLogAsPaid($orderId, $trxId);
-
+            if (in_array($status, self::SUCCESS_STATUSES)) {
+                 $this->markCoinLogAsPaid($orderId, $trxId);
+            }
             return response('Webhook Handled', 200);
 
         } catch (SignatureVerificationException $e) {
