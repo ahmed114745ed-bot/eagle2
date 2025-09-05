@@ -1179,10 +1179,19 @@
                 </a>
                      @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-                        <button type="submit" class="btn btn-danger edit_user_item_model_btn">
+                        <button type="submit" class="btn btn-success edit_user_item_model_btn">
                             {{ __('edit') }}
                         </button>
                  @endif
+
+                 @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
+                     <button type="button"
+                            class="btn btn-danger remove-bd-btn"
+                            data-id="{{ $user->id }}"
+                            data-url="{{ route('users.remove', $user->id) }}">
+                        {{ __('Remove BD') }}
+                    </button>
+                @endif
             </div>
         </div>
     </div>
@@ -1323,7 +1332,50 @@
 
                                     </td>
                                     <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :$pack->days  }}</td>
-                                    <td>{{ $pack->receive_type }}</td>
+                                    {{-- <td>{{ $pack->receive_type }}</td> --}}
+                                        <td>
+                                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                {{-- Always show type --}}
+                                                <span style="font-weight: 600; color: #444;">
+                                                    {{ @$pack->receive_type ?? '' }}
+                                                </span>
+
+                                                {{-- If receive_type contains "send", show sender below --}}
+                                                @if(@$pack->sender && Str::contains(@$pack->receive_type, 'send'))
+                                                    @php
+                                                        $name = @$pack->sender->name ?? 'Unknown User';
+                                                        $showUrl = url("admin/users/" . @$pack->sender->id);
+                                                    @endphp
+
+                                                    <a href="{{ $showUrl }}" 
+                                                    style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                        <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                            sender:
+                                                        </span>
+                                                        <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                            {{ $name }}
+                                                        </span>
+                                                    </a>
+                                                     @elseif($pack->receive_type == 'wares-dash-dedicate' && $pack->admin)
+                                                @php
+                                                    $name = @$pack->admin->name ?? 'Unknown User';
+                                                    $showUrl = url("admin/auth/users/" . @$pack->admin->id);
+                                                @endphp
+
+                                                <a href="{{ $showUrl }}" 
+                                                style="text-decoration: none; color: #28a745; display: inline-block;">
+                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                        admin:
+                                                    </span>
+                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                        {{ $name }}
+                                                    </span>
+                                                </a>
+        
+                                                @endif
+                                            </div>
+                                        </td>
+
 
                                     <td>
                                         <div class="d-flex">
@@ -2607,7 +2659,37 @@
 
     $(document).ready(function () {
 
-
+    $(document).on('click', '.remove-bd-btn', function (e) {
+                e.preventDefault();
+                let btn = $(this);
+                let url = btn.data('url');
+        
+                Swal.fire({
+                    title: 'هل أنت متأكد؟',
+                    text: "لن تستطيع التراجع بعد الحذف!",
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'نعم، احذف',
+                    cancelButtonText: 'إلغاء'
+                }).then((result) => {
+                    if (result.value) {
+                        let form = $('<form>', {
+                            'method': 'POST',
+                            'action': url
+                        }).append($('<input>', {
+                            'type': 'hidden',
+                            'name': '_token',
+                            'value': LA.token
+                        })).append($('<input>', {
+                            'type': 'hidden',
+                            'name': '_method',
+                            'value': 'POST'  
+                        }));
+                        form.appendTo('body').submit();
+                    }
+                });
+            });
 
          $('#agency_id').select2({
         placeholder: 'Select agency',

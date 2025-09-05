@@ -12,6 +12,8 @@
  <!-- <script src="https://cdn..net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
+<script src="{{ asset('js/helpers/admin-utils.js') }}"></script>
+
 
 <script>
     $(document).ready(function () {
@@ -151,5 +153,26 @@
 
     $(document).on('click', '.add-form-row', function () {
         setTimeout(initPhoneInput, 100);
+    });
+
+
+
+
+    function fixSidebarMenu() {
+    $('.sidebar-menu li.treeview')
+        .removeClass('menu-open')
+        .children('ul.treeview-menu').hide();
+
+    let $active = $('.sidebar-menu li.active').closest('.treeview');
+    $active.addClass('menu-open');
+    $active.children('ul.treeview-menu').show();
+    }
+
+    $(document).on('pjax:end ready', function () {
+        fixSidebarMenu();
+    });
+
+    $(document).ready(function () {
+        fixSidebarMenu();
     });
 </script>

@@ -43,6 +43,8 @@ class SettingController extends MainController
         $firebase_database_url = Common::getConf('firebase_database_url');
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
+        $zego_filter_enabled = Common::getConf('zego_filter_enabled');
+       
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))
@@ -72,7 +74,8 @@ class SettingController extends MainController
                 'soundLibrary',
                 'videoLibrary',
                 'gamesLibrary',
-                'agora_app_certificate'
+                'agora_app_certificate',
+                'zego_filter_enabled'
             ]))));
     }
 
@@ -86,6 +89,7 @@ class SettingController extends MainController
 
     public function saveSettings(Request $request)
     {
+        
         $data = $request->except('_token');
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);

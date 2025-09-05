@@ -26,6 +26,7 @@ class ChatRoomResourcePusher extends JsonResource
             'name'                => $user2->name,
             'img'                 => @$user2->profile->avatar,
             'chat_id'             => $this->id,
+            'type'                => $this->type,
             'unread_message'      => $total_undread_message,
             'last_message'        => @ new ChatMessageResource( $this->messages[0]),
         ];
