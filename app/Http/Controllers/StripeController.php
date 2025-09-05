@@ -191,18 +191,6 @@ class StripeController extends Controller
         ]);
     }
 
-    private function markCoinLogAsFailed(?string $orderId, ?string $trxId, string $status): void
-    {
-        $coinLog =  CoinLog::find($orderId);
-
-        if ($coinLog) {
-            $coinLog->update([
-                'trx'    => $trxId,
-                'status' => $status, 
-            ]);
-            Log::info("CoinLog {$coinLog->id} marked as {$status}");
-        }
-    }
 
 
     
