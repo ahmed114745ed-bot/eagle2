@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\LogHelper;
+use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Models\Coin;
 use App\Models\CoinLog;
@@ -12,6 +15,7 @@ use App\Traits\User\PaymentTrait;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Modules\Achievement\Http\Services\UserAchievementService;
 use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
@@ -168,26 +172,99 @@ class StripeController extends Controller
 
     private function markCoinLogAsPaid(?string $orderId, ?string $trxId)
     {
-        $coinLog =  CoinLog::find($orderId);
+        $coinLog = $this->findCoinLog($orderId, $trxId);
+        if (!$coinLog) return;
+    
+        if ($this->isAlreadyProcessed($coinLog)) return;
+    
+        $this->updateCoinLogAsPaid($coinLog, $trxId);
+    
+        $user = $coinLog->user;
+        if (!$user) {
+            return  $this->handleMissingUser($coinLog);
+        }
+    
+        $this->processUserPayment($user, $coinLog);
+        return   $this->finalizeResponse($coinLog);
+    }
 
+    private function findCoinLog(?string $orderId, ?string $trxId): ?CoinLog
+    {
+        $coinLog = CoinLog::find($orderId);
+    
         if (!$coinLog) {
-            Log::warning("Stripe Webhook: No CoinLog found", [
+            LogHelper::info("Stripe Webhook: No CoinLog found", [
                 'orderId' => $orderId,
                 'trxId'   => $trxId,
             ]);
-            return;
         }
-
+    
+        return $coinLog;
+    }
+    
+ 
+    private function isAlreadyProcessed(CoinLog $coinLog): bool
+    {
         if ($coinLog->status == 1) {
-            return response()->json([
-                'status' => 'failed',
-                'reason' => 'Transaction already processed',
-            ]);
+            Log::info("Stripe Webhook: CoinLog {$coinLog->id} already processed");
+            return true;
         }
+        return false;
+    }
+    
 
+    private function updateCoinLogAsPaid(CoinLog $coinLog, ?string $trxId): void
+    {
         $coinLog->update([
             'trx'     => $trxId,
             'status' => true,
+        ]);
+    
+        Log::info("Stripe Webhook: CoinLog {$coinLog->id} marked as paid");
+    }
+    
+ 
+    private function handleMissingUser(CoinLog $coinLog)
+    {
+        LogHelper::info("Stripe Webhook: No user found for CoinLog", [
+            'coinLogId' => $coinLog->id,
+        ]);
+        return response()->json([
+            'status'  => false,
+            'trx'     => $coinLog->trx,
+            'message' => 'Transaction failed. User not found.',
+        ]);
+    }
+    
+
+    private function processUserPayment(User $user, CoinLog $coinLog): void
+    {
+        $amountBefore = $user->di;
+        $user->increment('di', $coinLog->obtained_coins);
+    
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $coinLog->obtained_coins,
+            $amountBefore,
+            UserCoinLogType::PAYMENT
+        );
+    
+        UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
+    
+        (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
+    
+        Log::info("Stripe Webhook: User {$user->id} credited with {$coinLog->obtained_coins} coins");
+    }
+    
+    private function finalizeResponse(CoinLog $coinLog)
+    {
+        LogHelper::info("Stripe Webhook: Transaction {$coinLog->trx} completed successfully", [
+            'coinLogId' => $coinLog->id,
+        ]);
+        return response()->json([
+            'status'  => true,
+            'trx'     => $coinLog->trx,
+            'message' => 'Transaction completed successfully.',
         ]);
     }
 
