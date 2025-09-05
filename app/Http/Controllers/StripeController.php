@@ -188,7 +188,7 @@ class StripeController extends Controller
 
         $coinLog->update([
             'trx'     => $trxId,
-            'is_paid' => true,
+            'status' => true,
         ]);
     }
 
