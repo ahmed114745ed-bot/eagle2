@@ -42,7 +42,11 @@ class UserService
             }
         }
 
-        $name = htmlspecialchars($user->name, ENT_QUOTES, 'UTF-8');
+        $name = htmlspecialchars(
+            mb_convert_encoding($user->name, 'UTF-8', 'UTF-8'),
+            ENT_QUOTES,
+            'UTF-8'
+        );
         return <<<HTML
         <a href="{$this->adminUserUrl($user->id)}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
             {$image}
