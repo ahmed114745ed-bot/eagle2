@@ -46,7 +46,7 @@ class UserService
         <a href="{$this->adminUserUrl($user->id)}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
             {$image}
             <div>
-                <strong style="font-size:16px;">{$user->name}</strong><br>
+                <strong style="font-size:16px;">{Str::ascii($user->name)}</strong><br>
                 <span style="font-size:13px;">
                     UID: <span id="uid-{$user->id}">{$uid}</span>
                     <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('uid-{$user->id}')"
