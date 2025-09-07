@@ -293,6 +293,8 @@ class StripeController extends Controller
 
     public function cancel(Request $request)
     {
+        Log::info("cancel", ['cancel req' => $request->all()]);
+
         $orderId = $request->get('orderId');
         $coinLog = CoinLog::whereId($orderId)->whereMethod('paypal')->firstOrFail();
 
