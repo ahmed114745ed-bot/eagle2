@@ -314,7 +314,7 @@ class UserController extends MainController
         //                 })).append($('<input>', {
         //                     'type': 'hidden',
         //                     'name': '_method',
-        //                     'value': 'POST'  
+        //                     'value': 'POST'
         //                 }));
         //                 form.appendTo('body').submit();
         //             }
@@ -364,7 +364,7 @@ class UserController extends MainController
             if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
-            if ($model->phone = '+201000100010') {
+            if ($model->phone == '+201000100010') {
                 $actions->disableDelete();
             }
 
