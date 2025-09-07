@@ -67,7 +67,7 @@ trait CalcsTrait
 
     public static function getLevel($user_id = null, $type = null, $is_image = false, $giftLogs = null)
     {
-    
+
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
             if (!$user) {
@@ -76,7 +76,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-    
+
         if (!$giftLogs) {
             $giftLogs = self::getTotalGiftPrice($user_id);
         } else {
@@ -84,20 +84,20 @@ trait CalcsTrait
                 return $log->receiver_id == $user_id || $log->sender_id == $user_id;
             });
         }
-    
+
         $star_num = $giftLogs->where('receiver_id', $user_id)->sum('giftPrice');
         $gold_num = $giftLogs->where('sender_id', $user_id)->sum('giftPrice');
         $vip_num  = $gold_num;
-    
-    
+
+
         $value = match ($type) {
             1 => $star_num,
             2 => $gold_num,
             3 => $vip_num,
             default => 0,
         };
-    
-    
+
+
         $total = $value;
         $exp   = $value * 1;
         $level = Vip::collectionBuilder()
@@ -106,15 +106,15 @@ trait CalcsTrait
             ->orderByDesc('exp')
             ->limit(1)
             ->value('level');
-    
-    
+
+
         if ($type == 1) {
             $level += @$user->sub_receiver_level;
         } elseif ($type == 2) {
             $level += @$user->sub_sender_level;
         }
-    
-    
+
+
         if ($is_image) {
             $img = '';
             if ($level >= 0) {
@@ -875,7 +875,7 @@ trait CalcsTrait
             $user = $user_id;
         }
 
-        $vip = $user->UserVip->OVip;
+        $vip = $user->UserVip?->OVip;
         if (!$vip) return new \stdClass();
 
         $cacheKey = "ware_{$vip->level}_{10}";
@@ -1364,7 +1364,13 @@ trait CalcsTrait
 
     public static function chargeLevel($user_id)
     {
-        $user = User::find($user_id);
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+//        $user = User::find($user_id);
         if (!$user) {
             return [
                 'current_level'  =>  0,

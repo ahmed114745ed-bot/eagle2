@@ -166,7 +166,7 @@ class Pack extends Model
         }
 
         // if expire is NULL
-        return $this->days ?? 0;
+        return (string) ($this->days ?? 0);;
     }
 
     public function getIsDressAttribute()

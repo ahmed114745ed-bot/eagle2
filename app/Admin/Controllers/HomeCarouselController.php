@@ -11,6 +11,7 @@ use App\Helpers\Common;
 use App\Models\HomeCarousel;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
+use Illuminate\Validation\Rule;
 
 class HomeCarouselController extends MainController
 {
@@ -129,7 +130,7 @@ class HomeCarouselController extends MainController
             });
 
         $form->select('type', trans('type'))
-            ->options(['room' => __('Room'), 'normal' => __('normal'), 'link' => __('url'), 'event' => __('events')])
+            ->options(['room' => __('Room'), 'normal' => __('normal'), 'link' => __('url'), 'event' => __('events'),'live' => __('Live')])
             ->when('room', function (Form $form) {
                 $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
             })->when('link', function (Form $form) {
@@ -139,6 +140,14 @@ class HomeCarouselController extends MainController
                     $form->url('url', trans('url'));
                 });
             });
+
+        $form->select('display_at', __('Display At'))
+            ->options([
+                'discover' => __('Discover'),
+                'home_top' => __('Home Top'),
+                'home_middle' => __('Home Middle'),
+            ])
+            ->default('discover')->rules(['required', Rule::in(['home_top', 'home_middle', 'discover'])]);
 
         $form->saving(function (Form $form) {
             /*if (request()->hasFile('img')) {
