@@ -103,12 +103,16 @@ class RoomBoomLevelController extends MainController
     {
         $form = new Form(new RoomBoomLevel());
 
-        $form->number('level', __('level'))->rules('required|integer|min:1');
-        $form->number('min_target', __('min target'))->required();
-        $form->number('target', __('target'))->required();
+        $form->number('level', __('level'))->rules('required|integer|min:1')
+            ->help(__('Represents the stage or rank of the Room Boom.'));
+        $form->number('min_target', __('min target'))->required()
+            ->help(__('The minimum required gifts to activate the Boom Room at this level.'));
+        $form->number('target', __('target'))->required()
+            ->help(__('The full target that must be achieved to complete the Room Boom at this level.'));
         $form->file('video', trans('video'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->default('1.png');
+        })->default('1.png')
+            ->help(__('The special video for this level, displayed after completion. Each level has its own unique video.'));
 
         $form->saving(function (Form $form) {
             if (!$form->model()->exists) {
