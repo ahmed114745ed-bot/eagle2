@@ -404,12 +404,18 @@ class UserController extends Controller
 
     public function my_store_all(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user()->load([
+            'agency',
+            'agency.agencySalary',
+            'totalUserSalary',
+            'ownerRoom.roomSalary',
+            'wallet',
+        ]);    
         $user = $this->userService->myStore($user, $request);
+    
         $data = new MyStoreResource($user);
         return Common::apiResponse(true, '', $data, 200);
     }
-
     public function ranking_room(Request $request)
     {
         $toArray =  $this->userService->roomRanking($request);

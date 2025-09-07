@@ -24,48 +24,49 @@ class MyStoreResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-    public function toArray($request)
+    
+     public function toArray($request)
     {
-          
-        /** @var User $this*/
-        $agency_owner = $this->agency;
-        $salary       =round( $this->salary,2);
-        $sallary      = $salary; //
-        $userSalary   = $sallary;
+        /** @var User $this */
 
-        if (($this->type_user == 2 || $this->type_user == 4)) {
-            $userSalary = $salary; //
-            $hostSalary = number_format((float) ($agencySallary ?? $agency_owner?->salary ?? 0), 3, '.', '');
-            $sallary = $hostSalary;
+        $hostSalary = null;
+        $salary     = round($this->salary, 2);
+        $userSalary = $salary;
+        
+        if (in_array($this->type_user, [2, 4])) {
+            $hostSalary = number_format((float)($this->agency?->salary ?? 0), 3, '.', '');
+            $userSalary = $salary;
+            $salary     = $hostSalary;
         }
-        $pendingDollar = $this->totalUserSalary->sum("pending_dollar");
-        $paid = $this->totalUserSalary->sum("cut_amount");
-        $roomSalary = $this->ownerRoom?->roomSalary->sum(function ($roomSalary) {
-            return $roomSalary->salary - $roomSalary->cut_amount;
-        });
-
-        $diamonds = (in_array($this->type_user, [0,3])) ? $this->exchange_diamonds : $this->monthly_diamond_received;
-
-        $data = [
-
-            'my_store' => [
-                'id' => $this->id,
-                'coins_new' => $this->di,
-                'coins' => (string)$this->di,
-                'diamonds' =>  (string)$diamonds,
-                'silver_coins' => (string)$this->gold,
-                'usd' => (double)$sallary,
-                'user_usd' => (string) truncateAndTrim($userSalary) ?? '',
-                'user_usd_new' => (string) (isset($userSalary) ? round($userSalary, 0) : ''),
-                'host_usd' => (string) @$hostSalary ?? '',
-                'pending_dollar' => (string) $pendingDollar ?? '',
-                'room_salary' => (string) $roomSalary ?? '',
-                'paid' =>  $paid ?? 0,
-                'wallet_balance' =>  $this->wallet?->current_balance ?? 0,
-            ], 
-
+        
+        $totals = [
+            'pending' => $this->totalUserSalary->sum('pending_dollar'),
+            'paid'    => $this->totalUserSalary->sum('cut_amount'),
         ];
+        
+        $roomSalary = $this->ownerRoom?->roomSalary->sum(fn($r) => $r->salary - $r->cut_amount);
+        
+        $diamonds = in_array($this->type_user, [0, 3])
+            ? $this->exchange_diamonds
+            : $this->monthly_diamond_received;
 
-        return $data;
+        return [
+            'my_store' => [
+                'id'             => $this->id,
+                'coins_new'      => $this->di,
+                'coins'          => (string) $this->di,
+                'diamonds'       => (string) $diamonds,
+                'silver_coins'   => (string) $this->gold,
+                'usd'            => (double) $salary,
+                'user_usd'       => (string) truncateAndTrim($userSalary),
+                'user_usd_new'   => (string) round($userSalary, 0),
+                'host_usd'       => (string) $hostSalary,
+                'pending_dollar' => (string) $totals['pending'],
+                'room_salary'    => (string) $roomSalary,
+                'paid'           => $totals['paid'],
+                'wallet_balance' => $this->wallet?->current_balance ?? 0,
+            ],
+        ];
     }
+
 }

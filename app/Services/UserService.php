@@ -462,30 +462,39 @@ class UserService
     {
         return $this->vipRepository->getByLevels($levelsList, $type);
     }
-
     public function myStore($user, $request)
     {
         $cacheKey = 'cache-data-mystore-' . $user->id;
-        if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
 
-            $app_feature = Cache::get('host_agency');
-            if ($app_feature) {
-                $targetService = new FixedTargetService($user);
-                $targetService->calculateTarget();
-            }
-            if ($user->ownerRoom != null) {
-                $roomTarget = new RoomGameServices();
-                $roomTarget->CalculateRoomSalaries($user->ownerRoom);
-            }
-        }
-
-        if ($user->device_token  != $request->header('X-Device-Token')) {
-            $user->enableSaving = true;
-            $user->device_token = $request->header('X-Device-Token');
-            $user->save();
-        }
-
+        //  if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
+            $this->processUserTargets($user);
+        // }
+    
+        $this->updateDeviceTokenIfChanged($user, $request->header('X-Device-Token'));
+    
         return $user;
+    }
+    
+    protected function processUserTargets($user): void
+    {
+        // if (Cache::get('host_agency')) {
+            (new FixedTargetService($user))->calculateTarget();
+        // }
+    
+        if ($user->ownerRoom) {
+            (new RoomGameServices())->CalculateRoomSalaries($user->ownerRoom);
+        }
+    }
+    protected function updateDeviceTokenIfChanged($user, ?string $deviceToken): void
+    {
+        if (!$deviceToken || $user->device_token === $deviceToken) {
+            return;
+        }
+    
+        $user->forceFill([
+            'enableSaving' => true,
+            'device_token' => $deviceToken,
+        ])->save();
     }
 
     public function showUser($userId, $auth, $request, $isVisit)
