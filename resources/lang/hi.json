@@ -2897,6 +2897,9 @@
 "User": "उपयोगकर्ता",
 "Game": "खेल",
   "filters.expired_zero_or_null": "समाप्त (शून्य या खाली)",
+    "Display At": "प्रदर्शन स्थान",
+    "First": "पहला",
+    "Last": "अंतिम",
   "filters.yes": "हाँ"
 
 

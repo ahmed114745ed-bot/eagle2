@@ -3316,6 +3316,9 @@
     "User": "Kullanıcı",
     "Game": "Oyun",
       "filters.expired_zero_or_null": "Süresi dolmuş (Sıfır veya Boş)",
+    "Display At": "Gösterim Yeri",
+    "First": "İlk",
+    "Last": "Son",
   "filters.yes": "Evet"
 
 

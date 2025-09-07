@@ -8,6 +8,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Validation\Rule;
 
 class   BannerController extends MainController
 {
@@ -159,6 +160,13 @@ class   BannerController extends MainController
                 'cp_event' => __('cp event'),
             ]);
         });
+        $form->select('display_at', __('Display At'))
+            ->options([
+                'first' => 'First',
+                'last'  => 'Last',
+            ])
+            ->default('First')->rules(['required', Rule::in(['first', 'last'])]);
+
         return $form;
     }
 }

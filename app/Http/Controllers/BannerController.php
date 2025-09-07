@@ -79,10 +79,10 @@ class BannerController extends Controller
         $now = now();
 
         $banner = $this->getNextBannerForUser($user, $now);
-    
+
         return $this->respondWithBanner($user, $banner);
     }
-    
+
     private function getUserSeenBanners($user, $now)
     {
         return UserBannerShow::whereHas("banner", function ($q) use ($now) {
@@ -100,39 +100,41 @@ class BannerController extends Controller
         ->where("user_id", $user->id)
         ->pluck('banner_id');
     }
-    
-    
+
+
     private function getNextBannerForUser($user, $now)
     {
         $seenBannerIds = $this->getUserSeenBanners($user, $now);
-    
+
         $banner = $this->bannerServices->index2($seenBannerIds);
         if (!$banner) {
             $this->resetUserSeenBanners($user);
             return $this->getAnyRandomBanner();
         }
-    
+
         return $banner;
     }
-    
-    
+
+
     private function resetUserSeenBanners($user)
     {
         UserBannerShow::where("user_id", $user->id)->delete();
     }
-    
+
     private function getAnyRandomBanner()
     {
+        $displayAt = request('display_at');
         $banner = Banner::query()
+            ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
             ->where('is_active', true)
             ->whereNotNull('publish_at')
             ->inRandomOrder()
             ->first();
-    
-    
+
+
         return $banner;
     }
-    
+
     private function saveUserBannerShow($user, $banner)
     {
         if ($banner && !UserBannerShow::where('user_id', $user->id)
@@ -145,19 +147,19 @@ class BannerController extends Controller
             ]);
         }
     }
-    
+
     private function respondWithBanner($user, $banner)
     {
         try {
             $this->saveUserBannerShow($user, $banner);
-    
+
             return Common::apiResponse(true, 'successful', $banner ? new BannerResource($banner) : null);
         } catch (\Exception $exception) {
-    
+
             return Common::apiResponse(false, 'failed', null);
         }
     }
-    
+
 
 
 

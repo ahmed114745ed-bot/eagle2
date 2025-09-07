@@ -92,7 +92,9 @@ class BannerServices
 
     public function index2($ids)
     {
+        $displayAt = request('display_at');
         $query = Banner::query()
+            ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
             ->where('is_active', true)
             ->whereNotNull('publish_at')
             ->whereNotIn("id",$ids)
