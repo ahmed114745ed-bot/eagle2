@@ -123,9 +123,7 @@ class BannerController extends Controller
 
     private function getAnyRandomBanner()
     {
-        $displayAt = request('display_at');
         $banner = Banner::query()
-            ->when($displayAt, fn($q) => $q->where('display_at', $displayAt))
             ->where('is_active', true)
             ->whereNotNull('publish_at')
             ->inRandomOrder()

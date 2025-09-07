@@ -22,7 +22,6 @@ class BannerResource extends JsonResource
             'user_event_winner' =>  $avatar ?? "profile/g0lEsx7Joe.jpg",
             'user_event_winner_two' => $cpAvatar ?? "profile/g0lEsx7Joe.jpg",
             'event_type' => $this->event_type,
-            'display_at' => @$this->display_at
         ];
 
         if ($this->event_type == 'cp_event') {

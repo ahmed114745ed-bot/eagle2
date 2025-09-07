@@ -160,12 +160,6 @@ class   BannerController extends MainController
                 'cp_event' => __('cp event'),
             ]);
         });
-        $form->select('display_at', __('Display At'))
-            ->options([
-                'first' => 'First',
-                'last'  => 'Last',
-            ])
-            ->default('First')->rules(['required', Rule::in(['first', 'last'])]);
 
         return $form;
     }
