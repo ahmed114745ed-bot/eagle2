@@ -71,6 +71,7 @@ class HomeCarouselResource extends JsonResource
             'owner_id'   => $this->owner_id ?? 0,
             'avatar'     => $avatar ?? "profile/g0lEsx7Joe.jpg",
             'event_type' => $this->event_type,
+            'display_at' => @$this->display_at
         ];
 
         if ($this->event_type === 'weekly_cp') {

@@ -3316,6 +3316,14 @@
     "User": "Kullanıcı",
     "Game": "Oyun",
       "filters.expired_zero_or_null": "Süresi dolmuş (Sıfır veya Boş)",
+    "Display At": "Gösterim Yeri",
+    "Home Top": "Ana Sayfa Üstü",
+    "Home Middle": "Ana Sayfa Ortası",
+    "Discover": "Keşfet",
+    "Represents the stage or rank of the Room Boom.": "Room Boom'un aşamasını veya derecesini temsil eder.",
+    "The minimum required gifts to activate the Boom Room at this level.": "Bu seviyede Boom Room'u etkinleştirmek için gerekli minimum hediyeler.",
+    "The full target that must be achieved to complete the Room Boom at this level.": "Bu seviyedeki Room Boom'u tamamlamak için ulaşılması gereken tam hedef.",
+    "The special video for this level, displayed after completion. Each level has its own unique video.": "Bu seviyeye özel video, tamamlandıktan sonra gösterilir. Her seviyenin kendine özgü bir videosu vardır.",
   "filters.yes": "Evet"
 
 

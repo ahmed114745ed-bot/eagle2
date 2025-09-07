@@ -132,7 +132,7 @@ class MyDataResource extends JsonResource
         $intro = $dress_3_data ?: $dress_3_fallback;
         $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
 
-        $isHideCountry = $this->getPackWithType(13);
+        $isHideCountry = $this->getPackWithTypeV2(13);
 
         $show_user_setting = $this->userSetting;
         if ($show_user_setting == null) {
@@ -152,17 +152,27 @@ class MyDataResource extends JsonResource
             }
         }
         $counters = [];
-        if ($request->show_counter == true) {
+//        if ($request->show_counter == true) {
+//            $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
+//            $user = User::find(@$this->id);
+//            $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag', 'mall'];
+//
+//            $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
+//                return [$item => $userCounterServices->getUserCounts($user, $item)];
+//            });
+//            $counters['message'] = $userCounterServices->getCountByType($user, 'message');
+//        }
+
+
+        if ($request->show_counter) {
             $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
-            $user = User::find(@$this->id);
+
             $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag', 'mall'];
 
-            $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
-                return [$item => $userCounterServices->getUserCounts($user, $item)];
-            });
-            $counters['message'] = $userCounterServices->getCountByType($user, 'message');
-        }
+            $counters = $userCounterServices->getUserCountsV2($this->resource, $types);
 
+            $counters['message'] = $userCounterServices->getCountByType($this->resource, 'message');
+        }
 
         $ownerRoom = $this->ownerRoom;
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
@@ -235,8 +245,8 @@ class MyDataResource extends JsonResource
             'profile_visitors' => $this->profileVisits()->count(),
 
             'profile' => $this->profile ? new ProfileResource($this->profile) : null,
-            'level' => Common::level_center(@$this),
-            'charge_level' => Common::chargeLevel(@$this->id),
+            'level' => Common::level_center_v2(@$this),
+            'charge_level' => Common::chargeLevel(@$this),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
             $this->merge((new MyStoreResource($this->resource))),
             'family_data' => $f,
@@ -245,8 +255,8 @@ class MyDataResource extends JsonResource
             'type_user' => intval(@$this->type_user) ?: 0,
             'user_jobs' => $this->jobs,
             ///  'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
-            'has_color_name'       => Common::hasInPack($this->id, 18, true),
-            'has_anti_ban'       => Common::hasInPack($this->id, 15, true),
+            'has_color_name'       => Common::hasInPackV2($this->packs, 18, true),
+            'has_anti_ban'       => Common::hasInPackV2($this->packs, 15, true),
             'anonymous' => $this->packs->where('type', 17)->count() >= 1,
             //            'country' => $this->country ?? null,
             'country' => $this->country ? [

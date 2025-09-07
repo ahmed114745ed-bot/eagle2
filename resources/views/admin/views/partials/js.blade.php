@@ -12,6 +12,8 @@
  <!-- <script src="https://cdn..net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
+<script src="{{ asset('js/helpers/admin-utils.js') }}"></script>
+
 
 <script>
     $(document).ready(function () {
