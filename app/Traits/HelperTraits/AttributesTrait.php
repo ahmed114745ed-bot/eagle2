@@ -23,13 +23,11 @@ trait AttributesTrait
 
     public static function checkPackV2($userPacks, $type, $dress = null)
     {
-        $userPacks->where('type', $type)
-            ->filter(function ($item) {
-                return $item->expire == 0 || $item->expire >= time();
-            });
-
-        if ($dress != null) $userPacks->where('target_id', $dress);
-        return $userPacks;
+        return $userPacks->filter(function ($item) use ($type, $dress) {
+            if ($item->type !== $type) return false;
+            if ($dress !== null && $item->target_id !== $dress) return false;
+            return $item->expire == 0 || $item->expire >= time();
+        });
     }
 
     public static function getUserDress($user_id, $dress, $type, $item = 'img1', bool $isUsed = false)
