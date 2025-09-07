@@ -97,11 +97,21 @@ class RoomController extends Controller
 
     public function mine(Request $request)
     {
+        $user_id = request('user_id') ?? Auth::user()->id ;
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
-        $rooms = $this->roomService->getAllMine($request);
+        $rooms = $this->roomService->getAllMine($request ,$user_id);
         return Common::apiResponse(true, '', $rooms, 200);
     }
 
+
+    public function getAllLiveRooms(Request $request)
+    {
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        $rooms = $this->roomService->getAllLiveRooms($request);
+        return Common::apiResponse(true, '', $rooms, 200);
+    }
+
+    
     public function index(Request $request)
     {
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
@@ -123,11 +133,7 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('Store Room Request', [
-            'all'   => $request->all(),
-            'user'  => $request->user()?->id,
-            'files' => $request->allFiles(),
-        ]);
+
         $request['show']  = true;
         $request['numid'] = rand(111111, 999999);
         $user = $request->user();

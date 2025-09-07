@@ -490,9 +490,10 @@ class EnteranceRoomServices
         }
 
         return Common::apiResponse(true, '', $room_info);
-
-
     }
+
+
+
     private function updateRoom($user_id, $owner_id, Room &$room)
     {
        // $this->updateRoomVisitors($user_id, $owner_id, $room);
@@ -605,6 +606,139 @@ class EnteranceRoomServices
 
 
     }
+
+
+
+
+    public function enterLiveRoom($user, Request $request, $roomPass, Room $room)
+    {
+        $ownerId = $this->getOwnerId($request, $room);
+        if (!$ownerId) {
+            return Common::apiResponse(0, 'not found', null, 404);
+        }
+
+        if ($this->isUserBlocked($ownerId, $user->id)) {
+            return Common::apiResponse(false, __('You have been blocked by the other party'), null, 422);
+        }
+
+        if ($error = $this->validateRoomStatus($room, $user)) {
+            return $error;
+        }
+
+        if ($error = $this->checkRoomPassword($room, $roomPass, $ownerId, $user->id)) {
+            return $error;
+        }
+
+        $this->handleOwnerLogic($room, $user);
+
+        $roomInfo = $this->prepareRoomInfo($room, $user, $request);
+
+        $this->finalizeRoomEnter($user, $ownerId, $room);
+
+        return Common::apiResponse(true, '', $roomInfo);
+    }
+
+    private function getOwnerId(Request $request, Room $room): ?int
+    {
+        return $request->type === 'random'
+            ? $this->roomRepository->randomOwner()
+            : $room->uid;
+    }
+
+    private function isUserBlocked(int $ownerId, int $userId): bool
+    {
+        return Common::getUserBlackListInRoom($ownerId, $userId);
+    }
+
+    private function validateRoomStatus(Room $room, $user)
+    {
+        if (!$room) {
+            return Common::apiResponse(false, 'No room yet, please create first', null, 404);
+        }
+
+        if ($room->room_status == 2) {
+            return Common::apiResponse(0, __('room_closed'));
+        }
+
+        if ($this->isUserInTempBlacklist($room, $user->id)) {
+            return Common::apiResponse(false, __('You cannot enter this room temporarily'), null, 403);
+        }
+
+        return null;
+    }
+
+    private function isUserInTempBlacklist(Room $room, int $userId): bool
+    {
+        if (empty($room->room_black)) {
+            return false;
+        }
+
+        $isBlack = explode(',', $room->room_black);
+        foreach ($isBlack as $k => &$v) {
+            $arr = explode("#", $v);
+            $sjc = time() - $arr[1];
+            if ($sjc < $arr[2] && $arr[0] == $userId) {
+                return true;
+            }
+            if ($sjc >= $arr[2]) {
+                unset($isBlack[$k]); 
+            }
+        }
+
+        $room->room_black = implode(",", $isBlack);
+        $this->roomRepository->updateRoomBlack($room, $room->room_black);
+
+        return false;
+    }
+
+    private function checkRoomPassword(Room $room, ?string $roomPass, int $ownerId, int $userId)
+    {
+        if ($room->room_pass && $ownerId !== $userId) {
+            if (!$roomPass) {
+                return Common::apiResponse(false, __('The room is locked, please enter the password'), null, 409);
+            }
+            if ($room->room_pass !== $roomPass) {
+                return Common::apiResponse(false, __('Password is incorrect, please re-enter'), null, 410);
+            }
+        }
+        return null;
+    }
+
+    private function handleOwnerLogic(Room $room, $user): void
+    {
+        if ($user->id === $room->uid) {
+            $room->is_afk = 1;
+            $room->save();
+
+            if ($room->count_room_socket == 0) {
+                dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
+            }
+        }
+    }
+
+    private function prepareRoomInfo(Room $room, $user, Request $request): array
+    {
+        $roomInfo = (new EnterRoomCollection($room, $user->id))->toArray($request);
+        return $roomInfo;
+    }
+
+    private function finalizeRoomEnter($user, int $ownerId, Room $room): void
+    {
+        $this->updateRoom($user->id, $ownerId, $room);
+        $this->enterTheRoomCreateOrUpdate($user->id, $ownerId, $room->id);
+
+        $user->enableSaving = false;
+        $user->now_room_uid = $ownerId;
+        $user->save();
+
+        if (config('app.env') !== "production") {
+            RoomVisitor::firstOrCreate([
+                'user_id' => $user->id,
+                'room_id' => $room->id,
+            ]);
+        }
+    }
+
 
 }
 
