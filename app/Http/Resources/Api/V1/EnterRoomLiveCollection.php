@@ -51,6 +51,7 @@ class EnterRoomLiveCollection extends JsonResource
             "room_intro"          => $this->room_intro, // room intro
             "is_comment_closed"   => $this->is_comment_closed, // is Comments Closed
             "room_rule"           => Common::getConfig('room_rule' . (app()->getLocale() != 'ar' ? '_en' : '')), // room rules
+            'is_live' => (bool) ($this->is_live ?? false),
 
         ];
     }
