@@ -140,6 +140,7 @@ class MyDataResource extends JsonResource
                 'show_git' => 1,
                 'show_intro' => 1,
                 'show_banner' => 1,
+                'show_invite_code' => 1,
             ]);
         }
 

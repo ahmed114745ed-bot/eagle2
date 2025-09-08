@@ -130,7 +130,7 @@ class HomeCarouselController extends MainController
             });
 
         $form->select('type', trans('type'))
-            ->options(['room' => __('Room'), 'normal' => __('normal'), 'link' => __('url'), 'event' => __('events')])
+            ->options(['room' => __('Room'), 'normal' => __('normal'), 'link' => __('url'), 'event' => __('events'),'live' => __('Live')])
             ->when('room', function (Form $form) {
                 $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
             })->when('link', function (Form $form) {
