@@ -13,6 +13,7 @@ use Encore\Admin\Layout\Content;
 use App\Models\Admin as AdminModel;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
+use Illuminate\Validation\Rule;
 
 class   BannerController extends MainController
 {
@@ -177,6 +178,7 @@ class   BannerController extends MainController
                 'cp_event' => __('cp event'),
             ]);
         });
+
         return $form;
     }
 }

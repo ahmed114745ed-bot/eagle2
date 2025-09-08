@@ -3741,6 +3741,14 @@
   "User": "المستخدم",
   "Game": "اللعبة",
     "filters.expired_zero_or_null": "منتهي (صفر أو فارغ)",
+    "Display At": "عرض في",
+    "Home Top": "أعلى الصفحة الرئيسية",
+    "Home Middle": "وسط الصفحة الرئيسية",
+    "Discover": "اكتشف",
+    "Represents the stage or rank of the Room Boom.": "يمثل المرحلة أو الرتبة في خاصية الروم بوم",
+    "The minimum required gifts to activate the Boom Room at this level.": "الحد الأدنى المطلوب من الهدايا لتفعيل الروم البوم عند هذا المستوى.",
+    "The full target that must be achieved to complete the Room Boom at this level.": "الهدف الكامل الذي يجب تحقيقه لإكمال الروم بوم عند هذا المستوى.",
+    "The special video for this level, displayed after completion. Each level has its own unique video.": "الفيديو الخاص المخصص لهذا المستوى، والذي يتم عرضه بعد إكمال المستوى. كل مستوى له فيديو مميز خاص به.",
   "filters.yes": "نعم"
 
 }

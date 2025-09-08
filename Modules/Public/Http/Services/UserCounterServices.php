@@ -70,6 +70,33 @@ class UserCounterServices
         return $results;
     }
 
+    public function getUserCountsV2(User $user, array $types = []): array
+    {
+        $query = UserCounter::select(["id", "type", "date", "user_id"])
+            ->where("user_id", $user->id);
+
+        if (!empty($types)) {
+            $query->whereIn("type", $types);
+        }
+
+        $counters = $query->get();
+
+        $results = [];
+
+        $grouped = $counters->groupBy('type');
+
+        foreach ($types as $type) {
+            $items = $grouped->get($type, collect());
+            $count = 0;
+            foreach ($items as $counter) {
+                $count = $this->getCountByType($user, $type, $counter->date);
+            }
+
+            $results[$type] = $count;
+        }
+
+        return $results;
+    }
     /**
      * Get the count of specified type.
      *

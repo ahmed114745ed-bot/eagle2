@@ -135,6 +135,7 @@ return [
     'add_admin_agency' => 'You have been added as an admin to the agency: :name',
     'remove_admin_agency' => 'You have been removed as an admin from the agency: :name',
     'reject_agency' => 'Your request to join the agency :name has been rejected.',
-
+    'closeNormalBox' => 'Your normal luck box has expired.',
+    'closeSuperBox' => 'Your super luck box has expired.'
 
 ];
