@@ -507,8 +507,9 @@ class UserService
     private function getUserWithRelations($userId)
     {
         return  $this->userRepository->findUserData($userId);
-
     }
+
+
     
     private function ensureUserIsAccessible($user, $auth): void
     {
@@ -1176,5 +1177,26 @@ class UserService
         }
 
         return ['message' => 'Done'];
+    }
+
+
+    public function getUserStats($id)
+    {
+        return $this->userRepository->getStats($id);
+    }
+
+    public function getUserRooms($id)
+    {
+        return $this->userRepository->getRoomsData($id);
+    }
+
+    public function getUserVipLevel($id)
+    {
+        return $this->userRepository->getVipLevelData($id);
+    }
+
+    public function getUserFrames($id)
+    {
+        return $this->userRepository->getFramesData($id);
     }
 }

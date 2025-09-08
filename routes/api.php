@@ -277,6 +277,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/online', [UserController::class, 'online']);
                 Route::get('/friends', [UserController::class, 'friends']);
                 Route::get('/data', [UserController::class, 'dataUser']);
+
+                Route::get('/stats/{id?}', [UserController::class, 'stats']);
+                Route::get('/rooms/{id?}', [UserController::class, 'rooms']);
+                Route::get('/vip-level/{id?}', [UserController::class, 'vipLevel']);
+                Route::get('/frames/{id?}', [UserController::class, 'frames']);
+            
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -691,5 +697,7 @@ Route::get('gifts-by-id', function (Request $request) {
         'image' => $imageUrl,
     ]);
 });
+
+
 
 
