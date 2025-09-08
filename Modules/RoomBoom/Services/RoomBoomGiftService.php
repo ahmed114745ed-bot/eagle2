@@ -191,6 +191,8 @@ class RoomBoomGiftService
 
     private function mayStartNextBoom($totalRoomGift, $giftLog, $newTotal, $room, $boomLevel): void
     {
+        info('newTotal', [$newTotal]);
+        info('boomLevel', [$boomLevel->target]);
         if ($newTotal == $boomLevel->target) {
             $nextLevel = RoomBoomLevel::where('min_target', $newTotal)->first();
 
