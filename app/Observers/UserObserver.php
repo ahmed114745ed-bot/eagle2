@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Pack;
 use App\Models\User;
+use App\Models\UserSetting;
 use App\Models\Ware;
 use App\Models\Follow;
 use App\Models\BlackList;
@@ -24,6 +25,15 @@ class UserObserver
         $user->profile()->create([
             'gender' => 1
         ]);
+
+        $data = [
+            'user_id' => $user->id,
+            'show_git' => 1,
+            'show_intro' => 1,
+            'show_banner' => 1,
+            'show_invite_code' => 1,
+        ];
+        UserSetting::create($data);
     }
 
     /**
