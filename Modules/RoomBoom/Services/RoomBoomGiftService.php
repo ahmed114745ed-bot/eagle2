@@ -179,11 +179,13 @@ class RoomBoomGiftService
                 $openBoom->total_gifts_value = $newTotal;
                 $openBoom->final_gift_id = $giftLog->id;
                 $openBoom->save();
+                info('before jobs');
 
                 dispatch(new RoomBoomRewardJob($openBoom->id))->delay(now()->addSeconds(30));
                 dispatch(new EndBoomPusherJob($boomLevel, $newTotal, auth()->id(), $room));
                 dispatch(new EndBoomZegoJob($boomLevel, $room))->delay(now()->addSeconds(20));
 
+                info('after jobs');
                 $this->mayStartNextBoom($totalRoomGift, $giftLog, $newTotal, $room, $boomLevel);
             }
         }
