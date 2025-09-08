@@ -11,7 +11,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository as Repository;
 use Exception;
-
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 class UserRepository extends Repository
 {
     public function search($key, $family, $perPage, $currentPage)
@@ -428,4 +430,45 @@ class UserRepository extends Repository
                 ->orWhere('uuid', 'like', "%$search%")->orWhere('special_id', 'like', "%$search%")->orWhere('phone', 'like', "%$search%")->orWhere('nickname', 'like', "%$search%")->orWhere('email', 'like', "%$search%");
         })->orderByDesc('id')->with('agency', 'targets')->paginate($perPage, ['*'], 'page', $Page);
     }
+
+
+    public function findUserData(int $id): Model
+    {
+        $defaultRelations = [
+            'packs' => fn($q) => $q->where('is_used', 1)->with('ware'),
+
+            'profile',
+            'room',
+            'family.members',
+            'blacklists',
+            'chatSetting',
+            'userDataSetting',
+            'agency.owner',
+            'agency.members',
+            'shippingAgency.charges',
+            'specialId.ware',
+            'images',
+            'manager',
+
+            'medals' => fn($q) => $q->where('is_enable', true),
+
+            'room.backgroundImage',
+            'room.background',
+            'room.defaultBackground',
+
+            'Ovip.wareIcon',
+            'UserVip.vip.wares',
+
+            'nowRoomOwner.packs' => fn($q) => $q->where('is_used', 1)->with('ware'),
+        ];
+        
+        return $this->model
+            ->with($defaultRelations)
+            ->withCount(['profileVisits as profile_visitors'])
+            ->findOrFail($id)
+            ->append(['user_types', 'vip_data', 'level_data','profile_frame', 'profile_frame_id']);
+    }
+    
+    
+
 }

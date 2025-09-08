@@ -99,4 +99,11 @@ class OVip extends Model
             $oVip->wares()->forceDelete();
         });
     }
+
+    public function wareIcon10()
+    {
+        return $this->hasOne(Ware::class, 'level', 'level')
+            ->where('type', 10)
+            ->where('get_type', 1);
+    }
 }
