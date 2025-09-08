@@ -179,13 +179,11 @@ class RoomBoomGiftService
                 $openBoom->total_gifts_value = $newTotal;
                 $openBoom->final_gift_id = $giftLog->id;
                 $openBoom->save();
-                info('before jobs');
 
                 dispatch(new RoomBoomRewardJob($openBoom->id))->delay(now()->addSeconds(30));
                 dispatch(new EndBoomPusherJob($boomLevel, $newTotal, auth()->id(), $room));
                 dispatch(new EndBoomZegoJob($boomLevel, $room))->delay(now()->addSeconds(20));
 
-                info('after jobs');
                 $this->mayStartNextBoom($totalRoomGift, $giftLog, $newTotal, $room, $boomLevel);
             }
         }
@@ -193,12 +191,9 @@ class RoomBoomGiftService
 
     private function mayStartNextBoom($totalRoomGift, $giftLog, $newTotal, $room, $boomLevel): void
     {
-        info('newTotal', [$newTotal]);
-        info('boomLevel', [$boomLevel->target]);
         if ($newTotal == $boomLevel->target) {
             $nextLevel = RoomBoomLevel::where('min_target', $newTotal)->first();
 
-            info('next level', [$nextLevel]);
             if ($nextLevel) {
                 RoomBoom::firstOrCreate([
                     'total_room_gift_id' => $totalRoomGift->id,
