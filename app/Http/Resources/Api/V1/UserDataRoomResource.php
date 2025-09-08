@@ -14,7 +14,7 @@ class UserDataRoomResource extends JsonResource
      */
     public function toArray($request)
     {
-        $room = $this->whenLoaded('room');
+        $room = optional($this?->room);
 
         $pass_status = $room && $room->room_pass ? true : false;
 
