@@ -127,8 +127,6 @@ class BaishunGameController extends Controller
 
         dispatch(new GameWalletJop($request->currency_diff));
 
-        \App\Models\User::find(11)->createToken('api-token')->plainTextToken;
-
         if ($type && (int) $request->currency_diff >= Common::getConfig('game_map_win_coins')) {
             $user = User::with(['profile', 'nowGame'])->find($id);
             $room = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
