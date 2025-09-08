@@ -183,38 +183,7 @@ class RoomBoomGiftService
                 dispatch(new RoomBoomRewardJob($openBoom->id))->delay(now()->addSeconds(30));
                 dispatch(new EndBoomPusherJob($boomLevel, $newTotal, auth()->id(), $room));
                 dispatch(new EndBoomZegoJob($boomLevel, $room))->delay(now()->addSeconds(20));
-
-                $this->mayStartNextBoom($totalRoomGift, $giftLog, $newTotal, $room, $boomLevel);
             }
         }
     }
-
-    private function mayStartNextBoom($totalRoomGift, $giftLog, $newTotal, $room, $boomLevel): void
-    {
-        if ($newTotal == $boomLevel->target) {
-            $nextLevel = RoomBoomLevel::where('min_target', $newTotal)->first();
-
-            info('next level', [$nextLevel]);
-            if ($nextLevel) {
-                RoomBoom::firstOrCreate([
-                    'total_room_gift_id' => $totalRoomGift->id,
-                    'room_boom_level_id' => $nextLevel->id,
-                ], [
-                    'started_at'        => now(),
-                    'total_gifts_value' => $newTotal,
-                    'trigger_gift_id'   => $giftLog->id
-                ]);
-
-                $d = [
-                    "messageContent" => [
-                        "message" => "roomBoomStarted",
-                        "roomBoomLevel" => $nextLevel->id,
-                    ]
-                ];
-
-                Common::sendToZego('SendCustomCommand', $room->id, $room->uid, json_encode($d));
-            }
-        }
-    }
-
 }
