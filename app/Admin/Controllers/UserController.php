@@ -499,7 +499,8 @@ class UserController extends MainController
 
         $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
-        }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
+        }])->orderByDesc('is_used')->latest()->paginate(10, ['*'], 'pack_page');
+
         $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
         $hasVip = UserVip::where('user_id', $id)
             ->where('is_used', 1)
