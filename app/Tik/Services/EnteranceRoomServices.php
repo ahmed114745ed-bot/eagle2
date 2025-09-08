@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Http\Resources\Api\V1\EnterRoomLiveCollection;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -718,7 +719,7 @@ class EnteranceRoomServices
 
     private function prepareRoomInfo(Room $room, $user, Request $request): array
     {
-        $roomInfo = (new EnterRoomCollection($room, $user->id))->toArray($request);
+        $roomInfo = (new EnterRoomLiveCollection($room, $user->id))->toArray($request);
         return $roomInfo;
     }
 
