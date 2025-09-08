@@ -194,6 +194,7 @@ class RoomBoomGiftService
         if ($newTotal == $boomLevel->target) {
             $nextLevel = RoomBoomLevel::where('min_target', $newTotal)->first();
 
+            info('next level', [$nextLevel]);
             if ($nextLevel) {
                 RoomBoom::firstOrCreate([
                     'total_room_gift_id' => $totalRoomGift->id,
