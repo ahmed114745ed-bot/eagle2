@@ -500,7 +500,8 @@ class EnteranceController extends Controller
     {
         try {
             $user = $request->user();
-            $type = $request->type ?? 'audio';
+            $type = $request->get('type', 'audio'); 
+
             $room = $this->repo->findByType($id, $type);
             if (!$room) {
                 return Common::apiResponse(false, 'Room not found', null, 404);
@@ -523,8 +524,8 @@ class EnteranceController extends Controller
                 $room->room_intro = $request->room_intro;
             }
 
-            if ($request->type) {
-                $room->type = $request->type;
+            if ($type) {
+                $room->type = $type;
                 if ($request->type == 'live' ) {
                     $room->is_live = true;
                 }else{

@@ -317,16 +317,17 @@ class RoomRepository extends AbstractRepository
         $user     = User::find($id);    
         $query = $this->baseRoomQueryMine($user);
     
+
         $audio = (clone $query)->where('type', 'audio')->first();
         $live  = (clone $query)->where('type', 'live')->first();
-        
+    
         return [
-            'audio' => $audio->isNotEmpty()
+            'audio' => $audio
                 ? new RoomResource($audio)
                 : (object)[],   
-                
-            'live'  => $live->isNotEmpty()
-                ? new  RoomResource($live)
+    
+            'live'  => $live
+                ? new RoomResource($live)
                 : (object)[],   
         ];
         
