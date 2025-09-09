@@ -318,8 +318,8 @@ class RoomRepository extends AbstractRepository
         $query = $this->baseRoomQueryMine($user);
     
         return [
-            'audio' =>RoomResource::collection( (clone $query)->where('type', 'audio')->get()),
-            'live'  => RoomResource::collection((clone $query)->where('type',  'live')->get()),
+            'audio' => new RoomResource( (clone $query)->where('type', 'audio')->get()),
+            'live'  => new  RoomResource((clone $query)->where('type',  'live')->get()),
         ];
     }
     
