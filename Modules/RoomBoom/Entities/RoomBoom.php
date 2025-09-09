@@ -4,6 +4,7 @@ namespace Modules\RoomBoom\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RoomBoom extends Model
 {
@@ -18,5 +19,11 @@ class RoomBoom extends Model
     public function totalRoomGift(): BelongsTo
     {
         return $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
+    }
+
+    public function topContributors(): HasMany
+    {
+        return $this->hasMany(RoomBoomTopContributor::class, 'room_boom_level_id', 'room_boom_level_id')
+            ->orderByDesc('price');
     }
 }

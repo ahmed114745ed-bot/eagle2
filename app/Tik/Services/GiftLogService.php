@@ -25,6 +25,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Illuminate\Support\Facades\Log;
+use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 use Modules\RoomBoom\Services\RoomBoomGiftService;
 
 
@@ -159,7 +160,8 @@ class GiftLogService
 
             $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
-            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
+//            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
+            (new NewRoomBoomGiftService())->sendGift($room, $totalPrice, $userId);
 
             foreach ($receivedUsers as $receivedUser) {
                 $updateUserWhenSendGift->update($price, $receivedUser);
