@@ -323,12 +323,13 @@ class RoomRepository extends AbstractRepository
         return [
             'audio' => $audio->isNotEmpty()
                 ? RoomResource::collection($audio)
-                : (object)[],  
+                : (object)[],   
                 
-            'live' => $live->isNotEmpty()
+            'live'  => $live->isNotEmpty()
                 ? RoomResource::collection($live)
-                : (object)[],
+                : (object)[],   
         ];
+        
     }
     
 
