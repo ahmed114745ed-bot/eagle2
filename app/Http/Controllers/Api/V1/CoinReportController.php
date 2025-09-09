@@ -93,9 +93,13 @@ class CoinReportController extends Controller
     }
     public function rechargeAgencyCoins()
     {
-        $user = auth()->user();
+        $shippingAgency = auth()->user()->shippingAgency;
+        if (!$shippingAgency) {
+            return  [];
+        }
+        
         $paymentCoins = PaymentCoin::orderBy('type')->pluck('type')->toArray();
-        $data = CoinLog::where("user_id", $user->id)
+        $data = CoinLog::where("user_id", $shippingAgency->id)
             ->where('status', 1)
             ->where('user_type', ShippingAgency::class) 
             ->whereIn('method', $paymentCoins)
@@ -104,7 +108,7 @@ class CoinReportController extends Controller
                     ->whereDate("created_at", "<=", request("end_date"));
             })
             ->orderBy("created_at", "desc")
-            ->paginate(10);//->get();
+            ->paginate(10);
         return RechargeCoinsReportResource::collection($data);
     }
 
