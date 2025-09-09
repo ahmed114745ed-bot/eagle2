@@ -55,6 +55,13 @@ class RoomRepoService
         return $this->repository->mine($request ,$user_id);
     }
 
+    public function getUserRooms($request ,$user_id)
+    {
+        return $this->repository->getUserRooms($request ,$user_id);
+    }
+
+
+    
     public function getAllLiveRooms($request)
     {
         return $this->repository->liveRooms($request);

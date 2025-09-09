@@ -2,6 +2,7 @@
 
 namespace App\Tik\Repositories;
 
+use App\Http\Resources\Api\V1\NowRoomResource;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Models\EnteredRoom;
 use App\Models\Pack;
@@ -332,7 +333,46 @@ class RoomRepository extends AbstractRepository
         ];
         
     }
+
+    public function getUserRooms($req, $id)
+    {
+        $user     = User::find($id);    
+        $query = $this->baseRoomQueryMine($user);
+
+        
+        $audio = (clone $query)->where('type', 'audio')->first();
+        $live  = (clone $query)->where('type', 'live')->first();
+        $nowRooms  = $this->getNowRooms( $user);
     
+        return [
+            'audio' => $audio
+                ? new RoomResource($audio)
+                : (object)[],   
+    
+            'live'  => $live
+                ? new RoomResource($live)
+                : (object)[], 
+            'now_room'  => $nowRooms
+                ? $nowRooms
+                : (object)[],       
+        ];
+        
+    }
+    private function getNowRooms($user)
+    {
+
+        if (!$user->now_room_uid) return (object)[];
+     
+        $nowRoomOwner = $user->nowRoomOwner;
+    
+        if (!$nowRoomOwner) return (object)[];
+    
+        if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
+    
+        return new NowRoomResource($user) ?? (object)[];
+        
+
+    }  
 
     private function getBlockedUserIds()
     {

@@ -112,6 +112,16 @@ class RoomController extends Controller
         return Common::apiResponse(true, '', $rooms, 200);
     }
 
+    public function userRoom($id ,Request $request)
+    {
+        
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        $rooms = $this->roomService->getUserRooms($request ,$id);
+        return Common::apiResponse(true, '', $rooms, 200);
+    }
+
+
+    
 
     public function getAllLiveRooms(Request $request)
     {

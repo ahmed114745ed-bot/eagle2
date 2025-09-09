@@ -203,6 +203,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
                 Route::get('/mine', [RoomController::class, 'mine']);
+                Route::get('/users/{id}', [RoomController::class, 'userRoom']);
                 Route::get('/', [RoomController::class, 'index']);
                 Route::get('/live-rooms', [RoomController::class, 'getAllLiveRooms']);
                 Route::get('/game-rooms', [RoomController::class, 'gameRoom']);
