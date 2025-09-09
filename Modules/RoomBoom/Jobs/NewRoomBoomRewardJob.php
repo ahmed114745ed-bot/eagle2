@@ -21,14 +21,18 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Collection;
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\RoomBoom\Entities\RoomBoom;
+use Modules\RoomBoom\Entities\RoomBoomGift;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\RoomBoomReward;
+use Modules\RoomBoom\Entities\RoomBoomTopContributor;
 use Modules\RoomBoom\Transformers\RoomBoomRewardResource;
 
-class RoomBoomRewardJob implements ShouldQueue
+class NewRoomBoomRewardJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $boomId;
+    public $userId;
     protected Collection $users;
     protected array $giftInsertData = [];
     protected array $achievementInsertData = [];
@@ -38,9 +42,10 @@ class RoomBoomRewardJob implements ShouldQueue
     protected array $achievementNotifications = [];
     protected array $giftNotifications = [];
     protected array $wareNotifications = [];
-    public function __construct($boomId)
+    public function __construct($boomId, $userId)
     {
         $this->boomId = $boomId;
+        $this->userId = $userId;
     }
 
     /**
@@ -62,9 +67,11 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $this->getRewardItems($rewards, $rewardItems);
 
-        $topContributorIds = $this->getTopContributorIds($roomId, $level->level);
+        $topContributors = $this->getTopContributorIds($boom->total_room_gift_id, $level->level);
 
-        $lastTriggerSenderId = GiftLog::where('id', $boom->final_gift_id)->value('sender_id');
+        $topContributorIds = $topContributors->pluck('user_id')->toArray();
+
+        $lastTriggerSenderId = $this->userId;
 
         $room = Room::select('id')->with('roomVisitors:id,user_id,room_id')->find($roomId);
 
@@ -85,6 +92,8 @@ class RoomBoomRewardJob implements ShouldQueue
         $this->bulkInsertGiftsAchievements();
 
         $this->dispatchPendingNotifications();
+
+        $this->storeTopContributors($topContributors, $boom);
     }
 
     /**
@@ -242,23 +251,37 @@ class RoomBoomRewardJob implements ShouldQueue
         return null;
     }
 
-    public function getTopContributorIds($roomId, $levelColumn): array
+    public function getTopContributorIds($totalRoomGiftId, $levelColumn)
     {
-        return GiftLog::query()
-            ->select('sender_id',
-                DB::raw('SUM(giftPrice) as total_gift'),
+//        return GiftLog::query()
+//            ->select('sender_id',
+//                DB::raw('SUM(giftPrice) as total_gift'),
+//                DB::raw('MIN(created_at) as first_contribution')
+//            )
+//            ->where('room_id', $roomId)
+//            ->where('room_boom_level', $levelColumn)
+//            ->where('start_boom_ranking', 1)
+//            ->where('created_at', '>=', Carbon::today())
+//            ->groupBy('sender_id')
+//            ->orderByDesc('total_gift')
+//            ->orderBy('first_contribution', 'asc')
+//            ->limit(3)
+//            ->pluck('sender_id')
+//            ->toArray();
+
+        return RoomBoomGift::query()
+            ->select('user_id',
+                DB::raw('SUM(price) as total_gift'),
                 DB::raw('MIN(created_at) as first_contribution')
             )
-            ->where('room_id', $roomId)
+            ->where('total_room_gift_id', $totalRoomGiftId)
             ->where('room_boom_level', $levelColumn)
             ->where('start_boom_ranking', 1)
             ->where('created_at', '>=', Carbon::today())
-            ->groupBy('sender_id')
+            ->groupBy('user_id')
             ->orderByDesc('total_gift')
             ->orderBy('first_contribution', 'asc')
-            ->limit(3)
-            ->pluck('sender_id')
-            ->toArray();
+            ->get();
     }
 
     public function assignWinnerData($userId, $reward): void
@@ -379,6 +402,26 @@ class RoomBoomRewardJob implements ShouldQueue
             }
         }
     }
+
+    protected function storeTopContributors($topContributors, $boom): void
+    {
+        $level = $boom->roomBoomLevel;
+        $totalRoomGiftId = $boom->total_room_gift_id;
+
+        $topContributorData = array_map(function ($topContributor) use ($level, $totalRoomGiftId){
+            return [
+                'room_boom_level_id' => $level->id,
+                'total_room_gift_id' => $totalRoomGiftId,
+                'user_id' => $topContributor['user_id'],
+                'price' => $topContributor['total_gift'],
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }, $topContributors->toArray());
+
+        DB::table('room_boom_top_contributors')->insert($topContributorData);
+    }
+
 }
 
 //        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
