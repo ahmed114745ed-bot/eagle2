@@ -107,6 +107,7 @@ class Kernel extends HttpKernel
         'agencyFeature' => EnsureAgencyFeatureEnabled::class,
         'web-agency-feature' => WebAgencyFeatureEnable::class,
         'ban.user.actions' => \App\Http\Middleware\CheckUserBan::class,
+        'local' => \App\Http\Middleware\LocalOnly::class,
 
     ];
 }

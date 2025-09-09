@@ -2,6 +2,8 @@
 
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
+use App\Admin\Controllers\GiftLogController;
+use App\Admin\Controllers\GiftLogTestController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\SuperBoomRuleController;
 use App\Models\Room;
@@ -239,10 +241,6 @@ Route::group(
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
-        Route::get('get-setting/{key}', function ($key) {
-            return settings()->get($key);
-        });
-
         Route::post('/edit-level', [UsersAppController::class, 'editLevelUser']);
         Route::post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);
         Route::post('/delete-user-vip/{id}', [UsersAppController::class, 'deleteUserVip']);
@@ -267,8 +265,6 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
-
-        Route::resource('live-rooms', 'LiveRoomController');
         Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
         Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
         Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
@@ -622,7 +618,9 @@ Route::group(
         Route::get('coin-game-users/show', [CoinGameUserAllController::class,'showAll']);
 
 
-});
+        Route::get('/send-test', [GiftLogTestController::class, 'showGiftForm'])->middleware('local');
+        Route::post('/send-test', [GiftLogTestController::class, 'gift_queue_cp_view'])->middleware('local');
+    });
 
 
 Route::group([
