@@ -10,9 +10,9 @@
     @csrf
 
     <!-- Static hidden values -->
-    <input type="hidden" name="id" value="384">
-    <input type="hidden" name="owner_id" value="361">
-    <input type="hidden" name="toUid" value="360">
+    <input type="hidden" name="id" value="463">
+    <input type="hidden" name="owner_id" value="303">
+    <input type="hidden" name="toUid" value="1206">
     <input type="hidden" name="num" value="400">
     <input type="hidden" name="type" value="test">
 
