@@ -65,7 +65,7 @@ class EnteranceController extends Controller
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
-        
+
         $data = [
             'agora_app_id' => $agora_app_id,
             'zego' => [
@@ -236,7 +236,7 @@ class EnteranceController extends Controller
         $user     = $request->user();
         $roomId   = $request->input('room_id');
         $roomPass = $request->input('room_pass');
-        $type     = $request->input('type') ?? 'audio';
+        $type     = $request->input('type', 'audio') ;
 
         if (!$roomId) {
             return $this->errorResponse(__('Please provide a room_id.'), 422);
@@ -500,7 +500,7 @@ class EnteranceController extends Controller
     {
         try {
             $user = $request->user();
-            $type = $request->get('type', 'audio'); 
+            $type = $request->get('type', 'audio');
 
             $room = $this->repo->findByType($id, $type);
             if (!$room) {
