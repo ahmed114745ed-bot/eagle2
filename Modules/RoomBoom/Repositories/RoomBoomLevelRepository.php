@@ -18,11 +18,10 @@ class RoomBoomLevelRepository
             $query->orderBy('priority');
         },
             'roomBooms' => function ($query) use ($roomId, $today) {
-            $query->whereHas('totalRoomGift', function ($q) use ($roomId) {
-                $q->where('room_id', $roomId);
-            })
-                ->whereDate('started_at', $today)
-                ->with('topContributors');
+                $query->whereHas('totalRoomGift', function ($q) use ($roomId) {
+                    $q->where('room_id', $roomId);
+                })
+                ->whereDate('started_at', $today);
         },
         ])->orderBy('level')->get();
     }
