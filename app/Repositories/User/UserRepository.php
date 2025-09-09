@@ -457,7 +457,7 @@ class UserRepository extends Repository
                 'manager',
                 'medals' => fn($q) => $q->where('is_enable', true),
                 'Ovip.wareIcon',
-                'UserVip.vip.wares',
+                'UserVip.Ovip.wares',
                 'nowRoomOwner.packs' => fn($q) => $q->where('is_used', 1)->with('ware'),
             ])
             ->withCount(['profileVisits as profile_visitors'])
