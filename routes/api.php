@@ -201,6 +201,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('check-room', [RoomController::class, 'check_room']);
 
             Route::prefix('rooms')->group(function () {
+                Route::get('/{id}', [RoomController::class, 'show']);
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
                 Route::get('/mine', [RoomController::class, 'mine']);
                 Route::get('/', [RoomController::class, 'index']);
@@ -212,7 +213,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
                 Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);
                 Route::post('pk/change-image', [RoomController::class, 'changeRoomImage']);
-                Route::get('/{id}', [RoomController::class, 'show']);
                 Route::post('/{id}/edit', [EnteranceController::class, 'update']);
                 Route::post('firstOfRoom', [RoomController::class, 'firstOfRoom']);
                 Route::post('admins', [RoomController::class, 'getAdmins']);
