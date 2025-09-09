@@ -12,7 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payment_coins', function (Blueprint $table) {
-            $table->dropUnique(['type']); 
+            $sm = Schema::getConnection()->getDoctrineSchemaManager();
+            $indexes = $sm->listTableIndexes('payment_coins');
+
+            if (array_key_exists('payment_coins_type_unique', $indexes)) {
+                $table->dropUnique('payment_coins_type_unique');
+            } elseif (array_key_exists('type_unique', $indexes)) {
+                $table->dropUnique('type_unique');
+            }
+            
             $table->unique(['type', 'package_type'], 'type_package_unique');
         });
     }
