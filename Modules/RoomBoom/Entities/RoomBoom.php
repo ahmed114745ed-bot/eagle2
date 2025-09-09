@@ -20,10 +20,4 @@ class RoomBoom extends Model
     {
         return $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
     }
-
-    public function topContributors(): HasMany
-    {
-        return $this->hasMany(RoomBoomTopContributor::class, 'room_boom_level_id', 'room_boom_level_id')
-            ->orderByDesc('price');
-    }
 }

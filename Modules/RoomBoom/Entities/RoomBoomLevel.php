@@ -4,6 +4,7 @@ namespace Modules\RoomBoom\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RoomBoomLevel extends Model
@@ -20,5 +21,10 @@ class RoomBoomLevel extends Model
     public function roomBooms(): HasMany
     {
         return $this->hasMany(RoomBoom::class);
+    }
+
+    public function totalRoomGift(): BelongsTo
+    {
+        return $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
     }
 }
