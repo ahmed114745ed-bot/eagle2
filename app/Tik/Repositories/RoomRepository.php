@@ -317,8 +317,8 @@ class RoomRepository extends AbstractRepository
         $user     = User::find($id);    
         $query = $this->baseRoomQueryMine($user);
     
-        $audio = (clone $query)->where('type', 'audio')->get();
-        $live  = (clone $query)->where('type', 'live')->get();
+        $audio = (clone $query)->where('type', 'audio')->first();
+        $live  = (clone $query)->where('type', 'live')->first();
         
         return [
             'audio' => $audio->isNotEmpty()
