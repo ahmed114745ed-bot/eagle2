@@ -434,10 +434,10 @@ class User extends Authenticatable
         return $this->hasMany(ExchangeLog::class);
     }
 
-    public function coinLogs()
-    {
-        return $this->hasMany(CoinLog::class);
-    }
+    // public function coinLogs()
+    // {
+    //     return $this->hasMany(CoinLog::class);
+    // }
 
     public function charges()
     {
