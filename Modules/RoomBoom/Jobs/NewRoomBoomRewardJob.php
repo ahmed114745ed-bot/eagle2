@@ -253,22 +253,6 @@ class NewRoomBoomRewardJob implements ShouldQueue
 
     public function getTopContributorIds($totalRoomGiftId, $levelColumn)
     {
-//        return GiftLog::query()
-//            ->select('sender_id',
-//                DB::raw('SUM(giftPrice) as total_gift'),
-//                DB::raw('MIN(created_at) as first_contribution')
-//            )
-//            ->where('room_id', $roomId)
-//            ->where('room_boom_level', $levelColumn)
-//            ->where('start_boom_ranking', 1)
-//            ->where('created_at', '>=', Carbon::today())
-//            ->groupBy('sender_id')
-//            ->orderByDesc('total_gift')
-//            ->orderBy('first_contribution', 'asc')
-//            ->limit(3)
-//            ->pluck('sender_id')
-//            ->toArray();
-
         return RoomBoomGift::query()
             ->select('user_id',
                 DB::raw('SUM(price) as total_gift'),
