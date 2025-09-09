@@ -321,7 +321,6 @@ class RoomRepository extends AbstractRepository
         $audio = (clone $query)->where('type', 'audio')->first();
         $live  = (clone $query)->where('type', 'live')->first();
     
-        dd($audio ,$live ,$id ,$user);
         return [
             'audio' => $audio
                 ? new RoomResource($audio)
