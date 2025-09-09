@@ -201,7 +201,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('check-room', [RoomController::class, 'check_room']);
 
             Route::prefix('rooms')->group(function () {
-                Route::get('/{id}', [RoomController::class, 'show']);
+                Route::get('/{id}', [RoomController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
                 Route::get('/mine', [RoomController::class, 'mine']);
                 Route::get('/', [RoomController::class, 'index']);
