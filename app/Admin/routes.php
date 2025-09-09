@@ -263,6 +263,8 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+
+        Route::resource('live-rooms', 'LiveRoomController');
         Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
         Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
         Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
