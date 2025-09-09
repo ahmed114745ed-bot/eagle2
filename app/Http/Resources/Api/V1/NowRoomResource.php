@@ -21,6 +21,12 @@ class NowRoomResource extends JsonResource
                 $pass_status = true;
             }
         }
+
+        if (!$now_room->is_live &&  $now_room->type  == 'live') {
+            return [];
+        }
+
+
         return [
             'is_in_room'      => @$this->now_room_uid != 0,
             'uid'             => @(int)$this->now_room_uid,

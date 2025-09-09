@@ -45,11 +45,11 @@ class LiveRoomController extends MainController
     {
         $content = $content->title(trans('Rooms'));
 
-        if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
-            $content = $content->row(function (Row $row) {
-                $row->column(12, $this->grid2());
-            });
-        }
+        // if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
+        //     $content = $content->row(function (Row $row) {
+        //         $row->column(12, $this->grid2());
+        //     });
+        // }
 
         $grid = $this->grid();
         $content = $content->body($grid);
@@ -264,7 +264,7 @@ class LiveRoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-        $grid->header(fn () => $this->buildTabsHeader($filterType));
+        // $grid->header(fn () => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -531,11 +531,8 @@ class LiveRoomController extends MainController
     protected function defineGridColumns($grid)
     {
         $grid->disableRowSelector();
-        $maxRoomAdmin = Common::getConfig('max_room_admin');
 
-        // Preload users for this page only
         $grid->model()->collection(function (Collection $collection) {
-            // collect all microphone user IDs from the current page rows
             $allIds = $collection->flatMap(function ($row) {
                 return array_filter(explode(',', (string) $row->microphone));
             })->unique()->values()->all();
@@ -603,88 +600,14 @@ class LiveRoomController extends MainController
             return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
         });
 
-        // $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
-        //     $adminsCount = is_array($this->admins) ? count($this->admins) : 0;
-        //     return $adminsCount . '/' . ($maxAdmin ?? $maxRoomAdmin);
-        // });
+        $grid->column('session', __('Gifts'))->display(function () {
+            return $this->session  ?? 0; 
+        });
 
 
         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
 
 
-        // $grid->column(__('microphone'))->display(function () {
-
-        //     $usersForRow = $this->microphone_users ?? collect();
-        //     if ($usersForRow->isEmpty()) {
-        //         return '';
-        //     }
-        //     $ids = array_filter(explode(',', $this->microphone ?? ''));
-        //     if (empty($ids)) {
-        //         return '';
-        //     }
-
-        //     $html = '<div class="image-container">';
-        //     foreach ($usersForRow as $user) {
-
-        //         if (!$user) continue;
-
-        //         $url = $user->profile?->avatar
-        //             ? getImagePath($user->profile?->avatar)
-        //             : asset("images/businessman-icon.jpg");
-
-        //         $html .= <<<HTML
-        //         <div class="image-wrapper" onclick="window.location.href='{$user->id}'">
-        //             <img src="{$url}" title="{$user->name}"
-        //             style="width: 40px; height: 40px; border-radius: 50%;
-        //                             object-fit: cover; border: 2px solid white;
-        //                             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        //                             transition: transform 0.3s ease;"/>
-        //         </div>
-        //     HTML;
-        //     }
-
-
-        //     $html .= '</div>';
-
-        //     static $appended = false;
-        //     if (!$appended) {
-        //         $html .= '
-        //         <style>
-        //             .image-container {
-        //                 display: flex;
-        //                 justify-content: start;
-        //                 align-items: center;
-        //                 gap: -10px; /* Overlap the images slightly */
-        //                 padding: 8px 0;
-        //                 overflow-y: overlay;
-        //                 width: 218px;
-        //                 padding-right: 16px;
-        //             }
-        //             .image-wrapper {
-        //                 display: inline-block;
-        //                 position: relative;
-        //                 margin-right: -12px;
-        //             }
-        //             .image-wrapper img {
-        //                 width: 40px;
-        //                 height: 40px;
-        //                 border-radius: 50%;
-        //                 object-fit: cover;
-        //                 border: 2px solid #fff;
-        //                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        //                 transition: transform 0.3s ease, box-shadow 0.3s ease;
-        //                 cursor: pointer;
-        //             }
-        //             .image-wrapper img:hover {
-        //                 transform: scale(1.2);
-        //                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        //             }
-        //         </style>';
-        //         $appended = true;
-            // }
-
-        //     return $html;
-        // });
     }
 
 
@@ -881,6 +804,7 @@ class LiveRoomController extends MainController
         $form->text('room_intro', __('room intro'));
         $form->text('room_pass', __('room pass'))->rules('nullable|integer|digits:6');
         $form->hidden('is_afk', __('owner in'));
+        $form->hidden('type', __(' '))->default('live');
         $form->select('room_class')->options(function () {
             $options = [];
             $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', 0)->get();
