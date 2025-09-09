@@ -45,6 +45,7 @@ class CoinService
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $paymentMethod = $coin->paymentCoin->type;
         $userType = $coin->paymentCoin->package_type;
+        \Log::info("start  $coin->obtained_coins} coins");
 
         $user = $this->resolveCharger($request, $userType);
         
@@ -253,3 +254,7 @@ class CoinService
     }
 
 }
+
+
+
+
