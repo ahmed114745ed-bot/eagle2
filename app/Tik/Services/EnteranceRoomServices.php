@@ -397,7 +397,7 @@ class EnteranceRoomServices
     public function enterRoom($user, $request, $room_pass, Room $room)
     {
         $owner_id = $room->uid;
-        if ($request->type == 'random') {
+        if ($request->sub_type == 'random') {
             $owner_id = $this->roomRepository->randomOwner();
         }
 
@@ -682,7 +682,7 @@ class EnteranceRoomServices
                 return true;
             }
             if ($sjc >= $arr[2]) {
-                unset($isBlack[$k]); 
+                unset($isBlack[$k]);
             }
         }
 
