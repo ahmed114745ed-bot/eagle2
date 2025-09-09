@@ -22,8 +22,10 @@ class RoomBoomLevelRepository
                 $q->where('room_id', $roomId);
             })
                 ->whereDate('started_at', $today)
-                ->with('topContributors');
-        },
+                ->with(['topContributors' => function ($q) use ($roomId) {
+                    $q->whereHas('totalRoomGift', fn($tq) => $tq->where('room_id', $roomId));
+                }]);
+            },
         ])->orderBy('level')->get();
     }
 

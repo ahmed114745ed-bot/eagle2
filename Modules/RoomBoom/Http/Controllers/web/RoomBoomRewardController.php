@@ -70,6 +70,8 @@ class RoomBoomRewardController extends MainController
             } elseif ($this->target_type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
+            } elseif ($this?->target_type == "coin") {
+                return @$this?->target;
             }
         });
         if (!request()->filled('_export_')) {
@@ -83,6 +85,9 @@ class RoomBoomRewardController extends MainController
                 } elseif ($this->target_type == 'achievement') {
                     $value = getDriverUrl() . '/' . @$this?->target;
                     return "<img src='$value' width='80' height='80'>";
+                } elseif ($this?->target_type == "coin") {
+                    $image = asset('images/coin.png');
+                    return "<img src='$image' width='80' height='80'>";
                 } else {
                     $path = 'coin.png';
                 }
@@ -158,11 +163,22 @@ class RoomBoomRewardController extends MainController
         $form->select('target_type', trans('Target Type'))->options([
             "ware" => __('ware'),
             "gift" => __('gift'),
-            "achievement" => __('achievement')
+            "achievement" => __('achievement'),
+            "coin" => __('coin'),
         ])
-        ->when("ware", fn() => $this->addWareFields($form))
-        ->when("gift", fn() => $this->addGiftFields($form))
-        ->when("achievement", fn() => $this->addAchievementFields($form));
+            ->when("ware", function (Form $form) {
+                $this->addWareFields($form);
+                $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
+            })
+            ->when("gift", function (Form $form) {
+                $this->addGiftFields($form);
+                $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
+            })
+            ->when("achievement", function (Form $form) {
+                $this->addAchievementFields($form);
+                $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
+            })
+            ->when("coin", fn(Form $form) => $this->addcoinField($form));
 
         $form->number('priority', __('priority'))
             ->rules(function () use ($roomBoomLevelId, $form) {
@@ -176,7 +192,6 @@ class RoomBoomRewardController extends MainController
                 ];
             });
         $form->number('quantity', __('Quantity'))->rules('required|integer|min:1');
-        $form->number('expire_days', __('expire'));
 
         $form->saving(function (Form $form) {
             switch ($form->target_type) {
@@ -193,14 +208,16 @@ class RoomBoomRewardController extends MainController
                     $form->model()->target = $url ?? '';
                     $form->target = $url ?? '';
                     break;
+
+                case 'coin':
+                    $form->model()->target = $form->coin_target;
+                    break;
             }
 
             unset($form->ware_target_id);
             unset($form->gift_target_id);
+            unset($form->coin_target);
         });
-
-
-
 
         return $form;
     }
@@ -303,6 +320,16 @@ class RoomBoomRewardController extends MainController
                 return $file;
             })
             ->disk('gcs');
+    }
+
+    protected function addCoinField($form): void
+    {
+        $form->number("coin_target", __("Coin"))
+            ->value(function ($value, $model) {
+                return $model && $model->target_type === 'coin'
+                    ? (int) $model->target
+                    : null;
+            });
     }
 
     public function store()

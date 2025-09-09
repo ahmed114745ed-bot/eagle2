@@ -14,4 +14,9 @@ class RoomBoomTopContributor extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function totalRoomGift(): BelongsTo
+    {
+        return $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
+    }
 }

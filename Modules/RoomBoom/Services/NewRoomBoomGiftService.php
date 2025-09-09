@@ -200,11 +200,11 @@ class NewRoomBoomGiftService
             }
 
             $neededForLevel = $level->target - $currentTotal;
-            $contribution = min($remaining, $neededForLevel);
+            $levelAmount  = min($remaining, $neededForLevel);
             $neededToMin = max(0, $level->min_target - $currentTotal);
 
             if ($currentTotal < $level->min_target) {
-                if ($contribution >= $neededToMin && $neededToMin > 0) {
+                if ($levelAmount  >= $neededToMin && $neededToMin > 0) {
                     RoomBoomGift::create([
                         'total_room_gift_id' => $totalRoomGiftId,
                         'user_id' => $userId,
@@ -213,7 +213,7 @@ class NewRoomBoomGiftService
                         'start_boom_ranking' => 0,
                     ]);
 
-                    $remainingPart = $contribution - $neededToMin;
+                    $remainingPart = $levelAmount - $neededToMin;
                     if ($remainingPart > 0) {
                         RoomBoomGift::create([
                             'total_room_gift_id' => $totalRoomGiftId,
@@ -227,7 +227,7 @@ class NewRoomBoomGiftService
                     RoomBoomGift::create([
                         'total_room_gift_id' => $totalRoomGiftId,
                         'user_id' => $userId,
-                        'price' => $contribution,
+                        'price' => $levelAmount ,
                         'room_boom_level' => $level->level,
                         'start_boom_ranking' => 0,
                     ]);
@@ -236,14 +236,14 @@ class NewRoomBoomGiftService
                 RoomBoomGift::create([
                     'total_room_gift_id' => $totalRoomGiftId,
                     'user_id' => $userId,
-                    'price' => $contribution,
+                    'price' => $levelAmount ,
                     'room_boom_level' => $level->level,
                     'start_boom_ranking' => 1,
                 ]);
             }
 
-            $currentTotal += $contribution;
-            $remaining -= $contribution;
+            $currentTotal += $levelAmount ;
+            $remaining -= $levelAmount ;
         }
     }
 
