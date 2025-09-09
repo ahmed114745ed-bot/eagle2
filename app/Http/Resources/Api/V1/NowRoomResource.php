@@ -22,7 +22,7 @@ class NowRoomResource extends JsonResource
             }
         }
 
-        if (!$now_room->is_live &&  $now_room->type  == 'live') {
+        if (!@$now_room->is_live &&  @$now_room->type  == 'live') {
             return [];
         }
 
