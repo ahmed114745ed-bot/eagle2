@@ -13,7 +13,7 @@ class TopUsersRankResource extends JsonResource
             'name' => @$this->user->name ?? '',
             'uuid' => @$this->user->uuid,
             'img' => $this->user->profile->avatar ?? '',
-            'total_gift' => $this->price ?? 0,
+            'total_gift' => $this->total_gift ?? 0,
         ];
     }
 }
