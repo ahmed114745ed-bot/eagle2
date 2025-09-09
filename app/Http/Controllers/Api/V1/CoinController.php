@@ -120,6 +120,10 @@ class CoinController extends Controller
     public function paymentCoin(Request $request)
     {
         $type = $request->type ?? 'user';
+
+        if ($type === 'shipping') {
+            $type = 'shipping_agency';
+        }
         $data =  $this->coinService->paymentCoin($type);
         return Common::apiResponse(1, '', $data);
     }
