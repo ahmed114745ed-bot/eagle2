@@ -106,7 +106,7 @@ class RoomResource extends JsonResource
                 'created_at' => $this->created_at,
             ]);
         }
-        return $data;
+        return $data ;
     }
 
 

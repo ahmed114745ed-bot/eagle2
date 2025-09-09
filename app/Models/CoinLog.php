@@ -15,7 +15,7 @@ class CoinLog extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id')->with('profile');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function coin()
