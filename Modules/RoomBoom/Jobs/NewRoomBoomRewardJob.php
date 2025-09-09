@@ -235,7 +235,7 @@ class NewRoomBoomRewardJob implements ShouldQueue
 
     public function coinRewards($amount, $userId, $token = null): void
     {
-        User::where('id', $userId)->increment('coins', (int)$amount);
+        User::where('id', $userId)->increment('di', (int)$amount);
 
         $this->coinNotifications['users'][$userId] = ($this->coinNotifications['users'][$userId] ?? 0) + (int)$amount;
         if ($token) {
@@ -411,19 +411,15 @@ class NewRoomBoomRewardJob implements ShouldQueue
             $coinBody  = __('You have received :coin coin.');
 
             foreach ($this->coinNotifications['users'] as $userId => $coins) {
-                $user  = $this->users[$userId] ?? null;
-
-                if ($user) {
+                info('coins', $coins);
+                info('user Id coins', $userId);
+                if ($userId) {
                     Common::sendOfficialMessage($userId, $coinTitle, str_replace(':coin', $coins, $coinBody));
                 }
             }
 
             if (!empty($this->coinNotifications['tokens'])) {
-                Common::send_firebase_notification(
-                    $this->coinNotifications['tokens'],
-                    $coinTitle,
-                    $coinBody
-                );
+                Common::send_firebase_notification($this->coinNotifications['tokens'], $coinTitle, $coinBody);
             }
         }
     }
