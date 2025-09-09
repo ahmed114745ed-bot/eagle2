@@ -13,9 +13,4 @@ class TotalRoomGift extends Model
     {
         return $this->hasMany(RoomBoom::class, 'total_room_gift_id');
     }
-
-    public function topContributors(): HasMany
-    {
-        return $this->hasMany(RoomBoomTopContributor::class, 'total_room_gift_id');
-    }
 }

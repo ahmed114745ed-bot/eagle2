@@ -22,9 +22,4 @@ class RoomBoomLevel extends Model
     {
         return $this->hasMany(RoomBoom::class);
     }
-
-    public function totalRoomGift(): BelongsTo
-    {
-        return $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
-    }
 }
