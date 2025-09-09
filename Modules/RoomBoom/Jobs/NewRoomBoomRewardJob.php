@@ -411,8 +411,8 @@ class NewRoomBoomRewardJob implements ShouldQueue
             $coinBody  = __('You have received :coin coin.');
 
             foreach ($this->coinNotifications['users'] as $userId => $coins) {
-                info('coins', $coins);
-                info('user Id coins', $userId);
+                info('coins', [$coins]);
+                info('user Id coins', [$userId]);
                 if ($userId) {
                     Common::sendOfficialMessage($userId, $coinTitle, str_replace(':coin', $coins, $coinBody));
                 }
