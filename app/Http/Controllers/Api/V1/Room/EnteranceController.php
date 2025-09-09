@@ -500,7 +500,8 @@ class EnteranceController extends Controller
     {
         try {
             $user = $request->user();
-            $room = $this->repo->findByType($id, $request->type);
+            $type = $request->type ?? 'audio';
+            $room = $this->repo->findByType($id, $type);
             if (!$room) {
                 return Common::apiResponse(false, 'Room not found', null, 404);
             }
