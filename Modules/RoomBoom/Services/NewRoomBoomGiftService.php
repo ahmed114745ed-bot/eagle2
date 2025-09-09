@@ -58,14 +58,12 @@ class NewRoomBoomGiftService
                     ->first();
 
                 if (!$existingNotActiveBoom) {
-//                    $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->latest()->value('id');
                     try {
                         RoomBoom::create([
                             'total_room_gift_id' => $totalRoomGift->id,
                             'room_boom_level_id' => $level->id,
                             'started_at' => Carbon::now(),
                             'total_gifts_value' => $newTotal,
-//                            'trigger_gift_id' => $giftLogId
                         ]);
                     } catch (QueryException $e) {
                         if ($e->errorInfo[1] != 1062) {
@@ -82,15 +80,12 @@ class NewRoomBoomGiftService
                     ->first();
 
                 if (!$existingBoom) {
-//                    $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->value('id');
-
                     try {
                         $existingBoom = RoomBoom::create([
                             'total_room_gift_id' => $totalRoomGift->id,
                             'room_boom_level_id' => $currentLevel->id,
                             'started_at' => Carbon::now(),
                             'total_gifts_value' => $newTotal,
-//                            'trigger_gift_id' => $giftLogId
                         ]);
                     } catch (QueryException $e) {
                         if ($e->errorInfo[1] == 1062) {
@@ -114,46 +109,8 @@ class NewRoomBoomGiftService
                     Common::sendToZego('SendCustomCommand', $roomId, $roomUid, $json);
                 }
 
-                if ($newTotal >= $currentLevel->min_target) {
-                    $startBoomRanking = 1;
-                } else {
-                    $startBoomRanking = 0;
-                }
-
-//                GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
-//                    'room_boom_level' => $currentLevel->level,
-//                    'start_boom_ranking' => $startBoomRanking
-//                ]);
-//
-//                RoomBoomGift::create([
-//                    'total_room_gift_id' => $totalRoomGift->id,
-//                    'user_id'            => $userId,
-//                    'price'              => $totalPrice,
-//                    'room_boom_level'    => $currentLevel->level,
-//                    'start_boom_ranking' => $startBoomRanking,
-//                ]);
-
                 $existingBoom->total_gifts_value = $newTotal;
                 $existingBoom->save();
-            } else {
-                $nextLevel = RoomBoomLevel::where('min_target', '>', $newTotal)
-                    ->orderBy('min_target', 'asc')
-                    ->first();
-
-                if ($nextLevel) {
-//                    GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
-//                        'room_boom_level' => $nextLevel->level,
-//                        'start_boom_ranking' => 0
-//                    ]);
-
-//                    RoomBoomGift::create([
-//                        'total_room_gift_id' => $totalRoomGift->id,
-//                        'user_id'            => $userId,
-//                        'price'              => $totalPrice,
-//                        'room_boom_level'    => $nextLevel->level,
-//                        'start_boom_ranking' => 0,
-//                    ]);
-                }
             }
 
             $totalRoomGift->current_total = $newTotal;
@@ -162,12 +119,6 @@ class NewRoomBoomGiftService
 
             $totalRoomGift->save();
         });
-    }
-
-    private function getTimezone(): string
-    {
-        $tz = request()->header('tz', Common::timeZone());
-        return in_array($tz, timezone_identifiers_list()) ? $tz : 'UTC';
     }
 
     private function getOrCreateTotalRoomGift($roomId, $todayStart, $totalPrice){
@@ -195,12 +146,10 @@ class NewRoomBoomGiftService
 
         foreach ($openBooms as $openBoom){
             $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
-//            $giftLog = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->first(['id', 'sender_id']);
 
             if ($boomLevel && $newTotal >= $boomLevel->target) {
                 $openBoom->ended_at = Carbon::now();
                 $openBoom->total_gifts_value = $newTotal;
-//                $openBoom->final_gift_id = $giftLog->id;
                 $openBoom->save();
 
                 dispatch(new NewRoomBoomRewardJob($openBoom->id, $userId))->delay(now()->addSeconds(30));
@@ -224,7 +173,6 @@ class NewRoomBoomGiftService
                 ], [
                     'started_at'        => now(),
                     'total_gifts_value' => $newTotal,
-//                    'trigger_gift_id'   => $giftLog->id
                 ]);
 
                 $d = [
