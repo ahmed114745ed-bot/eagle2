@@ -95,6 +95,11 @@ class RoomRepo implements RoomRepoInterface {
         return $this->model->where('uid', $id)->first();
     }
 
+    public function findByType ( $id ,$type)
+    {
+        return $this->model->where('uid', $id)->where('type' , $type)->first();
+    }
+
     public function create ( $data )
     {
         // dd($data);

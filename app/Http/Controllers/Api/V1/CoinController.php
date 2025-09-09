@@ -30,29 +30,10 @@ class CoinController extends Controller
     public function buyCoins(Request $request)
     {
         if (!$request->coin_id) return Common::apiResponse(0, 'missing param', null, 422);
-         
-      
-        $userType = $request->get('type', 'user');
-        $charger = null;
-
-        switch ($userType) {
-            case 'user':
-                $charger = $request->user();
-                break;
-
-            case 'shipping_agency':
-                $charger = ShippingAgency::where('app_owner_id', Auth::id())->first();
-                if (!$charger) {
-                    return Common::apiResponse(0, 'Shipping agency not found', null, 404);
-                }
-                break;
-
-            default:
-                return Common::apiResponse(0, 'Invalid type', null, 422);
-        }
+        
 
         try {
-            return  $this->coinService->buyCoins($charger, $request ,$userType);
+            return  $this->coinService->buyCoins( $request );
         } catch (Exception $exception) {
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -120,6 +101,10 @@ class CoinController extends Controller
     public function paymentCoin(Request $request)
     {
         $type = $request->type ?? 'user';
+
+        if ($type === 'shipping') {
+            $type = 'shipping_agency';
+        }
         $data =  $this->coinService->paymentCoin($type);
         return Common::apiResponse(1, '', $data);
     }

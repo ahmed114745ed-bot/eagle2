@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\helper\TryCatchHelper;
 use App\Services\FilterChargeService;
 use Auth;
 use Exception;
@@ -1191,5 +1192,36 @@ class UserController extends Controller
     {
         $result = $this->userService->syncBDUsers();
         return response()->json($result);
+    }
+
+
+
+
+    public function stats(Request $request, $id = null)
+    {
+        return TryCatchHelper::handle(function () use ($id, $request) {
+            return $this->userService->getUserStats($id ?? $request->user()->id);
+        });
+    }
+
+    public function rooms(Request $request, $id = null)
+    {
+        return TryCatchHelper::handle(function () use ($id, $request) {
+            return $this->userService->getUserRooms($id ?? $request->user()->id);
+        });
+    }
+
+    public function vipLevel(Request $request, $id = null)
+    {
+        return TryCatchHelper::handle(function () use ($id, $request) {
+            return $this->userService->getUserVipLevel($id ?? $request->user()->id);
+        });
+    }
+
+    public function frames(Request $request, $id = null)
+    {
+        return TryCatchHelper::handle(function () use ($id, $request) {
+            return $this->userService->getUserFrames($id ?? $request->user()->id);
+        });
     }
 }
