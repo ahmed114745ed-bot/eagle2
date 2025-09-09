@@ -478,10 +478,13 @@ Route::get('/archive-old-coin-games', function () {
 
 Route::get('/update-user-follow-counts', function () {
     UpdateUserFollowCountsJob::dispatch()
-    ->delay(now()->addMinutes(5))
     ->onQueue('follow_counts');
     return response()->json([
         'success' => true,
         'message' => 'done'
     ]);
 });
+
+
+
+
