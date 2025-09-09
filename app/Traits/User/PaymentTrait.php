@@ -105,24 +105,18 @@ trait PaymentTrait
         ]);
     }
     
-    private function resolveCoinLogOwner(CoinLog $coinLog): void
+    private function resolveCoinLogOwner(CoinLog $coinLog)
     {
-        switch ($coinLog->user_type) {
-            case 'user':
-                if ($owner = $coinLog->user) {
-                    $this->processUserPayment($owner, $coinLog);
-                }
-                break;
-    
-            case 'shipping_agency':
-                if ($agency = $coinLog->shippingAgency) {
-                    $this->processAgencyPayment($agency, $coinLog);
-                }
-                break;
-    
-            default:
-                Log::warning("CoinLog {$coinLog->id} has invalid user_type: {$coinLog->user_type}");
+        $owner = $coinLog->owner;
+
+        if ($owner instanceof User) {
+            return $this->processUserPayment($owner, $coinLog);
         }
+
+        if ($owner instanceof ShippingAgency) {
+            return $this->processAgencyPayment($owner, $coinLog);
+        }
+
     }
     
     private function processUserPayment(User $user, CoinLog $coinLog): void

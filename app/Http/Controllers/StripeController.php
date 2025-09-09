@@ -186,20 +186,17 @@ class StripeController extends Controller
 
     private function resolveCoinLogOwner(CoinLog $coinLog)
     {
-        switch ($coinLog->user_type) {
-            case 'user':
+        $owner = $coinLog->owner;
 
-                $owner = $coinLog->user;
-                 $this->processUserPayment($owner, $coinLog);
-
-            case 'shipping_agency':
-
-                $agency = $coinLog->shippingAgency;
-                $this->processAgencyPayment($agency, $coinLog);
-
-            default:
-                return null;
+        if ($owner instanceof User) {
+            return $this->processUserPayment($owner, $coinLog);
         }
+
+        if ($owner instanceof ShippingAgency) {
+            return $this->processAgencyPayment($owner, $coinLog);
+        }
+
+        return null;
     }
 
     private function findCoinLog(?string $orderId, ?string $trxId): ?CoinLog
