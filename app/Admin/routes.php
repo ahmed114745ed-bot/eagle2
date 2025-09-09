@@ -239,6 +239,10 @@ Route::group(
 
         Route::post('/update-user', [UsersAppController::class, 'updateUsers']);
 
+        Route::get('get-setting/{key}', function ($key) {
+            return settings()->get($key);
+        });
+
         Route::post('/edit-level', [UsersAppController::class, 'editLevelUser']);
         Route::post('/delete-pack/{id}', [UsersAppController::class, 'deletePack']);
         Route::post('/delete-user-vip/{id}', [UsersAppController::class, 'deleteUserVip']);
