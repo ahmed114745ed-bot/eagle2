@@ -20,10 +20,18 @@ class UserResource extends JsonResource
      */
   
 
+
+
      public function toArray($request)
      {
          $userHandling = new \App\Classes\UserHandling();
- 
+     
+         $packsByType = $this->packs->groupBy('type');
+
+         $getPackImage = fn($type, $target_id, $item) => 
+         $packsByType->get($type)?->firstWhere('target_id', $target_id)?->ware?->{$item} ?? '';
+
+         
          $data = [
              'id'                   => $this->id,
              'uuid'                 => $this->uuid,
@@ -34,31 +42,29 @@ class UserResource extends JsonResource
              'notification_id'      => $this->notification_id ?: '',
              'name'                 => $this->name ?: "user #{$this->uuid}",
              'nick_name'            => $this->nick_name,
-             'number_of_fans'       => $this->numberOfFans(),
-             'number_of_followings' => $this->numberOfFollowings(),
-             'number_of_friends'    => $this->numberOfFriends(),
-             'profile_visitors'     => $this->profile_visitors, 
+             'number_of_fans'       => $this->number_of_fans,
+             'number_of_followings' => $this->number_of_followings,
+             'number_of_friends'    => $this->number_of_friends,
+             'profile_visitors'     => $this->profile_visitors,
              'is_followed'          => $this->is_followed,
              'is_follow'            => $this->is_follow,
              'is_friend'            => $this->isFriends(),
-             'room'                 => !$this->getPackWithType(16) ? new UserDataRoomResource($this->loadMissing('room')) : (object)[],
+             'room'                 => !$this->getPackWithType(16) ? new UserDataRoomResource($this->room) : (object)[],
              'now_room'             => $this->formatNowRoom(),
              'agency'               => $this->formatAgency(),
              'family_id'            => $this->family_id,
              'family_data'          => $this->formatFamily(),
              'profile'              => new ProfileResource($this->profile),
              'diamonds'             => $this->total_diamond_received ?: 0,
-             'vip'                  => $this->vip_data,
+             'vip'                  => Common::ovip_center($this),
              'lang'                 => $this->lang,
              'country'              => !$this->getPackWithType(13) ? ($this->country ?? (object)[]) : (object)[],
              'have_country'         => !is_null($this->country),
-             'medals'               => $this->medals,
-             'frame'                => $this->getUserDress(4, $this->dress_1, 'img2') 
-                                     ?? $this->getUserDress(4, $this->dress_1, 'img1'),
-             'intro'                => $this->getUserDress(6, $this->dress_3, 'img2') 
-                                     ?? $this->getUserDress(6, $this->dress_3, 'img1'),
-             'intro_type'           => $this->getUserDress(6, $this->dress_3, 'image_type'),
-             'bubble'               => $this->getUserDress(5, $this->dress_2, 'show_img'),
+             'medals'               => (object)[],
+             'frame'                => $getPackImage(4, $this->dress_1, 'img2') ?: $getPackImage(4, $this->dress_1, 'img1'),
+             'intro'                => $getPackImage(6, $this->dress_3, 'img2') ?: $getPackImage(6, $this->dress_3, 'img1'),
+             'intro_type'           => $getPackImage(6, $this->dress_3, 'image_type'),
+             'bubble'               => $getPackImage(5, $this->dress_2, 'show_img'),
              'bubble_id'            => $this->dress_2 ?: 0,
              'frame_id'             => $this->dress_1 ?: 0,
              'intro_id'             => $this->dress_3 ?: 0,
@@ -66,9 +72,7 @@ class UserResource extends JsonResource
              'is_agent'             => $this->is_agent,
              'is_gold_id'           => (bool) $this->color_image,
              'image_color'          => $this->color_image,
-             'my_agency'            => $this->agency?->where('app_owner_id', $this->id)
-                                         ->select('id', 'name', 'notice', 'status', 'phone', 'url', 'img', 'contents')
-                                         ->first(),
+             'my_agency'            => [],
              'online_time'          => !$this->getPackWithType(20) ? $this->formatOnlineTime() : '',
              'has_color_name'       => $this->getPackWithType(18),
              'anonymous'            => $this->getPackWithType(17),
@@ -81,23 +85,23 @@ class UserResource extends JsonResource
              'chat_setting'         => new ChatSettingResource($this->chatSetting),
              'manger_type'          => new MangerTypeResource($this->manager),
              'top_three_support'    => $userHandling->getTopThreeSupport($this->id),
-             'level'                 => $this->level_data,
+             'level'                => Common::level_center(@$this),
              'profile_frame'        => $this->profile_frame,
              'profile_frame_id'     => $this->profile_frame_id,
              'multi_images'         => $this->images?->pluck("img"),
              'user_types'           => $this->user_types,
-             'shipping-agency'      => $this->formatShippingAgency(),
-             'has_anti_ban'         => Common::hasInPack($this->id, 15, true),
+             'shipping_agency'      => $this->formatShippingAgency(),
+             'has_anti_ban'         => $this->getPackWithType(15),
          ];
- 
+     
          if (in_array($this->is_mic, ['0', '1'])) {
              $data['is_mic'] = $this->is_mic;
          }
- 
+     
          if ($this->pivot) {
              $data['visit_time'] = $this->pivot->updated_at;
          }
- 
+     
          return $data;
      }
  
@@ -105,17 +109,17 @@ class UserResource extends JsonResource
      {
          if (!$this->agency) return null;
  
-         $owner = $this->agency->app_owner_id == $this->id
-             ? new \stdClass()
-             : new MiniUserResource($this->agency->owner);
+        //  $owner = $this->agency->app_owner_id == $this->id
+        //      ? new \stdClass()
+        //      : new MiniUserResource($this->agency->owner);
  
          return [
              'id'           => $this->agency->id,
              'name'         => $this->agency->name,
              'status'       => $this->agency->status,
              'image'        => $this->agency->img,
-             'member_count' => $this->agency->members?->count() ?? 0,
-             'owner'        => $owner,
+             'member_count' =>  0,
+             'owner'        => [],
          ];
      }
  
@@ -127,7 +131,7 @@ class UserResource extends JsonResource
              'owner_id'       => $this->family->user_id,
              'family_name'    => $this->family->name,
              'img'            => $this->family->image,
-             'num_of_members' => $this->family->members?->count() ?? 0,
+             'num_of_members' =>  0,
          ];
      }
  
@@ -144,18 +148,17 @@ class UserResource extends JsonResource
  
      private function formatNowRoom()
      {
-         if (!$this->now_room_uid) {
-             return (object)[];
-         }
- 
+         if (!$this->now_room_uid) return (object)[];
+     
          $nowRoomOwner = $this->nowRoomOwner;
-
-         if ($nowRoomOwner?->getPackWithTypeV3(16)) {
-             return (object)[];
-         }
- 
+     
+         if (!$nowRoomOwner) return (object)[];
+     
+         if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
+     
          return new NowRoomResource($this) ?? (object)[];
      }
+     
  
      private function formatShippingAgency()
      {
@@ -165,18 +168,18 @@ class UserResource extends JsonResource
              "id"                   => $this->shippingAgency->id,
              "name"                 => $this->shippingAgency->name ?? '',
              "image"                => $this->shippingAgency->img ?? '',
-             "complete-transactions"=> $this->shippingAgency->charges?->count() ?? 0,
+             "complete-transactions"=>  0,
          ];
      }
  
+
+
      public function getUserDress($type, $dress, $item = 'img1')
      {
-         $pack = $this->packs
-             ->where('type', $type)
-             ->where('target_id', $dress)
-             ->first();
- 
+         $pack = $this->packsByType->get($type)?->firstWhere('target_id', $dress);
+     
          return $pack?->ware?->{$item} ?? '';
      }
+     
 
 }

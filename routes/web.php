@@ -4,6 +4,7 @@ use App\Admin\Controllers\BdController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\BdSalaryMigrationController;
+use App\Jobs\UpdateUserFollowCountsJob;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -473,3 +474,13 @@ Route::get('/archive-old-coin-games', function () {
 
 
 
+
+
+Route::get('/update-user-follow-counts', function () {
+    UpdateUserFollowCountsJob::dispatch();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'done'
+    ]);
+});

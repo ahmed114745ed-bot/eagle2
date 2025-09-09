@@ -37,7 +37,7 @@ class CoinReportController extends Controller
                 default    => [],
             };
         } elseif ($class === 'shipping') {
-            $data = $this->rechargeAgencyCoins();
+            $data = $this->rechargeShippingCoins();
         } else {
             $data = [];
         }
@@ -91,7 +91,7 @@ class CoinReportController extends Controller
             ->paginate(10);//->get();
         return RechargeCoinsReportResource::collection($data);
     }
-    public function rechargeAgencyCoins()
+    public function rechargeShippingCoins()
     {
         $shippingAgency = auth()->user()->shippingAgency;
         if (!$shippingAgency) {
@@ -111,6 +111,8 @@ class CoinReportController extends Controller
             ->paginate(10);
         return RechargeCoinsReportResource::collection($data);
     }
+
+
 
     public function eventCoins()
     {

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\UserFollowHelper;
 use DB;
 use Cache;
 use Exception;
@@ -284,6 +285,7 @@ class UserService
             return Common::apiResponse(false, 'this user not found', null, 404);
         }
 
+
         $follow = $this->followRepository->findFollow($userId, $followedUserId);
         if (!$follow) {
 
@@ -298,6 +300,9 @@ class UserService
         } else {
             $this->followRepository->updateFollowStatus($follow, 1);
         }
+
+        UserFollowHelper::updateCounts( $request->user());
+        UserFollowHelper::updateCounts($receiver);
 
         return Common::apiResponse(true, 'follow done', null, 201);
     }
@@ -498,10 +503,9 @@ class UserService
         if ($this->shouldRecordVisit($auth, $user, $isVisit)) {
             $this->recordVisit($auth, $user);
         }
-    
         $this->packRepository->deleteAllExpiredPacks();
-    
         return $user;
+
     }
     
     private function getUserWithRelations($userId)

@@ -436,40 +436,36 @@ class UserRepository extends Repository
 
     public function findUserData(int $id): Model
     {
-        $defaultRelations = [
-            'packs' => fn($q) => $q->where('is_used', 1)->with('ware'),
+        $targetPackTypes = [4,5,6,15,16,17,18,19,20];
 
-            'profile',
-            'room',
-            'family.members',
-            'blacklists',
-            'chatSetting',
-            'userDataSetting',
-            'agency.owner',
-            'agency.members',
-            'shippingAgency.charges',
-            'specialId.ware',
-            'images',
-            'manager',
-
-            'medals' => fn($q) => $q->where('is_enable', true),
-
-            'room.backgroundImage',
-            'room.background',
-            'room.defaultBackground',
-
-            'Ovip.wareIcon',
-            'UserVip.vip.wares',
-
-            'nowRoomOwner.packs' => fn($q) => $q->where('is_used', 1)->with('ware'),
-        ];
-        
-        return $this->model
-            ->with($defaultRelations)
+        $user = User::with([
+                'packs' => fn($q) => $q->where('is_used', 1)
+                                        ->whereIn('type', $targetPackTypes)
+                                        ->with('ware'),
+                'profile',
+                'room.backgroundImage',
+                'room.background',
+                'room.defaultBackground',
+                'family.members',
+                'blacklists',
+                'chatSetting',
+                'userDataSetting',
+                'agency',
+                'shippingAgency',
+                'specialId.ware',
+                'images',
+                'manager',
+                'medals' => fn($q) => $q->where('is_enable', true),
+                'Ovip.wareIcon',
+                'UserVip.vip.wares',
+                'nowRoomOwner.packs' => fn($q) => $q->where('is_used', 1)->with('ware'),
+            ])
             ->withCount(['profileVisits as profile_visitors'])
-            ->findOrFail($id)
-            ->append(['user_types', 'vip_data', 'level_data','profile_frame', 'profile_frame_id']);
+            ->findOrFail($id);
+
+            return $user;
     }
+    
 
 
     public function getStats($id)

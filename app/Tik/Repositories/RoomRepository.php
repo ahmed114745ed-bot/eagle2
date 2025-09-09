@@ -332,6 +332,28 @@ class RoomRepository extends AbstractRepository
         ];
         
     }
+
+    public function getUserRooms($req, $id)
+    {
+        $user     = User::find($id);    
+        $query = $this->baseRoomQueryMine($user);
+
+        $audio = (clone $query)->where('type', 'audio')->first();
+        $live  = (clone $query)->where('type', 'live')->first();
+    
+        return [
+            'audio' => $audio
+                ? new RoomResource($audio)
+                : (object)[],   
+    
+            'live'  => $live
+                ? new RoomResource($live)
+                : (object)[],   
+        ];
+        
+    }
+    
+
     
 
     private function getBlockedUserIds()
