@@ -12,6 +12,7 @@ use App\Models\User;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use phpDocumentor\Reflection\PseudoTypes\True_;
 
 /** @property Room $model*/
 class RoomRepository extends AbstractRepository
@@ -341,7 +342,7 @@ class RoomRepository extends AbstractRepository
 
         
         $audio = (clone $query)->where('type', 'audio')->first();
-        $live  = (clone $query)->where('type', 'live')->first();
+        $live  = (clone $query)->where('type', 'live')->where('is_live' , true)->first();
         $nowRooms  = $this->getNowRooms( $user);
     
         return [
@@ -354,7 +355,7 @@ class RoomRepository extends AbstractRepository
                 : (object)[], 
             'now_room'  => $nowRooms
                 ? $nowRooms
-                : (object)[],       
+                : (object)[],   
         ];
         
     }
@@ -370,8 +371,7 @@ class RoomRepository extends AbstractRepository
         if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
     
         return new NowRoomResource($user) ?? (object)[];
-        
-
+    
     }  
 
     private function getBlockedUserIds()
