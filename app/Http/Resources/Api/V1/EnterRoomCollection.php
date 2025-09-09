@@ -26,7 +26,6 @@ class EnterRoomCollection extends JsonResource
     {
 
         $pks     = $this->getRoomTwoLastPk($this->id);
-        $topUser = $this->getTopUser($this->uid);
 
         request()->type = 1;
         $owner = $this->owner;

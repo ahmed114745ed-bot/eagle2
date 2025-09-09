@@ -410,7 +410,7 @@ class NewRoomBoomRewardJob implements ShouldQueue
             $coinTitle = __('Coin Reward');
             $coinBody  = __('You have received :coin coin.');
 
-            foreach ($this->coinNotifications['user_ids'] as $userId => $coins) {
+            foreach ($this->coinNotifications['users'] as $userId => $coins) {
                 $user  = $this->users[$userId] ?? null;
 
                 if ($user) {
