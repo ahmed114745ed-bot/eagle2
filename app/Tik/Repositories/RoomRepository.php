@@ -321,12 +321,12 @@ class RoomRepository extends AbstractRepository
         $live  = (clone $query)->where('type', 'live')->get();
         
         return [
-            'audio' => $audio->isNotEmpty() 
-                ? RoomResource::collection($audio) 
-                : (object)[],
+            'audio' => $audio->isNotEmpty()
+                ? RoomResource::collection($audio)
+                : (object)[],  
                 
-            'live'  => $live->isNotEmpty() 
-                ? RoomResource::collection($live) 
+            'live' => $live->isNotEmpty()
+                ? RoomResource::collection($live)
                 : (object)[],
         ];
     }
