@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Models\ShippingAgency;
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;
 use App\Services\PayPalService;
@@ -9,6 +10,7 @@ use App\Services\StripeService;
 use App\Services\ZiniPaymentService;
 use Exception;
 use App\Helpers\Common;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Services\FawryPaymentService;
 use App\Classes\PaymentGateways\Fawry;
@@ -37,11 +39,16 @@ class CoinService
         return $this->coinRepository->allCoinsByPaymentId($payment_id);
     }
 
-    public function buyCoins($user, $request ,$userType)
+    public function buyCoins( $request )
     {
         $coin = $this->coinRepository->findById($request->coin_id);
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $paymentMethod = $coin->paymentCoin->type;
+        $userType = $coin->paymentCoin->package_type;
+
+        $user = $this->resolveCharger($request, $userType);
+        
+    
         $trx = rand(111111111111111111, 999999999999999999);
         // DB::beginTransaction();
         try {
@@ -117,6 +124,26 @@ class CoinService
         } catch (Exception $exception) {
             //  DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+
+
+    private function resolveCharger($request, string $userType)
+    {
+        switch ($userType) {
+            case 'user':
+                return $request->user();
+
+            case 'shipping_agency':
+                $charger = ShippingAgency::where('app_owner_id', Auth::id())->first();
+                if (!$charger) {
+                    return Common::apiResponse(0, 'Shipping agency not found', null, 404);
+                }
+                return $charger;
+
+            default:
+                return Common::apiResponse(0, 'Invalid type', null, 422);
         }
     }
 
