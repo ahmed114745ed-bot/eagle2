@@ -230,20 +230,16 @@ class NewRoomBoomGiftService
 
     private function safeCreateBoom($totalRoomGiftId, $levelId, $newTotal)
     {
-        try {
-            return RoomBoom::create([
+        return RoomBoom::firstOrCreate(
+            [
                 'total_room_gift_id' => $totalRoomGiftId,
                 'room_boom_level_id' => $levelId,
-                'started_at'         => Carbon::now(),
-                'total_gifts_value'  => $newTotal,
-            ]);
-        } catch (QueryException $e) {
-            if ($e->errorInfo[1] != 1062) {
-                throw $e;
-            }
-            return RoomBoom::where('total_room_gift_id', $totalRoomGiftId)
-                ->where('room_boom_level_id', $levelId)
-                ->first();
-        }
+            ],
+            [
+                'started_at' => Carbon::now(),
+                'total_gifts_value' => $newTotal,
+            ]
+        );
     }
+
 }
