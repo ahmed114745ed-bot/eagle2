@@ -61,7 +61,7 @@ class CoinService
                 'trx' => $trx,
                 'status' => 0,
                 'coin_id' => $request->coin_id,
-                'user_type' => $userType,
+                'user_type' => get_class($user),
             ];
             $log = $this->coinLogRepository->create($dataCoinLog);
             //  DB::commit();

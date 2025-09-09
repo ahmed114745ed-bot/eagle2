@@ -13,10 +13,19 @@ class CoinLog extends Model
 
     protected $guarded = [];
 
-    public function user()
+
+    public function owner()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->morphTo(__FUNCTION__, 'user_type', 'user_id')
+            ->withDefault(function ($model, $relation) {
+                return new \App\Models\User();
+            });
     }
+
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class, 'user_id');
+    // }
 
     public function coin()
     {
@@ -24,8 +33,8 @@ class CoinLog extends Model
     }
 
 
-    public function shippingAgency()
-    {
-        return $this->belongsTo(ShippingAgency::class, 'user_id');
-    }
+    // public function shippingAgency()
+    // {
+    //     return $this->belongsTo(ShippingAgency::class, 'user_id');
+    // }
 }
