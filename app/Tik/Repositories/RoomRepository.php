@@ -390,7 +390,8 @@ class RoomRepository extends AbstractRepository
     private function baseRoomQuery($user, $blockedUserIds)
     {
         return $this->model
-        ->where('uid', $user->id)
+            ->where('type', 'live')
+            ->where('is_live', true)
             ->select([
                 'id', 'uid', 'room_name', 'room_cover', 'room_intro', 'room_status',
                 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak',
