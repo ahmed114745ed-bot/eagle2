@@ -411,15 +411,15 @@ class NewRoomBoomRewardJob implements ShouldQueue
             $coinBody  = __('You have received :coin coin.');
 
             foreach ($this->coinNotifications['users'] as $userId => $coins) {
-                info('coins', [$coins]);
-                info('user Id coins', [$userId]);
+                $body = str_replace(':coin', $coins, $coinBody);
+
                 if ($userId) {
-                    Common::sendOfficialMessage($userId, $coinTitle, str_replace(':coin', $coins, $coinBody));
+                    Common::sendOfficialMessage($userId, $coinTitle, $body);
                 }
             }
 
             if (!empty($this->coinNotifications['tokens'])) {
-                Common::send_firebase_notification($this->coinNotifications['tokens'], $coinTitle, $coinBody);
+                Common::send_firebase_notification($this->coinNotifications['tokens'], $coinTitle, $body);
             }
         }
     }
