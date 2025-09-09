@@ -324,10 +324,10 @@ class RoomBoomRewardController extends MainController
 
     protected function addCoinField($form): void
     {
-        $form->number("coin_target", __("Coin"))
-            ->value(function ($value, $model) {
-                return $model && $model->target_type === 'coin'
-                    ? (int) $model->target
+        $form->number('coin_target', __('Coin'))
+            ->default(function ($form) {
+                return $form->model()->target_type === 'coin'
+                    ? (int) $form->model()->target
                     : null;
             });
     }
