@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Modules\CP\Entities\CpRoomHistory;
 
-class EnterRoomCollection extends JsonResource
+class EnterRoomLiveCollection extends JsonResource
 {
 
 
@@ -41,25 +41,18 @@ class EnterRoomCollection extends JsonResource
         /** @var User $owner*/
         return [
             "id"                  => $this->id, // room id
-            "mode"                => $this->mode, // room mode
             "owner_id"            => $this->uid, // owner id
             "uuid"                => $owner?->uuid ?? '', // owner uuid
-            "room_name"           => $this->room_name, // room name
             "owner_name"          => @$owner->name ?? '', // owner name
-            "room_cover"          => $this->room_cover, // room cover
-            "room_background"     => $this->final_room_image, // room background
             "owner_image"         => $owner->avatar ?: '', // owner image
             "giftPrice"           => $this->session_string ?: '', // gift price
             "password_status"     => !($this->room_pass == ""), // room password state
             "admins"              => explode(',', $this->room_admin ?? ''), // room admins
-            "pk"                  => (@$pks[0]) && $pks[0]->end_at >= now() ? new PkCollection($pks[0]) : new \stdClass(), // all pk data
             "room_intro"          => $this->room_intro, // room intro
-            "microphones"         => $this->getMicrophones($this->microphone, $this->main_microphone), // seat states
-            "cp_indexs"           => $indices, // cp
-            "charisma_status"     => ($this->charizma_status) ? true : false, // isCharisma
             "is_comment_closed"   => $this->is_comment_closed, // is Comments Closed
-            'is_live' => (bool) ($this->is_live ?? false),
             "room_rule"           => Common::getConfig('room_rule' . (app()->getLocale() != 'ar' ? '_en' : '')), // room rules
+            'is_live' => (bool) ($this->is_live ?? false),
+
         ];
     }
 

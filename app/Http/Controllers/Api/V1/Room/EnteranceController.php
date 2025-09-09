@@ -229,29 +229,67 @@ class EnteranceController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
+
+
     public function enter_room(Request $request): JsonResponse
     {
+        $user     = $request->user();
+        $roomId   = $request->input('room_id');
+        $roomPass = $request->input('room_pass');
+        $type     = $request->input('type') ?? 'audio';
 
-        $room_pass = $request['room_pass'];
-        // $owner_id = $request['owner_id'];
-        $user = $request->user();
-        $room_id = $request->input('room_id');
-
-        if (!$room_id ) {
-            return Common::apiResponse(0, __('Please provide either owner_id or room_id.'));
+        if (!$roomId) {
+            return $this->errorResponse(__('Please provide a room_id.'), 422);
         }
 
-        $room = Room::findOrFail($room_id);
-        $owner_id = $room->uid;
-
-
-        $ban = Common::ifRoomHasband($owner_id);
-        if ($ban) {
-            return Common::apiResponse(0, __('This room has been closed and you will not be able to enter until the ban is lifted by the room moderators.'), ['ban' => true],402);
+        $room = $this->findRoom($roomId);
+        if (!$room) {
+            return $this->errorResponse(__('Room not found.'), 404);
         }
-        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
-        return $this->enteranceRoomService->enterRoom($user, $request, $room_pass, $room);
+        if ($this->isRoomBanned($room->uid)) {
+            return $this->errorResponse(
+                __('This room has been closed. Wait until moderators lift the ban.'),
+                403,
+                ['ban' => true]
+            );
+        }
+
+        $this->setDefaultBackground();
+
+        return $this->handleRoomType($type, $user, $request, $roomPass, $room);
+    }
+
+    private function errorResponse(string $message, int $code, array $extra = []): JsonResponse
+    {
+        return Common::apiResponse(0, $message, $extra ?: null, $code);
+    }
+
+    private function findRoom(int $roomId): ?Room
+    {
+        return Room::find($roomId);
+    }
+
+    private function isRoomBanned(int $ownerId): bool
+    {
+        return Common::ifRoomHasband($ownerId);
+    }
+
+    private function setDefaultBackground(): void
+    {
+        request()->default_background = \DB::table('backgrounds')
+            ->where('enable', 1)
+            ->orderBy('id')
+            ->value('img');
+    }
+
+    private function handleRoomType(?string $type, $user, Request $request, $roomPass, Room $room): JsonResponse
+    {
+        return match ($type) {
+            'audio' => $this->enteranceRoomService->enterRoom($user, $request, $roomPass, $room),
+            'live'  => $this->enteranceRoomService->enterLiveRoom($user, $request, $roomPass, $room),
+            default => $this->errorResponse(__('Invalid room type. Allowed types: audio, live.'), 422),
+        };
     }
 
     private function updateRoom($user_id, $owner_id, Room &$room)
@@ -462,7 +500,7 @@ class EnteranceController extends Controller
     {
         try {
             $user = $request->user();
-            $room = $this->repo->find($id);
+            $room = $this->repo->findByType($id, $request->type);
             if (!$room) {
                 return Common::apiResponse(false, 'Room not found', null, 404);
             }
@@ -486,8 +524,10 @@ class EnteranceController extends Controller
 
             if ($request->type) {
                 $room->type = $request->type;
-                if ($request->type == 'single_live' || $request->type == 'multi_live') {
+                if ($request->type == 'live' ) {
                     $room->is_live = true;
+                }else{
+                    $room->is_live = false;
                 }
             }
 
