@@ -42,6 +42,8 @@ class NewRoomBoomRewardJob implements ShouldQueue
     protected array $achievementNotifications = [];
     protected array $giftNotifications = [];
     protected array $wareNotifications = [];
+    protected array $coinNotifications = [];
+
     public function __construct($boomId, $userId)
     {
         $this->boomId = $boomId;
@@ -186,6 +188,11 @@ class NewRoomBoomRewardJob implements ShouldQueue
             if ($reward['target_type'] == 'gift') {
                 $this->giftRewards($reward, $userId, $expire, $token);
             }
+
+
+            if ($reward['target_type'] == 'coin') {
+                $this->coinRewards($reward['target'], $userId, $token);
+            }
         }
     }
 
@@ -223,6 +230,16 @@ class NewRoomBoomRewardJob implements ShouldQueue
         $this->giftNotifications[$reward['target']]['user_ids'][] = $userId;
         if ($token) {
             $this->giftNotifications[$reward['target']]['tokens'][] = $token;
+        }
+    }
+
+    public function coinRewards($amount, $userId, $token = null): void
+    {
+        User::where('id', $userId)->increment('coins', (int)$amount);
+
+        $this->coinNotifications['users'][$userId] = ($this->coinNotifications['users'][$userId] ?? 0) + (int)$amount;
+        if ($token) {
+            $this->coinNotifications['tokens'][] = $token;
         }
     }
 
@@ -308,10 +325,10 @@ class NewRoomBoomRewardJob implements ShouldQueue
     protected function dispatchPendingNotifications(): void
     {
         $this->dispatchWareNotification();
-
         $this->dispatchAchievementNotification();
-
         $this->dispatchGiftNotification();
+        $this->dispatchCoinNotification();
+
     }
 
     /**
@@ -383,6 +400,30 @@ class NewRoomBoomRewardJob implements ShouldQueue
 
             if (!empty($notification['tokens'])) {
                 Common::send_firebase_notification($notification['tokens'], $giftTitle, $body);
+            }
+        }
+    }
+
+    public function dispatchCoinNotification(): void
+    {
+        if (!empty($this->coinNotifications)) {
+            $coinTitle = __('Coin Reward');
+            $coinBody  = __('You have received :coin coin.');
+
+            foreach ($this->coinNotifications['user_ids'] as $userId => $coins) {
+                $user  = $this->users[$userId] ?? null;
+
+                if ($user) {
+                    Common::sendOfficialMessage($userId, $coinTitle, str_replace(':coin', $coins, $coinBody));
+                }
+            }
+
+            if (!empty($this->coinNotifications['tokens'])) {
+                Common::send_firebase_notification(
+                    $this->coinNotifications['tokens'],
+                    $coinTitle,
+                    $coinBody
+                );
             }
         }
     }

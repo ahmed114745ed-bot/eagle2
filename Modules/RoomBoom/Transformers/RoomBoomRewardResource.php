@@ -55,8 +55,10 @@ class RoomBoomRewardResource extends JsonResource
             $path = $gift->img ?? '';
         } elseif ($this->target_type == 'achievement') {
             $path = $this->target;
-        } else {
+        } elseif ($this->target_type == 'coin') {
             $path = 'coin.png';
+        } else {
+            $path = '';
         }
 
         return getImagePath($path);
@@ -72,8 +74,10 @@ class RoomBoomRewardResource extends JsonResource
             return $gift?->name ?? '';
         } elseif ($this->target_type == 'achievement') {
             return 'Achievement';
-        } else {
+        } elseif ($this->target_type == 'Coin') {
             return 'Coin';
+        } else {
+            return '';
         }
     }
 
