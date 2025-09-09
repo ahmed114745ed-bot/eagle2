@@ -15,7 +15,7 @@ class CoinLog extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id')->with('profile')->where('user_type','user');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function coin()
@@ -26,6 +26,6 @@ class CoinLog extends Model
 
     public function shippingAgency()
     {
-        return $this->belongsTo(ShippingAgency::class, 'user_id')->where('user_type','shipping_agency');
+        return $this->belongsTo(ShippingAgency::class, 'user_id');
     }
 }
