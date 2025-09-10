@@ -50,6 +50,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 use App\Models\CoinTarget;
 use App\Models\UserCoinTarget;
 use App\Models\UserTargetCoin;
+use App\Facades\CustomNotification;
 
 class UserCommon
 {
@@ -177,6 +178,7 @@ class UserCommon
         }
     
         self::applyEarnings($parent, $invitation, $amount, $percentage);
+
     }
     
     private static function getInvitation($userId)
@@ -200,7 +202,7 @@ class UserCommon
         $configEarn = Config::where("name", "earn_from_invitation")->first();
         $configEarnHost = Config::where("name", "earn_from_invitation_host_agency")->first();
     
-        if ($parent->shippingAgency || $parent->type_user == 4) {
+        if ($parent->shippingAgency || $parent->is_bd ) {
             return $configEarnHost?->value;
         }
     
@@ -224,6 +226,9 @@ class UserCommon
             "user_charge"       => $amount,
             "parent_percentage" => $parentWin,
         ]);
+        CustomNotification::UserEarnedInvitation($parent, $amount);
+
+   
     }
     
 
