@@ -24,8 +24,8 @@ class CpProfileResource extends JsonResource
             $user = $this->fromUser;
         }
 
-        $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'img2');
-        $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
+        $dress_1_data = $this->getUserDress($user, 4, $user?->dress_1, 'img2');
+        $dress_1_fallback = $this->getUserDress($user, 4, $user?->dress_1, 'img1');
         $frame = $dress_1_data ?: $dress_1_fallback;
 
         $currentLevel = CpLevel::find($this->level_id);
