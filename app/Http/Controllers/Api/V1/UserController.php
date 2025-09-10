@@ -54,6 +54,7 @@ use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
+use App\Facades\CustomNotification;
 
 class UserController extends Controller
 {
@@ -784,6 +785,7 @@ class UserController extends Controller
             "user_id"    => $user_parent->id,
             "invited_id" => $user_id,
         ]);
+        CustomNotification::codeInvitationUses($user_parent ,Auth::user());
 
         return Common::apiResponse(true, $success_mes, $request->code, 200);
     }
