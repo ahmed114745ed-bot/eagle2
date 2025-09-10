@@ -117,6 +117,12 @@ class RoomBoomRewardController extends MainController
             );
         });
 
+        \Encore\Admin\Facades\Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
+
         return $grid;
     }
 
