@@ -36,7 +36,7 @@ class InvitationEarningHelper
             'user_charge'       => $userCharge,
             'parent_percentage' => $parentPercentage,
             'charge_id'         => $chargeId,
-            'is_claimed'        => false,
+            'is_claimed'        => true,
             'meta'              => $meta ,
         ]);
     }
