@@ -226,7 +226,7 @@ class UserCommon
             "user_charge"       => $amount,
             "parent_percentage" => $parentWin,
         ]);
-        CustomNotification::UserEarnedInvitation($parent, $amount);
+        CustomNotification::UserEarnedInvitation($parent, $parentWin);
 
    
     }
