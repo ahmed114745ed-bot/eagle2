@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
@@ -49,6 +50,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 use App\Models\CoinTarget;
 use App\Models\UserCoinTarget;
 use App\Models\UserTargetCoin;
+use App\Facades\CustomNotification;
 
 class UserCommon
 {
@@ -157,56 +159,78 @@ class UserCommon
         return $data;
     }
 
+
     public static function UserEarnedInvitation($userId, $amount)
     {
-        $invitation = UserCodeInvitation::where("invited_id", $userId)->first();
-        if ($invitation) {
-            $invitationDate = Carbon::parse($invitation->created_at)->format("Y-m-d");
-            $oneMonthAgo = Carbon::parse($invitationDate)->addMonths(settings()->get('invitation_code_date') ?? 1); // This subtracts one month from the current date
-            $formattedDate = $oneMonthAgo->format('Y-m-d');
-            if (date("Y-m-d") <  $formattedDate) {
-                $config_earn_from_invitation = Config::where("name", "earn_from_invitation")->first();
-                $earn_from_invitation_host_agency = Config::where("name", "earn_from_invitation_host_agency")->first();
-                $parent = User::find($invitation->user_id);
-                if ($parent) {
-                    $precentage = 0;
-                    if ($parent->type_user == 3 || $parent->type_user == 4) {
-                        if ($earn_from_invitation_host_agency != null) {
-                            $precentage = $earn_from_invitation_host_agency->value;
-                        } else {
-                            return '';
-                        }
-                    } else {
-                        if ($config_earn_from_invitation != null) {
-                            $precentage = $config_earn_from_invitation->value;
-                        } else {
-                            return '';
-                        }
-                    }
-
-                    // percentage vlaue
-                    $parent_win = ($amount * $precentage) / 100;
-
-                    // add to parent value earn
-                    $parent->di += $parent_win;
-                    $parent->save();
-
-                    // add in total
-                    $invitation->invited_charge += $amount;
-                    $invitation->user_percentage += $parent_win;
-                    $invitation->save();
-
-                    // add in charge details
-                    UserEarnInvitation::create([
-                        "parent_id" => $parent->id,
-                        "user_id" => $invitation->invited_id,
-                        "user_charge" => $amount,
-                        "parent_percentage" => $parent_win,
-                    ]);
-                }
-            }
+        $invitation = self::getInvitation($userId);
+        if (!$invitation || !self::isInvitationValid($invitation)) {
+            return;
         }
+    
+        $parent = User::find($invitation->user_id);
+        if (!$parent) {
+            return;
+        }
+    
+        $percentage = self::getPercentage($parent);
+        if ($percentage === null) {
+            return;
+        }
+    
+        self::applyEarnings($parent, $invitation, $amount, $percentage);
+
     }
+    
+    private static function getInvitation($userId)
+    {
+        return UserCodeInvitation::where("invited_id", $userId)->first();
+    }
+    
+    private static function isInvitationValid($invitation): bool
+    {
+        $invitationDate = Carbon::parse($invitation->created_at)->format("Y-m-d");
+    
+        $validUntil = Carbon::parse($invitationDate)
+            ->addMonths(settings()->get('invitation_code_date') ?? 1)
+            ->format('Y-m-d');
+    
+        return date("Y-m-d") < $validUntil;
+    }
+    
+    private static function getPercentage($parent): ?float
+    {
+        $configEarn = Config::where("name", "earn_from_invitation")->first();
+        $configEarnHost = Config::where("name", "earn_from_invitation_host_agency")->first();
+    
+        if ($parent->shippingAgency || $parent->is_bd ) {
+            return $configEarnHost?->value;
+        }
+    
+        return $configEarn?->value;
+    }
+    
+    private static function applyEarnings($parent, $invitation, $amount, $percentage): void
+    {
+        $parentWin = ($amount * $percentage) / 100;
+    
+        $parent->di += $parentWin;
+        $parent->save();
+    
+        $invitation->invited_charge += $amount;
+        $invitation->user_percentage += $parentWin;
+        $invitation->save();
+    
+        UserEarnInvitation::create([
+            "parent_id"         => $parent->id,
+            "user_id"           => $invitation->invited_id,
+            "user_charge"       => $amount,
+            "parent_percentage" => $parentWin,
+        ]);
+        CustomNotification::UserEarnedInvitation($parent, $parentWin);
+
+   
+    }
+    
 
     public static function UserLuckyGift($isWin, $userId, Gift $gift, $value, $number, $totalNumWin, $totalUserWin)
     {
