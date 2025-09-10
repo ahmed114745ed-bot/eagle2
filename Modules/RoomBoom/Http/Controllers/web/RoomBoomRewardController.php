@@ -85,10 +85,9 @@ class RoomBoomRewardController extends MainController
                     $value = getDriverUrl() . '/' . @$this?->target;
                     return "<img src='$value' width='80' height='80'>";
                 } elseif ($this?->target_type == "coin") {
-                    $image = asset('images/coin.png');
-                    return "<img src='$image' width='80' height='80'>";
-                } else {
                     $path = 'coin.png';
+                } else {
+                    $path = '';
                 }
                 /** @var Gift $this */
                 $url = getImagePath($path);
@@ -117,6 +116,12 @@ class RoomBoomRewardController extends MainController
                 HTML
             );
         });
+
+        \Encore\Admin\Facades\Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }

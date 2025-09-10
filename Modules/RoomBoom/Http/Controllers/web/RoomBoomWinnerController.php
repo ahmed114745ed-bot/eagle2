@@ -103,9 +103,9 @@ class RoomBoomWinnerController extends MainController
                     $value = getDriverUrl() . '/' . $reward->target;
                     return "<img src='$value' width='80' height='80'>";
                 } elseif ($reward->target_type === 'coin') {
-                    $image = asset('images/coin.png');
-                    return "<img src='{$image}' width='80' height='80'>";
+                    $path = 'coin.png';
                 }
+
                 if (!$path) {
                     return '';
                 }
@@ -164,6 +164,12 @@ class RoomBoomWinnerController extends MainController
         }
 
         $grid->disableActions();
+
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }
