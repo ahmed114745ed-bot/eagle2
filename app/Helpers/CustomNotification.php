@@ -509,6 +509,36 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
+    public function codeInvitationUses(User $user, User $invitationUser, float $amount = 0)
+    {
+        $tokens_notification[] = DB::table('users')
+            ->where('id', $user->id)
+            ->value('notification_id');
+        $body_ar = __('api.code_invitation_uses', ['name' => $user->name], 'ar');
+        $body_en = __('api.code_invitation_uses', ['name' => $user->name], 'en');
+        $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
+        $data = [
+            'coins' => $amount,
+        ];
+        if (!$user->is_logout) {
+            Common::send_firebase_notification(
+                $tokens_notification,
+                $this->appName($user->lan),
+                $firebaseBody,
+                data: $data,
+                messageType: 'charge-action-notifaction'
+            );
+        }
+        Common::sendOfficialMessage(
+            $user->id,
+            title: $body_en,
+            titleAr: $body_ar
+        );
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+    
+
+    
     public function banUser(User $user, $duration)
     {
         $tokens_notification = $user?->notification_id;
