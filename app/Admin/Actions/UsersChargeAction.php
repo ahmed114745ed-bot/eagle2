@@ -106,7 +106,6 @@ class UsersChargeAction extends Action
             ? 'You have received :coins coins from admin.'
             : ':coins coins were deducted from your account by admin.';
 
-            UserCommon::UserEarnedInvitation($user->id, $coins);
 
         CustomNotification::charges($user, $title, $body, ['coins' => $coins]);
 
@@ -127,9 +126,13 @@ class UsersChargeAction extends Action
         $charge->usd = $usdAmount;
         $charge->balance_before =  $user->di  - $coins;
         $charge->save();
+
+        UserCommon::UserEarnedInvitation($user->id, $coins,$charge->id);
+
         if ($request->hasFile('invoice')) {
             $imagePath = Common::upload('profile', $request->file('invoice'));
         }
+
         ChargeInvoice::create([
             'charge_id' => $charge->id,
             'user_id' => $user->id,

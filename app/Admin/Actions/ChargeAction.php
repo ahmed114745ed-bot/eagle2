@@ -166,7 +166,7 @@ class ChargeAction extends Action
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
         //dd($charge);
         $charge->save();
-        UserCommon::UserEarnedInvitation($user->id, $amount);
+        UserCommon::UserEarnedInvitation($user->id, $amount ,$charge->id);
     }
 
     public function form()

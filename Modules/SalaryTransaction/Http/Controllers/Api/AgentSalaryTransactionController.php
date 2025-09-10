@@ -201,7 +201,7 @@ class AgentSalaryTransactionController extends Controller
                 // 'balance_before'=>$user_id->di
             ]);
             // Increment recipient's coins
-            UserCommon::UserEarnedInvitation($user_id, $count);
+            UserCommon::UserEarnedInvitation($user_id, $count,$charge->id);
 
             return Common::apiResponse(1, __('api_responses.your_recharge_was_successful'), [
                 'transfer_amount' => $charge->amount,

@@ -164,7 +164,7 @@ class UserCommon
     }
 
 
-    public static function UserEarnedInvitation($userId, $amount)
+    public static function UserEarnedInvitation($userId, $amount, $chargeId = 0)
     {
         if (self::isStopInvitationValid()) {
             return;
@@ -184,7 +184,7 @@ class UserCommon
             return;
         }
     
-        self::applyEarnings($parent, $invitation, $amount, $percentage);
+        self::applyEarnings($parent, $invitation, $amount, $percentage,$chargeId);
 
     }
     
@@ -218,7 +218,7 @@ class UserCommon
         return $configEarn?->value ??  false;
     }
     
-    private static function applyEarnings($parent, $invitation, $amount, $percentage): void
+    private static function applyEarnings($parent, $invitation, $amount, $percentage,$chargeId): void
     {
         $amountBefore =  Common::getCurrentBalance($parent->id);
 
@@ -247,7 +247,7 @@ class UserCommon
             amount: $parentWin,
             userCharge: $amount,
             parentPercentage: $percentage,
-            chargeId: 0,
+            chargeId: $chargeId,
         );
      
         CustomNotification::UserEarnedInvitation($parent, $parentWin);
