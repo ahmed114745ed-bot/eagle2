@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserFollowHelper;
 use DB;
 use Cache;
@@ -1202,5 +1204,38 @@ class UserService
     public function getUserFrames($id)
     {
         return $this->userRepository->getFramesData($id);
+    }
+
+    public function getEarningsForParent(int $parentId)
+    {
+        return $this->userRepository->getByParentId($parentId);
+    }
+
+    public function claimEarning(int $parentId, int $earningId)
+    {
+        return DB::transaction(function () use ($parentId, $earningId) {
+            $earning = $this->userRepository->claimEarning($earningId);
+
+            if (!$earning || $earning->parent_id !== $parentId) {
+                return null;
+            }
+
+            $parent = User::find($parentId);
+            $amountBefore =  Common::getCurrentBalance($parent->id);
+
+            $parent->increment('di', $earning->amount);
+
+            $parent->increment('di', $earning->amount);
+
+            UserCoinLogHelper::logByType(
+                $parent->id,
+                $earning->amount,
+                $amountBefore,
+                UserCoinLogType::INVITATION_CODE,
+            );
+        
+
+            return $earning->refresh();
+        });
     }
 }

@@ -421,6 +421,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('user-earn-from-invitation', [UserController::class, 'UserEarnFromInvitation']);
             Route::get('create-code-invitation', [UserController::class, 'CreateCodeInvitation']);
             Route::get('add-code-invitation', [UserController::class, 'AddCodeInvitation']);
+            Route::get('/invitations/earnings', [UserController::class, 'invitationsEarnings']);
+            Route::post('/invitations/earnings/{id}/claim', [UserController::class, 'invitationsEarningsClaim']);
+        
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 

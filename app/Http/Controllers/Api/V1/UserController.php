@@ -1302,4 +1302,21 @@ class UserController extends Controller
             return $this->userService->getUserFrames($id ?? $request->user()->id);
         });
     }
+
+    public function invitationsEarnings(Request $request)
+    {
+        return TryCatchHelper::handle(function () use ($request) {
+            $parentId = $request->user()->id;
+            return $this->userService->getEarningsForParent($parentId);
+        });
+    }
+    
+    public function invitationsEarningsClaim(Request $request, int $id)
+    {
+        return TryCatchHelper::handle(function () use ($request, $id) {
+            $parentId = $request->user()->id;
+            return $this->userService->claimEarning($parentId, $id);
+        });
+    }
+    
 }
