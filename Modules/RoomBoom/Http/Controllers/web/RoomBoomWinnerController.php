@@ -24,6 +24,7 @@ class RoomBoomWinnerController extends MainController
             ->body($this->grid()));
     }
 
+
     protected function grid()
     {
         $grid = new Grid(new RoomBoomWinner());
