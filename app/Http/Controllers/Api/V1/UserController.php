@@ -787,13 +787,14 @@ class UserController extends Controller
             return Common::apiResponse(false, __('invitation.already_registered'), $existing, 409);
         }
 
-        $invitation = $this->createInvitation($userParent->id, $userId);
+         $this->createInvitation($userParent->id, $userId);
 
-        $this->rewardUser($userParent, $invitation->host_reward, 'invitation_host_reward', [
+
+        $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
             'invited_id' => $userId
         ]);
 
-        $this->rewardUser(Auth::user(), $invitation->invitee_reward, 'invitation_invitee_reward', [
+        $this->rewardUser(Auth::user(), $this->getValue('invitation_invitee_reward'), 'invitation_invitee_reward', [
             'parent_id' => $userParent->id
         ]);
 
