@@ -85,10 +85,9 @@ class RoomBoomRewardController extends MainController
                     $value = getDriverUrl() . '/' . @$this?->target;
                     return "<img src='$value' width='80' height='80'>";
                 } elseif ($this?->target_type == "coin") {
-                    $image = asset('images/coin.png');
-                    return "<img src='$image' width='80' height='80'>";
-                } else {
                     $path = 'coin.png';
+                } else {
+                    $path = '';
                 }
                 /** @var Gift $this */
                 $url = getImagePath($path);
