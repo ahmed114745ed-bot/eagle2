@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserFollowHelper;
+use App\Http\Resources\InvitationEarningResource;
 use DB;
 use Cache;
 use Exception;
@@ -1208,7 +1209,7 @@ class UserService
 
     public function getEarningsForParent(int $parentId)
     {
-        return $this->userRepository->getByParentId($parentId);
+        return InvitationEarningResource::collection( $this->userRepository->getByParentId($parentId));
     }
 
     public function claimEarning(int $parentId, int $earningId)
