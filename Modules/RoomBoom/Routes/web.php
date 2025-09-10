@@ -2,6 +2,7 @@
 
 use Modules\RoomBoom\Http\Controllers\web\RoomBoomLevelController;
 use Modules\RoomBoom\Http\Controllers\web\RoomBoomRewardController;
+use Modules\RoomBoom\Http\Controllers\web\RoomBoomWinnerController;
 use Modules\RoomBoom\Http\Controllers\web\SuperBoomRuleController;
 
 Route::group(
@@ -18,6 +19,7 @@ Route::group(
     function () {
         Route::resource('room_boom_levels', RoomBoomLevelController::class);
         Route::resource('super-boom-rules', SuperBoomRuleController::class);
+        Route::get('room_boom_winners', [RoomBoomWinnerController::class, 'index']);
 
         Route::prefix('room_boom_rewards/{room_boom_level_id}')->group(function () {
             Route::get('/', [RoomBoomRewardController::class, 'index'])->name('room_boom_rewards.index');
