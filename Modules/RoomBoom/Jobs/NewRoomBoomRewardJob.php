@@ -93,9 +93,11 @@ class NewRoomBoomRewardJob implements ShouldQueue
 
         $this->bulkInsertGiftsAchievements();
 
-        $this->dispatchPendingNotifications();
-
         $this->storeTopContributors($topContributors, $boom);
+
+        $this->storeWinners($boom);
+
+        $this->dispatchPendingNotifications();
     }
 
     /**
@@ -441,6 +443,21 @@ class NewRoomBoomRewardJob implements ShouldQueue
         }, $topContributors->toArray());
 
         DB::table('room_boom_top_contributors')->insert($topContributorData);
+    }
+
+    protected function storeWinners($boom): void
+    {
+        $winnersData = array_map(function ($reward, $userId) use ($boom) {
+            return [
+                'room_boom_reward_id' => $reward['id'],
+                'room_boom_id'        => $boom->id,
+                'user_id'             => $userId,
+                'created_at'          => now(),
+                'updated_at'          => now(),
+            ];
+        }, $this->assignments, $this->assignedUserIds);
+
+        DB::table('room_boom_winners')->insert($winnersData);
     }
 
 }

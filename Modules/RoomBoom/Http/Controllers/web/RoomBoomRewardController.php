@@ -56,6 +56,7 @@ class RoomBoomRewardController extends MainController
     protected function grid()
     {
         $grid = new Grid(new RoomBoomReward());
+        $grid->model()->with(['ware', 'gift']);
 
         $roomBoomLevelId = request('room_boom_level_id');
         $grid->model()->where('room_boom_level_id', $roomBoomLevelId);
@@ -77,11 +78,9 @@ class RoomBoomRewardController extends MainController
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->target_type == 'ware') {
-                    $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? $ware?->show_img;
+                    $path = @$this->ware->img2 ?? @$this->ware?->show_img;
                 } elseif ($this->target_type == 'gift') {
-                    $gift = Gift::find($this->target);
-                    $path = $gift->show_img ?? $gift?->img;
+                    $path = @$this->gift->show_img ?? @$this->gift?->img;
                 } elseif ($this->target_type == 'achievement') {
                     $value = getDriverUrl() . '/' . @$this?->target;
                     return "<img src='$value' width='80' height='80'>";

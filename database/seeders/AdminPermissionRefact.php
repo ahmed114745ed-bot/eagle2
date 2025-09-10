@@ -285,6 +285,7 @@ class AdminPermissionRefact extends Seeder
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => []],
                     ['key' => 'room-boom-levels', 'except' => [], 'additional' => []],
                     ['key' => 'room-boom-rewards', 'except' => [], 'additional' => []],
+                    ['key' => 'room-boom-winners', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => []],
                 ],
             ],
              [
