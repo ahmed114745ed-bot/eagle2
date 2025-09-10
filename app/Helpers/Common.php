@@ -1994,8 +1994,6 @@ class Common
     public static function getCurrentBalance(int $userId): int
     {
         $balance = User::where('id', $userId)->value('di') ?? 0;
-
-
         return $balance;
     }
 

@@ -528,6 +528,9 @@ class EnteranceRoomServices
 
     public function makeRequestInviteRoom($user, $request)
     {
+
+        $tokens_notfacion = [];
+
         $room = Room::where('uid','=',$request->owner_id)->first();
         if (!$room) throw new Exception('room not found');
 
@@ -542,6 +545,7 @@ class EnteranceRoomServices
             ]);
 
             $user->current_room_chat = $chatRoom->id;
+            $user->save();
         }
 
 

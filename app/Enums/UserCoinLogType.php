@@ -28,8 +28,8 @@ enum UserCoinLogType: string
     case PACK = 'packs';
     case GIFT = 'gifts';
     case RETURN_CHAGE = 'return_charge';
-
     case CREATE_ROOM = 'create_room';
+    case INVITATION_CODE = 'invitation_code';
 
     public function meta(): array
     {
@@ -167,7 +167,13 @@ enum UserCoinLogType: string
                 'item_name' => 'rooms',
                 'queue_job' => null,
             ],
+            self::INVITATION_CODE => [
+                'sub_type' => 'invitation_code',
+                'item_name' => 'invitation_code',
+                'queue_job' => null,
+            ],
 
+            
             
         };
     }

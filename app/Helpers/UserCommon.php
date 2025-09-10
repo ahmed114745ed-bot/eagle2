@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Log;
+use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
@@ -162,6 +163,9 @@ class UserCommon
 
     public static function UserEarnedInvitation($userId, $amount)
     {
+        if (self::isStopInvitationValid()) {
+            return;
+        }
         $invitation = self::getInvitation($userId);
         if (!$invitation || !self::isInvitationValid($invitation)) {
             return;
@@ -185,6 +189,13 @@ class UserCommon
     {
         return UserCodeInvitation::where("invited_id", $userId)->first();
     }
+    private static function isStopInvitationValid()
+    {
+        return settings()->get('stop_invite_code');
+    }
+
+    
+
     
     private static function isInvitationValid($invitation): bool
     {
@@ -200,13 +211,8 @@ class UserCommon
     private static function getPercentage($parent): ?float
     {
         $configEarn = Config::where("name", "earn_from_invitation")->first();
-        $configEarnHost = Config::where("name", "earn_from_invitation_host_agency")->first();
-    
-        if ($parent->shippingAgency || $parent->is_bd ) {
-            return $configEarnHost?->value;
-        }
-    
-        return $configEarn?->value;
+
+        return $configEarn?->value ??  false;
     }
     
     private static function applyEarnings($parent, $invitation, $amount, $percentage): void

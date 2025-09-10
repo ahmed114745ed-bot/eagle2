@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\UserCoinLogType;
 use App\helper\TryCatchHelper;
+use App\Helpers\UserCoinLogHelper;
 use App\Services\FilterChargeService;
 use Auth;
 use Exception;
@@ -53,6 +55,7 @@ use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
+use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use App\Facades\CustomNotification;
 
@@ -757,38 +760,96 @@ class UserController extends Controller
 
     public function AddCodeInvitation(Request $request)
     {
-        $user_id      = Auth::id();
-        $user_parent  = User::where("uuid", $request->code)->first();
-        $existingUser = UserCommon::CheckUserParent($user_id);
-        $CheckUserNew = UserCommon::CheckUserNew($user_id);
-        $lang         = app()->getLocale();
-        if ($lang == 'ar') {
-            $mes_user_not_found = 'لم يتم العثور علي المستخدم';
-            $mes_validation     = "لقد مر علي المستخدم 48 ساعه من تاريخ انشائه او المستخدم مسجل من قبل لدي شخص اخر";
-            $success_mes        = 'تم الاضافه بنجاح';
-        } else {
-            $mes_user_not_found = 'It was not found on the user';
-            $mes_validation     = "48 hours have passed since the user was created, or the user has already been registered with someone else";
-            $success_mes        = 'Added successfully';
-        }
-        if (!$user_parent) {
-            return Common::apiResponse(false, $mes_user_not_found, $existingUser, 404);
-        }
-        if ($CheckUserNew == false) {
-            return Common::apiResponse(false, $mes_validation, $existingUser, 404);
+        if (self::isStopInvitationValid()) {
+            return Common::apiResponse(false, __('invitation.stopped'), null, 403);
         }
 
-        if ($existingUser != null) {
-            return Common::apiResponse(false, 'المستخدم مسجل من قبل', $existingUser, 404);
+        $userId     = Auth::id();
+        $userParent = $this->getUserByCode($request->code);
+        $existing   = UserCommon::CheckUserParent($userId);
+        $isNew      = UserCommon::CheckUserNew($userId);
+
+        if (!$this->isDeviceUniqueForUser($userId, Auth::user()->device_token)) {
+            return Common::apiResponse(false, __('invitation.device_in_use'), null, 403);
         }
-        $data = UserCodeInvitation::create([
-            "user_id"    => $user_parent->id,
-            "invited_id" => $user_id,
+
+        if (!$userParent) {
+            return Common::apiResponse(false, __('invitation.user_not_found'), $existing, 404);
+        }
+
+        if (!$isNew) {
+            return Common::apiResponse(false, __('invitation.validation_failed'), $existing, 422);
+        }
+
+        if ($existing !== null) {
+            return Common::apiResponse(false, __('invitation.already_registered'), $existing, 409);
+        }
+
+        $invitation = $this->createInvitation($userParent->id, $userId);
+
+        $this->rewardUser($userParent, $invitation->host_reward, 'invitation_host_reward', [
+            'invited_id' => $userId
         ]);
-        CustomNotification::codeInvitationUses($user_parent ,Auth::user());
 
-        return Common::apiResponse(true, $success_mes, $request->code, 200);
+        $this->rewardUser(Auth::user(), $invitation->invitee_reward, 'invitation_invitee_reward', [
+            'parent_id' => $userParent->id
+        ]);
+
+        CustomNotification::codeInvitationUses($userParent, Auth::user());
+
+        return Common::apiResponse(true, __('invitation.success'), $request->code, 200);
     }
+
+    private static function isStopInvitationValid()
+    {
+        return settings()->get('stop_invite_code');
+    }
+    private function getUserByCode(string $code): ?User
+    {
+        return User::where("uuid", $code)->first();
+    }
+
+    private function createInvitation(int $parentId, int $invitedId): UserCodeInvitation
+    {
+        return UserCodeInvitation::create([
+            "user_id"    => $parentId,
+            "invited_id" => $invitedId,
+            "host_reward"    => $this->getValue('invitation_host_reward') ?? 0,
+            "invitee_reward" => $this->getValue('invitation_invitee_reward') ?? 0,
+            "host_received"  => true,
+        ]);
+    }
+
+    private function getValue(string $key, $default = 0)
+    {
+        return Config::where('name', $key)->value('value') ?? $default;
+    }
+    private function isDeviceUniqueForUser(int $userId, ?string $deviceToken): bool
+    {
+        if (!$deviceToken) {
+            return true;
+        }
+
+        return !UserDevicesHistory::where('device_token', $deviceToken)
+            ->where('user_id', '!=', $userId)
+            ->exists();
+    }
+
+    private function rewardUser(User $user, int $reward, string $type, array $meta = []): void
+    {
+        $amountBefore =  Common::getCurrentBalance($user->id);
+
+        if ($reward > 0) {
+            $user->increment('di', $reward);
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $reward,
+                $amountBefore,
+                UserCoinLogType::INVITATION_CODE,
+            );
+        }
+    }
+
 
     public function CreateCodeInvitation()
     {
