@@ -165,6 +165,12 @@ class RoomBoomWinnerController extends MainController
 
         $grid->disableActions();
 
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
+
         return $grid;
     }
 
