@@ -10,8 +10,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('user_earn_invitations', function (Blueprint $table) {
-            $table->decimal('user_charge', 12, 2)->nullable()->change();
-            $table->decimal('parent_percentage', 9, 2)->nullable()->change();
+            $table->decimal('user_charge', 20, 2)->nullable()->change();
+            $table->decimal('parent_percentage', 20, 2)->nullable()->change();
 
             $table->enum('source_type', [
                 'first_join_reward_host',
