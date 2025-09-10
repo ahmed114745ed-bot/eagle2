@@ -130,6 +130,16 @@ Route::get('/clear', function () {
     return "Cleared!";
 });
 
+Route::get('/clear-opcache', function () {
+
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        return "OPcache cleared!";
+    }
+
+    return "OPcache not enabled.";
+});
+
 Route::get('/clear-config', function () {
 
     Artisan::call('config:clear');
@@ -450,8 +460,8 @@ use App\Models\CoinGameUserAll;
 
 Route::get('/archive-old-coin-games', function () {
     $now = Carbon::now();
-    $start = $now->copy()->subMonth(); 
-    $end = $now->copy()->subYears(2); 
+    $start = $now->copy()->subMonth();
+    $end = $now->copy()->subYears(2);
 
     $current = $start->copy();
 
