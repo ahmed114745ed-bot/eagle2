@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\UserCoinLogType;
+use App\helper\InvitationWalletHelper;
 use App\helper\TryCatchHelper;
+use App\Helpers\InvitationEarningHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Services\FilterChargeService;
 use Auth;
@@ -811,12 +813,25 @@ class UserController extends Controller
 
     private function createInvitation(int $parentId, int $invitedId): UserCodeInvitation
     {
+        InvitationWalletHelper::updateInvitationWallet($this->getValue('invitation_host_reward'));
+        InvitationWalletHelper::updateInvitationWallet($this->getValue('invitation_invitee_reward'));
+
+        InvitationEarningHelper::addEarning(
+            parentId: $parentId,
+            userId: $invitedId,
+            sourceType: 'first_join_reward_host',
+            amount: $this->getValue('invitation_host_reward')
+        );
+        InvitationEarningHelper::addEarning(
+            parentId: $parentId,
+            userId: $invitedId,
+            sourceType: 'first_join_reward_invitee',
+            amount: $this->getValue('invitation_invitee_reward')
+        );
+     
         return UserCodeInvitation::create([
             "user_id"    => $parentId,
             "invited_id" => $invitedId,
-            "host_reward"    => $this->getValue('invitation_host_reward') ?? 0,
-            "invitee_reward" => $this->getValue('invitation_invitee_reward') ?? 0,
-            "host_received"  => true,
         ]);
     }
 

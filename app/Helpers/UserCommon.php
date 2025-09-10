@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use App\Enums\UserCoinLogType;
+use App\helper\InvitationWalletHelper;
 use Illuminate\Support\Facades\Log;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use Modules\Vip\Entities\OVip;
@@ -217,6 +219,8 @@ class UserCommon
     
     private static function applyEarnings($parent, $invitation, $amount, $percentage): void
     {
+        $amountBefore =  Common::getCurrentBalance($parent->id);
+
         $parentWin = ($amount * $percentage) / 100;
     
         $parent->di += $parentWin;
@@ -225,13 +229,26 @@ class UserCommon
         $invitation->invited_charge += $amount;
         $invitation->user_percentage += $parentWin;
         $invitation->save();
-    
-        UserEarnInvitation::create([
-            "parent_id"         => $parent->id,
-            "user_id"           => $invitation->invited_id,
-            "user_charge"       => $amount,
-            "parent_percentage" => $parentWin,
-        ]);
+
+        InvitationWalletHelper::updateInvitationWallet($parentWin);
+
+        UserCoinLogHelper::logByType(
+            $parent->id,
+            $parentWin,
+            $amountBefore,
+            UserCoinLogType::INVITATION_CHARGE_EARNINGS,
+        );
+        
+        InvitationEarningHelper::addEarning(
+            parentId:  $parent->id,
+            userId:  $invitation->invited_id,
+            sourceType: 'charge_percentage',
+            amount: $parentWin,
+            userCharge: $amount,
+            parentPercentage: $percentage,
+            chargeId: 0,
+        );
+     
         CustomNotification::UserEarnedInvitation($parent, $parentWin);
 
    
