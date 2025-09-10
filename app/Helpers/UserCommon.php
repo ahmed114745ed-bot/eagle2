@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Enums\UserCoinLogType;
+use App\helper\InvitationEarningHelper;
 use App\helper\InvitationWalletHelper;
 use Illuminate\Support\Facades\Log;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
@@ -238,7 +239,7 @@ class UserCommon
             $amountBefore,
             UserCoinLogType::INVITATION_CHARGE_EARNINGS,
         );
-        
+
         InvitationEarningHelper::addEarning(
             parentId:  $parent->id,
             userId:  $invitation->invited_id,

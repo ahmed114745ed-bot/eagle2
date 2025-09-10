@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Enums\UserCoinLogType;
 use App\helper\InvitationWalletHelper;
 use App\helper\TryCatchHelper;
-use App\Helpers\InvitationEarningHelper;
+use App\helper\InvitationEarningHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Services\FilterChargeService;
 use Auth;
