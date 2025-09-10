@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
@@ -157,56 +158,101 @@ class UserCommon
         return $data;
     }
 
+
     public static function UserEarnedInvitation($userId, $amount)
     {
+        Log::info("🔹 Start UserEarnedInvitation", [
+            'userId' => $userId,
+            'amount' => $amount
+        ]);
+    
         $invitation = UserCodeInvitation::where("invited_id", $userId)->first();
+        Log::info("Invitation fetched", ['invitation' => $invitation]);
+    
         if ($invitation) {
             $invitationDate = Carbon::parse($invitation->created_at)->format("Y-m-d");
-            $oneMonthAgo = Carbon::parse($invitationDate)->addMonths(settings()->get('invitation_code_date') ?? 1); // This subtracts one month from the current date
+            $oneMonthAgo = Carbon::parse($invitationDate)->addMonths(settings()->get('invitation_code_date') ?? 1);
             $formattedDate = $oneMonthAgo->format('Y-m-d');
+    
+            Log::info("Invitation validity check", [
+                'invitationDate' => $invitationDate,
+                'valid_until' => $formattedDate,
+                'today' => date("Y-m-d"),
+            ]);
+    
             if (date("Y-m-d") <  $formattedDate) {
                 $config_earn_from_invitation = Config::where("name", "earn_from_invitation")->first();
                 $earn_from_invitation_host_agency = Config::where("name", "earn_from_invitation_host_agency")->first();
+    
+                Log::info("Config values", [
+                    'earn_from_invitation' => $config_earn_from_invitation,
+                    'earn_from_invitation_host_agency' => $earn_from_invitation_host_agency
+                ]);
+    
                 $parent = User::find($invitation->user_id);
+                Log::info("Parent user fetched", ['parent' => $parent]);
+    
                 if ($parent) {
                     $precentage = 0;
-                    if ($parent->type_user == 3 || $parent->type_user == 4) {
+    
+                    if ($parent->shippingAgency || $parent->type_user == 4) {
                         if ($earn_from_invitation_host_agency != null) {
                             $precentage = $earn_from_invitation_host_agency->value;
                         } else {
+                            Log::warning("No earn_from_invitation_host_agency config found");
                             return '';
                         }
                     } else {
                         if ($config_earn_from_invitation != null) {
                             $precentage = $config_earn_from_invitation->value;
                         } else {
+                            Log::warning("No earn_from_invitation config found");
                             return '';
                         }
                     }
-
-                    // percentage vlaue
+    
+                    Log::info("Percentage determined", ['percentage' => $precentage]);
+    
+                    // percentage value
                     $parent_win = ($amount * $precentage) / 100;
-
+                    Log::info("Parent win calculated", ['parent_win' => $parent_win]);
+    
                     // add to parent value earn
                     $parent->di += $parent_win;
                     $parent->save();
-
+                    Log::info("Parent updated", ['parent_di' => $parent->di]);
+    
                     // add in total
                     $invitation->invited_charge += $amount;
                     $invitation->user_percentage += $parent_win;
                     $invitation->save();
-
+                    Log::info("Invitation updated", [
+                        'invited_charge' => $invitation->invited_charge,
+                        'user_percentage' => $invitation->user_percentage
+                    ]);
+    
                     // add in charge details
-                    UserEarnInvitation::create([
+                    $record = UserEarnInvitation::create([
                         "parent_id" => $parent->id,
                         "user_id" => $invitation->invited_id,
                         "user_charge" => $amount,
                         "parent_percentage" => $parent_win,
                     ]);
+                    Log::info("UserEarnInvitation record created", ['record' => $record]);
                 }
+            } else {
+                Log::warning("Invitation expired", [
+                    'today' => date("Y-m-d"),
+                    'valid_until' => $formattedDate
+                ]);
             }
+        } else {
+            Log::warning("No invitation found for user", ['userId' => $userId]);
         }
+    
+        Log::info("🔹 End UserEarnedInvitation");
     }
+    
 
     public static function UserLuckyGift($isWin, $userId, Gift $gift, $value, $number, $totalNumWin, $totalUserWin)
     {
