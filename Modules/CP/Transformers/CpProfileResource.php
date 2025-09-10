@@ -71,7 +71,7 @@ class CpProfileResource extends JsonResource
     }
     public function getUserDress($user, $type, $dress, $item = 'img1')
     {
-        $pack = $user->packs
+        $pack = $user?->packs
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
