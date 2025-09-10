@@ -106,6 +106,8 @@ class UsersChargeAction extends Action
             ? 'You have received :coins coins from admin.'
             : ':coins coins were deducted from your account by admin.';
 
+            UserCommon::UserEarnedInvitation($user->id, $coins);
+
         CustomNotification::charges($user, $title, $body, ['coins' => $coins]);
 
         return $this->response()->success('Success')->refresh();
