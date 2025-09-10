@@ -148,7 +148,7 @@ class HomeCarouselController extends MainController
                 'home_middle' => __('Home Middle'),
                 'live' => __('Live')
             ])
-            ->default('discover')->rules(['required', Rule::in(['home_top', 'home_middle', 'discover'])]);
+            ->default('discover')->rules(['required', Rule::in(['home_top', 'home_middle', 'discover','live'])]);
 
         $form->saving(function (Form $form) {
             /*if (request()->hasFile('img')) {
