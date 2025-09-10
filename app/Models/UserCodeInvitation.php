@@ -10,11 +10,7 @@ class UserCodeInvitation extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $fillable = ['id', 'user_id', 'code', 'invited_id', 'invited_charge', 'user_percentage',
-                            'host_reward',
-                            'invitee_reward',
-                            'host_received',
-                        ];
+    protected $fillable = ['id', 'user_id', 'code', 'invited_id', 'invited_charge', 'user_percentage'];
 
     public function user()
     {
