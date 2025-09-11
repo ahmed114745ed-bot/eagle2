@@ -17,6 +17,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use function Laravel\Prompts\select;
 class UserRepository extends Repository
 {
     public function search($key, $family, $perPage, $currentPage)
@@ -439,12 +440,29 @@ class UserRepository extends Repository
 
     public function findUserData(int $id): Model
     {
-        $targetPackTypes = [4,5,6,15,16,17,18,19,20,25];
+        $targetPackTypes = [4, 5, 6, 15, 16, 17, 18, 19, 20, 25];
 
-        $user = User::with([
+        $user = User::
+        select(  [ 'id',
+                        'uuid',
+                        'color_id',
+                        'chat_id',
+                        'notification_id',
+                        'name',
+                        'number_of_fans',
+                        'number_of_followings',
+                        'number_of_friends',
+                        'family_id',
+                        'total_diamond_received',
+                        'bio',
+                        'type_user',
+              ] )
+        ->with([
                 'packs' => fn($q) => $q->where('is_used', 1)
-                                        ->whereIn('type', $targetPackTypes)
-                                        ->with('ware'),
+                                       ->whereIn('type', $targetPackTypes)
+                                       ->where(fn($q) => $q->where('expire', 0)
+                                                           ->orWhere('expire', '>=', now()->timestamp))
+                                       ->with('ware'),
                 'profile',
                 'room.backgroundImage',
                 'room.background',
@@ -454,17 +472,22 @@ class UserRepository extends Repository
                 'chatSetting',
                 'userDataSetting',
                 'agency',
-                'shippingAgency',
+                'shippingAgency:id,app_owner_id,name,img',
                 'specialId.ware',
                 'images',
                 'manager',
-                'medals' => fn($q) => $q->where('is_enable', true),
-                'Ovip.wareIcon',
+                'Ovip',
+                'UserVip' => fn($q) => $q->with('OVip:id,img'),
                 'UserVip.Ovip.wares',
                 'nowRoomOwner.packs' => fn($q) => $q->where('is_used', 1)->with('ware'),
+                'receiverLevel:id,img',
+                'senderLevel:id,img',
+                'chargeLevel:id,img,level',
+                'agency.owner',
             ])
             ->withCount(['profileVisits as profile_visitors'])
             ->findOrFail($id);
+        
 
             return $user;
     }
